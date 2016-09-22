@@ -46,7 +46,9 @@
 				left : 37,
 				right : 39,
 				up : 38,
-				down : 40
+				down : 40,
+				space : 32,
+				enter : 13
 			};
 
 			var prevTime = 0;
@@ -104,7 +106,10 @@
 					/* CONTINUE DIALOG */
 
 					if (isDialogReadyToContinue) {
-						if (e.keyCode == key.down) {
+						if (e.keyCode == key.down || e.keyCode == key.up ||
+							e.keyCode == key.left || e.keyCode == key.right ||
+							e.keyCode == key.space || e.keyCode == key.enter) 
+						{
 							continueDialog();
 						}
 					}
@@ -116,16 +121,16 @@
 
 					var spr = null;
 
-					if (e.keyCode == key.left && !isWallLeft() && !(spr = getSpriteLeft())) {
+					if (e.keyCode == key.left && !(spr = getSpriteLeft()) && !isWallLeft()) {
 						player().x -= 1;
 					}
-					else if (e.keyCode == key.right && !isWallRight() && !(spr = getSpriteRight())) {
+					else if (e.keyCode == key.right && !(spr = getSpriteRight()) && !isWallRight()) {
 						player().x += 1;
 					}
-					else if (e.keyCode == key.up && !isWallUp() && !(spr = getSpriteUp())) {
+					else if (e.keyCode == key.up && !(spr = getSpriteUp()) && !isWallUp()) {
 						player().y -= 1;
 					}
-					else if (e.keyCode == key.down && !isWallDown() && !(spr = getSpriteDown())) {
+					else if (e.keyCode == key.down && !(spr = getSpriteDown()) && !isWallDown()) {
 						player().y += 1;
 					}
 
