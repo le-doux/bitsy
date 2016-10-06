@@ -326,14 +326,13 @@ SPR Y
 
 
 DLG B
-*rustle* Oh shit a bear!       ...                             No, it's a squirrel. Still, better try somewhere else.
+*rustle* Oh shit a bear!       ...         ..        .         No, it's a squirrel. Still, better try somewhere else.
 
 DLG H
 It took us an hour to hang our pack up there.
 
 DLG D
 Beyond the lamplight all is darkness, and quiet.
-The electric lamp casts a feeble circle of light. Beyond is darkness and quiet.
 
 DLG P
 ...                             (Relief at last.)              ...                             (Please look away for a moment! It's rude to watch, even in videogames.)
