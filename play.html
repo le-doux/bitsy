@@ -28,17 +28,22 @@
 					- bitsy player v2
 						X exits
 						X multiple sets
-						- multiple palettes
-						- palettes anywhere in the text file
-						- recreate sprites on set load
+						X multiple palettes
+						X palettes anywhere in the text file
 						- shared drawings
-						- sprites inline w/ tilemap
-						- pick drawing color offset
+						- sprites inline w/ tilemap (plus whitespace)
+						X pick drawing color offset
+						X sprites can only be used once per game
+						X default palette
 						X any key to continue text
 						X WASD
 						? animate player movement
 						? flipbook animation
 						? player face left/right
+						? loading anim
+						? bouncing arrow
+						? sprite walking paths
+						? set variable command
 
 					- bitsy editor 
 						- v1
@@ -60,7 +65,17 @@
 			var tile = {};
 			var sprite = {};
 			var dialog = {};
-			var palette = {};
+			var palette = {
+				"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
+			};
+
+			//stores all image data for tiles, sprites, drawings
+			var imageStore = {
+				source: {},
+				render: {}
+			};
+
+			var spriteStartLocations = {};
 
 			var width = 128;
 			var height = 128;
@@ -116,7 +131,7 @@
 				deltaTime = curTime - prevTime;
 				
 				//clear screen
-				ctx.fillStyle = "rgb("+palette["0"][0][0]+","+palette["0"][0][1]+","+palette["0"][0][2]+")";
+				ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
 				ctx.fillRect(0,0,canvas.width,canvas.height);
 				
 				if (!isTitle)
@@ -195,10 +210,12 @@
 
 
 			function getSpriteAt(x,y) {
-				for (s in getSet().sprites) {
-					if (getSet().sprites[s].x == x && getSet().sprites[s].y == y) {
-						console.log(s);
-						return s;
+				for (s in sprite) {
+					if (sprite[s].set === curSet) {
+						if (sprite[s].x == x && sprite[s].y == y) {
+							console.log(s);
+							return s;
+						}
 					}
 				}
 				return null;
@@ -241,7 +258,7 @@
 			}
 
 			function player() {
-				return getSet().sprites["A"];
+				return sprite["A"];
 			}
 
 			function getSet() { //set sounds weird -- use scene instead?
@@ -249,19 +266,22 @@
 			}
 
 			function setChange(ext) {
-				//remove avatar from current set
-				var avatar = player();
-				delete getSet().sprites["A"];
 				//change set
 				curSet = ext.dest.set;
-				//add avatar to new set & place it correctly
-				getSet().sprites["A"] = avatar;
+				//move avatar
+				player().set = curSet;
 				player().x = ext.dest.x;
 				player().y = ext.dest.y;
 			}
 
+			function isSpriteOffstage(id) {
+				return sprite[id].set == null;
+			}
+
 			function load_game(game_data) {
 				parseWorld(game_data);
+				renderImages();
+				console.log(imageStore);
 				onready();
 			}
 
@@ -294,12 +314,27 @@
 					else if (getType(curLine) === "SPR") {
 						i = parseSprite(lines, i);
 					}
+					else if (getType(curLine) === "DRW") {
+						i = parseDrawing(lines, i);
+					}
 					else if (getType(curLine) === "DLG") {
 						i = parseDialog(lines, i);
 					}
 					else {
 						i++;
 					}
+				}
+				placeSprites();
+			}
+
+			function placeSprites() {
+				for (id in spriteStartLocations) {
+					console.log(id);
+					console.log( spriteStartLocations[id] );
+					console.log(sprite[id]);
+					sprite[id].set = spriteStartLocations[id].set;
+					sprite[id].x = spriteStartLocations[id].x;
+					sprite[id].y = spriteStartLocations[id].y;
 				}
 			}
 
@@ -320,28 +355,28 @@
 			function parseSet(lines, i) {
 				var id = getId(lines[i]);
 				set[id] = {
+					id : id,
 					tilemap : [],
-					sprites : {},
 					walls : [],
-					exits : []
+					exits : [],
+					pal : null
 				};
 				i++;
 				var end = i + mapsize;
 				for (; i<end; i++) {
 					set[id].tilemap.push(lines[i]);
 				}
-				while (lines[i].length > 0) { //look for empty line
+				while (i < lines.length && lines[i].length > 0) { //look for empty line
 					console.log(getType(lines[i]));
 					if (getType(lines[i]) === "SPR") {
-						/* PLACE SPRITES */
+						/* NOTE SPRITE START LOCATIONS */
 						var sprId = getId(lines[i]);
 						var sprCoord = lines[i].split(" ")[2].split(",");
-						var spr = {
-							id : sprId,
+						spriteStartLocations[sprId] = {
+							set : id,
 							x : parseInt(sprCoord[0]),
 							y : parseInt(sprCoord[1])
 						};
-						set[id].sprites[sprId] = spr;
 					}
 					else if (getType(lines[i]) === "WAL") {
 						/* DEFINE COLLISIONS (WALLS) */
@@ -365,6 +400,10 @@
 						};
 						set[id].exits.push(ext);
 					}
+					else if (getType(lines[i]) === "PAL") {
+						/* CHOOSE PALETTE (that's not default) */
+						set[id].pal = getId(lines[i]);
+					}
 					i++;
 				}
 				return i;
@@ -374,78 +413,175 @@
 				var id = getId(lines[i]);
 				i++;
 				var pal = [];
-				while (lines[i].length > 0) { //look for empty line
+				while (i < lines.length && lines[i].length > 0) { //look for empty line
 					var col = [];
 					lines[i].split(",").forEach(function(i) {
 						col.push(parseInt(i));
 					});
 					pal.push(col);
-					console.log(col);
 					i++;
 				}
 				palette[id] = pal;
-				console.log(pal);
 				return i;
 			}
 
 			function parseTile(lines, i) {
 				var id = getId(lines[i]);
-				i++;
-				var img = ctx.createImageData(tilesize*scale,tilesize*scale);
-				for (var y = 0; y < tilesize; y++) {
-					for (var x = 0; x < tilesize; x++) {
-						var ch = lines[i+y][x];
-						for (var sy = 0; sy < scale; sy++) {
-							for (var sx = 0; sx < scale; sx++) {
-								var pxl = (((y * scale) + sy) * tilesize * scale * 4) + (((x*scale) + sx) * 4);
-								if (ch === "1") {
-									img.data[pxl + 0] = palette["0"][1][0];
-									img.data[pxl + 1] = palette["0"][1][1];
-									img.data[pxl + 2] = palette["0"][1][2];
-									img.data[pxl + 3] = 255;
-								}
-								else { //ch === "0"
-									img.data[pxl + 0] = palette["0"][0][0];
-									img.data[pxl + 1] = palette["0"][0][1];
-									img.data[pxl + 2] = palette["0"][0][2];
-									img.data[pxl + 3] = 255;
-								}
-							}
-						}
-					}
+
+				//check for pre-existing drawing
+				var drwId = null;
+				/*
+				var drawStrSplit = lines[i].split(":");
+				console.log(drawStrSplit);
+				if (drawStrSplit.length > 1) {
+					drwId = drawStrSplit[1]; //this tile uses a pre-existing drawing
 				}
-				tile[id] = img;
-				return i + tilesize;
+				*/
+
+				i++;
+
+				if (drwId == null) {
+					//store tile source
+					drwId = "TIL_" + id;
+					imageStore.source[drwId] = [];
+					for (var y = 0; y < tilesize; y++) {
+						var l = lines[i+y];
+						imageStore.source[drwId].push(l);
+					}
+					i = i + tilesize;
+				}
+
+				console.log("DRW ID " + drwId);
+
+				//other properties
+				var colorIndex = 1; //default palette color index is 1
+				while (i < lines.length && lines[i].length > 0) { //look for empty line
+					if (getType(lines[i]) === "COL") {
+						colorIndex = parseInt( getId(lines[i]) );
+					}
+					i++;
+				}
+
+				//tile data
+				tile[id] = {
+					drw : drwId, //drawing id
+					col : colorIndex
+				};
+				console.log(tile[id]);
+				return i;
 			}
 
 			function parseSprite(lines, i) {
 				var id = getId(lines[i]);
+
+				//check for pre-existing drawing
+				var drwId = null;
+				/*
+				var drawStrSplit = lines[i].split(":");
+				if (drawStrSplit.length > 1) {
+					drwId = drawStrSplit[1]; //this sprite uses a pre-existing drawing
+				}
+				*/
+
 				i++;
+
+				if (drwId == null) {
+					//store sprite source
+					drwId = "SPR_" + id;
+					imageStore.source[drwId] = [];
+					for (var y = 0; y < tilesize; y++) {
+						var l = lines[i+y];
+						imageStore.source[drwId].push(l);
+					}
+					i = i + tilesize;
+				}
+
+				//other properties
+				var colorIndex = 2; //default palette color index is 2
+				while (i < lines.length && lines[i].length > 0) { //look for empty line
+					if (getType(lines[i]) === "COL") {
+						colorIndex = parseInt( getId(lines[i]) );
+					}
+					i++;
+				}
+
+				//sprite data
+				sprite[id] = {
+					drw : drwId, //drawing id
+					col : colorIndex,
+					set : null, //default location is "offstage"
+					x : -1,
+					y : -1
+				};
+				return i;
+			}
+
+			function parseDrawing(lines, i) {
+				var drwId = getId(lines[i]);
+				i++;
+				imageStore.source[drwId] = [];
+				for (var y = 0; y < tilesize; y++) {
+					var l = lines[i+y];
+					imageStore.source[drwId].push(l);
+				}
+				console.log(drwId);
+				return i + tilesize;
+			}
+
+			function renderImages() {
+				//init image store
+				for (pal in palette) {
+					imageStore.render[pal] = {
+						"1" : {}, //images with primary color index 1 (usually tiles)
+						"2" : {}  //images with primary color index 2 (usually sprites)
+					};
+				}
+
+				//render images required by sprites
+				for (s in sprite) {
+					var spr = sprite[s];
+					for (pal in palette) {
+						var col = spr.col;
+						var colStr = "" + col;
+						imageStore.render[pal][colStr][spr.drw] = imageDataFromImageSource( imageStore.source[spr.drw], pal, col );
+					}
+				}
+				//render images required by tiles (duplicate)
+				for (t in tile) {
+					var til = tile[t];
+					for (pal in palette) {
+						var col = til.col;
+						var colStr = "" + col;
+						imageStore.render[pal][colStr][til.drw] = imageDataFromImageSource( imageStore.source[til.drw], pal, col );
+					}
+				}
+			}
+
+			function imageDataFromImageSource(imageSource, pal, col) {
 				var img = ctx.createImageData(tilesize*scale,tilesize*scale);
 				for (var y = 0; y < tilesize; y++) {
 					for (var x = 0; x < tilesize; x++) {
-						var ch = lines[i+y][x];
+						var ch = imageSource[y][x];
 						for (var sy = 0; sy < scale; sy++) {
 							for (var sx = 0; sx < scale; sx++) {
 								var pxl = (((y * scale) + sy) * tilesize * scale * 4) + (((x*scale) + sx) * 4);
 								if (ch === "1") {
-									img.data[pxl + 0] = palette["0"][2][0]; //ugly
-									img.data[pxl + 1] = palette["0"][2][1];
-									img.data[pxl + 2] = palette["0"][2][2];
+									img.data[pxl + 0] = palette[pal][col][0]; //ugly
+									img.data[pxl + 1] = palette[pal][col][1];
+									img.data[pxl + 2] = palette[pal][col][2];
 									img.data[pxl + 3] = 255;
 								}
 								else { //ch === "0"
-									img.data[pxl + 0] = palette["0"][0][0];
-									img.data[pxl + 1] = palette["0"][0][1];
-									img.data[pxl + 2] = palette["0"][0][2];
+									img.data[pxl + 0] = palette[pal][0][0];
+									img.data[pxl + 1] = palette[pal][0][1];
+									img.data[pxl + 2] = palette[pal][0][2];
 									img.data[pxl + 3] = 255;
 								}
 							}
 						}
 					}
 				}
-				sprite[id] = img;
-				return i + tilesize;
+				return img;
 			}
 
 			function parseDialog(lines, i) {
@@ -471,13 +607,43 @@
 					for (j in set.tilemap[i]) {
 						var id = set.tilemap[i][j];
 						if (id != "0") {
-							drawTile(tile[id],j,i);
+							//console.log(id);
+							//console.log(tile[id]);
+							drawTile( getTileImage(tile[id]), j, i );
 						}
 					}
 				}
 				//draw sprites
-				for (id in set.sprites) {
-					drawSprite(sprite[id], set.sprites[id].x, set.sprites[id].y);
+				for (id in sprite) {
+					var spr = sprite[id];
+					if (spr.set === set.id) {
+						drawSprite( getSpriteImage(spr), spr.x, spr.y );
+					}
+				}
+			}
+
+			function getTileImage(t) {
+				return imageStore.render[curPal()][t.col][t.drw];
+			}
+
+			function getSpriteImage(s) {
+				return imageStore.render[curPal()][s.col][s.drw];
+			}
+
+			function curPal() {
+				if (set[curSet].pal != null) {
+					//a specific palette was chosen
+					return curSet().pal;
+				}
+				else {
+					if (curSet in palette) {
+						//there is a palette matching the name of the set
+						return curSet;
+					}
+					else {
+						//use the default palette
+						return "0";
+					}
 				}
 			}
 
