@@ -30,8 +30,9 @@
 						X multiple sets
 						X multiple palettes
 						X palettes anywhere in the text file
-						- shared drawings
-						- sprites inline w/ tilemap (plus whitespace)
+						X shared drawings
+						X sprites inline w/ tilemap (plus whitespace)
+						X sprite start pos in sprite
 						X pick drawing color offset
 						X sprites can only be used once per game
 						X default palette
@@ -371,12 +372,34 @@
 					if (getType(lines[i]) === "SPR") {
 						/* NOTE SPRITE START LOCATIONS */
 						var sprId = getId(lines[i]);
-						var sprCoord = lines[i].split(" ")[2].split(",");
-						spriteStartLocations[sprId] = {
-							set : id,
-							x : parseInt(sprCoord[0]),
-							y : parseInt(sprCoord[1])
-						};
+						if (sprId.indexOf(",") == -1) {
+							/* PLACE A SINGLE SPRITE */
+							var sprCoord = lines[i].split(" ")[2].split(",");
+							spriteStartLocations[sprId] = {
+								set : id,
+								x : parseInt(sprCoord[0]),
+								y : parseInt(sprCoord[1])
+							};
+						}
+						else {
+							/* PLACE MULTIPLE SPRITES*/ 
+							//Does find and replace in the tilemap (may be hacky, but convenient)
+							var sprList = sprId.split(",");
+							for (row in set[id].tilemap) {
+								for (s in sprList) {
+									var col = set[id].tilemap[row].indexOf( sprList[s] );
+									//if the sprite is in this row, replace it with the "null tile" and set its starting position
+									if (col != -1) {
+										set[id].tilemap[row] = set[id].tilemap[row].replace( sprList[s], "0" );
+										spriteStartLocations[ sprList[s] ] = {
+											set : id,
+											x : col,
+											y : row
+										};
+									}
+								}
+							}
+						}
 					}
 					else if (getType(lines[i]) === "WAL") {
 						/* DEFINE COLLISIONS (WALLS) */
@@ -427,20 +450,15 @@
 
 			function parseTile(lines, i) {
 				var id = getId(lines[i]);
-
-				//check for pre-existing drawing
 				var drwId = null;
-				/*
-				var drawStrSplit = lines[i].split(":");
-				console.log(drawStrSplit);
-				if (drawStrSplit.length > 1) {
-					drwId = drawStrSplit[1]; //this tile uses a pre-existing drawing
-				}
-				*/
 
 				i++;
 
-				if (drwId == null) {
+				if (getType(lines[i]) === "DRW") { //load existing drawing
+					drwId = getId(lines[i]);
+					i++;
+				}
+				else {
 					//store tile source
 					drwId = "TIL_" + id;
 					imageStore.source[drwId] = [];
@@ -450,8 +468,6 @@
 					}
 					i = i + tilesize;
 				}
-
-				console.log("DRW ID " + drwId);
 
 				//other properties
 				var colorIndex = 1; //default palette color index is 1
@@ -467,25 +483,20 @@
 					drw : drwId, //drawing id
 					col : colorIndex
 				};
-				console.log(tile[id]);
 				return i;
 			}
 
 			function parseSprite(lines, i) {
 				var id = getId(lines[i]);
-
-				//check for pre-existing drawing
 				var drwId = null;
-				/*
-				var drawStrSplit = lines[i].split(":");
-				if (drawStrSplit.length > 1) {
-					drwId = drawStrSplit[1]; //this sprite uses a pre-existing drawing
-				}
-				*/
 
 				i++;
 
-				if (drwId == null) {
+				if (getType(lines[i]) === "DRW") { //load existing drawing
+					drwId = getId(lines[i]);
+					i++;
+				}
+				else {
 					//store sprite source
 					drwId = "SPR_" + id;
 					imageStore.source[drwId] = [];
@@ -500,7 +511,19 @@
 				var colorIndex = 2; //default palette color index is 2
 				while (i < lines.length && lines[i].length > 0) { //look for empty line
 					if (getType(lines[i]) === "COL") {
+						/* COLOR OFFSET INDEX */
 						colorIndex = parseInt( getId(lines[i]) );
+					}
+					else if (getType(lines[i]) === "POS") {
+						/* STARTING POSITION */
+						var posArgs = lines[i].split(" ");
+						var setId = posArgs[1];
+						var coordArgs = posArgs[2].split(",");
+						spriteStartLocations[id] = {
+							set : setId,
+							x : parseInt(coordArgs[0]),
+							y : parseInt(coordArgs[1])
+						};
 					}
 					i++;
 				}
