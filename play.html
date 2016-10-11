@@ -26,11 +26,14 @@
 			/*
 				TODO
 					- bitsy player v2
+						- dialog effects
+							- color
+							- speed
+							- pauses
 						? animate player movement
 						? flipbook animation
 						? player face left/right
-						? loading anim
-						? bouncing arrow
+						?? bouncing arrow
 						? sprite walking paths
 						? set variable command
 						?? narrative blocks
@@ -99,6 +102,9 @@
 
 				ctx = canvas.getContext("2d");
 
+				loadingAnimation();
+				loading_interval = setInterval(loadingAnimation,loading_anim_speed);
+
 				//networking
 				var socketio = io.connect("ws://nameless-beach-83507.herokuapp.com/");
 				socketio.on('connect',function() {
@@ -115,6 +121,109 @@
 				var game = window.location.hash.substring(1);
 				console.log("game name --- " + game);
 				return game;
+			}
+
+			function load_game(game_data) {
+				parseWorld(game_data);
+				renderImages();
+				console.log(imageStore);
+				onready();
+			}
+
+			function onready() {
+				clearInterval(loading_interval);
+
+				document.addEventListener('keydown', onkeydown);
+				setInterval(update,-1);
+
+				isTitle = true;
+				startDialog(title);
+			}
+
+			/* loading animation */
+			var loading_anim_data = [
+				[
+					0,1,1,1,1,1,1,0,
+					0,0,1,1,1,1,0,0,
+					0,0,1,1,1,1,0,0,
+					0,0,0,1,1,0,0,0,
+					0,0,0,1,1,0,0,0,
+					0,0,1,0,0,1,0,0,
+					0,0,1,0,0,1,0,0,
+					0,1,1,1,1,1,1,0,
+				],
+				[
+					0,1,1,1,1,1,1,0,
+					0,0,1,0,0,1,0,0,
+					0,0,1,1,1,1,0,0,
+					0,0,0,1,1,0,0,0,
+					0,0,0,1,1,0,0,0,
+					0,0,1,0,0,1,0,0,
+					0,0,1,1,1,1,0,0,
+					0,1,1,1,1,1,1,0,
+				],
+				[
+					0,1,1,1,1,1,1,0,
+					0,0,1,0,0,1,0,0,
+					0,0,1,0,0,1,0,0,
+					0,0,0,1,1,0,0,0,
+					0,0,0,1,1,0,0,0,
+					0,0,1,1,1,1,0,0,
+					0,0,1,1,1,1,0,0,
+					0,1,1,1,1,1,1,0,
+				],
+				[
+					0,1,1,1,1,1,1,0,
+					0,0,1,0,0,1,0,0,
+					0,0,1,0,0,1,0,0,
+					0,0,0,1,1,0,0,0,
+					0,0,0,1,1,0,0,0,
+					0,0,1,1,1,1,0,0,
+					0,0,1,1,1,1,0,0,
+					0,1,1,1,1,1,1,0,
+				],
+				[
+					0,0,0,0,0,0,0,0,
+					1,0,0,0,0,0,0,1,
+					1,1,1,0,0,1,1,1,
+					1,1,1,1,1,0,0,1,
+					1,1,1,1,1,0,0,1,
+					1,1,1,0,0,1,1,1,
+					1,0,0,0,0,0,0,1,
+					0,0,0,0,0,0,0,0,
+				]
+			];
+			var loading_anim_frame = 0;
+			var loading_anim_speed = 500;
+			var loading_interval = null;
+
+			function loadingAnimation() {
+				//create image
+				var loadingAnimImg = ctx.createImageData(8*scale, 8*scale);
+				//draw image
+				for (var y = 0; y < 8; y++) {
+					for (var x = 0; x < 8; x++) {
+						var i = (y * 8) + x;
+						if (loading_anim_data[loading_anim_frame][i] == 1) {
+							//scaling nonsense
+							for (var sy = 0; sy < scale; sy++) {
+								for (var sx = 0; sx < scale; sx++) {
+									var pxl = 4 * ( (((y*scale)+sy) * (8*scale)) + ((x*scale)+sx) );
+									loadingAnimImg.data[pxl+0] = 255;
+									loadingAnimImg.data[pxl+1] = 255;
+									loadingAnimImg.data[pxl+2] = 255;
+									loadingAnimImg.data[pxl+3] = 255;
+								}
+							}
+						}
+					}
+				}
+				//put image on canvas
+				ctx.putImageData(loadingAnimImg,scale*(width/2 - 4),scale*(height/2 - 4));
+				//update frame
+				loading_anim_frame++;
+				if (loading_anim_frame >= 5) loading_anim_frame = 0;
+				console.log(loading_anim_frame);
 			}
 
 			function update() {
@@ -267,21 +376,6 @@
 
 			function isSpriteOffstage(id) {
 				return sprite[id].set == null;
-			}
-
-			function load_game(game_data) {
-				parseWorld(game_data);
-				renderImages();
-				console.log(imageStore);
-				onready();
-			}
-
-			function onready() {
-				document.addEventListener('keydown', onkeydown);
-				setInterval(update,-1);
-
-				isTitle = true;
-				startDialog(title);
 			}
 
 			function parseWorld(file) {
