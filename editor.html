@@ -149,7 +149,6 @@
 				paintMode = TileType.Tile;
 				newTile();
 				on_paint_tile();
-				console.log(drawingId);
 				drawing_data = [
 					[1,1,1,1,1,1,1,1],
 					[1,0,0,0,0,0,0,1],
@@ -223,6 +222,8 @@
 				refreshGameData();
 
 				tileIndex = Object.keys(tile).length - 1;
+
+				reloadTile(); //hack for ui consistency
 			}
 
 			function nextTile() {
@@ -260,6 +261,8 @@
 				refreshGameData();
 
 				spriteIndex = Object.keys(sprite).length - 1;
+
+				reloadSprite(); //hack
 			}
 
 			function nextSprite() {
@@ -313,6 +316,15 @@
 					}
 				}
 				drawPaintCanvas();
+
+				if (set[curSet]) {	
+					if (set[curSet].walls.indexOf(drawingId) != -1) {
+						document.getElementById("wallCheckbox").checked = true;
+					}
+					else {
+						document.getElementById("wallCheckbox").checked = false;
+					}
+				}
 			}
 
 			function reloadSprite() {
@@ -324,6 +336,13 @@
 					}
 				}
 				drawPaintCanvas();
+
+				if (drawingId in dialog) {
+					document.getElementById("dialogText").value = dialog[drawingId];
+				}
+				else {
+					document.getElementById("dialogText").value = "";
+				}
 			}
 
 			function sortedTileIdList() {
@@ -435,7 +454,6 @@
 				drawSet(set[curSet]);
 
 				//draw grid
-				console.log(curSet);
 				if (drawMapGrid) {
 					ctx.fillStyle = "#fff";
 					for (var x = 1; x < mapsize; x++) {
@@ -579,6 +597,7 @@
 				drawingId = "A";
 				reloadSprite();
 				document.getElementById("dialog").setAttribute("style","display:none;");
+				document.getElementById("wall").setAttribute("style","display:none;");
 			}
 			function on_paint_tile() {
 				paintMode = TileType.Tile;
@@ -586,6 +605,7 @@
 				drawingId = sortedTileIdList()[tileIndex];
 				reloadTile();
 				document.getElementById("dialog").setAttribute("style","display:none;");
+				document.getElementById("wall").setAttribute("style","display:block;");
 			}
 			function on_paint_sprite() {
 				paintMode = TileType.Sprite;
@@ -593,13 +613,31 @@
 				drawingId = sortedSpriteIdList()[spriteIndex];
 				reloadSprite();
 				document.getElementById("dialog").setAttribute("style","display:block;");
-				if (drawingId in dialog) {
-					document.getElementById("dialogText").value = dialog[drawingId];
-				}
+				document.getElementById("wall").setAttribute("style","display:none;");
 			}
 
 			function on_change_dialog() {
 				dialog[drawingId] = document.getElementById("dialogText").value;
+				refreshGameData();
+			}
+
+			function on_game_data_change() {
+				//todo - doesn't work perfectly, probably need to clear out the whole game world
+				parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
+				drawPaintCanvas();
+				drawEditMap();
+			}
+
+			function on_toggle_wall() {
+				if ( document.getElementById("wallCheckbox").checked ){
+					//add to wall list
+					set[curSet].walls.push( drawingId );
+				}
+				else if ( set[curSet].walls.indexOf(drawingId) != -1 ){
+					//remove from wall list
+					set[curSet].walls.splice( set[curSet].walls.indexOf(drawingId), 1 );
+				}
+				console.log(set[curSet]);
 				refreshGameData();
 			}
 		</script>
@@ -617,7 +655,7 @@
 			</form>
 			<canvas id="game"></canvas>
 			<br>
-			<button onclick="toggleMapGrid();"> grid? </button>
+			<button onclick="toggleMapGrid();"> show/hide tile grid </button>
 		</div>
 		<div class="panel">
 			~ paint ~ <br>
@@ -632,9 +670,10 @@
 			<br>
 			<canvas id="paint"></canvas>
 			<br>
+			<div id="wall" style="display:none;">is this tile a wall? <input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall();"> </div>
 			<div id="dialog" style="display:none;">dialog: <input type="text" id="dialogText" onchange="on_change_dialog();"></div>
 			<!-- TODO isWall checkbox -->
-			<button onclick="toggleGrid();"> grid? </button>
+			<button onclick="toggleGrid();"> show/hide pixel grid </button>
 		</div>
 		<div class="panel">
 			~ colors ~ <br>
@@ -649,6 +688,6 @@
 		</div>
 		<div class="panel">
 			~ game data ~ <br>
-			<textarea id="game_data" style="width:300px;height:300px;"></textarea>
+			<textarea id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
 	</body>
 </html>

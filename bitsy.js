@@ -397,6 +397,16 @@ function serializeWorld() {
 		for (i in set[id].tilemap) {
 			worldStr += set[id].tilemap[i] + "\n";
 		}
+		if (set[id].walls.length > 0) {
+			worldStr += "WAL ";
+			for (j in set[id].walls) {
+				worldStr += set[id].walls[j];
+				if (j < set[id].walls.length-1) {
+					worldStr += ",";
+				}
+			}
+			worldStr += "\n";
+		}
 		worldStr += "\n";
 	}
 	/* TILE */
@@ -729,8 +739,6 @@ function drawSet(set) {
 		for (j in set.tilemap[i]) {
 			var id = set.tilemap[i][j];
 			if (id != "0") {
-				console.log(id);
-				console.log(tile[id]);
 				drawTile( getTileImage(tile[id]), j, i );
 			}
 		}
