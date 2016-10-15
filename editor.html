@@ -4,12 +4,11 @@
 		<title>bitsy editor</title>
 
 		<style>
-			/*
 			body {
-				color:#fff;
-				background: rgb(0,82,204)
+				/*color:#fff*/
+				background: #ffb3d9; /*#ccccff*/
+				line-height: 150%;
 			}
-			*/
 			canvas {
 				background: black;
 			}
@@ -18,9 +17,10 @@
 			}
 			.panel {
 				float:left;
-				background: gray;
+				background: white;
 				/*height: 600px;*/
 				margin:10px;
+				padding: 10px;
 			}
 			#game {
 				/*
@@ -38,7 +38,7 @@
 
 		<script src="bitsy.js"></script>
 		<script>
-			/* PAINT */
+			/* MOES */
 			var TileType = {
 				Tile : 0,
 				Sprite : 1,
@@ -51,12 +51,13 @@
 
 			var editMode = EditMode.Edit;
 
+			/* PAINT */
 			var paint_canvas;
 			var paint_ctx;
 			var paint_scale = 32;
 
-			var paintMode = TileType.Tile;
-			var drawingId = null;
+			var paintMode = TileType.Avatar;
+			var drawingId = "A";
 			var drawingPal = "0";
 			var drawing_data = [
 				[0,0,0,0,0,0,0,0],
@@ -75,7 +76,30 @@
 			var nextTileCharCode = 97;
 			var tileIndex = 0;
 
+			/* MAP */
+			var drawMapGrid = true;
+
 			function start() {
+				//game canvas & context (also the map editor)
+				canvas = document.getElementById("game");
+				canvas.width = width * scale;
+				canvas.height = width * scale;
+				ctx = canvas.getContext("2d");
+				//map edit events
+				listenMapEditEvents();
+
+				//paint canvas & context
+				paint_canvas = document.getElementById("paint");
+				paint_canvas.width = tilesize * paint_scale;
+				paint_canvas.height = tilesize * paint_scale;
+				paint_ctx = paint_canvas.getContext("2d");
+				//paint events
+				paint_canvas.addEventListener("mousedown", paint_onMouseDown);
+				paint_canvas.addEventListener("mousemove", paint_onMouseMove);
+				paint_canvas.addEventListener("mouseup", paint_onMouseUp);
+				paint_canvas.addEventListener("mouseleave", paint_onMouseUp);
+
+
 				//default values
 				title = "Write title here";
 				palette[drawingPal] = [
@@ -83,28 +107,79 @@
 					[128,159,255],
 					[255,255,255]
 				];
+				//default avatar
+				paintMode = TileType.Avatar;
+				on_paint_avatar();
+				drawing_data = [
+					[0,0,0,1,1,0,0,0],
+					[0,0,0,1,1,0,0,0],
+					[0,0,0,1,1,0,0,0],
+					[0,0,1,1,1,1,0,0],
+					[0,1,1,1,1,1,1,0],
+					[1,0,1,1,1,1,0,1],
+					[0,0,1,0,0,1,0,0],
+					[0,0,1,0,0,1,0,0]
+				];
+				saveDrawingData();
+				sprite["A"].set = "0";
+				sprite["A"].x = 4;
+				sprite["A"].y = 4;
+				//defualt sprite todo
+				paintMode = TileType.Tile;
+				newTile();
+				on_paint_tile();
+				console.log(drawingId);
+				drawing_data = [
+					[1,1,1,1,1,1,1,1],
+					[1,0,0,0,0,0,0,1],
+					[1,0,0,0,0,0,0,1],
+					[1,0,0,1,1,0,0,1],
+					[1,0,0,1,1,0,0,1],
+					[1,0,0,0,0,0,0,1],
+					[1,0,0,0,0,0,0,1],
+					[1,1,1,1,1,1,1,1]
+				];
+				saveDrawingData();
+				//default tile
+				renderImages();
+				//default set
+				set["0"] = {
+					id : "0",
+					tilemap : [
+							"0000000000000000",
+							"0aaaaaaaaaaaaaa0",
+							"0a000000000000a0",
+							"0a000000000000a0",
+							"0a000000000000a0",
+							"0a000000000000a0",
+							"0a000000000000a0",
+							"0a000000000000a0",
+							"0a000000000000a0",
+							"0a000000000000a0",
+							"0a000000000000a0",
+							"0a000000000000a0",
+							"0a000000000000a0",
+							"0a000000000000a0",
+							"0aaaaaaaaaaaaaa0",
+							"0000000000000000"
+						],
+					walls : [],
+					exits : [],
+					pal : null
+				};
 				refreshGameData();
 
-				//game canvas & context (also the map editor)
-				canvas = document.getElementById("game");
-				canvas.width = width * scale;
-				canvas.height = width * scale;
-				ctx = canvas.getContext("2d");
-				//paint canvas & context
-				paint_canvas = document.getElementById("paint");
-				paint_canvas.width = tilesize * paint_scale;
-				paint_canvas.height = tilesize * paint_scale;
-				paint_ctx = paint_canvas.getContext("2d");
-				//setInterval(paint_update,-1);
+				//draw everything
 				drawPaintCanvas();
-				//paint events
-				paint_canvas.addEventListener("mousedown", paint_onMouseDown);
-				paint_canvas.addEventListener("mousemove", paint_onMouseMove);
-				paint_canvas.addEventListener("mouseup", paint_onMouseUp);
-				paint_canvas.addEventListener("mouseleave", paint_onMouseUp);
+				drawEditMap();
+			}
 
-				//start with starting tile
-				newTile();
+			function listenMapEditEvents() {
+				canvas.addEventListener("mousedown", map_onMouseDown);
+			}
+
+			function unlistenMapEditEvents() {
+				canvas.removeEventListener("mousedown", map_onMouseDown);
 			}
 
 			function newTile() {
@@ -155,12 +230,51 @@
 				drawPaintCanvas();
 			}
 
+			function reloadSprite() {
+				var drw = "SPR_" + drawingId;
+				for (y in imageStore.source[drw]) {
+					for (var x = 0; x < 8; x++) {
+						var pixel = parseInt( imageStore.source[drw][y].charAt(x) );
+						drawing_data[y][x] = pixel;
+					}
+				}
+				drawPaintCanvas();
+			}
+
 			function sortedTileIdList() {
 				return Object.keys( tile ).sort();
 			}
 
 			function sortedSpriteIdList() {
 				return Object.keys( sprite ).sort();
+			}
+
+			function map_onMouseDown(e) {
+				var x = Math.floor(e.layerX / (tilesize*scale));
+				var y = Math.floor(e.layerY / (tilesize*scale));
+				console.log(x + " " + y);
+				var row = set[curSet].tilemap[y];
+				if (drawingId != null) {
+					if (paintMode == TileType.Tile) {
+						if ( row.charAt(x) === "0" ) {
+							//add
+							row = row.substr(0, x) + drawingId + row.substr(x+1);
+						}
+						else {
+							//delete (better way to do this?)
+							row = row.substr(0, x) + "0" + row.substr(x+1);
+						}
+						set[curSet].tilemap[y] = row;
+					}
+					else {
+						sprite[drawingId].set = curSet;
+						sprite[drawingId].x = x;
+						sprite[drawingId].y = y;
+						row = row.substr(0, x) + "0" + row.substr(x+1);
+					}
+					refreshGameData();
+					drawEditMap();
+				}
 			}
 
 			function paint_onMouseDown(e) {
@@ -190,6 +304,7 @@
 				isPainting = false;
 				saveDrawingData();
 				refreshGameData();
+				drawEditMap();
 			}
 
 			function drawPaintCanvas() {
@@ -217,11 +332,32 @@
 				//draw grid
 				if (drawPaintGrid) {
 					paint_ctx.fillStyle = "#fff";
-					for (var x = 1; x < 8; x++) {
-						paint_ctx.fillRect(x*paint_scale,0*paint_scale,1,8*paint_scale);
+					for (var x = 1; x < tilesize; x++) {
+						paint_ctx.fillRect(x*paint_scale,0*paint_scale,1,tilesize*paint_scale);
 					}
-					for (var y = 1; y < 8; y++) {
-						paint_ctx.fillRect(0*paint_scale,y*paint_scale,8*paint_scale,1);
+					for (var y = 1; y < tilesize; y++) {
+						paint_ctx.fillRect(0*paint_scale,y*paint_scale,tilesize*paint_scale,1);
+					}
+				}
+			}
+
+			function drawEditMap() {	
+				//clear screen
+				ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
+				ctx.fillRect(0,0,canvas.width,canvas.height);
+
+				//draw map
+				drawSet(set[curSet]);
+
+				//draw grid
+				console.log(curSet);
+				if (drawMapGrid) {
+					ctx.fillStyle = "#fff";
+					for (var x = 1; x < mapsize; x++) {
+						ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
+					}
+					for (var y = 1; y < mapsize; y++) {
+						ctx.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
 					}
 				}
 			}
@@ -245,6 +381,30 @@
 						}
 						imageStore.source[drw].push(ln);
 					} 
+					renderImages(); //rerender all images (inefficient)
+				}
+				else { //paintMode is Sprite or Avatar
+					//new sprite
+					var drw = "SPR_" + drawingId;
+					if (!(drawingId in sprite)) {
+						sprite[drawingId] = { //todo create default sprite creation method
+							drw : drw,
+							col : 2,
+							set : null,
+							x : -1,
+							y : -1
+						};
+					}
+					//save sprite drawing
+					imageStore.source[drw] = [];
+					for (var y = 0; y < 8; y++) {
+						var ln = "";
+						for (var x = 0; x < 8; x++) {
+							ln += drawing_data[y][x];
+						}
+						imageStore.source[drw].push(ln);
+					} 
+					renderImages();
 				}
 			}
 
@@ -255,15 +415,24 @@
 
 			function on_edit_mode() {
 				stopGame();
+				parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
+				drawEditMap();
+				listenMapEditEvents();
 			}
 
 			function on_play_mode() {
+				unlistenMapEditEvents();
 				load_game(document.getElementById("game_data").value);
 			}
 
 			function toggleGrid() {
 				drawPaintGrid = !drawPaintGrid;
 				drawPaintCanvas();
+			}
+
+			function toggleMapGrid() {
+				drawMapGrid = !drawMapGrid;
+				drawEditMap();
 			}
 
 			function on_change_title() {
@@ -277,7 +446,9 @@
 				palette[drawingPal][0][1] = rgb.g;
 				palette[drawingPal][0][2] = rgb.b;
 				refreshGameData();
+				renderImages();
 				drawPaintCanvas();
+				drawEditMap();
 			}
 
 			function on_change_color_tile() {
@@ -286,7 +457,9 @@
 				palette[drawingPal][1][1] = rgb.g;
 				palette[drawingPal][1][2] = rgb.b;
 				refreshGameData();
+				renderImages();
 				drawPaintCanvas();
+				drawEditMap();
 			}
 
 			function on_change_color_sprite() {
@@ -295,7 +468,9 @@
 				palette[drawingPal][2][1] = rgb.g;
 				palette[drawingPal][2][2] = rgb.b;
 				refreshGameData();
+				renderImages();
 				drawPaintCanvas();
+				drawEditMap();
 			}
 
 			//hex-to-rgb method borrowed from stack overflow
@@ -313,6 +488,22 @@
 					b: parseInt(result[3], 16)
 				} : null;
 			}
+
+			function on_paint_avatar() {
+				paintMode = TileType.Avatar;
+				drawingId = "A";
+				reloadSprite();
+			}
+			function on_paint_tile() {
+				paintMode = TileType.Tile;
+				tileIndex = 0;
+				console.log(sortedTileIdList());
+				drawingId = sortedTileIdList()[tileIndex];
+				reloadTile();
+			}
+			function on_paint_sprite() {
+				//todo
+			}
 		</script>
 	</head>
 
@@ -327,15 +518,16 @@
 				<input type="radio" name="edit mode" value="play" onclick="on_play_mode()"> play
 			</form>
 			<canvas id="game"></canvas>
+			<br>
+			<button onclick="toggleMapGrid();"> grid? </button>
 		</div>
 		<div class="panel">
 			~ paint ~ <br>
-			<!--
 			<form>
-				<input type="radio" name="paint mode" value="tile" checked> tile
-				<input type="radio" name="paint mode" value="sprite"> sprite
+				<input type="radio" name="paint mode" value="sprite" onclick="on_paint_avatar();" checked> avatar
+				<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();"> tile
+				<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();"> sprite
 			</form>
-			-->
 			<button onclick="prevTile();"> < prev </button>
 			<button onclick="nextTile();"> next > </button>
 			<button onclick="newTile();"> + new </button>
