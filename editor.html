@@ -6,7 +6,7 @@
 		<style>
 			body {
 				/*color:#fff*/
-				background: #ffb3d9; /*#ccccff*/
+				background: #ccccff; /*#ffb3d98*/ /*#ccccff*/
 				line-height: 150%;
 			}
 			canvas {
@@ -75,6 +75,8 @@
 
 			var nextTileCharCode = 97;
 			var tileIndex = 0;
+			var nextSpriteCharCode = 97;
+			var spriteIndex = 0;
 
 			/* MAP */
 			var drawMapGrid = true;
@@ -124,7 +126,25 @@
 				sprite["A"].set = "0";
 				sprite["A"].x = 4;
 				sprite["A"].y = 4;
-				//defualt sprite todo
+				//defualt sprite
+				paintMode = TileType.Sprite;
+				newSprite();
+				on_paint_sprite();
+				drawing_data = [
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,1,0,1,0,0,0,1],
+					[0,1,1,1,0,0,0,1],
+					[0,1,1,1,0,0,1,0],
+					[0,1,1,1,1,1,0,0],
+					[0,0,1,1,1,1,0,0],
+					[0,0,1,0,0,1,0,0]
+				];
+				saveDrawingData();
+				sprite["a"].set = "0";
+				sprite["a"].x = 8;
+				sprite["a"].y = 12;
+				//default tile
 				paintMode = TileType.Tile;
 				newTile();
 				on_paint_tile();
@@ -140,7 +160,6 @@
 					[1,1,1,1,1,1,1,1]
 				];
 				saveDrawingData();
-				//default tile
 				renderImages();
 				//default set
 				set["0"] = {
@@ -170,6 +189,7 @@
 				refreshGameData();
 
 				//draw everything
+				on_paint_avatar();
 				drawPaintCanvas();
 				drawEditMap();
 			}
@@ -217,6 +237,70 @@
 				if (tileIndex < 0) tileIndex = (ids.length-1);
 				drawingId = ids[tileIndex];
 				reloadTile();
+			}
+
+			function newSprite() {
+				drawingId = String.fromCharCode( nextSpriteCharCode );
+				nextSpriteCharCode++;
+
+				drawing_data = [
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0]
+				];
+
+				drawPaintCanvas();
+				saveDrawingData();
+				refreshGameData();
+
+				spriteIndex = Object.keys(sprite).length - 1;
+			}
+
+			function nextSprite() {
+				var ids = sortedSpriteIdList();
+				spriteIndex = (spriteIndex + 1) % ids.length;
+				drawingId = ids[spriteIndex];
+				reloadSprite();
+			}
+
+			function prevSprite() {
+				var ids = sortedSpriteIdList();
+				spriteIndex = (spriteIndex - 1) % ids.length;
+				if (spriteIndex < 0) spriteIndex = (ids.length-1);
+				drawingId = ids[spriteIndex];
+				reloadSprite();
+			}
+
+			function next() {
+				if (paintMode == TileType.Tile) {
+					nextTile();
+				}
+				else {
+					nextSprite();
+				}
+			}
+
+			function prev() {
+				if (paintMode == TileType.Tile) {
+					prevTile();
+				}
+				else {
+					prevSprite();
+				}
+			}
+
+			function newDrawing() {
+				if (paintMode == TileType.Tile) {
+					newTile();
+				}
+				else {
+					newSprite();
+				}
 			}
 
 			function reloadTile() {
@@ -497,12 +581,14 @@
 			function on_paint_tile() {
 				paintMode = TileType.Tile;
 				tileIndex = 0;
-				console.log(sortedTileIdList());
 				drawingId = sortedTileIdList()[tileIndex];
 				reloadTile();
 			}
 			function on_paint_sprite() {
-				//todo
+				paintMode = TileType.Sprite;
+				spriteIndex = 1;
+				drawingId = sortedSpriteIdList()[spriteIndex];
+				reloadSprite();
 			}
 		</script>
 	</head>
@@ -528,9 +614,9 @@
 				<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();"> tile
 				<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();"> sprite
 			</form>
-			<button onclick="prevTile();"> < prev </button>
-			<button onclick="nextTile();"> next > </button>
-			<button onclick="newTile();"> + new </button>
+			<button onclick="prev();"> < prev </button>
+			<button onclick="next();"> next > </button>
+			<button onclick="newDrawing();"> + new </button>
 			<br>
 			<canvas id="paint"></canvas>
 			<br>
@@ -548,7 +634,7 @@
 			<input type="color" value="#ffffff" id="spriteColor" onchange="on_change_color_sprite();"> sprite <br>
 		</div>
 		<div class="panel">
-			~ title and export ~ <br>
+			~ title and save ~ <br>
 			title: <input type="text" id="titleText" onchange="on_change_title();" value="Write title here"> <br>
 			<!-- <button>export game</button> -->
 		</div>
