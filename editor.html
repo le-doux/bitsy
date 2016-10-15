@@ -56,7 +56,7 @@
 			var paint_scale = 32;
 
 			var paintMode = TileType.Tile;
-			var drawingId = "a";
+			var drawingId = null;
 			var drawingPal = "0";
 			var drawing_data = [
 				[0,0,0,0,0,0,0,0],
@@ -72,7 +72,19 @@
 			var curPaintBrush = 0;
 			var isPainting = false;
 
+			var nextTileCharCode = 97;
+			var tileIndex = 0;
+
 			function start() {
+				//default values
+				title = "Write title here";
+				palette[drawingPal] = [
+					[0,82,204],
+					[128,159,255],
+					[255,255,255]
+				];
+				refreshGameData();
+
 				//game canvas & context (also the map editor)
 				canvas = document.getElementById("game");
 				canvas.width = width * scale;
@@ -89,6 +101,66 @@
 				paint_canvas.addEventListener("mousedown", paint_onMouseDown);
 				paint_canvas.addEventListener("mousemove", paint_onMouseMove);
 				paint_canvas.addEventListener("mouseup", paint_onMouseUp);
+				paint_canvas.addEventListener("mouseleave", paint_onMouseUp);
+
+				//start with starting tile
+				newTile();
+			}
+
+			function newTile() {
+				drawingId = String.fromCharCode( nextTileCharCode );
+				nextTileCharCode++;
+
+				drawing_data = [
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0],
+					[0,0,0,0,0,0,0,0]
+				];
+
+				drawPaintCanvas();
+				saveDrawingData();
+				refreshGameData();
+
+				tileIndex = Object.keys(tile).length - 1;
+			}
+
+			function nextTile() {
+				var ids = sortedTileIdList();
+				tileIndex = (tileIndex + 1) % ids.length;
+				drawingId = ids[tileIndex];
+				reloadTile();
+			}
+
+			function prevTile() {
+				var ids = sortedTileIdList();
+				tileIndex = (tileIndex - 1) % ids.length;
+				if (tileIndex < 0) tileIndex = (ids.length-1);
+				drawingId = ids[tileIndex];
+				reloadTile();
+			}
+
+			function reloadTile() {
+				var drw = "TIL_" + drawingId;
+				for (y in imageStore.source[drw]) {
+					for (var x = 0; x < 8; x++) {
+						var pixel = parseInt( imageStore.source[drw][y].charAt(x) );
+						drawing_data[y][x] = pixel;
+					}
+				}
+				drawPaintCanvas();
+			}
+
+			function sortedTileIdList() {
+				return Object.keys( tile ).sort();
+			}
+
+			function sortedSpriteIdList() {
+				return Object.keys( sprite ).sort();
 			}
 
 			function paint_onMouseDown(e) {
@@ -116,6 +188,8 @@
 
 			function paint_onMouseUp(e) {
 				isPainting = false;
+				saveDrawingData();
+				refreshGameData();
 			}
 
 			function drawPaintCanvas() {
@@ -152,6 +226,33 @@
 				}
 			}
 
+			function saveDrawingData() {
+				if (paintMode == TileType.Tile) {
+					//create tile if it doesn't exist
+					var drw = "TIL_" + drawingId;
+					if (!(drawingId in tile)) {
+						tile[drawingId] = {
+							drw : drw,
+							col : 1
+						};
+					}
+					//save tile drawing
+					imageStore.source[drw] = [];
+					for (var y = 0; y < 8; y++) {
+						var ln = "";
+						for (var x = 0; x < 8; x++) {
+							ln += drawing_data[y][x];
+						}
+						imageStore.source[drw].push(ln);
+					} 
+				}
+			}
+
+			function refreshGameData() {
+				var gameData = serializeWorld();
+				document.getElementById("game_data").value = gameData;
+			}
+
 			function on_edit_mode() {
 				stopGame();
 			}
@@ -163,6 +264,54 @@
 			function toggleGrid() {
 				drawPaintGrid = !drawPaintGrid;
 				drawPaintCanvas();
+			}
+
+			function on_change_title() {
+				title = document.getElementById("titleText").value;
+				refreshGameData();
+			}
+
+			function on_change_color_bg() {
+				var rgb = hexToRgb( document.getElementById("backgroundColor").value );
+				palette[drawingPal][0][0] = rgb.r;
+				palette[drawingPal][0][1] = rgb.g;
+				palette[drawingPal][0][2] = rgb.b;
+				refreshGameData();
+				drawPaintCanvas();
+			}
+
+			function on_change_color_tile() {
+				var rgb = hexToRgb( document.getElementById("tileColor").value );
+				palette[drawingPal][1][0] = rgb.r;
+				palette[drawingPal][1][1] = rgb.g;
+				palette[drawingPal][1][2] = rgb.b;
+				refreshGameData();
+				drawPaintCanvas();
+			}
+
+			function on_change_color_sprite() {
+				var rgb = hexToRgb( document.getElementById("spriteColor").value );
+				palette[drawingPal][2][0] = rgb.r;
+				palette[drawingPal][2][1] = rgb.g;
+				palette[drawingPal][2][2] = rgb.b;
+				refreshGameData();
+				drawPaintCanvas();
+			}
+
+			//hex-to-rgb method borrowed from stack overflow
+			function hexToRgb(hex) {
+				// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+				var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+				hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+					return r + r + g + g + b + b;
+				});
+
+				var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+				return result ? {
+					r: parseInt(result[1], 16),
+					g: parseInt(result[2], 16),
+					b: parseInt(result[3], 16)
+				} : null;
 			}
 		</script>
 	</head>
@@ -180,32 +329,36 @@
 			<canvas id="game"></canvas>
 		</div>
 		<div class="panel">
-			~ paint ~
+			~ paint ~ <br>
+			<!--
 			<form>
 				<input type="radio" name="paint mode" value="tile" checked> tile
 				<input type="radio" name="paint mode" value="sprite"> sprite
 			</form>
-			<button> < prev </button>
-			<button> next > </button>
-			<button> + new </button>
+			-->
+			<button onclick="prevTile();"> < prev </button>
+			<button onclick="nextTile();"> next > </button>
+			<button onclick="newTile();"> + new </button>
 			<br>
 			<canvas id="paint"></canvas>
 			<br>
+			<!--
 			dialog: <input type="text">
 			<br>
+			-->
 			<!-- TODO isWall checkbox -->
 			<button onclick="toggleGrid();"> grid? </button>
 		</div>
 		<div class="panel">
 			~ colors ~ <br>
-			background: <input type="color" value="#0052cc"> <br>
-			tile: <input type="color" value="#809fff"> <br>
-			sprite: <input type="color" value="#ffffff"> <br>
+			<input type="color" value="#0052cc" id="backgroundColor" onchange="on_change_color_bg();"> background <br>
+			<input type="color" value="#809fff" id="tileColor" onchange="on_change_color_tile();"> tile <br>
+			<input type="color" value="#ffffff" id="spriteColor" onchange="on_change_color_sprite();"> sprite <br>
 		</div>
 		<div class="panel">
 			~ title and export ~ <br>
-			title: <input type="text"> <br>
-			<button>export game</button>
+			title: <input type="text" id="titleText" onchange="on_change_title();" value="Write title here"> <br>
+			<!-- <button>export game</button> -->
 		</div>
 		<div class="panel">
 			~ game data ~ <br>

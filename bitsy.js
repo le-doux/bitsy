@@ -373,6 +373,38 @@ function parseWorld(file) {
 	placeSprites();
 }
 
+//TODO this is in progress and doesn't support all features
+function serializeWorld() {
+	var worldStr = "";
+	/* TITLE */
+	worldStr += title + "\n";
+	worldStr += "\n";
+	/* PAL */
+	for (id in palette) {
+		worldStr += "PAL " + id + "\n";
+		for (i in palette[id]) {
+			for (j in palette[id][i]) {
+				worldStr += palette[id][i][j];
+				if (j < 2) worldStr += ",";
+			}
+			worldStr += "\n";
+		}
+		worldStr += "\n";
+	}
+	/* SET */
+	/* TILE */
+	for (id in tile) {
+		worldStr += "TIL " + id + "\n";
+		for (i in imageStore.source["TIL_" + id]) {
+			worldStr += imageStore.source["TIL_" + id][i] + "\n";
+		}
+		worldStr += "\n";
+	}
+	/* SPR */
+	/* DLG */
+	return worldStr;
+}
+
 function placeSprites() {
 	for (id in spriteStartLocations) {
 		console.log(id);
