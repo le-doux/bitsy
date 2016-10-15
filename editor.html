@@ -144,6 +144,7 @@
 				sprite["a"].set = "0";
 				sprite["a"].x = 8;
 				sprite["a"].y = 12;
+				dialog["a"] = "I'm a cat";
 				//default tile
 				paintMode = TileType.Tile;
 				newTile();
@@ -577,18 +578,29 @@
 				paintMode = TileType.Avatar;
 				drawingId = "A";
 				reloadSprite();
+				document.getElementById("dialog").setAttribute("style","display:none;");
 			}
 			function on_paint_tile() {
 				paintMode = TileType.Tile;
 				tileIndex = 0;
 				drawingId = sortedTileIdList()[tileIndex];
 				reloadTile();
+				document.getElementById("dialog").setAttribute("style","display:none;");
 			}
 			function on_paint_sprite() {
 				paintMode = TileType.Sprite;
 				spriteIndex = 1;
 				drawingId = sortedSpriteIdList()[spriteIndex];
 				reloadSprite();
+				document.getElementById("dialog").setAttribute("style","display:block;");
+				if (drawingId in dialog) {
+					document.getElementById("dialogText").value = dialog[drawingId];
+				}
+			}
+
+			function on_change_dialog() {
+				dialog[drawingId] = document.getElementById("dialogText").value;
+				refreshGameData();
 			}
 		</script>
 	</head>
@@ -620,10 +632,7 @@
 			<br>
 			<canvas id="paint"></canvas>
 			<br>
-			<!--
-			dialog: <input type="text">
-			<br>
-			-->
+			<div id="dialog" style="display:none;">dialog: <input type="text" id="dialogText" onchange="on_change_dialog();"></div>
 			<!-- TODO isWall checkbox -->
 			<button onclick="toggleGrid();"> grid? </button>
 		</div>

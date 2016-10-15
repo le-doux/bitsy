@@ -419,6 +419,11 @@ function serializeWorld() {
 		worldStr += "\n";
 	}
 	/* DLG */
+	for (id in dialog) {
+		worldStr += "DLG " + id + "\n";
+		worldStr += dialog[id] + "\n";
+		worldStr += "\n";
+	}
 	return worldStr;
 }
 
