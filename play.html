@@ -1,6 +1,8 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
+		<title>bitsy player</title>
+
 		<style>
 			html {
 				height: 592px;
@@ -25,6 +27,16 @@
 
 			/*
 				TODO
+					- bitsy editor 
+						- v1
+							- text input
+							- player
+							- export html
+						- v2
+							- sprite / tile editor
+							- map editor
+							- palette editor
+
 					- bitsy player v2
 						- dialog effects
 							- color
@@ -38,16 +50,6 @@
 						? set variable command
 						?? narrative blocks
 						?? STRICT MODE where text can only fit on one page
-
-					- bitsy editor 
-						- v1
-							- text input
-							- player
-							- export html
-						- v2
-							- sprite / tile editor
-							- map editor
-							- palette editor
 			*/
 
 			var xhr;
@@ -386,6 +388,10 @@
 
 					if (i == 0) {
 						i = parseTitle(lines, i);
+					}
+					else if (curLine.length <= 0 || curLine.charAt(0) === "#") {
+						//skip blank lines & comments
+						i++;
 					}
 					else if (getType(curLine) == "PAL") {
 						i = parsePalette(lines, i);

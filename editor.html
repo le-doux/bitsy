@@ -1,0 +1,214 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>bitsy editor</title>
+
+		<style>
+			/*
+			body {
+				color:#fff;
+				background: rgb(0,82,204)
+			}
+			*/
+			canvas {
+				background: black;
+			}
+			#topbar {
+				width: 100%;
+			}
+			.panel {
+				float:left;
+				background: gray;
+				/*height: 600px;*/
+				margin:10px;
+			}
+			#game {
+				/*
+				width: 512px;
+				height: 512px;
+				*/
+			}
+			#paint {
+				/*
+				width: 256px;
+				height: 256px;
+				*/
+			}
+		</style>
+
+		<script src="bitsy.js"></script>
+		<script>
+			/* PAINT */
+			var TileType = {
+				Tile : 0,
+				Sprite : 1,
+				Avatar : 2
+			};
+			var EditMode = {
+				Edit : 0,
+				Play : 1
+			};
+
+			var editMode = EditMode.Edit;
+
+			var paint_canvas;
+			var paint_ctx;
+			var paint_scale = 32;
+
+			var paintMode = TileType.Tile;
+			var drawingId = "a";
+			var drawingPal = "0";
+			var drawing_data = [
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0]
+			];
+			var drawPaintGrid = true;
+			var curPaintBrush = 0;
+			var isPainting = false;
+
+			function start() {
+				//game canvas & context (also the map editor)
+				canvas = document.getElementById("game");
+				canvas.width = width * scale;
+				canvas.height = width * scale;
+				ctx = canvas.getContext("2d");
+				//paint canvas & context
+				paint_canvas = document.getElementById("paint");
+				paint_canvas.width = tilesize * paint_scale;
+				paint_canvas.height = tilesize * paint_scale;
+				paint_ctx = paint_canvas.getContext("2d");
+				//setInterval(paint_update,-1);
+				drawPaintCanvas();
+				//paint events
+				paint_canvas.addEventListener("mousedown", paint_onMouseDown);
+				paint_canvas.addEventListener("mousemove", paint_onMouseMove);
+				paint_canvas.addEventListener("mouseup", paint_onMouseUp);
+			}
+
+			function paint_onMouseDown(e) {
+				var x = Math.floor(e.layerX / paint_scale);
+				var y = Math.floor(e.layerY / paint_scale);
+				if (drawing_data[y][x] == 0) {
+					curPaintBrush = 1;
+				}
+				else {
+					curPaintBrush = 0;
+				}
+				drawing_data[y][x] = curPaintBrush;
+				drawPaintCanvas();
+				isPainting = true;
+			}
+
+			function paint_onMouseMove(e) {
+				if (isPainting) {	
+					var x = Math.floor(e.layerX / paint_scale);
+					var y = Math.floor(e.layerY / paint_scale);
+					drawing_data[y][x] = curPaintBrush;
+					drawPaintCanvas();
+				}
+			}
+
+			function paint_onMouseUp(e) {
+				isPainting = false;
+			}
+
+			function drawPaintCanvas() {
+				//background
+				paint_ctx.fillStyle = "rgb("+palette[drawingPal][0][0]+","+palette[drawingPal][0][1]+","+palette[drawingPal][0][2]+")";
+				paint_ctx.fillRect(0,0,canvas.width,canvas.height);
+
+				//pixel color
+				if (paintMode == TileType.Tile) {
+					paint_ctx.fillStyle = "rgb("+palette[drawingPal][1][0]+","+palette[drawingPal][1][1]+","+palette[drawingPal][1][2]+")";
+				}
+				else if (paintMode == TileType.Sprite || paintMode == TileType.Avatar) {
+					paint_ctx.fillStyle = "rgb("+palette[drawingPal][2][0]+","+palette[drawingPal][2][1]+","+palette[drawingPal][2][2]+")";
+				}
+
+				//draw pixels
+				for (var x = 0; x < 8; x++) {
+					for (var y = 0; y < 8; y++) {
+						if (drawing_data[y][x] == 1) {
+							paint_ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
+						}
+					}
+				}
+
+				//draw grid
+				if (drawPaintGrid) {
+					paint_ctx.fillStyle = "#fff";
+					for (var x = 1; x < 8; x++) {
+						paint_ctx.fillRect(x*paint_scale,0*paint_scale,1,8*paint_scale);
+					}
+					for (var y = 1; y < 8; y++) {
+						paint_ctx.fillRect(0*paint_scale,y*paint_scale,8*paint_scale,1);
+					}
+				}
+			}
+
+			function on_edit_mode() {
+				stopGame();
+			}
+
+			function on_play_mode() {
+				load_game(document.getElementById("game_data").value);
+			}
+
+			function toggleGrid() {
+				drawPaintGrid = !drawPaintGrid;
+				drawPaintCanvas();
+			}
+		</script>
+	</head>
+
+	<body onload="start()">
+		<div id="topbar">
+			bitsy editor v0
+		</div>
+		<div class="panel">
+			~ map ~
+			<form>
+				<input type="radio" name="edit mode" value="edit" onclick="on_edit_mode()" checked> edit
+				<input type="radio" name="edit mode" value="play" onclick="on_play_mode()"> play
+			</form>
+			<canvas id="game"></canvas>
+		</div>
+		<div class="panel">
+			~ paint ~
+			<form>
+				<input type="radio" name="paint mode" value="tile" checked> tile
+				<input type="radio" name="paint mode" value="sprite"> sprite
+			</form>
+			<button> < prev </button>
+			<button> next > </button>
+			<button> + new </button>
+			<br>
+			<canvas id="paint"></canvas>
+			<br>
+			dialog: <input type="text">
+			<br>
+			<!-- TODO isWall checkbox -->
+			<button onclick="toggleGrid();"> grid? </button>
+		</div>
+		<div class="panel">
+			~ colors ~ <br>
+			background: <input type="color" value="#0052cc"> <br>
+			tile: <input type="color" value="#809fff"> <br>
+			sprite: <input type="color" value="#ffffff"> <br>
+		</div>
+		<div class="panel">
+			~ title and export ~ <br>
+			title: <input type="text"> <br>
+			<button>export game</button>
+		</div>
+		<div class="panel">
+			~ game data ~ <br>
+			<textarea id="game_data" style="width:300px;height:300px;"></textarea>
+	</body>
+</html>
