@@ -192,6 +192,9 @@
 				on_paint_avatar();
 				drawPaintCanvas();
 				drawEditMap();
+
+				//load engine for export
+				loadEngineScript();
 			}
 
 			function listenMapEditEvents() {
@@ -598,6 +601,7 @@
 				reloadSprite();
 				document.getElementById("dialog").setAttribute("style","display:none;");
 				document.getElementById("wall").setAttribute("style","display:none;");
+				document.getElementById("paintNav").setAttribute("style","display:none;");
 			}
 			function on_paint_tile() {
 				paintMode = TileType.Tile;
@@ -606,6 +610,7 @@
 				reloadTile();
 				document.getElementById("dialog").setAttribute("style","display:none;");
 				document.getElementById("wall").setAttribute("style","display:block;");
+				document.getElementById("paintNav").setAttribute("style","display:block;");
 			}
 			function on_paint_sprite() {
 				paintMode = TileType.Sprite;
@@ -614,6 +619,7 @@
 				reloadSprite();
 				document.getElementById("dialog").setAttribute("style","display:block;");
 				document.getElementById("wall").setAttribute("style","display:none;");
+				document.getElementById("paintNav").setAttribute("style","display:block;");
 			}
 
 			function on_change_dialog() {
@@ -640,6 +646,45 @@
 				console.log(set[curSet]);
 				refreshGameData();
 			}
+
+
+			var engineScript;
+			function loadEngineScript() {
+				var client = new XMLHttpRequest();
+				client.open('GET', './bitsy.js');
+				client.onreadystatechange = function() {
+				  engineScript = client.responseText;
+				}
+				client.send();
+			}
+			var webExportTemplate = "<!DOCTYPE HTML>\n<html>\n<head>\n<title>@@T</title>\n<style>\nhtml {height:592px;}\nbody {width:100%; height:100%; overflow:hidden;}\n#game {background:black;margin: 0 auto;margin-top: 40px;display: block;}\n</style>\n<script>\n@@E\n<\/script>\n</head>\n<body onload='startExportedGame()'>\n<canvas id='game'>\n</canvas>\n</body>\n</html>";
+				
+			function exportGame() {
+				refreshGameData(); //just in case
+				var gameData = document.getElementById("game_data").value; //grab game data
+				gameData = gameData.split("\n").join("\\n"); //replace newlines with escaped newlines
+				var html = webExportTemplate.substr(); //copy template
+				var titleIndex = html.indexOf("@@T");
+				html = html.substr(0,titleIndex) + title + html.substr(titleIndex+3);
+				var engineIndex = html.indexOf("@@E");
+				html = html.substr(0,engineIndex) + engineScript + html.substr(engineIndex+3);
+				var gameDataIndex = html.indexOf("@@D");
+				html = html.substr(0,gameDataIndex) + gameData + html.substr(gameDataIndex+3);
+				downloadFile("mygame.html",html);
+			}
+
+			function downloadFile(filename, text) {
+				var element = document.createElement('a');
+				element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+				element.setAttribute('download', filename);
+
+				element.style.display = 'none';
+				document.body.appendChild(element);
+
+				element.click();
+
+				document.body.removeChild(element);
+			}
 		</script>
 	</head>
 
@@ -664,10 +709,11 @@
 				<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();"> tile
 				<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();"> sprite
 			</form>
-			<button onclick="prev();"> < prev </button>
-			<button onclick="next();"> next > </button>
-			<button onclick="newDrawing();"> + new </button>
-			<br>
+			<div id="paintNav" style="display:none;">
+				<button onclick="prev();"> < prev </button>
+				<button onclick="next();"> next > </button>
+				<button onclick="newDrawing();"> + new </button>
+			</div>
 			<canvas id="paint"></canvas>
 			<br>
 			<div id="wall" style="display:none;">is this tile a wall? <input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall();"> </div>
@@ -682,9 +728,9 @@
 			<input type="color" value="#ffffff" id="spriteColor" onchange="on_change_color_sprite();"> sprite <br>
 		</div>
 		<div class="panel">
-			~ title and save ~ <br>
+			~ title and share ~ <br>
 			title: <input type="text" id="titleText" onchange="on_change_title();" value="Write title here"> <br>
-			<!-- <button>export game</button> -->
+			<button onclick="exportGame();">share game</button>
 		</div>
 		<div class="panel">
 			~ game data ~ <br>

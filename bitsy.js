@@ -1,3 +1,30 @@
+/*
+	TODO
+		X bitsy editor 
+			X v1
+				X text input
+				X player
+				X export html
+			X v2
+				X sprite / tile editor
+				X map editor
+				X palette editor
+
+		- bitsy player v2
+			- dialog effects
+				- color
+				- speed
+				- pauses
+			? animate player movement
+			? flipbook animation
+			? player face left/right
+			?? bouncing arrow
+			? sprite walking paths
+			? set variable command
+			?? narrative blocks
+			?? STRICT MODE where text can only fit on one page
+*/
+
 var xhr;
 var canvas;
 var context;
@@ -43,29 +70,15 @@ var key = {
 var prevTime = 0;
 var deltaTime = 0;
 
-/*
-function start() {
+//only used by games exported from the editor
+var exportedGameData = "@@D";
+function startExportedGame() {
 	canvas = document.getElementById("game");
 	canvas.width = width * scale;
 	canvas.height = width * scale;
-
 	ctx = canvas.getContext("2d");
-
-	loadingAnimation();
-	loading_interval = setInterval(loadingAnimation,loading_anim_speed);
-
-	//networking
-	var socketio = io.connect("ws://nameless-beach-83507.herokuapp.com/");
-	socketio.on('connect',function() {
-		console.log('request_game');
-		socketio.emit('request_game', getGameNameFromURL());
-	});
-	socketio.on('game', function(data) {
-		console.log('load_game');
-		load_game(data);
-	});
+	load_game(exportedGameData);
 }
-*/
 
 function getGameNameFromURL() {
 	var game = window.location.hash.substring(1);
@@ -76,7 +89,6 @@ function getGameNameFromURL() {
 function load_game(game_data) {
 	parseWorld(game_data);
 	renderImages();
-	console.log(imageStore);
 	onready();
 }
 
