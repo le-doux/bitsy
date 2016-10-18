@@ -1,11 +1,26 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>In the middle of the night</title>
+<style>
+html {height:592px;}
+body {width:100%; height:100%; overflow:hidden;}
+#game {background:black;margin: 0 auto;margin-top: 40px;display: block;}
+</style>
+<script>
 /*
 	TODO
-		- bitsy editor
-			- remove sprites from map
-			- delete sprites and tiles
+		X bitsy editor 
+			X v1
+				X text input
+				X player
+				X export html
+			X v2
+				X sprite / tile editor
+				X map editor
+				X palette editor
 
 		- bitsy player v2
-			- touch controls
 			- dialog effects
 				- color
 				- speed
@@ -66,7 +81,7 @@ var prevTime = 0;
 var deltaTime = 0;
 
 //only used by games exported from the editor
-var exportedGameData = "@@D";
+var exportedGameData = "In the middle of the night\n\nPAL 0\n26,24,81\n148,121,247\n255,255,255\n\nSET 0\n0^0*0^^^00*00**0\n0^.0.^^^..00*00.\n.|^.^||^^^wwwww^\n^0^^|00|||wwww.^\n^.^^00=0000000^^\n^^^^0.00.00000^^\n^^^^.^0.^0=000^^\n^^^^^^.^^000.0^^\n|^^|||^||000^0^|\n0^|000|00000^0^=\n.^\\00/0=0000|0^0\n^^00000000=000|.\n^^000000=00.000^\n^|000.0000.^..0^\n^....^....^^^^.^\n^^^^^^^^^^^^^^^^\nSPR A 2,11\nSPR T 3,10\nSPR t 4,10\nSPR B 14,12\nSPR D 6,11\nSPR P 5,3\nSPR l 10,3\nSPR a 11,3\nSPR k 12,3\nSPR e 13,3\nSPR M 3,0\nSPR I 10,0\nSPR L 12,1\nSPR K 13,0\nSPR Y 14,0\nSPR H 11,9\nWAL ^,.\n\ntree tiles\n\nTIL *\n00000000\n00000000\n00000000\n00000000\n00000000\n00000000\n00011000\n00011000\n\nTIL ^\n00111100\n00111100\n01111110\n01111110\n01111110\n11111111\n11111111\n11111111\n\nTIL .\n00011000\n00011000\n00111100\n00111100\n00111100\n01111110\n01111110\n01111110\n\nTIL |\n00011000\n00011000\n00011000\n00011000\n00011000\n00011000\n00000000\n00000000\n\nTIL Y\n00011000\n00011000\n00011000\n00011000\n00000000\n00000000\n00000000\n00000000\n\ngrass\n\nTIL =\n00000000\n00000100\n00001000\n01001000\n00100010\n00100100\n00000100\n00000000\n\nstakes\n\nTIL /\n00000000\n00000000\n00000000\n00000000\n00000000\n00100000\n11100000\n00100000\n\nTIL \\\n00000000\n00000000\n00000000\n00000000\n00000000\n00000100\n00000111\n00000100\n\ntent\n\nSPR T\n00011111\n00011000\n00111100\n00111100\n01101110\n01101110\n11101111\n11101111\n\nSPR t\n11111000\n00000100\n00000100\n00000010\n00000010\n00000001\n00000001\n11111111\n\nme!\n\nSPR A\n00111100\n01111110\n00101110\n00100110\n00011100\n00111110\n01010101\n00010100\n\nbushes\n\nSPR B\n00011000\n00111100\n00111100\n01111110\n01111110\n01111110\n00011000\n00011000\n00011000\n\nSPR P\n00011000\n00111100\n00111100\n01111110\n01111110\n01111110\n00011000\n00011000\n00011000\n\nlamp\n\nSPR D\n00000000\n00000000\n00000000\n00011000\n01111110\n00100100\n00100100\n00111100\n\npack\n\nSPR H\n00000011\n00011100\n00001000\n00001000\n00111100\n01011110\n01011110\n00111100\n\n\nlake (this is hacky)\n\nTIL w\n00000000\n00000000\n10011001\n01100110\n00000000\n00000000\n11001100\n00110011\n\nSPR l\n00000000\n00000000\n10011001\n01100110\n00000000\n00000000\n11001100\n00110011\n\nSPR a\n00000000\n00000000\n10011001\n01100110\n00000000\n00000000\n11001100\n00110011\n\nSPR k\n00000000\n00000000\n10011001\n01100110\n00000000\n00000000\n11001100\n00110011\n\nSPR e\n00000000\n00000000\n10011001\n01100110\n00000000\n00000000\n11001100\n00110011\n\n\nplaceholder star tile\nTIL *\n00000000\n00100000\n00100000\n11011000\n00100000\n00100000\n00000010\n00000000\n\nstar sprites\nSPR M\n00000000\n01000100\n00000100\n00011011\n00000100\n10000100\n00000000\n00010000\n\nSPR I\n00000000\n00000000\n00000000\n00100000\n00000000\n00000000\n00000010\n00000000\n\nSPR L\n00000000\n00000001\n01000000\n00000100\n00000000\n00000000\n00000000\n00000000\n\nSPR K\n00000000\n00000000\n00000000\n01000000\n00000000\n00000000\n00000010\n00000000\n\nSPR Y\n00000000\n00000001\n00100000\n00100000\n11011000\n00100000\n00100000\n00000000\n\n\nDLG B\n*rustle* Oh shit a bear!       ...         ..        .         No, it's a squirrel. Still, better try somewhere else.\n\nDLG H\nIt took us an hour to hang our pack up there.\n\nDLG D\nBeyond the lamplight all is darkness, and quiet.\n\nDLG P\n...                             (Relief at last.)              ...                             (Please look away for a moment! It's rude to watch, even in videogames.)\n\n\n\ntent dialog hack\n\nDLG T\nOur tent looks cozy, but... I really need to pee.\n\nDLG t\nOur tent looks cozy, but... I really need to pee.\n\n\nlake dialog hack (opportunity to have multiple pieces of dialog?)\n\nDLG l\nReflected in the lake, between tall mossy trees, the Milky Way. The stars are brighter out here.\n\nDLG a\nReflected in the lake, between tall mossy trees, the Milky Way. The stars are brighter out here.\n\nDLG k\nReflected in the lake, between tall mossy trees, the Milky Way. The stars are brighter out here.\n\nDLG e\nReflected in the lake, between tall mossy trees, the Milky Way. The stars are brighter out here.";
 function startExportedGame() {
 	canvas = document.getElementById("game");
 	canvas.width = width * scale;
@@ -92,100 +107,10 @@ function onready() {
 	clearInterval(loading_interval);
 
 	document.addEventListener('keydown', onkeydown);
-	canvas.addEventListener("mousedown", onTouch);
-	console.log("hello");
 	update_interval = setInterval(update,-1);
 
 	isTitle = true;
 	startDialog(title);
-}
-
-//touch controls
-var followingTouch = false;
-var touchDest = {
-	x : 0,
-	y : 0
-};
-var touchMoveCount = 0;
-var touchMoveWait = 200;
-function onTouch(e) {
-	//dialog mode
-	if (isDialogMode) {
-
-		if (isDialogReadyToContinue) {
-			continueDialog();
-		}
-
-		return;
-	}
-
-	//walking mode
-	var x = Math.floor(e.layerX / (tilesize*scale));
-	var y = Math.floor(e.layerY / (tilesize*scale));
-	console.log(x + " " + y);
-	
-	//abort if you touch the square you're already on
-	if (player().x == x && player().y == y) {
-		return;
-	}
-
-	//did we touch a sprite?
-	var touchedSprite = null;
-	for (id in sprite) {
-		var spr = sprite[id];
-		if (spr.set === curSet) {
-			if (spr.x == x && spr.y == y) {
-				touchedSprite = id;
-			}
-		}
-	}
-
-	console.log(touchedSprite);
-
-	//respond to sprite touch
-	if (touchedSprite) {
-		var spr = sprite[touchedSprite];
-		console.log(Math.abs(player().x - spr.x));
-		console.log(Math.abs(player().y - spr.y));
-		if ( Math.abs(player().x - spr.x) == 0
-				&& Math.abs(player().y - spr.y) == 1 )
-		{
-			//touched a sprite next to you
-		}
-		else if ( Math.abs(player().y - spr.y) == 0
-				&& Math.abs(player().x - spr.x) == 1 )
-		{
-			//touched a sprite next to you
-		}
-		else
-		{
-			return; //touched a sprite that's out of range
-		}
-
-		console.log("hit!");
-
-		if (dialog[touchedSprite]) {
-			console.log()
-			startDialog( dialog[touchedSprite] );
-		}
-
-		return;
-	}
-
-	//did we touch an open square?
-	var row = set[curSet].tilemap[y];
-	var til = row.charAt(x);
-	if (til in set[curSet].walls) {
-		//touched a wall
-		return;
-	}
-
-	followingTouch = true;
-	touchDest.x = x;
-	touchDest.y = y;
-	touchMoveCount = 0;
-
-	console.log(touchDest);
 }
 
 function stopGame() {
@@ -288,86 +213,14 @@ function update() {
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 	
 	if (!isTitle)
-		drawSet(set[curSet]); // draw world if game has begun
+		drawSet(set[curSet]); //game has begun
 
 	if (isDialogMode) { // dialog mode
 		updateDialog();
 		drawDialogBox();
 	}
 
-	if (followingTouch) { // touch movement
-		touchMove();
-		ctx.fillStyle = "#fff";
-		ctx.globalAlpha = 0.3;
-		ctx.fillRect(touchDest.x*tilesize*scale,touchDest.y*tilesize*scale,tilesize*scale,tilesize*scale);
-		ctx.globalAlpha = 1;
-	}
-
 	prevTime = curTime;
-}
-
-function getSpriteAt(x,y) {
-	for (id in sprite) {
-		var spr = sprite[id];
-		if (spr.set === curSet) {
-			if (spr.x == x && spr.y == y) {
-				return id;
-			}
-		}
-	}
-	return null;
-}
-
-function touchMove() {
-	if (touchMoveCount < touchMoveWait) {
-		touchMoveCount += deltaTime;	
-	}
-	else {
-
-		var nextPos = {
-			x : player().x,
-			y : player().y
-		};
-
-		if ( Math.abs(player().x - touchDest.x) > 0 ) {
-			// move x axis
-			if (touchDest.x > player().x) {
-				nextPos.x++;
-			}
-			else if (touchDest.x < player().x) {
-				nextPos.x--;
-			}
-		}
-		else if ( Math.abs(player().y - touchDest.y) > 0 ) {
-			// then move y axis
-			if (touchDest.y > player().y) {
-				nextPos.y++;
-			}
-			else if (touchDest.y < player().y) {
-				nextPos.y--;
-			}
-		}
-
-		var destTile = getTile( nextPos.x, nextPos.y );
-		if ( (destTile in getSet().walls) || getSpriteAt(nextPos.x, nextPos.y) ) {
-			//stop! it's a collision and I don't have a better way to handle this yet :(
-			touchDest.x = player().x;
-			touchDest.y = player().y;
-		}
-		else {
-			//move normally
-			player().x = nextPos.x;
-			player().y = nextPos.y;
-		}
-
-		// are we done yet?
-		if (player().x == touchDest.x && player().y == touchDest.y) {
-			followingTouch = false;
-		}
-
-		// reset counter
-		touchMoveCount = 0;
-	}
 }
 
 function onkeydown(e) {
@@ -3466,3 +3319,10 @@ var fontdata = [
 		0,0,0,0,0,0,
 		0,0,0,0,0,0
 		];
+</script>
+</head>
+<body onload='startExportedGame()'>
+<canvas id='game'>
+</canvas>
+</body>
+</html>

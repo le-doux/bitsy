@@ -354,9 +354,28 @@
 				return Object.keys( sprite ).sort();
 			}
 
+			//from stack overflow (I know *gasp*)
+			function getOffset(evt) {
+			  var el = evt.target,
+			      x = 0,
+			      y = 0;
+
+			  while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+			    x += el.offsetLeft - el.scrollLeft;
+			    y += el.offsetTop - el.scrollTop;
+			    el = el.offsetParent;
+			  }
+
+			  x = evt.clientX - x;
+			  y = evt.clientY - y;
+
+			  return { x: x, y: y };
+			}
+
 			function map_onMouseDown(e) {
-				var x = Math.floor(e.layerX / (tilesize*scale));
-				var y = Math.floor(e.layerY / (tilesize*scale));
+				var off = getOffset(e);
+				var x = Math.floor(off.x / (tilesize*scale));
+				var y = Math.floor(off.y / (tilesize*scale));
 				console.log(x + " " + y);
 				var row = set[curSet].tilemap[y];
 				if (drawingId != null) {
@@ -383,8 +402,9 @@
 			}
 
 			function paint_onMouseDown(e) {
-				var x = Math.floor(e.layerX / paint_scale);
-				var y = Math.floor(e.layerY / paint_scale);
+				var off = getOffset(e);
+				var x = Math.floor(off.x / paint_scale);
+				var y = Math.floor(off.y / paint_scale);
 				if (drawing_data[y][x] == 0) {
 					curPaintBrush = 1;
 				}
@@ -398,8 +418,9 @@
 
 			function paint_onMouseMove(e) {
 				if (isPainting) {	
-					var x = Math.floor(e.layerX / paint_scale);
-					var y = Math.floor(e.layerY / paint_scale);
+					var off = getOffset(e);
+					var x = Math.floor(off.x / paint_scale);
+					var y = Math.floor(off.y / paint_scale);
 					drawing_data[y][x] = curPaintBrush;
 					drawPaintCanvas();
 				}
