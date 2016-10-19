@@ -36,7 +36,12 @@
 
 		<script src="bitsy.js"></script>
 		<script>
-			/* MOES */
+			/* 
+			NOTES
+			- remember to run chrome like this to test "open /Applications/Google\ Chrome.app --args --allow-file-access-from-files"
+			*/
+
+			/* MODES */
 			var TileType = {
 				Tile : 0,
 				Sprite : 1,
@@ -681,6 +686,7 @@
 			function exportGame() {
 				refreshGameData(); //just in case
 				var gameData = document.getElementById("game_data").value; //grab game data
+				gameData = escapeSpecialCharacters( gameData ); //escape quotes and slashes
 				gameData = gameData.split("\n").join("\\n"); //replace newlines with escaped newlines
 				var html = webExportTemplate.substr(); //copy template
 				var titleIndex = html.indexOf("@@T");
@@ -690,6 +696,12 @@
 				var gameDataIndex = html.indexOf("@@D");
 				html = html.substr(0,gameDataIndex) + gameData + html.substr(gameDataIndex+3);
 				downloadFile("mygame.html",html);
+			}
+
+			function escapeSpecialCharacters(str) {
+				str = str.replace(/"/g, '\\"');
+				str = str.replace(/\\/g, '\\\\');
+				return str;
 			}
 
 			function downloadFile(filename, text) {
