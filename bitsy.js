@@ -100,14 +100,6 @@ function onready() {
 	startDialog(title);
 }
 
-//touch controls
-var followingTouch = false;
-var touchDest = {
-	x : 0,
-	y : 0
-};
-var touchMoveCount = 0;
-var touchMoveWait = 200;
 function onTouch(e) {
 	//dialog mode
 	if (isDialogMode) {
@@ -120,9 +112,9 @@ function onTouch(e) {
 	}
 
 	//walking mode
-	var x = Math.floor(e.layerX / (tilesize*scale));
-	var y = Math.floor(e.layerY / (tilesize*scale));
-	console.log(x + " " + y);
+	var off = getOffset(e);
+	var x = Math.floor(off.x / (tilesize*scale));
+	var y = Math.floor(off.y / (tilesize*scale));
 	
 	//abort if you touch the square you're already on
 	if (player().x == x && player().y == y) {
@@ -139,8 +131,6 @@ function onTouch(e) {
 			}
 		}
 	}
-
-	console.log(touchedSprite);
 
 	//respond to sprite touch
 	if (touchedSprite) {
@@ -159,10 +149,8 @@ function onTouch(e) {
 		}
 		else
 		{
-			return; //touched a sprite that's out of range
+			return; //oh no! touched a sprite that's out of range
 		}
-
-		console.log("hit!");
 
 		if (dialog[touchedSprite]) {
 			console.log()
@@ -175,17 +163,142 @@ function onTouch(e) {
 	//did we touch an open square?
 	var row = set[curSet].tilemap[y];
 	var til = row.charAt(x);
-	if (til in set[curSet].walls) {
+	if ( set[curSet].walls.indexOf(til) != -1 ) {
 		//touched a wall
 		return;
 	}
 
-	followingTouch = true;
-	touchDest.x = x;
-	touchDest.y = y;
-	touchMoveCount = 0;
+	//find path to open square, if there is one
+	var map = collisionMap(curSet);
+	var path = breadthFirstSearch( map, {x:player().x, y:player().y}, {x:x,y:y} );
+	path = path.slice(1); //remove player's start square
 
-	console.log(touchDest);
+	//console.log( pathToString(path) );
+
+	player().walkingPath = path;
+}
+
+function breadthFirstSearch(map, from, to) {
+	from.trail = [];
+	var visited = [];
+	var queue = [from];
+	visited.push( posToString(from) );
+
+	//console.log( "~ bfs ~");
+	//console.log( posToString(from) + " to " + posToString(to) );
+
+	while ( queue.length > 0 ) {
+
+		//grab pos from queue and mark as visited
+		var curPos = queue.shift();
+
+		//console.log( posToString(curPos) );
+		//console.log( ".. " + pathToString(curPos.trail) );
+		//console.log( visited );
+
+		if (curPos.x == to.x && curPos.y == to.y) {
+			//found a path!
+			var path = curPos.trail.splice(0);
+			path.push( curPos );
+			return path;
+		}
+
+		//look at neighbors
+		neighbors(curPos).forEach( function(n) {
+			var inBounds = (n.x >= 0 && n.x < 16 && n.y >= 0 && n.y < 16);
+			if (inBounds) {
+				var noCollision = map[n.y][n.x] <= 0;
+				var notVisited = visited.indexOf( posToString(n) ) == -1;
+				if (noCollision && notVisited) {
+					n.trail = curPos.trail.slice();
+					n.trail.push(curPos);
+					queue.push( n );
+					visited.push( posToString(n) );
+				}
+			}
+		});
+
+	}
+
+	return []; // no path found
+}
+
+function posToString(pos) {
+	return pos.x + "," + pos.y;
+}
+
+function pathToString(path) {
+	var s = "";
+	for (i in path) {
+		s += posToString(path[i]) + " ";
+	}
+	return s;
+}
+
+function neighbors(pos) {
+	var neighborList = [];
+	neighborList.push( {x:pos.x+1, y:pos.y+0} );
+	neighborList.push( {x:pos.x-1, y:pos.y+0} );
+	neighborList.push( {x:pos.x+0, y:pos.y+1} );
+	neighborList.push( {x:pos.x+0, y:pos.y-1} );
+	return neighborList;
+}
+
+function collisionMap(setId) {
+	var map = [
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	];
+
+	for (r in set[setId].tilemap) {
+		var row = set[setId].tilemap[r];
+		for (var c = 0; c < row.length; c++) {
+			if (set[setId].walls.indexOf( row.charAt(c) ) != -1) {
+				map[r][c] = 1;
+			}
+		}
+	}
+
+	for (id in sprite) {
+		var spr = sprite[id];
+		if (spr.set === setId) {
+			map[spr.y][spr.x] = 2;
+		}
+	}
+
+	return map;
+}
+
+//from stack overflow (I know *gasp*)
+function getOffset(evt) {
+	var el = evt.target,
+	  x = 0,
+	  y = 0;
+
+	while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+	x += el.offsetLeft - el.scrollLeft;
+	y += el.offsetTop - el.scrollTop;
+	el = el.offsetParent;
+	}
+
+	x = evt.clientX - x;
+	y = evt.clientY - y;
+
+	return { x: x, y: y };
 }
 
 function stopGame() {
@@ -294,16 +407,40 @@ function update() {
 		updateDialog();
 		drawDialogBox();
 	}
+	else {
+		moveSprites();
 
-	if (followingTouch) { // touch movement
-		touchMove();
-		ctx.fillStyle = "#fff";
-		ctx.globalAlpha = 0.3;
-		ctx.fillRect(touchDest.x*tilesize*scale,touchDest.y*tilesize*scale,tilesize*scale,tilesize*scale);
-		ctx.globalAlpha = 1;
+		if (player().walkingPath.length > 0) {
+			var dest = player().walkingPath[ player().walkingPath.length - 1 ];
+			ctx.fillStyle = "#fff";
+			ctx.globalAlpha = 0.5;
+			ctx.fillRect( dest.x * tilesize*scale, dest.y * tilesize*scale, tilesize*scale, tilesize*scale );
+			ctx.globalAlpha = 1;
+		}
 	}
 
 	prevTime = curTime;
+}
+
+var moveCounter = 0;
+var moveTime = 200;
+function moveSprites() {
+	moveCounter += deltaTime;
+
+	if (moveCounter >= moveTime) {
+
+		for (id in sprite) {
+			var spr = sprite[id];
+			if (spr.walkingPath.length > 0) {
+				var nextPos = spr.walkingPath.shift();
+				spr.x = nextPos.x;
+				spr.y = nextPos.y;
+			}
+		}
+
+		moveCounter = 0;
+	}
+
 }
 
 function getSpriteAt(x,y) {
@@ -316,58 +453,6 @@ function getSpriteAt(x,y) {
 		}
 	}
 	return null;
-}
-
-function touchMove() {
-	if (touchMoveCount < touchMoveWait) {
-		touchMoveCount += deltaTime;	
-	}
-	else {
-
-		var nextPos = {
-			x : player().x,
-			y : player().y
-		};
-
-		if ( Math.abs(player().x - touchDest.x) > 0 ) {
-			// move x axis
-			if (touchDest.x > player().x) {
-				nextPos.x++;
-			}
-			else if (touchDest.x < player().x) {
-				nextPos.x--;
-			}
-		}
-		else if ( Math.abs(player().y - touchDest.y) > 0 ) {
-			// then move y axis
-			if (touchDest.y > player().y) {
-				nextPos.y++;
-			}
-			else if (touchDest.y < player().y) {
-				nextPos.y--;
-			}
-		}
-
-		var destTile = getTile( nextPos.x, nextPos.y );
-		if ( (destTile in getSet().walls) || getSpriteAt(nextPos.x, nextPos.y) ) {
-			//stop! it's a collision and I don't have a better way to handle this yet :(
-			touchDest.x = player().x;
-			touchDest.y = player().y;
-		}
-		else {
-			//move normally
-			player().x = nextPos.x;
-			player().y = nextPos.y;
-		}
-
-		// are we done yet?
-		if (player().x == touchDest.x && player().y == touchDest.y) {
-			followingTouch = false;
-		}
-
-		// reset counter
-		touchMoveCount = 0;
-	}
 }
 
 function onkeydown(e) {
@@ -812,7 +897,8 @@ function parseSprite(lines, i) {
 		col : colorIndex,
 		set : null, //default location is "offstage"
 		x : -1,
-		y : -1
+		y : -1,
+		walkingPath : [] //tile by tile movement path (isn't saved)
 	};
 	return i;
 }
