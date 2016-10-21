@@ -1,4 +1,15 @@
 /* 
+TODO NEXT
+- test quote bug on other browsers and OSs
+- fix tile/sprite # limit bug
+	- for now: don't allow over 26 (past z)
+	- later: comma-separated tile names (with more than one char)
+	- use hex count to generate names in editor
+- debug info (os, browser) in comment in file
+- warning message to non chrome (firefox?) users
+- make game data field work like expected (clear old data)
+
+
 NOTES
 - remember to run chrome like this to test "open /Applications/Google\ Chrome.app --args --allow-file-access-from-files"
 */
@@ -596,9 +607,16 @@ function on_change_dialog() {
 }
 
 function on_game_data_change() {
-	//todo - doesn't work perfectly, probably need to clear out the whole game world
+	clearGameData();
 	parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
-	drawPaintCanvas();
+	renderImages();
+	//drawPaintCanvas();
+	if ( paintMode == TileType.Tile ) {
+		reloadTile();
+	}
+	else {
+		reloadSprite();
+	}
 	drawEditMap();
 }
 

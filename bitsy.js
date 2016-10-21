@@ -41,6 +41,25 @@ var imageStore = {
 
 var spriteStartLocations = {};
 
+function clearGameData() {
+	title = "";
+	set = {};
+	tile = {};
+	sprite = {};
+	dialog = {};
+	palette = {
+		"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
+	};
+
+	//stores all image data for tiles, sprites, drawings
+	imageStore = {
+		source: {},
+		render: {}
+	};
+
+	spriteStartLocations = {};
+}
+
 var width = 128;
 var height = 128;
 var scale = 4; //this is stupid but necessary
