@@ -573,6 +573,13 @@ function hexToRgb(hex) {
 		b: parseInt(result[3], 16)
 	} : null;
 }
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
 
 function on_paint_avatar() {
 	paintMode = TileType.Avatar;
@@ -593,7 +600,13 @@ function on_paint_tile() {
 }
 function on_paint_sprite() {
 	paintMode = TileType.Sprite;
-	spriteIndex = 1;
+	if (sortedSpriteIdList().length > 1)
+	{
+		spriteIndex = 1;
+	}
+	else {
+		spriteIndex = 0; //fall back to avatar if no other sprites exist
+	}
 	drawingId = sortedSpriteIdList()[spriteIndex];
 	reloadSprite();
 	document.getElementById("dialog").setAttribute("style","display:block;");
@@ -609,15 +622,93 @@ function on_change_dialog() {
 function on_game_data_change() {
 	clearGameData();
 	parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
+
+	var curPaintMode = paintMode; //save current paint mode (hacky)
+
+	//fallback if there are no tiles, sprites, map
+	if (Object.keys(sprite).length == 0) {
+		paintMode = TileType.Avatar;
+		drawingId = "A";
+		drawing_data = [
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0]
+		];
+		saveDrawingData();
+		sprite["A"].set = null;
+		sprite["A"].x = -1;
+		sprite["A"].y = -1;
+	}
+	if (Object.keys(tile).length == 0) {
+		paintMode = TileType.Tile;
+		drawingId = "a";
+		drawing_data = [
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0]
+		];
+		saveDrawingData();
+	}
+	if (Object.keys(set).length == 0) {
+		set["0"] = {
+			id : "0",
+			tilemap : [
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000",
+					"0000000000000000"
+				],
+			walls : [],
+			exits : [],
+			pal : null
+		};
+	}
+
 	renderImages();
-	//drawPaintCanvas();
+
+	drawEditMap();
+
+	paintMode = curPaintMode;
 	if ( paintMode == TileType.Tile ) {
+		drawingId = sortedTileIdList()[0];
 		reloadTile();
 	}
 	else {
+		drawingId = sortedSpriteIdList()[0];
 		reloadSprite();
 	}
-	drawEditMap();
+
+	updatePaletteControlsFromGameData();
+
+	//todo set character indexes
+}
+
+function updatePaletteControlsFromGameData() {
+	document.getElementById("backgroundColor").value = rgbToHex(palette["0"][0][0], palette["0"][0][1], palette["0"][0][2]);
+	document.getElementById("tileColor").value = rgbToHex(palette["0"][1][0], palette["0"][1][1], palette["0"][1][2]);
+	document.getElementById("spriteColor").value = rgbToHex(palette["0"][2][0], palette["0"][2][1], palette["0"][2][2]);
 }
 
 function on_toggle_wall() {
