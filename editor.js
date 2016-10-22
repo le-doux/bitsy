@@ -1,13 +1,20 @@
 /* 
 TODO NEXT
-- test quote bug on other browsers and OSs
+X test quote bug on other browsers and OSs
 - fix tile/sprite # limit bug
-	- for now: don't allow over 26 (past z)
+	X for now: don't allow over 26 (past z)
 	- later: comma-separated tile names (with more than one char)
 	- use hex count to generate names in editor
 - debug info (os, browser) in comment in file
-- warning message to non chrome (firefox?) users
-- make game data field work like expected (clear old data)
+- warning message to browsers that don't support all features
+- fix safari automcplete bug
+- improve color input for browsers that only accept text
+	- hash or no-hash hex
+	- rgb with commas
+	- link to html color-picker if you don't support color
+- add instructions for downloading game text for browser that don't support download
+- add instruction on publishing the game (itchio shoutout)
+X make game data field work like expected (clear old data)
 
 
 NOTES
@@ -58,6 +65,33 @@ var spriteIndex = 0;
 var drawMapGrid = true;
 
 function start() {
+
+	//test feature support (this works!! how do I delete the fake element?)
+	try {
+	    var input = document.createElement("input");
+
+	    input.type = "color";
+
+	    if (input.type === "color") {
+	        console.log("color supported");
+	    } else {
+	        console.log("not supported");
+	    }
+
+	    //document.body.removeChild(input);
+	} catch(e) {
+	    console.log("not supported");
+	}
+
+	var a = document.createElement('a');
+	if (typeof a.download != "undefined") {
+	    console.log('has support for download');
+	}
+	else {
+		console.log("not supproted :(")
+	}
+	console.log("!!!!!");
+
 	//game canvas & context (also the map editor)
 	canvas = document.getElementById("game");
 	canvas.width = width * scale;
@@ -182,6 +216,11 @@ function unlistenMapEditEvents() {
 }
 
 function newTile() {
+	if (nextTileCharCode > 97+25) {
+		alert("Sorry, you've run out of space for tiles! :( \n(I'm working on a way to store more. - Adam)");
+		return;
+	}
+
 	drawingId = String.fromCharCode( nextTileCharCode );
 	nextTileCharCode++;
 
@@ -221,6 +260,11 @@ function prevTile() {
 }
 
 function newSprite() {
+	if (nextSpriteCharCode > 97+25) {
+		alert("Sorry, you've run out of space for sprites! :( \n(I'm working on a way to store more. - Adam)");
+		return;
+	}
+
 	drawingId = String.fromCharCode( nextSpriteCharCode );
 	nextSpriteCharCode++;
 
@@ -702,7 +746,11 @@ function on_game_data_change() {
 
 	updatePaletteControlsFromGameData();
 
-	//todo set character indexes
+	document.getElementById("titleText").value = title;
+
+	//this is my best guess of what index the tile character should be at -- but it could be wrong :(
+	nextTileCharCode = 97 + Object.keys(tile).length;
+	nextSpriteCharCode = 97 + Object.keys(sprite).length;
 }
 
 function updatePaletteControlsFromGameData() {
