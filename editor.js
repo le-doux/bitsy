@@ -7,14 +7,19 @@ X test quote bug on other browsers and OSs
 	- use hex count to generate names in editor
 - debug info (os, browser) in comment in file
 - warning message to browsers that don't support all features
-- fix safari automcplete bug
+X fix safari automcplete bug
 - improve color input for browsers that only accept text
 	- hash or no-hash hex
 	- rgb with commas
+	- show color somehow (border of input e.g. style="border:#f00 solid 5px;")
 	- link to html color-picker if you don't support color
 - add instructions for downloading game text for browser that don't support download
 - add instruction on publishing the game (itchio shoutout)
 X make game data field work like expected (clear old data)
+
+TODO BACKLOG
+- import old html or txt games to re-edit
+- export straight to itchio (is there a developer api?)
 
 
 NOTES
@@ -64,33 +69,51 @@ var spriteIndex = 0;
 /* MAP */
 var drawMapGrid = true;
 
-function start() {
+var browserFeatures = {
+	colorPicker : false,
+	fileDownload : false
+};
 
-	//test feature support (this works!! how do I delete the fake element?)
+function detectBrowserFeatures() {
+	//test feature support
 	try {
-	    var input = document.createElement("input");
+		var input = document.createElement("input");
+		input.type = "color";
 
-	    input.type = "color";
-
-	    if (input.type === "color") {
-	        console.log("color supported");
-	    } else {
-	        console.log("not supported");
-	    }
-
-	    //document.body.removeChild(input);
+		if (input.type === "color") {
+			console.log("color picker supported!");
+			browserFeatures.colorPicker = true;
+		} else {
+			browserFeatures.colorPicker = false;
+		}
+	//document.body.removeChild(input);
 	} catch(e) {
-	    console.log("not supported");
+		browserFeatures.colorPicker = false;
 	}
 
 	var a = document.createElement('a');
 	if (typeof a.download != "undefined") {
-	    console.log('has support for download');
+		console.log("downloads supported!");
+		browserFeatures.fileDownload = true;
 	}
 	else {
-		console.log("not supproted :(")
+		browserFeatures.fileDownload = false;
 	}
-	console.log("!!!!!");
+}
+
+function hasUnsupportedFeatures() {
+	return !browserFeatures.colorPicker || !browserFeatures.fileDownload;
+}
+
+function showUnsupportedFeatureWarning() {
+	document.getElementById("unsupportedFeatures").style.display = "block";
+}
+
+function hideUnsupportedFeatureWarning() {
+	document.getElementById("unsupportedFeatures").style.display = "none";
+}
+
+function start() {
 
 	//game canvas & context (also the map editor)
 	canvas = document.getElementById("game");
@@ -205,6 +228,17 @@ function start() {
 
 	//load engine for export
 	loadEngineScript();
+
+	//unsupported feature stuff
+	detectBrowserFeatures();
+	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
+	if (!browserFeatures.colorPicker) {
+		updatePaletteBorders();
+		document.getElementById("colorPickerHelp").style.display = "inline";
+	}
+	if (!browserFeatures.fileDownload) {
+		document.getElementById("downloadHelp").style.display = "block";
+	}
 }
 
 function listenMapEditEvents() {
@@ -569,6 +603,13 @@ function on_change_title() {
 	refreshGameData();
 }
 
+function updatePaletteBorders() {
+	//feature to show selected colors in browsers that don't support a color picker
+	document.getElementById("backgroundColor").style.border = "solid " + document.getElementById("backgroundColor").value + " 5px";
+	document.getElementById("tileColor").style.border = "solid " + document.getElementById("tileColor").value + " 5px";
+	document.getElementById("spriteColor").style.border = "solid " + document.getElementById("spriteColor").value + " 5px";
+}
+
 function on_change_color_bg() {
 	var rgb = hexToRgb( document.getElementById("backgroundColor").value );
 	palette[drawingPal][0][0] = rgb.r;
@@ -578,6 +619,10 @@ function on_change_color_bg() {
 	renderImages();
 	drawPaintCanvas();
 	drawEditMap();
+
+	if (!browserFeatures.colorPicker) {
+		updatePaletteBorders();
+	}
 }
 
 function on_change_color_tile() {
@@ -589,6 +634,10 @@ function on_change_color_tile() {
 	renderImages();
 	drawPaintCanvas();
 	drawEditMap();
+
+	if (!browserFeatures.colorPicker) {
+		updatePaletteBorders();
+	}
 }
 
 function on_change_color_sprite() {
@@ -600,6 +649,10 @@ function on_change_color_sprite() {
 	renderImages();
 	drawPaintCanvas();
 	drawEditMap();
+
+	if (!browserFeatures.colorPicker) {
+		updatePaletteBorders();
+	}
 }
 
 //hex-to-rgb method borrowed from stack overflow
@@ -745,6 +798,9 @@ function on_game_data_change() {
 	}
 
 	updatePaletteControlsFromGameData();
+	if (!browserFeatures.colorPicker) {
+		updatePaletteBorders();
+	}
 
 	document.getElementById("titleText").value = title;
 
@@ -809,6 +865,7 @@ function downloadFile(filename, text) {
 	var element = document.createElement('a');
 	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
 	element.setAttribute('download', filename);
+	element.setAttribute('target', '_blank');
 
 	element.style.display = 'none';
 	document.body.appendChild(element);

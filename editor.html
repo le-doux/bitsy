@@ -32,6 +32,20 @@
 			input {
 				font-family: monospace;
 			}
+			#unsupportedFeatures {
+				background: white;
+				border: solid red 2px;
+				padding: 10px;
+				margin: 10px;
+			}
+			#downloadHelp {
+				background: #eee;
+				padding: 5px;
+				margin: 2px;
+				color: #555;
+				font-size: 13px;
+				line-height: 130%;
+			}
 		</style>
 
 		<script src="bitsy.js"></script>
@@ -40,13 +54,26 @@
 
 	<body onload="start()">
 		<div id="topbar">
-			bitsy editor v0
+			bitsy editor v0.1 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
+		</div>
+		<div id="unsupportedFeatures" style="display:none;">
+			~ UH OH ~ your browser doesn't support all of bitsy's features, so some things might not work right. Maybe try <a href="https://www.google.com/chrome/browser" target="_blank">chrome</a> or <a href="https://www.mozilla.org/firefox" target="_blank">firefox</a>? - adam
+			<br>
+			<button onclick="hideUnsupportedFeatureWarning();">I'll be ok, hide this message</button>
 		</div>
 		<div class="panel" id="about">
 			~ about bitsy ~ <br>
 			hi! bitsy is a little editor for little games or worlds. <br>
 			the goal is to make it easy to make games where you <br>
 			can walk around and talk to people and be somewhere. <br>
+
+			~ instructions ~ <br>
+			<button>show</button> <br>
+
+			~ version notes ~ <br>
+			<button>show</button> <br>
+			version 0.1
+
 			<br>
 			you can draw things in the ~ paint ~ panel, then place <br>
 			them in your world in the ~ map ~ panel. you can write <br>
@@ -115,14 +142,30 @@
 			<input type="color" value="#0052cc" id="backgroundColor" onchange="on_change_color_bg();" autocomplete="off"> background <br>
 			<input type="color" value="#809fff" id="tileColor" onchange="on_change_color_tile();" autocomplete="off"> tile <br>
 			<input type="color" value="#ffffff" id="spriteColor" onchange="on_change_color_sprite();" autocomplete="off"> sprite <br>
+			<div id="colorPickerHelp" style="display:none;">
+				Having trouble choosing hex colors? <br>
+				Try this online <a href="http://www.w3schools.com/colors/colors_picker.asp" target="_blank">color picker</a>.
+			</div>
 		</div>
 		<div class="panel">
 			~ title and share ~ <br>
 			title: <input type="text" id="titleText" onchange="on_change_title();" value="Write title here"> <br>
 			<button onclick="exportGame();">share game</button>
+			<br>
+			<div id="downloadHelp" style="display:none;">
+				Note: your browser doesn't support<br>
+				direct downloads, so sharing requires<br>
+				some extra steps:<br>
+				- press share <br>
+				- a new tab will open <br>
+				- save that tab <br>
+				- name it "mygame.html" <br>
+				Your game is a web page you can share!
+			</div>
 		</div>
 		<div class="panel">
 			~ game data ~ <br>
 			<textarea id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
+		</div>
 	</body>
 </html>

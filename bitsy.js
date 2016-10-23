@@ -1,11 +1,33 @@
 /*
-	TODO
+	Hi! If you can see this, that means your browser doesn't support
+	downloading your bitsy game directly.
+
+	Don't panic!
+
+	All you need to do now is save this page as an ".html" file.
+	You should be able to use cmd-s or ctrl-s to save. Then
+	you may be given multiple download formats; if so, pick
+	"page source" or the closest looking thing.
+
+	The most important thing is when you save, you name the file
+	"mygame.html" or something similar. Your browser may ask
+	to append ".txt" or something, but don't do that. It should
+	end in ".html" so your computer knows it's a webpage. 
+
+	Now you should be able to click on your game and play it 
+	in your browser!
+
+	- adam
+*/
+
+/*
+	ADAM'S TODOs
 		- bitsy editor
 			- remove sprites from map
 			- delete sprites and tiles
 
 		- bitsy player v2
-			- touch controls
+			X touch controls
 			- dialog effects
 				- color
 				- speed
