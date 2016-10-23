@@ -46,6 +46,10 @@
 				font-size: 13px;
 				line-height: 130%;
 			}
+			#aboutInner {
+				font-size: 13px;
+				line-height: 130%;
+			}
 		</style>
 
 		<script src="bitsy.js"></script>
@@ -63,58 +67,60 @@
 		</div>
 		<div class="panel" id="about">
 			~ about bitsy ~ <br>
-			hi! bitsy is a little editor for little games or worlds. <br>
-			the goal is to make it easy to make games where you <br>
-			can walk around and talk to people and be somewhere. <br><br>
-			i hope you enjoy using it! <br>
-			- adam <br><br>
+			<div id="aboutInner">
+				hi! bitsy is a little editor for little games or worlds. <br>
+				the goal is to make it easy to make games where you <br>
+				can walk around and talk to people and be somewhere. <br><br>
+				i hope you enjoy using it! <br>
+				- adam <br><br>
 
-			<a href="#" onclick="showInstructions();">~ instructions ~</a> <br>
-			<div id="instructions" style="display:none;">
-				you can draw things in the ~ paint ~ panel, then place <br>
-				them in your world in the ~ map ~ panel. you can write <br>
-				dialog for your characters (aka sprites) too. <br>
+				<a href="#" onclick="showInstructions();">~ instructions ~</a> <br>
+				<div id="instructions" style="display:none;">
+					you can draw things in the ~ paint ~ panel, then place <br>
+					them in your world in the ~ map ~ panel. you can write <br>
+					dialog for your characters (aka sprites) too. <br>
+					<br>
+					some words:<br>
+					* map - the game world<br>
+					* avatar - the player's character<br>
+					* tile - a piece of the scenery<br>
+					* sprite - other characters or things<br>
+					<br>
+					to try your game, switch the map to play mode: <br>
+					* walk around with the arrow keys <br>
+					* talk to sprites by walking up to them <br>
+					<br>
+					use "share game" to download the game as an html file. <br>
+					you can email the file to a friend, or host it online! <br>
+					<br>
+					if you want to talk about bitsy, report a bug, or share <br>
+					a game you made, i'm on twitter <a href="https://www.twitter.com/adamledoux">@adamledoux</a><br>
+					<br>
+					special thanks to: <br>
+					* mary-margaret <br>
+					* seattle game meetup peeps <br>
+					<button onclick="hideInstructions();">hide instructions</button>
+				</div>
 				<br>
-				some words:<br>
-				* map - the game world<br>
-				* avatar - the player's character<br>
-				* tile - a piece of the scenery<br>
-				* sprite - other characters or things<br>
+
+				<a href="#" onclick="showVersionNotes();">~ what's new v0.1 ~</a> <br>
+				<div id="versionNotes" style="display:none;">
+					version 0.1 <br>
+					<i>new features:</i> <br>
+					- games have touch controls! <br>
+					<i>bugfixes:</i> <br>
+					- quotation marks in dialog don't break game <br>
+					- drawing on Surface devices works <br>
+					- pasting new game data refreshes everything <br>
+					- editor detects unsupported features <br>
+					- fix autocomplete color bug in Safari <br>
+					- limit number of sprites <br>
+					<button onclick="hideVersionNotes();">hide what's new</button>
+				</div>
+
 				<br>
-				to try your game, switch the map to play mode: <br>
-				* walk around with the arrow keys <br>
-				* talk to sprites by walking up to them <br>
-				<br>
-				use "share game" to download the game as an html file. <br>
-				you can email the file to a friend, or host it online! <br>
-				<br>
-				if you want to talk about bitsy, report a bug, or share <br>
-				a game you made, i'm on twitter <a href="https://www.twitter.com/adamledoux">@adamledoux</a><br>
-				<br>
-				special thanks to: <br>
-				* mary-margaret <br>
-				* seattle game meetup peeps <br>
-				<button onclick="hideInstructions();">hide instructions</button>
+				<button onclick="hideAbout();"> ok, hide all this nonsense </button>
 			</div>
-			<br>
-
-			<a href="#" onclick="showVersionNotes();">~ what's new v0.1 ~</a> <br>
-			<div id="versionNotes" style="display:none;">
-				version 0.1 <br>
-				<i>new features:</i> <br>
-				- games have touch controls! <br>
-				<i>bugfixes:</i> <br>
-				- quotation marks in dialog don't break game <br>
-				- drawing on Surface devices works <br>
-				- pasting new game data refreshes everything <br>
-				- editor detects unsupported features <br>
-				- fix autocomplete color bug in Safari <br>
-				- limit number of sprites <br>
-				<button onclick="hideVersionNotes();">hide what's new</button>
-			</div>
-
-			<br>
-			<button onclick="hideAbout();"> ok, hide all this nonsense </button>
 		</div>
 		<div class="panel">
 			~ map ~
