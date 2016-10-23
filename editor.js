@@ -878,3 +878,19 @@ function downloadFile(filename, text) {
 function hideAbout() {
 	document.getElementById("about").setAttribute("style","display:none;");
 }
+
+function showInstructions() {
+	document.getElementById("instructions").style.display = "block";
+}
+
+function hideInstructions() {
+	document.getElementById("instructions").style.display = "none";
+}
+
+function showVersionNotes() {
+	document.getElementById("versionNotes").style.display = "block";
+}
+
+function hideVersionNotes() {
+	document.getElementById("versionNotes").style.display = "none";
+}
