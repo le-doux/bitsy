@@ -26,6 +26,9 @@ X remove sprites from map
 TODO BACKLOG
 - import old html or txt games to re-edit
 - export straight to itchio (is there a developer api?)
+- control panel for all tools
+- hide/show all tool windows
+- drag tool windows around
 
 
 NOTES
@@ -906,18 +909,23 @@ function hideAbout() {
 	document.getElementById("about").setAttribute("style","display:none;");
 }
 
-function showInstructions() {
-	document.getElementById("instructions").style.display = "block";
+function toggleInstructions() {
+	var div = document.getElementById("instructions");
+	if (div.style.display === "none") {
+		div.style.display = "block";
+	}
+	else {
+		div.style.display = "none";
+	}
 }
 
-function hideInstructions() {
-	document.getElementById("instructions").style.display = "none";
-}
-
-function showVersionNotes() {
-	document.getElementById("versionNotes").style.display = "block";
-}
-
-function hideVersionNotes() {
-	document.getElementById("versionNotes").style.display = "none";
+//todo abstract this function into toggleDiv
+function toggleVersionNotes() {
+	var div = document.getElementById("versionNotes");
+	if (div.style.display === "none") {
+		div.style.display = "block";
+	}
+	else {
+		div.style.display = "none";
+	}
 }
