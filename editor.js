@@ -1,4 +1,7 @@
 /* 
+what's new
+	- removing sprites from map
+
 TODO NEXT
 X test quote bug on other browsers and OSs
 - fix tile/sprite # limit bug
@@ -16,8 +19,9 @@ X fix safari automcplete bug
 X add instructions for downloading game text for browser that don't support download
 - add instruction on publishing the game (itchio shoutout)
 X make game data field work like expected (clear old data)
-- remove sprites from map
+X remove sprites from map
 - delete sprites and tiles
+- drag to add/delete tiles from map in bulk
 
 TODO BACKLOG
 - import old html or txt games to re-edit
@@ -431,10 +435,31 @@ function map_onMouseDown(e) {
 			set[curSet].tilemap[y] = row;
 		}
 		else {
-			sprite[drawingId].set = curSet;
-			sprite[drawingId].x = x;
-			sprite[drawingId].y = y;
-			row = row.substr(0, x) + "0" + row.substr(x+1);
+			var otherSprite = getSpriteAt(x,y);
+			var isThisSpriteAlreadyHere = sprite[drawingId].set === curSet &&
+										sprite[drawingId].x === x &&
+										sprite[drawingId].y === y;
+
+			if (otherSprite) {
+				//remove other sprite from map
+				sprite[otherSprite].set = null;
+				sprite[otherSprite].x = -1;
+				sprite[otherSprite].y = -1;
+			}
+
+			if (!isThisSpriteAlreadyHere) {
+				//add sprite to map
+				sprite[drawingId].set = curSet;
+				sprite[drawingId].x = x;
+				sprite[drawingId].y = y;
+				//row = row.substr(0, x) + "0" + row.substr(x+1); //is this necessary? no
+			}
+			else {
+				//remove sprite from map
+				sprite[drawingId].set = null;
+				sprite[drawingId].x = -1;
+				sprite[drawingId].y = -1;
+			}
 		}
 		refreshGameData();
 		drawEditMap();
