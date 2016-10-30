@@ -243,7 +243,7 @@ function start() {
 	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
 	if (!browserFeatures.colorPicker) {
 		updatePaletteBorders();
-		document.getElementById("colorPickerHelp").style.display = "inline";
+		document.getElementById("colorPickerHelp").style.display = "block";
 	}
 	if (!browserFeatures.fileDownload) {
 		document.getElementById("downloadHelp").style.display = "block";

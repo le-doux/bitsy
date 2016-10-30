@@ -38,7 +38,7 @@
 				padding: 10px;
 				margin: 10px;
 			}
-			#downloadHelp {
+			.helpMessage {
 				background: #eee;
 				padding: 5px;
 				margin: 2px;
@@ -153,7 +153,7 @@
 			<input type="color" value="#0052cc" id="backgroundColor" onchange="on_change_color_bg();" autocomplete="off"> background <br>
 			<input type="color" value="#809fff" id="tileColor" onchange="on_change_color_tile();" autocomplete="off"> tile <br>
 			<input type="color" value="#ffffff" id="spriteColor" onchange="on_change_color_sprite();" autocomplete="off"> sprite <br>
-			<div id="colorPickerHelp" style="display:none;">
+			<div id="colorPickerHelp" class="helpMessage" style="display:none;">
 				Having trouble choosing hex colors? <br>
 				Try this online <a href="http://www.w3schools.com/colors/colors_picker.asp" target="_blank">color picker</a>.
 			</div>
@@ -163,7 +163,7 @@
 			title: <input type="text" id="titleText" onchange="on_change_title();" value="Write title here"> <br>
 			<button onclick="exportGame();">share game</button>
 			<br>
-			<div id="downloadHelp" style="display:none;">
+			<div id="downloadHelp" class="helpMessage" style="display:none;">
 				Note: your browser doesn't support<br>
 				direct downloads, so sharing requires<br>
 				some extra steps:<br>
