@@ -5,17 +5,19 @@ X test quote bug on other browsers and OSs
 	X for now: don't allow over 26 (past z)
 	- later: comma-separated tile names (with more than one char)
 	- use hex count to generate names in editor
-- debug info (os, browser) in comment in file
-- warning message to browsers that don't support all features
+X debug info (os, browser) in comment in file [ NOT ACTUALLY POSSIBLE ]
+X warning message to browsers that don't support all features
 X fix safari automcplete bug
 - improve color input for browsers that only accept text
 	- hash or no-hash hex
 	- rgb with commas
-	- show color somehow (border of input e.g. style="border:#f00 solid 5px;")
-	- link to html color-picker if you don't support color
-- add instructions for downloading game text for browser that don't support download
+	X show color somehow (border of input e.g. style="border:#f00 solid 5px;")
+	X link to html color-picker if you don't support color
+X add instructions for downloading game text for browser that don't support download
 - add instruction on publishing the game (itchio shoutout)
 X make game data field work like expected (clear old data)
+- remove sprites from map
+- delete sprites and tiles
 
 TODO BACKLOG
 - import old html or txt games to re-edit

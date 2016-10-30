@@ -22,11 +22,22 @@
 
 /*
 	ADAM'S TODOs
+
+		#feature ideas
+			#don't see you on exit for one frame?
+			#shortcut to sets?
+			#default tileset
+			#clear tilemap
+			#clear tileset
+			#delete tiles and sprites
+			#rename sets to maps?
+
 		- bitsy editor
 			- remove sprites from map
 			- delete sprites and tiles
 
 		- bitsy player v2
+			X start screen is wherever your avatar is
 			X touch controls
 			- dialog effects
 				- color
@@ -40,6 +51,8 @@
 			? set variable command
 			?? narrative blocks
 			?? STRICT MODE where text can only fit on one page
+
+		- bitsy player v3
 */
 
 var xhr;
@@ -473,9 +486,23 @@ function moveSprites() {
 		for (id in sprite) {
 			var spr = sprite[id];
 			if (spr.walkingPath.length > 0) {
+				//move sprite
 				var nextPos = spr.walkingPath.shift();
 				spr.x = nextPos.x;
 				spr.y = nextPos.y;
+
+				//if the sprite hits an exit
+				var ext = getExit( spr.set, spr.x, spr.y );
+				if (ext) {
+					//move it to another scene
+					spr.set = ext.dest.set;
+					spr.x = ext.dest.x;
+					spr.y = ext.dest.y;
+					if (id === "A") {
+						//if the player changes scenes, change the visible scene
+						curSet = ext.dest.set;
+					}
+				}
 			}
 		}
 
@@ -515,6 +542,8 @@ function onkeydown(e) {
 
 		var spr = null;
 
+		console.log(player().x);
+		console.log(player().y);
 		if ( (e.keyCode == key.left || e.keyCode == key.a) && !(spr = getSpriteLeft()) && !isWallLeft()) {
 			player().x -= 1;
 		}
@@ -525,17 +554,20 @@ function onkeydown(e) {
 			player().y -= 1;
 		}
 		else if ( (e.keyCode == key.down || e.keyCode == key.s) && !(spr = getSpriteDown()) && !isWallDown()) {
+			console.log(player().y);
 			player().y += 1;
+			console.log(player().y);
 		}
-
-		var ext = getExit( player().x, player().y );
-
+		
+		var ext = getExit( player().set, player().x, player().y );
 		if (ext) {
-			setChange(ext);
+			player().set = ext.dest.set;
+			player().x = ext.dest.x;
+			player().y = ext.dest.y;
+			curSet = ext.dest.set;
 		}
 		else if (spr) {
 			if (dialog[spr]) {
-				//console.log(dialog[spr]);
 				startDialog(dialog[spr]);
 			}
 		}
@@ -590,13 +622,14 @@ function isWallDown() {
 }
 
 function isWall(x,y) {
+	console.log(x + " " + y);
 	var i = getSet().walls.indexOf( getTile(x,y) );
 	return i > -1;
 }
 
-function getExit(x,y) {
-	for (i in getSet().exits) {
-		var e = getSet().exits[i];
+function getExit(setId,x,y) {
+	for (i in set[setId].exits) {
+		var e = set[setId].exits[i];
 		if (x == e.x && y == e.y) {
 			return e;
 		}
@@ -605,6 +638,7 @@ function getExit(x,y) {
 }
 
 function getTile(x,y) {
+	console.log(x + " " + y);
 	var t = getSet().tilemap[y][x];
 	return t;
 }
@@ -615,15 +649,6 @@ function player() {
 
 function getSet() { //set sounds weird -- use scene instead?
 	return set[curSet];
-}
-
-function setChange(ext) {
-	//change set
-	curSet = ext.dest.set;
-	//move avatar
-	player().set = curSet;
-	player().x = ext.dest.x;
-	player().y = ext.dest.y;
 }
 
 function isSpriteOffstage(id) {
@@ -666,6 +691,12 @@ function parseWorld(file) {
 		}
 	}
 	placeSprites();
+	console.log("!!!!");
+	console.log(player());
+	console.log(player().set);
+	if (player().set != null) {
+		curSet = player().set;
+	}
 }
 
 //TODO this is in progress and doesn't support all features
@@ -734,12 +765,13 @@ function serializeWorld() {
 
 function placeSprites() {
 	for (id in spriteStartLocations) {
-		console.log(id);
-		console.log( spriteStartLocations[id] );
-		console.log(sprite[id]);
+		//console.log(id);
+		//console.log( spriteStartLocations[id] );
+		//console.log(sprite[id]);
 		sprite[id].set = spriteStartLocations[id].set;
 		sprite[id].x = spriteStartLocations[id].x;
-		sprite[id].y = spriteStartLocations[id].y;
+		sprite[id].y = spriteStartLocations[id].y; //using parseInt to ensure it's not a string
+		//console.log(sprite[id]);
 	}
 }
 
@@ -776,7 +808,7 @@ function parseSet(lines, i) {
 		if (getType(lines[i]) === "SPR") {
 			/* NOTE SPRITE START LOCATIONS */
 			var sprId = getId(lines[i]);
-			if (sprId.indexOf(",") == -1) {
+			if (sprId.indexOf(",") == -1 && lines[i].split(" ").length >= 3) { //second conditional checks for coords
 				/* PLACE A SINGLE SPRITE */
 				var sprCoord = lines[i].split(" ")[2].split(",");
 				spriteStartLocations[sprId] = {
@@ -787,7 +819,7 @@ function parseSet(lines, i) {
 			}
 			else {
 				/* PLACE MULTIPLE SPRITES*/ 
-				//Does find and replace in the tilemap (may be hacky, but convenient)
+				//Does find and replace in the tilemap (may be hacky, but its convenient)
 				var sprList = sprId.split(",");
 				for (row in set[id].tilemap) {
 					for (s in sprList) {
@@ -797,8 +829,8 @@ function parseSet(lines, i) {
 							set[id].tilemap[row] = set[id].tilemap[row].replace( sprList[s], "0" );
 							spriteStartLocations[ sprList[s] ] = {
 								set : id,
-								x : col,
-								y : row
+								x : parseInt(col),
+								y : parseInt(row)
 							};
 						}
 					}
@@ -1059,7 +1091,7 @@ function getSpriteImage(s) {
 function curPal() {
 	if (set[curSet].pal != null) {
 		//a specific palette was chosen
-		return curSet().pal;
+		return set[curSet].pal;
 	}
 	else {
 		if (curSet in palette) {
