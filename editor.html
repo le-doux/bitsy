@@ -77,16 +77,16 @@
 				<a href="#" onclick="toggleInstructions();">~ instructions ~</a> <br>
 				<div id="instructions" style="display:none;">
 					you can draw things in the ~ paint ~ panel, then place <br>
-					them in your world in the ~ map ~ panel. you can write <br>
+					them in your world in the ~ room ~ panel. you can write <br>
 					dialog for your characters (aka sprites) too. <br>
 					<br>
 					some words:<br>
-					* map - the game world<br>
+					* room - a place in your game world<br>
 					* avatar - the player's character<br>
 					* tile - a piece of the scenery<br>
 					* sprite - other characters or things<br>
 					<br>
-					to try your game, switch the map to play mode: <br>
+					to try your game, switch the room to play mode: <br>
 					* walk around with the arrow keys <br>
 					* talk to sprites by walking up to them <br>
 					<br>
@@ -121,7 +121,7 @@
 			</div>
 		</div>
 		<div class="panel">
-			~ map ~
+			~ room ~
 			<form>
 				<input type="radio" name="edit mode" value="edit" onclick="on_edit_mode()" checked> edit
 				<input type="radio" name="edit mode" value="play" onclick="on_play_mode()"> play
@@ -129,6 +129,12 @@
 			<canvas id="game"></canvas>
 			<br>
 			<button onclick="toggleMapGrid();"> show/hide tile grid </button>
+			<div id="roomNav">
+				<button onclick="prevRoom();"> < prev </button>
+				<button onclick="nextRoom();"> next > </button>
+				<button onclick="newRoom();"> + new </button>
+				[ current room id: <span id="roomId">0</span> ]
+			</div>
 		</div>
 		<div class="panel">
 			~ paint ~ <br>
@@ -171,7 +177,7 @@
 				- a new tab will open <br>
 				- save that tab <br>
 				- name it "mygame.html" <br>
-				Your game is a web page you can share!
+				- share your game as a web page!
 			</div>
 		</div>
 		<div class="panel">

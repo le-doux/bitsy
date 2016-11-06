@@ -3,10 +3,11 @@ what's new
 	- removing sprites from map
 
 v2 TODOS
-- multiple rooms
+X multiple rooms
 X set -> room
 - exit tool
 - tool hide/show
+? make fake links not take up search history space
 ? import html files
 ? drag to add/delete tiles from map in bulk
 
@@ -72,9 +73,14 @@ var tileIndex = 0;
 var nextSpriteCharCode = 97;
 var spriteIndex = 0;
 
-/* MAP */
+/* ROOM */
 var drawMapGrid = true;
+var roomIdList = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"; //TODO copy this technique for other content types
+var nextRoomCharIndex = 1;
+var roomIndex = 0;
 
+
+/* BROWSER COMPATIBILITY */
 var browserFeatures = {
 	colorPicker : false,
 	fileDownload : false
@@ -328,6 +334,73 @@ function newSprite() {
 	reloadSprite(); //hack
 }
 
+function nextRoom() {
+	var ids = sortedRoomIdList();
+	console.log(ids);
+	roomIndex = (roomIndex + 1) % ids.length;
+	console.log(roomIndex);
+	curRoom = ids[roomIndex];
+	console.log(curRoom);
+	drawEditMap();
+
+	document.getElementById("roomId").innerHTML = curRoom;
+}
+
+function prevRoom() {
+	var ids = sortedRoomIdList();
+	roomIndex = (roomIndex + 1) % ids.length;
+	if (roomIndex < 0) roomIndex = (ids.length-1);
+	curRoom = ids[roomIndex];
+	console.log(curRoom);
+	drawEditMap();
+
+	document.getElementById("roomId").innerHTML = curRoom;
+}
+
+function newRoom() {
+	if (nextRoomCharIndex >= roomIdList.length) {
+		alert("Sorry, you've run out of space for rooms! :( \n(I'm working on a way to store more. - Adam)");
+		return;
+	}
+
+	roomIndex = nextRoomCharIndex;
+	var roomId = roomIdList.charAt(nextRoomCharIndex);
+	nextRoomCharIndex++;
+
+	console.log(roomId);
+	room[roomId] = {
+		id : roomId,
+		tilemap : [
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000",
+				"0000000000000000"
+			],
+		walls : [],
+		exits : [],
+		pal : null
+	};
+	refreshGameData();
+
+	curRoom = roomId;
+	//console.log(curRoom);
+	drawEditMap();
+
+	document.getElementById("roomId").innerHTML = curRoom;
+}
+
 function nextSprite() {
 	var ids = sortedSpriteIdList();
 	spriteIndex = (spriteIndex + 1) % ids.length;
@@ -414,6 +487,10 @@ function sortedTileIdList() {
 
 function sortedSpriteIdList() {
 	return Object.keys( sprite ).sort();
+}
+
+function sortedRoomIdList() {
+	return Object.keys( room ).sort();
 }
 
 function map_onMouseDown(e) {
@@ -606,6 +683,7 @@ function refreshGameData() {
 function on_edit_mode() {
 	stopGame();
 	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
+	curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
 	drawEditMap();
 	listenMapEditEvents();
 }
