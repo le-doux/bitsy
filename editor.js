@@ -2,26 +2,23 @@
 what's new
 	- removing sprites from map
 
+v2 TODOS
+- multiple rooms
+X set -> room
+- exit tool
+- tool hide/show
+? import html files
+? drag to add/delete tiles from map in bulk
+
 TODO NEXT
-X test quote bug on other browsers and OSs
 - fix tile/sprite # limit bug
-	X for now: don't allow over 26 (past z)
 	- later: comma-separated tile names (with more than one char)
 	- use hex count to generate names in editor
-X debug info (os, browser) in comment in file [ NOT ACTUALLY POSSIBLE ]
-X warning message to browsers that don't support all features
-X fix safari automcplete bug
 - improve color input for browsers that only accept text
 	- hash or no-hash hex
 	- rgb with commas
-	X show color somehow (border of input e.g. style="border:#f00 solid 5px;")
-	X link to html color-picker if you don't support color
-X add instructions for downloading game text for browser that don't support download
 - add instruction on publishing the game (itchio shoutout)
-X make game data field work like expected (clear old data)
-X remove sprites from map
 - delete sprites and tiles
-- drag to add/delete tiles from map in bulk
 
 TODO BACKLOG
 - import old html or txt games to re-edit
@@ -29,7 +26,7 @@ TODO BACKLOG
 - control panel for all tools
 - hide/show all tool windows
 - drag tool windows around
-
+- hide game data by default
 
 NOTES
 - remember to run chrome like this to test "open /Applications/Google\ Chrome.app --args --allow-file-access-from-files"
@@ -165,7 +162,7 @@ function start() {
 		[0,0,1,0,0,1,0,0]
 	];
 	saveDrawingData();
-	sprite["A"].set = "0";
+	sprite["A"].room = "0";
 	sprite["A"].x = 4;
 	sprite["A"].y = 4;
 	//defualt sprite
@@ -183,7 +180,7 @@ function start() {
 		[0,0,1,0,0,1,0,0]
 	];
 	saveDrawingData();
-	sprite["a"].set = "0";
+	sprite["a"].room = "0";
 	sprite["a"].x = 8;
 	sprite["a"].y = 12;
 	dialog["a"] = "I'm a cat";
@@ -203,8 +200,8 @@ function start() {
 	];
 	saveDrawingData();
 	renderImages();
-	//default set
-	set["0"] = {
+	//default room
+	room["0"] = {
 		id : "0",
 		tilemap : [
 				"0000000000000000",
@@ -383,8 +380,8 @@ function reloadTile() {
 	}
 	drawPaintCanvas();
 
-	if (set[curSet]) {	
-		if (set[curSet].walls.indexOf(drawingId) != -1) {
+	if (room[curRoom]) {	
+		if (room[curRoom].walls.indexOf(drawingId) != -1) {
 			document.getElementById("wallCheckbox").checked = true;
 		}
 		else {
@@ -424,7 +421,7 @@ function map_onMouseDown(e) {
 	var x = Math.floor(off.x / (tilesize*scale));
 	var y = Math.floor(off.y / (tilesize*scale));
 	console.log(x + " " + y);
-	var row = set[curSet].tilemap[y];
+	var row = room[curRoom].tilemap[y];
 	if (drawingId != null) {
 		if (paintMode == TileType.Tile) {
 			if ( row.charAt(x) === "0" ) {
@@ -435,31 +432,31 @@ function map_onMouseDown(e) {
 				//delete (better way to do this?)
 				row = row.substr(0, x) + "0" + row.substr(x+1);
 			}
-			set[curSet].tilemap[y] = row;
+			room[curRoom].tilemap[y] = row;
 		}
 		else {
 			var otherSprite = getSpriteAt(x,y);
-			var isThisSpriteAlreadyHere = sprite[drawingId].set === curSet &&
+			var isThisSpriteAlreadyHere = sprite[drawingId].room === curRoom &&
 										sprite[drawingId].x === x &&
 										sprite[drawingId].y === y;
 
 			if (otherSprite) {
 				//remove other sprite from map
-				sprite[otherSprite].set = null;
+				sprite[otherSprite].room = null;
 				sprite[otherSprite].x = -1;
 				sprite[otherSprite].y = -1;
 			}
 
 			if (!isThisSpriteAlreadyHere) {
 				//add sprite to map
-				sprite[drawingId].set = curSet;
+				sprite[drawingId].room = curRoom;
 				sprite[drawingId].x = x;
 				sprite[drawingId].y = y;
 				//row = row.substr(0, x) + "0" + row.substr(x+1); //is this necessary? no
 			}
 			else {
 				//remove sprite from map
-				sprite[drawingId].set = null;
+				sprite[drawingId].room = null;
 				sprite[drawingId].x = -1;
 				sprite[drawingId].y = -1;
 			}
@@ -541,7 +538,7 @@ function drawEditMap() {
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 
 	//draw map
-	drawSet(set[curSet]);
+	drawRoom( room[curRoom] );
 
 	//draw grid
 	if (drawMapGrid) {
@@ -583,7 +580,7 @@ function saveDrawingData() {
 			sprite[drawingId] = { //todo create default sprite creation method
 				drw : drw,
 				col : 2,
-				set : null,
+				room : null,
 				x : -1,
 				y : -1
 			};
@@ -767,7 +764,7 @@ function on_game_data_change() {
 			[0,0,0,0,0,0,0,0]
 		];
 		saveDrawingData();
-		sprite["A"].set = null;
+		sprite["A"].room = null;
 		sprite["A"].x = -1;
 		sprite["A"].y = -1;
 	}
@@ -786,8 +783,8 @@ function on_game_data_change() {
 		];
 		saveDrawingData();
 	}
-	if (Object.keys(set).length == 0) {
-		set["0"] = {
+	if (Object.keys(room).length == 0) {
+		room["0"] = {
 			id : "0",
 			tilemap : [
 					"0000000000000000",
@@ -848,13 +845,13 @@ function updatePaletteControlsFromGameData() {
 function on_toggle_wall() {
 	if ( document.getElementById("wallCheckbox").checked ){
 		//add to wall list
-		set[curSet].walls.push( drawingId );
+		room[curRoom].walls.push( drawingId );
 	}
-	else if ( set[curSet].walls.indexOf(drawingId) != -1 ){
+	else if ( room[curRoom].walls.indexOf(drawingId) != -1 ){
 		//remove from wall list
-		set[curSet].walls.splice( set[curSet].walls.indexOf(drawingId), 1 );
+		room[curRoom].walls.splice( room[curRoom].walls.indexOf(drawingId), 1 );
 	}
-	console.log(set[curSet]);
+	console.log(room[curRoom]);
 	refreshGameData();
 }
 

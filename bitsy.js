@@ -60,7 +60,7 @@ var canvas;
 var context;
 
 var title = "";
-var set = {};
+var room = {};
 var tile = {};
 var sprite = {};
 var dialog = {};
@@ -78,7 +78,7 @@ var spriteStartLocations = {};
 
 function clearGameData() {
 	title = "";
-	set = {};
+	room = {};
 	tile = {};
 	sprite = {};
 	dialog = {};
@@ -101,7 +101,7 @@ var scale = 4; //this is stupid but necessary
 var tilesize = 8;
 var mapsize = 16;
 
-var curSet = "0";
+var curRoom = "0";
 
 var key = {
 	left : 37,
@@ -179,7 +179,7 @@ function onTouch(e) {
 	var touchedSprite = null;
 	for (id in sprite) {
 		var spr = sprite[id];
-		if (spr.set === curSet) {
+		if (spr.room === curRoom) {
 			if (spr.x == x && spr.y == y) {
 				touchedSprite = id;
 			}
@@ -215,15 +215,15 @@ function onTouch(e) {
 	}
 
 	//did we touch an open square?
-	var row = set[curSet].tilemap[y];
+	var row = room[curRoom].tilemap[y];
 	var til = row.charAt(x);
-	if ( set[curSet].walls.indexOf(til) != -1 ) {
+	if ( room[curRoom].walls.indexOf(til) != -1 ) {
 		//touched a wall
 		return;
 	}
 
 	//find path to open square, if there is one
-	var map = collisionMap(curSet);
+	var map = collisionMap(curRoom);
 	var path = breadthFirstSearch( map, {x:player().x, y:player().y}, {x:x,y:y} );
 	path = path.slice(1); //remove player's start square
 
@@ -298,7 +298,7 @@ function neighbors(pos) {
 	return neighborList;
 }
 
-function collisionMap(setId) {
+function collisionMap(roomId) {
 	var map = [
 		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -318,10 +318,10 @@ function collisionMap(setId) {
 		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	];
 
-	for (r in set[setId].tilemap) {
-		var row = set[setId].tilemap[r];
+	for (r in room[roomId].tilemap) {
+		var row = room[roomId].tilemap[r];
 		for (var c = 0; c < row.length; c++) {
-			if (set[setId].walls.indexOf( row.charAt(c) ) != -1) {
+			if (room[roomId].walls.indexOf( row.charAt(c) ) != -1) {
 				map[r][c] = 1;
 			}
 		}
@@ -329,7 +329,7 @@ function collisionMap(setId) {
 
 	for (id in sprite) {
 		var spr = sprite[id];
-		if (spr.set === setId) {
+		if (spr.room === roomId) {
 			map[spr.y][spr.x] = 2;
 		}
 	}
@@ -455,7 +455,7 @@ function update() {
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 	
 	if (!isTitle)
-		drawSet(set[curSet]); // draw world if game has begun
+		drawRoom( room[curRoom] ); // draw world if game has begun
 
 	if (isDialogMode) { // dialog mode
 		updateDialog();
@@ -492,15 +492,15 @@ function moveSprites() {
 				spr.y = nextPos.y;
 
 				//if the sprite hits an exit
-				var ext = getExit( spr.set, spr.x, spr.y );
+				var ext = getExit( spr.room, spr.x, spr.y );
 				if (ext) {
 					//move it to another scene
-					spr.set = ext.dest.set;
+					spr.room = ext.dest.room;
 					spr.x = ext.dest.x;
 					spr.y = ext.dest.y;
 					if (id === "A") {
 						//if the player changes scenes, change the visible scene
-						curSet = ext.dest.set;
+						curRoom = ext.dest.room;
 					}
 				}
 			}
@@ -514,7 +514,7 @@ function moveSprites() {
 function getSpriteAt(x,y) {
 	for (id in sprite) {
 		var spr = sprite[id];
-		if (spr.set === curSet) {
+		if (spr.room === curRoom) {
 			if (spr.x == x && spr.y == y) {
 				return id;
 			}
@@ -559,12 +559,12 @@ function onkeydown(e) {
 			console.log(player().y);
 		}
 		
-		var ext = getExit( player().set, player().x, player().y );
+		var ext = getExit( player().room, player().x, player().y );
 		if (ext) {
-			player().set = ext.dest.set;
+			player().room = ext.dest.room;
 			player().x = ext.dest.x;
 			player().y = ext.dest.y;
-			curSet = ext.dest.set;
+			curRoom = ext.dest.room;
 		}
 		else if (spr) {
 			if (dialog[spr]) {
@@ -595,7 +595,7 @@ function getSpriteDown() {
 
 function getSpriteAt(x,y) {
 	for (s in sprite) {
-		if (sprite[s].set === curSet) {
+		if (sprite[s].room === curRoom) {
 			if (sprite[s].x == x && sprite[s].y == y) {
 				console.log(s);
 				return s;
@@ -623,13 +623,13 @@ function isWallDown() {
 
 function isWall(x,y) {
 	console.log(x + " " + y);
-	var i = getSet().walls.indexOf( getTile(x,y) );
+	var i = getRoom().walls.indexOf( getTile(x,y) );
 	return i > -1;
 }
 
-function getExit(setId,x,y) {
-	for (i in set[setId].exits) {
-		var e = set[setId].exits[i];
+function getExit(roomId,x,y) {
+	for (i in room[roomId].exits) {
+		var e = room[roomId].exits[i];
 		if (x == e.x && y == e.y) {
 			return e;
 		}
@@ -639,7 +639,7 @@ function getExit(setId,x,y) {
 
 function getTile(x,y) {
 	console.log(x + " " + y);
-	var t = getSet().tilemap[y][x];
+	var t = getRoom().tilemap[y][x];
 	return t;
 }
 
@@ -647,12 +647,12 @@ function player() {
 	return sprite["A"];
 }
 
-function getSet() { //set sounds weird -- use scene instead?
-	return set[curSet];
+function getRoom() {
+	return room[curRoom];
 }
 
 function isSpriteOffstage(id) {
-	return sprite[id].set == null;
+	return sprite[id].room == null;
 }
 
 function parseWorld(file) {
@@ -671,8 +671,8 @@ function parseWorld(file) {
 		else if (getType(curLine) == "PAL") {
 			i = parsePalette(lines, i);
 		}
-		else if (getType(curLine) === "SET") {
-			i = parseSet(lines, i);
+		else if (getType(curLine) === "ROOM" || getType(curLine) === "SET") { //SET for back compat
+			i = parseRoom(lines, i);
 		}
 		else if (getType(curLine) === "TIL") {
 			i = parseTile(lines, i);
@@ -691,11 +691,8 @@ function parseWorld(file) {
 		}
 	}
 	placeSprites();
-	console.log("!!!!");
-	console.log(player());
-	console.log(player().set);
-	if (player().set != null) {
-		curSet = player().set;
+	if (player().room != null) {
+		curRoom = player().room;
 	}
 }
 
@@ -717,17 +714,17 @@ function serializeWorld() {
 		}
 		worldStr += "\n";
 	}
-	/* SET */
-	for (id in set) {
-		worldStr += "SET " + id + "\n";
-		for (i in set[id].tilemap) {
-			worldStr += set[id].tilemap[i] + "\n";
+	/* ROOM */
+	for (id in room) {
+		worldStr += "ROOM " + id + "\n";
+		for (i in room[id].tilemap) {
+			worldStr += room[id].tilemap[i] + "\n";
 		}
-		if (set[id].walls.length > 0) {
+		if (room[id].walls.length > 0) {
 			worldStr += "WAL ";
-			for (j in set[id].walls) {
-				worldStr += set[id].walls[j];
-				if (j < set[id].walls.length-1) {
+			for (j in room[id].walls) {
+				worldStr += room[id].walls[j];
+				if (j < room[id].walls.length-1) {
 					worldStr += ",";
 				}
 			}
@@ -749,8 +746,8 @@ function serializeWorld() {
 		for (i in imageStore.source["SPR_" + id]) {
 			worldStr += imageStore.source["SPR_" + id][i] + "\n";
 		}
-		if (sprite[id].set != null) {
-			worldStr += "POS " + sprite[id].set + " " + sprite[id].x + "," + sprite[id].y + "\n";
+		if (sprite[id].room != null) {
+			worldStr += "POS " + sprite[id].room + " " + sprite[id].x + "," + sprite[id].y + "\n";
 		}
 		worldStr += "\n";
 	}
@@ -768,9 +765,9 @@ function placeSprites() {
 		//console.log(id);
 		//console.log( spriteStartLocations[id] );
 		//console.log(sprite[id]);
-		sprite[id].set = spriteStartLocations[id].set;
+		sprite[id].room = spriteStartLocations[id].room;
 		sprite[id].x = spriteStartLocations[id].x;
-		sprite[id].y = spriteStartLocations[id].y; //using parseInt to ensure it's not a string
+		sprite[id].y = spriteStartLocations[id].y;
 		//console.log(sprite[id]);
 	}
 }
@@ -789,9 +786,9 @@ function parseTitle(lines, i) {
 	return i;
 }
 
-function parseSet(lines, i) {
+function parseRoom(lines, i) {
 	var id = getId(lines[i]);
-	set[id] = {
+	room[id] = {
 		id : id,
 		tilemap : [],
 		walls : [],
@@ -801,7 +798,7 @@ function parseSet(lines, i) {
 	i++;
 	var end = i + mapsize;
 	for (; i<end; i++) {
-		set[id].tilemap.push(lines[i]);
+		room[id].tilemap.push(lines[i]);
 	}
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		console.log(getType(lines[i]));
@@ -812,7 +809,7 @@ function parseSet(lines, i) {
 				/* PLACE A SINGLE SPRITE */
 				var sprCoord = lines[i].split(" ")[2].split(",");
 				spriteStartLocations[sprId] = {
-					set : id,
+					room : id,
 					x : parseInt(sprCoord[0]),
 					y : parseInt(sprCoord[1])
 				};
@@ -821,14 +818,14 @@ function parseSet(lines, i) {
 				/* PLACE MULTIPLE SPRITES*/ 
 				//Does find and replace in the tilemap (may be hacky, but its convenient)
 				var sprList = sprId.split(",");
-				for (row in set[id].tilemap) {
+				for (row in room[id].tilemap) {
 					for (s in sprList) {
-						var col = set[id].tilemap[row].indexOf( sprList[s] );
+						var col = room[id].tilemap[row].indexOf( sprList[s] );
 						//if the sprite is in this row, replace it with the "null tile" and set its starting position
 						if (col != -1) {
-							set[id].tilemap[row] = set[id].tilemap[row].replace( sprList[s], "0" );
+							room[id].tilemap[row] = room[id].tilemap[row].replace( sprList[s], "0" );
 							spriteStartLocations[ sprList[s] ] = {
-								set : id,
+								room : id,
 								x : parseInt(col),
 								y : parseInt(row)
 							};
@@ -839,7 +836,7 @@ function parseSet(lines, i) {
 		}
 		else if (getType(lines[i]) === "WAL") {
 			/* DEFINE COLLISIONS (WALLS) */
-			set[id].walls = getId(lines[i]).split(",");
+			room[id].walls = getId(lines[i]).split(",");
 		}
 		else if (getType(lines[i]) === "EXT") {
 			/* ADD EXIT */
@@ -852,16 +849,16 @@ function parseSet(lines, i) {
 				x : parseInt(exitCoords[0]),
 				y : parseInt(exitCoords[1]),
 				dest : {
-					set : destName,
+					room : destName,
 					x : parseInt(destCoords[0]),
 					y : parseInt(destCoords[1])
 				}
 			};
-			set[id].exits.push(ext);
+			room[id].exits.push(ext);
 		}
 		else if (getType(lines[i]) === "PAL") {
 			/* CHOOSE PALETTE (that's not default) */
-			set[id].pal = getId(lines[i]);
+			room[id].pal = getId(lines[i]);
 		}
 		i++;
 	}
@@ -953,10 +950,10 @@ function parseSprite(lines, i) {
 		else if (getType(lines[i]) === "POS") {
 			/* STARTING POSITION */
 			var posArgs = lines[i].split(" ");
-			var setId = posArgs[1];
+			var roomId = posArgs[1];
 			var coordArgs = posArgs[2].split(",");
 			spriteStartLocations[id] = {
-				set : setId,
+				room : roomId,
 				x : parseInt(coordArgs[0]),
 				y : parseInt(coordArgs[1])
 			};
@@ -968,7 +965,7 @@ function parseSprite(lines, i) {
 	sprite[id] = {
 		drw : drwId, //drawing id
 		col : colorIndex,
-		set : null, //default location is "offstage"
+		room : null, //default location is "offstage"
 		x : -1,
 		y : -1,
 		walkingPath : [] //tile by tile movement path (isn't saved)
@@ -1061,11 +1058,11 @@ function drawSprite(img,x,y) { //this may differ later
 	drawTile(img,x,y);
 }
 
-function drawSet(set) {
+function drawRoom(room) {
 	//draw tiles
-	for (i in set.tilemap) {
-		for (j in set.tilemap[i]) {
-			var id = set.tilemap[i][j];
+	for (i in room.tilemap) {
+		for (j in room.tilemap[i]) {
+			var id = room.tilemap[i][j];
 			if (id != "0") {
 				drawTile( getTileImage(tile[id]), j, i );
 			}
@@ -1074,7 +1071,7 @@ function drawSet(set) {
 	//draw sprites
 	for (id in sprite) {
 		var spr = sprite[id];
-		if (spr.set === set.id) {
+		if (spr.room === room.id) {
 			drawSprite( getSpriteImage(spr), spr.x, spr.y );
 		}
 	}
@@ -1089,14 +1086,14 @@ function getSpriteImage(s) {
 }
 
 function curPal() {
-	if (set[curSet].pal != null) {
+	if (room[curRoom].pal != null) {
 		//a specific palette was chosen
-		return set[curSet].pal;
+		return room[curRoom].pal;
 	}
 	else {
-		if (curSet in palette) {
-			//there is a palette matching the name of the set
-			return curSet;
+		if (curRoom in palette) {
+			//there is a palette matching the name of the room
+			return curRoom;
 		}
 		else {
 			//use the default palette
