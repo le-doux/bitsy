@@ -403,6 +403,12 @@ function newRoom() {
 	drawEditMap();
 
 	document.getElementById("roomId").innerHTML = curRoom;
+
+	var select = document.getElementById("exitGoesToSelect");
+	var option = document.createElement("option");
+	option.text = "room " + roomId;
+	option.value = roomId;
+	select.add(option);
 }
 
 function nextSprite() {
@@ -505,13 +511,11 @@ function map_onMouseDown(e) {
 	var row = room[curRoom].tilemap[y];
 	if (selectedExit != null && getExit(curRoom,x,y) == null) {
 		//de-select exit
-		selectedExit = null;
-		drawEditMap();
+		setSelectedExit(null);
 	}
 	else if (areExitsVisible && getExit(curRoom,x,y) != null) {
 		//select exit
-		selectedExit = getExit(curRoom,x,y);
-		drawEditMap();
+		setSelectedExit( getExit(curRoom,x,y) );
 	}
 	else if (isAddingExit) {
 		//add exit
@@ -1048,12 +1052,18 @@ function toggleVersionNotes() {
 var isAddingExit = false;
 var areExitsVisible = true;
 var selectedExit = null;
+
 function addExit() { //todo rename something less vague
 	isAddingExit = true;
-	selectedExit = null;
-	drawEditMap();
+	setSelectedExit(null);
+	document.getElementById("addExitButton").style.display = "none";
+	document.getElementById("addingExitHelpText").style.display = "block";
 }
+
 function addExitToCurRoom(x,y) {
+	isAddingExit = false;
+	document.getElementById("addExitButton").style.display = "block";
+	document.getElementById("addingExitHelpText").style.display = "none";
 	var newExit = {
 		x : x,
 		y : y,
@@ -1064,10 +1074,28 @@ function addExitToCurRoom(x,y) {
 		}
 	}
 	room[curRoom].exits.push( newExit );
-	selectedExit = newExit;
-
-	isAddingExit = false;
-	
 	refreshGameData();
+	setSelectedExit(newExit);
+}
+
+function setSelectedExit(e) {
+	console.log("SET SELECTED EXIT");
+	selectedExit = e;
+
+	if (selectedExit == null) {
+		document.getElementById("noExitSelected").style.display = "block";
+		document.getElementById("exitSelected").style.display = "none";
+	}
+	else {
+		document.getElementById("noExitSelected").style.display = "none";
+		document.getElementById("exitSelected").style.display = "block";
+	}
+
 	drawEditMap();
+}
+
+function deleteSelectedExit() {
+	room[curRoom].exits.splice( room[curRoom].exits.indexOf( selectedExit ), 1 );
+	refreshGameData();
+	setSelectedExit(null);
 }

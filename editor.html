@@ -50,6 +50,18 @@
 				font-size: 13px;
 				line-height: 130%;
 			}
+			#exitCanvas {
+				width:256px;
+				height:256px;
+			}
+			#editSelectedExit {
+				background: #eee;
+				padding: 10px;
+				margin: 2px;
+				width: 256px;
+				height: 315px; 
+				color: #555;
+			}
 		</style>
 
 		<script src="bitsy.js"></script>
@@ -129,17 +141,33 @@
 			<canvas id="game"></canvas>
 			<br>
 			<div id="roomNav">
+				room <span id="roomId">0</span><br>
 				<button onclick="prevRoom();"> < prev </button>
 				<button onclick="nextRoom();"> next > </button>
 				<button onclick="newRoom();"> + new </button>
-				[ current room id: <span id="roomId">0</span> ]
 			</div>
 			<button onclick=""> add exits to other rooms </button>
 			<button onclick="toggleMapGrid();"> show/hide tile grid </button>
 		</div>
 		<div class="panel">
 			~ exits ~ <br>
-			<button onclick="addExit();"> + add new exit to this room </button>
+			<button onclick="addExit();" id="addExitButton"> + add new exit to this room </button>
+			<span id="addingExitHelpText" style="display:none;"><i>click space in room to add exit</i></span>
+			<div id="editSelectedExit">
+				<div id="noExitSelected">
+					<i>no exit selected</i>
+				</div>
+				<div id="exitSelected" style="display:none;">
+					this exit goes to: 
+					<select id="exitGoesToSelect">
+						<option>room 0</option>
+					</select>
+					<br>
+					<canvas id="exitCanvas"></canvas>
+					<br>
+					<button onclick="deleteSelectedExit();"> - delete selected exit </button>
+				</div>
+			</div>
 		</div>
 		<div class="panel">
 			~ paint ~ <br>
