@@ -11,6 +11,10 @@ X set -> room
 ? import html files
 ? drag to add/delete tiles from map in bulk
 
+v2.1 TODOS
+- multiple palettes
+- better logo for exits
+
 TODO NEXT
 - fix tile/sprite # limit bug
 	- later: comma-separated tile names (with more than one char)
@@ -499,7 +503,24 @@ function map_onMouseDown(e) {
 	var y = Math.floor(off.y / (tilesize*scale));
 	console.log(x + " " + y);
 	var row = room[curRoom].tilemap[y];
-	if (drawingId != null) {
+	if (selectedExit != null && getExit(curRoom,x,y) == null) {
+		//de-select exit
+		selectedExit = null;
+		drawEditMap();
+	}
+	else if (areExitsVisible && getExit(curRoom,x,y) != null) {
+		//select exit
+		selectedExit = getExit(curRoom,x,y);
+		drawEditMap();
+	}
+	else if (isAddingExit) {
+		//add exit
+		if ( getExit(curRoom,x,y) == null ) {
+			addExitToCurRoom(x,y);
+		}
+	}
+	else if (drawingId != null) {
+		//add tiles/sprites to map
 		if (paintMode == TileType.Tile) {
 			if ( row.charAt(x) === "0" ) {
 				//add
@@ -626,6 +647,24 @@ function drawEditMap() {
 		for (var y = 1; y < mapsize; y++) {
 			ctx.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
 		}
+	}
+
+	//draw exits
+	if (areExitsVisible) {
+		for (i in room[curRoom].exits) {
+			var e = room[curRoom].exits[i];
+			if (e == selectedExit) {
+				ctx.fillStyle = "#ff0";
+				ctx.globalAlpha = 0.9;
+			}
+			else {
+				ctx.fillStyle = "#fff";
+				ctx.globalAlpha = 0.5;
+			}
+			ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
+			//todo (tilesize*scale) should be a function
+		}
+		ctx.globalAlpha = 1;
 	}
 }
 
@@ -1003,4 +1042,32 @@ function toggleVersionNotes() {
 	else {
 		div.style.display = "none";
 	}
+}
+
+/* EXITS */
+var isAddingExit = false;
+var areExitsVisible = true;
+var selectedExit = null;
+function addExit() { //todo rename something less vague
+	isAddingExit = true;
+	selectedExit = null;
+	drawEditMap();
+}
+function addExitToCurRoom(x,y) {
+	var newExit = {
+		x : x,
+		y : y,
+		dest : { //starts with invalid destination
+			room : null,
+			x : -1,
+			y : -1
+		}
+	}
+	room[curRoom].exits.push( newExit );
+	selectedExit = newExit;
+
+	isAddingExit = false;
+	
+	refreshGameData();
+	drawEditMap();
 }

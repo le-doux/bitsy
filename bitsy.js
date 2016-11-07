@@ -702,7 +702,7 @@ function serializeWorld() {
 	/* TITLE */
 	worldStr += title + "\n";
 	worldStr += "\n";
-	/* PAL */
+	/* PALETTE */
 	for (id in palette) {
 		worldStr += "PAL " + id + "\n";
 		for (i in palette[id]) {
@@ -721,6 +721,7 @@ function serializeWorld() {
 			worldStr += room[id].tilemap[i] + "\n";
 		}
 		if (room[id].walls.length > 0) {
+			/* WALLS */
 			worldStr += "WAL ";
 			for (j in room[id].walls) {
 				worldStr += room[id].walls[j];
@@ -730,9 +731,19 @@ function serializeWorld() {
 			}
 			worldStr += "\n";
 		}
+		if (room[id].exits.length > 0) {
+			/* EXITS */
+			for (j in room[id].exits) {
+				var e = room[id].exits[j];
+				if ( isExitValid(e) ) {
+					worldStr += "EXT " + e.x + "," + e.y + " " + e.dest.room + " " + e.dest.x + "," + e.dest.y;
+					worldStr += "\n";
+				}
+			}
+		}
 		worldStr += "\n";
 	}
-	/* TILE */
+	/* TILES */
 	for (id in tile) {
 		worldStr += "TIL " + id + "\n";
 		for (i in imageStore.source["TIL_" + id]) {
@@ -740,24 +751,31 @@ function serializeWorld() {
 		}
 		worldStr += "\n";
 	}
-	/* SPR */
+	/* SPRITES */
 	for (id in sprite) {
 		worldStr += "SPR " + id + "\n";
 		for (i in imageStore.source["SPR_" + id]) {
 			worldStr += imageStore.source["SPR_" + id][i] + "\n";
 		}
 		if (sprite[id].room != null) {
+			/* SPRITE POSITION */
 			worldStr += "POS " + sprite[id].room + " " + sprite[id].x + "," + sprite[id].y + "\n";
 		}
 		worldStr += "\n";
 	}
-	/* DLG */
+	/* DIALOG */
 	for (id in dialog) {
 		worldStr += "DLG " + id + "\n";
 		worldStr += dialog[id] + "\n";
 		worldStr += "\n";
 	}
 	return worldStr;
+}
+
+function isExitValid(e) {
+	return e.x >= 0 && e.x < 16 && e.y >= 0 && e.y < 16 && 
+			e.dest != null && e.dest.room != null &&
+			e.dest.x >= 0 && e.dest.x < 16 && e.dest.y >= 0 && e.dest.y < 16;
 }
 
 function placeSprites() {

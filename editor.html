@@ -128,13 +128,18 @@
 			</form>
 			<canvas id="game"></canvas>
 			<br>
-			<button onclick="toggleMapGrid();"> show/hide tile grid </button>
 			<div id="roomNav">
 				<button onclick="prevRoom();"> < prev </button>
 				<button onclick="nextRoom();"> next > </button>
 				<button onclick="newRoom();"> + new </button>
 				[ current room id: <span id="roomId">0</span> ]
 			</div>
+			<button onclick=""> add exits to other rooms </button>
+			<button onclick="toggleMapGrid();"> show/hide tile grid </button>
+		</div>
+		<div class="panel">
+			~ exits ~ <br>
+			<button onclick="addExit();"> + add new exit to this room </button>
 		</div>
 		<div class="panel">
 			~ paint ~ <br>
