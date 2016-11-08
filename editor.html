@@ -59,7 +59,7 @@
 				padding: 10px;
 				margin: 2px;
 				width: 256px;
-				height: 315px; 
+				height: 325px; 
 				color: #555;
 			}
 		</style>
@@ -159,11 +159,13 @@
 				</div>
 				<div id="exitSelected" style="display:none;">
 					this exit goes to: 
-					<select id="exitGoesToSelect">
-						<option>room 0</option>
+					<select id="exitDestinationSelect" onchange="exitDestinationRoomChange(event);">
+						<option value="0">room 0</option> <!-- other options are added dynamically -->
 					</select>
 					<br>
 					<canvas id="exitCanvas"></canvas>
+					<br>
+					<i>click to place exit destination in this room</i>
 					<br>
 					<button onclick="deleteSelectedExit();"> - delete selected exit </button>
 				</div>

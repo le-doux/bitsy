@@ -5,11 +5,13 @@ what's new
 v2 TODOS
 X multiple rooms
 X set -> room
-- exit tool
+X exit tool
 - tool hide/show
 ? make fake links not take up search history space
 ? import html files
 ? drag to add/delete tiles from map in bulk
+? move title to top in its own box
+? nunito font
 
 v2.1 TODOS
 - multiple palettes
@@ -149,6 +151,14 @@ function start() {
 	paint_canvas.addEventListener("mousemove", paint_onMouseMove);
 	paint_canvas.addEventListener("mouseup", paint_onMouseUp);
 	paint_canvas.addEventListener("mouseleave", paint_onMouseUp);
+
+	//exit destination canvas & context
+	exit_canvas = document.getElementById("exitCanvas");
+	exit_canvas.width = width * scale;
+	exit_canvas.height = width * scale;
+	exit_ctx = exit_canvas.getContext("2d");
+	//exit events
+	exit_canvas.addEventListener("mousedown", exit_onMouseDown);
 
 
 	//default values
@@ -404,7 +414,7 @@ function newRoom() {
 
 	document.getElementById("roomId").innerHTML = curRoom;
 
-	var select = document.getElementById("exitGoesToSelect");
+	var select = document.getElementById("exitDestinationSelect");
 	var option = document.createElement("option");
 	option.text = "room " + roomId;
 	option.value = roomId;
@@ -1052,6 +1062,9 @@ function toggleVersionNotes() {
 var isAddingExit = false;
 var areExitsVisible = true;
 var selectedExit = null;
+var exit_canvas;
+var exit_ctx;
+var selectedExitRoom = "0";
 
 function addExit() { //todo rename something less vague
 	isAddingExit = true;
@@ -1068,7 +1081,7 @@ function addExitToCurRoom(x,y) {
 		x : x,
 		y : y,
 		dest : { //starts with invalid destination
-			room : null,
+			room : "0",
 			x : -1,
 			y : -1
 		}
@@ -1089,6 +1102,17 @@ function setSelectedExit(e) {
 	else {
 		document.getElementById("noExitSelected").style.display = "none";
 		document.getElementById("exitSelected").style.display = "block";
+
+		selectedExitRoom = selectedExit.dest.room;
+		var destOptions = document.getElementById("exitDestinationSelect").options;
+		for (i in destOptions) {
+			var o = destOptions[i];
+			if (o.value === selectedExitRoom) {
+				o.selected = true;
+			}
+		}
+
+		drawExitDestinationRoom();
 	}
 
 	drawEditMap();
@@ -1098,4 +1122,51 @@ function deleteSelectedExit() {
 	room[curRoom].exits.splice( room[curRoom].exits.indexOf( selectedExit ), 1 );
 	refreshGameData();
 	setSelectedExit(null);
+}
+
+function exitDestinationRoomChange(event) {
+	var roomId = event.target.value;
+	//selectedExit.dest.room = roomId;
+	selectedExitRoom = roomId;
+	drawExitDestinationRoom();
+}
+
+function drawExitDestinationRoom() {
+	//clear screen
+	exit_ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
+	exit_ctx.fillRect(0,0,canvas.width,canvas.height);
+
+	//draw map
+	drawRoom( room[selectedExitRoom], exit_ctx );
+
+	//draw grid
+	exit_ctx.fillStyle = "#fff";
+	for (var x = 1; x < mapsize; x++) {
+		exit_ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
+	}
+	for (var y = 1; y < mapsize; y++) {
+		exit_ctx.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
+	}
+
+	//draw exit destination
+	if ( isExitValid(selectedExit) && selectedExit.dest.room === selectedExitRoom ) {
+		exit_ctx.fillStyle = "#ff0";
+		exit_ctx.globalAlpha = 0.9;
+		exit_ctx.fillRect(selectedExit.dest.x * tilesize * scale, selectedExit.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
+		exit_ctx.globalAlpha = 1;
+	}
+}
+
+var exit_scale = 16;
+function exit_onMouseDown(e) {
+	var off = getOffset(e);
+	var x = Math.floor(off.x / exit_scale);
+	var y = Math.floor(off.y / exit_scale);
+	selectedExit.dest.room = selectedExitRoom;
+	selectedExit.dest.x = x;
+	selectedExit.dest.y = y;
+
+	refreshGameData();
+
+	drawExitDestinationRoom();
 }

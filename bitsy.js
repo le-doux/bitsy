@@ -1068,21 +1068,24 @@ function parseDialog(lines, i) {
 	return i;
 }
 
-function drawTile(img,x,y) {
-	ctx.putImageData(img,x*tilesize*scale,y*tilesize*scale);
+function drawTile(img,x,y,context) {
+	if (!context) { //optional pass in context; otherwise, use default
+		context = ctx;
+	}
+	context.putImageData(img,x*tilesize*scale,y*tilesize*scale);
 }
 
-function drawSprite(img,x,y) { //this may differ later
-	drawTile(img,x,y);
+function drawSprite(img,x,y,context) { //this may differ later
+	drawTile(img,x,y,context);
 }
 
-function drawRoom(room) {
+function drawRoom(room,context) {
 	//draw tiles
 	for (i in room.tilemap) {
 		for (j in room.tilemap[i]) {
 			var id = room.tilemap[i][j];
 			if (id != "0") {
-				drawTile( getTileImage(tile[id]), j, i );
+				drawTile( getTileImage(tile[id]), j, i, context );
 			}
 		}
 	}
@@ -1090,7 +1093,7 @@ function drawRoom(room) {
 	for (id in sprite) {
 		var spr = sprite[id];
 		if (spr.room === room.id) {
-			drawSprite( getSpriteImage(spr), spr.x, spr.y );
+			drawSprite( getSpriteImage(spr), spr.x, spr.y, context );
 		}
 	}
 }
