@@ -1092,7 +1092,6 @@ function addExitToCurRoom(x,y) {
 }
 
 function setSelectedExit(e) {
-	console.log("SET SELECTED EXIT");
 	selectedExit = e;
 
 	if (selectedExit == null) {

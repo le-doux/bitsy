@@ -77,6 +77,10 @@
 			<br>
 			<button onclick="hideUnsupportedFeatureWarning();">I'll be ok, hide this message</button>
 		</div>
+		<div class="panel" style="float:none; width:200px;">
+			~ title ~ <br>
+			<input type="text" id="titleText" onchange="on_change_title();" value="Write title here">
+		</div>
 		<div class="panel" id="about">
 			~ about bitsy ~ <br>
 			<div id="aboutInner">
@@ -200,9 +204,8 @@
 			</div>
 		</div>
 		<div class="panel">
-			~ title and share ~ <br>
-			title: <input type="text" id="titleText" onchange="on_change_title();" value="Write title here"> <br>
-			<button onclick="exportGame();">share game</button>
+			~ download and share ~ <br>
+			<button onclick="exportGame();">download game</button>
 			<br>
 			<div id="downloadHelp" class="helpMessage" style="display:none;">
 				Note: your browser doesn't support<br>
