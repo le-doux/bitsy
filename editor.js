@@ -265,6 +265,8 @@ function start() {
 	if (!browserFeatures.fileDownload) {
 		document.getElementById("downloadHelp").style.display = "block";
 	}
+
+	startLoadFont();
 }
 
 function listenMapEditEvents() {
@@ -1034,7 +1036,7 @@ function downloadFile(filename, text) {
 }
 
 function hideAbout() {
-	document.getElementById("about").setAttribute("style","display:none;");
+	document.getElementById("aboutPanel").setAttribute("style","display:none;");
 }
 
 function toggleInstructions() {
@@ -1168,4 +1170,38 @@ function exit_onMouseDown(e) {
 	refreshGameData();
 
 	drawExitDestinationRoom();
+}
+
+function hidePanel(id) {
+	//update panel
+	document.getElementById(id).style.display = "none";
+	//update checkbox
+	if (id != "toolsPanel")
+		document.getElementById(id.replace("Panel","Check")).checked = false;
+}
+
+function togglePanel(e) {
+	if (event.target.checked) {
+		document.getElementById(event.target.value).style.display = "block";
+	}
+	else {
+		document.getElementById(event.target.value).style.display = "none";
+	}
+}
+
+function showToolsPanel() {
+	document.getElementById("toolsPanel").style.display = "block";
+}
+
+//Load fancy font after page finishes loading
+function startLoadFont() {
+	var url = 'https://fonts.googleapis.com/css?family=Nunito|Coustard';
+	loadFont(url);
+}
+
+function loadFont(url) {
+	var link = document.createElement('link');
+	link.rel = 'stylesheet';
+	link.href = url;
+	document.head.appendChild(link);
 }

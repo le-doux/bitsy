@@ -5,10 +5,10 @@
 
 		<style>
 			body {
-				background: #ccccff;
+				background: /*#bdbddb;*/ #ccccff;
 				line-height: 150%;
-				font-family: "Gill Sans", Arial, sans-serif;
-				font-size: 15px;
+				font-family: /*"Gill Sans",*/ "Nunito", Helvetica, Arial, sans-serif;
+				font-size: 18px;
 			}
 			canvas {
 				background: black;
@@ -17,23 +17,25 @@
 				width: 100%;
 			}
 			.panel {
-				float:left;
+				float: left;
 				background: white;
-				margin:10px;
+				margin: 10px;
 				padding: 10px;
+				border-bottom: solid 3px #888;
+				border-radius: 5px;
 			}
 			textarea {
 				font-family: monospace;
 			}
 			button {
-				font-family: "Gill Sans", Arial, sans-serif;
-				font-size: 12px;
+				font-family: /*"Gill Sans",*/ "Nunito", Helvetica, Arial, sans-serif;
+				font-size: 13px;
 			}
 			input {
 				font-family: monospace;
 			}
 			#unsupportedFeatures {
-				background: white;
+				background: #fdd;
 				border: solid red 2px;
 				padding: 10px;
 				margin: 10px;
@@ -43,7 +45,7 @@
 				padding: 5px;
 				margin: 2px;
 				color: #555;
-				font-size: 13px;
+				font-size: 14px;
 				line-height: 130%;
 			}
 			#aboutInner {
@@ -62,6 +64,29 @@
 				height: 325px; 
 				color: #555;
 			}
+			.panel .bar {
+				background: #eee;
+				border-bottom: 2px solid #ccc;
+				padding: 5px;
+				padding-bottom: 2px;
+				margin: -10px;
+				margin-bottom: 10px;
+				border-radius: 5px 5px 0px 0px;
+			}
+			.minimize {
+				float:right;
+				color:blue;
+			}
+			.minimize:hover {
+				font-weight: bold;
+			}
+			#addTools {
+				color:blue;
+				float:right;
+			}
+			#addTools:hover {
+				text-decoration: underline;
+			}
 		</style>
 
 		<script src="bitsy.js"></script>
@@ -70,19 +95,39 @@
 
 	<body onload="start()">
 		<div id="topbar">
-			bitsy editor v0.1 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
+			Bitsy v1.0 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
+			<span id="addTools" onclick="showToolsPanel();"> + add tools </span>
 		</div>
 		<div id="unsupportedFeatures" style="display:none;">
 			~ UH OH ~ your browser doesn't support all of bitsy's features, so some things might not work right. Maybe try <a href="https://www.google.com/chrome/browser" target="_blank">chrome</a> or <a href="https://www.mozilla.org/firefox" target="_blank">firefox</a>? - adam
 			<br>
 			<button onclick="hideUnsupportedFeatureWarning();">I'll be ok, hide this message</button>
 		</div>
-		<div class="panel" style="float:none; width:200px;">
-			~ title ~ <br>
-			<input type="text" id="titleText" onchange="on_change_title();" value="Write title here">
+		<div id="titlePanel" class="panel" style="float:none; width:220px;">
+			<!--
+			<div class="bar"> 
+				title <span class="minimize" onclick="hidePanel('titlePanel');">[ - ]</span>
+			</div>
+			-->
+			title: <input type="text" id="titleText" onchange="on_change_title();" value="Write title here">
 		</div>
-		<div class="panel" id="about">
-			~ about bitsy ~ <br>
+		<div id="toolsPanel" class="panel" style="display:none;">
+			<div class="bar">
+				tools <span class="minimize" onclick="hidePanel('toolsPanel');">[ - ]</span>
+			</div>
+			<input type="checkbox" value="titlePanel" id="titlePanel" onclick="togglePanel(event);" checked/> title <br>
+			<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/> about <br>
+			<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanel(event);" checked/> room <br>
+			<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanel(event);" /> exits <br>
+			<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanel(event);"  checked/> paint <br>
+			<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanel(event);"  checked/> colors <br>
+			<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanel(event);"  checked/> download <br>
+			<input type="checkbox" value="dataPanel" onclick="togglePanel(event);" id="dataCheck"/> game data
+		</div>
+		<div id="aboutPanel" class="panel">
+			<div class="bar">
+				about bitsy <span class="minimize" onclick="hidePanel('aboutPanel');">[ - ]</span>
+			</div>
 			<div id="aboutInner">
 				hi! bitsy is a little editor for little games or worlds. <br>
 				the goal is to make it easy to make games where you <br>
@@ -131,13 +176,12 @@
 					- fix autocomplete color bug in Safari <br>
 					- limit number of sprites
 				</div>
-
-				<br>
-				<button onclick="hideAbout();"> ok, hide all this nonsense </button>
 			</div>
 		</div>
-		<div class="panel">
-			~ room ~
+		<div id="roomPanel" class="panel">
+			<div class="bar">
+				room <span class="minimize" onclick="hidePanel('roomPanel');">[ - ]</span>
+			</div>
 			<form>
 				<input type="radio" name="edit mode" value="edit" onclick="on_edit_mode()" checked> edit
 				<input type="radio" name="edit mode" value="play" onclick="on_play_mode()"> play
@@ -150,11 +194,13 @@
 				<button onclick="nextRoom();"> next > </button>
 				<button onclick="newRoom();"> + new </button>
 			</div>
-			<button onclick=""> add exits to other rooms </button>
+			<button onclick=""> + add exits from this room to other rooms </button>
 			<button onclick="toggleMapGrid();"> show/hide tile grid </button>
 		</div>
-		<div class="panel">
-			~ exits ~ <br>
+		<div id="exitsPanel" class="panel" style="display:none;">
+			<div class="bar">
+				exits <span class="minimize" onclick="hidePanel('exitsPanel');">[ - ]</span>
+			</div>
 			<button onclick="addExit();" id="addExitButton"> + add new exit to this room </button>
 			<span id="addingExitHelpText" style="display:none;"><i>click space in room to add exit</i></span>
 			<div id="editSelectedExit">
@@ -175,8 +221,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="panel">
-			~ paint ~ <br>
+		<div id="paintPanel" class="panel">
+			<div class="bar">
+				paint <span class="minimize" onclick="hidePanel('paintPanel');">[ - ]</span>
+			</div>
 			<form>
 				<input type="radio" name="paint mode" value="sprite" onclick="on_paint_avatar();" checked> avatar
 				<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();"> tile
@@ -193,8 +241,10 @@
 			<div id="dialog" style="display:none;">dialog: <input type="text" id="dialogText" onchange="on_change_dialog();"></div>
 			<button onclick="toggleGrid();"> show/hide pixel grid </button>
 		</div>
-		<div class="panel">
-			~ colors ~ <br>
+		<div id="colorsPanel" class="panel">
+			<div class="bar">
+				colors <span class="minimize" onclick="hidePanel('colorsPanel');">[ - ]</span>
+			</div>
 			<input type="color" value="#0052cc" id="backgroundColor" onchange="on_change_color_bg();" autocomplete="off"> background <br>
 			<input type="color" value="#809fff" id="tileColor" onchange="on_change_color_tile();" autocomplete="off"> tile <br>
 			<input type="color" value="#ffffff" id="spriteColor" onchange="on_change_color_sprite();" autocomplete="off"> sprite <br>
@@ -203,8 +253,10 @@
 				Try this online <a href="http://www.w3schools.com/colors/colors_picker.asp" target="_blank">color picker</a>.
 			</div>
 		</div>
-		<div class="panel">
-			~ download and share ~ <br>
+		<div id="downloadPanel" class="panel">
+			<div class="bar">
+				download <span class="minimize" onclick="hidePanel('downloadPanel');">[ - ]</span>
+			</div>
 			<button onclick="exportGame();">download game</button>
 			<br>
 			<div id="downloadHelp" class="helpMessage" style="display:none;">
@@ -218,8 +270,10 @@
 				- share your game as a web page!
 			</div>
 		</div>
-		<div class="panel">
-			~ game data ~ <br>
+		<div id="dataPanel" class="panel" style="display:none;">
+			<div class="bar">
+				game data <span class="minimize" onclick="hidePanel('dataPanel');">[ - ]</span>
+			</div>
 			<textarea id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
 		</div>
 	</body>
