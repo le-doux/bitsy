@@ -6,12 +6,12 @@ v2 TODOS
 X multiple rooms
 X set -> room
 X exit tool
-- tool hide/show
-? make fake links not take up search history space
+X tool hide/show
+X make fake links not take up search history space
 ? import html files
 ? drag to add/delete tiles from map in bulk
-? move title to top in its own box
-? nunito font
+X move title to top in its own box
+X nunito font
 
 v2.1 TODOS
 - multiple palettes
@@ -162,7 +162,7 @@ function start() {
 
 
 	//default values
-	title = "Write title here";
+	title = "Write your game's title here";
 	palette[drawingPal] = [
 		[0,82,204],
 		[128,159,255],
@@ -1172,6 +1172,11 @@ function exit_onMouseDown(e) {
 	drawExitDestinationRoom();
 }
 
+function showExitsPanel() {
+	document.getElementById("exitsPanel").style.display = "block";
+	document.getElementById("exitsCheck").checked = true;
+}
+
 function hidePanel(id) {
 	//update panel
 	document.getElementById(id).style.display = "none";
@@ -1193,6 +1198,7 @@ function showToolsPanel() {
 	document.getElementById("toolsPanel").style.display = "block";
 }
 
+/*
 //Load fancy font after page finishes loading
 function startLoadFont() {
 	var url = 'https://fonts.googleapis.com/css?family=Nunito|Coustard';
@@ -1205,3 +1211,4 @@ function loadFont(url) {
 	link.href = url;
 	document.head.appendChild(link);
 }
+*/

@@ -5,16 +5,28 @@
 
 		<style>
 			body {
+				margin: 0 !important;
+				padding: 0 !important;
 				background: /*#bdbddb;*/ #ccccff;
-				line-height: 150%;
-				font-family: /*"Gill Sans",*/ "Nunito", Helvetica, Arial, sans-serif;
+				line-height: 170%;
+				font-family: "Nunito", Helvetica, Arial, sans-serif;
 				font-size: 18px;
+			}
+			button {
+				font-family: Helvetica, Arial, sans-serif;
+				font-size: 13px;
 			}
 			canvas {
 				background: black;
 			}
 			#topbar {
 				width: 100%;
+				background: white;
+				border-bottom: solid 3px #888;
+				padding: 10px;
+				padding-left: 20px;
+				padding-right: 20px;
+    			box-sizing: border-box;
 			}
 			.panel {
 				float: left;
@@ -23,13 +35,10 @@
 				padding: 10px;
 				border-bottom: solid 3px #888;
 				border-radius: 5px;
+				font-size: 16px;
 			}
 			textarea {
 				font-family: monospace;
-			}
-			button {
-				font-family: /*"Gill Sans",*/ "Nunito", Helvetica, Arial, sans-serif;
-				font-size: 13px;
 			}
 			input {
 				font-family: monospace;
@@ -45,7 +54,7 @@
 				padding: 5px;
 				margin: 2px;
 				color: #555;
-				font-size: 14px;
+				font-size: 13px;
 				line-height: 130%;
 			}
 			#aboutInner {
@@ -61,17 +70,21 @@
 				padding: 10px;
 				margin: 2px;
 				width: 256px;
-				height: 325px; 
+				height: 350px; 
 				color: #555;
+				font-size: 13px;
 			}
 			.panel .bar {
 				background: #eee;
 				border-bottom: 2px solid #ccc;
 				padding: 5px;
+				padding-left: 10px;
+				padding-right: 10px;
 				padding-bottom: 2px;
 				margin: -10px;
 				margin-bottom: 10px;
 				border-radius: 5px 5px 0px 0px;
+				font-size: 18px;
 			}
 			.minimize {
 				float:right;
@@ -80,42 +93,46 @@
 			.minimize:hover {
 				font-weight: bold;
 			}
-			#addTools {
-				color:blue;
-				float:right;
+			#titleText {
+				width: 400px;
+				font-size: 16px;
 			}
-			#addTools:hover {
+			#bitsyEditorName {
+				font-size: 14px;
+				float: right;
+			}
+			.toggleText {
+				color: blue;
 				text-decoration: underline;
+			}
+			.toggleText:hover {
+				font-weight: bold;
 			}
 		</style>
 
 		<script src="bitsy.js"></script>
 		<script src="editor.js"></script>
+
+		<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 	</head>
 
 	<body onload="start()">
 		<div id="topbar">
-			Bitsy v1.0 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
-			<span id="addTools" onclick="showToolsPanel();"> + add tools </span>
+			<input type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
+			<button onclick="showToolsPanel();" style="margin-left:20px;">show toolbar</button>
+			<span id="bitsyEditorName">
+				Bitsy v1.0 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
+			</span>
 		</div>
 		<div id="unsupportedFeatures" style="display:none;">
-			~ UH OH ~ your browser doesn't support all of bitsy's features, so some things might not work right. Maybe try <a href="https://www.google.com/chrome/browser" target="_blank">chrome</a> or <a href="https://www.mozilla.org/firefox" target="_blank">firefox</a>? - adam
+			UH OH your browser doesn't support all of bitsy's features, so some things might not work right. Maybe try <a href="https://www.google.com/chrome/browser" target="_blank">chrome</a> or <a href="https://www.mozilla.org/firefox" target="_blank">firefox</a>? - adam
 			<br>
 			<button onclick="hideUnsupportedFeatureWarning();">I'll be ok, hide this message</button>
 		</div>
-		<div id="titlePanel" class="panel" style="float:none; width:220px;">
-			<!--
-			<div class="bar"> 
-				title <span class="minimize" onclick="hidePanel('titlePanel');">[ - ]</span>
-			</div>
-			-->
-			title: <input type="text" id="titleText" onchange="on_change_title();" value="Write title here">
-		</div>
 		<div id="toolsPanel" class="panel" style="display:none;">
 			<div class="bar">
-				tools <span class="minimize" onclick="hidePanel('toolsPanel');">[ - ]</span>
+				toolbar <span class="minimize" onclick="hidePanel('toolsPanel');">[ - ]</span>
 			</div>
-			<input type="checkbox" value="titlePanel" id="titlePanel" onclick="togglePanel(event);" checked/> title <br>
 			<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/> about <br>
 			<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanel(event);" checked/> room <br>
 			<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanel(event);" /> exits <br>
@@ -135,21 +152,24 @@
 				i hope you enjoy using it! <br>
 				- adam <br><br>
 
-				<a href="#" onclick="toggleInstructions();">~ instructions ~</a> <br>
+				<span class="toggleText" onclick="toggleInstructions();">instructions</span> <br>
 				<div id="instructions" style="display:none;">
-					you can draw things in the ~ paint ~ panel, then place <br>
-					them in your world in the ~ room ~ panel. you can write <br>
+					you can draw things in the <b>paint</b> panel, then place <br>
+					them in your world in the <b>room</b> panel. you can write <br>
 					dialog for your characters (aka sprites) too. <br>
 					<br>
 					some words:<br>
 					* room - a place in your game world<br>
 					* avatar - the player's character<br>
 					* tile - a piece of the scenery<br>
-					* sprite - other characters or things<br>
+					* sprite - interactive characters or things<br>
 					<br>
 					to try your game, switch the room to play mode: <br>
 					* walk around with the arrow keys <br>
 					* talk to sprites by walking up to them <br>
+					<br>
+					you can make multiple rooms, but make sure you add <br>
+					some <b>exits</b> to connect them to each other! <br>
 					<br>
 					use "share game" to download the game as an html file. <br>
 					you can email the file to a friend, or host it online! <br>
@@ -163,18 +183,14 @@
 				</div>
 				<br>
 
-				<a href="#" onclick="toggleVersionNotes();">~ what's new v0.1 ~</a> <br>
+				<span class="toggleText" onclick="toggleVersionNotes();">what's new v1.0</span> <br>
 				<div id="versionNotes" style="display:none;">
-					version 0.1 <br>
 					<i>new features:</i> <br>
-					- games have touch controls! <br>
-					<i>bugfixes:</i> <br>
-					- quotation marks in dialog don't break game <br>
-					- drawing on Surface devices works <br>
-					- pasting new game data refreshes everything <br>
-					- editor detects unsupported features <br>
-					- fix autocomplete color bug in Safari <br>
-					- limit number of sprites
+					- you can have multiple rooms in a game! <br>
+					- add exits that connect rooms <br>
+					- a toolbar for showing/hiding tool windows <br>
+					- you can minimize tools <br>
+					- remove sprites from a room by clicking on them <br>
 				</div>
 			</div>
 		</div>
@@ -194,7 +210,7 @@
 				<button onclick="nextRoom();"> next > </button>
 				<button onclick="newRoom();"> + new </button>
 			</div>
-			<button onclick=""> + add exits from this room to other rooms </button>
+			<button onclick="showExitsPanel();"> + add exits from this room to other rooms </button>
 			<button onclick="toggleMapGrid();"> show/hide tile grid </button>
 		</div>
 		<div id="exitsPanel" class="panel" style="display:none;">
