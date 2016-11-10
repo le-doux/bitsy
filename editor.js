@@ -1068,6 +1068,25 @@ var exit_canvas;
 var exit_ctx;
 var selectedExitRoom = "0";
 
+function resetExitVars() {
+	isAddingExit = false;
+	setSelectedExit(null);
+}
+
+function showExits() {
+	resetExitVars();
+	areExitsVisible = true;
+	drawEditMap();
+	drawExitDestinationRoom();
+}
+
+function hideExits() {
+	resetExitVars();
+	areExitsVisible = false;
+	drawEditMap();
+	drawExitDestinationRoom();
+}
+
 function addExit() { //todo rename something less vague
 	isAddingExit = true;
 	setSelectedExit(null);
@@ -1175,6 +1194,7 @@ function exit_onMouseDown(e) {
 function showExitsPanel() {
 	document.getElementById("exitsPanel").style.display = "block";
 	document.getElementById("exitsCheck").checked = true;
+	showExits();
 }
 
 function hidePanel(id) {
@@ -1183,32 +1203,22 @@ function hidePanel(id) {
 	//update checkbox
 	if (id != "toolsPanel")
 		document.getElementById(id.replace("Panel","Check")).checked = false;
+	//hide exits
+	if (id === "exitsPanel") hideExits();
 }
 
 function togglePanel(e) {
+	var id = event.target.value;
 	if (event.target.checked) {
-		document.getElementById(event.target.value).style.display = "block";
+		document.getElementById(id).style.display = "block";
+		if (id === "exitsPanel") showExits();
 	}
 	else {
-		document.getElementById(event.target.value).style.display = "none";
+		document.getElementById(id).style.display = "none";
+		if (id === "exitsPanel") hideExits();
 	}
 }
 
 function showToolsPanel() {
 	document.getElementById("toolsPanel").style.display = "block";
 }
-
-/*
-//Load fancy font after page finishes loading
-function startLoadFont() {
-	var url = 'https://fonts.googleapis.com/css?family=Nunito|Coustard';
-	loadFont(url);
-}
-
-function loadFont(url) {
-	var link = document.createElement('link');
-	link.rel = 'stylesheet';
-	link.href = url;
-	document.head.appendChild(link);
-}
-*/
