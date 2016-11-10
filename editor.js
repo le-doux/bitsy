@@ -1,21 +1,8 @@
 /* 
-what's new
-	- removing sprites from map
-
-v2 TODOS
-X multiple rooms
-X set -> room
-X exit tool
-X tool hide/show
-X make fake links not take up search history space
-? import html files
-? drag to add/delete tiles from map in bulk
-X move title to top in its own box
-X nunito font
-
 v2.1 TODOS
 - multiple palettes
-- better logo for exits
+- better icon for exits
+- import html files
 
 TODO NEXT
 - fix tile/sprite # limit bug
@@ -30,10 +17,7 @@ TODO NEXT
 TODO BACKLOG
 - import old html or txt games to re-edit
 - export straight to itchio (is there a developer api?)
-- control panel for all tools
-- hide/show all tool windows
 - drag tool windows around
-- hide game data by default
 
 NOTES
 - remember to run chrome like this to test "open /Applications/Google\ Chrome.app --args --allow-file-access-from-files"
@@ -266,15 +250,20 @@ function start() {
 		document.getElementById("downloadHelp").style.display = "block";
 	}
 
-	startLoadFont();
 }
 
 function listenMapEditEvents() {
 	canvas.addEventListener("mousedown", map_onMouseDown);
+	canvas.addEventListener("mousemove", map_onMouseMove);
+	canvas.addEventListener("mouseup", map_onMouseUp);
+	canvas.addEventListener("mouseleave", map_onMouseUp);
 }
 
 function unlistenMapEditEvents() {
 	canvas.removeEventListener("mousedown", map_onMouseDown);
+	canvas.removeEventListener("mousemove", map_onMouseMove);
+	canvas.removeEventListener("mouseup", map_onMouseUp);
+	canvas.removeEventListener("mouseleave", map_onMouseUp);
 }
 
 function newTile() {
@@ -515,6 +504,8 @@ function sortedRoomIdList() {
 	return Object.keys( room ).sort();
 }
 
+var isDragAddingTiles = false;
+var isDragDeletingTiles = false;
 function map_onMouseDown(e) {
 	var off = getOffset(e);
 	var x = Math.floor(off.x / (tilesize*scale));
@@ -541,10 +532,12 @@ function map_onMouseDown(e) {
 			if ( row.charAt(x) === "0" ) {
 				//add
 				row = row.substr(0, x) + drawingId + row.substr(x+1);
+				isDragAddingTiles = true;
 			}
 			else {
 				//delete (better way to do this?)
 				row = row.substr(0, x) + "0" + row.substr(x+1);
+				isDragDeletingTiles = true;
 			}
 			room[curRoom].tilemap[y] = row;
 		}
@@ -578,6 +571,39 @@ function map_onMouseDown(e) {
 		refreshGameData();
 		drawEditMap();
 	}
+}
+
+function editTilesOnDrag(e) {
+	var off = getOffset(e);
+	var x = Math.floor(off.x / (tilesize*scale));
+	var y = Math.floor(off.y / (tilesize*scale));
+	var row = room[curRoom].tilemap[y];
+	if (isDragAddingTiles) {
+		if ( row.charAt(x) != drawingId ) {
+			row = row.substr(0, x) + drawingId + row.substr(x+1);
+			room[curRoom].tilemap[y] = row;
+			refreshGameData();
+			drawEditMap();
+		}
+	}
+	else if (isDragDeletingTiles) {
+		if ( row.charAt(x) != "0" ) {
+			row = row.substr(0, x) + "0" + row.substr(x+1);
+			room[curRoom].tilemap[y] = row;
+			refreshGameData();
+			drawEditMap();
+		}
+	}
+}
+
+function map_onMouseMove(e) {
+	editTilesOnDrag(e);
+}
+
+function map_onMouseUp(e) {
+	editTilesOnDrag(e);
+	isDragAddingTiles = false;
+	isDragDeletingTiles = false;
 }
 
 function paint_onMouseDown(e) {
