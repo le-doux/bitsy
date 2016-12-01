@@ -76,6 +76,9 @@ var browserFeatures = {
 	fileDownload : false
 };
 
+/* SCREEN CAPTURE */
+var gifencoder = new gif();
+
 function detectBrowserFeatures() {
 	//test feature support
 	try {
@@ -250,6 +253,19 @@ function start() {
 		document.getElementById("downloadHelp").style.display = "block";
 	}
 
+	var gif = {
+		frames: [[255,0,0,255, 0,255,0,255, 0,0,255,255], [0,0,255,255, 255,0,0,255, 0,255,0,255], [0,255,0,255, 0,0,255,255, 255,0,0,255]],
+		width: 3,
+		height: 1,
+		palette: ["ff0000","00ff00","0000ff"],
+		loops: 0,
+		delay: 100
+	};
+	gifencoder.encode( gif, function(uri) {
+		console.log(uri);
+		document.getElementById("gifPreview").src = uri;
+		document.getElementById("gifDownload").href = uri;
+	});
 }
 
 function listenMapEditEvents() {

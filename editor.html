@@ -111,6 +111,7 @@
 		</style>
 
 		<script src="bitsy.js"></script>
+		<script src="gif.js"></script>
 		<script src="editor.js"></script>
 
 		<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -292,6 +293,23 @@
 				game data <span class="minimize" onclick="hidePanel('dataPanel');">[ - ]</span>
 			</div>
 			<textarea id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
+		</div>
+		<div id="gifPanel" class="panel">
+			<div class="bar">
+				record gif <span class="minimize" onclick="hidePanel('gifPanel');">[ - ]</span>
+			</div>
+			
+			<button>start recording</button>
+			<button>stop recording</button>
+			<span style="color:red;">recording...</span>
+			
+			<br/>
+			
+			<img width="300" height="300" id="gifPreview"/>
+			
+			<br/>
+			
+			<a href="" download="recording.gif" target="_blank" id="gifDownload">download gif</a>
 		</div>
 	</body>
 </html>
