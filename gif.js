@@ -68,9 +68,7 @@ this.encode = function(gifData, callback) {
 	*/
 
 	//regular js
-	var uri = arrayToDataUri( gifArr );
-
-	callback( uri );
+	returnAsDataUri( gifArr, callback );
 }
 
 //deprecated
@@ -83,13 +81,32 @@ function save(gifArr, fileName) {
 }
 */
 
-function arrayToDataUri(gifArr) {
+function returnAsDataUri(gifArr, callback) {
+	/*
+		TODO
+		- to uint8array
+		- to blob
+		- to base64
+	*/
+	var arr = new Uint8Array(gifArr);
+	var blob = new Blob([arr.buffer]);
+	var reader = new window.FileReader();
+	reader.readAsDataURL(blob); 
+	reader.onloadend = function() {
+		base64data = reader.result;
+		//console.log("!!!!");
+		//console.log(base64data);
+		callback( base64data );
+	}
+
+	/*
 	var byteString = "";
 	for (var i = 0; i < gifArr.length; i++) {
 		byteString += String.fromCharCode( gifArr[i] );
 	}
 	var uri = "data:image/gif;base64," + window.btoa( byteString );
 	return uri;
+	*/
 }
 
 function arrayToBuffer(gifArr) {

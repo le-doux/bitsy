@@ -140,6 +140,7 @@
 			<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanel(event);"  checked/> paint <br>
 			<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanel(event);"  checked/> colors <br>
 			<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanel(event);"  checked/> download <br>
+			<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanel(event);" /> record gif <br>
 			<input type="checkbox" value="dataPanel" onclick="togglePanel(event);" id="dataCheck"/> game data
 		</div>
 		<div id="aboutPanel" class="panel">
@@ -288,20 +289,15 @@
 				- share your game as a web page!
 			</div>
 		</div>
-		<div id="dataPanel" class="panel" style="display:none;">
-			<div class="bar">
-				game data <span class="minimize" onclick="hidePanel('dataPanel');">[ - ]</span>
-			</div>
-			<textarea id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
-		</div>
-		<div id="gifPanel" class="panel">
+		<div id="gifPanel" class="panel" style="display:none;">
 			<div class="bar">
 				record gif <span class="minimize" onclick="hidePanel('gifPanel');">[ - ]</span>
 			</div>
 			
-			<button>start recording</button>
-			<button>stop recording</button>
-			<span style="color:red;">recording...</span>
+			<button id="gifStartButton" onclick="startRecordingGif();">start recording</button>
+			<button id="gifStopButton" onclick="stopRecordingGif();" style="display:none;">stop recording</button>
+			<span id="gifRecordingText" style="color:red;display:none;">recording...</span>
+			<span id="gifEncodingText" style="color:green;display:none;">encoding...</span>
 			
 			<br/>
 			
@@ -310,6 +306,12 @@
 			<br/>
 			
 			<a href="" download="recording.gif" target="_blank" id="gifDownload">download gif</a>
+		</div>
+		<div id="dataPanel" class="panel" style="display:none;">
+			<div class="bar">
+				game data <span class="minimize" onclick="hidePanel('dataPanel');">[ - ]</span>
+			</div>
+			<textarea id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
 		</div>
 	</body>
 </html>

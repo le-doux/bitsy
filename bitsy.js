@@ -58,6 +58,7 @@
 var xhr;
 var canvas;
 var context;
+var ctx;
 
 var title = "";
 var room = {};
@@ -118,6 +119,12 @@ var key = {
 
 var prevTime = 0;
 var deltaTime = 0;
+
+//methods used to trigger gif recording
+var didPlayerMoveThisFrame = false;
+var onPlayerMoved = null;
+var didDialogUpdateThisFrame = false;
+var onDialogUpdate = null;
 
 //only used by games exported from the editor
 var exportedGameData = "@@D";
@@ -474,6 +481,12 @@ function update() {
 	}
 
 	prevTime = curTime;
+
+	//for gif recording
+	if (didPlayerMoveThisFrame && onPlayerMoved != null) onPlayerMoved();
+	didPlayerMoveThisFrame = false;
+	if (didDialogUpdateThisFrame && onDialogUpdate != null) onDialogUpdate();
+	didDialogUpdateThisFrame = false;
 }
 
 var moveCounter = 0;
@@ -503,6 +516,8 @@ function moveSprites() {
 						curRoom = ext.dest.room;
 					}
 				}
+
+				if (id === "A") didPlayerMoveThisFrame = true;
 			}
 		}
 
@@ -542,21 +557,21 @@ function onkeydown(e) {
 
 		var spr = null;
 
-		console.log(player().x);
-		console.log(player().y);
 		if ( (e.keyCode == key.left || e.keyCode == key.a) && !(spr = getSpriteLeft()) && !isWallLeft()) {
 			player().x -= 1;
+			didPlayerMoveThisFrame = true;
 		}
 		else if ( (e.keyCode == key.right || e.keyCode == key.d) && !(spr = getSpriteRight()) && !isWallRight()) {
 			player().x += 1;
+			didPlayerMoveThisFrame = true;
 		}
 		else if ( (e.keyCode == key.up || e.keyCode == key.w) && !(spr = getSpriteUp()) && !isWallUp()) {
 			player().y -= 1;
+			didPlayerMoveThisFrame = true;
 		}
 		else if ( (e.keyCode == key.down || e.keyCode == key.s) && !(spr = getSpriteDown()) && !isWallDown()) {
-			console.log(player().y);
 			player().y += 1;
-			console.log(player().y);
+			didPlayerMoveThisFrame = true;
 		}
 		
 		var ext = getExit( player().room, player().x, player().y );
@@ -1187,10 +1202,10 @@ function updateDialog() {
 			//the line is full!
 			drawNextDialogArrow();
 			isDialogReadyToContinue = true;
+			didDialogUpdateThisFrame = true;
 		}
 
 		drawNextDialogChar();
-		
 	}
 }
 

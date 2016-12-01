@@ -78,6 +78,9 @@ var browserFeatures = {
 
 /* SCREEN CAPTURE */
 var gifencoder = new gif();
+var isRecordingGif = false;
+var gifFrameData = [];
+var isPlayMode = false;
 
 function detectBrowserFeatures() {
 	//test feature support
@@ -253,6 +256,7 @@ function start() {
 		document.getElementById("downloadHelp").style.display = "block";
 	}
 
+	/*
 	var gif = {
 		frames: [[255,0,0,255, 0,255,0,255, 0,0,255,255], [0,0,255,255, 255,0,0,255, 0,255,0,255], [0,255,0,255, 0,0,255,255, 255,0,0,255]],
 		width: 3,
@@ -266,6 +270,24 @@ function start() {
 		document.getElementById("gifPreview").src = uri;
 		document.getElementById("gifDownload").href = uri;
 	});
+	*/
+
+	//respond to player movement event by recording gif frames
+	onPlayerMoved = function() {
+		if (isRecordingGif) 
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+	};
+	onDialogUpdate = function() {
+		console.log("dialog update!");
+		if (isRecordingGif) {
+			// copy frame 5x to slow it down (hacky)
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+		}
+	};
 }
 
 function listenMapEditEvents() {
@@ -783,11 +805,13 @@ function on_edit_mode() {
 	curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
 	drawEditMap();
 	listenMapEditEvents();
+	isPlayMode = false;
 }
 
 function on_play_mode() {
 	unlistenMapEditEvents();
 	load_game(document.getElementById("game_data").value);
+	isPlayMode = true;
 }
 
 function toggleGrid() {
@@ -1263,4 +1287,49 @@ function togglePanel(e) {
 
 function showToolsPanel() {
 	document.getElementById("toolsPanel").style.display = "block";
+}
+
+function startRecordingGif() {
+	gifFrameData = [];
+	if (isPlayMode)
+		gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+	isRecordingGif = true;
+	document.getElementById("gifStartButton").style.display="none";
+	document.getElementById("gifStopButton").style.display="inline";
+	document.getElementById("gifRecordingText").style.display="inline";
+}
+
+function stopRecordingGif() {
+	document.getElementById("gifStopButton").style.display="none";
+	document.getElementById("gifRecordingText").style.display="none";
+	document.getElementById("gifEncodingText").style.display="inline";
+
+	setTimeout( function() {
+		var hexPalette = [];
+		for (id in palette) {
+			for (i in palette[id]){
+				var hexStr = rgbToHex( palette[id][i][0], palette[id][i][1], palette[id][i][2] ).slice(1);
+				hexPalette.push( hexStr );
+			}
+		}
+		//console.log(hexPalette);
+		//console.log(gifFrameData);
+		var gif = {
+			frames: gifFrameData,
+			width: 512,
+			height: 512,
+			palette: hexPalette,
+			loops: 0,
+			delay: 30
+		};
+		gifencoder.encode( gif, function(uri) {
+			document.getElementById("gifEncodingText").style.display="none";
+			document.getElementById("gifStartButton").style.display="inline";
+			//console.log("encoding finished!");
+			//console.log(uri);
+			document.getElementById("gifPreview").src = uri;
+			document.getElementById("gifDownload").href = uri;
+		});
+		isRecordingGif = false;
+	}, 10);
 }
