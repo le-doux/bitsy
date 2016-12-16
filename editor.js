@@ -5,6 +5,12 @@ v2.1 TODOS
 - import html files
 
 TODO NEXT
+- async gif processing
+X auto-save in local storage
+	X auto-save
+	X clear data
+	X save tools set up
+	X make sure it works w/ direct editing of the game_data text box
 - fix tile/sprite # limit bug
 	- later: comma-separated tile names (with more than one char)
 	- use hex count to generate names in editor
@@ -122,6 +128,7 @@ function hideUnsupportedFeatureWarning() {
 }
 
 function start() {
+	detectBrowserFeatures();
 
 	//game canvas & context (also the map editor)
 	canvas = document.getElementById("game");
@@ -151,6 +158,68 @@ function start() {
 	exit_canvas.addEventListener("mousedown", exit_onMouseDown);
 
 
+	//load last auto-save
+	if (localStorage.game_data) {
+		console.log("~~~ found old save data! ~~~");
+		console.log(localStorage.game_data);
+		document.getElementById("game_data").value = localStorage.game_data;
+		on_game_data_change_core();
+	}
+	else {
+		console.log("~~~~ no old save data! ~~~~");
+		setDefaultGameState();
+		refreshGameData();
+	}
+
+	//load panel preferences
+	var prefs = localStorage.panel_prefs == null ? {} : JSON.parse( localStorage.panel_prefs );
+	console.log(prefs);
+	if (prefs != null) {
+		for (id in prefs) {
+			console.log(id + " " + prefs[id]);
+			togglePanelCore(id, prefs[id]);
+			if (id != "toolsPanel")
+				document.getElementById(id.replace("Panel","Check")).checked = prefs[id];
+		}
+	}
+
+	//draw everything
+	on_paint_avatar();
+	drawPaintCanvas();
+	drawEditMap();
+
+	//load engine for export
+	loadEngineScript();
+
+	//unsupported feature stuff
+	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
+	if (!browserFeatures.colorPicker) {
+		updatePaletteBorders();
+		document.getElementById("colorPickerHelp").style.display = "block";
+	}
+	if (!browserFeatures.fileDownload) {
+		document.getElementById("downloadHelp").style.display = "block";
+	}
+
+	//respond to player movement event by recording gif frames
+	onPlayerMoved = function() {
+		if (isRecordingGif) 
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+	};
+	onDialogUpdate = function() {
+		console.log("dialog update!");
+		if (isRecordingGif) {
+			// copy frame 5x to slow it down (hacky)
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+		}
+	};
+}
+
+function setDefaultGameState() {
 	//default values
 	title = "Write your game's title here";
 	palette[drawingPal] = [
@@ -234,59 +303,6 @@ function start() {
 		walls : [],
 		exits : [],
 		pal : null
-	};
-	refreshGameData();
-
-	//draw everything
-	on_paint_avatar();
-	drawPaintCanvas();
-	drawEditMap();
-
-	//load engine for export
-	loadEngineScript();
-
-	//unsupported feature stuff
-	detectBrowserFeatures();
-	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
-	if (!browserFeatures.colorPicker) {
-		updatePaletteBorders();
-		document.getElementById("colorPickerHelp").style.display = "block";
-	}
-	if (!browserFeatures.fileDownload) {
-		document.getElementById("downloadHelp").style.display = "block";
-	}
-
-	/*
-	var gif = {
-		frames: [[255,0,0,255, 0,255,0,255, 0,0,255,255], [0,0,255,255, 255,0,0,255, 0,255,0,255], [0,255,0,255, 0,0,255,255, 255,0,0,255]],
-		width: 3,
-		height: 1,
-		palette: ["ff0000","00ff00","0000ff"],
-		loops: 0,
-		delay: 100
-	};
-	gifencoder.encode( gif, function(uri) {
-		console.log(uri);
-		document.getElementById("gifPreview").src = uri;
-		document.getElementById("gifDownload").href = uri;
-	});
-	*/
-
-	//respond to player movement event by recording gif frames
-	onPlayerMoved = function() {
-		if (isRecordingGif) 
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-	};
-	onDialogUpdate = function() {
-		console.log("dialog update!");
-		if (isRecordingGif) {
-			// copy frame 5x to slow it down (hacky)
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-		}
 	};
 }
 
@@ -794,9 +810,19 @@ function saveDrawingData() {
 	}
 }
 
+function resetGameData() {
+	setDefaultGameState();
+	refreshGameData();
+	renderImages();
+	drawPaintCanvas();
+	drawEditMap();
+	updatePaletteControlsFromGameData();
+}
+
 function refreshGameData() {
 	var gameData = serializeWorld();
 	document.getElementById("game_data").value = gameData;
+	localStorage.setItem("game_data", gameData); //auto-save
 }
 
 function on_edit_mode() {
@@ -830,6 +856,7 @@ function on_change_title() {
 }
 
 function updatePaletteBorders() {
+	console.log("UPDATE PALETTE BORDERS");
 	//feature to show selected colors in browsers that don't support a color picker
 	document.getElementById("backgroundColor").style.border = "solid " + document.getElementById("backgroundColor").value + " 5px";
 	document.getElementById("tileColor").style.border = "solid " + document.getElementById("tileColor").value + " 5px";
@@ -943,6 +970,11 @@ function on_change_dialog() {
 }
 
 function on_game_data_change() {
+	on_game_data_change_core();
+	refreshGameData();
+}
+
+function on_game_data_change_core() {
 	clearGameData();
 	parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
 
@@ -1271,11 +1303,19 @@ function hidePanel(id) {
 		document.getElementById(id.replace("Panel","Check")).checked = false;
 	//hide exits
 	if (id === "exitsPanel") hideExits();
+	//save panel preferences
+	savePanelPref(id,false);
 }
 
 function togglePanel(e) {
-	var id = event.target.value;
-	if (event.target.checked) {
+	//hide/show panel
+	togglePanelCore(event.target.value, event.target.checked);
+	//save panel preferences
+	savePanelPref(event.target.value,event.target.checked);
+}
+
+function togglePanelCore(id,checked) {
+	if (checked) {
 		document.getElementById(id).style.display = "block";
 		if (id === "exitsPanel") showExits();
 	}
@@ -1285,8 +1325,18 @@ function togglePanel(e) {
 	}
 }
 
+function savePanelPref(id,visible) {
+	console.log(" -- save panel pref -- ");
+	var prefs = localStorage.panel_prefs == null ? {} : JSON.parse( localStorage.panel_prefs );
+	console.log(prefs);
+	prefs[id] = visible;
+	console.log(prefs);
+	localStorage.setItem( "panel_prefs", JSON.stringify(prefs) );
+}
+
 function showToolsPanel() {
 	document.getElementById("toolsPanel").style.display = "block";
+	savePanelPref("toolsPanel",true);
 }
 
 function startRecordingGif() {
