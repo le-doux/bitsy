@@ -1,16 +1,9 @@
 /* 
-v2.1 TODOS
-- multiple palettes
-- better icon for exits
-- import html files
-
 TODO NEXT
 - async gif processing
-X auto-save in local storage
-	X auto-save
-	X clear data
-	X save tools set up
-	X make sure it works w/ direct editing of the game_data text box
+- import html files
+- undo / redo
+- get to-dos written down elsewhere into here
 - fix tile/sprite # limit bug
 	- later: comma-separated tile names (with more than one char)
 	- use hex count to generate names in editor
@@ -24,6 +17,45 @@ TODO BACKLOG
 - import old html or txt games to re-edit
 - export straight to itchio (is there a developer api?)
 - drag tool windows around
+- multiple palettes
+- better icon for exits
+
+v2.0???
+- triggers
+- variables
+- dialog editor w/ special effects
+- character paths
+- flipbook animation
+
+
+/*
+	ADAM'S TODOs
+
+		#feature ideas
+			#don't see you on exit for one frame?
+			#shortcut to sets?
+			#default tileset
+			#clear tilemap
+			#clear tileset
+			#delete tiles and sprites
+			#rename sets to maps?
+
+		- bitsy player v2
+			- dialog effects
+				- color
+				- speed
+				- pauses
+			? animate player movement
+			? flipbook animation
+			? player face left/right
+			?? bouncing arrow
+			? sprite walking paths
+			? set variable command
+			?? narrative blocks
+			?? STRICT MODE where text can only fit on one page
+
+		- bitsy player v3
+*/
 
 NOTES
 - remember to run chrome like this to test "open /Applications/Google\ Chrome.app --args --allow-file-access-from-files"

@@ -20,41 +20,6 @@
 	- adam
 */
 
-/*
-	ADAM'S TODOs
-
-		#feature ideas
-			#don't see you on exit for one frame?
-			#shortcut to sets?
-			#default tileset
-			#clear tilemap
-			#clear tileset
-			#delete tiles and sprites
-			#rename sets to maps?
-
-		- bitsy editor
-			- remove sprites from map
-			- delete sprites and tiles
-
-		- bitsy player v2
-			X start screen is wherever your avatar is
-			X touch controls
-			- dialog effects
-				- color
-				- speed
-				- pauses
-			? animate player movement
-			? flipbook animation
-			? player face left/right
-			?? bouncing arrow
-			? sprite walking paths
-			? set variable command
-			?? narrative blocks
-			?? STRICT MODE where text can only fit on one page
-
-		- bitsy player v3
-*/
-
 var xhr;
 var canvas;
 var context;
