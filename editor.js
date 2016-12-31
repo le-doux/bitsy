@@ -1,7 +1,6 @@
 /* 
 TODO NEXT
-- async gif processing
-- import html files
+- async gif processings
 - undo / redo
 - get to-dos written down elsewhere into here
 - fix tile/sprite # limit bug
@@ -14,7 +13,6 @@ TODO NEXT
 - delete sprites and tiles
 
 TODO BACKLOG
-- import old html or txt games to re-edit
 - export straight to itchio (is there a developer api?)
 - drag tool windows around
 - multiple palettes
@@ -57,6 +55,7 @@ v2.0???
 		- bitsy player v3
 */
 
+/*
 NOTES
 - remember to run chrome like this to test "open /Applications/Google\ Chrome.app --args --allow-file-access-from-files"
 */
@@ -1151,6 +1150,12 @@ function escapeSpecialCharacters(str) {
 	return str;
 }
 
+function unescapeSpecialCharacters(str) {
+	str = str.replace(/\\"/g, '"');
+	str = str.replace(/\\\\/g, '\\');
+	return str;
+}
+
 function downloadFile(filename, text) {
 	var element = document.createElement('a');
 	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -1414,4 +1419,41 @@ function stopRecordingGif() {
 		});
 		isRecordingGif = false;
 	}, 10);
+}
+
+/* LOAD FROM FILE */
+function importGameFromFile(e) {
+	// load file chosen by user
+	var files = e.target.files;
+	var file = files[0];
+	var reader = new FileReader();
+	reader.readAsText( file );
+
+	reader.onloadend = function() {
+		var fileText = reader.result;
+
+		// find start of game data
+		var i = fileText.indexOf("var exportedGameData");
+		while ( fileText.charAt(i) != '"' ) {
+			i++; // move to first quote
+		}
+		i++; // move past first quote
+
+		// isolate game data
+		var gameDataStr = "";
+		var isEscapeChar = false;
+		while ( fileText.charAt(i) != '"' || isEscapeChar ) {
+			gameDataStr += fileText.charAt(i);
+			isEscapeChar = fileText.charAt(i) == "\\";
+			i++;
+		}
+
+		// replace special characters
+		gameDataStr = gameDataStr.replace(/\\n/g, "\n"); //todo: move this into the method below
+		gameDataStr = unescapeSpecialCharacters( gameDataStr );
+		
+		// change game data & reload everything
+		document.getElementById("game_data").value = gameDataStr;
+		on_game_data_change();
+	}
 }

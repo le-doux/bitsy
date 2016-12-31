@@ -283,6 +283,7 @@
 			<div class="bar">
 				download <span class="minimize" onclick="hidePanel('downloadPanel');">[ - ]</span>
 			</div>
+			download game as html file: <br>
 			<button onclick="exportGame();">download game</button>
 			<br>
 			<div id="downloadHelp" class="helpMessage" style="display:none;">
@@ -295,6 +296,9 @@
 				- name it "mygame.html" <br>
 				- share your game as a web page!
 			</div>
+			<br>
+			import game from html file: <br>
+			<input type="file" onchange="importGameFromFile(event);"/>
 		</div>
 		<div id="gifPanel" class="panel" style="display:none;">
 			<div class="bar">
