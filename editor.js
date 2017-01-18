@@ -5,11 +5,13 @@ v1.4
 X after reload, exit options go away
 X after reload, new room deletes old room
 - delete sprites and tiles
+- reset game data bug? not all data is really reset
 
+- Qs for creators
+- creator list (spreadsheet?)
 
 - preview/selection canvas for sprites, tiles, room
 - make exits easier to see on light backgrounds (black outline?)
-- reset game data bug?
 - show entrances as well as exits (drag entrances/exits?)
 - show text to explain where entrances exits go
 - async gif processings
@@ -266,6 +268,8 @@ function start() {
 }
 
 function setDefaultGameState() {
+	//clear values
+	clearGameData();
 	//default values
 	title = "Write your game's title here";
 	palette[drawingPal] = [
@@ -286,12 +290,15 @@ function setDefaultGameState() {
 		[0,0,1,0,0,1,0,0],
 		[0,0,1,0,0,1,0,0]
 	];
+	drawingId = "A";
 	saveDrawingData();
 	sprite["A"].room = "0";
 	sprite["A"].x = 4;
 	sprite["A"].y = 4;
 	//defualt sprite
 	paintMode = TileType.Sprite;
+	drawingId = "a";
+	nextSpriteCharCode = 97;
 	newSprite();
 	on_paint_sprite();
 	drawing_data = [
@@ -311,6 +318,8 @@ function setDefaultGameState() {
 	dialog["a"] = "I'm a cat";
 	//default tile
 	paintMode = TileType.Tile;
+	drawingId = "a";
+	nextTileCharCode = 97;
 	newTile();
 	on_paint_tile();
 	drawing_data = [
@@ -516,6 +525,7 @@ function newRoom() {
 function nextSprite() {
 	var ids = sortedSpriteIdList();
 	spriteIndex = (spriteIndex + 1) % ids.length;
+	if (spriteIndex === 0) spriteIndex = 1; //skip avatar
 	drawingId = ids[spriteIndex];
 	reloadSprite();
 }
@@ -523,7 +533,7 @@ function nextSprite() {
 function prevSprite() {
 	var ids = sortedSpriteIdList();
 	spriteIndex = (spriteIndex - 1) % ids.length;
-	if (spriteIndex < 0) spriteIndex = (ids.length-1);
+	if (spriteIndex <= 0) spriteIndex = (ids.length-1); //loop and skip avatar
 	drawingId = ids[spriteIndex];
 	reloadSprite();
 }
@@ -557,12 +567,29 @@ function newDrawing() {
 
 function deleteDrawing() {
 	if (paintMode == TileType.Tile) {
-		// todo
-		console.log("not implemented");
+		if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
+		delete tile[ drawingId ];
+		findAndReplaceTileInAllRooms( drawingId, "0" );
+		refreshGameData();
+		renderImages();
+		drawEditMap();
+		nextTile();
 	}
 	else {
-		// todo
-		console.log("not implemented");
+		if ( Object.keys( sprite ).length <= 2 ) { alert("You can't delete your last sprite!"); return; }
+		delete sprite[ drawingId ];
+		refreshGameData();
+		renderImages();
+		drawEditMap();
+		nextSprite();
+	}
+}
+
+function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
+	for (roomId in room) {
+		for (i in room[roomId].tilemap) {
+			room[roomId].tilemap[i] = room[roomId].tilemap[i].split(findTile).join(replaceTile);
+		}
 	}
 }
 
@@ -868,17 +895,33 @@ function saveDrawingData() {
 	}
 }
 
+function newGameDialog() {
+	if ( confirm("Starting a new game will erase your old data. Consider exporting your work first! Are you sure you want to start over?") ) {
+		resetGameData();
+	}
+}
+
 function resetGameData() {
 	setDefaultGameState();
+
+	// todo wrap these variable resets in a function
+	tileIndex = 0;
+	spriteIndex = 0;
+
 	refreshGameData();
 	renderImages();
 	drawPaintCanvas();
 	drawEditMap();
 	updatePaletteControlsFromGameData();
+
+	on_paint_avatar();
+	document.getElementById('paintOptionAvatar').checked = true;
 }
 
 function refreshGameData() {
 	var gameData = serializeWorld();
+	console.log("refresh!");
+	console.log(gameData);
 	document.getElementById("game_data").value = gameData;
 	localStorage.setItem("game_data", gameData); //auto-save
 }

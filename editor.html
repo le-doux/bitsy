@@ -121,6 +121,7 @@
 		<div id="topbar">
 			<input type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
 			<button onclick="showToolsPanel();" style="margin-left:20px;">show toolbar</button>
+			<button onclick="newGameDialog();" style="margin-left:20px;">new game (start over!)</button>
 			<span id="bitsyEditorName">
 				Bitsy v1.3 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
 			</span>
@@ -255,7 +256,7 @@
 				paint <span class="minimize" onclick="hidePanel('paintPanel');">[ - ]</span>
 			</div>
 			<form>
-				<input type="radio" name="paint mode" value="sprite" onclick="on_paint_avatar();" checked> avatar
+				<input type="radio" name="paint mode" value="sprite" onclick="on_paint_avatar();" id="paintOptionAvatar" checked> avatar
 				<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();"> tile
 				<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();"> sprite
 			</form>
