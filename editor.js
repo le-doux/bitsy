@@ -1,5 +1,17 @@
 /* 
 TODO NEXT
+
+v1.4
+X after reload, exit options go away
+X after reload, new room deletes old room
+- delete sprites and tiles
+
+
+- preview/selection canvas for sprites, tiles, room
+- make exits easier to see on light backgrounds (black outline?)
+- reset game data bug?
+- show entrances as well as exits (drag entrances/exits?)
+- show text to explain where entrances exits go
 - async gif processings
 - undo / redo
 - get to-dos written down elsewhere into here
@@ -10,7 +22,7 @@ TODO NEXT
 	- hash or no-hash hex
 	- rgb with commas
 - add instruction on publishing the game (itchio shoutout)
-- delete sprites and tiles
+
 
 TODO BACKLOG
 - export straight to itchio (is there a developer api?)
@@ -25,8 +37,6 @@ v2.0???
 - character paths
 - flipbook animation
 
-
-/*
 	ADAM'S TODOs
 
 		#feature ideas
@@ -53,6 +63,11 @@ v2.0???
 			?? STRICT MODE where text can only fit on one page
 
 		- bitsy player v3
+
+
+USER FEEDBACK
+- add an inventory system
+- add triggers
 */
 
 /*
@@ -490,6 +505,7 @@ function newRoom() {
 
 	document.getElementById("roomId").innerHTML = curRoom;
 
+	// add new exit destination option to exits panel
 	var select = document.getElementById("exitDestinationSelect");
 	var option = document.createElement("option");
 	option.text = "room " + roomId;
@@ -536,6 +552,17 @@ function newDrawing() {
 	}
 	else {
 		newSprite();
+	}
+}
+
+function deleteDrawing() {
+	if (paintMode == TileType.Tile) {
+		// todo
+		console.log("not implemented");
+	}
+	else {
+		// todo
+		console.log("not implemented");
 	}
 }
 
@@ -1091,11 +1118,35 @@ function on_game_data_change_core() {
 		updatePaletteBorders();
 	}
 
+	updateExitOptionsFromGameData();
+
 	document.getElementById("titleText").value = title;
 
 	//this is my best guess of what index the tile character should be at -- but it could be wrong :(
 	nextTileCharCode = 97 + Object.keys(tile).length;
 	nextSpriteCharCode = 97 + Object.keys(sprite).length;
+
+	// I'm more confident in this one
+	nextRoomCharIndex = Object.keys( room ).length;
+}
+
+function updateExitOptionsFromGameData() {
+	var select = document.getElementById("exitDestinationSelect");
+
+	// first, remove all current options
+	var i;
+	for(i = select.options.length - 1 ; i >= 0 ; i--) {
+		select.remove(i);
+	}
+
+	// then, add an option for each room
+	for (roomId in room) {
+		var option = document.createElement("option");
+		option.text = "room " + roomId;
+		option.value = roomId;
+		select.add(option);
+	}
+
 }
 
 function updatePaletteControlsFromGameData() {
