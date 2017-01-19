@@ -4,8 +4,8 @@ TODO NEXT
 v1.4
 X after reload, exit options go away
 X after reload, new room deletes old room
-- delete sprites and tiles
-- reset game data bug? not all data is really reset
+X delete sprites and tiles and rooms
+X reset game data bug? not all data is really reset
 
 - Qs for creators
 - creator list (spreadsheet?)
@@ -24,6 +24,8 @@ X after reload, new room deletes old room
 	- hash or no-hash hex
 	- rgb with commas
 - add instruction on publishing the game (itchio shoutout)
+
+- bug: some sort of bad things happen when you delete room 0
 
 
 TODO BACKLOG
@@ -70,6 +72,7 @@ v2.0???
 USER FEEDBACK
 - add an inventory system
 - add triggers
+- add dialog choices?
 */
 
 /*
@@ -522,6 +525,20 @@ function newRoom() {
 	select.add(option);
 }
 
+function deleteRoom() {
+	if ( Object.keys(room).length <= 1 ) {
+		alert("You can't delete your only room!");
+	}
+	else if ( confirm("Are you sure you want to delete this room? You can't get it back.") ) {
+		var roomId = sortedRoomIdList()[roomIndex];
+		delete room[roomId];
+		refreshGameData();
+		nextRoom();
+		drawEditMap();
+		//recreate exit options
+	}
+}
+
 function nextSprite() {
 	var ids = sortedSpriteIdList();
 	spriteIndex = (spriteIndex + 1) % ids.length;
@@ -566,22 +583,24 @@ function newDrawing() {
 }
 
 function deleteDrawing() {
-	if (paintMode == TileType.Tile) {
-		if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
-		delete tile[ drawingId ];
-		findAndReplaceTileInAllRooms( drawingId, "0" );
-		refreshGameData();
-		renderImages();
-		drawEditMap();
-		nextTile();
-	}
-	else {
-		if ( Object.keys( sprite ).length <= 2 ) { alert("You can't delete your last sprite!"); return; }
-		delete sprite[ drawingId ];
-		refreshGameData();
-		renderImages();
-		drawEditMap();
-		nextSprite();
+	if ( confirm("Are you sure you want to delete this drawing?") ) {
+		if (paintMode == TileType.Tile) {
+			if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
+			delete tile[ drawingId ];
+			findAndReplaceTileInAllRooms( drawingId, "0" );
+			refreshGameData();
+			renderImages();
+			drawEditMap();
+			nextTile();
+		}
+		else {
+			if ( Object.keys( sprite ).length <= 2 ) { alert("You can't delete your last sprite!"); return; }
+			delete sprite[ drawingId ];
+			refreshGameData();
+			renderImages();
+			drawEditMap();
+			nextSprite();
+		}
 	}
 }
 

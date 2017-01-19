@@ -123,7 +123,7 @@
 			<button onclick="showToolsPanel();" style="margin-left:20px;">show toolbar</button>
 			<button onclick="newGameDialog();" style="margin-left:20px;">new game (start over!)</button>
 			<span id="bitsyEditorName">
-				Bitsy v1.3 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
+				Bitsy v1.4 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
 			</span>
 		</div>
 		<div id="unsupportedFeatures" style="display:none;">
@@ -186,8 +186,14 @@
 				</div>
 				<br>
 
-				<span class="toggleText" onclick="toggleVersionNotes();">what's new in v1.3</span> <br>
+				<span class="toggleText" onclick="toggleVersionNotes();">what's new in v1.4</span> <br>
 				<div id="versionNotes" style="display:none;">
+					<i>v1.4:</i> <br>
+					- delete sprites, tiles, and rooms!<br>
+					- use "new" button to start over<br>
+					- fixed bug with exits when reloading files<br>
+					- fixed bug with refreshing game data<br>
+					<br>
 					<i>v1.3:</i> <br>
 					- re-import games from html files
 					<br><br>
@@ -223,6 +229,7 @@
 				<button onclick="prevRoom();"> < prev </button>
 				<button onclick="nextRoom();"> next > </button>
 				<button onclick="newRoom();"> + new </button>
+				<button onclick="deleteRoom();"> x delete x </button>
 			</div>
 			<button onclick="showExitsPanel();"> + add exits from this room to other rooms </button>
 			<button onclick="toggleMapGrid();"> show/hide tile grid </button>
