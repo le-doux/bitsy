@@ -1,15 +1,18 @@
 /* 
 TODO NEXT
 
-v1.4
-X after reload, exit options go away
-X after reload, new room deletes old room
-X delete sprites and tiles and rooms
-X reset game data bug? not all data is really reset
+from twitter
+- look at puzzlescript gist hosting of gamedata (from kool.tools)
+X @increpare says prev button doesn't work
+
+from cathsplat
+- copy/paste rooms (sprites too?)
+- skip dialog
 
 - Qs for creators
 - creator list (spreadsheet?)
 
+- better formatting for itch
 - preview/selection canvas for sprites, tiles, room
 - make exits easier to see on light backgrounds (black outline?)
 - show entrances as well as exits (drag entrances/exits?)
@@ -453,11 +456,8 @@ function newSprite() {
 
 function nextRoom() {
 	var ids = sortedRoomIdList();
-	console.log(ids);
 	roomIndex = (roomIndex + 1) % ids.length;
-	console.log(roomIndex);
 	curRoom = ids[roomIndex];
-	console.log(curRoom);
 	drawEditMap();
 
 	document.getElementById("roomId").innerHTML = curRoom;
@@ -465,10 +465,9 @@ function nextRoom() {
 
 function prevRoom() {
 	var ids = sortedRoomIdList();
-	roomIndex = (roomIndex + 1) % ids.length;
+	roomIndex--;
 	if (roomIndex < 0) roomIndex = (ids.length-1);
 	curRoom = ids[roomIndex];
-	console.log(curRoom);
 	drawEditMap();
 
 	document.getElementById("roomId").innerHTML = curRoom;
