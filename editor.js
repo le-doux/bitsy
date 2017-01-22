@@ -1,12 +1,22 @@
 /* 
 TODO NEXT
 
+v2.0 changes
+- engine changes
+	- flipbook animation
+	- skip dialog
+- editor changes
+	- duplicate rooms, sprites
+- UI changes
+	- preview/selection canvas for sprites, tiles, room
+	- make exits easier to see on light backgrounds (black outline?)
+
 from twitter
 - look at puzzlescript gist hosting of gamedata (from kool.tools)
 X @increpare says prev button doesn't work
 
 from cathsplat
-- copy/paste rooms (sprites too?)
+- copy/paste (or duplicate) rooms (sprites too?)
 - skip dialog
 
 - Qs for creators

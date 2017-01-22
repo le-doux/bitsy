@@ -133,6 +133,9 @@ function onTouch(e) {
 		if (isDialogReadyToContinue) {
 			continueDialog();
 		}
+		else {
+			skipDialog();
+		}
 
 		return;
 	}
@@ -513,6 +516,9 @@ function onkeydown(e) {
 
 		if (isDialogReadyToContinue) {
 			continueDialog();
+		}
+		else {
+			skipDialog();
 		}
 
 	}
@@ -1168,6 +1174,32 @@ function updateDialog() {
 			drawNextDialogArrow();
 			isDialogReadyToContinue = true;
 			didDialogUpdateThisFrame = true;
+		}
+
+		drawNextDialogChar();
+	}
+}
+
+function skipDialog() {
+	// add new characters until you get to the end of the current line of dialog
+	while ( curRow < curDialog[curLine].length ) {
+		if (curChar + 1 < curDialog[curLine][curRow].length) {
+			//add char to current row
+			curChar++;
+		}
+		else if (curRow + 1 < curDialog[curLine].length) {
+			//start next row
+			curRow++;
+			curChar = 0;
+		}
+		else {
+			//the line is full!
+			drawNextDialogArrow();
+			isDialogReadyToContinue = true;
+			didDialogUpdateThisFrame = true;
+			//make sure to push the curRow past the end to break out of the loop
+			curRow++;
+			curChar = 0;
 		}
 
 		drawNextDialogChar();
