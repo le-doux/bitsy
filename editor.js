@@ -10,13 +10,14 @@ TODO NEXT
 
 v2.0 changes
 - engine changes
-	- flipbook animation
+	X flipbook animation
 	X skip dialog
 - editor changes
 	- duplicate rooms, sprites
+	- animation editing
 - UI changes
 	- preview/selection canvas for sprites, tiles, room
-	- make exits easier to see on light backgrounds (black outline?)
+	X make exits easier to see on light backgrounds (black outline?)
 
 - is the skip dialog too easy? should I fast forward instead? use specific buttons? (maybe this should be playtested)
 
@@ -880,6 +881,13 @@ function drawEditMap() {
 				ctx.globalAlpha = 0.5;
 			}
 			ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
+			ctx.strokeStyle = "#000";
+			ctx.globalAlpha = 1.0;
+			ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+
+			ctx.font = '14px sans-serif';
+			ctx.fillText( "To room " + e.dest.room, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
+
 			//todo (tilesize*scale) should be a function
 		}
 		ctx.globalAlpha = 1;
@@ -893,7 +901,12 @@ function saveDrawingData() {
 		if (!(drawingId in tile)) {
 			tile[drawingId] = {
 				drw : drw,
-				col : 1
+				col : 1,
+				animation : { //todo
+					isAnimated : false,
+					frameIndex : 0,
+					frameCount : 2
+				}
 			};
 		}
 		//save tile drawing
@@ -916,7 +929,12 @@ function saveDrawingData() {
 				col : 2,
 				room : null,
 				x : -1,
-				y : -1
+				y : -1,
+				animation : { //todo
+					isAnimated : false,
+					frameIndex : 0,
+					frameCount : 2
+				}
 			};
 		}
 		//save sprite drawing
