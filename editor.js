@@ -638,6 +638,47 @@ function newDrawing() {
 	}
 }
 
+function duplicateDrawing() {
+	if (paintMode == TileType.Tile) {
+		if (nextTileCharCode > 97+25) {
+			alert("Sorry, you've run out of space for tiles! :( \n(I'm working on a way to store more. - Adam)");
+			return;
+		}
+
+		drawingId = String.fromCharCode( nextTileCharCode );
+		nextTileCharCode++;
+
+		drawing_data = drawing_data.slice(0); //copy drawing data
+
+		drawPaintCanvas();
+		saveDrawingData();
+		refreshGameData();
+
+		tileIndex = Object.keys(tile).length - 1;
+
+		reloadTile(); //hack for ui consistency
+	}
+	else {
+		if (nextSpriteCharCode > 97+25) {
+			alert("Sorry, you've run out of space for sprites! :( \n(I'm working on a way to store more. - Adam)");
+			return;
+		}
+
+		drawingId = String.fromCharCode( nextSpriteCharCode );
+		nextSpriteCharCode++;
+
+		drawing_data = drawing_data.slice(0); //copy drawing data
+
+		drawPaintCanvas();
+		saveDrawingData();
+		refreshGameData();
+
+		spriteIndex = Object.keys(sprite).length - 1;
+
+		reloadSprite(); //hack
+	}
+}
+
 function deleteDrawing() {
 	if ( confirm("Are you sure you want to delete this drawing?") ) {
 		if (paintMode == TileType.Tile) {
@@ -1131,6 +1172,7 @@ function on_paint_avatar() {
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintNav").setAttribute("style","display:none;");
+	document.getElementById("paintCommands").setAttribute("style","display:none;");
 }
 function on_paint_tile() {
 	paintMode = TileType.Tile;
@@ -1140,6 +1182,7 @@ function on_paint_tile() {
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:block;");
 	document.getElementById("paintNav").setAttribute("style","display:block;");
+	document.getElementById("paintCommands").setAttribute("style","display:block;");
 }
 function on_paint_sprite() {
 	paintMode = TileType.Sprite;

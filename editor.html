@@ -225,14 +225,16 @@
 			<canvas id="game"></canvas>
 			<br>
 			<div id="roomNav">
-				room <span id="roomId">0</span><br>
+				room <span id="roomId">0</span>
 				<button onclick="prevRoom();"> < prev </button>
 				<button onclick="nextRoom();"> next > </button>
 				<button onclick="newRoom();"> + new </button>
+			</div>
+			<div id="roomCommands">
 				<button onclick="duplicateRoom();"> ++ duplicate </button>
 				<button onclick="deleteRoom();"> x delete x </button>
+				<button onclick="showExitsPanel();"> + add exits from this room to other rooms </button>
 			</div>
-			<button onclick="showExitsPanel();"> + add exits from this room to other rooms </button>
 			<button onclick="toggleMapGrid();"> show/hide tile grid </button>
 		</div>
 		<div id="exitsPanel" class="panel" style="display:none;">
@@ -272,10 +274,13 @@
 				<button onclick="prev();"> < prev </button>
 				<button onclick="next();"> next > </button>
 				<button onclick="newDrawing();"> + new </button>
-				<button onclick="deleteDrawing();"> x delete x </button>
 			</div>
 			<canvas id="paint"></canvas>
 			<br>
+			<div id="paintCommands">
+				<button onclick="duplicateDrawing();"> ++ duplicate </button>
+				<button onclick="deleteDrawing();"> x delete x </button>
+			</div>
 			<div id="wall" style="display:none;">is this tile a wall? <input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall();"> </div>
 			<div id="dialog" style="display:none;">dialog: <input type="text" id="dialogText" onchange="on_change_dialog();"></div>
 			<button onclick="toggleGrid();"> show/hide pixel grid </button>
