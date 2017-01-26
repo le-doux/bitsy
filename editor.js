@@ -493,6 +493,43 @@ function prevRoom() {
 	document.getElementById("roomId").innerHTML = curRoom;
 }
 
+function duplicateRoom() {
+	if (nextRoomCharIndex >= roomIdList.length) {
+		alert("Sorry, you've run out of space for rooms! :( \n(I'm working on a way to store more. - Adam)");
+		return;
+	}
+
+	var copyRoomId = sortedRoomIdList()[roomIndex];
+	var roomToCopy = room[ copyRoomId ];
+
+	roomIndex = nextRoomCharIndex;
+	var newRoomId = roomIdList.charAt(nextRoomCharIndex);
+	nextRoomCharIndex++;
+
+	console.log(newRoomId);
+	room[newRoomId] = {
+		id : newRoomId,
+		tilemap : roomToCopy.tilemap,
+		walls : roomToCopy.walls,
+		exits : roomToCopy.exits,
+		pal : roomToCopy.pal
+	};
+	refreshGameData();
+
+	curRoom = newRoomId;
+	//console.log(curRoom);
+	drawEditMap();
+
+	document.getElementById("roomId").innerHTML = curRoom;
+
+	// add new exit destination option to exits panel
+	var select = document.getElementById("exitDestinationSelect");
+	var option = document.createElement("option");
+	option.text = "room " + newRoomId;
+	option.value = newRoomId;
+	select.add(option);
+}
+
 function newRoom() {
 	if (nextRoomCharIndex >= roomIdList.length) {
 		alert("Sorry, you've run out of space for rooms! :( \n(I'm working on a way to store more. - Adam)");
