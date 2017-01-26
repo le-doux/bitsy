@@ -1,15 +1,24 @@
 /* 
 TODO NEXT
 
+- BUG: wall switch doesn't work for all rooms
+- BUG: after play mode, avatar ends up in wrong room
+- name rooms, sprites, etc (esp rooms tho)
+- make it show/hide exits, instead of "add" exits
+- BUG: removing sprite from world doesn't work once you go back into playmode
+- BUG: exit highlighting is on by default when engine starts up?
+
 v2.0 changes
 - engine changes
 	- flipbook animation
-	- skip dialog
+	X skip dialog
 - editor changes
 	- duplicate rooms, sprites
 - UI changes
 	- preview/selection canvas for sprites, tiles, room
 	- make exits easier to see on light backgrounds (black outline?)
+
+- is the skip dialog too easy? should I fast forward instead? use specific buttons? (maybe this should be playtested)
 
 from twitter
 - look at puzzlescript gist hosting of gamedata (from kool.tools)
@@ -224,13 +233,13 @@ function start() {
 
 	//load last auto-save
 	if (localStorage.game_data) {
-		console.log("~~~ found old save data! ~~~");
-		console.log(localStorage.game_data);
+		//console.log("~~~ found old save data! ~~~");
+		//console.log(localStorage.game_data);
 		document.getElementById("game_data").value = localStorage.game_data;
 		on_game_data_change_core();
 	}
 	else {
-		console.log("~~~~ no old save data! ~~~~");
+		//console.log("~~~~ no old save data! ~~~~");
 		setDefaultGameState();
 		refreshGameData();
 	}
@@ -948,8 +957,8 @@ function resetGameData() {
 
 function refreshGameData() {
 	var gameData = serializeWorld();
-	console.log("refresh!");
-	console.log(gameData);
+	//console.log("refresh!");
+	//console.log(gameData);
 	document.getElementById("game_data").value = gameData;
 	localStorage.setItem("game_data", gameData); //auto-save
 }

@@ -1,3 +1,13 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Snowbound</title>
+<style>
+html {height:592px;}
+body {width:100%; height:100%; overflow:hidden;}
+#game {background:black;margin: 0 auto;margin-top: 40px;display: block;}
+</style>
+<script>
 /*
 	Hi! If you can see this, that means your browser doesn't support
 	downloading your bitsy game directly.
@@ -92,7 +102,7 @@ var didDialogUpdateThisFrame = false;
 var onDialogUpdate = null;
 
 //only used by games exported from the editor
-var exportedGameData = "@@D";
+var exportedGameData = "Snowbound\n\nPAL 0\n243,246,255\n183,220,255\n120,138,208\n\nROOM 0\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\n0haaaaaaaaaai000\n0aeeeeeeeeeee000\n0adddaddddd0dai0\n0a000000000000a0\n0aaaaaaaaaagaaa0\n000f00000000f000\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\nWAL a,d,e\nEXT 11,10 1 4,9\n\nROOM 1\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\n000000000000c000\n0jjjj000ccc00000\n0eeee00000000000\n0aaaai0000000000\ncfccgfaccccccccc\nc000000000000000\ncccccccccccccccc\n0000000000000000\n00000000000ccc00\n00c0000000000000\n000000cc00000000\n0000000000000000\nWAL a,f,c\nEXT 15,9 2 1,9\nEXT 4,8 0 11,9\n\nROOM 2\n000000jjjj000000\n0jjjj0aaaa000000\n0aaaa0aaaa000000\n0aeaa000000cc000\n0aaaa00000000000\n00000000n00n0000\n0c0000ccccccccc0\n0000cc000000000c\nccccc00000000000\n00000000cccccccc\ncccccccc00000000\n0000000000000000\n0000000000ccc000\n000c000000000000\n0000000000000000\n0000000000000000\nWAL a,c\nEXT 15,8 3 1,8\nEXT 0,9 1 14,9\n\nROOM 3\n0000000000000000\n0000000000000000\n000000000jjjj000\n000cc0000alma000\n000000000aaaa000\n00n000000aeaa000\n0ccccccccaakaccc\nc000000000000000\n000000000000cccc\ncccccccccccc0000\n0000000000000000\n0000000000000000\n000c0000000000c0\n0000000cc0000000\n0000000000000000\n0000000000000000\nWAL c,a\nEXT 11,6 6 9,9\nEXT 0,8 2 14,8\n\nROOM 4\n0000000000000000\n0000000000jjjj00\n0000000000aaaa00\n0000000000aaea00\n000c000000aaaa00\n0000000000000000\ncccccccc00000000\n0000000cccccccn0\nccccc00000000cc0\n0000ccccc000000c\n00000000ccccc000\n000000000000cccca\n000ccc0000000000\n0000000000000c00\n000000000c000000\n0000000000000000\nWAL a,c\nEXT 15,10 5 1,10\nEXT 0,7 7 14,7\n\nROOM 5\n0000000000000000\n0000000000000000\n0000000000000000\n0000000jjjj00000\n0000000aaaa00000\n0000000aeaa00000\n0000000aaea00000\n0c00000aaaa0cc00\n000n000aeaa00000\ncccccccaakacc000\n000000000000c000\nccccccccccccc000\n0000000000000000\n000cc00000000000\n0000000c0000ccc0\n0000000000000000\nWAL c,a\nEXT 9,9 8 9,10\nEXT 0,10 4 14,10\n\nROOM 6\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\n0000aaaaaaaaa000\n0000aaaaaaaaa000\n0000aq00d0o0a000\n0000app00000a000\n0000a0000000a000\n0000aaaaa0aaa000\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\nWAL o,p\nEXT 9,10 7 11,7\n\nROOM 7\n00000b0000000000\n00000b0000000000\n000000b00jjjj000\n000cc0b00alma000\n000000b00aaaa000\n00n0000b0aeaa000\n0ccccccbcaakaccc\nc000000000000000\n000000000000cccc\ncccccccccccc0000\n0000000000000000\n0000000000000000\n000c0000000000c0\n0000000cc0000000\n0000000000000000\n0000000000000000\nWAL c,a\nEXT 15,7 4 1,7\nEXT 11,6 6 9,9\n\nROOM 8\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\n0000aaa000000000\n000aaaaaaaaaa000\n000aasaaaaaaa000\n000a00000000a000\n000a0r0r00ppa000\n000a00000000a000\n000aaaaaa0aaa000\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\nWAL a,r\nEXT 5,7 9 5,8\nEXT 9,11 5 9,10\n\nROOM 9\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\n0000000000000000\n0000aaa000000000\n000aaaaaaaaaa000\n000aasaaaaaaa000\n000a00000000a000\n000a0dot0000a000\n000a00000000a000\n000aaaaaaaaaa000\n0000000000000000\n0000000000000000\n0000000000uvwx00\n0000000000000000\n\nTIL a\n11111111\n11111111\n11111111\n11111111\n11111111\n11111111\n11111111\n11111111\n\nTIL b\n00000000\n00100000\n00101000\n00001000\n00000000\n00010000\n00010100\n00000100\n\nTIL c\n00000000\n00000000\n00011000\n00111100\n01111110\n00111100\n00000000\n00000000\n\nTIL d\n00000000\n01100000\n01100000\n01100000\n01100000\n01111000\n01111100\n00110000\n\nTIL e\n11111111\n11000011\n11000011\n11000011\n11000011\n11000011\n11000011\n11111111\n\nTIL f\n00000000\n01111110\n11100111\n11000011\n01011010\n01011010\n01000010\n00111100\n\nTIL g\n01111110\n01111110\n00000000\n01111110\n01111110\n00000000\n01111110\n01111110\n\nTIL h\n00111111\n01111111\n11111111\n11111111\n11111111\n11111111\n11111111\n11111111\n\nTIL i\n11111100\n11111110\n11111111\n11111111\n11111111\n11111111\n11111111\n11111111\n\nTIL j\n00000000\n00000000\n00000000\n00000000\n00000000\n00000000\n11011101\n00000000\n\nTIL k\n00000000\n01111110\n01111110\n01111110\n01111110\n01111010\n01111110\n01111110\n\nTIL l\n11111111\n11111111\n10011001\n10101011\n10101001\n10101011\n10011001\n11111111\n\nTIL m\n11111111\n11111111\n01100011\n01110111\n01110111\n01110111\n00100011\n11111111\n\nTIL n\n00110000\n01001000\n00111000\n00001000\n00001000\n00001000\n00001000\n00001000\n\nTIL o\n00000000\n01111110\n01000010\n01000010\n01000010\n01000010\n01111110\n01000010\n\nTIL p\n00000000\n11111111\n11111111\n00000000\n11111111\n11111111\n11111111\n11111111\n\nTIL q\n00000000\n00000000\n00000000\n00110000\n01001001\n01111001\n01111011\n01111011\n\nTIL r\n00000000\n00010000\n00111000\n00111000\n00111000\n00111000\n00010000\n00111000\n\nTIL s\n00000000\n01100000\n01100000\n01111000\n01111000\n01111110\n01111110\n00000000\n\nTIL t\n00000000\n00001100\n00001100\n00001100\n00001100\n00111100\n01111100\n00011000\n\nTIL u\n00000000\n00000000\n11101010\n01001010\n01001110\n01001010\n01001010\n00000000\n\nTIL v\n00000000\n00000000\n11100000\n10000000\n11000000\n10000000\n11100000\n00000000\n\nTIL w\n00000000\n00000000\n11101001\n10001001\n11001101\n10001011\n11101001\n00000000\n\nTIL x\n00000000\n00000000\n01100000\n01010000\n01010000\n01010000\n01100100\n00000000\n\nSPR A\n00011000\n00110100\n01100010\n01100010\n00111100\n01111110\n00111100\n00100100\nPOS 0 3,9\n\nSPR a\n00000000\n00000000\n00011000\n00100100\n00100100\n00011100\n00011100\n00010100\nPOS 0 5,8\n\nSPR c\n00000000\n00011000\n00100100\n00100100\n01011010\n00111100\n00111100\n00111100\nPOS 0 9,8\n\nSPR d\n00011000\n01111000\n00100100\n00100100\n00011100\n00011010\n00011100\n00011000\nPOS 1 6,8\n\nSPR e\n00000000\n00000000\n00011000\n00100100\n01100100\n01111110\n01111100\n00100100\nPOS 1 11,8\n\nSPR f\n00000010\n00001100\n00011100\n00100100\n00100110\n00011100\n00011100\n00011100\nPOS 1 12,8\n\nSPR g\n00000000\n00000000\n00001000\n00001100\n00111000\n01111000\n00010000\n00000000\nPOS 2 6,7\n\nSPR i\n00000000\n00011000\n00111100\n00110100\n00110100\n00011000\n00111100\n00011000\nPOS 3 4,7\n\nSPR j\n00000000\n00000000\n00011000\n00111100\n00101100\n00101100\n00011000\n00011000\nPOS 3 5,7\n\nSPR k\n00011000\n00111100\n00101100\n00011000\n10101101\n01111110\n00101100\n00111100\nPOS 3 7,7\n\nSPR l\n00011000\n00111100\n00111100\n00111100\n01011010\n01100110\n00100100\n00111100\nPOS 6 6,7\n\nSPR m\n00010000\n00111100\n01111110\n00111110\n00011110\n00111110\n00011111\n00011110\nPOS 6 11,7\n\nSPR n\n00000000\n00000000\n00010000\n00001100\n00011100\n00110000\n00111100\n00110100\nPOS 6 9,7\n\nSPR o\n00000000\n00100000\n00100100\n00000100\n00000000\n00010000\n00010010\n00000010\nPOS 7 7,7\n\nSPR p\n00110000\n01001000\n00111000\n00001000\n00001000\n00001000\n00001000\n00001000\nPOS 4 7,7\n\nSPR q\n00000000\n00000000\n00000000\n00000000\n00111110\n00101010\n00101010\n00111110\nPOS 8 10,8\n\nSPR r\n00110000\n01001000\n11001100\n11001100\n00110000\n01111000\n00110000\n00110000\nPOS 9 10,9\n\nSPR s\n00000000\n00000000\n00000000\n00000000\n00000000\n00000000\n00000000\n00000000\nPOS 3 15,7\n\nDLG a\nI'm not going anywhere without my mom.\n\nDLG c\nI traded my jacks for Steve's lunch. Now I can survive the winter if I take small bites.\n\nDLG d\nSorry kids, I can't drive this bus in snow like this. You can wait here, or walk home.\n\nDLG e\nI heard there are bears past 43rd street. I'm not ready to die yet! I still need Harvey The Slugger Johnson for my baseball card collection!\n\nDLG f\nThere aren't bears on 43rd you dummy. They're on 12th! I saw one... well, my cousin did anyway.\n\nDLG g\n*peck peck* I hear there hasn't been a winter like this since before the City was a city. But what do I know? I'm just a bird.\n\nDLG h\nIs someone sleeping in there? Better not disturb them.\n\nDLG i\nWe used the instructions on this gum wrapper to bring our snowman to life! It follows our every command!\n\nDLG j\nWe told the snowman to DO nothing and SAY nothing. No matter what! Hehehehe - it worked too!\n\nDLG k\nThe snowman is motionless. It must be hard work to stay so still.\n\nDLG l\nOh hey, it's Adele's kid! I know your mother is busy, but this is a big storm to walk home in. Take this matzoh ball soup with you - it's on me!\n\nDLG m\nThe bear is concentrating on its tiles. He growls, thoughtfully.\n\nDLG n\nI may not see so well anymore, but I can still play Mah Jongg! My opponent is quite a tough customer.\n\nDLG o\nThere are footsteps in the snow. The snowman is gone.\n\nDLG p\nSnow drifts down through the light of the streetlamp. You can hear the muffled sound of the traffic. The rest of the city seems far away.\n\nDLG q\nThe books for the dress shop are still on the table. Mom must have just finished closing.\n\nDLG r\nYou made it home! I knew you would be alright.\n\nDLG s\nIt's too cold to keep walking that way. Better find somewhere to warm up.\n\n";
 function startExportedGame() {
 	canvas = document.getElementById("game");
 	canvas.width = width * scale;
@@ -429,10 +439,8 @@ function update() {
 	ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 	
-	if (!isTitle) {
-		updateAnimation();
+	if (!isTitle)
 		drawRoom( room[curRoom] ); // draw world if game has begun
-	}
 
 	if (isDialogMode) { // dialog mode
 		updateDialog();
@@ -457,35 +465,6 @@ function update() {
 	didPlayerMoveThisFrame = false;
 	if (didDialogUpdateThisFrame && onDialogUpdate != null) onDialogUpdate();
 	didDialogUpdateThisFrame = false;
-}
-
-var animationCounter = 0;
-var animationTime = 400;
-function updateAnimation() {
-	animationCounter += deltaTime;
-
-	if ( animationCounter >= animationTime ) {
-
-		// animate sprites
-		for (id in sprite) {
-			var spr = sprite[id];
-			if (spr.animation.isAnimated) {
-				spr.animation.frameIndex = ( spr.animation.frameIndex + 1 ) % spr.animation.frameCount;
-			}
-		}
-
-		// animate tiles
-		for (id in tile) {
-			var til = tile[id];
-			if (til.animation.isAnimated) {
-				til.animation.frameIndex = ( til.animation.frameIndex + 1 ) % til.animation.frameCount;
-			}
-		}
-
-		// reset counter
-		animationCounter = 0;
-
-	}
 }
 
 var moveCounter = 0;
@@ -928,17 +907,14 @@ function parseTile(lines, i) {
 	}
 	else {
 		//store tile source
-		// drwId = "TIL_" + id;
-		// imageStore.source[drwId] = [];
-		// for (var y = 0; y < tilesize; y++) {
-		// 	var l = lines[i+y];
-		// 	imageStore.source[drwId].push(l);
-		// }
-		// i = i + tilesize;
-
-		// store tile source (if this works, you need to package it in a function)
 		drwId = "TIL_" + id;
-		i = parseDrawingCore( lines, i, drwId );
+		imageStore.source[drwId] = [];
+		// todo loop through for animations
+		for (var y = 0; y < tilesize; y++) {
+			var l = lines[i+y];
+			imageStore.source[drwId].push(l);
+		}
+		i = i + tilesize;
 	}
 
 	//other properties
@@ -953,12 +929,7 @@ function parseTile(lines, i) {
 	//tile data
 	tile[id] = {
 		drw : drwId, //drawing id
-		col : colorIndex,
-		animation : {
-			isAnimated : (imageStore.source[drwId].length > tilesize),
-			frameIndex : 0,
-			frameCount : 2 // todo: allow more than 2 frames
-		}
+		col : colorIndex
 	};
 	return i;
 }
@@ -975,17 +946,13 @@ function parseSprite(lines, i) {
 	}
 	else {
 		//store sprite source
-		// drwId = "SPR_" + id;
-		// imageStore.source[drwId] = [];
-		// for (var y = 0; y < tilesize; y++) {
-		// 	var l = lines[i+y];
-		// 	imageStore.source[drwId].push(l);
-		// }
-		// i = i + tilesize;
-
-		// store sprite source
 		drwId = "SPR_" + id;
-		i = parseDrawingCore( lines, i, drwId );
+		imageStore.source[drwId] = [];
+		for (var y = 0; y < tilesize; y++) {
+			var l = lines[i+y];
+			imageStore.source[drwId].push(l);
+		}
+		i = i + tilesize;
 	}
 
 	//other properties
@@ -1016,53 +983,21 @@ function parseSprite(lines, i) {
 		room : null, //default location is "offstage"
 		x : -1,
 		y : -1,
-		walkingPath : [], //tile by tile movement path (isn't saved)
-		animation : {
-			isAnimated : (imageStore.source[drwId].length > tilesize),
-			frameIndex : 0,
-			frameCount : 2 // todo: allow more than 2 frames
-		}
+		walkingPath : [] //tile by tile movement path (isn't saved)
 	};
 	return i;
 }
 
 function parseDrawing(lines, i) {
-	// var drwId = getId(lines[i]);
-	// i++;
-	// imageStore.source[drwId] = [];
-	// for (var y = 0; y < tilesize; y++) {
-	// 	var l = lines[i+y];
-	// 	imageStore.source[drwId].push(l);
-	// }
-	// console.log(drwId);
-	// return i + tilesize;
-
-	// store drawing source
-	var drwId = getId( lines[i] );
-	return parseDrawingCore( lines, i, drwId );
-}
-
-function parseDrawingCore(lines, i, drwId) {
+	var drwId = getId(lines[i]);
+	i++;
 	imageStore.source[drwId] = [];
-	var y = 0;
-	while ( y < tilesize ) {
+	for (var y = 0; y < tilesize; y++) {
 		var l = lines[i+y];
 		imageStore.source[drwId].push(l);
-		y++;
-
-		if (y === tilesize) {
-			i = i + y;
-			if ( lines[i].charAt(0) === ">" ) {
-				// there's another animation!
-				imageStore.source[drwId].push( lines[i] );
-				i++;
-				y = 0; //start the count over again for the next frame
-			}
-		}
 	}
-
-	//console.log(imageStore.source[drwId]);
-	return i;
+	console.log(drwId);
+	return i + tilesize;
 }
 
 function renderImages() {
@@ -1082,38 +1017,7 @@ function renderImages() {
 		for (pal in palette) {
 			var col = spr.col;
 			var colStr = "" + col;
-			var rawSrc = imageStore.source[ spr.drw ];
-			if ( rawSrc.length === tilesize ) {
-				// non-animated drawing
-				imageStore.render[pal][colStr][spr.drw] = imageDataFromImageSource( rawSrc, pal, col );
-			}
-			else {
-				// animated drawing
-				var frameCount = 0;
-				var frameSrc = [];
-				for ( l in rawSrc ) {
-					if ( rawSrc[l].charAt(0) === ">" ) {
-						// end of frame!
-						var frameId = spr.drw + "_" + frameCount;
-						imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
-						frameSrc = [];
-						frameCount++;
-					}
-					else if ( l >= rawSrc.length-1 ) {
-						// finish building frame
-						frameSrc.push( rawSrc[l] );
-						// end of frame!
-						var frameId = spr.drw + "_" + frameCount;
-						imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
-						frameSrc = [];
-						frameCount++;
-					}
-					else {
-						// continue building frame
-						frameSrc.push( rawSrc[l] );
-					}
-				}
-			}			
+			imageStore.render[pal][colStr][spr.drw] = imageDataFromImageSource( imageStore.source[spr.drw], pal, col );
 		}
 	}
 	//render images required by tiles (duplicate)
@@ -1122,44 +1026,13 @@ function renderImages() {
 		for (pal in palette) {
 			var col = til.col;
 			var colStr = "" + col;
-			var rawSrc = imageStore.source[ til.drw ];
-			if ( rawSrc.length === tilesize ) {
-				// non-animated drawing
-				imageStore.render[pal][colStr][til.drw] = imageDataFromImageSource( rawSrc, pal, col );
-			}
-			else {
-				// animated drawing
-				var frameCount = 0;
-				var frameSrc = [];
-				for ( l in rawSrc ) {
-					if ( rawSrc[l].charAt(0) === ">" ) {
-						// end of frame!
-						var frameId = til.drw + "_" + frameCount;
-						imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
-						frameSrc = [];
-						frameCount++;
-					}
-					else if ( l >= rawSrc.length-1 ) {
-						// finish building frame
-						frameSrc.push( rawSrc[l] );
-						// end of frame!
-						var frameId = til.drw + "_" + frameCount;
-						imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
-						frameSrc = [];
-						frameCount++;
-					}
-					else {
-						// continue building frame
-						frameSrc.push( rawSrc[l] );
-					}
-				}
-			}			
+			imageStore.render[pal][colStr][til.drw] = imageDataFromImageSource( imageStore.source[til.drw], pal, col );
 		}
 	}
 }
 
 function imageDataFromImageSource(imageSource, pal, col) {
-	//console.log(imageSource);
+	console.log(imageSource);
 
 	var img = ctx.createImageData(tilesize*scale,tilesize*scale);
 	for (var y = 0; y < tilesize; y++) {
@@ -1227,15 +1100,11 @@ function drawRoom(room,context) {
 }
 
 function getTileImage(t) {
-	var drwId = t.drw;
-	if ( t.animation.isAnimated ) drwId += "_" + t.animation.frameIndex;
-	return imageStore.render[curPal()][t.col][drwId];
+	return imageStore.render[curPal()][t.col][t.drw];
 }
 
 function getSpriteImage(s) {
-	var drwId = s.drw;
-	if ( s.animation.isAnimated ) drwId += "_" + s.animation.frameIndex;
-	return imageStore.render[curPal()][s.col][drwId];
+	return imageStore.render[curPal()][s.col][s.drw];
 }
 
 function curPal() {
@@ -3803,3 +3672,10 @@ var fontdata = [
 		0,0,0,0,0,0,
 		0,0,0,0,0,0
 		];
+</script>
+</head>
+<body onload='startExportedGame()'>
+<canvas id='game'>
+</canvas>
+</body>
+</html>
