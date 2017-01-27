@@ -283,6 +283,14 @@
 			</div>
 			<div id="wall" style="display:none;">is this tile a wall? <input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall();"> </div>
 			<div id="dialog" style="display:none;">dialog: <input type="text" id="dialogText" onchange="on_change_dialog();"></div>
+			<div id="isAnimated" style="display:none;">animated? <input type="checkbox" id="animatedCheckbox" onchange="on_toggle_animated();"> </div>
+			<div id="animation" style="display:none;">
+				<form>
+					keyframe:
+					<input id="animationOptionFrame1" type="radio" name="keyframe" onclick="on_paint_frame1();" checked> frame 1
+					<input id="animationOptionFrame2" type="radio" name="keyframe" onclick="on_paint_frame2();"> frame 2
+				</form>
+			</div>
 			<button onclick="toggleGrid();"> show/hide pixel grid </button>
 		</div>
 		<div id="colorsPanel" class="panel">

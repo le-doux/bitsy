@@ -9,11 +9,11 @@ TODO NEXT
 - BUG: exit highlighting is on by default when engine starts up?
 
 v2.0 changes
-- engine changes
+X engine changes
 	X flipbook animation
 	X skip dialog
 - editor changes
-	- duplicate rooms, sprites
+	X duplicate rooms, sprites
 	- animation editing
 - UI changes
 	- preview/selection canvas for sprites, tiles, room
@@ -137,6 +137,8 @@ var drawing_data = [
 var drawPaintGrid = true;
 var curPaintBrush = 0;
 var isPainting = false;
+var isCurDrawingAnimated = false;
+var curDrawingFrameIndex = 0;
 
 var nextTileCharCode = 97;
 var tileIndex = 0;
@@ -600,6 +602,7 @@ function nextSprite() {
 	spriteIndex = (spriteIndex + 1) % ids.length;
 	if (spriteIndex === 0) spriteIndex = 1; //skip avatar
 	drawingId = ids[spriteIndex];
+	curDrawingFrameIndex = 0;
 	reloadSprite();
 }
 
@@ -608,6 +611,7 @@ function prevSprite() {
 	spriteIndex = (spriteIndex - 1) % ids.length;
 	if (spriteIndex <= 0) spriteIndex = (ids.length-1); //loop and skip avatar
 	drawingId = ids[spriteIndex];
+	curDrawingFrameIndex = 0;
 	reloadSprite();
 }
 
@@ -719,7 +723,7 @@ function reloadTile() {
 	}
 	drawPaintCanvas();
 
-	if (room[curRoom]) {	
+	if (room[curRoom]) { //todo this per-room wall nonsense is confusing
 		if (room[curRoom].walls.indexOf(drawingId) != -1) {
 			document.getElementById("wallCheckbox").checked = true;
 		}
@@ -730,21 +734,46 @@ function reloadTile() {
 }
 
 function reloadSprite() {
-	var drw = "SPR_" + drawingId;
-	for (y in imageStore.source[drw]) {
-		for (var x = 0; x < 8; x++) {
-			var pixel = parseInt( imageStore.source[drw][y].charAt(x) );
-			drawing_data[y][x] = pixel;
-		}
+	// animation UI
+	if ( sprite[drawingId].animation.isAnimated ) {
+		isCurDrawingAnimated = true;
+		document.getElementById("animatedCheckbox").checked = true;
+		document.getElementById("animationOptionFrame1").checked = (curDrawingFrameIndex == 0);
+		document.getElementById("animationOptionFrame2").checked = (curDrawingFrameIndex == 1);
+		document.getElementById("animation").setAttribute("style","display:block;");
 	}
-	drawPaintCanvas();
+	else {
+		isCurDrawingAnimated = false;
+		document.getElementById("animatedCheckbox").checked = false;
+		document.getElementById("animation").setAttribute("style","display:none;");
+	}
 
+	// dialog UI
 	if (drawingId in dialog) {
 		document.getElementById("dialogText").value = dialog[drawingId];
 	}
 	else {
 		document.getElementById("dialogText").value = "";
 	}
+
+	// update paint canvas
+	var drw = "SPR_" + drawingId;
+	var yStart = 0;
+	if ( isCurDrawingAnimated ) {
+		yStart += 9 * curDrawingFrameIndex;
+	}
+	console.log( imageStore.source[drw] );
+	for (var y = yStart; y < (yStart +8); y++) {
+		console.log( y );
+		console.log( imageStore.source[drw][y] );
+		for (var x = 0; x < 8; x++) {
+			var pixel = parseInt( imageStore.source[drw][y].charAt(x) );
+			var drwY = y-yStart;
+			drawing_data[drwY][x] = pixel;
+		}
+	}
+	drawPaintCanvas();
+
 }
 
 function sortedTileIdList() {
@@ -999,9 +1028,9 @@ function saveDrawingData() {
 		renderImages(); //rerender all images (inefficient)
 	}
 	else { //paintMode is Sprite or Avatar
-		//new sprite
 		var drw = "SPR_" + drawingId;
 		if (!(drawingId in sprite)) {
+			// new sprite
 			sprite[drawingId] = { //todo create default sprite creation method
 				drw : drw,
 				col : 2,
@@ -1014,16 +1043,34 @@ function saveDrawingData() {
 					frameCount : 2
 				}
 			};
-		}
-		//save sprite drawing
-		imageStore.source[drw] = [];
-		for (var y = 0; y < 8; y++) {
-			var ln = "";
-			for (var x = 0; x < 8; x++) {
-				ln += drawing_data[y][x];
+			// save sprite drawing
+			imageStore.source[drw] = [];
+			for (var y = 0; y < 8; y++) {
+				var ln = "";
+				for (var x = 0; x < 8; x++) {
+					ln += drawing_data[y][x];
+				}
+				imageStore.source[drw].push(ln);
 			}
-			imageStore.source[drw].push(ln);
-		} 
+		}
+		else {
+			// edit existing sprite
+			var yStart = 0;
+			if ( isCurDrawingAnimated ) {
+				//drw += "_" + curDrawingFrameIndex;
+				yStart += 9 * curDrawingFrameIndex; // 8 rows / images + 1 row separater
+			}
+			// save sprite drawing
+			for (var y = yStart; y < (yStart+8); y++) {
+				var ln = "";
+				for (var x = 0; x < 8; x++) {
+					var drwY = y-yStart;
+					ln += drawing_data[drwY][x];
+				}
+				imageStore.source[drw][y] = ln;
+			}
+		}
+		// re-render images
 		renderImages();
 	}
 }
@@ -1173,6 +1220,8 @@ function on_paint_avatar() {
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintNav").setAttribute("style","display:none;");
 	document.getElementById("paintCommands").setAttribute("style","display:none;");
+	document.getElementById("isAnimated").setAttribute("style","display:block;");
+	//document.getElementById("animation").setAttribute("style","display:none;");
 }
 function on_paint_tile() {
 	paintMode = TileType.Tile;
@@ -1183,6 +1232,8 @@ function on_paint_tile() {
 	document.getElementById("wall").setAttribute("style","display:block;");
 	document.getElementById("paintNav").setAttribute("style","display:block;");
 	document.getElementById("paintCommands").setAttribute("style","display:block;");
+	document.getElementById("isAnimated").setAttribute("style","display:block;");
+	//document.getElementById("animation").setAttribute("style","display:block;");
 }
 function on_paint_sprite() {
 	paintMode = TileType.Sprite;
@@ -1194,10 +1245,14 @@ function on_paint_sprite() {
 		spriteIndex = 0; //fall back to avatar if no other sprites exist
 	}
 	drawingId = sortedSpriteIdList()[spriteIndex];
+	curDrawingFrameIndex = 0;
 	reloadSprite();
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintNav").setAttribute("style","display:block;");
+	document.getElementById("paintCommands").setAttribute("style","display:block;");
+	document.getElementById("isAnimated").setAttribute("style","display:block;");
+	//document.getElementById("animation").setAttribute("style","display:block;");
 }
 
 function on_change_dialog() {
@@ -1345,7 +1400,6 @@ function on_toggle_wall() {
 	console.log(room[curRoom]);
 	refreshGameData();
 }
-
 
 var engineScript;
 function loadEngineScript() {
@@ -1685,4 +1739,73 @@ function importGameFromFile(e) {
 		document.getElementById("game_data").value = gameDataStr;
 		on_game_data_change();
 	}
+}
+
+/* ANIMATION EDITING*/
+function on_toggle_animated() {
+	if ( document.getElementById("animatedCheckbox").checked ){
+		if ( paintMode === TileType.Sprite ) {
+			addSpriteAnimation();
+		}
+		else if ( paintMode === TileType.Tile ) {
+			addTileAnimation();
+		}
+		document.getElementById("animation").setAttribute("style","display:block;");
+	}
+	else {
+		if ( paintMode === TileType.Sprite ) {
+			removeSpriteAnimation();
+		}
+		else if ( paintMode === TileType.Tile ) {
+			removeTileAnimation();			
+		}
+		document.getElementById("animation").setAttribute("style","display:none;");
+	}
+}
+
+function addSpriteAnimation() {
+	//set editor mode
+	isCurDrawingAnimated = true;
+	curDrawingFrameIndex = 0;
+
+	//mark sprite as animated
+	sprite[drawingId].animation.isAnimated = true;
+
+	//add blank frame to sprite
+	spriteImageId = "SPR_" + drawingId;
+	imageStore.source[ spriteImageId ].push(">");
+	imageStore.source[ spriteImageId ].push("00000000");
+	imageStore.source[ spriteImageId ].push("00000000");
+	imageStore.source[ spriteImageId ].push("00000000");
+	imageStore.source[ spriteImageId ].push("00000000");
+	imageStore.source[ spriteImageId ].push("00000000");
+	imageStore.source[ spriteImageId ].push("00000000");
+	imageStore.source[ spriteImageId ].push("00000000");
+	imageStore.source[ spriteImageId ].push("00000000");
+
+	//refresh data model
+	refreshGameData();
+	reloadSprite();
+}
+
+function removeSpriteAnimation() {
+
+}
+
+function addTileAnimation() {
+
+}
+
+function removeTileAnimation() {
+
+}
+
+function on_paint_frame1() {
+	curDrawingFrameIndex = 0;
+	reloadSprite();
+}
+
+function on_paint_frame2() {
+	curDrawingFrameIndex = 1;
+	reloadSprite();
 }
