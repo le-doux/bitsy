@@ -1744,7 +1744,7 @@ function importGameFromFile(e) {
 /* ANIMATION EDITING*/
 function on_toggle_animated() {
 	if ( document.getElementById("animatedCheckbox").checked ){
-		if ( paintMode === TileType.Sprite ) {
+		if ( paintMode === TileType.Sprite || paintMode === TileType.Avatar ) {
 			addSpriteAnimation();
 		}
 		else if ( paintMode === TileType.Tile ) {
@@ -1753,7 +1753,7 @@ function on_toggle_animated() {
 		document.getElementById("animation").setAttribute("style","display:block;");
 	}
 	else {
-		if ( paintMode === TileType.Sprite ) {
+		if ( paintMode === TileType.Sprite || paintMode === TileType.Avatar ) {
 			removeSpriteAnimation();
 		}
 		else if ( paintMode === TileType.Tile ) {
@@ -1789,7 +1789,23 @@ function addSpriteAnimation() {
 }
 
 function removeSpriteAnimation() {
+	//set editor mode
+	isCurDrawingAnimated = false;
 
+	//mark sprite as non-animated
+	sprite[drawingId].animation.isAnimated = false;
+
+	//remove all but the first frame of the sprite
+	spriteImageId = "SPR_" + drawingId;
+	var oldImageData = imageStore.source[ spriteImageId ].slice(0);
+	imageStore.source[ spriteImageId ] = [];
+	for (var i = 0; i < 8; i++) {
+		imageStore.source[ spriteImageId ].push( oldImageData[i] );
+	}
+
+	//refresh data model
+	refreshGameData();
+	reloadSprite();
 }
 
 function addTileAnimation() {
