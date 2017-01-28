@@ -123,7 +123,7 @@
 			<button onclick="showToolsPanel();" style="margin-left:20px;">show toolbar</button>
 			<button onclick="newGameDialog();" style="margin-left:20px;">new game (start over!)</button>
 			<span id="bitsyEditorName">
-				Bitsy v1.4 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
+				Bitsy v2.0 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
 			</span>
 		</div>
 		<div id="unsupportedFeatures" style="display:none;">
@@ -152,14 +152,20 @@
 				hi! bitsy is a little editor for little games or worlds. <br>
 				the goal is to make it easy to make games where you <br>
 				can walk around and talk to people and be somewhere. <br><br>
-				i hope you enjoy using it! <br>
-				- adam <br><br>
+
+				if you need inspiration, you can <a href="https://itch.io/c/90743/bitsy-games">play other bitsy games</a> 
+				<br>on <a href="https://itch.io">itch.io</a>, which is a great place to share games!<br><br>
+
+
+				have fun making things with bitsy! <br>
+				- <a href="https://www.twitter.com/adamledoux">adam</a> <br><br>
 
 				<span class="toggleText" onclick="toggleInstructions();">instructions</span> <br>
 				<div id="instructions" style="display:none;">
 					you can draw things in the <b>paint</b> panel, then place <br>
 					them in your world in the <b>room</b> panel. you can write <br>
-					dialog for your characters (aka sprites) too. <br>
+					dialog for your characters (aka sprites) too. you can <br>
+					also animate your drawings if you want to! <br>
 					<br>
 					some words:<br>
 					* room - a place in your game world<br>
@@ -179,6 +185,7 @@
 					<br>
 					if you want to talk about bitsy, report a bug, or share <br>
 					a game you made, i'm on twitter <a href="https://www.twitter.com/adamledoux">@adamledoux</a><br>
+					or you can post in the <a href="https://ledoux.itch.io/bitsy/community">community forum</a><br>
 					<br>
 					special thanks to: <br>
 					* mary-margaret <br>
@@ -186,31 +193,20 @@
 				</div>
 				<br>
 
-				<span class="toggleText" onclick="toggleVersionNotes();">what's new in v1.4</span> <br>
+				<span class="toggleText" onclick="toggleVersionNotes();">what's new in v2.0</span> <br>
 				<div id="versionNotes" style="display:none;">
-					<i>v1.4:</i> <br>
-					- delete sprites, tiles, and rooms!<br>
-					- use "new" button to start over<br>
-					- fixed bug with exits when reloading files<br>
-					- fixed bug with refreshing game data<br>
-					<br>
-					<i>v1.3:</i> <br>
-					- re-import games from html files
-					<br><br>
-					<i>v1.2:</i> <br>
-					- autosaving means you'll never lose your work! <br>
-					- your open tools are remembered between sessions
-					<br><br>
-					<i>v1.1:</i> <br>
-					- record gifs! (open from the toolbar)
-					<br><br>
-					<i>v1.0:</i> <br>
-					- you can have multiple rooms in a game! <br>
-					- add exits that connect rooms <br>
-					- a toolbar for showing/hiding tool windows <br>
-					- you can minimize tools <br>
-					- remove sprites from a room by clicking on them <br>
-					- drag to add/delete tiles from room <br>
+					<i>v2.0:</i> <br>
+					- flipbook-style animation!<br>
+					-> animate any sprite or tile or avatar<br>
+					-> check "add animation" in the paint tab<br>
+					-> switch frames by selecting frame 1 or 2<br>
+					~~~~<br>
+					- sprite/tile thumbnails <br>
+					-> click a thumbnail to paint it!<br>
+					~~~~<br>
+					- easily duplicate rooms, sprites, and tiles<br>
+					- exits are easier to see<br>
+					- skip dialog with any key
 				</div>
 			</div>
 		</div>
