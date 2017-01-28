@@ -7,18 +7,20 @@ TODO NEXT
 - make it show/hide exits, instead of "add" exits
 - BUG: removing sprite from world doesn't work once you go back into playmode
 - BUG: exit highlighting is on by default when engine starts up?
+- decreaes duplicate code between tile / sprites
 
 v2.0 changes
 X engine changes
 	X flipbook animation
 	X skip dialog
-- editor changes
+X editor changes
 	X duplicate rooms, sprites
-	- animation editing
+	X animation editing
 - UI changes
 	- preview/selection canvas for sprites, tiles, room
 	X make exits easier to see on light backgrounds (black outline?)
 
+- the UI is getting cluttered :(
 - is the skip dialog too easy? should I fast forward instead? use specific buttons? (maybe this should be playtested)
 
 from twitter
@@ -436,6 +438,7 @@ function nextTile() {
 	var ids = sortedTileIdList();
 	tileIndex = (tileIndex + 1) % ids.length;
 	drawingId = ids[tileIndex];
+	curDrawingFrameIndex = 0;
 	reloadTile();
 }
 
@@ -444,6 +447,7 @@ function prevTile() {
 	tileIndex = (tileIndex - 1) % ids.length;
 	if (tileIndex < 0) tileIndex = (ids.length-1);
 	drawingId = ids[tileIndex];
+	curDrawingFrameIndex = 0;
 	reloadTile();
 }
 
@@ -713,16 +717,26 @@ function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
 	}
 }
 
-function reloadTile() {
-	var drw = "TIL_" + drawingId;
-	for (y in imageStore.source[drw]) {
-		for (var x = 0; x < 8; x++) {
-			var pixel = parseInt( imageStore.source[drw][y].charAt(x) );
-			drawing_data[y][x] = pixel;
-		}
-	}
-	drawPaintCanvas();
+function updateAnimationUI() {
+	//todo
+}
 
+function reloadTile() {
+	// animation UI
+	if ( tile[drawingId].animation.isAnimated ) {
+		isCurDrawingAnimated = true;
+		document.getElementById("animatedCheckbox").checked = true;
+		document.getElementById("animationOptionFrame1").checked = (curDrawingFrameIndex == 0);
+		document.getElementById("animationOptionFrame2").checked = (curDrawingFrameIndex == 1);
+		document.getElementById("animation").setAttribute("style","display:block;");
+	}
+	else {
+		isCurDrawingAnimated = false;
+		document.getElementById("animatedCheckbox").checked = false;
+		document.getElementById("animation").setAttribute("style","display:none;");
+	}
+
+	// wall UI
 	if (room[curRoom]) { //todo this per-room wall nonsense is confusing
 		if (room[curRoom].walls.indexOf(drawingId) != -1) {
 			document.getElementById("wallCheckbox").checked = true;
@@ -731,6 +745,20 @@ function reloadTile() {
 			document.getElementById("wallCheckbox").checked = false;
 		}
 	}
+
+	var drw = "TIL_" + drawingId;
+	var yStart = 0;
+	if ( isCurDrawingAnimated ) {
+		yStart += 9 * curDrawingFrameIndex;
+	}
+	for (var y = yStart; y < (yStart + 8); y++) {
+		for (var x = 0; x < 8; x++) {
+			var pixel = parseInt( imageStore.source[drw][y].charAt(x) );
+			var drwY = y-yStart;
+			drawing_data[drwY][x] = pixel;
+		}
+	}
+	drawPaintCanvas();
 }
 
 function reloadSprite() {
@@ -1015,16 +1043,32 @@ function saveDrawingData() {
 					frameCount : 2
 				}
 			};
+			//save tile drawing
+			imageStore.source[drw] = [];
+			for (var y = 0; y < 8; y++) {
+				var ln = "";
+				for (var x = 0; x < 8; x++) {
+					ln += drawing_data[y][x];
+				}
+				imageStore.source[drw].push(ln);
+			} 
 		}
-		//save tile drawing
-		imageStore.source[drw] = [];
-		for (var y = 0; y < 8; y++) {
-			var ln = "";
-			for (var x = 0; x < 8; x++) {
-				ln += drawing_data[y][x];
+		else {
+			// edit existing tile
+			var yStart = 0;
+			if ( isCurDrawingAnimated ) {
+				yStart += 9 * curDrawingFrameIndex; // 8 rows / images + 1 row separater
 			}
-			imageStore.source[drw].push(ln);
-		} 
+			// save tile drawing
+			for (var y = yStart; y < (yStart+8); y++) {
+				var ln = "";
+				for (var x = 0; x < 8; x++) {
+					var drwY = y-yStart;
+					ln += drawing_data[drwY][x];
+				}
+				imageStore.source[drw][y] = ln;
+			}
+		}
 		renderImages(); //rerender all images (inefficient)
 	}
 	else { //paintMode is Sprite or Avatar
@@ -1772,7 +1816,7 @@ function addSpriteAnimation() {
 	sprite[drawingId].animation.isAnimated = true;
 
 	//add blank frame to sprite
-	spriteImageId = "SPR_" + drawingId;
+	var spriteImageId = "SPR_" + drawingId;
 	imageStore.source[ spriteImageId ].push(">");
 	imageStore.source[ spriteImageId ].push("00000000");
 	imageStore.source[ spriteImageId ].push("00000000");
@@ -1796,7 +1840,7 @@ function removeSpriteAnimation() {
 	sprite[drawingId].animation.isAnimated = false;
 
 	//remove all but the first frame of the sprite
-	spriteImageId = "SPR_" + drawingId;
+	var spriteImageId = "SPR_" + drawingId;
 	var oldImageData = imageStore.source[ spriteImageId ].slice(0);
 	imageStore.source[ spriteImageId ] = [];
 	for (var i = 0; i < 8; i++) {
@@ -1809,19 +1853,66 @@ function removeSpriteAnimation() {
 }
 
 function addTileAnimation() {
+	//set editor mode
+	isCurDrawingAnimated = true;
+	curDrawingFrameIndex = 0;
 
+	//mark tile as animated
+	tile[drawingId].animation.isAnimated = true;
+
+	//add blank frame to tile
+	var tileImageId = "TIL_" + drawingId;
+	imageStore.source[ tileImageId ].push(">");
+	imageStore.source[ tileImageId ].push("00000000");
+	imageStore.source[ tileImageId ].push("00000000");
+	imageStore.source[ tileImageId ].push("00000000");
+	imageStore.source[ tileImageId ].push("00000000");
+	imageStore.source[ tileImageId ].push("00000000");
+	imageStore.source[ tileImageId ].push("00000000");
+	imageStore.source[ tileImageId ].push("00000000");
+	imageStore.source[ tileImageId ].push("00000000");
+
+	//refresh data model
+	refreshGameData();
+	reloadTile();
 }
 
 function removeTileAnimation() {
+	//set editor mode
+	isCurDrawingAnimated = false;
 
+	//mark tile as non-animated
+	tile[drawingId].animation.isAnimated = false;
+
+	//remove all but the first frame of the tile
+	var tileImageId = "TIL_" + drawingId;
+	var oldImageData = imageStore.source[ tileImageId ].slice(0);
+	imageStore.source[ tileImageId ] = [];
+	for (var i = 0; i < 8; i++) {
+		imageStore.source[ tileImageId ].push( oldImageData[i] );
+	}
+
+	//refresh data model
+	refreshGameData();
+	reloadTile();
 }
 
 function on_paint_frame1() {
 	curDrawingFrameIndex = 0;
-	reloadSprite();
+	if ( paintMode === TileType.Tile) {
+		reloadTile();
+	}
+	else {
+		reloadSprite();
+	}
 }
 
 function on_paint_frame2() {
 	curDrawingFrameIndex = 1;
-	reloadSprite();
+	if ( paintMode === TileType.Tile) {
+		reloadTile();
+	}
+	else {
+		reloadSprite();
+	}
 }
