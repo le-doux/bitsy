@@ -16,10 +16,11 @@ X engine changes
 X editor changes
 	X duplicate rooms, sprites
 	X animation editing
-- UI changes
-	- preview/selection canvas for sprites, tiles, room
+X UI changes
+	X preview/selection canvas for sprites, tiles
 	X make exits easier to see on light backgrounds (black outline?)
 
+- add preview canvas for rooms
 - the UI is getting cluttered :(
 - is the skip dialog too easy? should I fast forward instead? use specific buttons? (maybe this should be playtested)
 
@@ -122,6 +123,9 @@ var editMode = EditMode.Edit;
 var paint_canvas;
 var paint_ctx;
 var paint_scale = 32;
+
+var paint_nav_canvas;
+var paint_nav_ctx;
 
 var paintMode = TileType.Avatar;
 var drawingId = "A";
@@ -226,6 +230,12 @@ function start() {
 	paint_canvas.addEventListener("mousemove", paint_onMouseMove);
 	paint_canvas.addEventListener("mouseup", paint_onMouseUp);
 	paint_canvas.addEventListener("mouseleave", paint_onMouseUp);
+	//paint nav canvas & context
+	paint_nav_canvas = document.getElementById("paintNavThumbnails");
+	paint_nav_canvas.width = tilesize * scale * 8;
+	paint_nav_canvas.height = tilesize * scale;
+	paint_nav_ctx = paint_nav_canvas.getContext("2d");
+	paint_nav_canvas.addEventListener("mousedown", paint_nav_onMouseDown);
 
 	//exit destination canvas & context
 	exit_canvas = document.getElementById("exitCanvas");
@@ -265,6 +275,12 @@ function start() {
 	on_paint_avatar();
 	drawPaintCanvas();
 	drawEditMap();
+
+	drawPaintNavThumbnailCanvas();
+	setInterval( function() {
+		paintNavThumbnailAnimationFrameIndex = ( paintNavThumbnailAnimationFrameIndex + 1 ) % 2;
+		drawPaintNavThumbnailCanvas();
+	}, animationTime ); // animate the thumbnails of sprites / tiles
 
 	//load engine for export
 	loadEngineScript();
@@ -405,6 +421,85 @@ function unlistenMapEditEvents() {
 	canvas.removeEventListener("mouseleave", map_onMouseUp);
 }
 
+var paintNavThumbnailAnimationFrameIndex = 0;
+function drawPaintNavThumbnailCanvas() {
+	var realTileSize = tilesize * scale;
+
+	//background
+	paint_nav_ctx.fillStyle = "rgb("+palette[drawingPal][0][0]+","+palette[drawingPal][0][1]+","+palette[drawingPal][0][2]+")";
+	paint_nav_ctx.fillRect(0,0,paint_nav_canvas.width,paint_nav_canvas.height);
+
+	//draw sprites/tiles
+	if ( paintMode === TileType.Tile ) {
+		var tileIdList = sortedTileIdList();
+		var tileIndex = tileIdList.indexOf( drawingId );
+		var tileId = tileIdList[ tileIndex ];
+		// draw selected tile
+		drawTile( getTileImage( tile[ tileId ], paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
+		// draw previous tiles
+		for (i = 2; i >= 0; i-- ) {
+			tileIndex--;
+			if (tileIndex >= 0) {
+				tileId = tileIdList[ tileIndex ];
+				drawTile( getTileImage( tile[ tileId ], paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
+			}
+		}
+		// draw next tiles
+		tileIndex = tileIdList.indexOf( drawingId );
+		for (i = 4; i < 8; i++) {
+			tileIndex++;
+			if (tileIndex < tileIdList.length) {
+				tileId = tileIdList[ tileIndex ];
+				drawTile( getTileImage( tile[ tileId ], paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
+			}
+		}
+	}
+	else if ( paintMode === TileType.Sprite ) {
+		var spriteIdList = sortedSpriteIdList();
+		var spriteIndex = spriteIdList.indexOf( drawingId );
+		var spriteId = spriteIdList[ spriteIndex ];
+		// draw selected sprite
+		drawSprite( getSpriteImage( sprite[ spriteId ], paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
+		// draw previous sprites
+		for (i = 2; i >= 0; i-- ) {
+			spriteIndex--;
+			if (spriteIndex >= 1) {
+				spriteId = spriteIdList[ spriteIndex ];
+				drawSprite( getSpriteImage( sprite[ spriteId ], paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
+			}
+		}
+		// draw next sprites
+		spriteIndex = spriteIdList.indexOf( drawingId );
+		for (i = 4; i < 8; i++) {
+			spriteIndex++;
+			if (spriteIndex < spriteIdList.length) {
+				spriteId = spriteIdList[ spriteIndex ];
+				drawSprite( getSpriteImage( sprite[ spriteId ], paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
+			}
+		}
+	}
+	else if ( paintMode === TileType.Avatar ) {
+		// draw selected sprite
+		drawSprite( getSpriteImage( sprite[ drawingId ], paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
+	}
+
+	//highlight selected drawing
+	paint_nav_ctx.fillStyle = "#000";
+	paint_nav_ctx.globalAlpha = 0.4;
+	paint_nav_ctx.fillRect(0,0,(3*realTileSize),paint_nav_canvas.height);
+	paint_nav_ctx.fillRect(4*realTileSize,0,4*realTileSize,paint_nav_canvas.height);
+	paint_nav_ctx.globalAlpha = 1.0;
+
+	//draw grid
+	paint_nav_ctx.fillStyle = "#fff";
+	for (var x = 1; x < (paint_nav_canvas.width/realTileSize); x++) {
+		paint_nav_ctx.fillRect(x*realTileSize,0*realTileSize,1,paint_nav_canvas.height);
+	}
+	for (var y = 1; y < (paint_nav_canvas.height/realTileSize); y++) {
+		paint_nav_ctx.fillRect(0*realTileSize,y*realTileSize,paint_nav_canvas.width,1);
+	}
+}
+
 function newTile() {
 	if (nextTileCharCode > 97+25) {
 		alert("Sorry, you've run out of space for tiles! :( \n(I'm working on a way to store more. - Adam)");
@@ -440,6 +535,7 @@ function nextTile() {
 	drawingId = ids[tileIndex];
 	curDrawingFrameIndex = 0;
 	reloadTile();
+	drawPaintNavThumbnailCanvas();
 }
 
 function prevTile() {
@@ -449,6 +545,7 @@ function prevTile() {
 	drawingId = ids[tileIndex];
 	curDrawingFrameIndex = 0;
 	reloadTile();
+	drawPaintNavThumbnailCanvas();
 }
 
 function newSprite() {
@@ -608,6 +705,7 @@ function nextSprite() {
 	drawingId = ids[spriteIndex];
 	curDrawingFrameIndex = 0;
 	reloadSprite();
+	drawPaintNavThumbnailCanvas();
 }
 
 function prevSprite() {
@@ -617,6 +715,7 @@ function prevSprite() {
 	drawingId = ids[spriteIndex];
 	curDrawingFrameIndex = 0;
 	reloadSprite();
+	drawPaintNavThumbnailCanvas();
 }
 
 function next() {
@@ -1639,6 +1738,36 @@ function drawExitDestinationRoom() {
 	}
 }
 
+function paint_nav_onMouseDown(e) {
+	var off = getOffset(e);
+	var x = Math.floor(off.x / (tilesize*scale));
+	console.log("MOUSE THUMBNAIL");
+	console.log(x);
+	if ( paintMode === TileType.Tile ) {
+		var tileList = sortedTileIdList();
+		var tileIndex = tileList.indexOf( drawingId );
+		tileIndex += (x-3);
+		console.log(tileIndex);
+		if (tileIndex >= 0 && tileIndex < tileList.length) {
+			drawingId = tileList[tileIndex];
+			curDrawingFrameIndex = 0;
+			reloadTile();
+			drawPaintNavThumbnailCanvas();
+		}
+	}
+	else if ( paintMode === TileType.Sprite ) {
+		var spriteList = sortedSpriteIdList();
+		var spriteIndex = spriteList.indexOf( drawingId );
+		spriteIndex += (x-3);
+		if (spriteIndex >= 0 && spriteIndex < spriteList.length) {
+			drawingId = spriteList[spriteIndex];
+			curDrawingFrameIndex = 0;
+			reloadSprite();
+			drawPaintNavThumbnailCanvas();
+		}
+	}
+}
+
 var exit_scale = 16;
 function exit_onMouseDown(e) {
 	var off = getOffset(e);
@@ -1787,7 +1916,7 @@ function importGameFromFile(e) {
 
 /* ANIMATION EDITING*/
 function on_toggle_animated() {
-	if ( document.getElementById("animatedCheckbox").checked ){
+	if ( document.getElementById("animatedCheckbox").checked ) {
 		if ( paintMode === TileType.Sprite || paintMode === TileType.Avatar ) {
 			addSpriteAnimation();
 		}
@@ -1828,6 +1957,7 @@ function addSpriteAnimation() {
 	imageStore.source[ spriteImageId ].push("00000000");
 
 	//refresh data model
+	renderImages();
 	refreshGameData();
 	reloadSprite();
 }
@@ -1848,6 +1978,7 @@ function removeSpriteAnimation() {
 	}
 
 	//refresh data model
+	renderImages();
 	refreshGameData();
 	reloadSprite();
 }
@@ -1873,6 +2004,7 @@ function addTileAnimation() {
 	imageStore.source[ tileImageId ].push("00000000");
 
 	//refresh data model
+	renderImages();
 	refreshGameData();
 	reloadTile();
 }
@@ -1893,6 +2025,7 @@ function removeTileAnimation() {
 	}
 
 	//refresh data model
+	renderImages();
 	refreshGameData();
 	reloadTile();
 }

@@ -1226,15 +1226,29 @@ function drawRoom(room,context) {
 	}
 }
 
-function getTileImage(t) {
+function getTileImage(t,frameIndex) {
 	var drwId = t.drw;
-	if ( t.animation.isAnimated ) drwId += "_" + t.animation.frameIndex;
+	if ( t.animation.isAnimated ) {
+		if (frameIndex) { // use optional provided frame index
+			drwId += "_" + frameIndex;
+		}
+		else { // or the one bundled with the tile
+			drwId += "_" + t.animation.frameIndex;
+		}
+	}
 	return imageStore.render[curPal()][t.col][drwId];
 }
 
-function getSpriteImage(s) {
+function getSpriteImage(s,frameIndex) {
 	var drwId = s.drw;
-	if ( s.animation.isAnimated ) drwId += "_" + s.animation.frameIndex;
+	if ( s.animation.isAnimated ) {
+		if (frameIndex) {
+			drwId += "_" + frameIndex;
+		}
+		else {
+			drwId += "_" + s.animation.frameIndex;
+		}
+	}
 	return imageStore.render[curPal()][s.col][drwId];
 }
 
