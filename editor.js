@@ -8,6 +8,7 @@ TODO NEXT
 - BUG: removing sprite from world doesn't work once you go back into playmode
 - BUG: exit highlighting is on by default when engine starts up?
 - decreaes duplicate code between tile / sprites
+- BUG: new game is broken
 
 v2.0 changes
 X engine changes
@@ -316,6 +317,9 @@ function start() {
 function setDefaultGameState() {
 	//clear values
 	clearGameData();
+	//hack
+	curDrawingFrameIndex = 0;
+	isCurDrawingAnimated = false;
 	//default values
 	title = "Write your game's title here";
 	palette[drawingPal] = [
@@ -324,8 +328,9 @@ function setDefaultGameState() {
 		[255,255,255]
 	];
 	//default avatar
+	console.log("A");
 	paintMode = TileType.Avatar;
-	on_paint_avatar();
+	//on_paint_avatar();
 	drawing_data = [
 		[0,0,0,1,1,0,0,0],
 		[0,0,0,1,1,0,0,0],
@@ -341,12 +346,13 @@ function setDefaultGameState() {
 	sprite["A"].room = "0";
 	sprite["A"].x = 4;
 	sprite["A"].y = 4;
+	console.log("B");
 	//defualt sprite
 	paintMode = TileType.Sprite;
 	drawingId = "a";
 	nextSpriteCharCode = 97;
 	newSprite();
-	on_paint_sprite();
+	//on_paint_sprite();
 	drawing_data = [
 		[0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0],
@@ -363,11 +369,12 @@ function setDefaultGameState() {
 	sprite["a"].y = 12;
 	dialog["a"] = "I'm a cat";
 	//default tile
+	console.log("C");
 	paintMode = TileType.Tile;
 	drawingId = "a";
 	nextTileCharCode = 97;
 	newTile();
-	on_paint_tile();
+	//on_paint_tile();
 	drawing_data = [
 		[1,1,1,1,1,1,1,1],
 		[1,0,0,0,0,0,0,1],
@@ -380,6 +387,7 @@ function setDefaultGameState() {
 	];
 	saveDrawingData();
 	renderImages();
+	console.log("D");
 	//default room
 	room["0"] = {
 		id : "0",
@@ -405,6 +413,7 @@ function setDefaultGameState() {
 		exits : [],
 		pal : null
 	};
+	console.log("E");
 }
 
 function listenMapEditEvents() {
@@ -822,7 +831,7 @@ function updateAnimationUI() {
 
 function reloadTile() {
 	// animation UI
-	if ( tile[drawingId].animation.isAnimated ) {
+	if ( tile[drawingId] && tile[drawingId].animation.isAnimated ) {
 		isCurDrawingAnimated = true;
 		document.getElementById("animatedCheckbox").checked = true;
 		document.getElementById("animationOptionFrame1").checked = (curDrawingFrameIndex == 0);
@@ -862,7 +871,7 @@ function reloadTile() {
 
 function reloadSprite() {
 	// animation UI
-	if ( sprite[drawingId].animation.isAnimated ) {
+	if ( sprite[drawingId] && sprite[drawingId].animation.isAnimated ) {
 		isCurDrawingAnimated = true;
 		document.getElementById("animatedCheckbox").checked = true;
 		document.getElementById("animationOptionFrame1").checked = (curDrawingFrameIndex == 0);
