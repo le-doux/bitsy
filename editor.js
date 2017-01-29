@@ -414,6 +414,8 @@ function setDefaultGameState() {
 		pal : null
 	};
 	console.log("E");
+	refreshGameData();
+	document.getElementById("titleText").value = title;
 }
 
 function listenMapEditEvents() {
