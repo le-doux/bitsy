@@ -9,6 +9,22 @@ TODO NEXT
 - BUG: exit highlighting is on by default when engine starts up?
 - decreaes duplicate code between tile / sprites
 - BUG: new game is broken
+- I really need to fix the sprite/tile limits
+- selection box? copy paste?
+- bug where copied rooms somehow stay in sync?
+- bug where word wrap doesn't work for words that are longer than a single line length
+
+now what?
+X email Matisse
+X join Seattle Indies Showcase
+	- coordinate with the org?
+- viral marketting features in the games
+	- gif recording
+	- linkbacks to editor
+	- twitter api sharing
+	- link to bitsy list
+- email patrick about his friend who's done game jam
+- talk to game makers (can I feature your game? other questions..)
 
 v2.0 changes
 X engine changes
