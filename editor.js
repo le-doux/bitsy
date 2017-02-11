@@ -170,8 +170,7 @@ var spriteIndex = 0;
 
 /* ROOM */
 var drawMapGrid = true;
-var roomIdList = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"; //TODO copy this technique for other content types
-var nextRoomCharIndex = 1;
+var nextRoomHexIndex = 1;
 var roomIndex = 0;
 
 
@@ -624,17 +623,12 @@ function prevRoom() {
 }
 
 function duplicateRoom() {
-	if (nextRoomCharIndex >= roomIdList.length) {
-		alert("Sorry, you've run out of space for rooms! :( \n(I'm working on a way to store more. - Adam)");
-		return;
-	}
-
 	var copyRoomId = sortedRoomIdList()[roomIndex];
 	var roomToCopy = room[ copyRoomId ];
 
-	roomIndex = nextRoomCharIndex;
-	var newRoomId = roomIdList.charAt(nextRoomCharIndex);
-	nextRoomCharIndex++;
+	roomIndex = nextRoomHexIndex;
+	var newRoomId = nextRoomHexIndex.toString(16).toLowerCase();
+	nextRoomHexIndex++;
 
 	console.log(newRoomId);
 	room[newRoomId] = {
@@ -661,14 +655,9 @@ function duplicateRoom() {
 }
 
 function newRoom() {
-	if (nextRoomCharIndex >= roomIdList.length) {
-		alert("Sorry, you've run out of space for rooms! :( \n(I'm working on a way to store more. - Adam)");
-		return;
-	}
-
-	roomIndex = nextRoomCharIndex;
-	var roomId = roomIdList.charAt(nextRoomCharIndex);
-	nextRoomCharIndex++;
+	roomIndex = nextRoomHexIndex;
+	var roomId = nextRoomHexIndex.toString(16).toLowerCase();
+	nextRoomHexIndex++;
 
 	console.log(roomId);
 	room[roomId] = {
@@ -1531,7 +1520,7 @@ function on_game_data_change_core() {
 	nextSpriteCharCode = 97 + Object.keys(sprite).length;
 
 	// I'm more confident in this one
-	nextRoomCharIndex = Object.keys( room ).length;
+	nextRoomHexIndex = Object.keys( room ).length;
 }
 
 function updateExitOptionsFromGameData() {
