@@ -170,7 +170,7 @@ var spriteIndex = 0;
 
 /* ROOM */
 var drawMapGrid = true;
-var nextRoomHexIndex = 1;
+var nextRoomAlphaNumIndex = 1;
 var roomIndex = 0;
 
 
@@ -626,9 +626,9 @@ function duplicateRoom() {
 	var copyRoomId = sortedRoomIdList()[roomIndex];
 	var roomToCopy = room[ copyRoomId ];
 
-	roomIndex = nextRoomHexIndex;
-	var newRoomId = nextRoomHexIndex.toString(16).toLowerCase();
-	nextRoomHexIndex++;
+	roomIndex = nextRoomAlphaNumIndex;
+	var newRoomId = nextRoomAlphaNumIndex.toString(36).toLowerCase();
+	nextRoomAlphaNumIndex++;
 
 	console.log(newRoomId);
 	room[newRoomId] = {
@@ -655,9 +655,9 @@ function duplicateRoom() {
 }
 
 function newRoom() {
-	roomIndex = nextRoomHexIndex;
-	var roomId = nextRoomHexIndex.toString(16).toLowerCase();
-	nextRoomHexIndex++;
+	roomIndex = nextRoomAlphaNumIndex;
+	var roomId = nextRoomAlphaNumIndex.toString(36).toLowerCase();
+	nextRoomAlphaNumIndex++;
 
 	console.log(roomId);
 	room[roomId] = {
@@ -1520,7 +1520,7 @@ function on_game_data_change_core() {
 	nextSpriteCharCode = 97 + Object.keys(sprite).length;
 
 	// I'm more confident in this one
-	nextRoomHexIndex = Object.keys( room ).length;
+	nextRoomAlphaNumIndex = Object.keys( room ).length;
 }
 
 function updateExitOptionsFromGameData() {
