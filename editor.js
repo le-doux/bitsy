@@ -163,14 +163,20 @@ var isPainting = false;
 var isCurDrawingAnimated = false;
 var curDrawingFrameIndex = 0;
 
-var nextTileCharCode = 97;
 var tileIndex = 0;
-var nextSpriteCharCode = 97;
 var spriteIndex = 0;
+function nextTileId() {
+	return (Object.keys( tile ).length + 10).toString(36); // the +10 is for legacy compat: it skips characters 0-9 so we start with "a"
+}
+function nextSpriteId() {
+	return (Object.keys( sprite ).length + 10).toString(36); // the +10 is for legacy compat (see comment above)
+}
+function nextRoomId() {
+	return (Object.keys( room ).length).toString(36); // rooms have always started with "0", so no compat needed
+}
 
 /* ROOM */
 var drawMapGrid = true;
-var nextRoomAlphaNumIndex = 1;
 var roomIndex = 0;
 
 
@@ -365,7 +371,6 @@ function setDefaultGameState() {
 	//defualt sprite
 	paintMode = TileType.Sprite;
 	drawingId = "a";
-	nextSpriteCharCode = 97;
 	newSprite();
 	//on_paint_sprite();
 	drawing_data = [
@@ -387,7 +392,6 @@ function setDefaultGameState() {
 	console.log("C");
 	paintMode = TileType.Tile;
 	drawingId = "a";
-	nextTileCharCode = 97;
 	newTile();
 	//on_paint_tile();
 	drawing_data = [
@@ -527,13 +531,7 @@ function drawPaintNavThumbnailCanvas() {
 }
 
 function newTile() {
-	if (nextTileCharCode > 97+25) {
-		alert("Sorry, you've run out of space for tiles! :( \n(I'm working on a way to store more. - Adam)");
-		return;
-	}
-
-	drawingId = String.fromCharCode( nextTileCharCode );
-	nextTileCharCode++;
+	drawingId = nextTileId();
 
 	drawing_data = [
 		[0,0,0,0,0,0,0,0],
@@ -575,13 +573,7 @@ function prevTile() {
 }
 
 function newSprite() {
-	if (nextSpriteCharCode > 97+25) {
-		alert("Sorry, you've run out of space for sprites! :( \n(I'm working on a way to store more. - Adam)");
-		return;
-	}
-
-	drawingId = String.fromCharCode( nextSpriteCharCode );
-	nextSpriteCharCode++;
+	drawingId = nextSpriteId();
 
 	drawing_data = [
 		[0,0,0,0,0,0,0,0],
@@ -626,9 +618,8 @@ function duplicateRoom() {
 	var copyRoomId = sortedRoomIdList()[roomIndex];
 	var roomToCopy = room[ copyRoomId ];
 
-	roomIndex = nextRoomAlphaNumIndex;
-	var newRoomId = nextRoomAlphaNumIndex.toString(36).toLowerCase();
-	nextRoomAlphaNumIndex++;
+	roomIndex = Object.keys( room ).length;
+	var newRoomId = nextRoomId();
 
 	console.log(newRoomId);
 	room[newRoomId] = {
@@ -655,9 +646,8 @@ function duplicateRoom() {
 }
 
 function newRoom() {
-	roomIndex = nextRoomAlphaNumIndex;
-	var roomId = nextRoomAlphaNumIndex.toString(36).toLowerCase();
-	nextRoomAlphaNumIndex++;
+	roomIndex = Object.keys( room ).length;
+	var roomId = nextRoomId();
 
 	console.log(roomId);
 	room[roomId] = {
@@ -763,13 +753,7 @@ function newDrawing() {
 
 function duplicateDrawing() {
 	if (paintMode == TileType.Tile) {
-		if (nextTileCharCode > 97+25) {
-			alert("Sorry, you've run out of space for tiles! :( \n(I'm working on a way to store more. - Adam)");
-			return;
-		}
-
-		drawingId = String.fromCharCode( nextTileCharCode );
-		nextTileCharCode++;
+		drawingId = nextTileId();
 
 		drawing_data = drawing_data.slice(0); //copy drawing data
 
@@ -782,13 +766,7 @@ function duplicateDrawing() {
 		reloadTile(); //hack for ui consistency
 	}
 	else {
-		if (nextSpriteCharCode > 97+25) {
-			alert("Sorry, you've run out of space for sprites! :( \n(I'm working on a way to store more. - Adam)");
-			return;
-		}
-
-		drawingId = String.fromCharCode( nextSpriteCharCode );
-		nextSpriteCharCode++;
+		drawingId = nextSpriteId();
 
 		drawing_data = drawing_data.slice(0); //copy drawing data
 
@@ -920,15 +898,15 @@ function reloadSprite() {
 }
 
 function sortedTileIdList() {
-	return Object.keys( tile ).sort();
+	return Object.keys( tile ).sort().sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
 }
 
 function sortedSpriteIdList() {
-	return Object.keys( sprite ).sort();
+	return Object.keys( sprite ).sort().sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
 }
 
 function sortedRoomIdList() {
-	return Object.keys( room ).sort();
+	return Object.keys( room ).sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
 }
 
 var isDragAddingTiles = false;
@@ -1514,13 +1492,6 @@ function on_game_data_change_core() {
 	updateExitOptionsFromGameData();
 
 	document.getElementById("titleText").value = title;
-
-	//this is my best guess of what index the tile character should be at -- but it could be wrong :(
-	nextTileCharCode = 97 + Object.keys(tile).length;
-	nextSpriteCharCode = 97 + Object.keys(sprite).length;
-
-	// I'm more confident in this one
-	nextRoomAlphaNumIndex = Object.keys( room ).length;
 }
 
 function updateExitOptionsFromGameData() {
