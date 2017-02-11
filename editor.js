@@ -13,11 +13,11 @@ TODO NEXT
 - selection box? copy paste?
 - bug where copied rooms somehow stay in sync?
 - bug where word wrap doesn't work for words that are longer than a single line length
+- bug with copied room aliasing
+- would be cool to select sprites and then find out who they are / what they say?
+- how do extra characters end up in the room maps?
 
 now what?
-X email Matisse
-X join Seattle Indies Showcase
-	- coordinate with the org?
 - viral marketting features in the games
 	- gif recording
 	- linkbacks to editor
@@ -1269,6 +1269,7 @@ function resetGameData() {
 }
 
 function refreshGameData() {
+	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
 	var gameData = serializeWorld();
 	//console.log("refresh!");
 	//console.log(gameData);

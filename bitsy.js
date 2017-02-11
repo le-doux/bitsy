@@ -42,6 +42,23 @@ var imageStore = {
 
 var spriteStartLocations = {};
 
+/* VERSION */
+var version = {
+	major: 2,
+	minor: 1
+};
+function getEngineVersion() {
+	return version.major + "." + version.minor;
+}
+
+/* FLAGS */
+var flags = {
+	ROOM_FORMAT : 0 // 0 = non-comma separated, 1 = comma separated
+};
+function resetFlags() {
+	flags.ROOM_FORMAT = 0; // default is original format
+}
+
 function clearGameData() {
 	title = "";
 	room = {};
@@ -673,10 +690,14 @@ function isSpriteOffstage(id) {
 }
 
 function parseWorld(file) {
+	resetFlags();
+
 	var lines = file.split("\n");
 	var i = 0;
 	while (i < lines.length) {
 		var curLine = lines[i];
+
+		console.log(lines[i]);
 
 		if (i == 0) {
 			i = parseTitle(lines, i);
@@ -703,6 +724,9 @@ function parseWorld(file) {
 		else if (getType(curLine) === "DLG") {
 			i = parseDialog(lines, i);
 		}
+		else if (getType(curLine) === "!") {
+			i = parseFlag(lines, i);
+		}
 		else {
 			i++;
 		}
@@ -719,6 +743,14 @@ function serializeWorld() {
 	/* TITLE */
 	worldStr += title + "\n";
 	worldStr += "\n";
+	/* VERSION */
+	worldStr += "# BITSY VERSION " + getEngineVersion() + "\n"; // add version as a comment for debugging purposes
+	worldStr += "\n";
+	/* FLAGS */
+	for (f in flags) {
+		worldStr += "! " + f + " " + flags[f] + "\n";
+	}
+	worldStr += "\n"
 	/* PALETTE */
 	for (id in palette) {
 		worldStr += "PAL " + id + "\n";
@@ -734,8 +766,24 @@ function serializeWorld() {
 	/* ROOM */
 	for (id in room) {
 		worldStr += "ROOM " + id + "\n";
-		for (i in room[id].tilemap) {
-			worldStr += room[id].tilemap[i] + "\n";
+		if ( flags.ROOM_FORMAT == 0 ) {
+			// old non-comma separated format
+			for (i in room[id].tilemap) {
+				for (j in room[id].tilemap[i]) {
+					worldStr += room[id].tilemap[i][j];	
+				}
+				worldStr += "\n";
+			}
+		}
+		else if ( flags.ROOM_FORMAT == 1 ) {
+			// new comma separated format
+			for (i in room[id].tilemap) {
+				for (j in room[id].tilemap[i]) {
+					worldStr += room[id].tilemap[i][j];
+					if (j < room[id].tilemap[i].length-1) worldStr += ","
+				}
+				worldStr += "\n";
+			}
 		}
 		if (room[id].walls.length > 0) {
 			/* WALLS */
@@ -831,10 +879,34 @@ function parseRoom(lines, i) {
 		pal : null
 	};
 	i++;
-	var end = i + mapsize;
-	for (; i<end; i++) {
-		room[id].tilemap.push(lines[i]);
+
+	// create tile map
+	if ( flags.ROOM_FORMAT == 0 ) {
+		// old way: no commas, single char tile ids
+		var end = i + mapsize;
+		var y = 0;
+		for (; i<end; i++) {
+			room[id].tilemap.push( [] );
+			for (x = 0; x<mapsize; x++) {
+				room[id].tilemap[y].push( lines[i].charAt(x) );
+			}
+			y++;
+		}
 	}
+	else if ( flags.ROOM_FORMAT == 1 ) {
+		// new way: comma separated, multiple char tile ids
+		var end = i + mapsize;
+		var y = 0;
+		for (; i<end; i++) {
+			room[id].tilemap.push( [] );
+			var lineSep = lines[i].split(",");
+			for (x = 0; x<mapsize; x++) {
+				room[id].tilemap[y].push( lineSep[x] );
+			}
+			y++;
+		}
+	}
+
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		console.log(getType(lines[i]));
 		if (getType(lines[i]) === "SPR") {
@@ -849,7 +921,7 @@ function parseRoom(lines, i) {
 					y : parseInt(sprCoord[1])
 				};
 			}
-			else {
+			else if ( flags.ROOM_FORMAT == 0 ) { // TODO: right now this shortcut only works w/ the old comma separate format
 				/* PLACE MULTIPLE SPRITES*/ 
 				//Does find and replace in the tilemap (may be hacky, but its convenient)
 				var sprList = sprId.split(",");
@@ -1193,6 +1265,14 @@ function parseDialog(lines, i) {
 	var text = lines[i];
 	i++;
 	dialog[id] = text;
+	return i;
+}
+
+function parseFlag(lines, i) {
+	var id = getId(lines[i]);
+	var valStr = lines[i].split(" ")[2];
+	flags[id] = parseInt( valStr );
+	i++;
 	return i;
 }
 
