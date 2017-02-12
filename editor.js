@@ -8,8 +8,6 @@ TODO NEXT
 - BUG: removing sprite from world doesn't work once you go back into playmode
 - BUG: exit highlighting is on by default when engine starts up?
 - decreaes duplicate code between tile / sprites
-- BUG: new game is broken
-- I really need to fix the sprite/tile limits
 - selection box? copy paste?
 - bug where copied rooms somehow stay in sync?
 - bug where word wrap doesn't work for words that are longer than a single line length
@@ -26,43 +24,20 @@ now what?
 - email patrick about his friend who's done game jam
 - talk to game makers (can I feature your game? other questions..)
 
-v2.0 changes
-X engine changes
-	X flipbook animation
-	X skip dialog
-X editor changes
-	X duplicate rooms, sprites
-	X animation editing
-X UI changes
-	X preview/selection canvas for sprites, tiles
-	X make exits easier to see on light backgrounds (black outline?)
-
 - add preview canvas for rooms
 - the UI is getting cluttered :(
 - is the skip dialog too easy? should I fast forward instead? use specific buttons? (maybe this should be playtested)
 
 from twitter
 - look at puzzlescript gist hosting of gamedata (from kool.tools)
-X @increpare says prev button doesn't work
-
-from cathsplat
-- copy/paste (or duplicate) rooms (sprites too?)
-- skip dialog
 
 - Qs for creators
 - creator list (spreadsheet?)
 
 - better formatting for itch
-- preview/selection canvas for sprites, tiles, room
-- make exits easier to see on light backgrounds (black outline?)
 - show entrances as well as exits (drag entrances/exits?)
-- show text to explain where entrances exits go
 - async gif processings
 - undo / redo
-- get to-dos written down elsewhere into here
-- fix tile/sprite # limit bug
-	- later: comma-separated tile names (with more than one char)
-	- use hex count to generate names in editor
 - improve color input for browsers that only accept text
 	- hash or no-hash hex
 	- rgb with commas
@@ -82,8 +57,6 @@ v2.0???
 - variables
 - dialog editor w/ special effects
 - character paths
-- flipbook animation
-
 	ADAM'S TODOs
 
 		#feature ideas
@@ -92,8 +65,6 @@ v2.0???
 			#default tileset
 			#clear tilemap
 			#clear tileset
-			#delete tiles and sprites
-			#rename sets to maps?
 
 		- bitsy player v2
 			- dialog effects
@@ -101,7 +72,6 @@ v2.0???
 				- speed
 				- pauses
 			? animate player movement
-			? flipbook animation
 			? player face left/right
 			?? bouncing arrow
 			? sprite walking paths
@@ -116,6 +86,8 @@ USER FEEDBACK
 - add an inventory system
 - add triggers
 - add dialog choices?
+
+- room transition animations
 */
 
 /*
