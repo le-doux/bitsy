@@ -166,13 +166,26 @@ var curDrawingFrameIndex = 0;
 var tileIndex = 0;
 var spriteIndex = 0;
 function nextTileId() {
-	return (Object.keys( tile ).length + 10).toString(36); // the +10 is for legacy compat: it skips characters 0-9 so we start with "a"
+	var idList = sortedTileIdList();
+	var lastId = idList[ idList.length - 1 ];
+	var idInt = parseInt( lastId, 36 );
+	idInt++;
+	return idInt.toString(36);
 }
 function nextSpriteId() {
-	return (Object.keys( sprite ).length + 10).toString(36); // the +10 is for legacy compat (see comment above)
+	var idList = sortedSpriteIdList();
+	console.log(idList);
+	var lastId = idList[ idList.length - 1 ];
+	var idInt = parseInt( lastId, 36 );
+	idInt++;
+	return idInt.toString(36);
 }
 function nextRoomId() {
-	return (Object.keys( room ).length).toString(36); // rooms have always started with "0", so no compat needed
+	var idList = sortedRoomIdList();
+	var lastId = idList[ idList.length - 1 ];
+	var idInt = parseInt( lastId, 36 );
+	idInt++;
+	return idInt.toString(36);
 }
 
 /* ROOM */
@@ -653,22 +666,22 @@ function newRoom() {
 	room[roomId] = {
 		id : roomId,
 		tilemap : [
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000",
-				"0000000000000000"
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"]
 			],
 		walls : [],
 		exits : [],
@@ -913,10 +926,10 @@ var isDragAddingTiles = false;
 var isDragDeletingTiles = false;
 function map_onMouseDown(e) {
 	var off = getOffset(e);
-	var x = Math.floor(off.x / (tilesize*scale));
-	var y = Math.floor(off.y / (tilesize*scale));
+	var x = Math.floor( off.x / (tilesize*scale) );
+	var y = Math.floor( off.y / (tilesize*scale) );
 	console.log(x + " " + y);
-	var row = room[curRoom].tilemap[y];
+	//var row = room[curRoom].tilemap[y];
 	if (selectedExit != null && getExit(curRoom,x,y) == null) {
 		//de-select exit
 		setSelectedExit(null);
@@ -933,18 +946,23 @@ function map_onMouseDown(e) {
 	}
 	else if (drawingId != null) {
 		//add tiles/sprites to map
+		console.log("DRAWING");
 		if (paintMode == TileType.Tile) {
-			if ( row.charAt(x) === "0" ) {
+			if ( room[curRoom].tilemap[y][x] === "0" ) {
+				console.log("ADD");
 				//add
-				row = row.substr(0, x) + drawingId + row.substr(x+1);
+				//row = row.substr(0, x) + drawingId + row.substr(x+1);
+				console.log( room[curRoom].tilemap );
+				room[curRoom].tilemap[y][x] = drawingId;
 				isDragAddingTiles = true;
 			}
 			else {
 				//delete (better way to do this?)
-				row = row.substr(0, x) + "0" + row.substr(x+1);
+				//row = row.substr(0, x) + "0" + row.substr(x+1);
+				room[curRoom].tilemap[y][x] = "0";
 				isDragDeletingTiles = true;
 			}
-			room[curRoom].tilemap[y] = row;
+			//room[curRoom].tilemap[y] = row;
 		}
 		else {
 			var otherSprite = getSpriteAt(x,y);
@@ -982,19 +1000,21 @@ function editTilesOnDrag(e) {
 	var off = getOffset(e);
 	var x = Math.floor(off.x / (tilesize*scale));
 	var y = Math.floor(off.y / (tilesize*scale));
-	var row = room[curRoom].tilemap[y];
+	// var row = room[curRoom].tilemap[y];
 	if (isDragAddingTiles) {
-		if ( row.charAt(x) != drawingId ) {
-			row = row.substr(0, x) + drawingId + row.substr(x+1);
-			room[curRoom].tilemap[y] = row;
+		if ( room[curRoom].tilemap[y][x] != drawingId ) {
+			// row = row.substr(0, x) + drawingId + row.substr(x+1);
+			// room[curRoom].tilemap[y] = row;
+			room[curRoom].tilemap[y][x] = drawingId;
 			refreshGameData();
 			drawEditMap();
 		}
 	}
 	else if (isDragDeletingTiles) {
-		if ( row.charAt(x) != "0" ) {
-			row = row.substr(0, x) + "0" + row.substr(x+1);
-			room[curRoom].tilemap[y] = row;
+		if ( room[curRoom].tilemap[y][x] != "0" ) {
+			// row = row.substr(0, x) + "0" + row.substr(x+1);
+			// room[curRoom].tilemap[y] = row;
+			room[curRoom].tilemap[y][x] = "0";
 			refreshGameData();
 			drawEditMap();
 		}
