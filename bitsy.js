@@ -52,12 +52,13 @@ function getEngineVersion() {
 }
 
 /* FLAGS */
-var flags = {
-	ROOM_FORMAT : 0 // 0 = non-comma separated, 1 = comma separated
-};
+var flags;
 function resetFlags() {
-	flags.ROOM_FORMAT = 0; // default is original format
+	flags = {
+		ROOM_FORMAT : 0 // 0 = non-comma separated, 1 = comma separated
+	};
 }
+resetFlags(); //init flags on load script
 
 function clearGameData() {
 	title = "";

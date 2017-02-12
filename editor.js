@@ -384,7 +384,7 @@ function setDefaultGameState() {
 	//defualt sprite
 	paintMode = TileType.Sprite;
 	drawingId = "a";
-	newSprite();
+	newSprite( drawingId );
 	//on_paint_sprite();
 	drawing_data = [
 		[0,0,0,0,0,0,0,0],
@@ -405,7 +405,7 @@ function setDefaultGameState() {
 	console.log("C");
 	paintMode = TileType.Tile;
 	drawingId = "a";
-	newTile();
+	newTile( drawingId );
 	//on_paint_tile();
 	drawing_data = [
 		[1,1,1,1,1,1,1,1],
@@ -424,22 +424,22 @@ function setDefaultGameState() {
 	room["0"] = {
 		id : "0",
 		tilemap : [
-				"0000000000000000",
-				"0aaaaaaaaaaaaaa0",
-				"0a000000000000a0",
-				"0a000000000000a0",
-				"0a000000000000a0",
-				"0a000000000000a0",
-				"0a000000000000a0",
-				"0a000000000000a0",
-				"0a000000000000a0",
-				"0a000000000000a0",
-				"0a000000000000a0",
-				"0a000000000000a0",
-				"0a000000000000a0",
-				"0a000000000000a0",
-				"0aaaaaaaaaaaaaa0",
-				"0000000000000000"
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
+				["0","a","a","a","a","a","a","a","a","a","a","a","a","a","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","0","0","0","0","0","0","0","0","0","0","0","0","a","0"],
+				["0","a","a","a","a","a","a","a","a","a","a","a","a","a","a","0"],
+				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"]
 			],
 		walls : [],
 		exits : [],
@@ -543,8 +543,11 @@ function drawPaintNavThumbnailCanvas() {
 	}
 }
 
-function newTile() {
-	drawingId = nextTileId();
+function newTile(id) {
+	if (id)
+		drawingId = id; //this optional parameter lets me override the default next id
+	else
+		drawingId = nextTileId();
 
 	drawing_data = [
 		[0,0,0,0,0,0,0,0],
@@ -585,8 +588,11 @@ function prevTile() {
 	drawPaintNavThumbnailCanvas();
 }
 
-function newSprite() {
-	drawingId = nextSpriteId();
+function newSprite(id) {
+	if (id)
+		drawingId = id; //this optional parameter lets me override the default next id
+	else
+		drawingId = nextSpriteId();
 
 	drawing_data = [
 		[0,0,0,0,0,0,0,0],
