@@ -1,6 +1,9 @@
 /* 
 TODO NEXT
 
+- bug with aliased rooms is bad
+- bug with extra tiles at the end of room rows breaks shit
+
 - BUG: wall switch doesn't work for all rooms
 - BUG: after play mode, avatar ends up in wrong room
 - name rooms, sprites, etc (esp rooms tho)
@@ -1547,12 +1550,16 @@ function exportGame() {
 	gameData = escapeSpecialCharacters( gameData ); //escape quotes and slashes
 	gameData = gameData.split("\n").join("\\n"); //replace newlines with escaped newlines
 	var html = webExportTemplate.substr(); //copy template
+	console.log(html);
 	var titleIndex = html.indexOf("@@T");
 	html = html.substr(0,titleIndex) + title + html.substr(titleIndex+3);
+	console.log(html);
 	var engineIndex = html.indexOf("@@E");
 	html = html.substr(0,engineIndex) + engineScript + html.substr(engineIndex+3);
+	console.log(html);
 	var gameDataIndex = html.indexOf("@@D");
 	html = html.substr(0,gameDataIndex) + gameData + html.substr(gameDataIndex+3);
+	console.log(html);
 	downloadFile("mygame.html",html);
 }
 

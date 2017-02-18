@@ -807,6 +807,10 @@ function serializeWorld() {
 				}
 			}
 		}
+		if (room[id].pal != null) {
+			/* PALETTE */
+			worldStr += "PAL " + room[id].pal + "\n";
+		}
 		worldStr += "\n";
 	}
 	/* TILES */
@@ -931,7 +935,7 @@ function parseRoom(lines, i) {
 						var col = room[id].tilemap[row].indexOf( sprList[s] );
 						//if the sprite is in this row, replace it with the "null tile" and set its starting position
 						if (col != -1) {
-							room[id].tilemap[row] = room[id].tilemap[row].replace( sprList[s], "0" );
+							room[id].tilemap[row][col] = "0";
 							spriteStartLocations[ sprList[s] ] = {
 								room : id,
 								x : parseInt(col),
@@ -1125,7 +1129,7 @@ function parseDrawingCore(lines, i, drwId) {
 
 		if (y === tilesize) {
 			i = i + y;
-			if ( lines[i].charAt(0) === ">" ) {
+			if ( lines[i] != undefined && lines[i].charAt(0) === ">" ) {
 				// there's another animation!
 				imageStore.source[drwId].push( lines[i] );
 				i++;
