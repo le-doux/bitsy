@@ -281,7 +281,9 @@
 				<button onclick="duplicateDrawing();"> ++ duplicate </button>
 				<button onclick="deleteDrawing();"> x delete x </button>
 			</div>
-			<div id="wall" style="display:none;">make this tile a wall <input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall();"> </div>
+			<div id="wall" style="display:none;">
+				make tile a wall <input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall();"> <button onclick="apply_wall_setting_all_rooms();">apply to all rooms</button>
+			</div>
 			<div id="dialog" style="display:none;">dialog: <input type="text" id="dialogText" onchange="on_change_dialog();"></div>
 			<div id="isAnimated" style="display:none;">add animation <input type="checkbox" id="animatedCheckbox" onchange="on_toggle_animated();"> </div>
 			<div id="animation" style="display:none;">

@@ -3,6 +3,7 @@
 - serialize palettes
 - bug: parse inline sprites
 - bug: can't go off screen to the left or right
+- apply walll settings to all rooms
 
 TODO NEXT
 
@@ -1535,6 +1536,23 @@ function on_toggle_wall() {
 		room[curRoom].walls.splice( room[curRoom].walls.indexOf(drawingId), 1 );
 	}
 	console.log(room[curRoom]);
+	refreshGameData();
+}
+
+function apply_wall_setting_all_rooms() {
+	if ( document.getElementById("wallCheckbox").checked ){
+		//add to wall list
+		for (id in room)
+			if (room[id].walls.indexOf(drawingId) == -1) room[id].walls.push( drawingId );
+	}
+	else {
+		//remove from wall list
+		for (id in room) {
+			if (room[id].walls.indexOf(drawingId) != -1) {
+				room[id].walls.splice( room[id].walls.indexOf(drawingId), 1 );
+			}
+		}
+	}
 	refreshGameData();
 }
 
