@@ -641,19 +641,19 @@ function getSpriteAt(x,y) {
 }
 
 function isWallLeft() {
-	return isWall( player().x - 1, player().y );
+	return isWall( player().x - 1, player().y ) || (player().x - 1 < 0);
 }
 
 function isWallRight() {
-	return isWall( player().x + 1, player().y );
+	return isWall( player().x + 1, player().y ) || (player().x + 1 >= 16);
 }
 
 function isWallUp() {
-	return isWall( player().x, player().y - 1 );
+	return isWall( player().x, player().y - 1 ) || (player().y - 1 < 0);
 }
 
 function isWallDown() {
-	return isWall( player().x, player().y + 1 );
+	return isWall( player().x, player().y + 1 ) || (player().y + 1 >= 16);
 }
 
 function isWall(x,y) {

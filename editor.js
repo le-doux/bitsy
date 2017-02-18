@@ -1,4 +1,9 @@
 /* 
+2.2 so far
+- serialize palettes
+- bug: parse inline sprites
+- bug: can't go off screen to the left or right
+
 TODO NEXT
 
 - bug with aliased rooms is bad
