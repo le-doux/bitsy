@@ -4,8 +4,40 @@
 - bug: parse inline sprites
 - bug: can't go off screen to the left or right
 - apply walll settings to all rooms
+- better data structure for drawings
+- remove use of drawing_data
 
 TODO NEXT
+
+- end editor (list of endings)
+- go to ending from exit
+- optional: got to ending after talking to sprite
+
+my ideas
+- text effects
+- end as a new "room"
+- triggers
+- transition animations
+- walking animations
+- bobbing arrow animations
+- dialog open close animations
+- new pass on UI
+- new dialog editor / preview pane
+	- bigger dialog box?
+- remove use of annoying drawing_data variable and draw directly from sprite/tile data
+
+from laura michet
+- animation usability: ghosting other frame
+- map for rooms
+- want to see all my tiles at once
+- character limit on sprite dialog
+- end game condition
+- key to restart game
+- change color of page background (export results)
+- bug: ghost rooms when you restart a game (did I fix this?)
+
+- hide "extra" UI better
+- bug: click to nav tiles and click on tile strip don't interoperate well
 
 - bug with aliased rooms is bad
 - bug with extra tiles at the end of room rows breaks shit
@@ -128,16 +160,6 @@ var paint_nav_ctx;
 var paintMode = TileType.Avatar;
 var drawingId = "A";
 var drawingPal = "0";
-var drawing_data = [
-	[0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0]
-];
 var drawPaintGrid = true;
 var curPaintBrush = 0;
 var isPainting = false;
@@ -346,7 +368,8 @@ function setDefaultGameState() {
 	console.log("A");
 	paintMode = TileType.Avatar;
 	//on_paint_avatar();
-	drawing_data = [
+	drawingId = "A";
+	var person_data = [
 		[0,0,0,1,1,0,0,0],
 		[0,0,0,1,1,0,0,0],
 		[0,0,0,1,1,0,0,0],
@@ -356,8 +379,7 @@ function setDefaultGameState() {
 		[0,0,1,0,0,1,0,0],
 		[0,0,1,0,0,1,0,0]
 	];
-	drawingId = "A";
-	saveDrawingData();
+	makeSprite( drawingId, person_data );
 	sprite["A"].room = "0";
 	sprite["A"].x = 4;
 	sprite["A"].y = 4;
@@ -365,9 +387,9 @@ function setDefaultGameState() {
 	//defualt sprite
 	paintMode = TileType.Sprite;
 	drawingId = "a";
-	newSprite( drawingId );
+	//newSprite( drawingId );
 	//on_paint_sprite();
-	drawing_data = [
+	var cat_data = [
 		[0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0],
 		[0,1,0,1,0,0,0,1],
@@ -377,7 +399,7 @@ function setDefaultGameState() {
 		[0,0,1,1,1,1,0,0],
 		[0,0,1,0,0,1,0,0]
 	];
-	saveDrawingData();
+	makeSprite( drawingId, cat_data );
 	sprite["a"].room = "0";
 	sprite["a"].x = 8;
 	sprite["a"].y = 12;
@@ -386,9 +408,9 @@ function setDefaultGameState() {
 	console.log("C");
 	paintMode = TileType.Tile;
 	drawingId = "a";
-	newTile( drawingId );
+	//newTile( drawingId );
 	//on_paint_tile();
-	drawing_data = [
+	var square_data = [
 		[1,1,1,1,1,1,1,1],
 		[1,0,0,0,0,0,0,1],
 		[1,0,0,0,0,0,0,1],
@@ -398,7 +420,7 @@ function setDefaultGameState() {
 		[1,0,0,0,0,0,0,1],
 		[1,1,1,1,1,1,1,1]
 	];
-	saveDrawingData();
+	makeTile( drawingId, square_data );
 	renderImages();
 	console.log("D");
 	//default room
@@ -530,19 +552,9 @@ function newTile(id) {
 	else
 		drawingId = nextTileId();
 
-	drawing_data = [
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0]
-	];
+	makeTile(drawingId);
 
 	drawPaintCanvas();
-	saveDrawingData();
 	refreshGameData();
 
 	tileIndex = Object.keys(tile).length - 1;
@@ -575,19 +587,9 @@ function newSprite(id) {
 	else
 		drawingId = nextSpriteId();
 
-	drawing_data = [
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0]
-	];
+	makeSprite(drawingId);
 
 	drawPaintCanvas();
-	saveDrawingData();
 	refreshGameData();
 
 	spriteIndex = Object.keys(sprite).length - 1;
@@ -753,12 +755,25 @@ function newDrawing() {
 
 function duplicateDrawing() {
 	if (paintMode == TileType.Tile) {
+
+		//copy drawing data
+		var copiedFrameData = [];
+		for (y in curDrawingData()) {
+			copiedFrameData.push([]);
+			for (x in curDrawingData()[y]) {
+				copiedFrameData[y].push( curDrawingData()[y][x] );
+			}
+		}
+
 		drawingId = nextTileId();
 
-		drawing_data = drawing_data.slice(0); //copy drawing data
+		console.log("DUPLICATE TILE");		
+		console.log(drawingId);
+		console.log(copiedFrameData);
+
+		makeTile( drawingId, copiedFrameData );
 
 		drawPaintCanvas();
-		saveDrawingData();
 		refreshGameData();
 
 		tileIndex = Object.keys(tile).length - 1;
@@ -766,12 +781,25 @@ function duplicateDrawing() {
 		reloadTile(); //hack for ui consistency
 	}
 	else {
+
+		//copy drawing data
+		var copiedFrameData = [];
+		for (y in curDrawingData()) {
+			copiedFrameData.push([]);
+			for (x in curDrawingData()[y]) {
+				copiedFrameData[y].push( curDrawingData()[y][x] );
+			}
+		}	
+
 		drawingId = nextSpriteId();
 
-		drawing_data = drawing_data.slice(0); //copy drawing data
+		console.log("DUPLICATE SPRITE");	
+		console.log(drawingId);
+		console.log(copiedFrameData);
+
+		makeSprite( drawingId, copiedFrameData );
 
 		drawPaintCanvas();
-		saveDrawingData();
 		refreshGameData();
 
 		spriteIndex = Object.keys(sprite).length - 1;
@@ -804,8 +832,12 @@ function deleteDrawing() {
 
 function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
 	for (roomId in room) {
-		for (i in room[roomId].tilemap) {
-			room[roomId].tilemap[i] = room[roomId].tilemap[i].split(findTile).join(replaceTile);
+		for (y in room[roomId].tilemap) {
+			for (x in room[roomId].tilemap[y]) {
+				if (room[roomId].tilemap[y][x] === findTile) {
+					room[roomId].tilemap[y][x] = replaceTile;
+				}
+			}
 		}
 	}
 }
@@ -839,18 +871,6 @@ function reloadTile() {
 		}
 	}
 
-	var drw = "TIL_" + drawingId;
-	var yStart = 0;
-	if ( isCurDrawingAnimated ) {
-		yStart += 9 * curDrawingFrameIndex;
-	}
-	for (var y = yStart; y < (yStart + 8); y++) {
-		for (var x = 0; x < 8; x++) {
-			var pixel = parseInt( imageStore.source[drw][y].charAt(x) );
-			var drwY = y-yStart;
-			drawing_data[drwY][x] = pixel;
-		}
-	}
 	drawPaintCanvas();
 }
 
@@ -878,21 +898,6 @@ function reloadSprite() {
 	}
 
 	// update paint canvas
-	var drw = "SPR_" + drawingId;
-	var yStart = 0;
-	if ( isCurDrawingAnimated ) {
-		yStart += 9 * curDrawingFrameIndex;
-	}
-	console.log( imageStore.source[drw] );
-	for (var y = yStart; y < (yStart +8); y++) {
-		console.log( y );
-		console.log( imageStore.source[drw][y] );
-		for (var x = 0; x < 8; x++) {
-			var pixel = parseInt( imageStore.source[drw][y].charAt(x) );
-			var drwY = y-yStart;
-			drawing_data[drwY][x] = pixel;
-		}
-	}
 	drawPaintCanvas();
 
 }
@@ -1022,13 +1027,13 @@ function paint_onMouseDown(e) {
 	var off = getOffset(e);
 	var x = Math.floor(off.x / paint_scale);
 	var y = Math.floor(off.y / paint_scale);
-	if (drawing_data[y][x] == 0) {
+	if (curDrawingData()[y][x] == 0) {
 		curPaintBrush = 1;
 	}
 	else {
 		curPaintBrush = 0;
 	}
-	drawing_data[y][x] = curPaintBrush;
+	curDrawingData()[y][x] = curPaintBrush;
 	drawPaintCanvas();
 	isPainting = true;
 }
@@ -1038,14 +1043,14 @@ function paint_onMouseMove(e) {
 		var off = getOffset(e);
 		var x = Math.floor(off.x / paint_scale);
 		var y = Math.floor(off.y / paint_scale);
-		drawing_data[y][x] = curPaintBrush;
+		curDrawingData()[y][x] = curPaintBrush;
 		drawPaintCanvas();
 	}
 }
 
 function paint_onMouseUp(e) {
 	isPainting = false;
-	saveDrawingData();
+	renderImages();
 	refreshGameData();
 	drawEditMap();
 }
@@ -1066,7 +1071,7 @@ function drawPaintCanvas() {
 	//draw pixels
 	for (var x = 0; x < 8; x++) {
 		for (var y = 0; y < 8; y++) {
-			if (drawing_data[y][x] == 1) {
+			if (curDrawingData()[y][x] == 1) {
 				paint_ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
 			}
 		}
@@ -1129,94 +1134,59 @@ function drawEditMap() {
 	}
 }
 
-function saveDrawingData() {
-	if (paintMode == TileType.Tile) {
-		//create tile if it doesn't exist
-		var drw = "TIL_" + drawingId;
-		if (!(drawingId in tile)) {
-			tile[drawingId] = {
-				drw : drw,
-				col : 1,
-				animation : { //todo
-					isAnimated : false,
-					frameIndex : 0,
-					frameCount : 2
-				}
-			};
-			//save tile drawing
-			imageStore.source[drw] = [];
-			for (var y = 0; y < 8; y++) {
-				var ln = "";
-				for (var x = 0; x < 8; x++) {
-					ln += drawing_data[y][x];
-				}
-				imageStore.source[drw].push(ln);
-			} 
+function curDrawingData() {
+	var imgId = (paintMode == TileType.Tile ? "TIL_" : "SPR_") + drawingId;
+	var frameIndex = (isCurDrawingAnimated ? curDrawingFrameIndex : 0);
+	return imageStore.source[ imgId ][ frameIndex ];
+}
+
+function makeTile(id,firstFrame) {
+	var drwId = "TIL_" + id;
+	tile[id] = {
+		drw : drwId,
+		col : 1,
+		animation : { //todo
+			isAnimated : false,
+			frameIndex : 0,
+			frameCount : 2
 		}
-		else {
-			// edit existing tile
-			var yStart = 0;
-			if ( isCurDrawingAnimated ) {
-				yStart += 9 * curDrawingFrameIndex; // 8 rows / images + 1 row separater
-			}
-			// save tile drawing
-			for (var y = yStart; y < (yStart+8); y++) {
-				var ln = "";
-				for (var x = 0; x < 8; x++) {
-					var drwY = y-yStart;
-					ln += drawing_data[drwY][x];
-				}
-				imageStore.source[drw][y] = ln;
-			}
+	};
+	makeDrawing(drwId,firstFrame);
+}
+
+function makeSprite(id,firstFrame) {
+	var drwId = "SPR_" + id;
+	sprite[id] = { //todo create default sprite creation method
+		drw : drwId,
+		col : 2,
+		room : null,
+		x : -1,
+		y : -1,
+		animation : { //todo
+			isAnimated : false,
+			frameIndex : 0,
+			frameCount : 2
 		}
-		renderImages(); //rerender all images (inefficient)
+	};
+	makeDrawing(drwId,firstFrame);
+}
+
+function makeDrawing(id,firstFrame) {
+	imageStore.source[id] = [];
+	if (!firstFrame) { //use default blank frame
+		firstFrame = [
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0]
+		]
 	}
-	else { //paintMode is Sprite or Avatar
-		var drw = "SPR_" + drawingId;
-		if (!(drawingId in sprite)) {
-			// new sprite
-			sprite[drawingId] = { //todo create default sprite creation method
-				drw : drw,
-				col : 2,
-				room : null,
-				x : -1,
-				y : -1,
-				animation : { //todo
-					isAnimated : false,
-					frameIndex : 0,
-					frameCount : 2
-				}
-			};
-			// save sprite drawing
-			imageStore.source[drw] = [];
-			for (var y = 0; y < 8; y++) {
-				var ln = "";
-				for (var x = 0; x < 8; x++) {
-					ln += drawing_data[y][x];
-				}
-				imageStore.source[drw].push(ln);
-			}
-		}
-		else {
-			// edit existing sprite
-			var yStart = 0;
-			if ( isCurDrawingAnimated ) {
-				//drw += "_" + curDrawingFrameIndex;
-				yStart += 9 * curDrawingFrameIndex; // 8 rows / images + 1 row separater
-			}
-			// save sprite drawing
-			for (var y = yStart; y < (yStart+8); y++) {
-				var ln = "";
-				for (var x = 0; x < 8; x++) {
-					var drwY = y-yStart;
-					ln += drawing_data[drwY][x];
-				}
-				imageStore.source[drw][y] = ln;
-			}
-		}
-		// re-render images
-		renderImages();
-	}
+	imageStore.source[id].push(firstFrame);
+	renderImages(); //todo is this the right place for this?
 }
 
 function newGameDialog() {
@@ -1420,17 +1390,7 @@ function on_game_data_change_core() {
 	if (Object.keys(sprite).length == 0) {
 		paintMode = TileType.Avatar;
 		drawingId = "A";
-		drawing_data = [
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0]
-		];
-		saveDrawingData();
+		makeSprite(drawingId);
 		sprite["A"].room = null;
 		sprite["A"].x = -1;
 		sprite["A"].y = -1;
@@ -1438,17 +1398,7 @@ function on_game_data_change_core() {
 	if (Object.keys(tile).length == 0) {
 		paintMode = TileType.Tile;
 		drawingId = "a";
-		drawing_data = [
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0]
-		];
-		saveDrawingData();
+		makeTile(drawingId);
 	}
 	if (Object.keys(room).length == 0) {
 		room["0"] = {
@@ -1962,15 +1912,7 @@ function addSpriteAnimation() {
 
 	//add blank frame to sprite
 	var spriteImageId = "SPR_" + drawingId;
-	imageStore.source[ spriteImageId ].push(">");
-	imageStore.source[ spriteImageId ].push("00000000");
-	imageStore.source[ spriteImageId ].push("00000000");
-	imageStore.source[ spriteImageId ].push("00000000");
-	imageStore.source[ spriteImageId ].push("00000000");
-	imageStore.source[ spriteImageId ].push("00000000");
-	imageStore.source[ spriteImageId ].push("00000000");
-	imageStore.source[ spriteImageId ].push("00000000");
-	imageStore.source[ spriteImageId ].push("00000000");
+	addNewFrameToDrawing( spriteImageId );
 
 	//refresh data model
 	renderImages();
@@ -1987,11 +1929,7 @@ function removeSpriteAnimation() {
 
 	//remove all but the first frame of the sprite
 	var spriteImageId = "SPR_" + drawingId;
-	var oldImageData = imageStore.source[ spriteImageId ].slice(0);
-	imageStore.source[ spriteImageId ] = [];
-	for (var i = 0; i < 8; i++) {
-		imageStore.source[ spriteImageId ].push( oldImageData[i] );
-	}
+	removeDrawingAnimation( spriteImageId );
 
 	//refresh data model
 	renderImages();
@@ -2009,15 +1947,7 @@ function addTileAnimation() {
 
 	//add blank frame to tile
 	var tileImageId = "TIL_" + drawingId;
-	imageStore.source[ tileImageId ].push(">");
-	imageStore.source[ tileImageId ].push("00000000");
-	imageStore.source[ tileImageId ].push("00000000");
-	imageStore.source[ tileImageId ].push("00000000");
-	imageStore.source[ tileImageId ].push("00000000");
-	imageStore.source[ tileImageId ].push("00000000");
-	imageStore.source[ tileImageId ].push("00000000");
-	imageStore.source[ tileImageId ].push("00000000");
-	imageStore.source[ tileImageId ].push("00000000");
+	addNewFrameToDrawing( tileImageId );
 
 	//refresh data model
 	renderImages();
@@ -2034,16 +1964,31 @@ function removeTileAnimation() {
 
 	//remove all but the first frame of the tile
 	var tileImageId = "TIL_" + drawingId;
-	var oldImageData = imageStore.source[ tileImageId ].slice(0);
-	imageStore.source[ tileImageId ] = [];
-	for (var i = 0; i < 8; i++) {
-		imageStore.source[ tileImageId ].push( oldImageData[i] );
-	}
+	removeDrawingAnimation( tileImageId );
 
 	//refresh data model
 	renderImages();
 	refreshGameData();
 	reloadTile();
+}
+
+function addNewFrameToDrawing(drwId) {
+	var newFrame = [
+		[0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0]
+	];
+	imageStore.source[ drwId ].push( newFrame );
+}
+
+function removeDrawingAnimation(drwId) {
+	var oldImageData = imageStore.source[ drwId ].slice(0);
+	imageStore.source[ drwId ] = [ oldImageData[0] ];
 }
 
 function on_paint_frame1() {

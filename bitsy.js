@@ -816,17 +816,13 @@ function serializeWorld() {
 	/* TILES */
 	for (id in tile) {
 		worldStr += "TIL " + id + "\n";
-		for (i in imageStore.source["TIL_" + id]) {
-			worldStr += imageStore.source["TIL_" + id][i] + "\n";
-		}
+		worldStr += serializeDrawing( "TIL_" + id );
 		worldStr += "\n";
 	}
 	/* SPRITES */
 	for (id in sprite) {
 		worldStr += "SPR " + id + "\n";
-		for (i in imageStore.source["SPR_" + id]) {
-			worldStr += imageStore.source["SPR_" + id][i] + "\n";
-		}
+		worldStr += serializeDrawing( "SPR_" + id );
 		if (sprite[id].room != null) {
 			/* SPRITE POSITION */
 			worldStr += "POS " + sprite[id].room + " " + sprite[id].x + "," + sprite[id].y + "\n";
@@ -840,6 +836,21 @@ function serializeWorld() {
 		worldStr += "\n";
 	}
 	return worldStr;
+}
+
+function serializeDrawing(drwId) {
+	var drwStr = "";
+	for (f in imageStore.source[drwId]) {
+		for (y in imageStore.source[drwId][f]) {
+			var rowStr = "";
+			for (x in imageStore.source[drwId][f][y]) {
+				rowStr += imageStore.source[drwId][f][y][x];
+			}
+			drwStr += rowStr + "\n";
+		}
+		if (f < (imageStore.source[drwId].length-1)) drwStr += ">\n";
+	}
+	return drwStr;
 }
 
 function isExitValid(e) {
@@ -1004,16 +1015,7 @@ function parseTile(lines, i) {
 		i++;
 	}
 	else {
-		//store tile source
-		// drwId = "TIL_" + id;
-		// imageStore.source[drwId] = [];
-		// for (var y = 0; y < tilesize; y++) {
-		// 	var l = lines[i+y];
-		// 	imageStore.source[drwId].push(l);
-		// }
-		// i = i + tilesize;
-
-		// store tile source (if this works, you need to package it in a function)
+		// store tile source
 		drwId = "TIL_" + id;
 		i = parseDrawingCore( lines, i, drwId );
 	}
@@ -1032,9 +1034,9 @@ function parseTile(lines, i) {
 		drw : drwId, //drawing id
 		col : colorIndex,
 		animation : {
-			isAnimated : (imageStore.source[drwId].length > tilesize),
+			isAnimated : (imageStore.source[drwId].length > 1),
 			frameIndex : 0,
-			frameCount : 2 // todo: allow more than 2 frames
+			frameCount : imageStore.source[drwId].length
 		}
 	};
 	return i;
@@ -1051,15 +1053,6 @@ function parseSprite(lines, i) {
 		i++;
 	}
 	else {
-		//store sprite source
-		// drwId = "SPR_" + id;
-		// imageStore.source[drwId] = [];
-		// for (var y = 0; y < tilesize; y++) {
-		// 	var l = lines[i+y];
-		// 	imageStore.source[drwId].push(l);
-		// }
-		// i = i + tilesize;
-
 		// store sprite source
 		drwId = "SPR_" + id;
 		i = parseDrawingCore( lines, i, drwId );
@@ -1095,45 +1088,43 @@ function parseSprite(lines, i) {
 		y : -1,
 		walkingPath : [], //tile by tile movement path (isn't saved)
 		animation : {
-			isAnimated : (imageStore.source[drwId].length > tilesize),
+			isAnimated : (imageStore.source[drwId].length > 1),
 			frameIndex : 0,
-			frameCount : 2 // todo: allow more than 2 frames
+			frameCount : imageStore.source[drwId].length
 		}
 	};
 	return i;
 }
 
 function parseDrawing(lines, i) {
-	// var drwId = getId(lines[i]);
-	// i++;
-	// imageStore.source[drwId] = [];
-	// for (var y = 0; y < tilesize; y++) {
-	// 	var l = lines[i+y];
-	// 	imageStore.source[drwId].push(l);
-	// }
-	// console.log(drwId);
-	// return i + tilesize;
-
 	// store drawing source
 	var drwId = getId( lines[i] );
 	return parseDrawingCore( lines, i, drwId );
 }
 
 function parseDrawingCore(lines, i, drwId) {
-	imageStore.source[drwId] = [];
+	imageStore.source[drwId] = []; //init list of frames
+	imageStore.source[drwId].push( [] ); //init first frame
+	var frameIndex = 0;
 	var y = 0;
 	while ( y < tilesize ) {
 		var l = lines[i+y];
-		imageStore.source[drwId].push(l);
+		var row = [];
+		for (x = 0; x < tilesize; x++) {
+			row.push( parseInt( l.charAt(x) ) );
+		}
+		imageStore.source[drwId][frameIndex].push( row );
 		y++;
 
 		if (y === tilesize) {
 			i = i + y;
 			if ( lines[i] != undefined && lines[i].charAt(0) === ">" ) {
-				// there's another animation!
-				imageStore.source[drwId].push( lines[i] );
+				// start next frame!
+				imageStore.source[drwId].push( [] );
+				frameIndex++;
+				//start the count over again for the next frame
 				i++;
-				y = 0; //start the count over again for the next frame
+				y = 0;
 			}
 		}
 	}
@@ -1156,82 +1147,35 @@ function renderImages() {
 	//render images required by sprites
 	for (s in sprite) {
 		var spr = sprite[s];
-		for (pal in palette) {
-			var col = spr.col;
-			var colStr = "" + col;
-			var rawSrc = imageStore.source[ spr.drw ];
-			if ( rawSrc.length === tilesize ) {
-				// non-animated drawing
-				imageStore.render[pal][colStr][spr.drw] = imageDataFromImageSource( rawSrc, pal, col );
-			}
-			else {
-				// animated drawing
-				var frameCount = 0;
-				var frameSrc = [];
-				for ( l in rawSrc ) {
-					if ( rawSrc[l].charAt(0) === ">" ) {
-						// end of frame!
-						var frameId = spr.drw + "_" + frameCount;
-						imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
-						frameSrc = [];
-						frameCount++;
-					}
-					else if ( l >= rawSrc.length-1 ) {
-						// finish building frame
-						frameSrc.push( rawSrc[l] );
-						// end of frame!
-						var frameId = spr.drw + "_" + frameCount;
-						imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
-						frameSrc = [];
-						frameCount++;
-					}
-					else {
-						// continue building frame
-						frameSrc.push( rawSrc[l] );
-					}
-				}
-			}			
-		}
+		renderImageForAllPalettes( spr );
 	}
-	//render images required by tiles (duplicate)
+	//render images required by tiles
 	for (t in tile) {
 		var til = tile[t];
-		for (pal in palette) {
-			var col = til.col;
-			var colStr = "" + col;
-			var rawSrc = imageStore.source[ til.drw ];
-			if ( rawSrc.length === tilesize ) {
-				// non-animated drawing
-				imageStore.render[pal][colStr][til.drw] = imageDataFromImageSource( rawSrc, pal, col );
-			}
-			else {
-				// animated drawing
-				var frameCount = 0;
-				var frameSrc = [];
-				for ( l in rawSrc ) {
-					if ( rawSrc[l].charAt(0) === ">" ) {
-						// end of frame!
-						var frameId = til.drw + "_" + frameCount;
-						imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
-						frameSrc = [];
-						frameCount++;
-					}
-					else if ( l >= rawSrc.length-1 ) {
-						// finish building frame
-						frameSrc.push( rawSrc[l] );
-						// end of frame!
-						var frameId = til.drw + "_" + frameCount;
-						imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
-						frameSrc = [];
-						frameCount++;
-					}
-					else {
-						// continue building frame
-						frameSrc.push( rawSrc[l] );
-					}
-				}
-			}			
+		renderImageForAllPalettes( til );
+	}
+}
+
+function renderImageForAllPalettes(drawing) {
+	for (pal in palette) {
+		var col = drawing.col;
+		var colStr = "" + col;
+		var imgSrc = imageStore.source[ drawing.drw ];
+		if ( imgSrc.length <= 1 ) {
+			// non-animated drawing
+			var frameSrc = imgSrc[0];
+			imageStore.render[pal][colStr][drawing.drw] = imageDataFromImageSource( frameSrc, pal, col );
 		}
+		else {
+			// animated drawing
+			var frameCount = 0;
+			for (f in imgSrc) {
+				var frameSrc = imgSrc[f];
+				var frameId = drawing.drw + "_" + frameCount;
+				imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
+				frameCount++;
+			}
+		}		
 	}
 }
 
@@ -1241,17 +1185,17 @@ function imageDataFromImageSource(imageSource, pal, col) {
 	var img = ctx.createImageData(tilesize*scale,tilesize*scale);
 	for (var y = 0; y < tilesize; y++) {
 		for (var x = 0; x < tilesize; x++) {
-			var ch = imageSource[y][x];
+			var px = imageSource[y][x];
 			for (var sy = 0; sy < scale; sy++) {
 				for (var sx = 0; sx < scale; sx++) {
 					var pxl = (((y * scale) + sy) * tilesize * scale * 4) + (((x*scale) + sx) * 4);
-					if (ch === "1") {
+					if (px === 1) {
 						img.data[pxl + 0] = palette[pal][col][0]; //ugly
 						img.data[pxl + 1] = palette[pal][col][1];
 						img.data[pxl + 2] = palette[pal][col][2];
 						img.data[pxl + 3] = 255;
 					}
-					else { //ch === "0"
+					else { //ch === 0
 						img.data[pxl + 0] = palette[pal][0][0];
 						img.data[pxl + 1] = palette[pal][0][1];
 						img.data[pxl + 2] = palette[pal][0][2];
@@ -1298,6 +1242,7 @@ function drawRoom(room,context) {
 		for (j in room.tilemap[i]) {
 			var id = room.tilemap[i][j];
 			if (id != "0") {
+				//console.log(id);
 				drawTile( getTileImage(tile[id]), j, i, context );
 			}
 		}
@@ -1312,6 +1257,7 @@ function drawRoom(room,context) {
 }
 
 function getTileImage(t,frameIndex) {
+	//console.log(t);
 	var drwId = t.drw;
 	if ( t.animation.isAnimated ) {
 		if (frameIndex) { // use optional provided frame index
