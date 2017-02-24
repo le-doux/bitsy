@@ -8,6 +8,7 @@
 - remove use of drawing_data
 - show ghost of alternate frame
 - bug: room tilemap aliasing
+- bug: exit options dont update on reset game
 
 TODO NEXT
 

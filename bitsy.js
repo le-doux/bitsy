@@ -1286,6 +1286,9 @@ function getSpriteImage(s,frameIndex) {
 function curPal() {
 	//console.log(curRoom);
 	//console.log(room[curRoom]);
+	// var err = new Error();
+	// console.log(curRoom);
+	// console.log(err.stack);
 	if (room[curRoom].pal != null) {
 		//a specific palette was chosen
 		return room[curRoom].pal;
