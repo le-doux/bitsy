@@ -7,7 +7,7 @@
 - better data structure for drawings
 - remove use of drawing_data
 - show ghost of alternate frame
-	- TODO: way to turn that off?
+- bug: room tilemap aliasing
 
 TODO NEXT
 
@@ -25,11 +25,10 @@ my ideas
 - dialog open close animations
 - new pass on UI
 - new dialog editor / preview pane
-	- bigger dialog box?
-- remove use of annoying drawing_data variable and draw directly from sprite/tile data
+	- bigger dialog box textbox?
 
 from laura michet
-- animation usability: ghosting other frame
+X animation usability: ghosting other frame
 - map for rooms
 - want to see all my tiles at once
 - character limit on sprite dialog
@@ -41,20 +40,16 @@ from laura michet
 - hide "extra" UI better
 - bug: click to nav tiles and click on tile strip don't interoperate well
 
-- bug with aliased rooms is bad
 - bug with extra tiles at the end of room rows breaks shit
 
-- BUG: wall switch doesn't work for all rooms
 - BUG: after play mode, avatar ends up in wrong room
 - name rooms, sprites, etc (esp rooms tho)
 - make it show/hide exits, instead of "add" exits
 - BUG: removing sprite from world doesn't work once you go back into playmode
 - BUG: exit highlighting is on by default when engine starts up?
-- decreaes duplicate code between tile / sprites
+- ONGOING: decrease duplicate code between tile / sprites
 - selection box? copy paste?
-- bug where copied rooms somehow stay in sync?
 - bug where word wrap doesn't work for words that are longer than a single line length
-- bug with copied room aliasing
 - would be cool to select sprites and then find out who they are / what they say?
 - how do extra characters end up in the room maps?
 
@@ -626,11 +621,19 @@ function duplicateRoom() {
 	var newRoomId = nextRoomId();
 
 	console.log(newRoomId);
+	var duplicateTilemap = [];
+	for (y in roomToCopy.tilemap) {
+		duplicateTilemap.push([]);
+		for (x in roomToCopy.tilemap[y]) {
+			duplicateTilemap[y].push( roomToCopy.tilemap[y][x] );
+		}
+	}
+
 	room[newRoomId] = {
 		id : newRoomId,
-		tilemap : roomToCopy.tilemap,
-		walls : roomToCopy.walls,
-		exits : roomToCopy.exits,
+		tilemap : duplicateTilemap,
+		walls : roomToCopy.walls.slice(0),
+		exits : roomToCopy.exits.slice(0),
 		pal : roomToCopy.pal
 	};
 	refreshGameData();
