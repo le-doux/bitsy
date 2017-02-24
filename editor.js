@@ -3,9 +3,11 @@
 - serialize palettes
 - bug: parse inline sprites
 - bug: can't go off screen to the left or right
-- apply walll settings to all rooms
+- apply wall settings to all rooms
 - better data structure for drawings
 - remove use of drawing_data
+- show ghost of alternate frame
+	- TODO: way to turn that off?
 
 TODO NEXT
 
@@ -1071,7 +1073,14 @@ function drawPaintCanvas() {
 	//draw pixels
 	for (var x = 0; x < 8; x++) {
 		for (var y = 0; y < 8; y++) {
-			if (curDrawingData()[y][x] == 1) {
+			// draw alternate frame
+			if (isCurDrawingAnimated && curDrawingAltFrameData()[y][x] === 1) {
+				paint_ctx.globalAlpha = 0.3;
+				paint_ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
+				paint_ctx.globalAlpha = 1;
+			}
+			// draw current frame
+			if (curDrawingData()[y][x] === 1) {
 				paint_ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
 			}
 		}
@@ -1137,6 +1146,13 @@ function drawEditMap() {
 function curDrawingData() {
 	var imgId = (paintMode == TileType.Tile ? "TIL_" : "SPR_") + drawingId;
 	var frameIndex = (isCurDrawingAnimated ? curDrawingFrameIndex : 0);
+	return imageStore.source[ imgId ][ frameIndex ];
+}
+
+// todo: assumes 2 frames
+function curDrawingAltFrameData() {
+	var imgId = (paintMode == TileType.Tile ? "TIL_" : "SPR_") + drawingId;
+	var frameIndex = (curDrawingFrameIndex === 0 ? 1 : 0);
 	return imageStore.source[ imgId ][ frameIndex ];
 }
 
