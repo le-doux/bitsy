@@ -9,6 +9,7 @@
 - show ghost of alternate frame
 - bug: room tilemap aliasing
 - bug: exit options dont update on reset game
+- change exported page background
 
 TODO NEXT
 
@@ -35,8 +36,8 @@ X animation usability: ghosting other frame
 - character limit on sprite dialog
 - end game condition
 - key to restart game
-- change color of page background (export results)
-- bug: ghost rooms when you restart a game (did I fix this?)
+X change color of page background (export results)
+X bug: ghost rooms when you restart a game (did I fix this?)
 
 - hide "extra" UI better
 - bug: click to nav tiles and click on tile strip don't interoperate well
@@ -1535,7 +1536,7 @@ function loadEngineScript() {
 	}
 	client.send();
 }
-var webExportTemplate = "<!DOCTYPE HTML>\n<html>\n<head>\n<title>@@T</title>\n<style>\nhtml {height:592px;}\nbody {width:100%; height:100%; overflow:hidden;}\n#game {background:black;margin: 0 auto;margin-top: 40px;display: block;}\n</style>\n<script>\n@@E\n<\/script>\n</head>\n<body onload='startExportedGame()'>\n<canvas id='game'>\n</canvas>\n</body>\n</html>";
+var webExportTemplate = "<!DOCTYPE HTML>\n<html>\n<head>\n<title>@@T</title>\n<style>\nhtml {height:592px;}\nbody {width:100%; height:100%; overflow:hidden; background:@@B;}\n#game {background:black;margin: 0 auto;margin-top: 40px;display: block;}\n</style>\n<script>\n@@E\n<\/script>\n</head>\n<body onload='startExportedGame()'>\n<canvas id='game'>\n</canvas>\n</body>\n</html>";
 	
 function exportGame() {
 	refreshGameData(); //just in case
@@ -1547,6 +1548,8 @@ function exportGame() {
 	var titleIndex = html.indexOf("@@T");
 	html = html.substr(0,titleIndex) + title + html.substr(titleIndex+3);
 	console.log(html);
+	var pageBackgroundColorIndex = html.indexOf("@@B");
+	html = html.substr(0,pageBackgroundColorIndex) + exportPageColor + html.substr(pageBackgroundColorIndex+3);
 	var engineIndex = html.indexOf("@@E");
 	html = html.substr(0,engineIndex) + engineScript + html.substr(engineIndex+3);
 	console.log(html);
@@ -2029,4 +2032,14 @@ function on_paint_frame2() {
 	else {
 		reloadSprite();
 	}
+}
+
+
+var exportPageColor = "#fff";
+function on_change_color_page() {
+	var hex = document.getElementById("pageColor").value;
+	//console.log(hex);
+	var rgb = hexToRgb( hex );
+	document.body.style.background = hex;
+	exportPageColor = hex;
 }

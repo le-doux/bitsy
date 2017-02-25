@@ -108,6 +108,15 @@
 			.toggleText:hover {
 				font-weight: bold;
 			}
+			.options {
+				background: #f2f2f2;
+				padding: 7px;
+				margin-top: 2px;
+				margin-bottom: 2px;
+				color: #333;
+				font-size: 13px;
+				line-height: 150%;
+			}
 		</style>
 
 		<script src="bitsy.js"></script>
@@ -312,8 +321,11 @@
 				download <span class="minimize" onclick="hidePanel('downloadPanel');">[ - ]</span>
 			</div>
 			download game as html file: <br>
-			<button onclick="exportGame();">download game</button>
-			<br>
+			<button onclick="exportGame();">download game</button><br>
+			<div id="downloadOptions" class="options">
+				download options: <br>
+				<input type="color" value="#ffffff" id="pageColor" onchange="on_change_color_page();" autocomplete="off"> page color
+			</div>
 			<div id="downloadHelp" class="helpMessage" style="display:none;">
 				Note: your browser doesn't support<br>
 				direct downloads, so sharing requires<br>
