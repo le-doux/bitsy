@@ -1782,9 +1782,9 @@ function hidePanel(id) {
 
 function togglePanel(e) {
 	//hide/show panel
-	togglePanelCore(event.target.value, event.target.checked);
+	togglePanelCore(e.target.value, e.target.checked);
 	//save panel preferences
-	savePanelPref(event.target.value,event.target.checked);
+	savePanelPref(e.target.value, e.target.checked);
 }
 
 function togglePanelCore(id,checked) {
