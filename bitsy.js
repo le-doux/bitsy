@@ -209,7 +209,9 @@ function onTouch(e) {
 
 	//did we touch an open square?
 	var row = room[curRoom].tilemap[y];
-	var til = row.charAt(x);
+	console.log(row);
+	var til = row[x];
+	console.log(til);
 	if ( room[curRoom].walls.indexOf(til) != -1 ) {
 		//touched a wall
 		return;
@@ -314,7 +316,7 @@ function collisionMap(roomId) {
 	for (r in room[roomId].tilemap) {
 		var row = room[roomId].tilemap[r];
 		for (var c = 0; c < row.length; c++) {
-			if (room[roomId].walls.indexOf( row.charAt(c) ) != -1) {
+			if (room[roomId].walls.indexOf( row[x] ) != -1) {
 				map[r][c] = 1;
 			}
 		}
@@ -1243,7 +1245,14 @@ function drawRoom(room,context) {
 			var id = room.tilemap[i][j];
 			if (id != "0") {
 				//console.log(id);
-				drawTile( getTileImage(tile[id]), j, i, context );
+				if (tile[id] == null) { // hack-around to avoid corrupting files (not a solution though!)
+					id = "0";
+					room.tilemap[i][j] = id;
+				}
+				else {
+					console.log(id);
+					drawTile( getTileImage(tile[id]), j, i, context );
+				}
 			}
 		}
 	}
