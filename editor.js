@@ -8,6 +8,7 @@
 - cache animations during session so you don't lose them
 - bug: duplicate animated drawing doesn't include 2nd frame (requires storing unused frame data)
 - automatically pick high contrast colors for the UI
+- collision map for rooms
 
 TODO NOW
 - * UI mockup for leaf *
@@ -19,7 +20,6 @@ USABILITY THREAD
 - bug: nasty corruption bug still exists
 - bug: test things in firefox
 - bug: (firefox?) if you write dialog after placing a sprite, the textfield clears itself (no repro)
-- collision map for rooms
 - editable room names
 - dialog box should be textarea
 - line breaks for dialog
@@ -1164,6 +1164,19 @@ function drawEditMap() {
 		}
 	}
 
+	//draw walls
+	if (drawCollisionMap) {
+		ctx.fillStyle = getContrastingColor();
+		for (i in room[curRoom].tilemap) {
+			for (j in room[curRoom].tilemap[i]) {
+				var id = room[curRoom].tilemap[i][j];
+				if ( room[curRoom].walls.indexOf(id) != -1 ) {
+					ctx.fillRect(j*tilesize*scale,i*tilesize*scale,tilesize*scale,tilesize*scale);
+				}
+			}
+		}
+	}
+
 	//draw exits
 	if (areExitsVisible) {
 		for (i in room[curRoom].exits) {
@@ -1189,6 +1202,7 @@ function drawEditMap() {
 		ctx.globalAlpha = 1;
 	}
 }
+
 
 function curDrawingData() {
 	var imgId = (paintMode == TileType.Tile ? "TIL_" : "SPR_") + drawingId;
@@ -1305,6 +1319,12 @@ function toggleGrid() {
 
 function toggleMapGrid() {
 	drawMapGrid = !drawMapGrid;
+	drawEditMap();
+}
+
+var drawCollisionMap = false; //todo - move variable to more centeral spot?
+function toggleCollisionMap() {
+	drawCollisionMap = !drawCollisionMap;
 	drawEditMap();
 }
 
