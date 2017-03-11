@@ -5,8 +5,9 @@
 - bug: "is this a wall" checkbox doesn't update on changing rooms
 - bug: when you open the editor exits are visible (but shouldn't be)
 - bug: if you select a new sprite with cursor in dialog box, the dialog gets erased
-- when you turn off animation it shouldn't delete the 2nd frame forever
+- cache animations during session so you don't lose them
 - bug: duplicate animated drawing doesn't include 2nd frame (requires storing unused frame data)
+- automatically pick high contrast colors for the UI
 
 TODO NOW
 - * UI mockup for leaf *
@@ -22,7 +23,6 @@ USABILITY THREAD
 - editable room names
 - dialog box should be textarea
 - line breaks for dialog
-- white UI elements (pixel/tile grid) don't work with white as a color
 - downloadable Bitsy (electron?)
 - RPG mechanics: enemies, items???
 - walls maintain wall status everywhere once checked (even when you add new rooms)
@@ -552,14 +552,14 @@ function drawPaintNavThumbnailCanvas() {
 	}
 
 	//highlight selected drawing
-	paint_nav_ctx.fillStyle = "#000";
+	paint_nav_ctx.fillStyle = getComplimentingColor();
 	paint_nav_ctx.globalAlpha = 0.4;
 	paint_nav_ctx.fillRect(0,0,(3*realTileSize),paint_nav_canvas.height);
 	paint_nav_ctx.fillRect(4*realTileSize,0,4*realTileSize,paint_nav_canvas.height);
 	paint_nav_ctx.globalAlpha = 1.0;
 
 	//draw grid
-	paint_nav_ctx.fillStyle = "#fff";
+	paint_nav_ctx.fillStyle = getContrastingColor();
 	for (var x = 1; x < (paint_nav_canvas.width/realTileSize); x++) {
 		paint_nav_ctx.fillRect(x*realTileSize,0*realTileSize,1,paint_nav_canvas.height);
 	}
@@ -1134,7 +1134,8 @@ function drawPaintCanvas() {
 
 	//draw grid
 	if (drawPaintGrid) {
-		paint_ctx.fillStyle = "#fff";
+		paint_ctx.fillStyle = getContrastingColor();
+
 		for (var x = 1; x < tilesize; x++) {
 			paint_ctx.fillRect(x*paint_scale,0*paint_scale,1,tilesize*paint_scale);
 		}
@@ -1154,7 +1155,7 @@ function drawEditMap() {
 
 	//draw grid
 	if (drawMapGrid) {
-		ctx.fillStyle = "#fff";
+		ctx.fillStyle = getContrastingColor();
 		for (var x = 1; x < mapsize; x++) {
 			ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
 		}
@@ -1172,11 +1173,11 @@ function drawEditMap() {
 				ctx.globalAlpha = 0.9;
 			}
 			else {
-				ctx.fillStyle = "#fff";
+				ctx.fillStyle = getContrastingColor();
 				ctx.globalAlpha = 0.5;
 			}
 			ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
-			ctx.strokeStyle = "#000";
+			ctx.strokeStyle = getComplimentingColor();
 			ctx.globalAlpha = 1.0;
 			ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
 
@@ -1753,7 +1754,7 @@ function drawExitDestinationRoom() {
 	drawRoom( room[selectedExitRoom], exit_ctx );
 
 	//draw grid
-	exit_ctx.fillStyle = "#fff";
+	exit_ctx.fillStyle = getContrastingColor();
 	for (var x = 1; x < mapsize; x++) {
 		exit_ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
 	}
@@ -2106,4 +2107,62 @@ function on_change_color_page() {
 	var rgb = hexToRgb( hex );
 	document.body.style.background = hex;
 	exportPageColor = hex;
+}
+
+/**
+ * From: http://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
+ * Converts an RGB color value to HSL. Conversion formula
+ * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+ * Assumes r, g, and b are contained in the set [0, 255] and
+ * returns h, s, and l in the set [0, 1].
+ *
+ * @param   {number}  r       The red color value
+ * @param   {number}  g       The green color value
+ * @param   {number}  b       The blue color value
+ * @return  {Array}           The HSL representation
+ */
+function rgbToHsl(r, g, b){
+    r /= 255, g /= 255, b /= 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h, s, l = (max + min) / 2;
+
+    if(max == min){
+        h = s = 0; // achromatic
+    }else{
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max){
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+
+    return [h, s, l];
+}
+
+// todo - what about multiple palettes?
+function getContrastingColor() {
+	var hsl = rgbToHsl( palette["0"][0][0], palette["0"][0][1], palette["0"][0][2] );
+	console.log(hsl);
+	var lightness = hsl[2];
+	if (lightness > 0.5) {
+		return "#000";
+	}
+	else {
+		return "#fff";
+	}
+}
+
+function getComplimentingColor() {
+	var hsl = rgbToHsl( palette["0"][0][0], palette["0"][0][1], palette["0"][0][2] );
+	console.log(hsl);
+	var lightness = hsl[2];
+	if (lightness > 0.5) {
+		return "#fff";
+	}
+	else {
+		return "#000";
+	}
 }
