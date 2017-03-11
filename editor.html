@@ -132,7 +132,7 @@
 			<button onclick="showToolsPanel();" style="margin-left:20px;">show toolbar</button>
 			<button onclick="newGameDialog();" style="margin-left:20px;">new game (start over!)</button>
 			<span id="bitsyEditorName">
-				Bitsy v2.2 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
+				Bitsy v2.3 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
 			</span>
 		</div>
 		<div id="unsupportedFeatures" style="display:none;">
@@ -202,8 +202,19 @@
 				</div>
 				<br>
 
-				<span class="toggleText" onclick="toggleVersionNotes();">what's new in v2.2</span> <br>
+				<span class="toggleText" onclick="toggleVersionNotes();">what's new in v2.3</span> <br>
 				<div id="versionNotes" style="display:none;">
+					<i>v2.3:</i> <br>
+					- easily see walls! <br>
+					- high contrast colors (black grid for light backgrounds) <br>
+					- remembers and restores animations you deleted <br>
+					- bugs fixed: <br>
+					-> temporary fix for file corruption issue <br>
+					-> couldn't toggle panels in Firefox <br>
+					-> wall checkbox didn't update on room change <br>
+					-> exits were always visible on reload <br>
+					-> new dialog was lost when switching sprites <br>
+					-> duplicated drawings didn't include animation <br>
 					<i>v2.2:</i> <br>
 					- see overlay of other frame while animating <br>
 					- change background color of exported game <br>
@@ -219,10 +230,8 @@
 					-> animate any sprite or tile or avatar<br>
 					-> check "add animation" in the paint tab<br>
 					-> switch frames by selecting frame 1 or 2<br>
-					~~~~<br>
 					- sprite/tile thumbnails <br>
 					-> click a thumbnail to paint it!<br>
-					~~~~<br>
 					- easily duplicate rooms, sprites, and tiles<br>
 					- exits are easier to see<br>
 					- skip dialog with any key
