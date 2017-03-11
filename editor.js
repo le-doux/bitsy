@@ -6,6 +6,7 @@
 - bug: when you open the editor exits are visible (but shouldn't be)
 - bug: if you select a new sprite with cursor in dialog box, the dialog gets erased
 - when you turn off animation it shouldn't delete the 2nd frame forever
+- bug: duplicate animated drawing doesn't include 2nd frame (requires storing unused frame data)
 
 TODO NOW
 - * UI mockup for leaf *
@@ -14,7 +15,6 @@ TODO NOW
 - end?
 
 USABILITY THREAD
-- bug: duplicate animated drawing doesn't include 2nd frame (requires storing unused frame data)
 - bug: nasty corruption bug still exists
 - bug: test things in firefox
 - bug: (firefox?) if you write dialog after placing a sprite, the textfield clears itself (no repro)
@@ -391,7 +391,7 @@ function setDefaultGameState() {
 	paintMode = TileType.Avatar;
 	//on_paint_avatar();
 	drawingId = "A";
-	var person_data = [
+	var person_data = [[
 		[0,0,0,1,1,0,0,0],
 		[0,0,0,1,1,0,0,0],
 		[0,0,0,1,1,0,0,0],
@@ -400,7 +400,7 @@ function setDefaultGameState() {
 		[1,0,1,1,1,1,0,1],
 		[0,0,1,0,0,1,0,0],
 		[0,0,1,0,0,1,0,0]
-	];
+	]];
 	makeSprite( drawingId, person_data );
 	sprite["A"].room = "0";
 	sprite["A"].x = 4;
@@ -411,7 +411,7 @@ function setDefaultGameState() {
 	drawingId = "a";
 	//newSprite( drawingId );
 	//on_paint_sprite();
-	var cat_data = [
+	var cat_data = [[
 		[0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0],
 		[0,1,0,1,0,0,0,1],
@@ -420,7 +420,7 @@ function setDefaultGameState() {
 		[0,1,1,1,1,1,0,0],
 		[0,0,1,1,1,1,0,0],
 		[0,0,1,0,0,1,0,0]
-	];
+	]];
 	makeSprite( drawingId, cat_data );
 	sprite["a"].room = "0";
 	sprite["a"].x = 8;
@@ -432,7 +432,7 @@ function setDefaultGameState() {
 	drawingId = "a";
 	//newTile( drawingId );
 	//on_paint_tile();
-	var square_data = [
+	var square_data = [[
 		[1,1,1,1,1,1,1,1],
 		[1,0,0,0,0,0,0,1],
 		[1,0,0,0,0,0,0,1],
@@ -441,7 +441,7 @@ function setDefaultGameState() {
 		[1,0,0,0,0,0,0,1],
 		[1,0,0,0,0,0,0,1],
 		[1,1,1,1,1,1,1,1]
-	];
+	]];
 	makeTile( drawingId, square_data );
 	renderImages();
 	console.log("D");
@@ -793,11 +793,15 @@ function duplicateDrawing() {
 	if (paintMode == TileType.Tile) {
 
 		//copy drawing data
-		var copiedFrameData = [];
-		for (y in curDrawingData()) {
-			copiedFrameData.push([]);
-			for (x in curDrawingData()[y]) {
-				copiedFrameData[y].push( curDrawingData()[y][x] );
+		var sourceImageData = imageStore.source[ "TIL_" + drawingId ];
+		var copiedImageData = [];
+		for (f in sourceImageData) {
+			copiedImageData.push([]);
+			for (y in sourceImageData[f]) {
+				copiedImageData[f].push([]);
+				for (x in sourceImageData[f][y]) {
+					copiedImageData[f][y].push( sourceImageData[f][y][x] );
+				}
 			}
 		}
 
@@ -805,9 +809,9 @@ function duplicateDrawing() {
 
 		console.log("DUPLICATE TILE");		
 		console.log(drawingId);
-		console.log(copiedFrameData);
+		console.log(copiedImageData);
 
-		makeTile( drawingId, copiedFrameData );
+		makeTile( drawingId, copiedImageData );
 
 		drawPaintCanvas();
 		refreshGameData();
@@ -818,22 +822,26 @@ function duplicateDrawing() {
 	}
 	else {
 
-		//copy drawing data
-		var copiedFrameData = [];
-		for (y in curDrawingData()) {
-			copiedFrameData.push([]);
-			for (x in curDrawingData()[y]) {
-				copiedFrameData[y].push( curDrawingData()[y][x] );
+		//copy drawing data -- hacky duplication as usual between sprite and tile :(
+		var sourceImageData = imageStore.source[ "SPR_" + drawingId ];
+		var copiedImageData = [];
+		for (f in sourceImageData) {
+			copiedImageData.push([]);
+			for (y in sourceImageData[f]) {
+				copiedImageData[f].push([]);
+				for (x in sourceImageData[f][y]) {
+					copiedImageData[f][y].push( sourceImageData[f][y][x] );
+				}
 			}
-		}	
+		}
 
 		drawingId = nextSpriteId();
 
 		console.log("DUPLICATE SPRITE");	
 		console.log(drawingId);
-		console.log(copiedFrameData);
+		console.log(copiedImageData);
 
-		makeSprite( drawingId, copiedFrameData );
+		makeSprite( drawingId, copiedImageData );
 
 		drawPaintCanvas();
 		refreshGameData();
@@ -1194,21 +1202,21 @@ function curDrawingAltFrameData() {
 	return imageStore.source[ imgId ][ frameIndex ];
 }
 
-function makeTile(id,firstFrame) {
+function makeTile(id,imageData) {
 	var drwId = "TIL_" + id;
 	tile[id] = {
 		drw : drwId,
 		col : 1,
 		animation : { //todo
-			isAnimated : false,
+			isAnimated : (!imageData) ? false : (imageData.length>1),
 			frameIndex : 0,
-			frameCount : 2
+			frameCount : (!imageData) ? 2 : imageData.length
 		}
 	};
-	makeDrawing(drwId,firstFrame);
+	makeDrawing(drwId,imageData);
 }
 
-function makeSprite(id,firstFrame) {
+function makeSprite(id,imageData) {
 	var drwId = "SPR_" + id;
 	sprite[id] = { //todo create default sprite creation method
 		drw : drwId,
@@ -1217,18 +1225,17 @@ function makeSprite(id,firstFrame) {
 		x : -1,
 		y : -1,
 		animation : { //todo
-			isAnimated : false,
+			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
 			frameIndex : 0,
-			frameCount : 2
+			frameCount : (!imageData) ? 2 : imageData.length
 		}
 	};
-	makeDrawing(drwId,firstFrame);
+	makeDrawing(drwId,imageData);
 }
 
-function makeDrawing(id,firstFrame) {
-	imageStore.source[id] = [];
-	if (!firstFrame) { //use default blank frame
-		firstFrame = [
+function makeDrawing(id,imageData) {
+	if (!imageData) {
+		imageData = [[
 			[0,0,0,0,0,0,0,0],
 			[0,0,0,0,0,0,0,0],
 			[0,0,0,0,0,0,0,0],
@@ -1237,9 +1244,9 @@ function makeDrawing(id,firstFrame) {
 			[0,0,0,0,0,0,0,0],
 			[0,0,0,0,0,0,0,0],
 			[0,0,0,0,0,0,0,0]
-		]
+		]];
 	}
-	imageStore.source[id].push(firstFrame);
+	imageStore.source[id] = imageData;
 	renderImages(); //todo is this the right place for this?
 }
 
