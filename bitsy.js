@@ -700,7 +700,7 @@ function parseWorld(file) {
 	while (i < lines.length) {
 		var curLine = lines[i];
 
-		console.log(lines[i]);
+		// console.log(lines[i]);
 
 		if (i == 0) {
 			i = parseTitle(lines, i);
@@ -926,7 +926,7 @@ function parseRoom(lines, i) {
 	}
 
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
-		console.log(getType(lines[i]));
+		// console.log(getType(lines[i]));
 		if (getType(lines[i]) === "SPR") {
 			/* NOTE SPRITE START LOCATIONS */
 			var sprId = getId(lines[i]);
@@ -1250,7 +1250,7 @@ function drawRoom(room,context) {
 					room.tilemap[i][j] = id;
 				}
 				else {
-					console.log(id);
+					// console.log(id);
 					drawTile( getTileImage(tile[id]), j, i, context );
 				}
 			}

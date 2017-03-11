@@ -1,9 +1,48 @@
 /* 
 2.3 so far
 - hack to stop corruption of tilemaps
+- bug: can't toggle panels in firefox
+- bug: "is this a wall" checkbox doesn't update on changing rooms
+- bug: when you open the editor exits are visible (but shouldn't be)
+- bug: if you select a new sprite with cursor in dialog box, the dialog gets erased
+- when you turn off animation it shouldn't delete the 2nd frame forever
 
-TODO NEXT
+TODO NOW
+- * UI mockup for leaf *
+- game jam stuff
+- more usability
+- end?
 
+USABILITY THREAD
+- bug: duplicate animated drawing doesn't include 2nd frame (requires storing unused frame data)
+- bug: nasty corruption bug still exists
+- bug: test things in firefox
+- bug: (firefox?) if you write dialog after placing a sprite, the textfield clears itself (no repro)
+- collision map for rooms
+- editable room names
+- dialog box should be textarea
+- line breaks for dialog
+- white UI elements (pixel/tile grid) don't work with white as a color
+- downloadable Bitsy (electron?)
+- RPG mechanics: enemies, items???
+- walls maintain wall status everywhere once checked (even when you add new rooms)
+	- maybe needs a file format change: a universal wall specifier that can be overridden?
+- music / sfx tool (bleepy bloopy piano track)
+	- http://marcgg.com/blog/2016/11/01/javascript-audio/#
+- dialog choices
+- dialog "reply" from your character
+- dialog changes with repetition
+- dialog branching
+- better support for side-scrolling games???? (e.g. gravity mode (jump? ramps? ladders?))
+from laura michet
+- map for rooms
+- want to see all my tiles at once
+- character limit on sprite dialog
+- end game condition
+- key to restart game)
+
+
+TODO NEXT?
 - end editor (list of endings)
 - go to ending from exit
 - optional: got to ending after talking to sprite
@@ -19,16 +58,6 @@ my ideas
 - new pass on UI
 - new dialog editor / preview pane
 	- bigger dialog box textbox?
-
-from laura michet
-X animation usability: ghosting other frame
-- map for rooms
-- want to see all my tiles at once
-- character limit on sprite dialog
-- end game condition
-- key to restart game
-X change color of page background (export results)
-X bug: ghost rooms when you restart a game (did I fix this?)
 
 - hide "extra" UI better
 - bug: click to nav tiles and click on tile strip don't interoperate well
@@ -298,6 +327,9 @@ function start() {
 				document.getElementById(id.replace("Panel","Check")).checked = prefs[id];
 		}
 	}
+
+	//show/hide exits
+	(document.getElementById("exitsPanel").style.display === "block") ? showExits() : hideExits();
 
 	//draw everything
 	on_paint_avatar();
@@ -593,6 +625,9 @@ function nextRoom() {
 	curRoom = ids[roomIndex];
 	drawEditMap();
 
+	if (paintMode === TileType.Tile)
+		updateWallCheckboxOnCurrentTile();
+
 	document.getElementById("roomId").innerHTML = curRoom;
 }
 
@@ -602,6 +637,9 @@ function prevRoom() {
 	if (roomIndex < 0) roomIndex = (ids.length-1);
 	curRoom = ids[roomIndex];
 	drawEditMap();
+
+	if (paintMode === TileType.Tile)
+		updateWallCheckboxOnCurrentTile();
 
 	document.getElementById("roomId").innerHTML = curRoom;
 }
@@ -860,6 +898,12 @@ function reloadTile() {
 	}
 
 	// wall UI
+	updateWallCheckboxOnCurrentTile();
+
+	drawPaintCanvas();
+}
+
+function updateWallCheckboxOnCurrentTile() {
 	if (room[curRoom]) { //todo this per-room wall nonsense is confusing
 		if (room[curRoom].walls.indexOf(drawingId) != -1) {
 			document.getElementById("wallCheckbox").checked = true;
@@ -868,8 +912,6 @@ function reloadTile() {
 			document.getElementById("wallCheckbox").checked = false;
 		}
 	}
-
-	drawPaintCanvas();
 }
 
 function reloadSprite() {
@@ -1384,6 +1426,7 @@ function on_paint_sprite() {
 
 function on_change_dialog() {
 	dialog[drawingId] = document.getElementById("dialogText").value;
+	console.log("NEW DIALOG " + dialog[drawingId]);
 	refreshGameData();
 }
 
@@ -1615,6 +1658,7 @@ function resetExitVars() {
 }
 
 function showExits() {
+	console.log("show exits");
 	resetExitVars();
 	areExitsVisible = true;
 	drawEditMap();
@@ -1622,6 +1666,7 @@ function showExits() {
 }
 
 function hideExits() {
+	console.log("hide exits");
 	resetExitVars();
 	areExitsVisible = false;
 	drawEditMap();
@@ -1710,7 +1755,7 @@ function drawExitDestinationRoom() {
 	}
 
 	//draw exit destination
-	if ( isExitValid(selectedExit) && selectedExit.dest.room === selectedExitRoom ) {
+	if ( selectedExit && isExitValid(selectedExit) && selectedExit.dest.room === selectedExitRoom ) {
 		exit_ctx.fillStyle = "#ff0";
 		exit_ctx.globalAlpha = 0.9;
 		exit_ctx.fillRect(selectedExit.dest.x * tilesize * scale, selectedExit.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
@@ -1763,9 +1808,10 @@ function exit_onMouseDown(e) {
 }
 
 function showExitsPanel() {
-	document.getElementById("exitsPanel").style.display = "block";
+	// turn this into another core method? ( togglePanel -> togglePanelCore -> togglePanelInnerCore (lol) )
+	togglePanelCore("exitsPanel",true);
+	savePanelPref("exitsPanel",true);
 	document.getElementById("exitsCheck").checked = true;
-	showExits();
 }
 
 function hidePanel(id) {
@@ -1924,9 +1970,12 @@ function addSpriteAnimation() {
 	//mark sprite as animated
 	sprite[drawingId].animation.isAnimated = true;
 
-	//add blank frame to sprite
+	//add blank frame to sprite (or restore removed animation)
 	var spriteImageId = "SPR_" + drawingId;
-	addNewFrameToDrawing( spriteImageId );
+	if (sprite[drawingId].cachedAnimation != null)
+		restoreDrawingAnimation( spriteImageId, sprite[drawingId].cachedAnimation )
+	else
+		addNewFrameToDrawing( spriteImageId );
 
 	//refresh data model
 	renderImages();
@@ -1943,6 +1992,7 @@ function removeSpriteAnimation() {
 
 	//remove all but the first frame of the sprite
 	var spriteImageId = "SPR_" + drawingId;
+	cacheDrawingAnimation( sprite[drawingId], spriteImageId );
 	removeDrawingAnimation( spriteImageId );
 
 	//refresh data model
@@ -1959,9 +2009,12 @@ function addTileAnimation() {
 	//mark tile as animated
 	tile[drawingId].animation.isAnimated = true;
 
-	//add blank frame to tile
+	//add blank frame to tile (or restore removed animation)
 	var tileImageId = "TIL_" + drawingId;
-	addNewFrameToDrawing( tileImageId );
+	if (tile[drawingId].cachedAnimation != null)
+		restoreDrawingAnimation( tileImageId, tile[drawingId].cachedAnimation )
+	else
+		addNewFrameToDrawing( tileImageId );
 
 	//refresh data model
 	renderImages();
@@ -1978,6 +2031,7 @@ function removeTileAnimation() {
 
 	//remove all but the first frame of the tile
 	var tileImageId = "TIL_" + drawingId;
+	cacheDrawingAnimation( tile[drawingId], tileImageId );
 	removeDrawingAnimation( tileImageId );
 
 	//refresh data model
@@ -2003,6 +2057,18 @@ function addNewFrameToDrawing(drwId) {
 function removeDrawingAnimation(drwId) {
 	var oldImageData = imageStore.source[ drwId ].slice(0);
 	imageStore.source[ drwId ] = [ oldImageData[0] ];
+}
+
+// let's us restore the animation during the session if the user wants it back
+function cacheDrawingAnimation(drawing,imageStoreId) {
+	var oldImageData = imageStore.source[ imageStoreId ].slice(0);
+	drawing.cachedAnimation = [ oldImageData[1] ]; // ah the joys of javascript
+}
+
+function restoreDrawingAnimation(imageStoreId,cachedAnimation) {
+	for (f in cachedAnimation) {
+		imageStore.source[ imageStoreId ].push( cachedAnimation[f] );	
+	}
 }
 
 function on_paint_frame1() {

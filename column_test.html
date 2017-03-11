@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style>
+			body {
+				background: #444;
+			}
+			.column {
+				background: #999;
+				width: 400px;
+				height: 600px;
+				float: left;
+				margin: 30px;
+				margin-right: 0px;
+			}
+			.card {
+				background: #fff;
+				margin: 10px;
+				width: 380px;
+				height: 200px;
+			}
+			/*#test_card {
+				position: absolute;
+				top:10px;
+			}*/
+		</style>
+
+		<script>
+			/*
+				TODO
+				collision detection
+			*/
+
+			var card = null;
+
+			function onmousemove(e) {
+				console.log(e);
+				if (card != null) {
+					card.style.top = e.clientY + "px";
+					card.style.left = e.clientX + "px";
+				}
+			}
+
+			document.addEventListener("mousemove",onmousemove);
+
+			function grabCard() {
+				card = document.getElementById("test_card");
+				card.style.position = "absolute";
+			}
+		</script>
+	</head>
+
+	<body>
+		<div class="column">
+			<div class="card" id="test_card" onmousedown="grabCard();">
+			</div>
+		</div>
+		<div class="column">
+		</div>
+	</body>
+</html>
