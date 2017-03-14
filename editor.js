@@ -2190,7 +2190,7 @@ function rgbToHsl(r, g, b){
 // todo - what about multiple palettes?
 function getContrastingColor() {
 	var hsl = rgbToHsl( palette["0"][0][0], palette["0"][0][1], palette["0"][0][2] );
-	console.log(hsl);
+	// console.log(hsl);
 	var lightness = hsl[2];
 	if (lightness > 0.5) {
 		return "#000";
@@ -2202,7 +2202,7 @@ function getContrastingColor() {
 
 function getComplimentingColor() {
 	var hsl = rgbToHsl( palette["0"][0][0], palette["0"][0][1], palette["0"][0][2] );
-	console.log(hsl);
+	// console.log(hsl);
 	var lightness = hsl[2];
 	if (lightness > 0.5) {
 		return "#fff";

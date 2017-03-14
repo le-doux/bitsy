@@ -33,6 +33,7 @@ var dialog = {};
 var palette = {
 	"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
 };
+var ending = {};
 
 //stores all image data for tiles, sprites, drawings
 var imageStore = {
@@ -69,6 +70,8 @@ function clearGameData() {
 	palette = {
 		"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
 	};
+	ending = {};
+	isEnding = false; //todo - correct place for this?
 
 	//stores all image data for tiles, sprites, drawings
 	imageStore = {
@@ -448,7 +451,7 @@ function update() {
 	ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 	
-	if (!isNarrating) {
+	if (!isNarrating && !isEnding) {
 		updateAnimation();
 		drawRoom( room[curRoom] ); // draw world if game has begun
 	}
@@ -457,7 +460,7 @@ function update() {
 		updateDialog();
 		drawDialogBox();
 	}
-	else {
+	else if (!isEnding) {
 		moveSprites();
 
 		if (player().walkingPath.length > 0) {
@@ -726,6 +729,9 @@ function parseWorld(file) {
 		else if (getType(curLine) === "DLG") {
 			i = parseDialog(lines, i);
 		}
+		else if (getType(curLine) === "END") {
+			i = parseEnding(lines, i);
+		}
 		else if (getType(curLine) === "!") {
 			i = parseFlag(lines, i);
 		}
@@ -834,6 +840,12 @@ function serializeWorld() {
 	for (id in dialog) {
 		worldStr += "DLG " + id + "\n";
 		worldStr += dialog[id] + "\n";
+		worldStr += "\n";
+	}
+	/* ENDINGS */
+	for (id in ending) {
+		worldStr += "END " + id + "\n";
+		worldStr += ending[id] + "\n";
 		worldStr += "\n";
 	}
 	return worldStr;
@@ -1218,6 +1230,15 @@ function parseDialog(lines, i) {
 	return i;
 }
 
+function parseEnding(lines, i) {
+	var id = getId(lines[i]);
+	i++;
+	var text = lines[i];
+	i++;
+	ending[id] = text;
+	return i;
+}
+
 function parseFlag(lines, i) {
 	var id = getId(lines[i]);
 	var valStr = lines[i].split(" ")[2];
@@ -1333,6 +1354,7 @@ var nextCharMaxTime = 50; //in milliseconds
 
 var isDialogMode = false;
 var isNarrating = false;
+var isEnding = false;
 var isDialogReadyToContinue = false;
 
 function clearDialogBox() {
@@ -1496,8 +1518,9 @@ function drawDialogChar(char, row, col) {
 	}
 }
 
-function startNarrating(dialogStr) {
+function startNarrating(dialogStr,end=false) {
 	isNarrating = true;
+	isEnding = end;
 	startDialog(dialogStr);
 }
 
