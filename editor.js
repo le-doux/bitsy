@@ -1,20 +1,45 @@
 /* 
-2.3 so far
-- hack to stop corruption of tilemaps
-- bug: can't toggle panels in firefox
-- bug: "is this a wall" checkbox doesn't update on changing rooms
-- bug: when you open the editor exits are visible (but shouldn't be)
-- bug: if you select a new sprite with cursor in dialog box, the dialog gets erased
-- cache animations during session so you don't lose them
-- bug: duplicate animated drawing doesn't include 2nd frame (requires storing unused frame data)
-- automatically pick high contrast colors for the UI
-- collision map for rooms
+2.4 so far
 
 TODO NOW
 - * UI mockup for leaf *
 - game jam stuff
 - more usability
 - end?
+
+v3 candidate features
+- triggers
+	- first gen goal: extensible, enables "inventory" system
+		- or just create an inventory system? and let people re-appropriate it?
+	- goals: items, battles, choices
+	- variables (increment, decrement, add arbitrary val? multiply?)
+		- renamable?
+		- limited number?
+	- things that can happen
+		- move sprites or player (or remove them)
+		- change dialog
+		- end game?
+		- do something with tiles?
+	- triggers
+		- enter square
+		- talk (bump?) to sprite (before?after?)
+		- enter / exit room
+		- tile-based?
+	- ambient triggers
+		- based on state of a variable
+	- need to be able to name (alias) sprites, tiles, rooms
+	- trigger multiple things at once? (one trigger -> multiple effects)
+	- special trigger window? trigger in dialog / map / exit window?
+- endings
+- new dialog editor / effects  / options
+	- text effects
+	- choices?
+	- multiple options
+- music / sfx tool
+- room map
+- UI redesign (more horizontal?, move panels around, duplicate panels)
+- fancier animations (transitions, arrow, walk?, etc)
+- character pathing (why am I the only one that wants this???)
 
 USABILITY THREAD
 - bug: nasty corruption bug still exists

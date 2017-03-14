@@ -140,8 +140,7 @@ function onready() {
 	console.log("hello");
 	update_interval = setInterval(update,-1);
 
-	isTitle = true;
-	startDialog(title);
+	startNarrating(title);
 }
 
 function onTouch(e) {
@@ -449,7 +448,7 @@ function update() {
 	ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 	
-	if (!isTitle) {
+	if (!isNarrating) {
 		updateAnimation();
 		drawRoom( room[curRoom] ); // draw world if game has begun
 	}
@@ -1333,7 +1332,7 @@ var nextCharTimer = 0;
 var nextCharMaxTime = 50; //in milliseconds
 
 var isDialogMode = false;
-var isTitle = false;
+var isNarrating = false;
 var isDialogReadyToContinue = false;
 
 function clearDialogBox() {
@@ -1341,7 +1340,7 @@ function clearDialogBox() {
 }
 
 function drawDialogBox() {
-	if (isTitle) {
+	if (isNarrating) {
 		ctx.putImageData(dialogbox.img, dialogbox.left*scale, ((height/2)-(dialogbox.height/2))*scale);
 	}
 	else if (player().y < mapsize/2) {
@@ -1458,7 +1457,7 @@ function continueDialog() {
 }
 
 function onExitDialog() {
-	if (isTitle) isTitle = false;
+	if (isNarrating) isNarrating = false;
 }
 
 function drawNextDialogChar() {
@@ -1495,6 +1494,11 @@ function drawDialogChar(char, row, col) {
 			}
 		}
 	}
+}
+
+function startNarrating(dialogStr) {
+	isNarrating = true;
+	startDialog(dialogStr);
 }
 
 function startDialog(dialogStr) {
