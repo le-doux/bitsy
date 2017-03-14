@@ -5,7 +5,8 @@ TODO NOW
 - * UI mockup for leaf *
 - game jam stuff
 - more usability
-- end?
+- endings
+	- use exit to trigger them?
 
 v3 candidate features
 - triggers
