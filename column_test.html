@@ -8,16 +8,28 @@
 			.column {
 				background: #999;
 				width: 400px;
-				height: 600px;
+				/*height: 600px;*/
 				float: left;
-				margin: 30px;
+				/*margin: 10px;*/
+				margin: 2%;
+				height: 90%;
 				margin-right: 0px;
+				overflow: scroll;
 			}
 			.card {
 				background: #fff;
 				margin: 10px;
 				width: 380px;
 				height: 200px;
+			}
+			.columnHolder {
+				background: #666;
+				/*padding: 2px;*/
+				width: 96vw;
+				margin-left: 1vw;
+				height: 96vh;
+				overflow-x: scroll;
+				overflow-y: hidden;
 			}
 			/*#test_card {
 				position: absolute;
@@ -51,11 +63,14 @@
 	</head>
 
 	<body>
-		<div class="column">
-			<div class="card" id="test_card" onmousedown="grabCard();">
+		<div class="columnHolder">
+			<div class="column">
+				<!--- <div class="card" id="test_card" onmousedown="grabCard();"> -->
+				<div class="card"></div>
+				<div class="card"></div>
 			</div>
-		</div>
-		<div class="column">
+			<div class="column">
+			</div>
 		</div>
 	</body>
 </html>

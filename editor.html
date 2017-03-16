@@ -117,6 +117,12 @@
 				font-size: 13px;
 				line-height: 150%;
 			}
+			#dialogText {
+				resize: none;
+				/*width: 95%;*/
+				font-size: 12px;
+				width: 32ch;
+			}
 		</style>
 
 		<script src="bitsy.js"></script>
@@ -311,7 +317,11 @@
 			<div id="wall" style="display:none;">
 				make tile a wall <input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall();"> <button onclick="apply_wall_setting_all_rooms();">apply to all rooms</button>
 			</div>
-			<div id="dialog" style="display:none;">dialog: <input type="text" id="dialogText" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"></div>
+			<div id="dialog" style="display:none;">dialog:
+				<!-- <input type="text" id="dialogText" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"> --> 
+				<br>
+				<textarea id="dialogText" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"></textarea> <!-- rows="2" cols="32" -->
+			</div>
 			<div id="isAnimated" style="display:none;">add animation <input type="checkbox" id="animatedCheckbox" onchange="on_toggle_animated();"> </div>
 			<div id="animation" style="display:none;">
 				<form>
