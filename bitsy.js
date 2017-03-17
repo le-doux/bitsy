@@ -128,10 +128,18 @@ function getGameNameFromURL() {
 	return game;
 }
 
+var curGameData = null;
 function load_game(game_data) {
+	curGameData = game_data; //remember the current game (used to reset the game)
 	parseWorld(game_data);
 	renderImages();
 	onready();
+}
+
+function reset_cur_game() {
+	if (curGameData != null);
+	clearGameData();
+	load_game(curGameData);
 }
 
 var update_interval = null;
@@ -157,6 +165,11 @@ function onTouch(e) {
 			skipDialog();
 		}
 
+		return;
+	}
+
+	if (isEnding) {
+		reset_cur_game();
 		return;
 	}
 
@@ -581,6 +594,10 @@ function onkeydown(e) {
 			skipDialog();
 		}
 
+	}
+	else if (isEnding) {
+		/* RESTART GAME */
+		reset_cur_game();
 	}
 	else {
 

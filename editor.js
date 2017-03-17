@@ -9,6 +9,7 @@ TODO NOW
 - game jam stuff
 - more usability
 - endings
+	- *** I'm not sure how I feel about using exits to go to endings... ***
 	- use exit to trigger them?
 	- possibilities:
 	000
