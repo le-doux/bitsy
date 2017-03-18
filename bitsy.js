@@ -548,19 +548,12 @@ function moveSprites() {
 				}
 				else if (ext) { //if the sprite hits an exit
 					//move it to another scene
-					if (ext.dest.isEnd) {
-						if (id === "A") {
-							startNarrating( ending[ext.dest.end], true /*isEnding*/ );
-						}
-					}
-					else {
-						spr.room = ext.dest.room;
-						spr.x = ext.dest.x;
-						spr.y = ext.dest.y;
-						if (id === "A") {
-							//if the player changes scenes, change the visible scene
-							curRoom = ext.dest.room;
-						}
+					spr.room = ext.dest.room;
+					spr.x = ext.dest.x;
+					spr.y = ext.dest.y;
+					if (id === "A") {
+						//if the player changes scenes, change the visible scene
+						curRoom = ext.dest.room;
 					}
 				}
 
@@ -634,15 +627,10 @@ function onkeydown(e) {
 			startNarrating( ending[end.id], true /*isEnding*/ );
 		}
 		else if (ext) {
-			if (ext.dest.isEnd) {
-				startNarrating( ending[ext.dest.end], true /*isEnding*/ );
-			}
-			else {
-				player().room = ext.dest.room;
-				player().x = ext.dest.x;
-				player().y = ext.dest.y;
-				curRoom = ext.dest.room;
-			}
+			player().room = ext.dest.room;
+			player().x = ext.dest.x;
+			player().y = ext.dest.y;
+			curRoom = ext.dest.room;
 		}
 		else if (spr) {
 			if (dialog[spr]) {
@@ -858,12 +846,7 @@ function serializeWorld() {
 			for (j in room[id].exits) {
 				var e = room[id].exits[j];
 				if ( isExitValid(e) ) {
-					if (e.dest.isEnd) {
-						worldStr += "EXT " + e.x + "," + e.y + " END " + e.dest.end;
-					}
-					else {
-						worldStr += "EXT " + e.x + "," + e.y + " " + e.dest.room + " " + e.dest.x + "," + e.dest.y;
-					}
+					worldStr += "EXT " + e.x + "," + e.y + " " + e.dest.room + " " + e.dest.x + "," + e.dest.y;
 					worldStr += "\n";
 				}
 			}
@@ -873,8 +856,6 @@ function serializeWorld() {
 			for (j in room[id].endings) {
 				var e = room[id].endings[j];
 				// todo isEndingValid
-				console.log("SERIALIZE ENDING");
-				console.log(e);
 				worldStr += "END " + e.id + " " + e.x + "," + e.y;
 				worldStr += "\n";
 			}
@@ -934,9 +915,8 @@ function serializeDrawing(drwId) {
 function isExitValid(e) {
 	var hasValidStartPos = e.x >= 0 && e.x < 16 && e.y >= 0 && e.y < 16;
 	var hasDest = e.dest != null;
-	var hasValidRoomDest = e.dest.isEnd || (e.dest.room != null && e.dest.x >= 0 && e.dest.x < 16 && e.dest.y >= 0 && e.dest.y < 16);
-	var hasValidEndDest = !e.dest.isEnd || (e.dest.end != null);
-	return hasValidStartPos && hasDest && hasValidRoomDest && hasValidEndDest;
+	var hasValidRoomDest = (e.dest.room != null && e.dest.x >= 0 && e.dest.x < 16 && e.dest.y >= 0 && e.dest.y < 16);
+	return hasValidStartPos && hasDest && hasValidRoomDest;
 }
 
 function placeSprites() {
@@ -1057,30 +1037,17 @@ function parseRoom(lines, i) {
 			//arg format: EXT 10,5 M 3,2
 			var exitCoords = exitArgs[1].split(",");
 			var destName = exitArgs[2];
+			var destCoords = exitArgs[3].split(",");
 			var ext = {
 				x : parseInt(exitCoords[0]),
-				y : parseInt(exitCoords[1])
-			};
-
-			if (destName === "END") {
-				// to end
-				ext.dest = {
-					end : exitArgs[3],
-					isEnd : true
-				};
-			}
-			else {
-				// to new room
-				var destCoords = exitArgs[3].split(",");
-				ext.dest = {
+				y : parseInt(exitCoords[1]),
+				dest : {
 					room : destName,
 					x : parseInt(destCoords[0]),
-					y : parseInt(destCoords[1]),
-					isEnd : false
-				};
-			}
+					y : parseInt(destCoords[1])
+				}
+			};
 			room[id].exits.push(ext);
-
 		}
 		else if (getType(lines[i]) === "END") {
 			/* ADD ENDING */

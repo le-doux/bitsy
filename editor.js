@@ -2,42 +2,13 @@
 2.4 so far
 - fixed bug with animated tiles
 - dialog textarea matches size of dialog box in game
+- endings in file format!
 
 TODO NOW
 - * UI mockup for leaf *
 	- keep emailing
 - game jam stuff
 - more usability
-- endings
-	- *** I'm not sure how I feel about using exits to go to endings... ***
-	- use exit to trigger them?
-	- possibilities:
-	000
-	000
-	EXT 1,1 END A
-
-	END A
-	the end
-
-	vs.
-
-	000
-	000
-	END 1,1 A
-
-	END A
-	the end
-
-	PROS / CONS
-	- re-use exit UI vs create new UI
-	- treat ending as a location vs treat it as an object
-	- keep exit code simple vs hijack it
-	- will endings always funtion like exits / destinations? or not?
-	- what about triggers?
-	- should endings be tied to specific positions? probably not
-	- two ending objects? ending portal + ending description?
-	- or build off of the "exit" object (rename door or portal??? or link?)
-	- split UI ? or single UI? (inside the exit UI?)
 - item system ideas / requirements
 	- drawing of item in world
 	- item can be picked up
