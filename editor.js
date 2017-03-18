@@ -222,33 +222,30 @@ var curDrawingFrameIndex = 0;
 
 var tileIndex = 0;
 var spriteIndex = 0;
-function nextTileId() {
-	var idList = sortedTileIdList();
-	var lastId = idList[ idList.length - 1 ];
-	var idInt = parseInt( lastId, 36 );
-	idInt++;
-	return idInt.toString(36);
-}
-function nextSpriteId() {
-	var idList = sortedSpriteIdList();
-	console.log(idList);
-	var lastId = idList[ idList.length - 1 ];
-	var idInt = parseInt( lastId, 36 );
-	idInt++;
-	return idInt.toString(36);
-}
-function nextRoomId() {
-	var idList = sortedRoomIdList();
-	var lastId = idList[ idList.length - 1 ];
-	var idInt = parseInt( lastId, 36 );
-	idInt++;
-	return idInt.toString(36);
-}
 
 /* ROOM */
 var drawMapGrid = true;
 var roomIndex = 0;
 
+/* ENDINGS */
+var endingIndex = 0;
+
+/* UNIQUE ID METHODS */
+function nextTileId() {
+	return nextObjectId( sortedTileIdList() );
+}
+function nextSpriteId() {
+	return nextObjectId( sortedSpriteIdList() );
+}
+function nextRoomId() {
+	return nextObjectId( sortedRoomIdList() );
+}
+function nextObjectId(idList) {
+	var lastId = idList[ idList.length - 1 ];
+	var idInt = parseInt( lastId, 36 );
+	idInt++;
+	return idInt.toString(36);
+}
 
 /* BROWSER COMPATIBILITY */
 var browserFeatures = {
