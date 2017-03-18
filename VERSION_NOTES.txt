@@ -1,0 +1,69 @@
+v2.3:
+- easily see walls!
+- high contrast colors (black grid for light backgrounds)
+- remembers and restores animations you deleted
+- bugs fixed:
+-> temporary fix for file corruption issue
+-> couldn't toggle panels in Firefox
+-> wall checkbox didn't update on room change
+-> exits were always visible on reload
+-> new dialog was lost when switching sprites
+-> duplicated drawings didn't include animation
+
+v2.2:
+- see overlay of other frame while animating
+- change background color of exported game
+- apply wall settings to all rooms
+- bugs fixed:
+-> player could escape off-screen
+-> copied rooms changed each other
+-> exit options didn't update correctly
+
+v2.1:
+- unlimited sprites, tiles, and rooms!
+
+v2.0:
+- flipbook-style animation!
+-> animate any sprite or tile or avatar
+-> check "add animation" in the paint tab
+-> switch frames by selecting frame 1 or 2
+- sprite/tile thumbnails
+-> click a thumbnail to paint it!
+- easily duplicate rooms, sprites, and tiles
+- exits are easier to see
+- skip dialog with any key
+
+v1.4:
+- delete sprites, tiles, and rooms!<br>
+- use "new" button to start over<br>
+- fixed bug with exits when reloading files<br>
+- fixed bug with refreshing game data<br>
+
+v1.3:
+- re-import games from html files
+
+v1.2:
+- autosaving means you'll never lose your work! <br>
+- your open tools are remembered between sessions
+
+v1.1:
+- record gifs! (open from the toolbar)
+
+v1.0:
+- you can have multiple rooms in a game! <br>
+- add exits that connect rooms <br>
+- a toolbar for showing/hiding tool windows <br>
+- you can minimize tools <br>
+- remove sprites from a room by clicking on them <br>
+- drag to add/delete tiles from room <br>
+
+v0.1:
+new features:
+- games have touch controls!
+bugfixes:
+- quotation marks in dialog don't break game
+- drawing on Surface devices works
+- pasting new game data refreshes everything
+- editor detects unsupported features
+- fix autocomplete color bug in Safari
+- limit number of sprites
