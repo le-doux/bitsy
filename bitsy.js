@@ -538,9 +538,15 @@ function moveSprites() {
 				spr.x = nextPos.x;
 				spr.y = nextPos.y;
 
-				//if the sprite hits an exit
+
+				var end = getEnding( spr.room, spr.x, spr.y );
 				var ext = getExit( spr.room, spr.x, spr.y );
-				if (ext) {
+				if (end) { //if the sprite hits an ending
+					if (id === "A") { // only the player can end the game
+						startNarrating( ending[end.id], true /*isEnding*/ );
+					}
+				}
+				else if (ext) { //if the sprite hits an exit
 					//move it to another scene
 					if (ext.dest.isEnd) {
 						if (id === "A") {
@@ -623,7 +629,11 @@ function onkeydown(e) {
 		}
 		
 		var ext = getExit( player().room, player().x, player().y );
-		if (ext) {
+		var end = getEnding( player().room, player().x, player().y );
+		if (end) {
+			startNarrating( ending[end.id], true /*isEnding*/ );
+		}
+		else if (ext) {
 			if (ext.dest.isEnd) {
 				startNarrating( ending[ext.dest.end], true /*isEnding*/ );
 			}
@@ -698,6 +708,16 @@ function isWall(x,y) {
 function getExit(roomId,x,y) {
 	for (i in room[roomId].exits) {
 		var e = room[roomId].exits[i];
+		if (x == e.x && y == e.y) {
+			return e;
+		}
+	}
+	return null;
+}
+
+function getEnding(roomId,x,y) {
+	for (i in room[roomId].endings) {
+		var e = room[roomId].endings[i];
 		if (x == e.x && y == e.y) {
 			return e;
 		}
@@ -848,6 +868,17 @@ function serializeWorld() {
 				}
 			}
 		}
+		if (room[id].endings.length > 0) {
+			/* ENDINGS */
+			for (j in room[id].endings) {
+				var e = room[id].endings[j];
+				// todo isEndingValid
+				console.log("SERIALIZE ENDING");
+				console.log(e);
+				worldStr += "END " + e.id + " " + e.x + "," + e.y;
+				worldStr += "\n";
+			}
+		}
 		if (room[id].pal != null) {
 			/* PALETTE */
 			worldStr += "PAL " + room[id].pal + "\n";
@@ -920,12 +951,21 @@ function placeSprites() {
 	}
 }
 
+/* ARGUMENT GETTERS */
 function getType(line) {
-	return line.split(" ")[0];
+	return getArg(line,0);
 }
 
 function getId(line) {
-	return line.split(" ")[1];
+	return getArg(line,1);
+}
+
+function getArg(line,arg) {
+	return line.split(" ")[arg];
+}
+
+function getCoord(line,arg) {
+	return getArg(line,arg).split(",");
 }
 
 function parseTitle(lines, i) {
@@ -941,6 +981,7 @@ function parseRoom(lines, i) {
 		tilemap : [],
 		walls : [],
 		exits : [],
+		endings : [],
 		pal : null
 	};
 	i++;
@@ -1040,6 +1081,17 @@ function parseRoom(lines, i) {
 			}
 			room[id].exits.push(ext);
 
+		}
+		else if (getType(lines[i]) === "END") {
+			/* ADD ENDING */
+			var endId = getId( lines[i] );
+			var endCoords = getCoord( lines[i], 2 );
+			var end = {
+				id : endId,
+				x : parseInt( endCoords[0] ),
+				y : parseInt( endCoords[1] )
+			};
+			room[id].endings.push(end);
 		}
 		else if (getType(lines[i]) === "PAL") {
 			/* CHOOSE PALETTE (that's not default) */

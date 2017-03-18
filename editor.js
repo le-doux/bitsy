@@ -532,6 +532,7 @@ function setDefaultGameState() {
 			],
 		walls : [],
 		exits : [],
+		endings : [],
 		pal : null
 	};
 	console.log("E");
