@@ -34,28 +34,28 @@ v2.0:
 - skip dialog with any key
 
 v1.4:
-- delete sprites, tiles, and rooms!<br>
-- use "new" button to start over<br>
-- fixed bug with exits when reloading files<br>
-- fixed bug with refreshing game data<br>
+- delete sprites, tiles, and rooms!
+- use "new" button to start over
+- fixed bug with exits when reloading files
+- fixed bug with refreshing game data
 
 v1.3:
 - re-import games from html files
 
 v1.2:
-- autosaving means you'll never lose your work! <br>
+- autosaving means you'll never lose your work! 
 - your open tools are remembered between sessions
 
 v1.1:
 - record gifs! (open from the toolbar)
 
 v1.0:
-- you can have multiple rooms in a game! <br>
-- add exits that connect rooms <br>
-- a toolbar for showing/hiding tool windows <br>
-- you can minimize tools <br>
-- remove sprites from a room by clicking on them <br>
-- drag to add/delete tiles from room <br>
+- you can have multiple rooms in a game! 
+- add exits that connect rooms 
+- a toolbar for showing/hiding tool windows 
+- you can minimize tools 
+- remove sprites from a room by clicking on them 
+- drag to add/delete tiles from room 
 
 v0.1:
 new features:

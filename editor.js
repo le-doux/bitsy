@@ -1869,55 +1869,66 @@ function exit_onMouseDown(e) {
 	drawExitDestinationRoom();
 }
 
-function showExitsPanel() {
-	// turn this into another core method? ( togglePanel -> togglePanelCore -> togglePanelInnerCore (lol) )
-	togglePanelCore("exitsPanel",true);
-	savePanelPref("exitsPanel",true);
-	document.getElementById("exitsCheck").checked = true;
+function togglePanel(e) {
+	togglePanelCore( e.target.value, e.target.checked );
+}
+
+function showPanel(id) {
+	togglePanelCore( id, true /*visible*/ );
+	//update checkbox
+	if (id != "toolsPanel")
+		document.getElementById(id.replace("Panel","Check")).checked = true;
 }
 
 function hidePanel(id) {
-	//update panel
-	document.getElementById(id).style.display = "none";
+	togglePanelCore( id, false /*visible*/ );
 	//update checkbox
 	if (id != "toolsPanel")
 		document.getElementById(id.replace("Panel","Check")).checked = false;
-	//hide exits
-	if (id === "exitsPanel") hideExits();
-	//save panel preferences
-	savePanelPref(id,false);
 }
 
-function togglePanel(e) {
+function togglePanelCore(id,visible) {
 	//hide/show panel
-	togglePanelCore(e.target.value, e.target.checked);
+	togglePanelUI( id, visible );
+	//any side effects
+	afterTogglePanel( id, visible );
 	//save panel preferences
-	savePanelPref(e.target.value, e.target.checked);
+	savePanelPref( id, visible );
 }
 
-function togglePanelCore(id,checked) {
-	if (checked) {
+function togglePanelUI(id,visible) {
+	if (visible) {
 		document.getElementById(id).style.display = "block";
-		if (id === "exitsPanel") showExits();
 	}
 	else {
 		document.getElementById(id).style.display = "none";
-		if (id === "exitsPanel") hideExits();
 	}
 }
 
-function savePanelPref(id,visible) {
-	console.log(" -- save panel pref -- ");
-	var prefs = localStorage.panel_prefs == null ? {} : JSON.parse( localStorage.panel_prefs );
-	console.log(prefs);
-	prefs[id] = visible;
-	console.log(prefs);
-	localStorage.setItem( "panel_prefs", JSON.stringify(prefs) );
+function afterTogglePanel(id,visible) {
+	if (visible) {
+		afterShowPanel(id);
+	}
+	else {
+		afterHidePanel(id);
+	}
 }
 
-function showToolsPanel() {
-	document.getElementById("toolsPanel").style.display = "block";
-	savePanelPref("toolsPanel",true);
+function afterShowPanel(id) {
+	if (id === "exitsPanel") showExits();
+}
+
+function afterHidePanel(id) {
+	if (id === "exitsPanel") hideExits();
+}
+
+function savePanelPref(id,visible) {
+	// console.log(" -- save panel pref -- ");
+	var prefs = localStorage.panel_prefs == null ? {} : JSON.parse( localStorage.panel_prefs );
+	// console.log(prefs);
+	prefs[id] = visible;
+	// console.log(prefs);
+	localStorage.setItem( "panel_prefs", JSON.stringify(prefs) );
 }
 
 function startRecordingGif() {

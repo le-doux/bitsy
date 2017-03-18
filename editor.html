@@ -117,9 +117,8 @@
 				font-size: 13px;
 				line-height: 150%;
 			}
-			#dialogText {
+			.dialogTextArea {
 				resize: none;
-				/*width: 95%;*/
 				font-size: 12px;
 				width: 32ch;
 			}
@@ -135,7 +134,7 @@
 	<body onload="start()">
 		<div id="topbar">
 			<input type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
-			<button onclick="showToolsPanel();" style="margin-left:20px;">show toolbar</button>
+			<button onclick="showPanel('toolsPanel');" style="margin-left:20px;">show toolbar</button>
 			<button onclick="newGameDialog();" style="margin-left:20px;">new game (start over!)</button>
 			<span id="bitsyEditorName">
 				Bitsy v2.3 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
@@ -153,6 +152,7 @@
 			<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/> about <br>
 			<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanel(event);" checked/> room <br>
 			<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanel(event);" /> exits <br>
+			<input type="checkbox" value="endingsPanel" id="endingsCheck" onclick="togglePanel(event);" /> endings <br>
 			<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanel(event);"  checked/> paint <br>
 			<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanel(event);"  checked/> colors <br>
 			<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanel(event);"  checked/> download <br>
@@ -263,7 +263,8 @@
 			<div id="roomCommands">
 				<button onclick="duplicateRoom();"> ++ duplicate </button>
 				<button onclick="deleteRoom();"> x delete x </button>
-				<button onclick="showExitsPanel();"> + add exits from this room to other rooms </button>
+				<button onclick="showPanel('exitsPanel');"> + add exits to other rooms </button>
+				<button onclick="showPanel('endingsPanel');"> + add endings </button>
 			</div>
 			<button onclick="toggleMapGrid();"> show/hide tile grid </button>
 			<button onclick="toggleCollisionMap();"> show/hide walls </button>
@@ -291,6 +292,21 @@
 					<button onclick="deleteSelectedExit();"> - delete selected exit </button>
 				</div>
 			</div>
+		</div>
+		<div id="endingsPanel" class="panel" style="display:block;">
+			<div class="bar">
+				endings <span class="minimize" onclick="hidePanel('endingsPanel');">[ - ]</span>
+			</div>
+			<div id="endingNav">
+				<!-- room <span id="roomId">0</span> -->
+				<button onclick="prevEnding();"> < prev </button>
+				<button onclick="nextEnding();"> next > </button>
+				<button onclick="newEnding();"> + new </button>
+				<button onclick="deleteEnding();"> x delete x </button>
+			</div>
+			<textarea id="endingText" class="dialogTextArea"></textarea>
+			<br>
+			<button onclick="addEnding();"> + place ending in room </button>
 		</div>
 		<div id="paintPanel" class="panel">
 			<div class="bar">
@@ -320,7 +336,7 @@
 			<div id="dialog" style="display:none;">dialog:
 				<!-- <input type="text" id="dialogText" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"> --> 
 				<br>
-				<textarea id="dialogText" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"></textarea> <!-- rows="2" cols="32" -->
+				<textarea id="dialogText" class="dialogTextArea" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"></textarea> <!-- rows="2" cols="32" -->
 			</div>
 			<div id="isAnimated" style="display:none;">add animation <input type="checkbox" id="animatedCheckbox" onchange="on_toggle_animated();"> </div>
 			<div id="animation" style="display:none;">
