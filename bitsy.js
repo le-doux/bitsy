@@ -851,7 +851,7 @@ function serializeWorld() {
 				}
 			}
 		}
-		if (room[id].endings && room[id].endings.length > 0) { //null check is a hack - why are rooms created without any endings?
+		if (room[id].endings.length > 0) {
 			/* ENDINGS */
 			for (j in room[id].endings) {
 				var e = room[id].endings[j];

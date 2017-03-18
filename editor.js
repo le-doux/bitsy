@@ -724,6 +724,7 @@ function newRoom() {
 			],
 		walls : [],
 		exits : [],
+		endings : [],
 		pal : null
 	};
 	refreshGameData();
