@@ -985,7 +985,7 @@ function nextObjectId(idList) {
 }
 
 function sortedTileIdList() {
-	return sortedTileIdList( tile );
+	return sortedBase36IdList( tile );
 }
 
 function sortedSpriteIdList() {
