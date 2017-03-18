@@ -230,23 +230,6 @@ var roomIndex = 0;
 /* ENDINGS */
 var endingIndex = 0;
 
-/* UNIQUE ID METHODS */
-function nextTileId() {
-	return nextObjectId( sortedTileIdList() );
-}
-function nextSpriteId() {
-	return nextObjectId( sortedSpriteIdList() );
-}
-function nextRoomId() {
-	return nextObjectId( sortedRoomIdList() );
-}
-function nextObjectId(idList) {
-	var lastId = idList[ idList.length - 1 ];
-	var idInt = parseInt( lastId, 36 );
-	idInt++;
-	return idInt.toString(36);
-}
-
 /* BROWSER COMPATIBILITY */
 var browserFeatures = {
 	colorPicker : false,
@@ -981,16 +964,40 @@ function reloadSprite() {
 
 }
 
+/* UNIQUE ID METHODS */ // TODO - lots of duplicated code around stuff (ex: all these things with IDs)
+function nextTileId() {
+	return nextObjectId( sortedTileIdList() );
+}
+
+function nextSpriteId() {
+	return nextObjectId( sortedSpriteIdList() );
+}
+
+function nextRoomId() {
+	return nextObjectId( sortedRoomIdList() );
+}
+
+function nextObjectId(idList) {
+	var lastId = idList[ idList.length - 1 ];
+	var idInt = parseInt( lastId, 36 );
+	idInt++;
+	return idInt.toString(36);
+}
+
 function sortedTileIdList() {
-	return Object.keys( tile ).sort().sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
+	return sortedTileIdList( tile );
 }
 
 function sortedSpriteIdList() {
-	return Object.keys( sprite ).sort().sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
+	return sortedBase36IdList( sprite );
 }
 
 function sortedRoomIdList() {
-	return Object.keys( room ).sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
+	return sortedBase36IdList( room );
+}
+
+function sortedBase36IdList( objHolder ) {
+	return Object.keys( objHolder ).sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
 }
 
 var isDragAddingTiles = false;
