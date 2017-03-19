@@ -275,6 +275,7 @@
 			</div>
 			<button onclick="addExit();" id="addExitButton"> + add new exit to this room </button>
 			<span id="addingExitHelpText" style="display:none;"><i>click space in room to add exit</i></span>
+			<!-- todo needs a cancel button -->
 			<div id="editSelectedExit">
 				<div id="noExitSelected">
 					<i>no exit selected</i>
@@ -302,11 +303,15 @@
 				<button onclick="prevEnding();"> < prev </button>
 				<button onclick="nextEnding();"> next > </button>
 				<button onclick="newEnding();"> + new </button>
-				<button onclick="deleteEnding();"> x delete x </button>
+				<!-- <button onclick="deleteEnding();"> x delete x </button> -->
 			</div>
-			<textarea id="endingText" class="dialogTextArea"></textarea>
+			<textarea id="endingText" class="dialogTextArea" onkeydown="on_change_ending();" onkeyup="on_change_ending();" onchange="on_change_ending();"></textarea>
 			<br>
 			<button onclick="addEnding();"> + place ending in room </button>
+			<span style="display:none;"> click tile in room to add ending </span>
+			<!-- todo needs a cancel button -->
+			<br>
+			<button onclick="removeSelectedEnding();" style="display:none;"> - remove selected ending </button>
 		</div>
 		<div id="paintPanel" class="panel">
 			<div class="bar">

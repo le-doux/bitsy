@@ -333,29 +333,26 @@ function start() {
 
 	//load panel preferences
 	var prefs = localStorage.panel_prefs == null ? {} : JSON.parse( localStorage.panel_prefs );
-	console.log(prefs);
+	// console.log(prefs);
 	if (prefs != null) {
 		for (id in prefs) {
-			console.log(id + " " + prefs[id]);
+			// console.log(id + " " + prefs[id]);
 			togglePanelCore(id, prefs[id]);
-			if (id != "toolsPanel")
-				document.getElementById(id.replace("Panel","Check")).checked = prefs[id];
 		}
 	}
-
-	//show/hide exits
-	(document.getElementById("exitsPanel").style.display === "block") ? showExits() : hideExits();
 
 	//draw everything
 	on_paint_avatar();
 	drawPaintCanvas();
 	drawEditMap();
+	reloadEnding();
 
 	drawPaintNavThumbnailCanvas();
 	setInterval( function() {
 		paintNavThumbnailAnimationFrameIndex = ( paintNavThumbnailAnimationFrameIndex + 1 ) % 2;
 		drawPaintNavThumbnailCanvas();
 	}, animationTime ); // animate the thumbnails of sprites / tiles
+
 
 	//load engine for export
 	loadEngineScript();
@@ -978,6 +975,10 @@ function nextRoomId() {
 	return nextObjectId( sortedRoomIdList() );
 }
 
+function nextEndingId() {
+	return nextObjectId( sortedEndingIdList() );
+}
+
 function nextObjectId(idList) {
 	var lastId = idList[ idList.length - 1 ];
 	var idInt = parseInt( lastId, 36 );
@@ -995,6 +996,10 @@ function sortedSpriteIdList() {
 
 function sortedRoomIdList() {
 	return sortedBase36IdList( room );
+}
+
+function sortedEndingIdList() {
+	return sortedBase36IdList( ending );
 }
 
 function sortedBase36IdList( objHolder ) {
@@ -1880,16 +1885,10 @@ function togglePanel(e) {
 
 function showPanel(id) {
 	togglePanelCore( id, true /*visible*/ );
-	//update checkbox
-	if (id != "toolsPanel")
-		document.getElementById(id.replace("Panel","Check")).checked = true;
 }
 
 function hidePanel(id) {
 	togglePanelCore( id, false /*visible*/ );
-	//update checkbox
-	if (id != "toolsPanel")
-		document.getElementById(id.replace("Panel","Check")).checked = false;
 }
 
 function togglePanelCore(id,visible) {
@@ -1902,12 +1901,11 @@ function togglePanelCore(id,visible) {
 }
 
 function togglePanelUI(id,visible) {
-	if (visible) {
-		document.getElementById(id).style.display = "block";
-	}
-	else {
-		document.getElementById(id).style.display = "none";
-	}
+	//update panel
+	document.getElementById(id).style.display = visible ? "block" : "none";
+	//update checkbox
+	if (id != "toolsPanel")
+		document.getElementById(id.replace("Panel","Check")).checked = visible;
 }
 
 function afterTogglePanel(id,visible) {
@@ -2179,8 +2177,57 @@ function on_change_color_page() {
 	exportPageColor = hex;
 }
 
+/* ENDINGS */
+function hasEndings() {
+	return Object.keys(ending).length > 0;
+}
+
+function on_change_ending() { //todo get rid of these underscore functions uggh
+	var curEndingId = "0"; //default in case no endings have been created yet
+	if ( hasEndings() ) curEndingId = sortedEndingIdList()[endingIndex];
+	ending[ curEndingId ] = document.getElementById("endingText").value;
+	refreshGameData();
+}
+
+function newEnding() {
+	if ( !hasEndings() ) return; //do nothin
+
+	// create new ending and save the data
+	var id = nextEndingId();
+	ending[ id ] = "";
+	refreshGameData();
+
+	// change the UI
+	endingIndex = Object.keys(ending).length - 1;
+	reloadEnding();
+}
+
+function prevEnding() {
+	// update index
+	endingIndex = (endingIndex - 1);
+	if (endingIndex < 0) endingIndex = Object.keys(ending).length - 1;
+
+	// change the UI
+	reloadEnding();
+}
+
+function nextEnding() {
+	// update index
+	endingIndex = (endingIndex + 1);
+	if (endingIndex >= Object.keys(ending).length) endingIndex = 0;
+
+	// change the UI
+	reloadEnding();
+}
+
+function reloadEnding() {
+	var id = sortedEndingIdList()[ endingIndex ];
+	document.getElementById("endingText").value = ending[ id ];
+}
+
 /**
  * From: http://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
+ *
  * Converts an RGB color value to HSL. Conversion formula
  * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
  * Assumes r, g, and b are contained in the set [0, 255] and
