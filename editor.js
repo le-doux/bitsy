@@ -1022,10 +1022,16 @@ function map_onMouseDown(e) {
 		//select exit
 		setSelectedExit( getExit(curRoom,x,y) );
 	}
-	else if (isAddingExit) {
+	else if (isAddingExit) { //todo - mutually exclusive with adding an ending?
 		//add exit
-		if ( getExit(curRoom,x,y) == null ) {
+		if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
 			addExitToCurRoom(x,y);
+		}
+	}
+	else if (isAddingEnding) {
+		//add ending
+		if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
+			addEndingToCurRoom(x,y);
 		}
 	}
 	else if (drawingId != null) {
@@ -2224,6 +2230,58 @@ function reloadEnding() {
 	var id = sortedEndingIdList()[ endingIndex ];
 	document.getElementById("endingText").value = ending[ id ];
 }
+
+var isAddingEnding = false;
+var selectedEndingTile = null;
+function addEnding() {
+	isAddingEnding = true;
+	// setSelectedEnding(null);
+	document.getElementById("addEndingButton").style.display = "none";
+	document.getElementById("addingEndingHelpText").style.display = "block";
+}
+
+function addEndingToCurRoom(x,y) {
+	isAddingEnding = false;
+	document.getElementById("addEndingButton").style.display = "block";
+	document.getElementById("addingEndingHelpText").style.display = "none";
+	var id = sortedEndingIdList()[ endingIndex ];
+	var newEnding = {
+		x : x,
+		y : y,
+		id : id
+	}
+	room[ curRoom ].endings.push( newEnding );
+	refreshGameData();
+	// setSelectedEnding(newExit);
+}
+
+/*
+function setSelectedEnding(e) { //todo
+	selectedExit = e;
+
+	if (selectedExit == null) {
+		document.getElementById("noExitSelected").style.display = "block";
+		document.getElementById("exitSelected").style.display = "none";
+	}
+	else {
+		document.getElementById("noExitSelected").style.display = "none";
+		document.getElementById("exitSelected").style.display = "block";
+
+		selectedExitRoom = selectedExit.dest.room;
+		var destOptions = document.getElementById("exitDestinationSelect").options;
+		for (i in destOptions) {
+			var o = destOptions[i];
+			if (o.value === selectedExitRoom) {
+				o.selected = true;
+			}
+		}
+
+		drawExitDestinationRoom();
+	}
+
+	drawEditMap();
+}
+*/
 
 /**
  * From: http://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion

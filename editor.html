@@ -307,10 +307,9 @@
 			</div>
 			<textarea id="endingText" class="dialogTextArea" onkeydown="on_change_ending();" onkeyup="on_change_ending();" onchange="on_change_ending();"></textarea>
 			<br>
-			<button onclick="addEnding();"> + place ending in room </button>
-			<span style="display:none;"> click tile in room to add ending </span>
+			<button id="addEndingButton" onclick="addEnding();"> + place ending in room </button>
+			<span id="addingEndingHelpText" style="display:none;"> click space in room to add ending </span>
 			<!-- todo needs a cancel button -->
-			<br>
 			<button onclick="removeSelectedEnding();" style="display:none;"> - remove selected ending </button>
 		</div>
 		<div id="paintPanel" class="panel">
