@@ -299,18 +299,18 @@
 				endings <span class="minimize" onclick="hidePanel('endingsPanel');">[ - ]</span>
 			</div>
 			<div id="endingNav">
-				<!-- room <span id="roomId">0</span> -->
 				<button onclick="prevEnding();"> < prev </button>
 				<button onclick="nextEnding();"> next > </button>
 				<button onclick="newEnding();"> + new </button>
 				<!-- <button onclick="deleteEnding();"> x delete x </button> -->
 			</div>
+			ending <span id="endingId">0</span><br>
 			<textarea id="endingText" class="dialogTextArea" onkeydown="on_change_ending();" onkeyup="on_change_ending();" onchange="on_change_ending();"></textarea>
 			<br>
 			<button id="addEndingButton" onclick="addEnding();"> + place ending in room </button>
 			<span id="addingEndingHelpText" style="display:none;"> click space in room to add ending </span>
 			<!-- todo needs a cancel button -->
-			<button onclick="removeSelectedEnding();" style="display:none;"> - remove selected ending </button>
+			<button id="removeEndingButton" onclick="removeSelectedEnding();" style="display:none;"> - remove selected ending </button>
 		</div>
 		<div id="paintPanel" class="panel">
 			<div class="bar">

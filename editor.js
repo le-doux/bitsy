@@ -1012,15 +1012,13 @@ function map_onMouseDown(e) {
 	var off = getOffset(e);
 	var x = Math.floor( off.x / (tilesize*scale) );
 	var y = Math.floor( off.y / (tilesize*scale) );
-	console.log(x + " " + y);
-	//var row = room[curRoom].tilemap[y];
-	if (selectedExit != null && getExit(curRoom,x,y) == null) {
-		//de-select exit
-		setSelectedExit(null);
-	}
-	else if (areExitsVisible && getExit(curRoom,x,y) != null) {
-		//select exit
-		setSelectedExit( getExit(curRoom,x,y) );
+	// console.log(x + " " + y);
+
+	var didSelectedExitChange = areExitsVisible ? setSelectedExit( getExit(curRoom,x,y) ) : false;
+	var didSelectedEndingChange = areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;
+
+	if (didSelectedExitChange || didSelectedEndingChange) {
+		//don't do anything else
 	}
 	else if (isAddingExit) { //todo - mutually exclusive with adding an ending?
 		//add exit
@@ -1248,6 +1246,29 @@ function drawEditMap() {
 			ctx.fillText( "To room " + e.dest.room, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
 
 			//todo (tilesize*scale) should be a function
+		}
+		ctx.globalAlpha = 1;
+	}
+
+	//draw endings
+	if (areEndingsVisible) {
+		for (i in room[curRoom].endings) {
+			var e = room[curRoom].endings[i];
+			if (e == selectedEndingTile) {
+				ctx.fillStyle = "#ff0";
+				ctx.globalAlpha = 0.9;
+			}
+			else {
+				ctx.fillStyle = getContrastingColor();
+				ctx.globalAlpha = 0.5;
+			}
+			ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
+			ctx.strokeStyle = getComplimentingColor();
+			ctx.globalAlpha = 1.0;
+			ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+
+			ctx.font = '14px sans-serif';
+			ctx.fillText( "To ending " + e.id, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
 		}
 		ctx.globalAlpha = 1;
 	}
@@ -1754,6 +1775,7 @@ function hideExits() {
 function addExit() { //todo rename something less vague
 	isAddingExit = true;
 	setSelectedExit(null);
+	setSelectedEnding(null);
 	document.getElementById("addExitButton").style.display = "none";
 	document.getElementById("addingExitHelpText").style.display = "block";
 }
@@ -1777,6 +1799,8 @@ function addExitToCurRoom(x,y) {
 }
 
 function setSelectedExit(e) {
+	var didChange = selectedExit != e;
+
 	selectedExit = e;
 
 	if (selectedExit == null) {
@@ -1800,6 +1824,8 @@ function setSelectedExit(e) {
 	}
 
 	drawEditMap();
+
+	return didChange;
 }
 
 function deleteSelectedExit() {
@@ -1925,10 +1951,12 @@ function afterTogglePanel(id,visible) {
 
 function afterShowPanel(id) {
 	if (id === "exitsPanel") showExits();
+	if (id === "endingsPanel") showEndings();
 }
 
 function afterHidePanel(id) {
 	if (id === "exitsPanel") hideExits();
+	if (id === "endingsPanel") hideEndings();
 }
 
 function savePanelPref(id,visible) {
@@ -2184,6 +2212,10 @@ function on_change_color_page() {
 }
 
 /* ENDINGS */
+var isAddingEnding = false;
+var selectedEndingTile = null;
+var areEndingsVisible = false;
+
 function hasEndings() {
 	return Object.keys(ending).length > 0;
 }
@@ -2206,6 +2238,8 @@ function newEnding() {
 	// change the UI
 	endingIndex = Object.keys(ending).length - 1;
 	reloadEnding();
+
+	setSelectedEnding(null);
 }
 
 function prevEnding() {
@@ -2215,6 +2249,8 @@ function prevEnding() {
 
 	// change the UI
 	reloadEnding();
+
+	setSelectedEnding(null);
 }
 
 function nextEnding() {
@@ -2224,18 +2260,20 @@ function nextEnding() {
 
 	// change the UI
 	reloadEnding();
+
+	setSelectedEnding(null);
 }
 
 function reloadEnding() {
 	var id = sortedEndingIdList()[ endingIndex ];
+	document.getElementById("endingId").innerHTML = id;
 	document.getElementById("endingText").value = ending[ id ];
 }
 
-var isAddingEnding = false;
-var selectedEndingTile = null;
 function addEnding() {
 	isAddingEnding = true;
-	// setSelectedEnding(null);
+	setSelectedExit(null);
+	setSelectedEnding(null);
 	document.getElementById("addEndingButton").style.display = "none";
 	document.getElementById("addingEndingHelpText").style.display = "block";
 }
@@ -2249,39 +2287,47 @@ function addEndingToCurRoom(x,y) {
 		x : x,
 		y : y,
 		id : id
-	}
+	};
 	room[ curRoom ].endings.push( newEnding );
 	refreshGameData();
-	// setSelectedEnding(newExit);
+	setSelectedEnding( newEnding );
 }
 
-/*
-function setSelectedEnding(e) { //todo
-	selectedExit = e;
+function showEndings() {
+	// resetExitVars(); -- what's this for?
+	areEndingsVisible = true;
+	drawEditMap();
+}
 
-	if (selectedExit == null) {
-		document.getElementById("noExitSelected").style.display = "block";
-		document.getElementById("exitSelected").style.display = "none";
+function hideEndings() {
+	areEndingsVisible = false;
+	drawEditMap();
+}
+
+function setSelectedEnding(e) { //todo
+	var didChange = selectedEndingTile != e;
+
+	selectedEndingTile = e;
+
+	if (selectedEndingTile == null) {
+		document.getElementById("removeEndingButton").style.display = "none";
 	}
 	else {
-		document.getElementById("noExitSelected").style.display = "none";
-		document.getElementById("exitSelected").style.display = "block";
-
-		selectedExitRoom = selectedExit.dest.room;
-		var destOptions = document.getElementById("exitDestinationSelect").options;
-		for (i in destOptions) {
-			var o = destOptions[i];
-			if (o.value === selectedExitRoom) {
-				o.selected = true;
-			}
-		}
-
-		drawExitDestinationRoom();
+		endingIndex = sortedEndingIdList().indexOf( e.id );
+		reloadEnding();
+		document.getElementById("removeEndingButton").style.display = "block";
 	}
 
 	drawEditMap();
+
+	return didChange;
 }
-*/
+
+function removeSelectedEnding() {
+	room[curRoom].endings.splice( room[curRoom].endings.indexOf( selectedEndingTile ), 1 );
+	refreshGameData();
+	setSelectedEnding(null);
+}
 
 /**
  * From: http://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
