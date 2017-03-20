@@ -137,7 +137,8 @@ function load_game(game_data) {
 }
 
 function reset_cur_game() {
-	if (curGameData != null);
+	if (curGameData == null) return; //can't reset if we don't have the game data
+	stopGame();
 	clearGameData();
 	load_game(curGameData);
 }
@@ -366,6 +367,7 @@ function getOffset(evt) {
 }
 
 function stopGame() {
+	console.log("STOP GAME?");
 	document.removeEventListener('keydown', onkeydown);
 	clearInterval(update_interval);
 }
