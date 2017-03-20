@@ -259,12 +259,16 @@
 				<button onclick="prevRoom();"> < prev </button>
 				<button onclick="nextRoom();"> next > </button>
 				<button onclick="newRoom();"> + new </button>
-			</div>
-			<div id="roomCommands">
 				<button onclick="duplicateRoom();"> ++ duplicate </button>
 				<button onclick="deleteRoom();"> x delete x </button>
+			</div>
+			<div id="roomCommands">
 				<button onclick="showPanel('exitsPanel');"> + add exits to other rooms </button>
 				<button onclick="showPanel('endingsPanel');"> + add endings </button>
+				color palette: 
+				<select id="roomPaletteSelect" onchange="roomPaletteChange(event);">
+					<option value="0">palette 0</option> <!-- other options are added dynamically -->
+				</select>
 			</div>
 			<button onclick="toggleMapGrid();"> show/hide tile grid </button>
 			<button onclick="toggleCollisionMap();"> show/hide walls </button>
@@ -356,6 +360,7 @@
 			<div class="bar">
 				colors <span class="minimize" onclick="hidePanel('colorsPanel');">[ - ]</span>
 			</div>
+			<div id="paletteIdContainer" style="display:none;">palette <span id="paletteId">0</span></div>
 			<input type="color" value="#0052cc" id="backgroundColor" onchange="on_change_color_bg();" autocomplete="off"> background <br>
 			<input type="color" value="#809fff" id="tileColor" onchange="on_change_color_tile();" autocomplete="off"> tile <br>
 			<input type="color" value="#ffffff" id="spriteColor" onchange="on_change_color_sprite();" autocomplete="off"> sprite <br>
@@ -363,12 +368,11 @@
 				Having trouble choosing hex colors? <br>
 				Try this online <a href="http://www.w3schools.com/colors/colors_picker.asp" target="_blank">color picker</a>.
 			</div>
-			<div id="roomNav">
-				palette <span id="roomId">0</span><br>
-				<button onclick="prevRoom();"> < prev </button>
-				<button onclick="nextRoom();"> next > </button>
-				<button onclick="newRoom();"> + new </button>
+			<div id="paletteNav" style="display:none;">
+				<button onclick="prevPalette();"> < prev </button>
+				<button onclick="nextPalette();"> next > </button>
 			</div>
+			<button onclick="newPalette();"> + new color palette</button>
 		</div>
 		<div id="downloadPanel" class="panel">
 			<div class="bar">

@@ -3,6 +3,7 @@
 - fixed bug with animated tiles
 - dialog textarea matches size of dialog box in game
 - endings!
+- multiple palettes!
 
 next?
 - multiple palettes
@@ -207,7 +208,6 @@ var paint_nav_ctx;
 
 var paintMode = TileType.Avatar;
 var drawingId = "A";
-var drawingPal = "0";
 var drawPaintGrid = true;
 var curPaintBrush = 0;
 var isPainting = false;
@@ -223,6 +223,13 @@ var roomIndex = 0;
 
 /* ENDINGS */
 var endingIndex = 0;
+
+/* PALETTES */
+var paletteIndex = 0;
+function selectedColorPal() {
+	return sortedPaletteIdList()[ paletteIndex ];
+};
+// var drawingPal = "0";
 
 /* BROWSER COMPATIBILITY */
 var browserFeatures = {
@@ -339,6 +346,7 @@ function start() {
 	on_paint_avatar();
 	drawPaintCanvas();
 	drawEditMap();
+	updateRoomPaletteSelect(); //dumb to have to specify this here --- wrap up room UI method?
 	reloadEnding();
 
 	drawPaintNavThumbnailCanvas();
@@ -387,7 +395,7 @@ function setDefaultGameState() {
 	isCurDrawingAnimated = false;
 	//default values
 	title = "Write your game's title here";
-	palette[drawingPal] = [
+	palette[selectedColorPal()] = [
 		[0,82,204],
 		[128,159,255],
 		[255,255,255]
@@ -475,7 +483,7 @@ function setDefaultGameState() {
 		walls : [],
 		exits : [],
 		endings : [],
-		pal : null
+		pal : "0"
 	};
 	console.log("E");
 	refreshGameData();
@@ -501,7 +509,7 @@ function drawPaintNavThumbnailCanvas() {
 	var realTileSize = tilesize * scale;
 
 	//background
-	paint_nav_ctx.fillStyle = "rgb("+palette[drawingPal][0][0]+","+palette[drawingPal][0][1]+","+palette[drawingPal][0][2]+")";
+	paint_nav_ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
 	paint_nav_ctx.fillRect(0,0,paint_nav_canvas.width,paint_nav_canvas.height);
 
 	//draw sprites/tiles
@@ -510,13 +518,13 @@ function drawPaintNavThumbnailCanvas() {
 		var tileIndex = tileIdList.indexOf( drawingId );
 		var tileId = tileIdList[ tileIndex ];
 		// draw selected tile
-		drawTile( getTileImage( tile[ tileId ], paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
+		drawTile( getTileImage( tile[ tileId ], curPal(), paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
 		// draw previous tiles
 		for (i = 2; i >= 0; i-- ) {
 			tileIndex--;
 			if (tileIndex >= 0) {
 				tileId = tileIdList[ tileIndex ];
-				drawTile( getTileImage( tile[ tileId ], paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
+				drawTile( getTileImage( tile[ tileId ], curPal(), paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
 			}
 		}
 		// draw next tiles
@@ -525,7 +533,7 @@ function drawPaintNavThumbnailCanvas() {
 			tileIndex++;
 			if (tileIndex < tileIdList.length) {
 				tileId = tileIdList[ tileIndex ];
-				drawTile( getTileImage( tile[ tileId ], paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
+				drawTile( getTileImage( tile[ tileId ], curPal(), paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
 			}
 		}
 	}
@@ -534,13 +542,13 @@ function drawPaintNavThumbnailCanvas() {
 		var spriteIndex = spriteIdList.indexOf( drawingId );
 		var spriteId = spriteIdList[ spriteIndex ];
 		// draw selected sprite
-		drawSprite( getSpriteImage( sprite[ spriteId ], paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
+		drawSprite( getSpriteImage( sprite[ spriteId ], curPal(), paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
 		// draw previous sprites
 		for (i = 2; i >= 0; i-- ) {
 			spriteIndex--;
 			if (spriteIndex >= 1) {
 				spriteId = spriteIdList[ spriteIndex ];
-				drawSprite( getSpriteImage( sprite[ spriteId ], paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
+				drawSprite( getSpriteImage( sprite[ spriteId ], curPal(), paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
 			}
 		}
 		// draw next sprites
@@ -549,13 +557,13 @@ function drawPaintNavThumbnailCanvas() {
 			spriteIndex++;
 			if (spriteIndex < spriteIdList.length) {
 				spriteId = spriteIdList[ spriteIndex ];
-				drawSprite( getSpriteImage( sprite[ spriteId ], paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
+				drawSprite( getSpriteImage( sprite[ spriteId ], curPal(), paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
 			}
 		}
 	}
 	else if ( paintMode === TileType.Avatar ) {
 		// draw selected sprite
-		drawSprite( getSpriteImage( sprite[ drawingId ], paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
+		drawSprite( getSpriteImage( sprite[ drawingId ], curPal(), paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
 	}
 
 	//highlight selected drawing
@@ -629,6 +637,8 @@ function nextRoom() {
 	roomIndex = (roomIndex + 1) % ids.length;
 	curRoom = ids[roomIndex];
 	drawEditMap();
+	drawPaintCanvas();
+	updateRoomPaletteSelect();
 
 	if (paintMode === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -642,6 +652,8 @@ function prevRoom() {
 	if (roomIndex < 0) roomIndex = (ids.length-1);
 	curRoom = ids[roomIndex];
 	drawEditMap();
+	drawPaintCanvas();
+	updateRoomPaletteSelect();
 
 	if (paintMode === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -677,6 +689,8 @@ function duplicateRoom() {
 	curRoom = newRoomId;
 	//console.log(curRoom);
 	drawEditMap();
+	drawPaintCanvas();
+	updateRoomPaletteSelect();
 
 	document.getElementById("roomId").innerHTML = curRoom;
 
@@ -716,13 +730,15 @@ function newRoom() {
 		walls : [],
 		exits : [],
 		endings : [],
-		pal : null
+		pal : "0"
 	};
 	refreshGameData();
 
 	curRoom = roomId;
 	//console.log(curRoom);
 	drawEditMap();
+	drawPaintCanvas();
+	updateRoomPaletteSelect();
 
 	document.getElementById("roomId").innerHTML = curRoom;
 
@@ -744,6 +760,8 @@ function deleteRoom() {
 		refreshGameData();
 		nextRoom();
 		drawEditMap();
+		drawPaintCanvas();
+		updateRoomPaletteSelect();
 		//recreate exit options
 	}
 }
@@ -973,6 +991,10 @@ function nextEndingId() {
 	return nextObjectId( sortedEndingIdList() );
 }
 
+function nextPaletteId() {
+	return nextObjectId( sortedPaletteIdList() );
+}
+
 function nextObjectId(idList) {
 	var lastId = idList[ idList.length - 1 ];
 	var idInt = parseInt( lastId, 36 );
@@ -994,6 +1016,10 @@ function sortedRoomIdList() {
 
 function sortedEndingIdList() {
 	return sortedBase36IdList( ending );
+}
+
+function sortedPaletteIdList() {
+	return sortedBase36IdList( palette );
 }
 
 function sortedBase36IdList( objHolder ) {
@@ -1147,15 +1173,15 @@ function paint_onMouseUp(e) {
 
 function drawPaintCanvas() {
 	//background
-	paint_ctx.fillStyle = "rgb("+palette[drawingPal][0][0]+","+palette[drawingPal][0][1]+","+palette[drawingPal][0][2]+")";
+	paint_ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
 	paint_ctx.fillRect(0,0,canvas.width,canvas.height);
 
 	//pixel color
 	if (paintMode == TileType.Tile) {
-		paint_ctx.fillStyle = "rgb("+palette[drawingPal][1][0]+","+palette[drawingPal][1][1]+","+palette[drawingPal][1][2]+")";
+		paint_ctx.fillStyle = "rgb("+palette[curPal()][1][0]+","+palette[curPal()][1][1]+","+palette[curPal()][1][2]+")";
 	}
 	else if (paintMode == TileType.Sprite || paintMode == TileType.Avatar) {
-		paint_ctx.fillStyle = "rgb("+palette[drawingPal][2][0]+","+palette[drawingPal][2][1]+","+palette[drawingPal][2][2]+")";
+		paint_ctx.fillStyle = "rgb("+palette[curPal()][2][0]+","+palette[curPal()][2][1]+","+palette[curPal()][2][2]+")";
 	}
 
 	//draw pixels
@@ -1398,6 +1424,35 @@ function on_change_title() {
 	refreshGameData();
 }
 
+/* PALETTE STUFF */
+function updatePaletteUI() {
+	document.getElementById("paletteId").innerHTML = selectedColorPal();
+	if ( Object.keys(palette).length > 1 ) {
+		document.getElementById("paletteIdContainer").style.display = "block";
+		document.getElementById("paletteNav").style.display = "block";
+	}
+	else {
+		document.getElementById("paletteIdContainer").style.display = "none";
+		document.getElementById("paletteNav").style.display = "none";
+	}
+	updatePaletteOptionsFromGameData();
+	updatePaletteControlsFromGameData();
+	if (!browserFeatures.colorPicker) {
+		updatePaletteBorders();
+	}
+}
+
+function updateRoomPaletteSelect() {
+	var palOptions = document.getElementById("roomPaletteSelect").options;
+	for (i in palOptions) {
+		var o = palOptions[i];
+		console.log(o);
+		if (o.value === curPal()) {
+			o.selected = true;
+		}
+	}
+}
+
 function updatePaletteBorders() {
 	console.log("UPDATE PALETTE BORDERS");
 	//feature to show selected colors in browsers that don't support a color picker
@@ -1408,9 +1463,9 @@ function updatePaletteBorders() {
 
 function on_change_color_bg() {
 	var rgb = hexToRgb( document.getElementById("backgroundColor").value );
-	palette[drawingPal][0][0] = rgb.r;
-	palette[drawingPal][0][1] = rgb.g;
-	palette[drawingPal][0][2] = rgb.b;
+	palette[selectedColorPal()][0][0] = rgb.r;
+	palette[selectedColorPal()][0][1] = rgb.g;
+	palette[selectedColorPal()][0][2] = rgb.b;
 	refreshGameData();
 	renderImages();
 	drawPaintCanvas();
@@ -1423,9 +1478,9 @@ function on_change_color_bg() {
 
 function on_change_color_tile() {
 	var rgb = hexToRgb( document.getElementById("tileColor").value );
-	palette[drawingPal][1][0] = rgb.r;
-	palette[drawingPal][1][1] = rgb.g;
-	palette[drawingPal][1][2] = rgb.b;
+	palette[selectedColorPal()][1][0] = rgb.r;
+	palette[selectedColorPal()][1][1] = rgb.g;
+	palette[selectedColorPal()][1][2] = rgb.b;
 	refreshGameData();
 	renderImages();
 	drawPaintCanvas();
@@ -1438,9 +1493,9 @@ function on_change_color_tile() {
 
 function on_change_color_sprite() {
 	var rgb = hexToRgb( document.getElementById("spriteColor").value );
-	palette[drawingPal][2][0] = rgb.r;
-	palette[drawingPal][2][1] = rgb.g;
-	palette[drawingPal][2][2] = rgb.b;
+	palette[selectedColorPal()][2][0] = rgb.r;
+	palette[selectedColorPal()][2][1] = rgb.g;
+	palette[selectedColorPal()][2][2] = rgb.b;
 	refreshGameData();
 	renderImages();
 	drawPaintCanvas();
@@ -1449,6 +1504,71 @@ function on_change_color_sprite() {
 	if (!browserFeatures.colorPicker) {
 		updatePaletteBorders();
 	}
+}
+
+function updatePaletteOptionsFromGameData() {
+	var select = document.getElementById("roomPaletteSelect");
+
+	// first, remove all current options
+	var i;
+	for(i = select.options.length - 1 ; i >= 0 ; i--) {
+		select.remove(i);
+	}
+
+	// then, add an option for each room
+	for (palId in palette) {
+		var option = document.createElement("option");
+		option.text = "palette " + palId;
+		option.value = palId;
+		select.add(option);
+	}
+}
+
+function updatePaletteControlsFromGameData() {
+	document.getElementById("backgroundColor").value = rgbToHex(palette[selectedColorPal()][0][0], palette[selectedColorPal()][0][1], palette[selectedColorPal()][0][2]);
+	document.getElementById("tileColor").value = rgbToHex(palette[selectedColorPal()][1][0], palette[selectedColorPal()][1][1], palette[selectedColorPal()][1][2]);
+	document.getElementById("spriteColor").value = rgbToHex(palette[selectedColorPal()][2][0], palette[selectedColorPal()][2][1], palette[selectedColorPal()][2][2]);
+}
+
+function prevPalette() {
+	// update index
+	paletteIndex = (paletteIndex - 1);
+	if (paletteIndex < 0) paletteIndex = Object.keys(palette).length - 1;
+
+	// change the UI
+	updatePaletteUI();
+}
+
+function nextPalette() {
+	// update index
+	paletteIndex = (paletteIndex + 1);
+	if (paletteIndex >= Object.keys(palette).length) paletteIndex = 0;
+
+	// change the UI
+	updatePaletteUI();
+}
+
+function newPalette() {
+	// create new ending and save the data
+	var id = nextPaletteId();
+	palette[ id ] = [
+		[255,255,255],
+		[255,255,255],
+		[255,255,255]
+	];
+	refreshGameData();
+
+	// change the UI
+	paletteIndex = Object.keys(palette).length - 1;
+	updatePaletteUI();
+}
+
+function roomPaletteChange(event) {
+	var palId = event.target.value;
+	room[curRoom].pal = palId;
+	refreshGameData();
+	drawEditMap();
+	drawPaintCanvas();
 }
 
 //hex-to-rgb method borrowed from stack overflow
@@ -1571,7 +1691,7 @@ function on_game_data_change_core() {
 				],
 			walls : [],
 			exits : [],
-			pal : null
+			pal : "0"
 		};
 	}
 
@@ -1589,10 +1709,8 @@ function on_game_data_change_core() {
 		reloadSprite();
 	}
 
-	updatePaletteControlsFromGameData();
-	if (!browserFeatures.colorPicker) {
-		updatePaletteBorders();
-	}
+
+	updatePaletteUI();
 
 	updateExitOptionsFromGameData();
 
@@ -1616,12 +1734,6 @@ function updateExitOptionsFromGameData() {
 		select.add(option);
 	}
 
-}
-
-function updatePaletteControlsFromGameData() {
-	document.getElementById("backgroundColor").value = rgbToHex(palette["0"][0][0], palette["0"][0][1], palette["0"][0][2]);
-	document.getElementById("tileColor").value = rgbToHex(palette["0"][1][0], palette["0"][1][1], palette["0"][1][2]);
-	document.getElementById("spriteColor").value = rgbToHex(palette["0"][2][0], palette["0"][2][1], palette["0"][2][2]);
 }
 
 function on_toggle_wall() {
@@ -1837,14 +1949,16 @@ function exitDestinationRoomChange(event) {
 
 function drawExitDestinationRoom() {
 	//clear screen
-	exit_ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
+	console.log(selectedExitRoom);
+	var roomPal = getRoomPal(selectedExitRoom);
+	exit_ctx.fillStyle = "rgb("+palette[roomPal][0][0]+","+palette[roomPal][0][1]+","+palette[roomPal][0][2]+")";
 	exit_ctx.fillRect(0,0,canvas.width,canvas.height);
 
 	//draw map
 	drawRoom( room[selectedExitRoom], exit_ctx );
 
 	//draw grid
-	exit_ctx.fillStyle = getContrastingColor();
+	exit_ctx.fillStyle = getContrastingColor( roomPal );
 	for (var x = 1; x < mapsize; x++) {
 		exit_ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
 	}
@@ -2357,9 +2471,9 @@ function rgbToHsl(r, g, b){
     return [h, s, l];
 }
 
-// todo - what about multiple palettes?
-function getContrastingColor() {
-	var hsl = rgbToHsl( palette["0"][0][0], palette["0"][0][1], palette["0"][0][2] );
+function getContrastingColor(palId) {
+	if (!palId) palId = curPal();
+	var hsl = rgbToHsl( palette[palId][0][0], palette[palId][0][1], palette[palId][0][2] );
 	// console.log(hsl);
 	var lightness = hsl[2];
 	if (lightness > 0.5) {
@@ -2370,8 +2484,9 @@ function getContrastingColor() {
 	}
 }
 
-function getComplimentingColor() {
-	var hsl = rgbToHsl( palette["0"][0][0], palette["0"][0][1], palette["0"][0][2] );
+function getComplimentingColor(palId) {
+	if (!palId) palId = curPal();
+	var hsl = rgbToHsl( palette[palId][0][0], palette[palId][0][1], palette[palId][0][2] );
 	// console.log(hsl);
 	var lightness = hsl[2];
 	if (lightness > 0.5) {

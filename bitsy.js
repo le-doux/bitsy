@@ -1322,7 +1322,7 @@ function drawTile(img,x,y,context) {
 	context.putImageData(img,x*tilesize*scale,y*tilesize*scale);
 }
 
-function drawSprite(img,x,y,context) { //this may differ later
+function drawSprite(img,x,y,context) { //this may differ later (or not haha)
 	drawTile(img,x,y,context);
 }
 
@@ -1339,7 +1339,7 @@ function drawRoom(room,context) {
 				}
 				else {
 					// console.log(id);
-					drawTile( getTileImage(tile[id]), j, i, context );
+					drawTile( getTileImage(tile[id],getRoomPal(room.id)), j, i, context );
 				}
 			}
 		}
@@ -1348,14 +1348,16 @@ function drawRoom(room,context) {
 	for (id in sprite) {
 		var spr = sprite[id];
 		if (spr.room === room.id) {
-			drawSprite( getSpriteImage(spr), spr.x, spr.y, context );
+			drawSprite( getSpriteImage(spr,getRoomPal(room.id)), spr.x, spr.y, context );
 		}
 	}
 }
 
-function getTileImage(t,frameIndex) {
-	//console.log(t);
+function getTileImage(t,palId,frameIndex) {
 	var drwId = t.drw;
+
+	if (!palId) palId = curPal();
+
 	if ( t.animation.isAnimated ) {
 		if (frameIndex) { // use optional provided frame index
 			drwId += "_" + frameIndex;
@@ -1364,11 +1366,14 @@ function getTileImage(t,frameIndex) {
 			drwId += "_" + t.animation.frameIndex;
 		}
 	}
-	return imageStore.render[curPal()][t.col][drwId];
+	return imageStore.render[ palId ][ t.col ][ drwId ];
 }
 
-function getSpriteImage(s,frameIndex) {
+function getSpriteImage(s,palId,frameIndex) {
 	var drwId = s.drw;
+
+	if (!palId) palId = curPal();
+
 	if ( s.animation.isAnimated ) {
 		if (frameIndex) {
 			drwId += "_" + frameIndex;
@@ -1377,29 +1382,30 @@ function getSpriteImage(s,frameIndex) {
 			drwId += "_" + s.animation.frameIndex;
 		}
 	}
-	return imageStore.render[curPal()][s.col][drwId];
+
+	return imageStore.render[ palId ][ s.col ][ drwId ];
 }
 
 function curPal() {
-	//console.log(curRoom);
-	//console.log(room[curRoom]);
-	// var err = new Error();
-	// console.log(curRoom);
-	// console.log(err.stack);
-	if (room[curRoom].pal != null) {
+	return getRoomPal(curRoom);
+}
+
+function getRoomPal(roomId) {
+	if (room[roomId].pal != null) {
 		//a specific palette was chosen
-		return room[curRoom].pal;
+		return room[roomId].pal;
 	}
 	else {
-		if (curRoom in palette) {
+		if (roomId in palette) {
 			//there is a palette matching the name of the room
-			return curRoom;
+			return roomId;
 		}
 		else {
 			//use the default palette
 			return "0";
 		}
 	}
+	return "0";	
 }
 
 /* DIALOG */
@@ -1552,7 +1558,7 @@ function onExitDialog() {
 
 function drawNextDialogChar() {
 	//draw the character
-	var nextChar = curDialog[curLine][curRow][curChar];
+	var nextChar = curDialog[curLine][curRow][curChar]; //todo - there's a bug here sometimes on speed text (but it doesn't really break anything)
 	drawDialogChar(nextChar, curRow, curChar);
 
 	nextCharTimer = 0; //reset timer
