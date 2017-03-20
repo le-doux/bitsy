@@ -1136,6 +1136,8 @@ function map_onMouseUp(e) {
 }
 
 function paint_onMouseDown(e) {
+	if (isPlayMode) return; //can't paint during play mode
+
 	var off = getOffset(e);
 	var x = Math.floor(off.x / paint_scale);
 	var y = Math.floor(off.y / paint_scale);
@@ -1161,10 +1163,12 @@ function paint_onMouseMove(e) {
 }
 
 function paint_onMouseUp(e) {
-	isPainting = false;
-	renderImages();
-	refreshGameData();
-	drawEditMap();
+	if (isPainting) {
+		isPainting = false;
+		renderImages();
+		refreshGameData();
+		drawEditMap();
+	}
 }
 
 function drawPaintCanvas() {
@@ -1377,6 +1381,8 @@ function resetGameData() {
 }
 
 function refreshGameData() {
+	if (isPlayMode) return; //never store game data while in playmode (TODO: wouldn't be necessary if the game data was decoupled form editor data)
+
 	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
 	var gameData = serializeWorld();
 	//console.log("refresh!");
@@ -1386,19 +1392,19 @@ function refreshGameData() {
 }
 
 function on_edit_mode() {
+	isPlayMode = false;
 	stopGame();
 	// TODO I should really do more to separate the editor's game-data from the engine's game-data
 	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
 	curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
 	drawEditMap();
 	listenMapEditEvents();
-	isPlayMode = false;
 }
 
 function on_play_mode() {
+	isPlayMode = true;
 	unlistenMapEditEvents();
 	load_game(document.getElementById("game_data").value);
-	isPlayMode = true;
 }
 
 function toggleGrid() {
