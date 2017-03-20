@@ -100,7 +100,8 @@ var key = {
 	w : 87,
 	a : 65,
 	s : 83,
-	d : 68
+	d : 68,
+	r : 82
 };
 
 var prevTime = 0;
@@ -640,6 +641,12 @@ function onkeydown(e) {
 			}
 		}
 
+		/* RESTART GAME */
+		if ( e.keyCode === key.r && ( e.getModifierState("Control") || e.getModifierState("Meta") ) ) {
+			if ( confirm("Restart the game?") ) {
+				reset_cur_game();
+			}
+		}
 	}
 
 }
