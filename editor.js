@@ -4,11 +4,7 @@
 - dialog textarea matches size of dialog box in game
 - endings!
 - multiple palettes!
-
-next?
-- multiple palettes
-- game reset button?
-- clean up TODOs
+- restart the game
 
 TODO NOW
 - * UI mockup for leaf *
@@ -78,7 +74,6 @@ from laura michet
 - map for rooms
 - want to see all my tiles at once
 - character limit on sprite dialog (sort of fixed with the dialog box textarea)
-- key to restart game
 
 my ideas
 - text effects
@@ -395,6 +390,7 @@ function setDefaultGameState() {
 	isCurDrawingAnimated = false;
 	//default values
 	title = "Write your game's title here";
+	paletteIndex = 0;
 	palette[selectedColorPal()] = [
 		[0,82,204],
 		[128,159,255],
@@ -1373,7 +1369,8 @@ function resetGameData() {
 	renderImages();
 	drawPaintCanvas();
 	drawEditMap();
-	updatePaletteControlsFromGameData();
+	updatePaletteUI();
+	// updatePaletteControlsFromGameData();
 
 	on_paint_avatar();
 	document.getElementById('paintOptionAvatar').checked = true;
