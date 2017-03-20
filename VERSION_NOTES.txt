@@ -1,3 +1,11 @@
+v3.0:
+- add endings to your game!
+- you can have multiple color palettes (one per room)
+- restart the game with ctrl-r or cmd-r
+- dialog textbox matches size of dialog box in game
+- bug: you could edit sprites during play mode
+- fixed a bug with animated tiles
+
 v2.3:
 - easily see walls!
 - high contrast colors (black grid for light backgrounds)

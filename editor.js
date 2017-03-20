@@ -1,11 +1,4 @@
 /* 
-2.4 so far (3.0?)
-- fixed bug with animated tiles
-- dialog textarea matches size of dialog box in game
-- endings!
-- multiple palettes!
-- restart the game
-
 TODO NOW
 - * UI mockup for leaf *
 	- keep emailing

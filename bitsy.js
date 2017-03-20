@@ -45,8 +45,8 @@ var spriteStartLocations = {};
 
 /* VERSION */
 var version = {
-	major: 2,
-	minor: 3
+	major: 3,
+	minor: 0
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
