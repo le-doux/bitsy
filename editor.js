@@ -1,8 +1,13 @@
 /* 
-2.4 so far
+2.4 so far (3.0?)
 - fixed bug with animated tiles
 - dialog textarea matches size of dialog box in game
-- endings in file format!
+- endings!
+
+next?
+- multiple palettes
+- game reset button?
+- clean up TODOs
 
 TODO NOW
 - * UI mockup for leaf *
@@ -56,7 +61,6 @@ USABILITY THREAD
 - bug: test things in firefox
 - bug: (firefox?) if you write dialog after placing a sprite, the textfield clears itself (no repro)
 - editable room names
-- dialog box should be textarea
 - line breaks for dialog
 - downloadable Bitsy (electron?)
 - RPG mechanics: enemies, items???
@@ -72,19 +76,11 @@ USABILITY THREAD
 from laura michet
 - map for rooms
 - want to see all my tiles at once
-- character limit on sprite dialog
-- end game condition
-- key to restart game)
-
-
-TODO NEXT?
-- end editor (list of endings)
-- go to ending from exit
-- optional: got to ending after talking to sprite
+- character limit on sprite dialog (sort of fixed with the dialog box textarea)
+- key to restart game
 
 my ideas
 - text effects
-- end as a new "room"
 - triggers
 - transition animations
 - walking animations
@@ -173,8 +169,6 @@ v2.0???
 			? set variable command
 			?? narrative blocks
 			?? STRICT MODE where text can only fit on one page
-
-		- bitsy player v3
 
 
 USER FEEDBACK
