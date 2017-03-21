@@ -2370,6 +2370,7 @@ function nextEnding() {
 }
 
 function reloadEnding() {
+	if ( !hasEndings() ) return; //do nothin
 	var id = sortedEndingIdList()[ endingIndex ];
 	document.getElementById("endingId").innerHTML = id;
 	document.getElementById("endingText").value = ending[ id ];
