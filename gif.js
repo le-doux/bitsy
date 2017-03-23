@@ -44,31 +44,38 @@ this.encode = function(gifData, callback) {
 		//static gif
 		gifArr = imageDescriptor( gifArr, 0, 0, gifData.width, gifData.height );
 		gifArr = imageData( gifArr, gifData.frames[0], colorTable );
+
+		//end gif
+		gifArr = trailer( gifArr );
+
+		//regular js
+		returnAsDataUri( gifArr, callback );
 	}
 	else if (gifData.frames.length > 1) {
 		//animated gif
 		gifArr = animationApplicationExtension(gifArr, gifData.loops);
-		for (var i = 0; i < gifData.frames.length; i++) {
-			gifArr = animationGraphicsControlExtension( gifArr, gifData.delay );
-			gifArr = imageDescriptor( gifArr, 0, 0, gifData.width, gifData.height );
-			gifArr = imageData( gifArr, gifData.frames[i], colorTable );
-		}
+		//render one frame per update loop
+		var i = 0;
+		var loop = setInterval( function() {
+			if (i < gifData.frames.length) {
+				//record one frame
+				gifArr = animationGraphicsControlExtension( gifArr, gifData.delay );
+				gifArr = imageDescriptor( gifArr, 0, 0, gifData.width, gifData.height );
+				gifArr = imageData( gifArr, gifData.frames[i], colorTable );
+				i++;
+			}
+			else {
+				//end gif
+				gifArr = trailer( gifArr );
+
+				//regular js
+				returnAsDataUri( gifArr, callback );
+
+				//stop loop
+				clearInterval( loop );
+			}
+		}, 100);
 	}
-
-	//end gif
-	gifArr = trailer( gifArr );
-
-	//node js
-	/*
-	//convert gif into buffer
-	var buf = arrayToBuffer( gifArr );
-
-	//callback
-	callback(buf);
-	*/
-
-	//regular js
-	returnAsDataUri( gifArr, callback );
 }
 
 //deprecated
