@@ -3,6 +3,7 @@ v3.0:
 - you can have multiple color palettes (one per room)
 - restart the game with ctrl-r or cmd-r
 - dialog textbox matches size of dialog box in game
+- gif encoding doesn't freeze the whole browser tab
 - bug: you could edit sprites during play mode
 - fixed a bug with animated tiles
 
