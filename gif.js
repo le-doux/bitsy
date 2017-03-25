@@ -78,6 +78,10 @@ this.encode = function(gifData, callback) {
 	}
 }
 
+this.setAsync = function(isAsync, operationCount) {
+	//todo
+}
+
 //deprecated
 /*
 function save(gifArr, fileName) {
@@ -256,6 +260,77 @@ function packCode(codeStream, code, codeSize) {
 	return codeStream;
 }
 
+
+//TODO async LZW compression
+// LZW compression
+// The GIF format is always compressed.
+// This algorithm is the most processing intensive part of the code, so we'll make it run asynchronously
+
+// Store current state of the lzw algorithm, so it can be run asynchronously (is this the best design?)
+/*
+var lzwState = {
+
+}
+
+function lzwSetup(indexStream, colors, lzwMinimumCodeSize) {
+	//the code table stores patterns of color indices and pairs them with codes
+	var codeMap = new Map();
+	for (i in colors) { //assumes the colors array has a power of 2 length
+		codeMap.set(i + ",", codeMap.size);
+	}
+	codeMap.set(CLEAR_CODE, codeMap.size);
+	codeMap.set(EOI_CODE, codeMap.size);
+
+	//the index buffer stores the indices we're trying to match with a code
+	var indexStreamIndex = 0;
+	var indexBuffer = "";
+	// PERF NOTES: 
+	// - We don't do indexStream.shift because it's super slow in JS.
+	// - We use Map() instead of an object because indexing is faster.
+	// - We use a string for the buffer instead of an array because map can't use arrays as keys.
+	indexBuffer += indexStream[indexStreamIndex] + ",";
+	indexStreamIndex++;
+
+	//smallest code size is lzwMin + 1, to accomodate the clear code and EOI code
+	var codeSize = lzwMinimumCodeSize + 1;
+
+	//need to do all the image blocks in here right now --- refactor?
+	var imageBlocks = [];
+
+	// LZW algorithm
+	var codeStream = initCodeStream();
+	codeStream = packCode(codeStream, codeMap.get(CLEAR_CODE), codeSize);
+}
+
+function lzwAlgorithm() {
+
+}
+
+function lzwEnd() {
+
+}
+*/
+
+/*
+	variables used inside the loop
+	- indexStream
+	- colors
+	- lzwMinimumCodeSize
+	- codeMap
+	- indexStreamIndex
+	- indexBuffer
+	- codeSize
+	- imageBlocks
+	- codeStream
+
+	variables used after the loop
+	- codeStream
+	- codeMap
+	- indexBuffer
+	- codeSize
+	- imageBlocks
+*/
+
 //TODO
 // - clean up this function (split into sub-functions)
 // LZW compression turns an index stream into a compressed code stream
@@ -274,9 +349,10 @@ function lzw(indexStream, colors, lzwMinimumCodeSize) {
 	//the index buffer stores the indices we're trying to match with a code
 	var indexStreamIndex = 0;
 	var indexBuffer = "";
-	// PERF NOTE we don't do indexStream.shift because it's super slow in JS
-	// PERF NOTE we use Map() instead of an object because indexing is faster
-	// PERF NOTE we use a string for the buffer instead of an array because map can't use arrays as keys?
+	// PERF NOTES: 
+	// - We don't do indexStream.shift because it's super slow in JS.
+	// - We use Map() instead of an object because indexing is faster.
+	// - We use a string for the buffer instead of an array because map can't use arrays as keys.
 	indexBuffer += indexStream[indexStreamIndex] + ",";
 	indexStreamIndex++;
 
@@ -306,16 +382,12 @@ function lzw(indexStream, colors, lzwMinimumCodeSize) {
 			var nextCode = codeMap.size;
 			codeMap.set(indexBufferPlusK, nextCode);
 
-			//write current code & restart index buffer
 			if (!codeMap.has(indexBuffer)) {
-				/*
-				console.log(indexBuffer);
-				console.log("undefined code for " + indexBuffer);
-				console.log(codeMap);
-				*/
+				// failure: there is no matching code for the current indexBuffer
 				return [];
 			}
 
+			//write current code & restart index buffer
 			codeStream = packCode(codeStream, codeMap.get(indexBuffer), codeSize);
 			indexBuffer = indexStream[indexStreamIndex] + ",";
 
