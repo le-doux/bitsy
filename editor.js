@@ -1,4 +1,26 @@
 /* 
+
+v4 features
+- refactor
+	- modularize engine
+		- engine
+		- renderer
+		- game-data
+		- parser
+		- font
+	- modularize editor
+- re-do UI
+	- moveable windows
+	- icons
+	- modularized windows?
+	- cuter "branding"?
+	- think through ALL existing features and how they work together (or not)
+	- make everything MORE VISIBLE
+	- UI animations
+	- ? dialog preview thing
+	- ? rename everything with aliases (rooms, sprites, endings, etc)
+
+
 TODO NOW
 - * UI mockup for leaf *
 	- keep emailing
@@ -12,7 +34,7 @@ TODO NOW
 	- give/receive items
 	- game responds ot having / not having an item (dialog, doors??)
 
-v3 candidate features
+v5 candidate features
 - triggers
 	- first gen goal: extensible, enables "inventory" system
 		- or just create an inventory system? and let people re-appropriate it?
@@ -1764,6 +1786,7 @@ function apply_wall_setting_all_rooms() {
 }
 
 var engineScript;
+var fontScript;
 function loadEngineScript() {
 	var client = new XMLHttpRequest();
 	client.open('GET', './bitsy.js');
@@ -1771,8 +1794,16 @@ function loadEngineScript() {
 	  engineScript = client.responseText;
 	}
 	client.send();
+
+	//hacky
+	var clientFont = new XMLHttpRequest();
+	clientFont.open('GET', './font.js');
+	clientFont.onreadystatechange = function() {
+	  fontScript = clientFont.responseText;
+	}
+	clientFont.send();
 }
-var webExportTemplate = "<!DOCTYPE HTML>\n<html>\n<head>\n<title>@@T</title>\n<style>\nhtml {height:592px;}\nbody {width:100%; height:100%; overflow:hidden; background:@@B;}\n#game {background:black;margin: 0 auto;margin-top: 40px;display: block;}\n</style>\n<script>\n@@E\n<\/script>\n</head>\n<body onload='startExportedGame()'>\n<canvas id='game'>\n</canvas>\n</body>\n</html>";
+var webExportTemplate = "<!DOCTYPE HTML>\n<html>\n<head>\n<title>@@T</title>\n<style>\nhtml {height:592px;}\nbody {width:100%; height:100%; overflow:hidden; background:@@B;}\n#game {background:black;margin: 0 auto;margin-top: 40px;display: block;}\n</style>\n<script>\n@@F\n<\/script>\n<script>\n@@E\n<\/script>\n</head>\n<body onload='startExportedGame()'>\n<canvas id='game'>\n</canvas>\n</body>\n</html>";
 	
 function exportGame() {
 	refreshGameData(); //just in case
@@ -1786,6 +1817,8 @@ function exportGame() {
 	console.log(html);
 	var pageBackgroundColorIndex = html.indexOf("@@B");
 	html = html.substr(0,pageBackgroundColorIndex) + exportPageColor + html.substr(pageBackgroundColorIndex+3);
+	var fontIndex = html.indexOf("@@F");
+	html = html.substr(0,fontIndex) + fontScript + html.substr(fontIndex+3);
 	var engineIndex = html.indexOf("@@E");
 	html = html.substr(0,engineIndex) + engineScript + html.substr(engineIndex+3);
 	console.log(html);
