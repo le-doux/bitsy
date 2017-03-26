@@ -1,25 +1,3 @@
-/*
-	Hi! If you can see this, that means your browser doesn't support
-	downloading your bitsy game directly.
-
-	Don't panic!
-
-	All you need to do now is save this page as an ".html" file.
-	You should be able to use cmd-s or ctrl-s to save. Then
-	you may be given multiple download formats; if so, pick
-	"page source" or the closest looking thing.
-
-	The most important thing is when you save, you name the file
-	"mygame.html" or something similar. Your browser may ask
-	to append ".txt" or something, but don't do that. It should
-	end in ".html" so your computer knows it's a webpage. 
-
-	Now you should be able to click on your game and play it 
-	in your browser!
-
-	- adam
-*/
-
 var xhr;
 var canvas;
 var context;
@@ -113,20 +91,17 @@ var onPlayerMoved = null;
 var didDialogUpdateThisFrame = false;
 var onDialogUpdate = null;
 
-//only used by games exported from the editor
-var exportedGameData = "@@D";
-function startExportedGame() {
-	canvas = document.getElementById("game");
-	canvas.width = width * scale;
-	canvas.height = width * scale;
-	ctx = canvas.getContext("2d");
-	load_game(exportedGameData);
-}
-
 function getGameNameFromURL() {
 	var game = window.location.hash.substring(1);
 	console.log("game name --- " + game);
 	return game;
+}
+
+function attachCanvas(c) {
+	canvas = c;
+	canvas.width = width * scale;
+	canvas.height = width * scale;
+	ctx = canvas.getContext("2d");
 }
 
 var curGameData = null;

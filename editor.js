@@ -7,8 +7,9 @@ v4 features
 		- renderer
 		- game-data
 		- parser
-		- font
+		X font
 	- modularize editor
+		X exporter
 - re-do UI
 	- moveable windows
 	- icons
@@ -253,6 +254,9 @@ var isRecordingGif = false;
 var gifFrameData = [];
 var isPlayMode = false;
 
+/* EXPORT HTML */
+var exporter = new Exporter();
+
 function detectBrowserFeatures() {
 	//test feature support
 	try {
@@ -364,10 +368,6 @@ function start() {
 		paintNavThumbnailAnimationFrameIndex = ( paintNavThumbnailAnimationFrameIndex + 1 ) % 2;
 		drawPaintNavThumbnailCanvas();
 	}, animationTime ); // animate the thumbnails of sprites / tiles
-
-
-	//load engine for export
-	loadEngineScript();
 
 	//unsupported feature stuff
 	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
@@ -1785,73 +1785,10 @@ function apply_wall_setting_all_rooms() {
 	refreshGameData();
 }
 
-var engineScript;
-var fontScript;
-function loadEngineScript() {
-	var client = new XMLHttpRequest();
-	client.open('GET', './bitsy.js');
-	client.onreadystatechange = function() {
-	  engineScript = client.responseText;
-	}
-	client.send();
-
-	//hacky
-	var clientFont = new XMLHttpRequest();
-	clientFont.open('GET', './font.js');
-	clientFont.onreadystatechange = function() {
-	  fontScript = clientFont.responseText;
-	}
-	clientFont.send();
-}
-var webExportTemplate = "<!DOCTYPE HTML>\n<html>\n<head>\n<title>@@T</title>\n<style>\nhtml {height:592px;}\nbody {width:100%; height:100%; overflow:hidden; background:@@B;}\n#game {background:black;margin: 0 auto;margin-top: 40px;display: block;}\n</style>\n<script>\n@@F\n<\/script>\n<script>\n@@E\n<\/script>\n</head>\n<body onload='startExportedGame()'>\n<canvas id='game'>\n</canvas>\n</body>\n</html>";
-	
 function exportGame() {
 	refreshGameData(); //just in case
 	var gameData = document.getElementById("game_data").value; //grab game data
-	gameData = escapeSpecialCharacters( gameData ); //escape quotes and slashes
-	gameData = gameData.split("\n").join("\\n"); //replace newlines with escaped newlines
-	var html = webExportTemplate.substr(); //copy template
-	console.log(html);
-	var titleIndex = html.indexOf("@@T");
-	html = html.substr(0,titleIndex) + title + html.substr(titleIndex+3);
-	console.log(html);
-	var pageBackgroundColorIndex = html.indexOf("@@B");
-	html = html.substr(0,pageBackgroundColorIndex) + exportPageColor + html.substr(pageBackgroundColorIndex+3);
-	var fontIndex = html.indexOf("@@F");
-	html = html.substr(0,fontIndex) + fontScript + html.substr(fontIndex+3);
-	var engineIndex = html.indexOf("@@E");
-	html = html.substr(0,engineIndex) + engineScript + html.substr(engineIndex+3);
-	console.log(html);
-	var gameDataIndex = html.indexOf("@@D");
-	html = html.substr(0,gameDataIndex) + gameData + html.substr(gameDataIndex+3);
-	console.log(html);
-	downloadFile("mygame.html",html);
-}
-
-function escapeSpecialCharacters(str) {
-	str = str.replace(/\\/g, '\\\\');
-	str = str.replace(/"/g, '\\"');
-	return str;
-}
-
-function unescapeSpecialCharacters(str) {
-	str = str.replace(/\\"/g, '"');
-	str = str.replace(/\\\\/g, '\\');
-	return str;
-}
-
-function downloadFile(filename, text) {
-	var element = document.createElement('a');
-	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-	element.setAttribute('download', filename);
-	element.setAttribute('target', '_blank');
-
-	element.style.display = 'none';
-	document.body.appendChild(element);
-
-	element.click();
-
-	document.body.removeChild(element);
+	exporter.exportGame( gameData, title, exportPageColor, "mygame.html" ); //download as html file
 }
 
 function hideAbout() {
@@ -2161,26 +2098,7 @@ function importGameFromFile(e) {
 
 	reader.onloadend = function() {
 		var fileText = reader.result;
-
-		// find start of game data
-		var i = fileText.indexOf("var exportedGameData");
-		while ( fileText.charAt(i) != '"' ) {
-			i++; // move to first quote
-		}
-		i++; // move past first quote
-
-		// isolate game data
-		var gameDataStr = "";
-		var isEscapeChar = false;
-		while ( fileText.charAt(i) != '"' || isEscapeChar ) {
-			gameDataStr += fileText.charAt(i);
-			isEscapeChar = fileText.charAt(i) == "\\";
-			i++;
-		}
-
-		// replace special characters
-		gameDataStr = gameDataStr.replace(/\\n/g, "\n"); //todo: move this into the method below
-		gameDataStr = unescapeSpecialCharacters( gameDataStr );
+		gameDataStr = exporter.importGame( fileText );
 		
 		// change game data & reload everything
 		document.getElementById("game_data").value = gameDataStr;
