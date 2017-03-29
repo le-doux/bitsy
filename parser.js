@@ -3,9 +3,9 @@ function BitsyGameData() {
 	// X room
 	// how to do getter / setters properly? (don't do it for now)
 	// X flags
-	// resetFlags() (might not be needed with this set up since they're "reset" on game data creation)
-	// placeSprites()
-	// spriteStartLocations ?? (should be in parser temp variable)
+	// X resetFlags() (might not be needed with this set up since they're "reset" on game data creation)
+	// X placeSprites()
+	// X spriteStartLocations ?? (should be in parser temp variable)
 	// player() (save for engine)
 	// curRoom (save for engine)
 	// X palette
@@ -14,10 +14,10 @@ function BitsyGameData() {
 	// X imageStore.source (rename this??? drawing)
 	// X dialog
 	// X ending
-	// getEngineVersion() (part of game data... or parser? or??)
+	// X getEngineVersion() (part of game data... or parser? or??)
 	//		- this concept could be clarified: there's an engine verison, an editor version, and a file format version (in theory)
 	// how do I pass the game data around in the parser/serializer? (do I give it to it at creation? or attach it? or pass it down?)
-	// isExitValid()
+	// X isExitValid()
 
 	this.title = "";
 	this.room = {};
@@ -37,6 +37,16 @@ function BitsyGameData() {
 
 
 function Parser() {
+
+
+/* engine version */
+var version = {
+	major: 3,
+	minor: 0
+};
+function getEngineVersion() {
+	return version.major + "." + version.minor;
+}
 
 
 /* parsing */
@@ -435,22 +445,22 @@ this.serialize = function(gameData) {
 function serializeWorld() {
 	var worldStr = "";
 	/* TITLE */
-	worldStr += title + "\n";
+	worldStr += curGameData.title + "\n";
 	worldStr += "\n";
 	/* VERSION */
 	worldStr += "# BITSY VERSION " + getEngineVersion() + "\n"; // add version as a comment for debugging purposes
 	worldStr += "\n";
 	/* FLAGS */
-	for (f in flags) {
-		worldStr += "! " + f + " " + flags[f] + "\n";
+	for (f in curGameData.flags) {
+		worldStr += "! " + f + " " + curGameData.flags[f] + "\n";
 	}
 	worldStr += "\n"
 	/* PALETTE */
-	for (id in palette) {
+	for (id in curGameData.palette) {
 		worldStr += "PAL " + id + "\n";
-		for (i in palette[id]) {
-			for (j in palette[id][i]) {
-				worldStr += palette[id][i][j];
+		for (i in curGameData.palette[id]) {
+			for (j in curGameData.palette[id][i]) {
+				worldStr += curGameData.palette[id][i][j];
 				if (j < 2) worldStr += ",";
 			}
 			worldStr += "\n";
@@ -458,89 +468,90 @@ function serializeWorld() {
 		worldStr += "\n";
 	}
 	/* ROOM */
-	for (id in room) {
+	for (id in curGameData.room) {
 		worldStr += "ROOM " + id + "\n";
-		if ( flags.ROOM_FORMAT == 0 ) {
+		if ( curGameData.flags.ROOM_FORMAT == 0 ) {
 			// old non-comma separated format
-			for (i in room[id].tilemap) {
-				for (j in room[id].tilemap[i]) {
-					worldStr += room[id].tilemap[i][j];	
+			for (i in curGameData.room[id].tilemap) {
+				for (j in curGameData.room[id].tilemap[i]) {
+					worldStr += curGameData.room[id].tilemap[i][j];	
 				}
 				worldStr += "\n";
 			}
 		}
-		else if ( flags.ROOM_FORMAT == 1 ) {
+		else if ( curGameData.flags.ROOM_FORMAT == 1 ) {
 			// new comma separated format
-			for (i in room[id].tilemap) {
-				for (j in room[id].tilemap[i]) {
-					worldStr += room[id].tilemap[i][j];
-					if (j < room[id].tilemap[i].length-1) worldStr += ","
+			for (i in curGameData.room[id].tilemap) {
+				for (j in curGameData.room[id].tilemap[i]) {
+					worldStr += curGameData.room[id].tilemap[i][j];
+					if (j < curGameData.room[id].tilemap[i].length-1) worldStr += ","
 				}
 				worldStr += "\n";
 			}
 		}
-		if (room[id].walls.length > 0) {
+		if (curGameData.room[id].walls.length > 0) {
 			/* WALLS */
 			worldStr += "WAL ";
-			for (j in room[id].walls) {
-				worldStr += room[id].walls[j];
-				if (j < room[id].walls.length-1) {
+			for (j in curGameData.room[id].walls) {
+				worldStr += curGameData.room[id].walls[j];
+				if (j < curGameData.room[id].walls.length-1) {
 					worldStr += ",";
 				}
 			}
 			worldStr += "\n";
 		}
-		if (room[id].exits.length > 0) {
+		if (curGameData.room[id].exits.length > 0) {
 			/* EXITS */
-			for (j in room[id].exits) {
-				var e = room[id].exits[j];
+			for (j in curGameData.room[id].exits) {
+				var e = curGameData.room[id].exits[j];
 				if ( isExitValid(e) ) {
 					worldStr += "EXT " + e.x + "," + e.y + " " + e.dest.room + " " + e.dest.x + "," + e.dest.y;
 					worldStr += "\n";
 				}
 			}
 		}
-		if (room[id].endings.length > 0) {
+		if (curGameData.room[id].endings.length > 0) {
 			/* ENDINGS */
-			for (j in room[id].endings) {
-				var e = room[id].endings[j];
+			for (j in curGameData.room[id].endings) {
+				var e = curGameData.room[id].endings[j];
 				// todo isEndingValid
 				worldStr += "END " + e.id + " " + e.x + "," + e.y;
 				worldStr += "\n";
 			}
 		}
-		if (room[id].pal != null) {
+		if (curGameData.room[id].pal != null) {
 			/* PALETTE */
-			worldStr += "PAL " + room[id].pal + "\n";
+			worldStr += "PAL " + curGameData.room[id].pal + "\n";
 		}
 		worldStr += "\n";
 	}
 	/* TILES */
-	for (id in tile) {
+	for (id in curGameData.tile) {
 		worldStr += "TIL " + id + "\n";
 		worldStr += serializeDrawing( "TIL_" + id );
 		worldStr += "\n";
 	}
 	/* SPRITES */
-	for (id in sprite) {
+	for (id in curGameData.sprite) {
 		worldStr += "SPR " + id + "\n";
 		worldStr += serializeDrawing( "SPR_" + id );
-		if (sprite[id].room != null) {
+		if (curGameData.sprite[id].room != null) {
+			var spr = curGameData.sprite[id];
 			/* SPRITE POSITION */
-			worldStr += "POS " + sprite[id].room + " " + sprite[id].x + "," + sprite[id].y + "\n";
+			worldStr += "POS " + spr.room + " " + spr.x + "," + spr.y + "\n";
 		}
 		worldStr += "\n";
 	}
 	/* DIALOG */
-	for (id in dialog) {
+	for (id in curGameData.dialog) {
 		worldStr += "DLG " + id + "\n";
-		worldStr += dialog[id] + "\n";
+		worldStr += curGameData.dialog[id] + "\n";
 		worldStr += "\n";
 	}
 	/* ENDINGS */
-	for (id in ending) {
+	for (id in curGameData.ending) {
 		worldStr += "END " + id + "\n";
-		worldStr += ending[id] + "\n";
+		worldStr += curGameData.ending[id] + "\n";
 		worldStr += "\n";
 	}
 	return worldStr;
@@ -548,17 +559,24 @@ function serializeWorld() {
 
 function serializeDrawing(drwId) {
 	var drwStr = "";
-	for (f in imageStore.source[drwId]) {
-		for (y in imageStore.source[drwId][f]) {
+	for (f in curGameData.drawing[drwId]) {
+		for (y in curGameData.drawing[drwId][f]) {
 			var rowStr = "";
-			for (x in imageStore.source[drwId][f][y]) {
-				rowStr += imageStore.source[drwId][f][y][x];
+			for (x in curGameData.drawing[drwId][f][y]) {
+				rowStr += curGameData.drawing[drwId][f][y][x];
 			}
 			drwStr += rowStr + "\n";
 		}
-		if (f < (imageStore.source[drwId].length-1)) drwStr += ">\n";
+		if (f < (curGameData.drawing[drwId].length-1)) drwStr += ">\n";
 	}
 	return drwStr;
+}
+
+function isExitValid(e) {
+	var hasValidStartPos = e.x >= 0 && e.x < 16 && e.y >= 0 && e.y < 16;
+	var hasDest = e.dest != null;
+	var hasValidRoomDest = (e.dest.room != null && e.dest.x >= 0 && e.dest.x < 16 && e.dest.y >= 0 && e.dest.y < 16);
+	return hasValidStartPos && hasDest && hasValidRoomDest;
 }
 
 
