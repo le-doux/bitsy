@@ -1,5 +1,30 @@
 /* 
 
+editor UI problems to solve
+- layout doesn't look good in itch.io
+- unusuable on mobile
+- layout doesn't look good when every panel is open
+- too many gray buttons
+- too many buttons visible at once for newcomers
+- not cute enough
+- gif UI is terrible and not findable
+- prev / next buttons everywhere are a pain to use if you have a lot of stuff
+- can't rename things
+- can't see all the tiles you want to work on
+- dialog UI isn't that great??
+- not cute enough
+- feedback for exits and ending creation is not good enough
+
+editor UI fixes
+- new trello-y layout
+- show/hide additional UI in panels
+- icons
+--
+- cuteness redesign (including animations)
+- create centralized toolbar / settings menu
+- renameable objects
+
+
 v4 features
 - refactor
 	- modularize engine
@@ -693,6 +718,7 @@ function duplicateRoom() {
 		tilemap : duplicateTilemap,
 		walls : roomToCopy.walls.slice(0),
 		exits : roomToCopy.exits.slice(0),
+		endings : roomToCopy.endings.slice(0),
 		pal : roomToCopy.pal
 	};
 	refreshGameData();

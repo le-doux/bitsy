@@ -63,6 +63,15 @@ this.parse = function(gameDataString) {
 function parseWorld(file) {
 	// resetFlags(); // not necessary anymore
 
+	var parseContext = {
+		gameData : new BitsyGameData(),
+		file : {
+			lines : file.split("\n"),
+			i : 0
+		},
+		cur : function() { return this.file.lines[this.file.i] }
+	};
+
 	var lines = file.split("\n");
 	var i = 0;
 	while (i < lines.length) {
