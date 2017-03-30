@@ -1,5 +1,15 @@
 /* 
 
+new UI features
+- columns
+- add/remove columns
+- add cards
+- hide cards
+- maximize cards
+- minimize cards
+- move cards
+- shadows
+
 editor UI problems to solve
 - layout doesn't look good in itch.io
 - unusuable on mobile
