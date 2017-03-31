@@ -11,6 +11,7 @@
 				min-width: 200px;
 				/*height: 600px;*/
 				float: left;
+				/*display: inline;*/
 				/*margin: 10px;*/
 				margin: 10px;
 				height: 90%;
@@ -24,6 +25,7 @@
 				/*height: 200px;*/
 				width: 100%;
 				height: 100%;
+				text-align: left;
 			}
 			.columnHolder {
 				background: #666;
@@ -38,11 +40,20 @@
 				background: #777;
 				margin: 10px;
 				overflow: hidden;
+				text-align: left;
 			}
 			.card_handle {
 				background: #ccc;
 				height: 30px;
-				width: 100%;
+				/*width: 100%;*/
+				width: calc(100% - 110px);
+				float:right;
+			}
+			.card_buttons {
+				background: #ccc;
+				height: 30px;
+				float:right;
+				width:110px;
 			}
 			.big {
 				width: 380px;
@@ -56,12 +67,25 @@
 				width: 180px;
 				height: 100px;
 			}
+			#fullscreenLayer {
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				width: 100%;
+				height: 100%;
+				background: rgba(0,0,0,0.5);
+				text-align: center;
+				padding-top: 30px;
+			}
 		</style>
 
 		<script>
 			/*
 				TODO
 				collision detection
+
+				TODO
+				- think of all the states needed for the buttons (fullscreen,minimized,closed,etc)
 			*/
 
 			var card = null;
@@ -75,17 +99,17 @@
 					card.style.left = e.clientX - grabOffset.x + "px";
 
 					var columns = document.getElementsByClassName("column");
-					for (c in columns) {
-						var column = columns[c];
+					for (i in columns) {
+						var column = columns[i];
 
-						var cardPos = getDocumentPosition( card );
-						var cardSize = getSize( card );
+						var cardPos = getElementPosition( card );
+						var cardSize = getElementSize( card );
 						var cardCenter = { x:cardPos.x+cardSize.x/2, y:cardPos.y+cardSize.y/2 };
 						// console.log(cardCenter);
 						// console.log(cardSize);
 
-						var columnPos = getDocumentPosition( column );
-						var columnSize = getSize( column );
+						var columnPos = getElementPosition( column );
+						var columnSize = getElementSize( column );
 						// console.log(columnPos);
 						// console.log(column);
 
@@ -93,8 +117,25 @@
 							cardCenter.y > columnPos.y && cardCenter.y < columnPos.y + columnSize.y)
 						{
 							// console.log("hit!");
-							console.log( card.parentElement );
-							column.appendChild(card.parentElement);
+							// console.log( card.parentElement );
+							// column.appendChild(card.parentElement);
+
+							var isAppended = false;
+							for(j in column.childNodes) {
+								var child = column.childNodes[j];
+								var childPos = getElementPosition( child );
+								var childSize = getElementSize( child );
+								var childCenter = { x:childPos.x+childSize.x/2, y:childPos.y+childSize.y/2 };
+
+								if (cardPos.y < childPos.y) {
+									console.log(child);
+									column.insertBefore( card.parentElement, child );
+									isAppended = true;
+								}
+							}
+
+							if (!isAppended)
+								column.appendChild(card.parentElement);
 						}
 					}
 						// console.log("--");
@@ -110,7 +151,7 @@
 
 				card.style.position = "absolute";
 
-				var pos = getDocumentPosition(card);
+				var pos = getElementPosition(card);
 				grabOffset.x = e.clientX - pos.x;
 				grabOffset.y = e.clientY - pos.y;
 
@@ -131,7 +172,7 @@
 
 			document.addEventListener("mouseup",onmouseup);
 
-			function getDocumentPosition(e) {
+			function getElementPosition(e) {
 				var offset = {x:0,y:0};
 				while (e && e.offsetLeft && e.offsetTop)
 				{
@@ -144,7 +185,7 @@
 				return offset;
 			}
 
-			function getSize(e) {
+			function getElementSize(e) {
 				return {
 					x: e.clientWidth,
 					y: e.clientHeight
@@ -160,6 +201,43 @@
 				else
 					card_base.style.height = "30px";
 			}
+
+			function closeCard(e) {
+				console.log("close");
+				var card_base = e.target.parentElement.parentElement.parentElement;
+				// console.log(card_base);
+				card_base.parentElement.removeChild( card_base );
+			}
+
+			var fullscreen_card = null;
+			var fullscreen_card_shadow = null;
+			function fullscreen(e) {
+				console.log("full screen!");
+				var cur_card = e.target.parentElement.parentElement;
+				console.log(cur_card);
+				if (fullscreen_card == null) {
+					var fullscreenLayer = document.getElementById("fullscreenLayer");
+					var fullScreenCenter = document.getElementById("fullScreenCenter");
+					fullscreenLayer.style.display = "block";
+
+					fullscreen_card_shadow = cur_card.parentElement;
+					fullscreen_card_shadow.removeChild( cur_card );
+					fullScreenCenter.appendChild( cur_card );
+					fullscreen_card = cur_card;
+				}
+				else if (fullscreen_card === cur_card) {
+					console.log("close full screen!");
+					var fullscreenLayer = document.getElementById("fullscreenLayer");
+					var fullScreenCenter = document.getElementById("fullScreenCenter");
+					fullscreenLayer.style.display = "none";
+					fullScreenCenter.removeChild( cur_card );
+					console.log(fullscreen_card_shadow);
+					fullscreen_card_shadow.appendChild( cur_card );
+
+					fullscreen_card = null;
+					fullscreen_card_shadow = null;
+				}
+			}
 		</script>
 	</head>
 
@@ -168,12 +246,24 @@
 			<div class="column">
 				<div class="card_shadow med" id="test_card_shadow">
 					<div class="card med" id="test_card">
-						<div class="card_handle" onmousedown="grabCard(event);"></div>
+						<div class="card_buttons">
+							<button onclick="minimize(event);">min</button>
+							<button onclick="fullscreen(event);">ful</button>
+							<button onclick="closeCard(event);">cls</button>
+						</div>
+						<div class="card_handle" onmousedown="grabCard(event);">
+						</div>
 					</div>
 				</div>
 				<div class="card_shadow med" id="test_card_shadow">
 					<div class="card med" id="test_card">
-						<div class="card_handle" onmousedown="grabCard(event);"></div>
+						<div class="card_buttons">
+							<button onclick="minimize(event);">min</button>
+							<button onclick="fullscreen(event);">ful</button>
+							<button onclick="closeCard(event);">cls</button>
+						</div>
+						<div class="card_handle" onmousedown="grabCard(event);">
+						</div>
 					</div>
 				</div>
 				<!-- <div class="card" style="width:40px;height:40px;"></div> -->
@@ -184,19 +274,35 @@
 				
 				<div class="card_shadow big">
 					<div class="card big">
-						<div class="card_handle" onmousedown="grabCard(event);"></div>
+						<div class="card_buttons">
+							<button onclick="minimize(event);">min</button>
+							<button onclick="fullscreen(event);">ful</button>
+							<button onclick="closeCard(event);">cls</button>
+						</div>
+						<div class="card_handle" onmousedown="grabCard(event);">
+						</div>
 					</div>
 				</div>
 			</div>
 			<div class="column">
 				<div class="card_shadow sml">
 					<div class="card sml">
-						<div class="card_handle" onmousedown="grabCard(event);">
+						<div class="card_buttons">
 							<button onclick="minimize(event);">min</button>
+							<button onclick="fullscreen(event);">ful</button>
+							<button onclick="closeCard(event);">cls</button>
+						</div>
+						<div class="card_handle" onmousedown="grabCard(event);">
 						</div>
 					</div>
 				</div>
 			</div>
+			<!-- <div class="column"> -->
+			<!-- </div> -->
+		</div>
+		<div id="fullscreenLayer" style="display:none;">
+			<center id="fullScreenCenter">
+			</center>
 		</div>
 	</body>
 </html>
