@@ -1,3 +1,6 @@
+v3.1:
+- bugfix: duplicated rooms don't disappear
+
 v3.0:
 - add endings to your game!
 - you can have multiple color palettes (one per room)

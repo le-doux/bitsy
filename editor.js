@@ -1,4 +1,8 @@
 /* 
+v3.1 bugs
+- FIXED duplicate room names in romo selector in ending (happens when you restart the game and don't refresh the window)
+- prev/next and tile preview don't work together (old bug)
+
 
 new UI features
 - columns
@@ -1426,6 +1430,7 @@ function resetGameData() {
 	drawEditMap();
 	updatePaletteUI();
 	// updatePaletteControlsFromGameData();
+	updateExitOptionsFromGameData();
 
 	on_paint_avatar();
 	document.getElementById('paintOptionAvatar').checked = true;
