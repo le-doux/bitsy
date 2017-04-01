@@ -6,6 +6,7 @@
 				background: #444;
 			}
 			.column {
+				/*background: #666;*/
 				background: #999;
 				/*width: 400px;*/
 				min-width: 200px;
@@ -86,6 +87,11 @@
 
 				TODO
 				- think of all the states needed for the buttons (fullscreen,minimized,closed,etc)
+				- take into account scroll in position
+				- create wrapping object for cards
+				- add / remove columns (need better name for columns?)
+				- fix left/right scrolling for column holder
+				- need a better html structure for the cards
 			*/
 
 			var card = null;
@@ -121,14 +127,20 @@
 							// column.appendChild(card.parentElement);
 
 							var isAppended = false;
-							for(j in column.childNodes) {
-								var child = column.childNodes[j];
+							var cardChildren = column.getElementsByClassName("card_shadow");
+							for(j in cardChildren) {
+								var child = cardChildren[j];
+								// console.log(typeof(child));
+								// console.log(child);
+								// console.log("---")
+								
 								var childPos = getElementPosition( child );
 								var childSize = getElementSize( child );
 								var childCenter = { x:childPos.x+childSize.x/2, y:childPos.y+childSize.y/2 };
 
-								if (cardPos.y < childPos.y) {
-									console.log(child);
+								if (cardPos.y < childCenter.y) {
+									// console.log(typeof(child));
+									// console.log(child);
 									column.insertBefore( card.parentElement, child );
 									isAppended = true;
 								}
@@ -173,12 +185,14 @@
 			document.addEventListener("mouseup",onmouseup);
 
 			function getElementPosition(e) {
+				console.log("position!");
 				var offset = {x:0,y:0};
 				while (e && e.offsetLeft && e.offsetTop)
 				{
 					// console.log(offset.y);
-				    offset.x += e.offsetLeft;
-				    offset.y += e.offsetTop;
+					console.log(e.scrollTop);
+				    offset.x += e.offsetLeft - e.scrollLeft;
+				    offset.y += e.offsetTop - e.scrollTop;
 				    e = e.offsetParent;
 				}
 				// console.log(offset.y);
@@ -247,9 +261,9 @@
 				<div class="card_shadow med" id="test_card_shadow">
 					<div class="card med" id="test_card">
 						<div class="card_buttons">
-							<button onclick="minimize(event);">min</button>
-							<button onclick="fullscreen(event);">ful</button>
-							<button onclick="closeCard(event);">cls</button>
+							<!-- <button onclick="minimize(event);">min</button> -->
+							<!-- <button onclick="fullscreen(event);">ful</button> -->
+							<!-- <button onclick="closeCard(event);">cls</button> -->
 						</div>
 						<div class="card_handle" onmousedown="grabCard(event);">
 						</div>
@@ -258,9 +272,9 @@
 				<div class="card_shadow med" id="test_card_shadow">
 					<div class="card med" id="test_card">
 						<div class="card_buttons">
-							<button onclick="minimize(event);">min</button>
-							<button onclick="fullscreen(event);">ful</button>
-							<button onclick="closeCard(event);">cls</button>
+							<!-- <button onclick="minimize(event);">min</button> -->
+							<!-- <button onclick="fullscreen(event);">ful</button> -->
+							<!-- <button onclick="closeCard(event);">cls</button> -->
 						</div>
 						<div class="card_handle" onmousedown="grabCard(event);">
 						</div>
@@ -275,9 +289,9 @@
 				<div class="card_shadow big">
 					<div class="card big">
 						<div class="card_buttons">
-							<button onclick="minimize(event);">min</button>
-							<button onclick="fullscreen(event);">ful</button>
-							<button onclick="closeCard(event);">cls</button>
+							<!-- <button onclick="minimize(event);">min</button> -->
+							<!-- <button onclick="fullscreen(event);">ful</button> -->
+							<!-- <button onclick="closeCard(event);">cls</button> -->
 						</div>
 						<div class="card_handle" onmousedown="grabCard(event);">
 						</div>
@@ -288,9 +302,9 @@
 				<div class="card_shadow sml">
 					<div class="card sml">
 						<div class="card_buttons">
-							<button onclick="minimize(event);">min</button>
-							<button onclick="fullscreen(event);">ful</button>
-							<button onclick="closeCard(event);">cls</button>
+							<!-- <button onclick="minimize(event);">min</button> -->
+							<!-- <button onclick="fullscreen(event);">ful</button> -->
+							<!-- <button onclick="closeCard(event);">cls</button> -->
 						</div>
 						<div class="card_handle" onmousedown="grabCard(event);">
 						</div>
