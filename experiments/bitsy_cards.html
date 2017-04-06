@@ -1,6 +1,129 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
+		<!-- old style -->
+		<style>
+			body {
+				margin: 0 !important;
+				padding: 0 !important;
+				background: /*#bdbddb;*/ #ccccff;
+				line-height: 170%;
+				font-family: "Nunito", Helvetica, Arial, sans-serif;
+				font-size: 18px;
+			}
+			button {
+				font-family: Helvetica, Arial, sans-serif;
+				font-size: 13px;
+			}
+			canvas {
+				background: black;
+			}
+			#topbar {
+				width: 100%;
+				background: white;
+				border-bottom: solid 3px #888;
+				padding: 10px;
+				padding-left: 20px;
+				padding-right: 20px;
+    			box-sizing: border-box;
+			}
+			.panel {
+				float: left;
+				background: white;
+				margin: 10px;
+				padding: 10px;
+				border-bottom: solid 3px #888;
+				border-radius: 5px;
+				font-size: 16px;
+			}
+			textarea {
+				font-family: monospace;
+			}
+			input {
+				font-family: monospace;
+			}
+			#unsupportedFeatures {
+				background: #fdd;
+				border: solid red 2px;
+				padding: 10px;
+				margin: 10px;
+			}
+			.helpMessage {
+				background: #eee;
+				padding: 5px;
+				margin: 2px;
+				color: #555;
+				font-size: 13px;
+				line-height: 130%;
+			}
+			#aboutInner {
+				font-size: 13px;
+				line-height: 130%;
+			}
+			#exitCanvas {
+				width:256px;
+				height:256px;
+			}
+			#editSelectedExit {
+				background: #eee;
+				padding: 10px;
+				margin: 2px;
+				width: 256px;
+				height: 350px; 
+				color: #555;
+				font-size: 13px;
+			}
+			.panel .bar {
+				background: #eee;
+				border-bottom: 2px solid #ccc;
+				padding: 5px;
+				padding-left: 10px;
+				padding-right: 10px;
+				padding-bottom: 2px;
+				margin: -10px;
+				margin-bottom: 10px;
+				border-radius: 5px 5px 0px 0px;
+				font-size: 18px;
+			}
+			.minimize {
+				float:right;
+				color:blue;
+			}
+			.minimize:hover {
+				font-weight: bold;
+			}
+			#titleText {
+				width: 400px;
+				font-size: 16px;
+			}
+			#bitsyEditorName {
+				font-size: 14px;
+				float: right;
+			}
+			.toggleText {
+				color: blue;
+				text-decoration: underline;
+			}
+			.toggleText:hover {
+				font-weight: bold;
+			}
+			.options {
+				background: #f2f2f2;
+				padding: 7px;
+				margin-top: 2px;
+				margin-bottom: 2px;
+				color: #333;
+				font-size: 13px;
+				line-height: 150%;
+			}
+			.dialogTextArea {
+				resize: none;
+				font-size: 12px;
+				width: 32ch;
+			}
+		</style>
+
+		<!-- new style -->
 		<style>
 			body {
 				background: #444;
@@ -15,7 +138,7 @@
 				/*display: inline;*/
 				/*margin: 10px;*/
 				margin: 10px;
-				height: 90%;
+				height: 95%;
 				margin-right: 0px;
 				overflow: scroll;
 				display: inline-block;
@@ -88,8 +211,26 @@
 				text-align: center;
 				padding-top: 30px;
 			}
+
+			.roomSize {
+				width: 550px;
+				height: 680px;
+			}
 		</style>
 
+		<!-- ENGINE SCRIPTS -->
+		<script src="font.js"></script>
+		<script src="parser.js"></script>
+		<script src="bitsy.js"></script>
+
+		<!-- EDITOR SCRIPTS -->
+		<script src="gif.js"></script>
+		<script src="exporter.js"></script>
+		<script src="editor.js"></script>
+
+		<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+
+		<!-- card scripts -->
 		<script>
 			/*
 				NEXT STEPS
@@ -291,16 +432,48 @@
 		</script>
 	</head>
 
-	<body>
+	<body onload="start()">
 		<div class="columnHolderWindow">
 			<div class="columnHolderContent">
 				<div class="column">
-					<div class="card_shadow med" id="test_card_shadow">
-						<div class="card med" id="test_card">
+
+
+					<div class="card_shadow roomSize" id="test_card_shadow">
+						<div class="card roomSize" id="test_card">
 							<div class="card_handle" onmousedown="grabCard(event);">
+							</div>
+							<div>
+								<br/>
+								<form>
+									<input type="radio" name="edit mode" value="edit" onclick="on_edit_mode()" checked> edit
+									<input type="radio" name="edit mode" value="play" onclick="on_play_mode()"> play
+								</form>
+								<canvas id="game"></canvas>
+								<br>
+								<div id="roomNav">
+									room <span id="roomId">0</span>
+									<button onclick="prevRoom();"> < prev </button>
+									<button onclick="nextRoom();"> next > </button>
+									<button onclick="newRoom();"> + new </button>
+									<button onclick="duplicateRoom();"> ++ duplicate </button>
+									<button onclick="deleteRoom();"> x delete x </button>
+								</div>
+								<div id="roomCommands">
+									<button onclick="showPanel('exitsPanel');"> + add exits to other rooms </button>
+									<button onclick="showPanel('endingsPanel');"> + add endings </button>
+									color palette: 
+									<select id="roomPaletteSelect" onchange="roomPaletteChange(event);">
+										<option value="0">palette 0</option> <!-- other options are added dynamically -->
+									</select>
+								</div>
+								<button onclick="toggleMapGrid();"> show/hide tile grid </button>
+								<button onclick="toggleCollisionMap();"> show/hide walls </button>
 							</div>
 						</div>
 					</div>
+
+
+
 					<div class="card_shadow med" id="test_card_shadow">
 						<div class="card med" id="test_card">
 							<div class="card_handle" onmousedown="grabCard(event);">
