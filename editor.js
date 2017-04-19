@@ -1,4 +1,12 @@
 /* 
+colors based on plates
+- periwinkle bg (+ darker for shadows)
+- gold cards
+- salmon top bars & buttons
+- periwinkle for alt buttons
+- white
+
+
 new usability ideas
 - tiles in grid so you can see more
 - Oh and possibly a way to "toggle" the placement of endings or exits, so you can put multiples of the same one in a room without having to scroll up and so down to select it each time
@@ -438,6 +446,11 @@ function start() {
 			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
 		}
 	};
+
+	//color testing
+	// on_change_color_bg();
+	// on_change_color_tile();
+	// on_change_color_sprite();
 }
 
 function setDefaultGameState() {
@@ -1526,6 +1539,9 @@ function updatePaletteBorders() {
 }
 
 function on_change_color_bg() {
+	//color testing
+	// document.body.style.background = document.getElementById("backgroundColor").value;
+
 	var rgb = hexToRgb( document.getElementById("backgroundColor").value );
 	palette[selectedColorPal()][0][0] = rgb.r;
 	palette[selectedColorPal()][0][1] = rgb.g;
@@ -1541,6 +1557,14 @@ function on_change_color_bg() {
 }
 
 function on_change_color_tile() {
+	//color testing
+	// var elements = document.getElementsByClassName("bar");
+	// for (var i = 0; i < elements.length; i++) {
+	// 	var el = elements[i];
+	// 	console.log(el);
+	// 	el.style.background = document.getElementById("tileColor").value;
+	// }
+
 	var rgb = hexToRgb( document.getElementById("tileColor").value );
 	palette[selectedColorPal()][1][0] = rgb.r;
 	palette[selectedColorPal()][1][1] = rgb.g;
@@ -1556,6 +1580,9 @@ function on_change_color_tile() {
 }
 
 function on_change_color_sprite() {
+	//color testing
+	// document.getElementById("topbar").style.background = document.getElementById("spriteColor").value;
+
 	var rgb = hexToRgb( document.getElementById("spriteColor").value );
 	palette[selectedColorPal()][2][0] = rgb.r;
 	palette[selectedColorPal()][2][1] = rgb.g;
@@ -2054,7 +2081,7 @@ function togglePanelCore(id,visible) {
 
 function togglePanelUI(id,visible) {
 	//update panel
-	document.getElementById(id).style.display = visible ? "block" : "none";
+	document.getElementById(id).style.display = visible ? "inline-block" : "none";
 	//update checkbox
 	if (id != "toolsPanel")
 		document.getElementById(id.replace("Panel","Check")).checked = visible;
@@ -2489,4 +2516,99 @@ function getComplimentingColor(palId) {
 	else {
 		return "#000";
 	}
+}
+
+/* MOVEABLE PANESL */
+var grabbedPanel = {
+	card: null,
+	size: 0,
+	cursorOffset: {x:0,y:0},
+	shadow: null
+};
+
+function grabCard(e) {
+	e.preventDefault();
+
+	console.log(grabbedPanel.card);
+
+	if (grabbedPanel.card != null) return;
+
+	console.log("grab!");
+
+	grabbedPanel.card = e.target.parentElement;
+	grabbedPanel.size = getElementSize( grabbedPanel.card );
+	var pos = getElementPosition( grabbedPanel.card );
+	
+	grabbedPanel.shadow = document.createElement("div");
+	grabbedPanel.shadow.className = "panelShadow";
+	grabbedPanel.shadow.style.width = grabbedPanel.size.x + "px";
+	grabbedPanel.shadow.style.height = grabbedPanel.size.y + "px";
+
+	document.getElementById("editorContent").insertBefore( grabbedPanel.shadow, grabbedPanel.card );
+	grabbedPanel.cursorOffset.x = e.clientX - pos.x;
+	grabbedPanel.cursorOffset.y = e.clientY - pos.y;
+	console.log("client " + e.clientX);
+	console.log("card " + pos.x);
+	console.log("offset " + grabbedPanel.cursorOffset.x);
+	// console.log("screen " + e.screenX);
+	grabbedPanel.card.style.position = "absolute";
+	grabbedPanel.card.style.left = e.clientX - grabbedPanel.cursorOffset.x + "px";
+	grabbedPanel.card.style.top = e.clientY - grabbedPanel.cursorOffset.y + "px";
+	grabbedPanel.card.style.zIndex = 1000;
+}
+
+function onmousemove(e) {
+	if (grabbedPanel.card == null) return;
+
+	grabbedPanel.card.style.left = e.clientX - grabbedPanel.cursorOffset.x + "px";
+	grabbedPanel.card.style.top = e.clientY - grabbedPanel.cursorOffset.y + "px";
+
+	var cardPos = getElementPosition( grabbedPanel.card );
+	var cardSize = grabbedPanel.size;
+	var cardCenter = { x:cardPos.x+cardSize.x/2, y:cardPos.y+cardSize.y/2 };
+
+	var editorContent = document.getElementById("editorContent");
+	var otherCards = editorContent.getElementsByClassName("panel");
+
+	for(var j = 0; j < otherCards.length; j++) {
+		var other = otherCards[j];
+		var otherPos = getElementPosition( other );
+		var otherSize = getElementSize( other );
+		var otherCenter = { x:otherPos.x+otherSize.x/2, y:otherPos.y+otherSize.y/2 };
+
+		if ( cardCenter.x < otherCenter.x ) {
+			editorContent.insertBefore( grabbedPanel.shadow, other );
+			break;
+		}
+	}
+}
+document.addEventListener("mousemove",onmousemove);
+
+function onmouseup(e) {
+	if (grabbedPanel.card == null) return;
+
+	var editorContent = document.getElementById("editorContent");
+	editorContent.insertBefore( grabbedPanel.card, grabbedPanel.shadow );
+	editorContent.removeChild( grabbedPanel.shadow );
+	grabbedPanel.card.style.position = "relative";
+	grabbedPanel.card.style.top = null;
+	grabbedPanel.card.style.left = null;
+	grabbedPanel.card.style.zIndex = null;
+
+	grabbedPanel.card = null;
+}
+document.addEventListener("mouseup",onmouseup);
+
+// TODO consolidate these into one function?
+function getElementPosition(e) { /* gets absolute position on page */
+	var rect = e.getBoundingClientRect();
+	var pos = {x:rect.left,y:rect.top};
+	return pos;
+}
+
+function getElementSize(e) { /* gets visible size */
+	return {
+		x: e.clientWidth,
+		y: e.clientHeight
+	};
 }
