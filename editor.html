@@ -191,7 +191,8 @@
 			/*default: gray*/
 			.panel {
 				background: white;
-				border-bottom: solid 3px #888;
+				border: solid 1px #888;
+				border-bottom: solid 4px #888;
 			}
 			.panel .bar {
 				background: #eee;
@@ -201,7 +202,8 @@
 			/*periwinkle*/
 			.panel.color0 {
 				background: white;
-				border-bottom: solid 3px #9797f4;
+				border: solid 1px #9797f4;
+				border-bottom: solid 4px #9797f4;
 			}
 			.bar.color0 {
 				background: #eeeeff;
@@ -211,7 +213,8 @@
 			/*pink*/
 			.panel.color1 {
 				background: white;
-				border-bottom: solid 3px #ff88ff;
+				border: solid 1px #ff88ff;
+				border-bottom: solid 4px #ff88ff;
 			}
 			.bar.color1 {
 				background: #ffeeff;
@@ -221,7 +224,8 @@
 			/*yellow*/
 			.panel.color2 {
 				background: white;
-				border-bottom: solid 3px #f9ea72;
+				border: solid 1px #f9ea72;
+				border-bottom: solid 4px #f9ea72;
 			}
 			.bar.color2 {
 				background: #ffffcc;
@@ -231,7 +235,8 @@
 			/*green*/
 			.panel.color3 {
 				background: white;
-				border-bottom: solid 3px #00d197;
+				border: solid 1px #00d197;
+				border-bottom: solid 4px #00d197;
 			}
 			.bar.color3 {
 				background: #ccfff1;
@@ -244,19 +249,61 @@
 		<style>
 			button {
 				font-family: "Nunito", Helvetica, Arial, sans-serif;
-				font-size: 16px;
+				padding: 6px;
+				padding-left: 8px;
+				padding-right: 8px;
+				margin-bottom: 4px;
+				font-size: 14px;
 				border: none;
 				border-radius: 5px;
 				background: #eee;
+				border: solid 1px #aaa;
 				border-bottom: solid 2px #aaa;
 			}
-			/*button:hover {
-				background: #eee;
-			}*/
 			button:active {
-				margin-top: 2px;
-				border-bottom: none;
+				/*margin-top: 2px;*/
+				/*border-bottom: solid 2px white;*/
 				background: #bbb;
+				color:white;
+			}
+			button:focus { outline:none; }
+
+			/*periwinkle*/
+			button.color0 {
+				background: #eeeeff;
+				/*border: solid 1px #9797f4;*/
+				border: solid 1px #9797f4;
+				border-bottom: solid 2px #9797f4;
+			}
+			button.color0:active {
+				background: #9797f4;
+			}
+
+			/*pink*/
+			button.color1 {
+				background: #ffeeff;
+				border-bottom: solid 2px #ff88ff;
+			}
+			button.color1:active {
+				background: #ff88ff;
+			}
+
+			/*yellow*/
+			button.color2 {
+				background: #ffffcc;
+				border-bottom: solid 2px #f9ea72;
+			}
+			button.color2:active {
+				background: #f9ea72;
+			}
+
+			/*green*/
+			button.color3 {
+				background: #ccfff1;
+				border-bottom: solid 2px #00d197;
+			}
+			button.color3:active {
+				background: #00d197;
 			}
 		</style>
 
@@ -282,8 +329,8 @@
 			<span style="float:left;"> Bitsy </span>
 
 			<input type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
-			<button onclick="showPanel('toolsPanel');" style="margin-left:20px;">show toolbar</button>
-			<button onclick="newGameDialog();" style="margin-left:20px;">new game (start over!)</button>
+			<button class="color0" onclick="showPanel('toolsPanel');" style="margin-left:20px;">show toolbar</button>
+			<button class="color0" onclick="newGameDialog();" style="margin-left:20px;">new game (start over!)</button>
 			<span id="bitsyEditorName">
 				Bitsy v3.1 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
 			</span>
@@ -292,6 +339,7 @@
 		<div style="width:25%;height:5px;float:left;background:#00d197;"></div>
 		<div style="width:25%;height:5px;float:left;background:#f9ea72;"></div>
 		<div style="width:25%;height:5px;float:left;background:#9797f4;"></div>
+		<!-- <div style="width:100%;height:5px;float:left;background:#9797f4;"></div> -->
 
 		<div id="unsupportedFeatures" style="display:none;">
 			UH OH your browser doesn't support all of bitsy's features, so some things might not work right. Maybe try <a href="https://www.google.com/chrome/browser" target="_blank">chrome</a> or <a href="https://www.mozilla.org/firefox" target="_blank">firefox</a>? - adam
@@ -395,29 +443,29 @@
 					<br>
 					<div id="roomNav">
 						room <span id="roomId">0</span>
-						<button onclick="prevRoom();"> < prev </button>
-						<button onclick="nextRoom();"> next > </button>
-						<button onclick="newRoom();"> + new </button>
-						<button onclick="duplicateRoom();"> ++ duplicate </button>
-						<button onclick="deleteRoom();"> x delete x </button>
+						<button class="color0" onclick="prevRoom();"> < prev </button>
+						<button class="color0" onclick="nextRoom();"> next > </button>
+						<button class="color0" onclick="newRoom();"> + new </button>
+						<button class="color0" onclick="duplicateRoom();"> ++ duplicate </button>
+						<button class="color0" onclick="deleteRoom();"> x delete x </button>
 					</div>
 					<div id="roomCommands">
-						<button onclick="showPanel('exitsPanel');"> + add exits to other rooms </button>
-						<button onclick="showPanel('endingsPanel');"> + add endings </button>
+						<button class="color0" onclick="showPanel('exitsPanel');"> + add exits to other rooms </button>
+						<button class="color0" onclick="showPanel('endingsPanel');"> + add endings </button>
 						color palette: 
 						<select id="roomPaletteSelect" onchange="roomPaletteChange(event);">
 							<option value="0">palette 0</option> <!-- other options are added dynamically -->
 						</select>
 					</div>
-					<button onclick="toggleMapGrid();"> show/hide tile grid </button>
-					<button onclick="toggleCollisionMap();"> show/hide walls </button>
+					<button class="color0" onclick="toggleMapGrid();"> show/hide tile grid </button>
+					<button class="color0" onclick="toggleCollisionMap();"> show/hide walls </button>
 				</div>
 
 				<div id="exitsPanel" class="panel color3" style="display:none;">
 					<div class="bar color3" onmousedown="grabCard(event);">
 						exits <span class="minimize" onclick="hidePanel('exitsPanel');">[ - ]</span>
 					</div>
-					<button onclick="addExit();" id="addExitButton"> + add new exit to this room </button>
+					<button class="color0" onclick="addExit();" id="addExitButton"> + add new exit to this room </button>
 					<span id="addingExitHelpText" style="display:none;"><i>click space in room to add exit</i></span>
 					<!-- todo needs a cancel button -->
 					<div id="editSelectedExit">
@@ -434,7 +482,7 @@
 							<br>
 							<i>click to place exit destination in this room</i>
 							<br>
-							<button onclick="deleteSelectedExit();"> - delete selected exit </button>
+							<button class="color0" onclick="deleteSelectedExit();"> - delete selected exit </button>
 						</div>
 					</div>
 				</div>
@@ -444,18 +492,18 @@
 						endings <span class="minimize" onclick="hidePanel('endingsPanel');">[ - ]</span>
 					</div>
 					<div id="endingNav">
-						<button onclick="prevEnding();"> < prev </button>
-						<button onclick="nextEnding();"> next > </button>
-						<button onclick="newEnding();"> + new </button>
+						<button class="color0" onclick="prevEnding();"> < prev </button>
+						<button class="color0" onclick="nextEnding();"> next > </button>
+						<button class="color0" onclick="newEnding();"> + new </button>
 						<!-- <button onclick="deleteEnding();"> x delete x </button> -->
 					</div>
 					ending <span id="endingId">0</span><br>
 					<textarea id="endingText" class="dialogTextArea" onkeydown="on_change_ending();" onkeyup="on_change_ending();" onchange="on_change_ending();"></textarea>
 					<br>
-					<button id="addEndingButton" onclick="addEnding();"> + place ending in room </button>
+					<button class="color0" id="addEndingButton" onclick="addEnding();"> + place ending in room </button>
 					<span id="addingEndingHelpText" style="display:none;"> click space in room to add ending </span>
 					<!-- todo needs a cancel button -->
-					<button id="removeEndingButton" onclick="removeSelectedEnding();" style="display:none;"> - remove selected ending </button>
+					<button class="color0" id="removeEndingButton" onclick="removeSelectedEnding();" style="display:none;"> - remove selected ending </button>
 				</div>
 
 				<div id="paintPanel" class="panel color1">
@@ -468,20 +516,20 @@
 						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();"> sprite
 					</form>
 					<div id="paintNav" style="display:none;">
-						<button onclick="prev();"> < prev </button>
-						<button onclick="next();"> next > </button>
-						<button onclick="newDrawing();"> + new </button>
+						<button class="color0" onclick="prev();"> < prev </button>
+						<button class="color0" onclick="next();"> next > </button>
+						<button class="color0" onclick="newDrawing();"> + new </button>
 					</div>
 					<canvas id="paint"></canvas>
 					<br>
 					<canvas id="paintNavThumbnails"></canvas>
 					<br>
 					<div id="paintCommands">
-						<button onclick="duplicateDrawing();"> ++ duplicate </button>
-						<button onclick="deleteDrawing();"> x delete x </button>
+						<button class="color0" onclick="duplicateDrawing();"> ++ duplicate </button>
+						<button class="color0" onclick="deleteDrawing();"> x delete x </button>
 					</div>
 					<div id="wall" style="display:none;">
-						make tile a wall <input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall();"> <button onclick="apply_wall_setting_all_rooms();">apply to all rooms</button>
+						make tile a wall <input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall();"> <button class="color0" onclick="apply_wall_setting_all_rooms();">apply to all rooms</button>
 					</div>
 					<div id="dialog" style="display:none;">dialog:
 						<!-- <input type="text" id="dialogText" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"> --> 
@@ -496,7 +544,7 @@
 							<input id="animationOptionFrame2" type="radio" name="keyframe" onclick="on_paint_frame2();"> frame 2
 						</form>
 					</div>
-					<button onclick="toggleGrid();"> show/hide pixel grid </button>
+					<button class="color0" onclick="toggleGrid();"> show/hide pixel grid </button>
 				</div>
 
 				<div id="colorsPanel" class="panel color1">
@@ -512,10 +560,10 @@
 						Try this online <a href="http://www.w3schools.com/colors/colors_picker.asp" target="_blank">color picker</a>.
 					</div>
 					<div id="paletteNav" style="display:none;">
-						<button onclick="prevPalette();"> < prev </button>
-						<button onclick="nextPalette();"> next > </button>
+						<button class="color0" onclick="prevPalette();"> < prev </button>
+						<button class="color0" onclick="nextPalette();"> next > </button>
 					</div>
-					<button onclick="newPalette();"> + new color palette</button>
+					<button class="color0" onclick="newPalette();"> + new color palette</button>
 				</div>
 
 				<div id="downloadPanel" class="panel color2">
@@ -523,7 +571,7 @@
 						download <span class="minimize" onclick="hidePanel('downloadPanel');">[ - ]</span>
 					</div>
 					download game as html file: <br>
-					<button onclick="exportGame();">download game</button><br>
+					<button class="color0" onclick="exportGame();">download game</button><br>
 					<div id="downloadOptions" class="options">
 						download options: <br>
 						<input type="color" value="#ffffff" id="pageColor" onchange="on_change_color_page();" autocomplete="off"> page color
@@ -548,8 +596,8 @@
 						record gif <span class="minimize" onclick="hidePanel('gifPanel');">[ - ]</span>
 					</div>
 					
-					<button id="gifStartButton" onclick="startRecordingGif();">start recording</button>
-					<button id="gifStopButton" onclick="stopRecordingGif();" style="display:none;">stop recording</button>
+					<button class="color0" id="gifStartButton" onclick="startRecordingGif();">start recording</button>
+					<button class="color0" id="gifStopButton" onclick="stopRecordingGif();" style="display:none;">stop recording</button>
 					<span id="gifRecordingText" style="color:red;display:none;">recording...</span>
 					<span id="gifEncodingText" style="color:green;display:none;">encoding...</span>
 					
@@ -568,7 +616,7 @@
 					</div>
 					<textarea id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
 					<br>
-					<button id="resetData" onclick="resetGameData();">reset game data</button>
+					<button class="color0" id="resetData" onclick="resetGameData();">reset game data</button>
 					<div class="helpMessage">
 						(be careful, you'll lose your changes <br>if you reset the game data)
 					</div>
