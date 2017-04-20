@@ -7,18 +7,7 @@
 			body {
 				margin: 0 !important;
 				padding: 0 !important;
-				/*background: #bdbddb; #ccccff; #ffe5fa;*/
-				
-				/*pink*/
-				/*background: #ffd3e5;*/
-
-				/*purple*/
-				/*background: #2a2a5c;*/
-				background: #f2dae7;
-
-				/*background: #c9faff;*/
-
-				/*background: #FFDEE9;*/
+				background: #ccccff;
 				
 				line-height: 170%;
 				font-family: "Nunito", Helvetica, Arial, sans-serif;
@@ -35,12 +24,8 @@
 				width: 100%;
 				/*height: 40px;*/
 				background: white;
-				
-				/*background: #F97FC8;*/
-				
-				/*border-bottom: solid 3px #7874FF;*/
 
-				border-bottom: solid 3px #9793bc;
+				border-bottom: solid 3px #888;
 				
 				padding: 10px;
 				padding-left: 20px;
@@ -67,46 +52,18 @@
 				display: inline-block;
 				vertical-align: top;
 				background: white;
-				/*background: #ffbac2;*/
 				margin: 10px;
 				margin-right: 0px;
 				padding: 10px;
-				
-				/*purple*/
-				border-bottom: solid 3px #9793bc;
 
-				/*border-bottom: solid 3px #9268a5;*/
-				
-				/*aqua*/
-				/*border-bottom: solid 3px #82e4ed;*/
-
-				/*border-left: solid 1px #9b99ff;*/
-				/*border-right: solid 1px #9b99ff;*/
+				border-bottom: solid 3px #888;
 				border-radius: 5px;
 				font-size: 16px;
 			}
 			.panel .bar {
-				/*background: #eee;*/
-				/*background: #FF7F8E;*/
-				/*background: #ccccff;*/
+				background: #eee;
 				
-				/*purple*/
-				color: white;
-				background: #b0aef9;
-				border-bottom: 2px solid #9793bc;
-
-				/*pink*/
-				/*background: #db7da3;*/
-
-				color: #9793bc;
-				background: #cdc9f2;
-				/*border-bottom: 2px solid #9268a5;*/
-				/*background: #ffc6d5;*/
-
-				/*aqua*/
-				/*background: #a9f5fc;*/
-				/*color: #7874FF;*/
-				/*border-bottom: 2px solid #82e4ed;*/
+				border-bottom: 2px solid #aaa;
 
 				padding: 5px;
 				padding-left: 10px;
@@ -120,12 +77,7 @@
 			.panelShadow {
 				display: inline-block;
 				vertical-align: top;
-				/*background: #efc6e6;*/
-
-				/*pink*/
-				/*background: #FBADCD;*/
-
-				background: #e0bccf;
+				background: #aaaadd;
 				margin: 10px;
 				margin-right: 0px;
 				border-radius: 5px;
@@ -205,6 +157,109 @@
 			}
 		</style>
 
+		<!-- COLOR THEME STYLE -->
+		<style>
+			/*default style*/
+/*			
+			#topbar {
+				background: white;
+				border-bottom: solid 3px #888;
+			}
+			.panel {
+				background: white;
+				border-bottom: solid 3px #888;
+			}
+			.panel .bar {
+				background: #eee;
+				border-bottom: 2px solid #aaa;
+			}
+			.panelShadow {
+				background: #aaaadd;
+			}
+*/
+
+			#topbar {
+				background: white;
+				/*border-bottom: solid 3px #888;*/
+				border-bottom: none;
+			}
+
+			.panelShadow {
+				background: #aaaadd;
+			}
+
+			/*default: gray*/
+			.panel {
+				background: white;
+				border-bottom: solid 3px #888;
+			}
+			.panel .bar {
+				background: #eee;
+				border-bottom: 2px solid #aaa;
+			}
+
+			/*periwinkle*/
+			.panel.color0 {
+				background: white;
+				border-bottom: solid 3px #9797f4;
+			}
+			.bar.color0 {
+				background: #eeeeff;
+				border-bottom: 2px solid #9797f4;
+			}
+
+			/*pink*/
+			.panel.color1 {
+				background: white;
+				border-bottom: solid 3px #ff88ff;
+			}
+			.bar.color1 {
+				background: #ffeeff;
+				border-bottom: 2px solid #ff88ff;
+			}
+
+			/*yellow*/
+			.panel.color2 {
+				background: white;
+				border-bottom: solid 3px #f9ea72;
+			}
+			.bar.color2 {
+				background: #ffffcc;
+				border-bottom: 2px solid #f9ea72;
+			}
+
+			/*green*/
+			.panel.color3 {
+				background: white;
+				border-bottom: solid 3px #00d197;
+			}
+			.bar.color3 {
+				background: #ccfff1;
+				border-bottom: 2px solid #00d197;
+			}
+
+		</style>
+
+		<!-- BUTTON STYLE -->
+		<style>
+			button {
+				font-family: "Nunito", Helvetica, Arial, sans-serif;
+				font-size: 16px;
+				border: none;
+				border-radius: 5px;
+				background: #eee;
+				border-bottom: solid 2px #aaa;
+			}
+			/*button:hover {
+				background: #eee;
+			}*/
+			button:active {
+				margin-top: 2px;
+				border-bottom: none;
+				background: #bbb;
+			}
+		</style>
+
 		<!-- ENGINE SCRIPTS -->
 		<script src="font.js"></script>
 		<script src="parser.js"></script>
@@ -233,6 +288,11 @@
 				Bitsy v3.1 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
 			</span>
 		</div>
+		<div style="width:25%;height:5px;float:left;background:#ff88ff;"></div>
+		<div style="width:25%;height:5px;float:left;background:#00d197;"></div>
+		<div style="width:25%;height:5px;float:left;background:#f9ea72;"></div>
+		<div style="width:25%;height:5px;float:left;background:#9797f4;"></div>
+
 		<div id="unsupportedFeatures" style="display:none;">
 			UH OH your browser doesn't support all of bitsy's features, so some things might not work right. Maybe try <a href="https://www.google.com/chrome/browser" target="_blank">chrome</a> or <a href="https://www.mozilla.org/firefox" target="_blank">firefox</a>? - adam
 			<br>
@@ -242,8 +302,8 @@
 		<div id="editorWindow">
 			<div id="editorContent">
 
-				<div id="toolsPanel" class="panel" style="display:none;">
-					<div class="bar" onmousedown="grabCard(event);">
+				<div id="toolsPanel" class="panel color0" style="display:none;">
+					<div class="bar color0" onmousedown="grabCard(event);">
 						toolbar <span class="minimize" onclick="hidePanel('toolsPanel');">[ - ]</span>
 					</div>
 					<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/> about <br>
@@ -257,8 +317,8 @@
 					<input type="checkbox" value="dataPanel" onclick="togglePanel(event);" id="dataCheck"/> game data
 				</div>
 
-				<div id="aboutPanel" class="panel">
-					<div class="bar" onmousedown="grabCard(event);">
+				<div id="aboutPanel" class="panel color0">
+					<div class="bar color0" onmousedown="grabCard(event);">
 						about bitsy <span class="minimize" onclick="hidePanel('aboutPanel');">[ - ]</span>
 					</div>
 					<div id="aboutInner">
@@ -323,8 +383,8 @@
 					</div>
 				</div>
 
-				<div id="roomPanel" class="panel">
-					<div class="bar" onmousedown="grabCard(event);">
+				<div id="roomPanel" class="panel color3">
+					<div class="bar color3" onmousedown="grabCard(event);">
 						room <span class="minimize" onclick="hidePanel('roomPanel');">[ - ]</span>
 					</div>
 					<form>
@@ -353,8 +413,8 @@
 					<button onclick="toggleCollisionMap();"> show/hide walls </button>
 				</div>
 
-			<div id="exitsPanel" class="panel" style="display:none;">
-					<div class="bar" onmousedown="grabCard(event);">
+				<div id="exitsPanel" class="panel color3" style="display:none;">
+					<div class="bar color3" onmousedown="grabCard(event);">
 						exits <span class="minimize" onclick="hidePanel('exitsPanel');">[ - ]</span>
 					</div>
 					<button onclick="addExit();" id="addExitButton"> + add new exit to this room </button>
@@ -379,8 +439,8 @@
 					</div>
 				</div>
 
-				<div id="endingsPanel" class="panel" style="display:block;">
-					<div class="bar" onmousedown="grabCard(event);">
+				<div id="endingsPanel" class="panel color3" style="display:block;">
+					<div class="bar color3" onmousedown="grabCard(event);">
 						endings <span class="minimize" onclick="hidePanel('endingsPanel');">[ - ]</span>
 					</div>
 					<div id="endingNav">
@@ -398,8 +458,8 @@
 					<button id="removeEndingButton" onclick="removeSelectedEnding();" style="display:none;"> - remove selected ending </button>
 				</div>
 
-				<div id="paintPanel" class="panel">
-					<div class="bar" onmousedown="grabCard(event);">
+				<div id="paintPanel" class="panel color1">
+					<div class="bar color1" onmousedown="grabCard(event);">
 						paint <span class="minimize" onclick="hidePanel('paintPanel');">[ - ]</span>
 					</div>
 					<form>
@@ -439,8 +499,8 @@
 					<button onclick="toggleGrid();"> show/hide pixel grid </button>
 				</div>
 
-				<div id="colorsPanel" class="panel">
-					<div class="bar" onmousedown="grabCard(event);">
+				<div id="colorsPanel" class="panel color1">
+					<div class="bar color1" onmousedown="grabCard(event);">
 						colors <span class="minimize" onclick="hidePanel('colorsPanel');">[ - ]</span>
 					</div>
 					<div id="paletteIdContainer" style="display:none;">palette <span id="paletteId">0</span></div>
@@ -458,8 +518,8 @@
 					<button onclick="newPalette();"> + new color palette</button>
 				</div>
 
-				<div id="downloadPanel" class="panel">
-					<div class="bar" onmousedown="grabCard(event);">
+				<div id="downloadPanel" class="panel color2">
+					<div class="bar color2" onmousedown="grabCard(event);">
 						download <span class="minimize" onclick="hidePanel('downloadPanel');">[ - ]</span>
 					</div>
 					download game as html file: <br>
@@ -483,8 +543,8 @@
 					<input type="file" onchange="importGameFromFile(event);"/>
 				</div>
 
-				<div id="gifPanel" class="panel" style="display:none;">
-					<div class="bar" onmousedown="grabCard(event);">
+				<div id="gifPanel" class="panel color2" style="display:none;">
+					<div class="bar color2" onmousedown="grabCard(event);">
 						record gif <span class="minimize" onclick="hidePanel('gifPanel');">[ - ]</span>
 					</div>
 					
@@ -502,8 +562,8 @@
 					<a href="" download="recording.gif" target="_blank" id="gifDownload">download gif</a>
 				</div>
 
-				<div id="dataPanel" class="panel" style="display:none;">
-					<div class="bar" onmousedown="grabCard(event);">
+				<div id="dataPanel" class="panel color0" style="display:none;">
+					<div class="bar color0" onmousedown="grabCard(event);">
 						game data <span class="minimize" onclick="hidePanel('dataPanel');">[ - ]</span>
 					</div>
 					<textarea id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
