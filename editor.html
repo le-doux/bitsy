@@ -46,6 +46,8 @@
 				/*background: blue;*/
 				white-space: nowrap;
 				display: inline-block;
+				padding-left: 5px;
+				padding-right: 20px;
 			}
 			.panel {
 				/*float: left;*/
@@ -160,7 +162,7 @@
 		<!-- COLOR THEME STYLE -->
 		<style>
 			/*default style*/
-/*			
+			/*			
 			#topbar {
 				background: white;
 				border-bottom: solid 3px #888;
@@ -176,7 +178,7 @@
 			.panelShadow {
 				background: #aaaadd;
 			}
-*/
+			*/
 
 			#topbar {
 				background: white;
@@ -186,6 +188,10 @@
 
 			.panelShadow {
 				background: #aaaadd;
+			}
+
+			.panel .material-icons {
+				font-size: 18px;
 			}
 
 			/*default: gray*/
@@ -252,6 +258,7 @@
 				padding: 6px;
 				padding-left: 8px;
 				padding-right: 8px;
+				padding-bottom: 0px;
 				margin-bottom: 4px;
 				font-size: 14px;
 				border: none;
@@ -267,6 +274,10 @@
 				color:white;
 			}
 			button:focus { outline:none; }
+
+			button .material-icons {
+				font-size: 24px;
+			}
 
 			/*periwinkle*/
 			button.color0 {
@@ -318,6 +329,7 @@
 		<script src="editor.js"></script>
 
 		<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	</head>
 
 	<body onload="start()">
@@ -329,7 +341,9 @@
 			<span style="float:left;"> Bitsy </span>
 
 			<input type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
-			<button class="color0" onclick="showPanel('toolsPanel');" style="margin-left:20px;">show toolbar</button>
+			<button class="color0" onclick="showPanel('toolsPanel');" style="margin-left:20px;">
+				<i class="material-icons">settings</i>
+			</button>
 			<button class="color0" onclick="newGameDialog();" style="margin-left:20px;">new game (start over!)</button>
 			<span id="bitsyEditorName">
 				Bitsy v3.1 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
@@ -352,7 +366,7 @@
 
 				<div id="toolsPanel" class="panel color0" style="display:none;">
 					<div class="bar color0" onmousedown="grabCard(event);">
-						toolbar <span class="minimize" onclick="hidePanel('toolsPanel');">[ - ]</span>
+						<i class="material-icons">settings</i> Toolbar <span class="minimize" onclick="hidePanel('toolsPanel');">[ - ]</span>
 					</div>
 					<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/> about <br>
 					<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanel(event);" checked/> room <br>
@@ -443,11 +457,21 @@
 					<br>
 					<div id="roomNav">
 						room <span id="roomId">0</span>
-						<button class="color0" onclick="prevRoom();"> < prev </button>
-						<button class="color0" onclick="nextRoom();"> next > </button>
-						<button class="color0" onclick="newRoom();"> + new </button>
-						<button class="color0" onclick="duplicateRoom();"> ++ duplicate </button>
-						<button class="color0" onclick="deleteRoom();"> x delete x </button>
+						<button class="color0" onclick="prevRoom();">
+							<i class="material-icons">skip_previous</i>
+						</button>
+						<button class="color0" onclick="nextRoom();">
+							<i class="material-icons">skip_next</i>
+						</button>
+						<button class="color0" onclick="newRoom();">
+							<i class="material-icons">add</i>
+						</button>
+						<button class="color0" onclick="duplicateRoom();">
+							<i class="material-icons">content_copy</i>
+						</button>
+						<button class="color0" onclick="deleteRoom();">
+							<i class="material-icons">delete</i>
+						</button>
 					</div>
 					<div id="roomCommands">
 						<button class="color0" onclick="showPanel('exitsPanel');"> + add exits to other rooms </button>
