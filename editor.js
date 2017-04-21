@@ -1464,6 +1464,16 @@ function refreshGameData() {
 	localStorage.setItem("game_data", gameData); //auto-save
 }
 
+function togglePlayMode(e) {
+	if (e.target.checked) {
+		on_play_mode();
+	}
+	else {
+		on_edit_mode();
+	}
+	updatePlayModeButton();
+}
+
 function on_edit_mode() {
 	isPlayMode = false;
 	stopGame();
@@ -1480,19 +1490,26 @@ function on_play_mode() {
 	load_game(document.getElementById("game_data").value);
 }
 
+function updatePlayModeButton() {
+	document.getElementById("playModeIcon").innerHTML = isPlayMode ? "stop" : "play_arrow";
+	document.getElementById("playModeText").innerHTML = isPlayMode ? "stop" : "play";
+}
+
 function toggleGrid() {
 	drawPaintGrid = !drawPaintGrid;
 	drawPaintCanvas();
 }
 
-function toggleMapGrid() {
-	drawMapGrid = !drawMapGrid;
+function toggleMapGrid(e) {
+	drawMapGrid = e.target.checked;
+	document.getElementById("roomGridIcon").innerHTML = drawMapGrid ? "visibility" : "visibility_off";
 	drawEditMap();
 }
 
 var drawCollisionMap = false; //todo - move variable to more centeral spot?
-function toggleCollisionMap() {
-	drawCollisionMap = !drawCollisionMap;
+function toggleCollisionMap(e) {
+	drawCollisionMap = e.target.checked;
+	document.getElementById("roomWallsIcon").innerHTML = drawCollisionMap ? "visibility" : "visibility_off";
 	drawEditMap();
 }
 

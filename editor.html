@@ -74,7 +74,15 @@
 				margin: -10px;
 				margin-bottom: 10px;
 				border-radius: 5px 5px 0px 0px;
+				
 				font-size: 18px;
+				line-height: 150%;
+			}
+			.panel .bar .material-icons {
+				line-height: 150%;
+				/*vertical-align: -10%;*/
+				vertical-align: middle;
+				font-size: 22px;
 			}
 			.panelShadow {
 				display: inline-block;
@@ -255,17 +263,20 @@
 		<style>
 			button {
 				font-family: "Nunito", Helvetica, Arial, sans-serif;
-				padding: 6px;
+				padding: 3px;
 				padding-left: 8px;
 				padding-right: 8px;
-				padding-bottom: 0px;
+				/*padding-bottom: 0px;*/
 				margin-bottom: 4px;
+				/*font-size: 20px;*/
 				font-size: 14px;
 				border: none;
 				border-radius: 5px;
 				background: #eee;
 				border: solid 1px #aaa;
 				border-bottom: solid 2px #aaa;
+				vertical-align: middle;
+				line-height: 100%;
 			}
 			button:active {
 				/*margin-top: 2px;*/
@@ -274,9 +285,10 @@
 				color:white;
 			}
 			button:focus { outline:none; }
-
 			button .material-icons {
 				font-size: 24px;
+				vertical-align: middle;
+				line-height: 100%;
 			}
 
 			/*periwinkle*/
@@ -293,6 +305,7 @@
 			/*pink*/
 			button.color1 {
 				background: #ffeeff;
+				border: solid 1px #ff88ff;
 				border-bottom: solid 2px #ff88ff;
 			}
 			button.color1:active {
@@ -302,6 +315,7 @@
 			/*yellow*/
 			button.color2 {
 				background: #ffffcc;
+				border: solid 1px #f9ea72;
 				border-bottom: solid 2px #f9ea72;
 			}
 			button.color2:active {
@@ -311,10 +325,77 @@
 			/*green*/
 			button.color3 {
 				background: #ccfff1;
+				border: solid 1px #00d197;
 				border-bottom: solid 2px #00d197;
 			}
 			button.color3:active {
 				background: #00d197;
+			}
+
+			/* light button style */
+			button.light {
+				font-family: "Nunito", Helvetica, Arial, sans-serif;
+				font-size: 14px;
+				margin: none;
+				padding: -5px;
+				border: none;
+				border-radius: 5px;
+				background: none;
+				color:black;
+			}
+			button.light:hover {
+				background:#aaa;
+			}
+			button.light:active {
+				background:black;
+				color:white;
+			}
+			button.light:focus { outline:none; }
+			button.light .material-icons {
+				font-size: 20px;
+			}
+			/* light green */
+			button.light.color3:hover {
+				/*background:#00d197;*/
+				/*opacity: 0.5;*/
+				background: rgba(0, 209, 151, 0.2);
+			}
+			button.light.color3:active {
+				background:#00d197;
+				/*opacity: 1.0;*/
+			}
+
+			/* todo this seems weirdly specific */
+			.panel .bar button .material-icons {
+				font-size: 18px;
+			}
+		</style>
+
+		<!-- checkbox style -->
+		<style>
+			input[type=checkbox] {
+				display: none;
+			}
+			
+			input[type=checkbox] + label {
+				background: #ccc;
+				color: black;
+				padding: 3px;
+				padding-left: 5px;
+				padding-right: 5px;
+				border-radius: 5px;
+				margin: 2px;
+				vertical-align: middle;
+				line-height: 100%;
+			}
+			input[type=checkbox] + label .material-icons {
+				vertical-align: middle;
+				line-height: 100%;
+			}
+			
+			input[type=checkbox]:checked + label {
+				background: #444;
+				color: white;
 			}
 		</style>
 
@@ -366,21 +447,58 @@
 
 				<div id="toolsPanel" class="panel color0" style="display:none;">
 					<div class="bar color0" onmousedown="grabCard(event);">
-						<i class="material-icons">settings</i> Toolbar <span class="minimize" onclick="hidePanel('toolsPanel');">[ - ]</span>
+						<i class="material-icons">settings</i> toolbar <span class="minimize" onclick="hidePanel('toolsPanel');">[ - ]</span>
 					</div>
-					<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/> about <br>
-					<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanel(event);" checked/> room <br>
-					<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanel(event);" /> exits <br>
-					<input type="checkbox" value="endingsPanel" id="endingsCheck" onclick="togglePanel(event);" /> endings <br>
-					<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanel(event);"  checked/> paint <br>
-					<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanel(event);"  checked/> colors <br>
-					<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanel(event);"  checked/> download <br>
-					<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanel(event);" /> record gif <br>
-					<input type="checkbox" value="dataPanel" onclick="togglePanel(event);" id="dataCheck"/> game data
+				
+					<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/>
+					<label for="aboutCheck">
+						<i class="material-icons">info</i> about
+					</label> <br>
+					
+					<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanel(event);" checked/>
+					<label for="roomCheck">
+						<i class="material-icons">grid_on</i> room
+					</label> <br>
+
+					<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanel(event);" />
+					<label for="exitsCheck">
+						<i class="material-icons">directions</i> exits
+					</label> <br>
+
+					<input type="checkbox" value="endingsPanel" id="endingsCheck" onclick="togglePanel(event);" />
+					<label for="endingsCheck">
+						<i class="material-icons">place</i> endings
+					</label> <br>
+					
+					<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanel(event);"  checked/>
+					<label for="paintCheck">
+						<i class="material-icons">format_paint</i> paint
+					</label> <br>
+					
+					<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanel(event);"  checked/>
+					<label for="colorsCheck">
+						<i class="material-icons">palette</i> colors
+					</label> <br>
+					
+					<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanel(event);"  checked/>
+					<label for="downloadCheck">
+						<i class="material-icons">file_download</i> download
+					</label> <br>
+					
+					<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanel(event);" />
+					<label for="gifCheck">
+						<i class="material-icons">videocam</i> record gif
+					</label> <br>
+					
+					<input type="checkbox" value="dataPanel" onclick="togglePanel(event);" id="dataCheck"/>
+					<label for="dataCheck">
+						<i class="material-icons">save</i> game data
+					</label>
 				</div>
 
 				<div id="aboutPanel" class="panel color0">
 					<div class="bar color0" onmousedown="grabCard(event);">
+						<i class="material-icons">info</i>
 						about bitsy <span class="minimize" onclick="hidePanel('aboutPanel');">[ - ]</span>
 					</div>
 					<div id="aboutInner">
@@ -447,46 +565,68 @@
 
 				<div id="roomPanel" class="panel color3">
 					<div class="bar color3" onmousedown="grabCard(event);">
-						room <span class="minimize" onclick="hidePanel('roomPanel');">[ - ]</span>
+						<i class="material-icons">grid_on</i> room
+						<button class="light color3" style="float:right;" onclick="hidePanel('roomPanel');">
+							<i class="material-icons">close</i>
+						</button>
 					</div>
-					<form>
-						<input type="radio" name="edit mode" value="edit" onclick="on_edit_mode()" checked> edit
-						<input type="radio" name="edit mode" value="play" onclick="on_play_mode()"> play
-					</form>
+					
 					<canvas id="game"></canvas>
-					<br>
+					
+					
+					<div style="margin-bottom:2px;">			
+						<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" />
+						<label for="playModeCheck">
+							<i class="material-icons" id="playModeIcon">play_arrow</i>
+							<span id="playModeText"> play </span>
+						</label>
+					</div>
+
 					<div id="roomNav">
 						room <span id="roomId">0</span>
-						<button class="color0" onclick="prevRoom();">
-							<i class="material-icons">skip_previous</i>
+						<button title="previous room" class="color0" onclick="prevRoom();">
+							<i class="material-icons">navigate_before</i>
 						</button>
-						<button class="color0" onclick="nextRoom();">
-							<i class="material-icons">skip_next</i>
+						<button title="next room" class="color0" onclick="nextRoom();">
+							<i class="material-icons">navigate_next</i>
 						</button>
-						<button class="color0" onclick="newRoom();">
+						<button title="add new room" class="color0" onclick="newRoom();">
 							<i class="material-icons">add</i>
 						</button>
-						<button class="color0" onclick="duplicateRoom();">
+						<button title="duplicate room" class="color0" onclick="duplicateRoom();">
 							<i class="material-icons">content_copy</i>
 						</button>
-						<button class="color0" onclick="deleteRoom();">
-							<i class="material-icons">delete</i>
+						<button title="delete room" class="color0" onclick="deleteRoom();">
+							<i class="material-icons">remove</i>
 						</button>
 					</div>
 					<div id="roomCommands">
-						<button class="color0" onclick="showPanel('exitsPanel');"> + add exits to other rooms </button>
-						<button class="color0" onclick="showPanel('endingsPanel');"> + add endings </button>
+						<button title="add exits to other rooms" class="color0" onclick="showPanel('exitsPanel');">
+							<i class="material-icons">add</i> exits
+						</button>
+						<button title="add endings" class="color0" onclick="showPanel('endingsPanel');">
+							<i class="material-icons">add</i> endings
+						</button>
 						color palette: 
 						<select id="roomPaletteSelect" onchange="roomPaletteChange(event);">
 							<option value="0">palette 0</option> <!-- other options are added dynamically -->
 						</select>
 					</div>
-					<button class="color0" onclick="toggleMapGrid();"> show/hide tile grid </button>
-					<button class="color0" onclick="toggleCollisionMap();"> show/hide walls </button>
+
+					<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
+					<label title="show / hide grid" for="roomGridCheck">
+						<i class="material-icons" id="roomGridIcon">visibility</i> grid
+					</label>
+
+					<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" />
+					<label title="show / hide walls" for="roomWallsCheck">
+						<i class="material-icons" id="roomWallsIcon">visibility_off</i> walls
+					</label>
 				</div>
 
 				<div id="exitsPanel" class="panel color3" style="display:none;">
 					<div class="bar color3" onmousedown="grabCard(event);">
+						<i class="material-icons">directions</i> 
 						exits <span class="minimize" onclick="hidePanel('exitsPanel');">[ - ]</span>
 					</div>
 					<button class="color0" onclick="addExit();" id="addExitButton"> + add new exit to this room </button>
@@ -513,6 +653,7 @@
 
 				<div id="endingsPanel" class="panel color3" style="display:block;">
 					<div class="bar color3" onmousedown="grabCard(event);">
+						<i class="material-icons">place</i>
 						endings <span class="minimize" onclick="hidePanel('endingsPanel');">[ - ]</span>
 					</div>
 					<div id="endingNav">
@@ -532,6 +673,7 @@
 
 				<div id="paintPanel" class="panel color1">
 					<div class="bar color1" onmousedown="grabCard(event);">
+						<i class="material-icons">format_paint</i>
 						paint <span class="minimize" onclick="hidePanel('paintPanel');">[ - ]</span>
 					</div>
 					<form>
@@ -553,7 +695,12 @@
 						<button class="color0" onclick="deleteDrawing();"> x delete x </button>
 					</div>
 					<div id="wall" style="display:none;">
-						make tile a wall <input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall();"> <button class="color0" onclick="apply_wall_setting_all_rooms();">apply to all rooms</button>
+						<input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall();">
+						<label for="wallCheckbox">
+							wall
+						</label>
+
+						<button class="color0" onclick="apply_wall_setting_all_rooms();">apply to all rooms</button>
 					</div>
 					<div id="dialog" style="display:none;">dialog:
 						<!-- <input type="text" id="dialogText" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"> --> 
@@ -573,6 +720,7 @@
 
 				<div id="colorsPanel" class="panel color1">
 					<div class="bar color1" onmousedown="grabCard(event);">
+						<i class="material-icons">palette</i>
 						colors <span class="minimize" onclick="hidePanel('colorsPanel');">[ - ]</span>
 					</div>
 					<div id="paletteIdContainer" style="display:none;">palette <span id="paletteId">0</span></div>
@@ -592,6 +740,7 @@
 
 				<div id="downloadPanel" class="panel color2">
 					<div class="bar color2" onmousedown="grabCard(event);">
+						<i class="material-icons">file_download</i>
 						download <span class="minimize" onclick="hidePanel('downloadPanel');">[ - ]</span>
 					</div>
 					download game as html file: <br>
@@ -617,6 +766,7 @@
 
 				<div id="gifPanel" class="panel color2" style="display:none;">
 					<div class="bar color2" onmousedown="grabCard(event);">
+						<i class="material-icons">videocam</i>
 						record gif <span class="minimize" onclick="hidePanel('gifPanel');">[ - ]</span>
 					</div>
 					
@@ -636,6 +786,7 @@
 
 				<div id="dataPanel" class="panel color0" style="display:none;">
 					<div class="bar color0" onmousedown="grabCard(event);">
+						<i class="material-icons">save</i>
 						game data <span class="minimize" onclick="hidePanel('dataPanel');">[ - ]</span>
 					</div>
 					<textarea id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
