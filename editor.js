@@ -1464,6 +1464,17 @@ function refreshGameData() {
 	localStorage.setItem("game_data", gameData); //auto-save
 }
 
+function toggleRoomTools(e) {
+	if( e.target.checked ) {
+		document.getElementById("roomTools").style.display = "block";
+		document.getElementById("roomToolsCheckIcon").innerHTML = "expand_more";
+	}
+	else {
+		document.getElementById("roomTools").style.display = "none";
+		document.getElementById("roomToolsCheckIcon").innerHTML = "expand_less";
+	}
+}
+
 function togglePlayMode(e) {
 	if (e.target.checked) {
 		on_play_mode();

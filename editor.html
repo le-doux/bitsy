@@ -14,8 +14,9 @@
 				font-size: 18px;
 			}
 			button {
-				font-family: Helvetica, Arial, sans-serif;
-				font-size: 13px;
+				font-family: "Nunito", Helvetica, Arial, sans-serif;
+				/*font-family: Helvetica, Arial, sans-serif;*/
+				/*font-size: 13px;*/
 			}
 			canvas {
 				background: black;
@@ -191,7 +192,7 @@
 			#topbar {
 				background: white;
 				/*border-bottom: solid 3px #888;*/
-				border-bottom: none;
+				/*border-bottom: none;*/
 			}
 
 			.panelShadow {
@@ -214,7 +215,7 @@
 			}
 
 			/*periwinkle*/
-			.panel.color0 {
+/*			.panel.color0 {
 				background: white;
 				border: solid 1px #9797f4;
 				border-bottom: solid 4px #9797f4;
@@ -222,10 +223,10 @@
 			.bar.color0 {
 				background: #eeeeff;
 				border-bottom: 2px solid #9797f4;
-			}
+			}*/
 
 			/*pink*/
-			.panel.color1 {
+/*			.panel.color1 {
 				background: white;
 				border: solid 1px #ff88ff;
 				border-bottom: solid 4px #ff88ff;
@@ -233,10 +234,10 @@
 			.bar.color1 {
 				background: #ffeeff;
 				border-bottom: 2px solid #ff88ff;
-			}
+			}*/
 
 			/*yellow*/
-			.panel.color2 {
+/*			.panel.color2 {
 				background: white;
 				border: solid 1px #f9ea72;
 				border-bottom: solid 4px #f9ea72;
@@ -244,10 +245,10 @@
 			.bar.color2 {
 				background: #ffffcc;
 				border-bottom: 2px solid #f9ea72;
-			}
+			}*/
 
 			/*green*/
-			.panel.color3 {
+/*			.panel.color3 {
 				background: white;
 				border: solid 1px #00d197;
 				border-bottom: solid 4px #00d197;
@@ -255,7 +256,7 @@
 			.bar.color3 {
 				background: #ccfff1;
 				border-bottom: 2px solid #00d197;
-			}
+			}*/
 
 		</style>
 
@@ -269,7 +270,7 @@
 				/*padding-bottom: 0px;*/
 				margin-bottom: 4px;
 				/*font-size: 20px;*/
-				font-size: 14px;
+				/*font-size: 14px;*/
 				border: none;
 				border-radius: 5px;
 				background: #eee;
@@ -286,51 +287,50 @@
 			}
 			button:focus { outline:none; }
 			button .material-icons {
-				font-size: 24px;
+				/*font-size: 24px;*/
 				vertical-align: middle;
 				line-height: 100%;
 			}
 
 			/*periwinkle*/
-			button.color0 {
+/*			button.color0 {
 				background: #eeeeff;
-				/*border: solid 1px #9797f4;*/
 				border: solid 1px #9797f4;
 				border-bottom: solid 2px #9797f4;
 			}
 			button.color0:active {
 				background: #9797f4;
-			}
+			}*/
 
 			/*pink*/
-			button.color1 {
+/*			button.color1 {
 				background: #ffeeff;
 				border: solid 1px #ff88ff;
 				border-bottom: solid 2px #ff88ff;
 			}
 			button.color1:active {
 				background: #ff88ff;
-			}
+			}*/
 
 			/*yellow*/
-			button.color2 {
+/*			button.color2 {
 				background: #ffffcc;
 				border: solid 1px #f9ea72;
 				border-bottom: solid 2px #f9ea72;
 			}
 			button.color2:active {
 				background: #f9ea72;
-			}
+			}*/
 
 			/*green*/
-			button.color3 {
+/*			button.color3 {
 				background: #ccfff1;
 				border: solid 1px #00d197;
 				border-bottom: solid 2px #00d197;
 			}
 			button.color3:active {
 				background: #00d197;
-			}
+			}*/
 
 			/* light button style */
 			button.light {
@@ -354,6 +354,7 @@
 			button.light .material-icons {
 				font-size: 20px;
 			}
+
 			/* light green */
 			button.light.color3:hover {
 				/*background:#00d197;*/
@@ -399,6 +400,148 @@
 			}
 		</style>
 
+		<!-- radio button style -->
+		<style>
+			input[type=radio] {
+				display: none;
+			}
+
+			input[type=radio] + label {
+				background: #ccc;
+				color: black;
+				padding: 3px;
+				padding-left: 5px;
+				padding-right: 5px;
+				border-radius: 5px;
+				border: solid 1px #444;
+				vertical-align: middle;
+				line-height: 100%;
+			}
+			input[type=radio] + label .material-icons {
+				vertical-align: middle;
+				line-height: 100%;
+			}
+
+			input[type=radio]:checked + label {
+				background: #444;
+				color: white;
+			}
+
+			input[type=radio] + label.left {
+				border-radius: 5px 0px 0px 5px;
+			}
+
+			input[type=radio] + label.middle {
+				border-radius: 0px;
+			}
+
+			input[type=radio] + label.right {
+				border-radius: 0px 5px 5px 0px;
+			}
+		</style>
+
+		<!-- another attempt at style -->
+		<style>
+			/* remove borders */
+			.panel {
+				border: none;
+				border-radius: 0px;
+			}
+			.panel .bar {
+				border: none;
+				border-radius: 0px;
+			}
+			.panelShadow {
+				border-radius: 0px;
+			}
+
+			button {
+				border-radius: 0px;
+				border: none;
+				font-size: 16px;
+			}
+
+			input[type=radio] + label {
+				border-radius: 0px;
+				border: none;
+			}
+
+			input[type=checkbox] + label {
+				border-radius: 0px;
+				border: none;
+			}
+
+			/* new UI groupers */
+			.buttonGroup {
+				background: #eee;
+				padding: 2px;
+				margin: 2px;
+				display: inline-block;
+			}
+
+			.toolBox {
+				background: #ddd;
+				padding: 5px;
+			}
+
+			/*colors*/
+			#topbar {
+				border-bottom: solid 3px #6767b2;
+			}
+
+			body {
+				background: #ccccff;
+				color: #6767b2;
+			}
+
+			.panel .bar {
+				background: #e8e8ff;
+				color: #6767b2;
+			}
+
+			.panelShadow {
+				background: #6767b2;
+			}
+
+			button {
+				background: #e8e8ff;
+				color: #6767b2;
+			}
+			button:active {
+				background: #6767b2;
+			}
+
+			.toolBox button {
+				background: #ccccff;
+			}
+
+			input[type=checkbox] + label {
+				background: #e8e8ff;
+				color: #6767b2;
+			}
+			input[type=checkbox]:checked + label {
+				background: #6767b2;
+			}
+
+			.buttonGroup {
+				background: none;
+			}
+
+			.toolBox {
+				background: #e8e8ff;
+			}
+
+			/*toolbar*/
+			#toolsPanel {
+				padding-top: 5px;
+				font-size: 14px;
+			}
+
+			#toolsPanel input[type=checkbox]:not(:checked) + label {
+				background: none;
+			}
+		</style>
+
 		<!-- ENGINE SCRIPTS -->
 		<script src="font.js"></script>
 		<script src="parser.js"></script>
@@ -422,18 +565,75 @@
 			<span style="float:left;"> Bitsy </span>
 
 			<input type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
-			<button class="color0" onclick="showPanel('toolsPanel');" style="margin-left:20px;">
+			
+<!-- 			<button class="color0" onclick="showPanel('toolsPanel');" style="margin-left:20px;">
 				<i class="material-icons">settings</i>
-			</button>
+			</button> -->
+
+			<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="togglePanel(event);" />
+			<label for="toolsCheck">
+				<i class="material-icons">settings</i> toolbar
+			</label>
+			
 			<button class="color0" onclick="newGameDialog();" style="margin-left:20px;">new game (start over!)</button>
+			
 			<span id="bitsyEditorName">
 				Bitsy v3.1 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
 			</span>
+
+			<br>
+
+			<div id="toolsPanel">
+				<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/>
+				<label for="aboutCheck">
+					<i class="material-icons">info</i> about
+				</label>
+				
+				<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanel(event);" checked/>
+				<label for="roomCheck">
+					<i class="material-icons">grid_on</i> room
+				</label>
+
+				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanel(event);" />
+				<label for="exitsCheck">
+					<i class="material-icons">directions</i> exits
+				</label>
+
+				<input type="checkbox" value="endingsPanel" id="endingsCheck" onclick="togglePanel(event);" />
+				<label for="endingsCheck">
+					<i class="material-icons">place</i> endings
+				</label>
+				
+				<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanel(event);"  checked/>
+				<label for="paintCheck">
+					<i class="material-icons">brush</i> paint
+				</label>
+				
+				<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanel(event);"  checked/>
+				<label for="colorsCheck">
+					<i class="material-icons">palette</i> colors
+				</label>
+				
+				<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanel(event);"  checked/>
+				<label for="downloadCheck">
+					<i class="material-icons">file_download</i> download
+				</label>
+				
+				<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanel(event);" />
+				<label for="gifCheck">
+					<i class="material-icons">videocam</i> record gif
+				</label>
+				
+				<input type="checkbox" value="dataPanel" onclick="togglePanel(event);" id="dataCheck"/>
+				<label for="dataCheck">
+					<i class="material-icons">save</i> game data
+				</label>
+			</div>
 		</div>
-		<div style="width:25%;height:5px;float:left;background:#ff88ff;"></div>
-		<div style="width:25%;height:5px;float:left;background:#00d197;"></div>
-		<div style="width:25%;height:5px;float:left;background:#f9ea72;"></div>
-		<div style="width:25%;height:5px;float:left;background:#9797f4;"></div>
+		<!-- <div style="width:25%;height:5px;float:left;background:#ff88ff;"></div> -->
+		<!-- <div style="width:25%;height:5px;float:left;background:#00d197;"></div> -->
+		<!-- <div style="width:25%;height:5px;float:left;background:#f9ea72;"></div> -->
+		<!-- <div style="width:25%;height:5px;float:left;background:#9797f4;"></div> -->
 		<!-- <div style="width:100%;height:5px;float:left;background:#9797f4;"></div> -->
 
 		<div id="unsupportedFeatures" style="display:none;">
@@ -445,11 +645,11 @@
 		<div id="editorWindow">
 			<div id="editorContent">
 
-				<div id="toolsPanel" class="panel color0" style="display:none;">
+				<div id="toolsPanel2" class="panel color0" style="display:none;">
 					<div class="bar color0" onmousedown="grabCard(event);">
 						<i class="material-icons">settings</i> toolbar <span class="minimize" onclick="hidePanel('toolsPanel');">[ - ]</span>
 					</div>
-				
+<!-- 				
 					<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/>
 					<label for="aboutCheck">
 						<i class="material-icons">info</i> about
@@ -472,7 +672,7 @@
 					
 					<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanel(event);"  checked/>
 					<label for="paintCheck">
-						<i class="material-icons">format_paint</i> paint
+						<i class="material-icons">brush</i> paint
 					</label> <br>
 					
 					<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanel(event);"  checked/>
@@ -493,7 +693,7 @@
 					<input type="checkbox" value="dataPanel" onclick="togglePanel(event);" id="dataCheck"/>
 					<label for="dataCheck">
 						<i class="material-icons">save</i> game data
-					</label>
+					</label> -->
 				</div>
 
 				<div id="aboutPanel" class="panel color0">
@@ -571,9 +771,6 @@
 						</button>
 					</div>
 					
-					<canvas id="game"></canvas>
-					
-					
 					<div style="margin-bottom:2px;">			
 						<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" />
 						<label for="playModeCheck">
@@ -582,46 +779,77 @@
 						</label>
 					</div>
 
-					<div id="roomNav">
-						room <span id="roomId">0</span>
-						<button title="previous room" class="color0" onclick="prevRoom();">
-							<i class="material-icons">navigate_before</i>
-						</button>
-						<button title="next room" class="color0" onclick="nextRoom();">
-							<i class="material-icons">navigate_next</i>
-						</button>
-						<button title="add new room" class="color0" onclick="newRoom();">
-							<i class="material-icons">add</i>
-						</button>
-						<button title="duplicate room" class="color0" onclick="duplicateRoom();">
-							<i class="material-icons">content_copy</i>
-						</button>
-						<button title="delete room" class="color0" onclick="deleteRoom();">
-							<i class="material-icons">remove</i>
-						</button>
-					</div>
-					<div id="roomCommands">
-						<button title="add exits to other rooms" class="color0" onclick="showPanel('exitsPanel');">
-							<i class="material-icons">add</i> exits
-						</button>
-						<button title="add endings" class="color0" onclick="showPanel('endingsPanel');">
-							<i class="material-icons">add</i> endings
-						</button>
-						color palette: 
-						<select id="roomPaletteSelect" onchange="roomPaletteChange(event);">
-							<option value="0">palette 0</option> <!-- other options are added dynamically -->
-						</select>
+					<canvas id="game"></canvas>
+
+					<br>
+
+					<div id="roomToolsOuter" class="toolBox">
+
+						<input type="checkbox" id="roomToolsCheck" onclick="toggleRoomTools(event);" />
+						<label for="roomToolsCheck">
+							room tools
+							<i id="roomToolsCheckIcon" class="material-icons">expand_less</i>
+						</label>
+
+						<br>
+						
+						<div id="roomTools" style="display:none;">
+							<div id="roomNav" class="buttonGroup">
+								room <span id="roomId">0</span>
+								<button title="previous room" class="color0" onclick="prevRoom();">
+									<i class="material-icons">navigate_before</i>
+								</button>
+								<button title="next room" class="color0" onclick="nextRoom();">
+									<i class="material-icons">navigate_next</i>
+								</button>
+
+							</div>
+
+							<div id="roomCommands" class="buttonGroup">
+								<button title="add new room" class="color0" onclick="newRoom();">
+									<i class="material-icons">add</i>
+								</button>
+								<button title="duplicate room" class="color0" onclick="duplicateRoom();">
+									<i class="material-icons">content_copy</i>
+								</button>
+								<button title="delete room" class="color0" onclick="deleteRoom();">
+									<i class="material-icons">remove</i>
+								</button>
+							</div>
+							<div id="roomVisibility" class="buttonGroup">
+								<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
+								<label title="show / hide grid" for="roomGridCheck">
+									<i class="material-icons" id="roomGridIcon">visibility</i> grid
+								</label>
+
+								<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" />
+								<label title="show / hide walls" for="roomWallsCheck">
+									<i class="material-icons" id="roomWallsIcon">visibility_off</i> walls
+								</label>
+							</div>
+
+							<br>
+
+							<div id="roomExits" class="buttonGroup">
+								<button title="add exits to other rooms" class="color0" onclick="showPanel('exitsPanel');">
+									<i class="material-icons">add</i> exits
+								</button>
+								<button title="add endings" class="color0" onclick="showPanel('endingsPanel');">
+									<i class="material-icons">add</i> endings
+								</button>
+							</div>
+
+							<div id="roomColor" class="buttonGroup">
+								colors: 
+								<select id="roomPaletteSelect" onchange="roomPaletteChange(event);">
+									<option value="0">palette 0</option> <!-- other options are added dynamically -->
+								</select>
+							</div>
+						</div>
+
 					</div>
 
-					<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
-					<label title="show / hide grid" for="roomGridCheck">
-						<i class="material-icons" id="roomGridIcon">visibility</i> grid
-					</label>
 
-					<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" />
-					<label title="show / hide walls" for="roomWallsCheck">
-						<i class="material-icons" id="roomWallsIcon">visibility_off</i> walls
-					</label>
 				</div>
 
 				<div id="exitsPanel" class="panel color3" style="display:none;">
@@ -673,13 +901,27 @@
 
 				<div id="paintPanel" class="panel color1">
 					<div class="bar color1" onmousedown="grabCard(event);">
-						<i class="material-icons">format_paint</i>
+						<i class="material-icons">brush</i>
 						paint <span class="minimize" onclick="hidePanel('paintPanel');">[ - ]</span>
 					</div>
 					<form>
-						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_avatar();" id="paintOptionAvatar" checked> avatar
-						<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();"> tile
-						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();"> sprite
+						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_avatar();" id="paintOptionAvatar" checked>
+						<label for="paintOptionAvatar" class="left">
+							<i class="material-icons">perm_identity</i>
+							avatar
+						</label>
+
+						<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();" id="paintOptionTile">
+						<label for="paintOptionTile" class="middle">
+							<i class="material-icons">terrain</i>
+							tile
+						</label>
+
+						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite">
+						<label for="paintOptionSprite" class="right">
+							<i class="material-icons">nature_people</i>
+							sprite
+						</label>
 					</form>
 					<div id="paintNav" style="display:none;">
 						<button class="color0" onclick="prev();"> < prev </button>
@@ -707,7 +949,13 @@
 						<br>
 						<textarea id="dialogText" class="dialogTextArea" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"></textarea> <!-- rows="2" cols="32" -->
 					</div>
-					<div id="isAnimated" style="display:none;">add animation <input type="checkbox" id="animatedCheckbox" onchange="on_toggle_animated();"> </div>
+					<div id="isAnimated" style="display:none;">
+						<input type="checkbox" id="animatedCheckbox" onchange="on_toggle_animated();">
+						<label for="animatedCheckbox">
+							<i class="material-icons">local_movies</i>
+							add animation
+						</label>
+					</div>
 					<div id="animation" style="display:none;">
 						<form>
 							keyframe:
