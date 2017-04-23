@@ -990,11 +990,13 @@ function reloadTile() {
 		document.getElementById("animationOptionFrame1").checked = (curDrawingFrameIndex == 0);
 		document.getElementById("animationOptionFrame2").checked = (curDrawingFrameIndex == 1);
 		document.getElementById("animation").setAttribute("style","display:block;");
+		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
 	}
 	else {
 		isCurDrawingAnimated = false;
 		document.getElementById("animatedCheckbox").checked = false;
 		document.getElementById("animation").setAttribute("style","display:none;");
+		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
 	}
 
 	// wall UI
@@ -1007,9 +1009,11 @@ function updateWallCheckboxOnCurrentTile() {
 	if (room[curRoom]) { //todo this per-room wall nonsense is confusing
 		if (room[curRoom].walls.indexOf(drawingId) != -1) {
 			document.getElementById("wallCheckbox").checked = true;
+			document.getElementById("wallCheckboxIcon").innerHTML = "border_outer";
 		}
 		else {
 			document.getElementById("wallCheckbox").checked = false;
+			document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
 		}
 	}
 }
@@ -1022,11 +1026,13 @@ function reloadSprite() {
 		document.getElementById("animationOptionFrame1").checked = (curDrawingFrameIndex == 0);
 		document.getElementById("animationOptionFrame2").checked = (curDrawingFrameIndex == 1);
 		document.getElementById("animation").setAttribute("style","display:block;");
+		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
 	}
 	else {
 		isCurDrawingAnimated = false;
 		document.getElementById("animatedCheckbox").checked = false;
 		document.getElementById("animation").setAttribute("style","display:none;");
+		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
 	}
 
 	// dialog UI
@@ -1464,6 +1470,17 @@ function refreshGameData() {
 	localStorage.setItem("game_data", gameData); //auto-save
 }
 
+function toggleToolBar(e) {
+	if( e.target.checked ) {
+		document.getElementById("toolsPanel").style.display = "block";
+		document.getElementById("toolsCheckIcon").innerHTML = "expand_more";
+	}
+	else {
+		document.getElementById("toolsPanel").style.display = "none";
+		document.getElementById("toolsCheckIcon").innerHTML = "expand_less";
+	}
+}
+
 function toggleRoomTools(e) {
 	if( e.target.checked ) {
 		document.getElementById("roomTools").style.display = "block";
@@ -1472,6 +1489,28 @@ function toggleRoomTools(e) {
 	else {
 		document.getElementById("roomTools").style.display = "none";
 		document.getElementById("roomToolsCheckIcon").innerHTML = "expand_less";
+	}
+}
+
+function togglePaletteTools(e) {
+	if( e.target.checked ) {
+		document.getElementById("paletteTools").style.display = "block";
+		document.getElementById("paletteToolsCheckIcon").innerHTML = "expand_more";
+	}
+	else {
+		document.getElementById("paletteTools").style.display = "none";
+		document.getElementById("paletteToolsCheckIcon").innerHTML = "expand_less";
+	}
+}
+
+function toggleDownloadOptions(e) {
+	if( e.target.checked ) {
+		document.getElementById("downloadOptions").style.display = "block";
+		document.getElementById("downloadOptionsCheckIcon").innerHTML = "expand_more";
+	}
+	else {
+		document.getElementById("downloadOptions").style.display = "none";
+		document.getElementById("downloadOptionsCheckIcon").innerHTML = "expand_less";
 	}
 }
 
@@ -1506,8 +1545,9 @@ function updatePlayModeButton() {
 	document.getElementById("playModeText").innerHTML = isPlayMode ? "stop" : "play";
 }
 
-function toggleGrid() {
-	drawPaintGrid = !drawPaintGrid;
+function togglePaintGrid(e) {
+	drawPaintGrid = e.target.checked;
+	document.getElementById("paintGridIcon").innerHTML = drawPaintGrid ? "visibility" : "visibility_off";
 	drawPaintCanvas();
 }
 
@@ -1532,14 +1572,14 @@ function on_change_title() {
 /* PALETTE STUFF */
 function updatePaletteUI() {
 	document.getElementById("paletteId").innerHTML = selectedColorPal();
-	if ( Object.keys(palette).length > 1 ) {
-		document.getElementById("paletteIdContainer").style.display = "block";
-		document.getElementById("paletteNav").style.display = "block";
-	}
-	else {
-		document.getElementById("paletteIdContainer").style.display = "none";
-		document.getElementById("paletteNav").style.display = "none";
-	}
+	// if ( Object.keys(palette).length > 1 ) {
+	// 	document.getElementById("paletteIdContainer").style.display = "block";
+	// 	document.getElementById("paletteNav").style.display = "block";
+	// }
+	// else {
+	// 	document.getElementById("paletteIdContainer").style.display = "none";
+	// 	document.getElementById("paletteNav").style.display = "none";
+	// }
 	updatePaletteOptionsFromGameData();
 	updatePaletteControlsFromGameData();
 	if (!browserFeatures.colorPicker) {
@@ -1721,7 +1761,7 @@ function on_paint_avatar() {
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintNav").setAttribute("style","display:none;");
 	document.getElementById("paintCommands").setAttribute("style","display:none;");
-	document.getElementById("isAnimated").setAttribute("style","display:block;");
+	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:none;");
 }
 function on_paint_tile() {
@@ -1731,9 +1771,9 @@ function on_paint_tile() {
 	reloadTile();
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:block;");
-	document.getElementById("paintNav").setAttribute("style","display:block;");
-	document.getElementById("paintCommands").setAttribute("style","display:block;");
-	document.getElementById("isAnimated").setAttribute("style","display:block;");
+	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
+	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
+	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:block;");
 }
 function on_paint_sprite() {
@@ -1750,9 +1790,9 @@ function on_paint_sprite() {
 	reloadSprite();
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
-	document.getElementById("paintNav").setAttribute("style","display:block;");
-	document.getElementById("paintCommands").setAttribute("style","display:block;");
-	document.getElementById("isAnimated").setAttribute("style","display:block;");
+	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
+	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
+	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:block;");
 }
 
@@ -1855,14 +1895,16 @@ function updateExitOptionsFromGameData() {
 
 }
 
-function on_toggle_wall() {
-	if ( document.getElementById("wallCheckbox").checked ){
+function on_toggle_wall(e) {
+	if ( e.target.checked ){
 		//add to wall list
 		room[curRoom].walls.push( drawingId );
+		document.getElementById("wallCheckboxIcon").innerHTML = "border_outer";
 	}
 	else if ( room[curRoom].walls.indexOf(drawingId) != -1 ){
 		//remove from wall list
 		room[curRoom].walls.splice( room[curRoom].walls.indexOf(drawingId), 1 );
+		document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
 	}
 	console.log(room[curRoom]);
 	refreshGameData();
@@ -1895,25 +1937,27 @@ function hideAbout() {
 	document.getElementById("aboutPanel").setAttribute("style","display:none;");
 }
 
-function toggleInstructions() {
+function toggleInstructions(e) {
 	var div = document.getElementById("instructions");
-	if (div.style.display === "none") {
+	if (e.target.checked) {
 		div.style.display = "block";
 	}
 	else {
 		div.style.display = "none";
 	}
+	document.getElementById("instructionsCheckIcon").innerHTML = e.target.checked ? "expand_more" : "expand_less";
 }
 
 //todo abstract this function into toggleDiv
-function toggleVersionNotes() {
+function toggleVersionNotes(e) {
 	var div = document.getElementById("versionNotes");
-	if (div.style.display === "none") {
+	if (e.target.checked) {
 		div.style.display = "block";
 	}
 	else {
 		div.style.display = "none";
 	}
+	document.getElementById("versionNotesCheckIcon").innerHTML = e.target.checked ? "expand_more" : "expand_less";
 }
 
 /* EXITS */
@@ -2216,6 +2260,7 @@ function on_toggle_animated() {
 			addTileAnimation();
 		}
 		document.getElementById("animation").setAttribute("style","display:block;");
+		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
 	}
 	else {
 		if ( paintMode === TileType.Sprite || paintMode === TileType.Avatar ) {
@@ -2225,6 +2270,7 @@ function on_toggle_animated() {
 			removeTileAnimation();			
 		}
 		document.getElementById("animation").setAttribute("style","display:none;");
+		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
 	}
 }
 
