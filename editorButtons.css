@@ -1,0 +1,63 @@
+/* button */
+button {
+	font-family: "Nunito", Helvetica, Arial, sans-serif;
+	font-size: 18px;
+	padding: 4px;
+	margin: 0px;
+	margin-right: 2px;
+	margin-bottom: 2px;
+	border: none;
+	vertical-align: middle;
+	line-height: 100%;
+}
+button:focus { outline:none; }
+button .material-icons {
+	font-size: 24px;
+	vertical-align: middle;
+	line-height: 100%;
+}
+
+/* checkbox */
+input[type=checkbox] {
+	display: none;
+}
+input[type=checkbox] + label {
+	font-family: "Nunito", Helvetica, Arial, sans-serif;
+	font-size: 18px;
+	padding: 4px;
+	margin: 0px;
+	margin-right: 2px;
+	margin-bottom: 2px;
+	vertical-align: middle;
+	line-height: 100%;
+}
+input[type=checkbox] + label .material-icons {
+	font-size: 24px;
+	vertical-align: middle;
+	line-height: 100%;
+}
+input[type=checkbox] + label:hover {
+	text-decoration: underline;
+}
+
+/* radio */
+input[type=radio] {
+	display: none;
+}
+input[type=radio] + label {
+	font-family: "Nunito", Helvetica, Arial, sans-serif;
+	font-size: 18px;
+	padding: 4px;
+	margin: 0px;
+	margin-bottom: 2px;
+	vertical-align: middle;
+	line-height: 100%;
+}
+input[type=radio] + label .material-icons {
+	font-size: 24px;
+	vertical-align: middle;
+	line-height: 100%;
+}
+input[type=radio] + label:hover {
+	text-decoration: underline;
+}

@@ -1,0 +1,97 @@
+body {
+	background: #ccccff;
+	color: #6767b2;
+}
+
+#topbar {
+	border-bottom: solid 3px #6767b2;
+}
+
+.panel {
+	background: white;
+}
+
+.panel .bar {
+	background: #e8e8ff;
+	color: #6767b2;
+}
+
+.panelShadow {
+	background: #6767b2;
+}
+
+button {
+	background: #e8e8ff;
+	color: #6767b2;
+}
+button:active {
+	background: #6767b2;
+	color:white;
+}
+
+.controlBox button {
+	background: #ccccff;
+}
+
+input[type=checkbox] + label {
+	background: #e8e8ff;
+	color: #6767b2;
+}
+input[type=checkbox]:checked + label {
+	background: #6767b2;
+	color: white;
+}
+input[type=radio] + label.left {
+	border-right: solid 1px #6767b2;
+}
+input[type=radio] + label.middle {
+	border-right: solid 1px #6767b2;
+}
+
+input[type=radio] + label {
+	background: #e8e8ff;
+	color: #6767b2;
+}
+input[type=radio]:checked + label {
+	background: #6767b2;
+	color:white;
+}
+
+.controlBox input[type=radio]:not(:checked) + label {
+	background: #ccccff;
+}
+
+.buttonGroup {
+	background: none;
+}
+
+.controlBox {
+	background: #e8e8ff;
+}
+
+/*topbar*/
+#topbar input[type=checkbox]:not(:checked) + label {
+	background: none;
+}
+
+#toolsPanel input[type=checkbox]:not(:checked) + label {
+	background: none;
+}
+
+#unsupportedFeatures {
+	background: #f7df74;
+	border-bottom: solid #776203 2px;
+	color: #776203;
+}
+#unsupportedFeatures button {
+	color: white;
+	background: #776203;
+}
+.helpMessage {
+	background: #e8e8ff;
+	color: #6767b2;
+}
+#editSelectedExit {
+	background: #e8e8ff;
+	color: #6767b2;
+}
