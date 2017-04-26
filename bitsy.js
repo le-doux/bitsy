@@ -324,22 +324,19 @@ function collisionMap(roomId) {
 	return map;
 }
 
-//from stack overflow (I know *gasp*)
 function getOffset(evt) {
-	var el = evt.target,
-	  x = 0,
-	  y = 0;
+	var offset = { x:0, y:0 };
 
-	while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
-	x += el.offsetLeft - el.scrollLeft;
-	y += el.offsetTop - el.scrollTop;
-	el = el.offsetParent;
-	}
+	var el = evt.target;
+	var rect = el.getBoundingClientRect();
 
-	x = evt.clientX - x;
-	y = evt.clientY - y;
+	offset.x += rect.left + el.scrollLeft;
+	offset.y += rect.top + el.scrollTop;
 
-	return { x: x, y: y };
+	offset.x = evt.clientX - offset.x;
+	offset.y = evt.clientY - offset.y;
+
+	return offset;
 }
 
 function stopGame() {
