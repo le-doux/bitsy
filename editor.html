@@ -31,7 +31,7 @@
 				</div>
 
 				<div class="buttonGroup">
-					<input title="Title text for your game" type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
+					<input title="title text for your game" type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
 				</div>
 
 				<div class="buttonGroup">
@@ -299,33 +299,38 @@
 				<div id="exitsPanel" class="panel color3" style="display:none;">
 					<div class="bar color3">
 
-						<button class="light" style="float:right;" onclick="hidePanel('exitsPanel');">
+						<button title="minimize exits window" class="light" style="float:right;" onclick="hidePanel('exitsPanel');">
 							<i class="material-icons">close</i>
 						</button>
 
-						<div class="panelBarTitle" onmousedown="grabCard(event);">
+						<div title="exits window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">directions</i> 
 							exits
 						</div>
 					</div>
-					<button class="color0" onclick="addExit();" id="addExitButton"> + add new exit to this room </button>
+					<button title="create new exit and place it in the current room" class="color0" onclick="addExit();" id="addExitButton">
+						<i class="material-icons">location_searching</i>
+						place new exit
+					</button>
 					<span id="addingExitHelpText" style="display:none;"><i>click space in room to add exit</i></span>
 					<!-- todo needs a cancel button -->
-					<div id="editSelectedExit">
+					<div title="edit selected exit" id="editSelectedExit" class="controlBox">
+						<u>selected exit</u><br>
 						<div id="noExitSelected">
 							<i>no exit selected</i>
 						</div>
 						<div id="exitSelected" style="display:none;">
 							this exit goes to: 
-							<select id="exitDestinationSelect" onchange="exitDestinationRoomChange(event);">
+							<select title="choose which room the selected exit goes to" id="exitDestinationSelect" onchange="exitDestinationRoomChange(event);">
 								<option value="0">room 0</option> <!-- other options are added dynamically -->
 							</select>
 							<br>
-							<canvas id="exitCanvas"></canvas>
+							<canvas title="click to place exit destination in selected room" id="exitCanvas"></canvas>
 							<br>
-							<i>click to place exit destination in this room</i>
-							<br>
-							<button class="color0" onclick="deleteSelectedExit();"> - delete selected exit </button>
+							<button title="delete selected exit" class="color0" onclick="deleteSelectedExit();">
+								<i class="material-icons">remove</i>
+								delete selected exit
+							</button>
 						</div>
 					</div>
 				</div>
@@ -333,28 +338,43 @@
 				<div id="endingsPanel" class="panel color3" style="display:block;">
 					<div class="bar color3">
 
-						<button class="light" style="float:right;" onclick="hidePanel('endingsPanel');">
+						<button title="minimize endings window" class="light" style="float:right;" onclick="hidePanel('endingsPanel');">
 							<i class="material-icons">close</i>
 						</button>
 
-						<div class="panelBarTitle" onmousedown="grabCard(event);">
+						<div title="endings window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">place</i>
 							endings
 						</div>
 					</div>
+					<textarea title="text displayed on player reaching this ending" id="endingText" class="dialogTextArea" onkeydown="on_change_ending();" onkeyup="on_change_ending();" onchange="on_change_ending();"></textarea>
 					<div id="endingNav">
-						<button class="color0" onclick="prevEnding();"> < prev </button>
-						<button class="color0" onclick="nextEnding();"> next > </button>
-						<button class="color0" onclick="newEnding();"> + new </button>
+						<div class="buttonGroup">
+							ending <span id="endingId">0</span>
+							<button title="previous ending" class="color0" onclick="prevEnding();">
+								<i class="material-icons">navigate_before</i>
+							</button>
+							<button title="next ending" class="color0" onclick="nextEnding();">
+								<i class="material-icons">navigate_next</i>
+							</button>
+							<button title="add new ending" class="color0" onclick="newEnding();">
+								<i class="material-icons">add</i>
+							</button>
+						</div>
 						<!-- <button onclick="deleteEnding();"> x delete x </button> -->
 					</div>
-					ending <span id="endingId">0</span><br>
-					<textarea id="endingText" class="dialogTextArea" onkeydown="on_change_ending();" onkeyup="on_change_ending();" onchange="on_change_ending();"></textarea>
-					<br>
-					<button class="color0" id="addEndingButton" onclick="addEnding();"> + place ending in room </button>
-					<span id="addingEndingHelpText" style="display:none;"> click space in room to add ending </span>
+					<div class="buttonGroup">
+						<button title="click to place ending in current room" class="color0" id="addEndingButton" onclick="addEnding();">
+							<i class="material-icons">location_searching</i>
+							place ending
+						</button>
+						<span id="addingEndingHelpText" style="display:none;"> click space in room to add ending </span>
 					<!-- todo needs a cancel button -->
-					<button class="color0" id="removeEndingButton" onclick="removeSelectedEnding();" style="display:none;"> - remove selected ending </button>
+						<button title="remove selected ending from room" class="color0" id="removeEndingButton" onclick="removeSelectedEnding();" style="display:none;">
+							<i class="material-icons">location_disabled</i>
+							remove selected ending
+						</button>
+					</div>
 				</div>
 
 				<div id="paintPanel" class="panel color1">

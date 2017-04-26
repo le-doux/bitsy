@@ -2409,7 +2409,8 @@ function on_change_color_page() {
 	var hex = document.getElementById("pageColor").value;
 	//console.log(hex);
 	var rgb = hexToRgb( hex );
-	document.body.style.background = hex;
+	// document.body.style.background = hex;
+	document.getElementById("roomPanel").style.background = hex;
 	exportPageColor = hex;
 }
 
