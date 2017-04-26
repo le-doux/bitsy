@@ -397,6 +397,7 @@ function start() {
 		refreshGameData();
 	}
 
+	// TODO redo this
 	//load panel preferences
 	var prefs = localStorage.panel_prefs == null ? {} : JSON.parse( localStorage.panel_prefs );
 	// console.log(prefs);
@@ -405,6 +406,15 @@ function start() {
 			// console.log(id + " " + prefs[id]);
 			togglePanelCore(id, prefs[id]);
 		}
+	}
+	// Automatically open tool trays that are needed
+	if( sortedRoomIdList().length > 1 )
+	{
+		toggleRoomToolsCore( true );
+	}
+	if( sortedPaletteIdList().length > 1 )
+	{
+		togglePaletteToolsCore( true );
 	}
 
 	//draw everything
@@ -1482,7 +1492,11 @@ function toggleToolBar(e) {
 }
 
 function toggleRoomTools(e) {
-	if( e.target.checked ) {
+	toggleRoomToolsCore( e.target.checked );
+}
+
+function toggleRoomToolsCore(visible) {
+	if( visible ) {
 		document.getElementById("roomTools").style.display = "block";
 		document.getElementById("roomToolsCheckIcon").innerHTML = "expand_more";
 	}
@@ -1493,7 +1507,11 @@ function toggleRoomTools(e) {
 }
 
 function togglePaletteTools(e) {
-	if( e.target.checked ) {
+	togglePaletteToolsCore( e.target.checked );
+}
+
+function togglePaletteToolsCore(visible) {
+	if( visible ) {
 		document.getElementById("paletteTools").style.display = "block";
 		document.getElementById("paletteToolsCheckIcon").innerHTML = "expand_more";
 	}
