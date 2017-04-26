@@ -24,13 +24,23 @@ button {
 	background: #e8e8ff;
 	color: #6767b2;
 }
+.controlBox button {
+	background: #ccccff;
+}
 button:active {
 	background: #6767b2;
 	color:white;
 }
 
-.controlBox button {
+button.light {
+	background: none;
+}
+button.light:hover {
 	background: #ccccff;
+}
+button.light:active {
+	background: #6767b2;
+	color:white;
 }
 
 input[type=checkbox] + label {

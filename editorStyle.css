@@ -3,7 +3,7 @@ body {
 	padding: 0 !important;
 	line-height: 170%;
 	font-family: "Nunito", Helvetica, Arial, sans-serif;
-	font-size: 24px;
+	font-size: 16px;
 }
 canvas {
 	background: black;
@@ -16,6 +16,7 @@ canvas {
 	padding-left: 20px;
 	padding-right: 20px;
 	box-sizing: border-box;
+	font-size: 20px;
 }
 #editorWindow {
 	width:100%;
@@ -36,7 +37,7 @@ canvas {
 	margin: 10px;
 	margin-right: 0px;
 	padding: 10px;
-	font-size: 18px;
+	font-size: 16px;
 }
 .panel .bar {
 	padding: 5px;
@@ -139,15 +140,20 @@ input {
 }
 
 /* random hacks */
-#instructionsCheck + label {
-	line-height: 170%;
+#instructionsOuter {
+	padding-top: 10px; /*why*/
 }
-#versionNotesCheck + label {
-	line-height: 170%;
+#versionNotesOuter {
+	padding-top: 10px;
 }
 
 /*toolbar*/
 #toolsPanel {
 	padding-top: 5px;
 	font-size: 14px;
+}
+
+.panelBarTitle {
+	/*background:red;*/
+	overflow:auto;
 }

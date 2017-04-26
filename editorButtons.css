@@ -1,18 +1,29 @@
 /* button */
 button {
 	font-family: "Nunito", Helvetica, Arial, sans-serif;
-	font-size: 18px;
-	padding: 4px;
+	font-size: 14px;
+	padding: 3px;
+	padding-bottom: 4px; /* hack to line up with checkboxes */
 	margin: 0px;
 	margin-right: 2px;
 	margin-bottom: 2px;
+	/*margin-top: 2px;*/
 	border: none;
 	vertical-align: middle;
-	line-height: 100%;
+	/*line-height: 100%;*/
 }
 button:focus { outline:none; }
 button .material-icons {
-	font-size: 24px;
+	font-size: 18px;
+	vertical-align: middle;
+	line-height: 100%;
+}
+
+.panel .bar button.light button.light {
+	line-height: 100%;
+}
+.panel .bar button.light .material-icons {
+	font-size: 18px;
 	vertical-align: middle;
 	line-height: 100%;
 }
@@ -23,16 +34,18 @@ input[type=checkbox] {
 }
 input[type=checkbox] + label {
 	font-family: "Nunito", Helvetica, Arial, sans-serif;
-	font-size: 18px;
+	font-size: 14px;
 	padding: 4px;
 	margin: 0px;
+	margin-top: 0px;
 	margin-right: 2px;
 	margin-bottom: 2px;
 	vertical-align: middle;
 	line-height: 100%;
+	border:none;
 }
 input[type=checkbox] + label .material-icons {
-	font-size: 24px;
+	font-size: 18px;
 	vertical-align: middle;
 	line-height: 100%;
 }
@@ -46,7 +59,7 @@ input[type=radio] {
 }
 input[type=radio] + label {
 	font-family: "Nunito", Helvetica, Arial, sans-serif;
-	font-size: 18px;
+	font-size: 14px;
 	padding: 4px;
 	margin: 0px;
 	margin-bottom: 2px;
@@ -54,7 +67,7 @@ input[type=radio] + label {
 	line-height: 100%;
 }
 input[type=radio] + label .material-icons {
-	font-size: 24px;
+	font-size: 18px;
 	vertical-align: middle;
 	line-height: 100%;
 }

@@ -34,7 +34,7 @@
 					<input type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
 				</div>
 
-				<div class="buttonGroup" style="float:right;">
+				<div class="buttonGroup">
 					<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" />
 					<label for="toolsCheck">
 						<i class="material-icons">settings</i>
@@ -51,7 +51,7 @@
 			<div id="toolsPanel">
 				<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/>
 				<label for="aboutCheck">
-					<i class="material-icons">info</i> about
+					<i class="material-icons">favorite</i> about
 				</label>
 				
 				<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanel(event);" checked/>
@@ -110,9 +110,14 @@
 			<div id="editorContent">
 
 				<div id="aboutPanel" class="panel color0">
-					<div class="bar color0" onmousedown="grabCard(event);">
-						<i class="material-icons">info</i>
-						about bitsy <span class="minimize" onclick="hidePanel('aboutPanel');">[ - ]</span>
+					<div class="bar color0">
+						<button class="light" style="float:right;" onclick="hidePanel('aboutPanel');">
+							<i class="material-icons">close</i>
+						</button>
+						<div class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">favorite</i>
+							about bitsy
+						</div>
 					</div>
 					<div id="aboutInner">
 						hi! bitsy is a little editor for little games or worlds. <br>
@@ -197,12 +202,16 @@
 					</div>
 				</div>
 
-				<div id="roomPanel" class="panel color3">
-					<div class="bar color3" onmousedown="grabCard(event);">
-						<i class="material-icons">grid_on</i> room
-						<button class="light color3" style="float:right;" onclick="hidePanel('roomPanel');">
+				<div id="roomPanel" class="panel">
+					<div class="bar">
+						<button class="light" style="float:right;" onclick="hidePanel('roomPanel');">
 							<i class="material-icons">close</i>
 						</button>
+
+						<div class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">grid_on</i>
+							room
+						</div>
 					</div>
 					
 					<div style="margin-bottom:2px;">			
@@ -264,11 +273,13 @@
 							<br>
 
 							<div id="roomExits" class="buttonGroup">
-								<button title="add exits to other rooms" class="color0" onclick="showPanel('exitsPanel');">
-									<i class="material-icons">add</i> exits
+								<button title="add exits from this room to other rooms" class="color0" onclick="showPanel('exitsPanel');">
+									<i class="material-icons">open_in_new</i>
+									add exits
 								</button>
 								<button title="add endings" class="color0" onclick="showPanel('endingsPanel');">
-									<i class="material-icons">add</i> endings
+									<i class="material-icons">open_in_new</i>
+									add endings
 								</button>
 							</div>
 
@@ -286,9 +297,16 @@
 				</div>
 
 				<div id="exitsPanel" class="panel color3" style="display:none;">
-					<div class="bar color3" onmousedown="grabCard(event);">
-						<i class="material-icons">directions</i> 
-						exits <span class="minimize" onclick="hidePanel('exitsPanel');">[ - ]</span>
+					<div class="bar color3">
+
+						<button class="light" style="float:right;" onclick="hidePanel('exitsPanel');">
+							<i class="material-icons">close</i>
+						</button>
+
+						<div class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">directions</i> 
+							exits
+						</div>
 					</div>
 					<button class="color0" onclick="addExit();" id="addExitButton"> + add new exit to this room </button>
 					<span id="addingExitHelpText" style="display:none;"><i>click space in room to add exit</i></span>
@@ -313,9 +331,16 @@
 				</div>
 
 				<div id="endingsPanel" class="panel color3" style="display:block;">
-					<div class="bar color3" onmousedown="grabCard(event);">
-						<i class="material-icons">place</i>
-						endings <span class="minimize" onclick="hidePanel('endingsPanel');">[ - ]</span>
+					<div class="bar color3">
+
+						<button class="light" style="float:right;" onclick="hidePanel('endingsPanel');">
+							<i class="material-icons">close</i>
+						</button>
+
+						<div class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">place</i>
+							endings
+						</div>
 					</div>
 					<div id="endingNav">
 						<button class="color0" onclick="prevEnding();"> < prev </button>
@@ -333,9 +358,16 @@
 				</div>
 
 				<div id="paintPanel" class="panel color1">
-					<div class="bar color1" onmousedown="grabCard(event);">
-						<i class="material-icons">brush</i>
-						paint <span class="minimize" onclick="hidePanel('paintPanel');">[ - ]</span>
+					<div class="bar color1">
+
+						<button class="light" style="float:right;" onclick="hidePanel('paintPanel');">
+							<i class="material-icons">close</i>
+						</button>
+
+						<div class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">brush</i>
+							paint
+						</div>
 					</div>
 					<form>
 						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_avatar();" id="paintOptionAvatar" checked>
@@ -431,9 +463,16 @@
 				</div>
 
 				<div id="colorsPanel" class="panel color1">
-					<div class="bar color1" onmousedown="grabCard(event);">
-						<i class="material-icons">palette</i>
-						colors <span class="minimize" onclick="hidePanel('colorsPanel');">[ - ]</span>
+					<div class="bar color1">
+
+						<button class="light" style="float:right;" onclick="hidePanel('colorsPanel');">
+							<i class="material-icons">close</i>
+						</button>
+
+						<div class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">palette</i>
+							colors
+						</div>
 					</div>
 					
 					<input type="color" value="#0052cc" id="backgroundColor" onchange="on_change_color_bg();" autocomplete="off"> background <br>
@@ -478,9 +517,16 @@
 				</div>
 
 				<div id="downloadPanel" class="panel color2">
-					<div class="bar color2" onmousedown="grabCard(event);">
-						<i class="material-icons">file_download</i>
-						download <span class="minimize" onclick="hidePanel('downloadPanel');">[ - ]</span>
+					<div class="bar color2">
+
+						<button class="light" style="float:right;" onclick="hidePanel('downloadPanel');">
+							<i class="material-icons">close</i>
+						</button>
+
+						<div class="panelBarTitle" onmousedown="grabCard(event);">						
+							<i class="material-icons">file_download</i>
+							download
+						</div>
 					</div>
 
 					<div>
@@ -504,7 +550,10 @@
 						</label>
 
 						<div id="downloadOptions" style="display:none;">
-							<input type="color" value="#ffffff" id="pageColor" onchange="on_change_color_page();" autocomplete="off"> html page color
+							<div class="buttonGroup">
+								<input type="color" value="#ffffff" id="pageColor" onchange="on_change_color_page();" autocomplete="off">
+								html page color
+							</div>
 						</div>
 					</div>
 
@@ -521,9 +570,16 @@
 				</div>
 
 				<div id="gifPanel" class="panel color2" style="display:none;">
-					<div class="bar color2" onmousedown="grabCard(event);">
-						<i class="material-icons">videocam</i>
-						record gif <span class="minimize" onclick="hidePanel('gifPanel');">[ - ]</span>
+					<div class="bar color2">
+
+						<button class="light" style="float:right;" onclick="hidePanel('gifPanel');">
+							<i class="material-icons">close</i>
+						</button>
+
+						<div class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">videocam</i>
+							record gif
+						</div>
 					</div>
 					
 					<button class="color0" id="gifStartButton" onclick="startRecordingGif();">start recording</button>
@@ -541,9 +597,16 @@
 				</div>
 
 				<div id="dataPanel" class="panel color0" style="display:none;">
-					<div class="bar color0" onmousedown="grabCard(event);">
-						<i class="material-icons">save</i>
-						game data <span class="minimize" onclick="hidePanel('dataPanel');">[ - ]</span>
+					<div class="bar color0">
+
+						<button class="light" style="float:right;" onclick="hidePanel('dataPanel');">
+							<i class="material-icons">close</i>
+						</button>
+
+						<div class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">save</i>
+							game data
+						</div>
 					</div>
 					<textarea id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
 					<br>

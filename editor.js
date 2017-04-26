@@ -2609,7 +2609,7 @@ function grabCard(e) {
 
 	console.log("grab!");
 
-	grabbedPanel.card = e.target.parentElement;
+	grabbedPanel.card = e.target.parentElement.parentElement;
 	grabbedPanel.size = getElementSize( grabbedPanel.card );
 	var pos = getElementPosition( grabbedPanel.card );
 	
