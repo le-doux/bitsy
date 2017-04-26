@@ -21,34 +21,35 @@
 		<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	</head>
-
+ 
 	<body onload="start()">
 		<div id="topbar">
 
-			<div id="topbarMain">
-				<div title="Bitsy: Make little worlds" class="buttonGroup" style="font-weight:bold;">
-					Bitsy
+			<div id="topbarMain" style="width:100%;display:block;">
+				<div title="Bitsy: Make little worlds" style="float:left;">
+					~ Bitsy ~
+					<span style="font-size:12px;">
+						// v3.1 // by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
+					</span>
+				</div>
+				<div>
+					<div style="float:right;">
+						<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" />
+						<label title="show / hide toolbar" for="toolsCheck" style="font-size:18px;">
+							<i class="material-icons">settings</i>
+							tools
+							<i id="toolsCheckIcon" class="material-icons">expand_less</i>
+						</label>
+					</div>
+					<div>
+						<input title="title text for your game" type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title" style="margin-left:20px;width:60%;min-width:300px;">
+					</div>
 				</div>
 
-				<div class="buttonGroup">
-					<input title="title text for your game" type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
-				</div>
-
-				<div class="buttonGroup">
-					<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" />
-					<label title="show / hide toolbar" for="toolsCheck">
-						<i class="material-icons">settings</i>
-						tools
-						<i id="toolsCheckIcon" class="material-icons">expand_less</i>
-					</label>
-				</div>
-			
-				<!--<span id="bitsyEditorName">
-					Bitsy v3.1 by <a href="https://www.twitter.com/adamledoux">@adamledoux</a>
-				</span> -->
 			</div>
 
-			<div id="toolsPanel">
+			<div id="toolsPanel" style="width:100%;">
+
 				<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/>
 				<label title="show / hide about window" for="aboutCheck">
 					<i class="material-icons">favorite</i> about
@@ -172,15 +173,12 @@
 								* seattle game meetup peeps
 							</div>
 						</div>
-						<br>
-
-						<!-- <span class="toggleText" onclick="toggleVersionNotes();">what's new in v3.1</span> <br> -->
 
 						<div id="versionNotesOuter" class="controlBox">
 
 							<input type="checkbox" id="versionNotesCheck" onclick="toggleVersionNotes(event);"/>
 							<label title="show / hide version notes" for="versionNotesCheck">
-								what's new
+								what's new in v3.1
 								<i id="versionNotesCheckIcon" class="material-icons">expand_less</i>
 							</label>
 
@@ -216,7 +214,7 @@
 					
 					<div style="margin-bottom:2px;">			
 						<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" />
-						<label title="play/pause game" for="playModeCheck">
+						<label title="play / pause game" for="playModeCheck">
 							<i class="material-icons" id="playModeIcon">play_arrow</i>
 							<span id="playModeText"> play </span>
 						</label>
@@ -634,21 +632,21 @@
 				<div id="dataPanel" class="panel color0" style="display:none;">
 					<div class="bar color0">
 
-						<button class="light" style="float:right;" onclick="hidePanel('dataPanel');">
+						<button title="minimize game data window" class="light" style="float:right;" onclick="hidePanel('dataPanel');">
 							<i class="material-icons">close</i>
 						</button>
 
-						<div class="panelBarTitle" onmousedown="grabCard(event);">
+						<div title="game data window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">save</i>
 							game data
 						</div>
 					</div>
-					<textarea id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
+					<textarea title="raw text of the bitsy game data file (be careful when editing)" id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
 					<br>
-					<button class="color0" id="resetData" onclick="resetGameData();">reset game data</button>
-					<div class="helpMessage">
-						(be careful, you'll lose your changes <br>if you reset the game data)
-					</div>
+					<button title="reset everything and start new game" class="color0" onclick="newGameDialog();">
+						<i class="material-icons">restore_page</i>
+						reset game data
+					</button>
 				</div>
 
 			</div> <!-- Editor Content -->
