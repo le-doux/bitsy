@@ -592,20 +592,32 @@
 				<div id="gifPanel" class="panel color2" style="display:none;">
 					<div class="bar color2">
 
-						<button class="light" style="float:right;" onclick="hidePanel('gifPanel');">
+						<button title="minimize gif recording window" class="light" style="float:right;" onclick="hidePanel('gifPanel');">
 							<i class="material-icons">close</i>
 						</button>
 
-						<div class="panelBarTitle" onmousedown="grabCard(event);">
+						<div title="gif recording window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">videocam</i>
 							record gif
 						</div>
 					</div>
 					
-					<button class="color0" id="gifStartButton" onclick="startRecordingGif();">start recording</button>
-					<button class="color0" id="gifStopButton" onclick="stopRecordingGif();" style="display:none;">stop recording</button>
-					<span id="gifRecordingText" style="color:red;display:none;">recording...</span>
-					<span id="gifEncodingText" style="color:green;display:none;">encoding...</span>
+					<button title="start recording a gif of your game" class="color0" id="gifStartButton" onclick="startRecordingGif();">
+						<i class="material-icons">videocam</i>
+						start recording
+					</button>
+					<button title="stop recording a gif of your game" class="color0" id="gifStopButton" onclick="stopRecordingGif();" style="display:none;">
+						<i class="material-icons">videocam_off</i>
+						stop recording
+					</button>
+					<span id="gifRecordingText" style="display:none;">
+						<i class="material-icons">lens</i>
+						recording...
+					</span>
+					<span id="gifEncodingText" style="display:none;">
+						<i class="material-icons">movie_creation</i>
+						encoding...
+					</span>
 					
 					<br/>
 					
@@ -613,7 +625,10 @@
 					
 					<br/>
 					
-					<a href="" download="recording.gif" target="_blank" id="gifDownload">download gif</a>
+					<a title="download latest gif recording of your game" href="" download="recording.gif" target="_blank" id="gifDownload">
+						<i class="material-icons">file_download</i>
+						download gif
+					</a>
 				</div>
 
 				<div id="dataPanel" class="panel color0" style="display:none;">

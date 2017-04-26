@@ -157,3 +157,27 @@ input {
 	/*background:red;*/
 	overflow:auto;
 }
+
+#gifDownload .material-icons {
+	line-height: 100%;
+	vertical-align: middle;
+	font-size: 18px;
+}
+
+#gifRecordingText {
+	color:red;
+}
+#gifRecordingText .material-icons {
+	line-height: 100%;
+	vertical-align: middle;
+	font-size: 18px;
+}
+
+#gifEncodingText {
+	color: green;
+}
+#gifEncodingText .material-icons {
+	line-height: 100%;
+	vertical-align: middle;
+	font-size: 18px;
+}

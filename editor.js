@@ -2202,6 +2202,12 @@ function stopRecordingGif() {
 	document.getElementById("gifRecordingText").style.display="none";
 	document.getElementById("gifEncodingText").style.display="inline";
 
+	if(gifFrameData.length <= 0) {
+		document.getElementById("gifEncodingText").style.display="none";
+		document.getElementById("gifStartButton").style.display="inline";
+		return; // nothing recorded, nothing to encode
+	}
+
 	setTimeout( function() {
 		var hexPalette = [];
 		for (id in palette) {
