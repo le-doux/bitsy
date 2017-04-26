@@ -111,10 +111,10 @@
 
 				<div id="aboutPanel" class="panel color0">
 					<div class="bar color0">
-						<button class="light" style="float:right;" onclick="hidePanel('aboutPanel');">
+						<button title="minimize about window" class="light" style="float:right;" onclick="hidePanel('aboutPanel');">
 							<i class="material-icons">close</i>
 						</button>
-						<div class="panelBarTitle" onmousedown="grabCard(event);">
+						<div title="about window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">favorite</i>
 							about bitsy
 						</div>
@@ -135,7 +135,7 @@
 
 						<div id="instructionsOuter" class="controlBox">
 							<input type="checkbox" id="instructionsCheck" onclick="toggleInstructions(event);"/>
-							<label for="instructionsCheck">
+							<label title="show / hide instructions" for="instructionsCheck">
 								instructions
 								<i id="instructionsCheckIcon" class="material-icons">expand_less</i>
 							</label>
@@ -179,7 +179,7 @@
 						<div id="versionNotesOuter" class="controlBox">
 
 							<input type="checkbox" id="versionNotesCheck" onclick="toggleVersionNotes(event);"/>
-							<label for="versionNotesCheck">
+							<label title="show / hide version notes" for="versionNotesCheck">
 								what's new
 								<i id="versionNotesCheckIcon" class="material-icons">expand_less</i>
 							</label>
@@ -204,11 +204,11 @@
 
 				<div id="roomPanel" class="panel">
 					<div class="bar">
-						<button class="light" style="float:right;" onclick="hidePanel('roomPanel');">
+						<button title="minimize room editing window" class="light" style="float:right;" onclick="hidePanel('roomPanel');">
 							<i class="material-icons">close</i>
 						</button>
 
-						<div class="panelBarTitle" onmousedown="grabCard(event);">
+						<div title="room window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">grid_on</i>
 							room
 						</div>
@@ -216,7 +216,7 @@
 					
 					<div style="margin-bottom:2px;">			
 						<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" />
-						<label for="playModeCheck">
+						<label title="play/pause game" for="playModeCheck">
 							<i class="material-icons" id="playModeIcon">play_arrow</i>
 							<span id="playModeText"> play </span>
 						</label>
@@ -229,7 +229,7 @@
 					<div id="roomToolsOuter" class="controlBox">
 
 						<input type="checkbox" id="roomToolsCheck" onclick="toggleRoomTools(event);" />
-						<label for="roomToolsCheck">
+						<label title="show / hide additional room tools" for="roomToolsCheck">
 							room tools
 							<i id="roomToolsCheckIcon" class="material-icons">expand_less</i>
 						</label>
@@ -285,7 +285,7 @@
 
 							<div id="roomColor" class="buttonGroup">
 								colors: 
-								<select id="roomPaletteSelect" onchange="roomPaletteChange(event);">
+								<select title="select color palette for room" id="roomPaletteSelect" onchange="roomPaletteChange(event);">
 									<option value="0">palette 0</option> <!-- other options are added dynamically -->
 								</select>
 							</div>
@@ -360,30 +360,30 @@
 				<div id="paintPanel" class="panel color1">
 					<div class="bar color1">
 
-						<button class="light" style="float:right;" onclick="hidePanel('paintPanel');">
+						<button title="minimize paint window" class="light" style="float:right;" onclick="hidePanel('paintPanel');">
 							<i class="material-icons">close</i>
 						</button>
 
-						<div class="panelBarTitle" onmousedown="grabCard(event);">
+						<div title="paint window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">brush</i>
 							paint
 						</div>
 					</div>
 					<form>
 						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_avatar();" id="paintOptionAvatar" checked>
-						<label for="paintOptionAvatar" class="left">
+						<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
 							<i class="material-icons">perm_identity</i>
 							avatar
 						</label>
 
 						<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();" id="paintOptionTile">
-						<label for="paintOptionTile" class="middle">
+						<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
 							<i class="material-icons">terrain</i>
 							tile
 						</label>
 
 						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite">
-						<label for="paintOptionSprite" class="right">
+						<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="right">
 							<i class="material-icons">nature_people</i>
 							sprite
 						</label>
@@ -421,12 +421,12 @@
 
 					<div id="wall" class="controlBox" style="display:none;">
 						<input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall(event);">
-						<label for="wallCheckbox">
+						<label title="make tile an impassible wall" for="wallCheckbox">
 							<i id="wallCheckboxIcon" class="material-icons">border_clear</i>
 							wall
 						</label>
 
-						<button class="color0" onclick="apply_wall_setting_all_rooms();">
+						<button title="apply tile's wall setting to all rooms" class="color0" onclick="apply_wall_setting_all_rooms();">
 							for all rooms
 							<i class="material-icons">done_all</i>
 						</button>
@@ -434,13 +434,13 @@
 					<div id="dialog" class="controlBox" style="display:none;">
 						dialog
 						<br>
-						<textarea id="dialogText" class="dialogTextArea" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"></textarea> <!-- rows="2" cols="32" -->
+						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"></textarea> <!-- rows="2" cols="32" -->
 					</div>
 
 					<div id="animationOuter" class="controlBox">
 						<div id="isAnimated">
 							<input type="checkbox" id="animatedCheckbox" onchange="on_toggle_animated();">
-							<label for="animatedCheckbox">
+							<label title="add animation to drawing" for="animatedCheckbox">
 								animation
 								<i id="animatedCheckboxIcon" class="material-icons">expand_less</i>
 							</label>
@@ -449,11 +449,11 @@
 							<form>
 								keyframe:
 								<input id="animationOptionFrame1" class="left" type="radio" name="keyframe" onclick="on_paint_frame1();" checked>
-								<label for="animationOptionFrame1">
+								<label title="first frame of animation" for="animationOptionFrame1">
 									frame 1
 								</label>
 								<input id="animationOptionFrame2" class="right" type="radio" name="keyframe" onclick="on_paint_frame2();"> 
-								<label for="animationOptionFrame2">
+								<label title="second frame of animation" for="animationOptionFrame2">
 									frame 2
 								</label>
 							</form>
@@ -465,21 +465,21 @@
 				<div id="colorsPanel" class="panel color1">
 					<div class="bar color1">
 
-						<button class="light" style="float:right;" onclick="hidePanel('colorsPanel');">
+						<button title="minimize color palette window" class="light" style="float:right;" onclick="hidePanel('colorsPanel');">
 							<i class="material-icons">close</i>
 						</button>
 
-						<div class="panelBarTitle" onmousedown="grabCard(event);">
+						<div title="color palette window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">palette</i>
 							colors
 						</div>
 					</div>
 					
-					<input type="color" value="#0052cc" id="backgroundColor" onchange="on_change_color_bg();" autocomplete="off"> background <br>
+					<input title="pick background color" type="color" value="#0052cc" id="backgroundColor" onchange="on_change_color_bg();" autocomplete="off"> background <br>
 					
-					<input type="color" value="#809fff" id="tileColor" onchange="on_change_color_tile();" autocomplete="off"> tile <br>
+					<input title="pick tile color" type="color" value="#809fff" id="tileColor" onchange="on_change_color_tile();" autocomplete="off"> tile <br>
 					
-					<input type="color" value="#ffffff" id="spriteColor" onchange="on_change_color_sprite();" autocomplete="off"> sprite <br>
+					<input title="pick sprite / avatar color" type="color" value="#ffffff" id="spriteColor" onchange="on_change_color_sprite();" autocomplete="off"> sprite <br>
 					
 					<div id="colorPickerHelp" class="helpMessage" style="display:none;">
 						Having trouble choosing hex colors? <br>
@@ -489,7 +489,7 @@
 					<div id="paletteToolsOuter" class="controlBox">
 
 						<input type="checkbox" id="paletteToolsCheck" onclick="togglePaletteTools(event);" />
-						<label for="paletteToolsCheck">
+						<label title="show / hide additional palette tools" for="paletteToolsCheck">
 							palettes
 							<i id="paletteToolsCheckIcon" class="material-icons">expand_less</i>
 						</label>
@@ -502,13 +502,13 @@
 							</div>
 							<br>
 							<div class="buttonGroup">
-								<button class="color0" onclick="prevPalette();">
+								<button title="previous color palette" class="color0" onclick="prevPalette();">
 									<i class="material-icons">navigate_before</i>
 								</button>
-								<button class="color0" onclick="nextPalette();">
+								<button title="next color palette" class="color0" onclick="nextPalette();">
 									<i class="material-icons">navigate_next</i>
 								</button>
-								<button class="color0" onclick="newPalette();">
+								<button title="add new color palette" class="color0" onclick="newPalette();">
 									<i class="material-icons">add</i>
 								</button>
 							</div>
@@ -519,11 +519,11 @@
 				<div id="downloadPanel" class="panel color2">
 					<div class="bar color2">
 
-						<button class="light" style="float:right;" onclick="hidePanel('downloadPanel');">
+						<button title="minimize download window" class="light" style="float:right;" onclick="hidePanel('downloadPanel');">
 							<i class="material-icons">close</i>
 						</button>
 
-						<div class="panelBarTitle" onmousedown="grabCard(event);">						
+						<div title="download window" class="panelBarTitle" onmousedown="grabCard(event);">						
 							<i class="material-icons">file_download</i>
 							download
 						</div>
@@ -531,7 +531,7 @@
 
 					<div>
 						download game as html file: <br>
-						<button class="color0" onclick="exportGame();">
+						<button title="download game as html file" class="color0" onclick="exportGame();">
 							<i class="material-icons">file_download</i>
 							download game
 						</button>
@@ -539,19 +539,19 @@
 
 					<div>
 						import game from html file: <br>
-						<input type="file" onchange="importGameFromFile(event);"/>
+						<input title="import game from html file on your computer" type="file" onchange="importGameFromFile(event);"/>
 					</div>
 
 					<div id="downloadOptionsOuter" class="controlBox">
 						<input type="checkbox" id="downloadOptionsCheck" onclick="toggleDownloadOptions(event);" />
-						<label for="downloadOptionsCheck">
+						<label title="show / hide download options" for="downloadOptionsCheck">
 							options
 							<i id="downloadOptionsCheckIcon" class="material-icons">expand_less</i>
 						</label>
 
 						<div id="downloadOptions" style="display:none;">
 							<div class="buttonGroup">
-								<input type="color" value="#ffffff" id="pageColor" onchange="on_change_color_page();" autocomplete="off">
+								<input title="pick background color for exported html page" type="color" value="#ffffff" id="pageColor" onchange="on_change_color_page();" autocomplete="off">
 								html page color
 							</div>
 						</div>
