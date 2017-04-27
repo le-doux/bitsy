@@ -38,6 +38,7 @@ canvas {
 	margin-right: 0px;
 	padding: 10px;
 	font-size: 16px;
+	border-radius: 4px;
 }
 .panel .bar {
 	padding: 5px;
@@ -48,6 +49,7 @@ canvas {
 	margin-bottom: 10px;
 	font-size: 20px;
 	line-height: 150%;
+	border-radius: 4px 4px 0px 0px;
 }
 .panel .bar .material-icons {
 	line-height: 150%;
@@ -59,6 +61,7 @@ canvas {
 	vertical-align: top;
 	margin: 10px;
 	margin-right: 0px;
+	border-radius: 4px;
 }
 textarea {
 	font-family: monospace;
@@ -137,6 +140,7 @@ input {
 .controlBox {
 	padding: 5px;
 	margin-bottom: 5px;
+	border-radius: 2px;
 }
 
 /* random hacks */

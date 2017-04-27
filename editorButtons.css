@@ -11,6 +11,7 @@ button {
 	border: none;
 	vertical-align: middle;
 	/*line-height: 100%;*/
+	border-radius: 2px;
 }
 button:focus { outline:none; }
 button .material-icons {
@@ -43,6 +44,7 @@ input[type=checkbox] + label {
 	vertical-align: middle;
 	line-height: 100%;
 	border:none;
+	border-radius: 2px;
 }
 input[type=checkbox] + label .material-icons {
 	font-size: 18px;
@@ -73,4 +75,10 @@ input[type=radio] + label .material-icons {
 }
 input[type=radio] + label:hover {
 	text-decoration: underline;
+}
+input[type=radio] + label.left {
+	border-radius: 2px 0px 0px 2px;
+}
+input[type=radio] + label.right {
+	border-radius: 0px 2px 2px 0px;
 }

@@ -2711,3 +2711,15 @@ function getElementSize(e) { /* gets visible size */
 		y: e.clientHeight
 	};
 }
+
+// sort of a hack to avoid accidentally activating backpage and nextpage while scrolling through editor panels 
+function blockScrollBackpage(e) {
+	var el = document.getElementById("editorWindow");
+	var maxX = el.scrollWidth - el.offsetWidth;
+
+	if ( el.scrollLeft + e.deltaX < 0 || el.scrollLeft + e.deltaX > maxX )
+	{
+		e.preventDefault();
+		el.scrollLeft = Math.max(0, Math.min(maxX, el.scrollLeft + event.deltaX));
+	}
+}
