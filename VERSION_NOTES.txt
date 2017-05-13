@@ -1,3 +1,7 @@
+v3.2:
+- move tool windows around by dragging the title bar!
+- user interface redesign
+
 v3.1:
 - bugfix: duplicated rooms don't disappear
 

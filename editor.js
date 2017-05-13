@@ -1,6 +1,6 @@
 /* 
 TODO to release next version (3.2)
-- updated panel prefs (including way to switch versions)
+X updated panel prefs (including way to switch versions)
 X some animations (pick up / put down / minimize)
 X panels appear in reliable place
 - ? default workspaces
