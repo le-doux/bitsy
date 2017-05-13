@@ -348,6 +348,16 @@ var defaultPanelPrefs = {
 		{ id:"dataPanel", 		visible:false, 	position:6 }
 	]
 };
+function getPanelPrefs() {
+	// (TODO: weird that engine version and editor version are the same??)
+	var useDefaultPrefs = ( localStorage.engine_version == null ) ||
+							( localStorage.panel_prefs == null ) ||
+							( JSON.parse(localStorage.engine_version).major < 3 ) ||
+							( JSON.parse(localStorage.engine_version).minor < 2 );
+	console.log("USE DEFAULT?? " + useDefaultPrefs);
+	var prefs = useDefaultPrefs ? defaultPanelPrefs : JSON.parse( localStorage.panel_prefs );
+	return prefs;
+}
 
 function start() {
 	detectBrowserFeatures();
@@ -399,21 +409,16 @@ function start() {
 		refreshGameData();
 	}
 
-	// TODO redo this
-	//load panel preferences
-	var prefs = localStorage.panel_prefs == null ? {} : JSON.parse( localStorage.panel_prefs );
-	// console.log(prefs);
-	// if (prefs != null) {
-	// 	for (id in prefs) {
-	// 		console.log(id + " " + prefs[id]);
-	// 		togglePanelCore(id, prefs[id]);
-	// 	}
-	// }
-
-	console.log( localStorage.panel_prefs );
-	console.log( defaultPanelPrefs );
-	var sortedWorkspace = defaultPanelPrefs.workspace.sort( function(a,b) { return a.position - b.position; } );
-	console.log( sortedWorkspace );
+	// load panel preferences
+	var prefs = getPanelPrefs();
+	localStorage.panel_prefs = JSON.stringify(prefs); // save loaded prefs
+	var sortedWorkspace = prefs.workspace.sort( function(a,b) { return a.position - b.position; } );
+	var editorContent = document.getElementById("editorContent");
+	for(i in sortedWorkspace) {
+		var panelSettings = sortedWorkspace[i];
+		togglePanelCore( panelSettings.id, panelSettings.visible, false /*doUpdatePrefs*/ );
+		editorContent.insertBefore( document.getElementById(panelSettings.id), null ); //insert on the left
+	}
 
 	// Automatically open tool trays that are needed
 	if( sortedRoomIdList().length > 1 )
@@ -469,6 +474,9 @@ function start() {
 	// on_change_color_bg();
 	// on_change_color_tile();
 	// on_change_color_sprite();
+
+	// save latest version used by editor (for compatibility)
+	localStorage.engine_version = JSON.stringify( version );
 }
 
 function setDefaultGameState() {
@@ -2201,13 +2209,15 @@ function hidePanel(id) {
 	);
 }
 
-function togglePanelCore(id,visible) {
+function togglePanelCore(id,visible,doUpdatePrefs=true) {
 	//hide/show panel
 	togglePanelUI( id, visible );
 	//any side effects
 	afterTogglePanel( id, visible );
 	//save panel preferences
-	savePanelPref( id, visible );
+	// savePanelPref( id, visible );
+	if(doUpdatePrefs)
+		updatePanelPrefs();
 }
 
 function togglePanelUI(id,visible) {
@@ -2253,13 +2263,39 @@ function afterHidePanel(id) {
 	if (id === "endingsPanel") hideEndings();
 }
 
+// DEPRECATED
 function savePanelPref(id,visible) {
-	// console.log(" -- save panel pref -- ");
 	var prefs = localStorage.panel_prefs == null ? {} : JSON.parse( localStorage.panel_prefs );
-	// console.log(prefs);
 	prefs[id] = visible;
-	// console.log(prefs);
 	localStorage.setItem( "panel_prefs", JSON.stringify(prefs) );
+}
+
+function updatePanelPrefs() {
+	console.log("UPDATE PREFS");
+
+	var prefs = getPanelPrefs();
+	console.log(prefs);
+
+	var editorContent = document.getElementById("editorContent");
+	var cards = editorContent.getElementsByClassName("panel");
+
+	for(var i = 0; i < cards.length; i++) {
+		var card = cards[i];
+		var id = card.id;
+		var visible = card.style.display != "none";
+
+		for (var j = 0; j < prefs.workspace.length; j++ )
+		{
+			if (prefs.workspace[j].id === id) {
+				prefs.workspace[j].position = i;
+				prefs.workspace[j].visible = visible;
+			}
+		}
+	}
+
+	console.log(prefs);
+	localStorage.panel_prefs = JSON.stringify( prefs );
+	console.log(localStorage.panel_prefs);
 }
 
 function startRecordingGif() {
@@ -2757,6 +2793,8 @@ function onmouseup(e) {
 	setTimeout( function() { cardTmp.classList.remove("drop"); }, 300 );
 
 	grabbedPanel.card = null;
+
+	updatePanelPrefs();
 }
 document.addEventListener("mouseup",onmouseup);
 
