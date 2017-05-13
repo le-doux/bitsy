@@ -1,10 +1,8 @@
 /* 
-colors based on plates
-- periwinkle bg (+ darker for shadows)
-- gold cards
-- salmon top bars & buttons
-- periwinkle for alt buttons
-- white
+TODO to release next version (3.2)
+- updated panel prefs (including way to switch versions)
+X some animations (pick up / put down / minimize)
+- ? default workspaces
 
 
 new usability ideas
@@ -12,42 +10,30 @@ new usability ideas
 - Oh and possibly a way to "toggle" the placement of endings or exits, so you can put multiples of the same one in a room without having to scroll up and so down to select it each time
 
 v3.1 bugs
-- FIXED duplicate room names in romo selector in ending (happens when you restart the game and don't refresh the window)
+- FIXED duplicate room names in room selector in ending (happens when you restart the game and don't refresh the window)
 - prev/next and tile preview don't work together (old bug)
-
-
-new UI features
-- columns
-- add/remove columns
-- add cards
-- hide cards
-- maximize cards
-- minimize cards
-- move cards
-- shadows
 
 editor UI problems to solve
 - layout doesn't look good in itch.io
-- unusuable on mobile
-- layout doesn't look good when every panel is open
-- too many gray buttons
-- too many buttons visible at once for newcomers
-- not cute enough
+- unusable on mobile
+X layout doesn't look good when every panel is open
+X too many gray buttons
+X too many buttons visible at once for newcomers
+X not cute enough
 - gif UI is terrible and not findable
 - prev / next buttons everywhere are a pain to use if you have a lot of stuff
 - can't rename things
 - can't see all the tiles you want to work on
 - dialog UI isn't that great??
-- not cute enough
 - feedback for exits and ending creation is not good enough
 
 editor UI fixes
-- new trello-y layout
-- show/hide additional UI in panels
-- icons
+X new trello-y layout
+X show/hide additional UI in panels
+X icons
 --
 - cuteness redesign (including animations)
-- create centralized toolbar / settings menu
+X create centralized toolbar / settings menu
 - renameable objects
 
 
@@ -347,6 +333,21 @@ function hideUnsupportedFeatureWarning() {
 	document.getElementById("unsupportedFeatures").style.display = "none";
 }
 
+// This is the panel arrangement you get if you are new or your editor settings are out-of-date
+var defaultPanelPrefs = {
+	workspace : [
+		{ id:"aboutPanel", 		visible:true, 	position:0 },
+		{ id:"roomPanel", 		visible:true, 	position:1 },
+		{ id:"exitsPanel", 		visible:false, 	position:7 },
+		{ id:"endingsPanel", 	visible:false, 	position:8 },
+		{ id:"paintPanel", 		visible:true, 	position:2 },
+		{ id:"colorsPanel", 	visible:true, 	position:3 },
+		{ id:"downloadPanel", 	visible:true, 	position:4 },
+		{ id:"gifPanel", 		visible:false, 	position:5 },
+		{ id:"dataPanel", 		visible:false, 	position:6 }
+	]
+};
+
 function start() {
 	detectBrowserFeatures();
 
@@ -401,12 +402,18 @@ function start() {
 	//load panel preferences
 	var prefs = localStorage.panel_prefs == null ? {} : JSON.parse( localStorage.panel_prefs );
 	// console.log(prefs);
-	if (prefs != null) {
-		for (id in prefs) {
-			// console.log(id + " " + prefs[id]);
-			togglePanelCore(id, prefs[id]);
-		}
-	}
+	// if (prefs != null) {
+	// 	for (id in prefs) {
+	// 		console.log(id + " " + prefs[id]);
+	// 		togglePanelCore(id, prefs[id]);
+	// 	}
+	// }
+
+	console.log( localStorage.panel_prefs );
+	console.log( defaultPanelPrefs );
+	var sortedWorkspace = defaultPanelPrefs.workspace.sort( function(a,b) { return a.position - b.position; } );
+	console.log( sortedWorkspace );
+
 	// Automatically open tool trays that are needed
 	if( sortedRoomIdList().length > 1 )
 	{
@@ -2148,6 +2155,25 @@ function exit_onMouseDown(e) {
 	drawExitDestinationRoom();
 }
 
+function togglePanelAnimated(e) {
+	var panel = document.getElementById(e.target.value);
+	if (e.target.checked) {
+		togglePanel(e);
+		panel.classList.add("drop");
+		setTimeout( function() { panel.classList.remove("drop"); }, 300 );
+	}
+	else {
+		panel.classList.add("close");
+		setTimeout(
+			function() {
+				togglePanel(e);
+				panel.classList.remove("close");
+			},
+			400
+		);
+	}
+}
+
 function togglePanel(e) {
 	togglePanelCore( e.target.value, e.target.checked );
 }
@@ -2157,7 +2183,21 @@ function showPanel(id) {
 }
 
 function hidePanel(id) {
-	togglePanelCore( id, false /*visible*/ );
+	// animate panel and tools button
+	document.getElementById(id).classList.add("close");
+	document.getElementById("toolsCheckLabel").classList.add("flash");
+
+	setTimeout(
+		function() {
+			// close panel after animations
+			togglePanelCore( id, false /*visible*/ );
+
+			// reset animations
+			document.getElementById(id).classList.remove("close");
+			document.getElementById("toolsCheckLabel").classList.remove("flash");
+		},
+		400
+	);
 }
 
 function togglePanelCore(id,visible) {
@@ -2693,6 +2733,11 @@ function onmouseup(e) {
 	grabbedPanel.card.style.top = null;
 	grabbedPanel.card.style.left = null;
 	grabbedPanel.card.style.zIndex = null;
+
+	// drop card anim
+	var cardTmp = grabbedPanel.card;
+	cardTmp.classList.add("drop");
+	setTimeout( function() { cardTmp.classList.remove("drop"); }, 300 );
 
 	grabbedPanel.card = null;
 }

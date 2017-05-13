@@ -7,6 +7,7 @@
 		<link rel="stylesheet" type="text/css" href="editorStyle.css">
 		<link rel="stylesheet" type="text/css" href="editorButtons.css">
 		<link rel="stylesheet" type="text/css" href="editorColors.css">
+		<link rel="stylesheet" type="text/css" href="editorAnimations.css">
 
 		<!-- ENGINE SCRIPTS -->
 		<script src="font.js"></script>
@@ -31,9 +32,9 @@
 					<span title="Bitsy ~ make little worlds ~">Bitsy</span>
 					
 					<input title="title text for your game" type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title" style="margin-left:10px;">
+
 					<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" />
-					
-					<label title="show / hide toolbar" for="toolsCheck" style="font-size:18px;">
+					<label title="show / hide toolbar" for="toolsCheck" style="font-size:18px;" id="toolsCheckLabel">
 						<i class="material-icons">settings</i>
 						tools
 						<i id="toolsCheckIcon" class="material-icons">expand_less</i>
@@ -45,49 +46,49 @@
 
 			</div>
 
-			<div id="toolsPanel" style="width:100%;overflow:auto;">
+			<div id="toolsPanel" style="width:100%;overflow:auto;display:none;">
 
-				<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanel(event);" checked/>
+				<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanelAnimated(event);" checked/>
 				<label title="show / hide about window" for="aboutCheck">
 					<i class="material-icons">favorite</i> about
 				</label>
 				
-				<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanel(event);" checked/>
+				<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanelAnimated(event);" checked/>
 				<label title="show / hide room window" for="roomCheck">
 					<i class="material-icons">grid_on</i> room
 				</label>
 
-				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanel(event);" />
+				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanelAnimated(event);" />
 				<label title="show / hide exits window" for="exitsCheck">
 					<i class="material-icons">directions</i> exits
 				</label>
 
-				<input type="checkbox" value="endingsPanel" id="endingsCheck" onclick="togglePanel(event);" />
+				<input type="checkbox" value="endingsPanel" id="endingsCheck" onclick="togglePanelAnimated(event);" />
 				<label title="show / hide endings window" for="endingsCheck">
 					<i class="material-icons">place</i> endings
 				</label>
 				
-				<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanel(event);"  checked/>
+				<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide paint window" for="paintCheck">
 					<i class="material-icons">brush</i> paint
 				</label>
 				
-				<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanel(event);"  checked/>
+				<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide color palette window" for="colorsCheck">
 					<i class="material-icons">palette</i> colors
 				</label>
 				
-				<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanel(event);"  checked/>
+				<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide download window" for="downloadCheck">
 					<i class="material-icons">file_download</i> download
 				</label>
 				
-				<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanel(event);" />
+				<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanelAnimated(event);" />
 				<label title="show / hide gif recording window" for="gifCheck">
 					<i class="material-icons">videocam</i> record gif
 				</label>
 				
-				<input type="checkbox" value="dataPanel" onclick="togglePanel(event);" id="dataCheck"/>
+				<input type="checkbox" value="dataPanel" onclick="togglePanelAnimated(event);" id="dataCheck"/>
 				<label title="show / hide game data window" for="dataCheck">
 					<i class="material-icons">save</i> game data
 				</label>
@@ -330,7 +331,7 @@
 					</div>
 				</div>
 
-				<div id="endingsPanel" class="panel color3" style="display:block;">
+				<div id="endingsPanel" class="panel color3" style="display:none;">
 					<div class="bar color3">
 
 						<button title="minimize endings window" class="light" style="float:right;" onclick="hidePanel('endingsPanel');">
