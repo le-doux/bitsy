@@ -2,6 +2,7 @@
 TODO to release next version (3.2)
 - updated panel prefs (including way to switch versions)
 X some animations (pick up / put down / minimize)
+X panels appear in reliable place
 - ? default workspaces
 
 
@@ -2210,9 +2211,25 @@ function togglePanelCore(id,visible) {
 }
 
 function togglePanelUI(id,visible) {
-	//update panel
+	// move panel to the left of the left-most visible panel
+	if( visible ) {
+		var editorContent = document.getElementById("editorContent");
+		var otherCards = Array.prototype.slice.call( editorContent.getElementsByClassName("panel") );
+		console.log(otherCards.length);
+		otherCards = otherCards.filter(
+						function(card) {
+							var pos = getElementPosition( card );
+							return card.style.display != "none" && pos.x >= 0;
+						});
+		otherCards = otherCards.sort(
+						function(card1,card2) {
+							return getElementPosition( card1 ).x - getElementPosition( card2 ).x;
+						});
+		editorContent.insertBefore( document.getElementById(id), otherCards[0] );
+	}
+	// update panel
 	document.getElementById(id).style.display = visible ? "inline-block" : "none";
-	//update checkbox
+	// update checkbox
 	if (id != "toolsPanel")
 		document.getElementById(id.replace("Panel","Check")).checked = visible;
 }
