@@ -1,4 +1,11 @@
 /* 
+v3.3 notes
+- fix exit aliasing bug
+
+v3.3 TODO
+- improve exit editing (flow, size?, show entrances, drag to move?)
+
+
 TODO to release next version (3.2)
 X updated panel prefs (including way to switch versions)
 X some animations (pick up / put down / minimize)
@@ -770,11 +777,17 @@ function duplicateRoom() {
 		}
 	}
 
+	var duplicateExits = [];
+	for (i in roomToCopy.exits) {
+		var exit = roomToCopy.exits[i];
+		duplicateExits.push( duplicateExit( exit ) );
+	}
+
 	room[newRoomId] = {
 		id : newRoomId,
 		tilemap : duplicateTilemap,
 		walls : roomToCopy.walls.slice(0),
-		exits : roomToCopy.exits.slice(0),
+		exits : duplicateExits,
 		endings : roomToCopy.endings.slice(0),
 		pal : roomToCopy.pal
 	};
@@ -794,6 +807,19 @@ function duplicateRoom() {
 	option.text = "room " + newRoomId;
 	option.value = newRoomId;
 	select.add(option);
+}
+
+function duplicateExit(exit) {
+	var newExit = {
+		x : exit.x,
+		y : exit.y,
+		dest : {
+			room : exit.dest.room,
+			x : exit.dest.x,
+			y : exit.dest.y
+		}
+	}
+	return newExit;
 }
 
 function newRoom() {
