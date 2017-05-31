@@ -1379,26 +1379,6 @@ function drawEditMap() {
 
 	//draw exits (and entrances)
 	if (areExitsVisible) {
-		// for (i in room[curRoom].exits) {
-		// 	var e = room[curRoom].exits[i];
-		// 	if (e == selectedExit) {
-		// 		ctx.fillStyle = "#ff0";
-		// 		ctx.globalAlpha = 0.9;
-		// 	}
-		// 	else {
-		// 		ctx.fillStyle = getContrastingColor();
-		// 		ctx.globalAlpha = 0.5;
-		// 	}
-		// 	ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
-		// 	ctx.strokeStyle = getComplimentingColor();
-		// 	ctx.globalAlpha = 1.0;
-		// 	ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-
-		// 	ctx.font = '14px sans-serif';
-		// 	ctx.fillText( "To room " + e.dest.room, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
-
-		// 	//todo (tilesize*scale) should be a function
-		// }
 		for( r in room ) {
 			if( r === curRoom ) {
 				for (i in room[curRoom].exits) {
@@ -2177,6 +2157,34 @@ function drawExitDestinationRoom() {
 	}
 	for (var y = 1; y < mapsize; y++) {
 		exit_ctx.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
+	}
+
+	//draw exits and entrances (TODO: turn this into a function)
+	for( r in room ) {
+		if( r === selectedExitRoom ) {
+			for (i in room[selectedExitRoom].exits) {
+				var e = room[selectedExitRoom].exits[i];
+				exit_ctx.fillStyle = getContrastingColor();
+				exit_ctx.globalAlpha = 0.5;
+				exit_ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
+				exit_ctx.strokeStyle = getComplimentingColor();
+				exit_ctx.globalAlpha = 1.0;
+				exit_ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+			}
+		}
+		else {
+			for (i in room[r].exits) {
+				var e = room[r].exits[i];
+				if (e.dest.room === selectedExitRoom){
+					exit_ctx.fillStyle = getContrastingColor();
+					exit_ctx.globalAlpha = 0.3;
+					exit_ctx.fillRect(e.dest.x * tilesize * scale, e.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
+					exit_ctx.strokeStyle = getComplimentingColor();
+					exit_ctx.globalAlpha = 0.6;
+					exit_ctx.strokeRect( (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+				}
+			}
+		}
 	}
 
 	//draw exit destination
