@@ -4,7 +4,9 @@ v3.3 notes
 
 v3.3 TODO
 - improve exit editing (flow, size?, show entrances, drag to move?)
-
+- update TODOs from project and community
+- iOS mobile bug
+- android freezing bug
 
 TODO to release next version (3.2)
 X updated panel prefs (including way to switch versions)
@@ -1375,27 +1377,67 @@ function drawEditMap() {
 		}
 	}
 
-	//draw exits
+	//draw exits (and entrances)
 	if (areExitsVisible) {
-		for (i in room[curRoom].exits) {
-			var e = room[curRoom].exits[i];
-			if (e == selectedExit) {
-				ctx.fillStyle = "#ff0";
-				ctx.globalAlpha = 0.9;
+		// for (i in room[curRoom].exits) {
+		// 	var e = room[curRoom].exits[i];
+		// 	if (e == selectedExit) {
+		// 		ctx.fillStyle = "#ff0";
+		// 		ctx.globalAlpha = 0.9;
+		// 	}
+		// 	else {
+		// 		ctx.fillStyle = getContrastingColor();
+		// 		ctx.globalAlpha = 0.5;
+		// 	}
+		// 	ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
+		// 	ctx.strokeStyle = getComplimentingColor();
+		// 	ctx.globalAlpha = 1.0;
+		// 	ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+
+		// 	ctx.font = '14px sans-serif';
+		// 	ctx.fillText( "To room " + e.dest.room, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
+
+		// 	//todo (tilesize*scale) should be a function
+		// }
+		for( r in room ) {
+			if( r === curRoom ) {
+				for (i in room[curRoom].exits) {
+					var e = room[curRoom].exits[i];
+					if (e == selectedExit) {
+						ctx.fillStyle = "#ff0";
+						ctx.globalAlpha = 0.9;
+					}
+					else {
+						ctx.fillStyle = getContrastingColor();
+						ctx.globalAlpha = 0.5;
+					}
+					ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
+					ctx.strokeStyle = getComplimentingColor();
+					ctx.globalAlpha = 1.0;
+					ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+
+					ctx.font = '14px sans-serif';
+					ctx.fillText( "To room " + e.dest.room, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
+
+					//todo (tilesize*scale) should be a function
+				}
 			}
 			else {
-				ctx.fillStyle = getContrastingColor();
-				ctx.globalAlpha = 0.5;
+				for (i in room[r].exits) {
+					var e = room[r].exits[i];
+					if (e.dest.room === curRoom){
+						ctx.fillStyle = getContrastingColor();
+						ctx.globalAlpha = 0.3;
+						ctx.fillRect(e.dest.x * tilesize * scale, e.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
+						ctx.strokeStyle = getComplimentingColor();
+						ctx.globalAlpha = 0.6;
+						ctx.strokeRect( (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+	
+						ctx.font = '14px sans-serif';
+						ctx.fillText( "From room " + r, (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 5 );
+					}
+				}
 			}
-			ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
-			ctx.strokeStyle = getComplimentingColor();
-			ctx.globalAlpha = 1.0;
-			ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-
-			ctx.font = '14px sans-serif';
-			ctx.fillText( "To room " + e.dest.room, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
-
-			//todo (tilesize*scale) should be a function
 		}
 		ctx.globalAlpha = 1;
 	}
