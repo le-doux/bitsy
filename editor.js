@@ -1,53 +1,26 @@
 /* 
-v3.3 notes
-- fix exit aliasing bug
-- show entrances in room view
-- exits start with valid destination
-- exits are draggable
-
-v3.3 TODO
-- improve exit editing (X flow, size?, X show entrances, drag to move?)
+NEW TODO
 - update TODOs from project and community
+- draggable entrances
 - iOS mobile bug
 - android freezing bug
-
-TODO to release next version (3.2)
-X updated panel prefs (including way to switch versions)
-X some animations (pick up / put down / minimize)
-X panels appear in reliable place
 - ? default workspaces
-
 
 new usability ideas
 - tiles in grid so you can see more
 - Oh and possibly a way to "toggle" the placement of endings or exits, so you can put multiples of the same one in a room without having to scroll up and so down to select it each time
 
 v3.1 bugs
-- FIXED duplicate room names in room selector in ending (happens when you restart the game and don't refresh the window)
 - prev/next and tile preview don't work together (old bug)
 
 editor UI problems to solve
-- layout doesn't look good in itch.io
 - unusable on mobile
-X layout doesn't look good when every panel is open
-X too many gray buttons
-X too many buttons visible at once for newcomers
-X not cute enough
 - gif UI is terrible and not findable
 - prev / next buttons everywhere are a pain to use if you have a lot of stuff
 - can't rename things
 - can't see all the tiles you want to work on
-- dialog UI isn't that great??
+- dialog UI could be improved
 - feedback for exits and ending creation is not good enough
-
-editor UI fixes
-X new trello-y layout
-X show/hide additional UI in panels
-X icons
---
-- cuteness redesign (including animations)
-X create centralized toolbar / settings menu
-- renameable objects
 
 
 v4 features
@@ -60,23 +33,14 @@ v4 features
 		X font
 	- modularize editor
 		X exporter
+		- ???
 - re-do UI
-	- moveable windows
-	- icons
-	- modularized windows?
-	- cuter "branding"?
 	- think through ALL existing features and how they work together (or not)
 	- make everything MORE VISIBLE
-	- UI animations
-	- ? dialog preview thing
-	- ? rename everything with aliases (rooms, sprites, endings, etc)
 
 
 TODO NOW
-- * UI mockup for leaf *
-	- keep emailing
-- game jam stuff
-- more usability
+- email leaf
 - item system ideas / requirements
 	- drawing of item in world
 	- item can be picked up
@@ -108,14 +72,12 @@ v5 candidate features
 	- need to be able to name (alias) sprites, tiles, rooms
 	- trigger multiple things at once? (one trigger -> multiple effects)
 	- special trigger window? trigger in dialog / map / exit window?
-- endings
 - new dialog editor / effects  / options
 	- text effects
 	- choices?
 	- multiple options
 - music / sfx tool
 - room map
-- UI redesign (more horizontal?, move panels around, duplicate panels)
 - fancier animations (transitions, arrow, walk?, etc)
 - character pathing (why am I the only one that wants this???)
 
@@ -169,7 +131,7 @@ my ideas
 - how do extra characters end up in the room maps?
 
 now what?
-- viral marketting features in the games
+- sharing features in the games
 	- gif recording
 	- linkbacks to editor
 	- twitter api sharing
@@ -187,9 +149,7 @@ from twitter
 - Qs for creators
 - creator list (spreadsheet?)
 
-- better formatting for itch
-- show entrances as well as exits (drag entrances/exits?)
-- async gif processings
+- async gif processings (IN PROGRESS)
 - undo / redo
 - improve color input for browsers that only accept text
 	- hash or no-hash hex
@@ -201,8 +161,6 @@ from twitter
 
 TODO BACKLOG
 - export straight to itchio (is there a developer api?)
-- drag tool windows around
-- multiple palettes
 - better icon for exits
 
 v2.0???

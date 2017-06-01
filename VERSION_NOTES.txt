@@ -1,3 +1,9 @@
+v3.3:
+- drag exits and endings to move them!
+- show entrances in room view
+- fix exit copy bug
+- exits start with valid destination
+
 v3.2:
 - move tool windows around by dragging the title bar!
 - user interface redesign
