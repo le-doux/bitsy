@@ -1160,6 +1160,7 @@ function sortedBase36IdList( objHolder ) {
 var isDragAddingTiles = false;
 var isDragDeletingTiles = false;
 var isDragMovingExit = false;
+var isDragMovingEnding = false;
 function map_onMouseDown(e) {
 	var off = getOffset(e);
 	var x = Math.floor( off.x / (tilesize*scale) );
@@ -1172,6 +1173,7 @@ function map_onMouseDown(e) {
 	if (didSelectedExitChange || didSelectedEndingChange) {
 		//don't do anything else
 		if( selectedExit != null ) isDragMovingExit = true;
+		if( selectedEndingTile != null ) isDragMovingEnding = true;
 	}
 	else if (isAddingExit) { //todo - mutually exclusive with adding an ending?
 		//add exit
@@ -1269,10 +1271,28 @@ function map_onMouseMove(e) {
 		var off = getOffset(e);
 		var x = Math.floor(off.x / (tilesize*scale));
 		var y = Math.floor(off.y / (tilesize*scale));
-		selectedExit.x = x;
-		selectedExit.y = y;
-		refreshGameData();
-		drawEditMap();
+		if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
+		{
+			selectedExit.x = x;
+			selectedExit.y = y;
+			refreshGameData();
+			drawEditMap();	
+		}
+	}
+	else if( selectedEndingTile != null && isDragMovingEnding )
+	{
+		// drag ending around
+		var off = getOffset(e);
+		var x = Math.floor(off.x / (tilesize*scale));
+		var y = Math.floor(off.y / (tilesize*scale));
+		var y = Math.floor(off.y / (tilesize*scale));
+		if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
+		{
+			selectedEndingTile.x = x;
+			selectedEndingTile.y = y;
+			refreshGameData();
+			drawEditMap();	
+		}
 	}
 	else
 		editTilesOnDrag(e);
@@ -1283,6 +1303,7 @@ function map_onMouseUp(e) {
 	isDragAddingTiles = false;
 	isDragDeletingTiles = false;
 	isDragMovingExit = false;
+	isDragMovingEnding = false;
 }
 
 function paint_onMouseDown(e) {
@@ -2721,7 +2742,8 @@ function hideEndings() {
 }
 
 function setSelectedEnding(e) { //todo
-	var didChange = selectedEndingTile != e;
+	// var didChange = selectedEndingTile != e;
+	var didChange = (e != null) || (e == null && selectedEndingTile != null);
 
 	selectedEndingTile = e;
 
