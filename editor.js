@@ -1,9 +1,12 @@
 /* 
 v3.3 notes
 - fix exit aliasing bug
+- show entrances in room view
+- exits start with valid destination
+- exits are draggable
 
 v3.3 TODO
-- improve exit editing (flow, size?, show entrances, drag to move?)
+- improve exit editing (X flow, size?, X show entrances, drag to move?)
 - update TODOs from project and community
 - iOS mobile bug
 - android freezing bug
@@ -1156,6 +1159,7 @@ function sortedBase36IdList( objHolder ) {
 
 var isDragAddingTiles = false;
 var isDragDeletingTiles = false;
+var isDragMovingExit = false;
 function map_onMouseDown(e) {
 	var off = getOffset(e);
 	var x = Math.floor( off.x / (tilesize*scale) );
@@ -1167,6 +1171,7 @@ function map_onMouseDown(e) {
 
 	if (didSelectedExitChange || didSelectedEndingChange) {
 		//don't do anything else
+		if( selectedExit != null ) isDragMovingExit = true;
 	}
 	else if (isAddingExit) { //todo - mutually exclusive with adding an ending?
 		//add exit
@@ -1258,13 +1263,26 @@ function editTilesOnDrag(e) {
 }
 
 function map_onMouseMove(e) {
-	editTilesOnDrag(e);
+	if( selectedExit != null && isDragMovingExit )
+	{
+		// drag exit around
+		var off = getOffset(e);
+		var x = Math.floor(off.x / (tilesize*scale));
+		var y = Math.floor(off.y / (tilesize*scale));
+		selectedExit.x = x;
+		selectedExit.y = y;
+		refreshGameData();
+		drawEditMap();
+	}
+	else
+		editTilesOnDrag(e);
 }
 
 function map_onMouseUp(e) {
 	editTilesOnDrag(e);
 	isDragAddingTiles = false;
 	isDragDeletingTiles = false;
+	isDragMovingExit = false;
 }
 
 function paint_onMouseDown(e) {
@@ -2086,10 +2104,10 @@ function addExitToCurRoom(x,y) {
 	var newExit = {
 		x : x,
 		y : y,
-		dest : { //starts with invalid destination
+		dest : { // start with valid destination so you can't accidentally uncreate exits
 			room : "0",
-			x : -1,
-			y : -1
+			x : 0,
+			y : 0
 		}
 	}
 	room[curRoom].exits.push( newExit );
@@ -2098,7 +2116,8 @@ function addExitToCurRoom(x,y) {
 }
 
 function setSelectedExit(e) {
-	var didChange = selectedExit != e;
+	// var didChange = selectedExit != e;
+	var didChange = (e != null) || (e == null && selectedExit != null);
 
 	selectedExit = e;
 
