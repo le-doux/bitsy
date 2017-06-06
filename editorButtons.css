@@ -82,3 +82,14 @@ input[type=radio] + label.left {
 input[type=radio] + label.right {
 	border-radius: 0px 2px 2px 0px;
 }
+
+#paintExplorerContent input[type=radio] + label {
+	padding: 0px;
+	background: none;
+	border: none;
+	text-decoration: none;
+}
+
+#paintExplorerContent input[type=radio]:checked + label img {
+	border: solid 2px black;
+}

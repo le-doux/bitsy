@@ -185,3 +185,18 @@ input {
 	vertical-align: middle;
 	font-size: 18px;
 }
+
+#paintExplorerViewport {
+	/*padding:5px;*/
+	margin-top:5px;
+	height:338px;
+	overflow:scroll;
+	display:block;
+	white-space:normal;
+}
+#paintExplorerContent {
+	width:210px;margin:0px;
+}
+#paintExplorerContent img {
+	background:green; width:64px;height:64px; margin:2px; margin-right:0px; margin-bottom:0px; display:inline-block;
+}

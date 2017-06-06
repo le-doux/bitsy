@@ -5,6 +5,9 @@ NEW TODO
 - iOS mobile bug
 - android freezing bug
 - ? default workspaces
+- items
+- drawing selector
+- aliases
 
 new usability ideas
 - tiles in grid so you can see more
@@ -1842,6 +1845,7 @@ function on_paint_avatar() {
 	document.getElementById("paintCommands").setAttribute("style","display:none;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:none;");
+	updatePaintExplorer();
 }
 function on_paint_tile() {
 	paintMode = TileType.Tile;
@@ -1854,6 +1858,7 @@ function on_paint_tile() {
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:block;");
+	updatePaintExplorer();
 }
 function on_paint_sprite() {
 	paintMode = TileType.Sprite;
@@ -1873,6 +1878,47 @@ function on_paint_sprite() {
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:block;");
+	updatePaintExplorer();
+}
+
+function updatePaintExplorer() {
+	var idList = [];
+	if( paintMode == TileType.Avatar ) {
+		idList = ["A"];
+	}
+	else if( paintMode == TileType.Sprite ) {
+		idList = sortedSpriteIdList();
+	}
+	else if ( paintMode == TileType.Tile ) {
+		idList = sortedTileIdList();
+	}
+	var paintExplorerForm = document.getElementById("paintExplorerForm");
+	paintExplorerForm.innerHTML = "";
+	for(var i = 0; i < idList.length; i++) {
+		var id = idList[i];
+		if(id != "A" || paintMode == TileType.Avatar)
+		{
+			var radio = document.createElement("input");
+			radio.type = "radio";
+			radio.name = "paintRadio";
+			radio.id = "paintRadio_" + id;
+			radio.value = id;
+			radio.checked = id === drawingId;
+			paintExplorerForm.appendChild(radio);
+			var label = document.createElement("label");
+			label.htmlFor = "paintRadio_" + id;
+			var img = document.createElement("img");
+			label.appendChild(img);
+			paintExplorerForm.appendChild(label);
+
+			radio.onclick = selectPaint;
+		}
+	}
+}
+
+function selectPaint() {
+	console.log("HI!");
+	console.log(this.value);
 }
 
 function on_change_dialog() {
