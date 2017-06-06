@@ -879,6 +879,7 @@ function next() {
 	else {
 		nextSprite();
 	}
+	updatePaintExplorer(); // TODO hacky and destructive
 }
 
 function prev() {
@@ -888,6 +889,7 @@ function prev() {
 	else {
 		prevSprite();
 	}
+	updatePaintExplorer(); // TODO hacky and destructive
 }
 
 function newDrawing() {
@@ -897,6 +899,7 @@ function newDrawing() {
 	else {
 		newSprite();
 	}
+	updatePaintExplorer();
 }
 
 function duplicateDrawing() {
@@ -960,6 +963,7 @@ function duplicateDrawing() {
 
 		reloadSprite(); //hack
 	}
+	updatePaintExplorer(); //TODO Hacky
 }
 
 function deleteDrawing() {
@@ -982,6 +986,7 @@ function deleteDrawing() {
 			nextSprite();
 		}
 	}
+	updatePaintExplorer(); // TODO hacky and destructive
 }
 
 function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
@@ -1892,6 +1897,9 @@ function updatePaintExplorer() {
 	else if ( paintMode == TileType.Tile ) {
 		idList = sortedTileIdList();
 	}
+
+	var imgList = [];
+
 	var paintExplorerForm = document.getElementById("paintExplorerForm");
 	paintExplorerForm.innerHTML = "";
 	for(var i = 0; i < idList.length; i++) {
@@ -1900,25 +1908,62 @@ function updatePaintExplorer() {
 		{
 			var radio = document.createElement("input");
 			radio.type = "radio";
-			radio.name = "paintRadio";
-			radio.id = "paintRadio_" + id;
+			radio.name = "paintExplorerRadio";
+			radio.id = "paintExplorerRadio_" + id;
 			radio.value = id;
 			radio.checked = id === drawingId;
 			paintExplorerForm.appendChild(radio);
 			var label = document.createElement("label");
-			label.htmlFor = "paintRadio_" + id;
+			label.htmlFor = "paintExplorerRadio_" + id;
 			var img = document.createElement("img");
 			label.appendChild(img);
 			paintExplorerForm.appendChild(label);
 
 			radio.onclick = selectPaint;
+
+			imgList.push( img );
 		}
 	}
+
+	//hacky test thing	
+
+		var hexPalette = [];
+		for (id in palette) {
+			for (i in palette[id]){
+				var hexStr = rgbToHex( palette[id][i][0], palette[id][i][1], palette[id][i][2] ).slice(1);
+				hexPalette.push( hexStr );
+			}
+		}
+	gifFrameData = [];
+	gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+	var gif = {
+			frames: gifFrameData,
+			width: 512,
+			height: 512,
+			palette: hexPalette,
+			loops: 0,
+			delay: 30
+		};
+	gifencoder.encode( gif, function(uri) {
+		for(var i = 0; i < imgList.length; i++ ) {
+			imgList[i].src = uri;
+		}
+	});
+
 }
 
 function selectPaint() {
-	console.log("HI!");
-	console.log(this.value);
+	// console.log("HI!");
+	// console.log(this.value);
+	drawingId = this.value;
+	if( paintMode === TileType.Tile ) {
+		tileIndex = sortedTileIdList().indexOf( drawingId );
+		reloadTile();
+	}
+	else {
+		spriteIndex = sortedSpriteIdList().indexOf( drawingId );
+		reloadSprite();
+	}
 }
 
 function on_change_dialog() {
