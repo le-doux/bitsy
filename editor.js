@@ -368,6 +368,12 @@ function start() {
 	//exit events
 	exit_canvas.addEventListener("mousedown", exit_onMouseDown);
 
+	//
+	drawingThumbnailCanvas = document.createElement("canvas");
+	drawingThumbnailCanvas.width = 8 * scale;
+	drawingThumbnailCanvas.height = 8 * scale;
+	drawingThumbnailCtx = drawingThumbnailCanvas.getContext("2d");
+
 
 	//load last auto-save
 	if (localStorage.game_data) {
@@ -705,6 +711,7 @@ function nextRoom() {
 	drawEditMap();
 	drawPaintCanvas();
 	updateRoomPaletteSelect();
+	refreshPaintExplorer();
 
 	if (paintMode === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -720,6 +727,7 @@ function prevRoom() {
 	drawEditMap();
 	drawPaintCanvas();
 	updateRoomPaletteSelect();
+	refreshPaintExplorer();
 
 	if (paintMode === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -879,7 +887,7 @@ function next() {
 	else {
 		nextSprite();
 	}
-	updatePaintExplorer(); // TODO hacky and destructive
+	refreshPaintExplorer(); // TODO hacky and destructive
 }
 
 function prev() {
@@ -889,7 +897,7 @@ function prev() {
 	else {
 		prevSprite();
 	}
-	updatePaintExplorer(); // TODO hacky and destructive
+	refreshPaintExplorer(); // TODO hacky and destructive
 }
 
 function newDrawing() {
@@ -899,7 +907,7 @@ function newDrawing() {
 	else {
 		newSprite();
 	}
-	updatePaintExplorer();
+	refreshPaintExplorer();
 }
 
 function duplicateDrawing() {
@@ -963,7 +971,7 @@ function duplicateDrawing() {
 
 		reloadSprite(); //hack
 	}
-	updatePaintExplorer(); //TODO Hacky
+	refreshPaintExplorer(); //TODO Hacky
 }
 
 function deleteDrawing() {
@@ -986,7 +994,7 @@ function deleteDrawing() {
 			nextSprite();
 		}
 	}
-	updatePaintExplorer(); // TODO hacky and destructive
+	refreshPaintExplorer(); // TODO hacky and destructive
 }
 
 function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
@@ -1705,6 +1713,7 @@ function on_change_color_bg() {
 	renderImages();
 	drawPaintCanvas();
 	drawEditMap();
+	refreshPaintExplorer();
 
 	if (!browserFeatures.colorPicker) {
 		updatePaletteBorders();
@@ -1728,6 +1737,7 @@ function on_change_color_tile() {
 	renderImages();
 	drawPaintCanvas();
 	drawEditMap();
+	refreshPaintExplorer();
 
 	if (!browserFeatures.colorPicker) {
 		updatePaletteBorders();
@@ -1746,6 +1756,7 @@ function on_change_color_sprite() {
 	renderImages();
 	drawPaintCanvas();
 	drawEditMap();
+	refreshPaintExplorer();
 
 	if (!browserFeatures.colorPicker) {
 		updatePaletteBorders();
@@ -1850,7 +1861,7 @@ function on_paint_avatar() {
 	document.getElementById("paintCommands").setAttribute("style","display:none;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:none;");
-	updatePaintExplorer();
+	refreshPaintExplorer();
 }
 function on_paint_tile() {
 	paintMode = TileType.Tile;
@@ -1863,7 +1874,7 @@ function on_paint_tile() {
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:block;");
-	updatePaintExplorer();
+	refreshPaintExplorer();
 }
 function on_paint_sprite() {
 	paintMode = TileType.Sprite;
@@ -1883,10 +1894,26 @@ function on_paint_sprite() {
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:block;");
-	updatePaintExplorer();
+	refreshPaintExplorer();
 }
 
-function updatePaintExplorer() {
+/*
+TODO
+- name for "paint explorer"
+- tool button
+- save/load tool
+- linked avatar/tile/sprite radio button
+- break up updatePaintExplorer for different scenarios:
+	- update individual drawing
+	- delete individual drawing
+	- duplicate individual drawing
+	- add / remove animation
+	- change palette
+	- etc
+- slow perf if we do it all at once for every rapid color change (cancellable gif rendering?)
+*/
+var drawingThumbnailCanvas, drawingThumbnailCtx;
+function refreshPaintExplorer() {
 	var idList = [];
 	if( paintMode == TileType.Avatar ) {
 		idList = ["A"];
@@ -1898,7 +1925,13 @@ function updatePaintExplorer() {
 		idList = sortedTileIdList();
 	}
 
-	var imgList = [];
+	var hexPalette = [];
+	for (id in palette) {
+		for (i in palette[id]){
+			var hexStr = rgbToHex( palette[id][i][0], palette[id][i][1], palette[id][i][2] ).slice(1);
+			hexPalette.push( hexStr );
+		}
+	}
 
 	var paintExplorerForm = document.getElementById("paintExplorerForm");
 	paintExplorerForm.innerHTML = "";
@@ -1921,40 +1954,42 @@ function updatePaintExplorer() {
 
 			radio.onclick = selectPaint;
 
-			imgList.push( img );
+			var drawingFrameData = [];
+			if( paintMode == TileType.Tile ) {
+				drawTile( getTileImage( tile[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
+				drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+				drawTile( getTileImage( tile[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
+				drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+			}
+			else {
+				drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
+				drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+				drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
+				drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+			}
+			var gifData = {
+				frames: drawingFrameData,
+				width: 8*scale,
+				height: 8*scale,
+				palette: hexPalette,
+				loops: 0,
+				delay: animationTime / 10 // TODO why divide by 10???
+			};
+			var encoder = new gif();
+			encoder.encode( gifData, createThumbnailRenderCallback(img) );
 		}
 	}
+}
 
-	//hacky test thing	
+function changePaintExplorerSelection(id) {
+	// TODO
+}
 
-		var hexPalette = [];
-		for (id in palette) {
-			for (i in palette[id]){
-				var hexStr = rgbToHex( palette[id][i][0], palette[id][i][1], palette[id][i][2] ).slice(1);
-				hexPalette.push( hexStr );
-			}
-		}
-	gifFrameData = [];
-	gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-	var gif = {
-			frames: gifFrameData,
-			width: 512,
-			height: 512,
-			palette: hexPalette,
-			loops: 0,
-			delay: 30
-		};
-	gifencoder.encode( gif, function(uri) {
-		for(var i = 0; i < imgList.length; i++ ) {
-			imgList[i].src = uri;
-		}
-	});
-
+function createThumbnailRenderCallback(img) {
+	return function(uri) { img.src = uri; };
 }
 
 function selectPaint() {
-	// console.log("HI!");
-	// console.log(this.value);
 	drawingId = this.value;
 	if( paintMode === TileType.Tile ) {
 		tileIndex = sortedTileIdList().indexOf( drawingId );

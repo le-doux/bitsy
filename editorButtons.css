@@ -91,5 +91,7 @@ input[type=radio] + label.right {
 }
 
 #paintExplorerContent input[type=radio]:checked + label img {
-	border: solid 2px black;
+	background: white;
+	padding: 2px;
+	border: solid 2px #6767b2;
 }

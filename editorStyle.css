@@ -195,8 +195,15 @@ input {
 	white-space:normal;
 }
 #paintExplorerContent {
-	width:210px;margin:0px;
+	width:224px;margin:0px;
 }
 #paintExplorerContent img {
-	background:green; width:64px;height:64px; margin:2px; margin-right:0px; margin-bottom:0px; display:inline-block;
+	width:64px;
+	height:64px;
+	margin:0px;
+	margin-right:2px;
+	margin-bottom:-6px; /* should be unnecesarry really */
+	display:inline-block;
+	image-rendering: pixelated;
+	border: solid 4px white;
 }
