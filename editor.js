@@ -1867,6 +1867,8 @@ function on_paint_avatar() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:none;");
 	refreshPaintExplorer();
+	document.getElementById("paintOptionAvatar").checked = true;
+	document.getElementById("paintExplorerOptionAvatar").checked = true;
 }
 function on_paint_tile() {
 	paintMode = TileType.Tile;
@@ -1880,6 +1882,8 @@ function on_paint_tile() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	refreshPaintExplorer();
+	document.getElementById("paintOptionTile").checked = true;
+	document.getElementById("paintExplorerOptionTile").checked = true;
 }
 function on_paint_sprite() {
 	paintMode = TileType.Sprite;
@@ -1900,14 +1904,17 @@ function on_paint_sprite() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	refreshPaintExplorer();
+	document.getElementById("paintOptionSprite").checked = true;
+	document.getElementById("paintExplorerOptionSprite").checked = true;
 }
 
 /*
 TODO
-- name for "paint explorer"
+X name for "paint explorer"
 - tool button
 - save/load tool
-- linked avatar/tile/sprite radio button
+- launch button from paint panel
+X linked avatar/tile/sprite radio button
 X break up updatePaintExplorer for different scenarios:
 	X update individual drawing
 	X delete individual drawing
