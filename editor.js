@@ -310,15 +310,16 @@ function hideUnsupportedFeatureWarning() {
 // This is the panel arrangement you get if you are new or your editor settings are out-of-date
 var defaultPanelPrefs = {
 	workspace : [
-		{ id:"aboutPanel", 		visible:true, 	position:0 },
-		{ id:"roomPanel", 		visible:true, 	position:1 },
-		{ id:"exitsPanel", 		visible:false, 	position:7 },
-		{ id:"endingsPanel", 	visible:false, 	position:8 },
-		{ id:"paintPanel", 		visible:true, 	position:2 },
-		{ id:"colorsPanel", 	visible:true, 	position:3 },
-		{ id:"downloadPanel", 	visible:true, 	position:4 },
-		{ id:"gifPanel", 		visible:false, 	position:5 },
-		{ id:"dataPanel", 		visible:false, 	position:6 }
+		{ id:"aboutPanel", 			visible:true, 	position:0 },
+		{ id:"roomPanel", 			visible:true, 	position:1 },
+		{ id:"paintPanel", 			visible:true, 	position:2 },
+		{ id:"colorsPanel", 		visible:true, 	position:3 },
+		{ id:"downloadPanel", 		visible:true, 	position:4 },
+		{ id:"gifPanel", 			visible:false, 	position:5 },
+		{ id:"dataPanel", 			visible:false, 	position:6 },
+		{ id:"exitsPanel", 			visible:false, 	position:7 },
+		{ id:"endingsPanel", 		visible:false, 	position:8 },
+		{ id:"paintExplorerPanel",	visible:false,	position:9 }
 	]
 };
 function getPanelPrefs() {
@@ -329,6 +330,20 @@ function getPanelPrefs() {
 							( JSON.parse(localStorage.engine_version).minor < 2 );
 	console.log("USE DEFAULT?? " + useDefaultPrefs);
 	var prefs = useDefaultPrefs ? defaultPanelPrefs : JSON.parse( localStorage.panel_prefs );
+	// add missing panel prefs (if any)
+	for( var i = 0; i < defaultPanelPrefs.workspace.length; i++ ) {
+		var isMissing = true;
+		var panelPref = defaultPanelPrefs.workspace[i];
+		for( var j = 0; j < prefs.workspace.length; j++ )
+		{
+			if( prefs.workspace[j].id === panelPref.id )
+				isMissing = false;
+		}
+		if( isMissing ) {
+			console.log( "MISSING PREF " + panelPref.id );
+			prefs.workspace.push( panelPref );
+		}
+	}
 	return prefs;
 }
 
@@ -1908,22 +1923,6 @@ function on_paint_sprite() {
 	document.getElementById("paintExplorerOptionSprite").checked = true;
 }
 
-/*
-TODO
-X name for "paint explorer"
-- tool button
-- save/load tool
-- launch button from paint panel
-X linked avatar/tile/sprite radio button
-X break up updatePaintExplorer for different scenarios:
-	X update individual drawing
-	X delete individual drawing
-	X duplicate individual drawing
-	X add / remove animation
-	X change palette
-	X etc
-X slow perf if we do it all at once for every rapid color change (cancellable gif rendering?)
-*/
 var drawingThumbnailCanvas, drawingThumbnailCtx;
 function refreshPaintExplorer( doKeepOldThumbnails = false ) {
 	var idList = [];

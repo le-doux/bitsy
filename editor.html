@@ -73,6 +73,11 @@
 					<i class="material-icons">brush</i> paint
 				</label>
 				
+				<input type="checkbox" value="paintExplorerPanel" id="paintExplorerCheck" onclick="togglePanelAnimated(event);" />
+				<label title="show / hide find drawing window" for="paintExplorerCheck">
+					<i class="material-icons">brush</i> find drawing
+				</label>
+				
 				<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide color palette window" for="colorsCheck">
 					<i class="material-icons">palette</i> colors
@@ -425,6 +430,9 @@
 						</button>
 						<button title="previous drawing" class="color0" onclick="next();">
 							<i class="material-icons">navigate_next</i>
+						</button>
+						<button title="find drawing: look through list of all drawings" class="color0" onclick="showPanel('paintExplorerPanel');">
+							<i class="material-icons">search</i>
 						</button>
 					</div>
 					<div id="paintCommands" class="buttonGroup">
