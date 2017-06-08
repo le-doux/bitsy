@@ -491,34 +491,34 @@
 					
 				</div>
 
-				<div id="paintSelectPanel" class="panel color1">
+				<div id="paintExplorerPanel" class="panel color1">
 					<div class="bar color1">
 
-						<button title="minimize paint window" class="light" style="float:right;" onclick="hidePanel('paintSelectPanel');">
+						<button title="minimize find drawing window" class="light" style="float:right;" onclick="hidePanel('paintExplorerPanel');">
 							<i class="material-icons">close</i>
 						</button>
 
-						<div title="paint window" class="panelBarTitle" onmousedown="grabCard(event);">
+						<div title="find drawing window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">brush</i>
-							paint explorer
+							find drawing
 						</div>
 					</div>
 
 					<form>
-						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_avatar();" id="paintOptionAvatar" checked>
-						<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
+						<input type="radio" name="paint explorer mode" value="sprite" onclick="on_paint_avatar();" id="paintExplorerOptionAvatar" checked>
+						<label title="find the avatar: the player's character" for="paintExplorerOptionAvatar" class="left">
 							<i class="material-icons">perm_identity</i>
 							avatar
 						</label>
 
-						<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();" id="paintOptionTile">
-						<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
+						<input type="radio" name="paint explorer mode" value="tile" onclick="on_paint_tile();" id="paintExplorerOptionTile">
+						<label title="find tiles: pieces of scenery" for="paintExplorerOptionTile" class="middle">
 							<i class="material-icons">terrain</i>
 							tile
 						</label>
 
-						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite">
-						<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="right">
+						<input type="radio" name="paint explorer mode" value="sprite" onclick="on_paint_sprite();" id="paintExplorerOptionSprite">
+						<label title="find sprites: non-player characters and interactive objects" for="paintExplorerOptionSprite" class="right">
 							<i class="material-icons">nature_people</i>
 							sprite
 						</label>

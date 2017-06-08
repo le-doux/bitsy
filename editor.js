@@ -711,7 +711,7 @@ function nextRoom() {
 	drawEditMap();
 	drawPaintCanvas();
 	updateRoomPaletteSelect();
-	refreshPaintExplorer();
+	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 
 	if (paintMode === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -727,7 +727,7 @@ function prevRoom() {
 	drawEditMap();
 	drawPaintCanvas();
 	updateRoomPaletteSelect();
-	refreshPaintExplorer();
+	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 
 	if (paintMode === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -887,7 +887,7 @@ function next() {
 	else {
 		nextSprite();
 	}
-	refreshPaintExplorer(); // TODO hacky and destructive
+	changePaintExplorerSelection( drawingId );
 }
 
 function prev() {
@@ -897,7 +897,7 @@ function prev() {
 	else {
 		prevSprite();
 	}
-	refreshPaintExplorer(); // TODO hacky and destructive
+	changePaintExplorerSelection( drawingId );
 }
 
 function newDrawing() {
@@ -907,7 +907,8 @@ function newDrawing() {
 	else {
 		newSprite();
 	}
-	refreshPaintExplorer();
+	addPaintThumbnail( drawingId );
+	changePaintExplorerSelection( drawingId );
 }
 
 function duplicateDrawing() {
@@ -971,11 +972,13 @@ function duplicateDrawing() {
 
 		reloadSprite(); //hack
 	}
-	refreshPaintExplorer(); //TODO Hacky
+	addPaintThumbnail( drawingId );
+	changePaintExplorerSelection( drawingId );
 }
 
 function deleteDrawing() {
 	if ( confirm("Are you sure you want to delete this drawing?") ) {
+		deletePaintThumbnail( drawingId );
 		if (paintMode == TileType.Tile) {
 			if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
 			delete tile[ drawingId ];
@@ -993,8 +996,8 @@ function deleteDrawing() {
 			drawEditMap();
 			nextSprite();
 		}
+		changePaintExplorerSelection( drawingId );
 	}
-	refreshPaintExplorer(); // TODO hacky and destructive
 }
 
 function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
@@ -1313,6 +1316,7 @@ function paint_onMouseUp(e) {
 		renderImages();
 		refreshGameData();
 		drawEditMap();
+		renderPaintThumbnail( drawingId );
 	}
 }
 
@@ -1713,7 +1717,7 @@ function on_change_color_bg() {
 	renderImages();
 	drawPaintCanvas();
 	drawEditMap();
-	refreshPaintExplorer();
+	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 
 	if (!browserFeatures.colorPicker) {
 		updatePaletteBorders();
@@ -1737,7 +1741,7 @@ function on_change_color_tile() {
 	renderImages();
 	drawPaintCanvas();
 	drawEditMap();
-	refreshPaintExplorer();
+	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 
 	if (!browserFeatures.colorPicker) {
 		updatePaletteBorders();
@@ -1756,7 +1760,7 @@ function on_change_color_sprite() {
 	renderImages();
 	drawPaintCanvas();
 	drawEditMap();
-	refreshPaintExplorer();
+	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 
 	if (!browserFeatures.colorPicker) {
 		updatePaletteBorders();
@@ -1826,6 +1830,7 @@ function roomPaletteChange(event) {
 	refreshGameData();
 	drawEditMap();
 	drawPaintCanvas();
+	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 }
 
 //hex-to-rgb method borrowed from stack overflow
@@ -1903,17 +1908,17 @@ TODO
 - tool button
 - save/load tool
 - linked avatar/tile/sprite radio button
-- break up updatePaintExplorer for different scenarios:
-	- update individual drawing
-	- delete individual drawing
-	- duplicate individual drawing
-	- add / remove animation
-	- change palette
-	- etc
-- slow perf if we do it all at once for every rapid color change (cancellable gif rendering?)
+X break up updatePaintExplorer for different scenarios:
+	X update individual drawing
+	X delete individual drawing
+	X duplicate individual drawing
+	X add / remove animation
+	X change palette
+	X etc
+X slow perf if we do it all at once for every rapid color change (cancellable gif rendering?)
 */
 var drawingThumbnailCanvas, drawingThumbnailCtx;
-function refreshPaintExplorer() {
+function refreshPaintExplorer( doKeepOldThumbnails = false ) {
 	var idList = [];
 	if( paintMode == TileType.Avatar ) {
 		idList = ["A"];
@@ -1934,55 +1939,97 @@ function refreshPaintExplorer() {
 	}
 
 	var paintExplorerForm = document.getElementById("paintExplorerForm");
-	paintExplorerForm.innerHTML = "";
+	if( !doKeepOldThumbnails )
+		paintExplorerForm.innerHTML = "";
+	
 	for(var i = 0; i < idList.length; i++) {
 		var id = idList[i];
 		if(id != "A" || paintMode == TileType.Avatar)
 		{
-			var radio = document.createElement("input");
-			radio.type = "radio";
-			radio.name = "paintExplorerRadio";
-			radio.id = "paintExplorerRadio_" + id;
-			radio.value = id;
-			radio.checked = id === drawingId;
-			paintExplorerForm.appendChild(radio);
-			var label = document.createElement("label");
-			label.htmlFor = "paintExplorerRadio_" + id;
-			var img = document.createElement("img");
-			label.appendChild(img);
-			paintExplorerForm.appendChild(label);
-
-			radio.onclick = selectPaint;
-
-			var drawingFrameData = [];
-			if( paintMode == TileType.Tile ) {
-				drawTile( getTileImage( tile[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
-				drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-				drawTile( getTileImage( tile[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
-				drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-			}
-			else {
-				drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
-				drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-				drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
-				drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-			}
-			var gifData = {
-				frames: drawingFrameData,
-				width: 8*scale,
-				height: 8*scale,
-				palette: hexPalette,
-				loops: 0,
-				delay: animationTime / 10 // TODO why divide by 10???
-			};
-			var encoder = new gif();
-			encoder.encode( gifData, createThumbnailRenderCallback(img) );
+			if( !doKeepOldThumbnails )
+				addPaintThumbnail( id ); // create thumbnail element and render thumbnail
+			else
+				renderPaintThumbnail( id ); // just re-render the thumbnail
 		}
 	}
 }
 
-function changePaintExplorerSelection(id) {
-	// TODO
+function addPaintThumbnail(id) {
+	var paintExplorerForm = document.getElementById("paintExplorerForm");
+
+	var radio = document.createElement("input");
+	radio.type = "radio";
+	radio.name = "paintExplorerRadio";
+	radio.id = "paintExplorerRadio_" + id;
+	radio.value = id;
+	radio.checked = id === drawingId;
+	paintExplorerForm.appendChild(radio);
+	var label = document.createElement("label");
+	label.htmlFor = "paintExplorerRadio_" + id;
+	label.id = "paintExplorerLabel_" + id;
+	var img = document.createElement("img");
+	img.id = "paintExplorerThumbnail_" + id;
+	if( paintMode === TileType.Tile )
+		img.title = "tile " + id;
+	else if( paintMode === TileType.Sprite )
+		img.title = "sprite " + id;
+	else
+		img.title = "player avatar";
+	label.appendChild(img);
+	paintExplorerForm.appendChild(label);
+
+	radio.onclick = selectPaint;
+	
+	renderPaintThumbnail( id );
+}
+
+var thumbnailRenderEncoders = {};
+function renderPaintThumbnail(id) {
+	var hexPalette = []; // TODO this is a bit repetitive to do all the time, huh?
+	for (pal in palette) {
+		for (i in palette[pal]){
+			var hexStr = rgbToHex( palette[pal][i][0], palette[pal][i][1], palette[pal][i][2] ).slice(1);
+			hexPalette.push( hexStr );
+		}
+	}
+
+	// console.log(id);
+	var img = document.getElementById("paintExplorerThumbnail_" + id);
+
+	var drawingFrameData = [];
+	if( paintMode == TileType.Tile ) {
+		// console.log(tile[id]);
+		drawTile( getTileImage( tile[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+		drawTile( getTileImage( tile[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+	}
+	else {
+		// console.log(sprite[id]);
+		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+	}
+
+	// create encoder
+	var gifData = {
+		frames: drawingFrameData,
+		width: 8*scale,
+		height: 8*scale,
+		palette: hexPalette,
+		loops: 0,
+		delay: animationTime / 10 // TODO why divide by 10???
+	};
+	var encoder = new gif();
+
+	// cancel old encoder (if in progress already)
+	if( thumbnailRenderEncoders[id] != null )
+		thumbnailRenderEncoders[id].cancel();
+	thumbnailRenderEncoders[id] = encoder;
+
+	// start encoding new GIF
+	encoder.encode( gifData, createThumbnailRenderCallback(img) );
 }
 
 function createThumbnailRenderCallback(img) {
@@ -1999,6 +2046,25 @@ function selectPaint() {
 		spriteIndex = sortedSpriteIdList().indexOf( drawingId );
 		reloadSprite();
 	}
+}
+
+function changePaintExplorerSelection(id) {
+	var paintExplorerForm = document.getElementById("paintExplorerForm");
+	for( var i = 0; i < paintExplorerForm.childNodes.length; i++ ) {
+		var child = paintExplorerForm.childNodes[i];
+		if( child.type && child.type === "radio" ) {
+			if( child.id === "paintExplorerRadio_" + id )
+				child.checked = true;
+			else
+				child.checked = false;
+		}
+	}
+}
+
+function deletePaintThumbnail(id) {
+	var paintExplorerForm = document.getElementById("paintExplorerForm");
+	paintExplorerForm.removeChild( document.getElementById( "paintExplorerRadio_" + id ) );
+	paintExplorerForm.removeChild( document.getElementById( "paintExplorerLabel_" + id ) );
 }
 
 function on_change_dialog() {
@@ -2589,6 +2655,7 @@ function on_toggle_animated() {
 		document.getElementById("animation").setAttribute("style","display:none;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
 	}
+	renderPaintThumbnail( drawingId );
 }
 
 function addSpriteAnimation() {

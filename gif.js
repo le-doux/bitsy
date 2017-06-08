@@ -55,9 +55,14 @@ this.encode = function(gifData, callback) {
 		//animated gif
 		gifArr = animationApplicationExtension(gifArr, gifData.loops);
 		//render one frame per update loop
+		isCancelled = false;
 		var i = 0;
 		var loop = setInterval( function() {
-			if (i < gifData.frames.length) {
+			if (isCancelled) {
+				//stop loop
+				clearInterval( loop );
+			}
+			else if (i < gifData.frames.length) {
 				//record one frame
 				gifArr = animationGraphicsControlExtension( gifArr, gifData.delay );
 				gifArr = imageDescriptor( gifArr, 0, 0, gifData.width, gifData.height );
@@ -80,6 +85,11 @@ this.encode = function(gifData, callback) {
 
 this.setAsync = function(isAsync, operationCount) {
 	//todo
+}
+
+var isCancelled = false;
+this.cancel = function() {
+	isCancelled = true;
 }
 
 //deprecated
