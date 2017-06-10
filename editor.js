@@ -431,11 +431,6 @@ function start() {
 	updateRoomPaletteSelect(); //dumb to have to specify this here --- wrap up room UI method?
 	reloadEnding();
 
-	drawPaintNavThumbnailCanvas();
-	setInterval( function() {
-		paintNavThumbnailAnimationFrameIndex = ( paintNavThumbnailAnimationFrameIndex + 1 ) % 2;
-		drawPaintNavThumbnailCanvas();
-	}, animationTime ); // animate the thumbnails of sprites / tiles
 
 	//unsupported feature stuff
 	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
@@ -577,11 +572,20 @@ function setDefaultGameState() {
 	document.getElementById("titleText").value = title;
 }
 
+var mapEditAnimationLoop;
+
 function listenMapEditEvents() {
 	canvas.addEventListener("mousedown", map_onMouseDown);
 	canvas.addEventListener("mousemove", map_onMouseMove);
 	canvas.addEventListener("mouseup", map_onMouseUp);
 	canvas.addEventListener("mouseleave", map_onMouseUp);
+
+	mapEditAnimationLoop =
+		setInterval( function() {
+			animationCounter = animationTime + 1; // hack
+			updateAnimation();
+			drawEditMap();
+		}, animationTime ); // update animation in map mode
 }
 
 function unlistenMapEditEvents() {
@@ -589,6 +593,7 @@ function unlistenMapEditEvents() {
 	canvas.removeEventListener("mousemove", map_onMouseMove);
 	canvas.removeEventListener("mouseup", map_onMouseUp);
 	canvas.removeEventListener("mouseleave", map_onMouseUp);
+	clearInterval( mapEditAnimationLoop );
 }
 
 function newTile(id) {
@@ -2004,6 +2009,7 @@ function renderAnimationThumbnail(id,frameA,frameB,imgId) {
 	var drawingFrameData = [];
 	if( paintMode == TileType.Tile ) {
 		// console.log(tile[id]);
+		// console.log("RENDER ANIM " + frameA + " " + frameB);
 		drawTile( getTileImage( tile[id], getRoomPal(curRoom), frameA ), 0, 0, drawingThumbnailCtx );
 		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 		drawTile( getTileImage( tile[id], getRoomPal(curRoom), frameB ), 0, 0, drawingThumbnailCtx );
@@ -2038,6 +2044,7 @@ function renderAnimationThumbnail(id,frameA,frameB,imgId) {
 }
 
 function renderAnimationPreview(id) {
+	// console.log("RENDRE ANIM PREVIW");
 	renderAnimationThumbnail( id, 0, 1, "animationThumbnailPreview" );
 	renderAnimationThumbnail( id, 0, 0, "animationThumbnailFrame1" );
 	renderAnimationThumbnail( id, 1, 1, "animationThumbnailFrame2" );
@@ -2626,6 +2633,7 @@ function on_toggle_animated() {
 		document.getElementById("animation").setAttribute("style","display:block;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
 		renderAnimationPreview( drawingId );
+		parseWorld(document.getElementById("game_data").value); // hack to make animation show up in edit map (why?)
 	}
 	else {
 		if ( paintMode === TileType.Sprite || paintMode === TileType.Avatar ) {

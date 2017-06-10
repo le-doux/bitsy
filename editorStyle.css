@@ -212,7 +212,7 @@ input {
 	width:64px;
 	height:64px;
 	margin:0px;
-	margin-right:2px;
+	border: solid 2px #6767b2;
 	display:inline-block;
 	image-rendering: pixelated;
 }

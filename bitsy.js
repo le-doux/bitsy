@@ -1334,13 +1334,14 @@ function drawRoom(room,context) {
 	}
 }
 
-function getTileImage(t,palId,frameIndex) {
+function getTileImage(t,palId,frameIndex=null) {
 	var drwId = t.drw;
 
 	if (!palId) palId = curPal();
 
 	if ( t.animation.isAnimated ) {
-		if (frameIndex) { // use optional provided frame index
+		if (frameIndex != null) { // use optional provided frame index
+			// console.log("GET TILE " + frameIndex);
 			drwId += "_" + frameIndex;
 		}
 		else { // or the one bundled with the tile
@@ -1350,13 +1351,13 @@ function getTileImage(t,palId,frameIndex) {
 	return imageStore.render[ palId ][ t.col ][ drwId ];
 }
 
-function getSpriteImage(s,palId,frameIndex) {
+function getSpriteImage(s,palId,frameIndex=null) {
 	var drwId = s.drw;
 
 	if (!palId) palId = curPal();
 
 	if ( s.animation.isAnimated ) {
-		if (frameIndex) {
+		if (frameIndex != null) {
 			drwId += "_" + frameIndex;
 		}
 		else {
