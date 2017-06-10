@@ -421,9 +421,6 @@
 					</form>
 					<canvas id="paint"></canvas>
 					<br>
-					<!-- TODO REMOVE THIS -->
-					<canvas id="paintNavThumbnails" style="display:none;"></canvas>
-					<!-- <br> -->
 					<div id="paintNav" class="buttonGroup">
 						<button title="next drawing" class="color0" onclick="prev();">
 							<i class="material-icons">navigate_before</i>
@@ -482,17 +479,24 @@
 						</div>
 						<div id="animation" style="display:none;">
 							<div class="buttonGroup">
-								<form>
-									keyframe:
-									<input id="animationOptionFrame1" class="left" type="radio" name="keyframe" onclick="on_paint_frame1();" checked>
-									<label class="left" title="first frame of animation" for="animationOptionFrame1">
+								<div class="animationThumbnail preview">
+									<img id="animationThumbnailPreview" />
+									<div>
+										preview
+									</div>
+								</div>
+								<div id="animationKeyframe1" class="animationThumbnail left selected" onclick="on_paint_frame1();">
+									<img id="animationThumbnailFrame1" />
+									<div>
 										frame 1
-									</label>
-									<input id="animationOptionFrame2" class="right" type="radio" name="keyframe" onclick="on_paint_frame2();"> 
-									<label class="right" title="second frame of animation" for="animationOptionFrame2">
+									</div>
+								</div>
+								<div id="animationKeyframe2" class="animationThumbnail right unselected" onclick="on_paint_frame2();">
+									<img id="animationThumbnailFrame2" />
+									<div>
 										frame 2
-									</label>
-								</form>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>

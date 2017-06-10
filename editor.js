@@ -1,4 +1,11 @@
 /* 
+v3.3 so far
+- new "find drawing" tool
+--> lets you scroll through tiles and sprites
+
+v3.3 to do
+- animated gif animation preview
+
 NEW TODO
 - update TODOs from project and community
 - draggable entrances
@@ -8,6 +15,8 @@ NEW TODO
 - items
 - drawing selector
 - aliases
+- better gif async
+- (publish gif library)
 
 new usability ideas
 - tiles in grid so you can see more
@@ -225,9 +234,6 @@ var paint_canvas;
 var paint_ctx;
 var paint_scale = 32;
 
-var paint_nav_canvas;
-var paint_nav_ctx;
-
 var paintMode = TileType.Avatar;
 var drawingId = "A";
 var drawPaintGrid = true;
@@ -368,12 +374,6 @@ function start() {
 	paint_canvas.addEventListener("mousemove", paint_onMouseMove);
 	paint_canvas.addEventListener("mouseup", paint_onMouseUp);
 	paint_canvas.addEventListener("mouseleave", paint_onMouseUp);
-	//paint nav canvas & context
-	paint_nav_canvas = document.getElementById("paintNavThumbnails");
-	paint_nav_canvas.width = tilesize * scale * 8;
-	paint_nav_canvas.height = tilesize * scale;
-	paint_nav_ctx = paint_nav_canvas.getContext("2d");
-	paint_nav_canvas.addEventListener("mousedown", paint_nav_onMouseDown);
 
 	//exit destination canvas & context
 	exit_canvas = document.getElementById("exitCanvas");
@@ -589,85 +589,6 @@ function unlistenMapEditEvents() {
 	canvas.removeEventListener("mousemove", map_onMouseMove);
 	canvas.removeEventListener("mouseup", map_onMouseUp);
 	canvas.removeEventListener("mouseleave", map_onMouseUp);
-}
-
-var paintNavThumbnailAnimationFrameIndex = 0;
-function drawPaintNavThumbnailCanvas() {
-	var realTileSize = tilesize * scale;
-
-	//background
-	paint_nav_ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
-	paint_nav_ctx.fillRect(0,0,paint_nav_canvas.width,paint_nav_canvas.height);
-
-	//draw sprites/tiles
-	if ( paintMode === TileType.Tile ) {
-		var tileIdList = sortedTileIdList();
-		var tileIndex = tileIdList.indexOf( drawingId );
-		var tileId = tileIdList[ tileIndex ];
-		// draw selected tile
-		drawTile( getTileImage( tile[ tileId ], curPal(), paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
-		// draw previous tiles
-		for (i = 2; i >= 0; i-- ) {
-			tileIndex--;
-			if (tileIndex >= 0) {
-				tileId = tileIdList[ tileIndex ];
-				drawTile( getTileImage( tile[ tileId ], curPal(), paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
-			}
-		}
-		// draw next tiles
-		tileIndex = tileIdList.indexOf( drawingId );
-		for (i = 4; i < 8; i++) {
-			tileIndex++;
-			if (tileIndex < tileIdList.length) {
-				tileId = tileIdList[ tileIndex ];
-				drawTile( getTileImage( tile[ tileId ], curPal(), paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
-			}
-		}
-	}
-	else if ( paintMode === TileType.Sprite ) {
-		var spriteIdList = sortedSpriteIdList();
-		var spriteIndex = spriteIdList.indexOf( drawingId );
-		var spriteId = spriteIdList[ spriteIndex ];
-		// draw selected sprite
-		drawSprite( getSpriteImage( sprite[ spriteId ], curPal(), paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
-		// draw previous sprites
-		for (i = 2; i >= 0; i-- ) {
-			spriteIndex--;
-			if (spriteIndex >= 1) {
-				spriteId = spriteIdList[ spriteIndex ];
-				drawSprite( getSpriteImage( sprite[ spriteId ], curPal(), paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
-			}
-		}
-		// draw next sprites
-		spriteIndex = spriteIdList.indexOf( drawingId );
-		for (i = 4; i < 8; i++) {
-			spriteIndex++;
-			if (spriteIndex < spriteIdList.length) {
-				spriteId = spriteIdList[ spriteIndex ];
-				drawSprite( getSpriteImage( sprite[ spriteId ], curPal(), paintNavThumbnailAnimationFrameIndex ), i, 0, paint_nav_ctx );
-			}
-		}
-	}
-	else if ( paintMode === TileType.Avatar ) {
-		// draw selected sprite
-		drawSprite( getSpriteImage( sprite[ drawingId ], curPal(), paintNavThumbnailAnimationFrameIndex ), 3, 0, paint_nav_ctx );
-	}
-
-	//highlight selected drawing
-	paint_nav_ctx.fillStyle = getComplimentingColor();
-	paint_nav_ctx.globalAlpha = 0.4;
-	paint_nav_ctx.fillRect(0,0,(3*realTileSize),paint_nav_canvas.height);
-	paint_nav_ctx.fillRect(4*realTileSize,0,4*realTileSize,paint_nav_canvas.height);
-	paint_nav_ctx.globalAlpha = 1.0;
-
-	//draw grid
-	paint_nav_ctx.fillStyle = getContrastingColor();
-	for (var x = 1; x < (paint_nav_canvas.width/realTileSize); x++) {
-		paint_nav_ctx.fillRect(x*realTileSize,0*realTileSize,1,paint_nav_canvas.height);
-	}
-	for (var y = 1; y < (paint_nav_canvas.height/realTileSize); y++) {
-		paint_nav_ctx.fillRect(0*realTileSize,y*realTileSize,paint_nav_canvas.width,1);
-	}
 }
 
 function newTile(id) {
@@ -1036,10 +957,21 @@ function reloadTile() {
 	if ( tile[drawingId] && tile[drawingId].animation.isAnimated ) {
 		isCurDrawingAnimated = true;
 		document.getElementById("animatedCheckbox").checked = true;
-		document.getElementById("animationOptionFrame1").checked = (curDrawingFrameIndex == 0);
-		document.getElementById("animationOptionFrame2").checked = (curDrawingFrameIndex == 1);
+
+		if( curDrawingFrameIndex == 0)
+		{
+			document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
+			document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
+		}
+		else if( curDrawingFrameIndex == 1 )
+		{
+			document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
+			document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
+		}
+
 		document.getElementById("animation").setAttribute("style","display:block;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
+		renderAnimationPreview( drawingId );
 	}
 	else {
 		isCurDrawingAnimated = false;
@@ -1072,10 +1004,21 @@ function reloadSprite() {
 	if ( sprite[drawingId] && sprite[drawingId].animation.isAnimated ) {
 		isCurDrawingAnimated = true;
 		document.getElementById("animatedCheckbox").checked = true;
-		document.getElementById("animationOptionFrame1").checked = (curDrawingFrameIndex == 0);
-		document.getElementById("animationOptionFrame2").checked = (curDrawingFrameIndex == 1);
+
+		if( curDrawingFrameIndex == 0)
+		{
+			document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
+			document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
+		}
+		else if( curDrawingFrameIndex == 1 )
+		{
+			document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
+			document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
+		}
+
 		document.getElementById("animation").setAttribute("style","display:block;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
+		renderAnimationPreview( drawingId );
 	}
 	else {
 		isCurDrawingAnimated = false;
@@ -1332,6 +1275,8 @@ function paint_onMouseUp(e) {
 		refreshGameData();
 		drawEditMap();
 		renderPaintThumbnail( drawingId );
+		if( isCurDrawingAnimated )
+			renderAnimationPreview( drawingId );
 	}
 }
 
@@ -1733,6 +1678,8 @@ function on_change_color_bg() {
 	drawPaintCanvas();
 	drawEditMap();
 	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
+	if( isCurDrawingAnimated )
+		renderAnimationPreview( drawingId );
 
 	if (!browserFeatures.colorPicker) {
 		updatePaletteBorders();
@@ -1757,6 +1704,8 @@ function on_change_color_tile() {
 	drawPaintCanvas();
 	drawEditMap();
 	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
+	if( isCurDrawingAnimated )
+		renderAnimationPreview( drawingId );
 
 	if (!browserFeatures.colorPicker) {
 		updatePaletteBorders();
@@ -1776,6 +1725,8 @@ function on_change_color_sprite() {
 	drawPaintCanvas();
 	drawEditMap();
 	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
+	if( isCurDrawingAnimated )
+		renderAnimationPreview( drawingId );
 
 	if (!browserFeatures.colorPicker) {
 		updatePaletteBorders();
@@ -2036,6 +1987,60 @@ function renderPaintThumbnail(id) {
 
 	// start encoding new GIF
 	encoder.encode( gifData, createThumbnailRenderCallback(img) );
+}
+
+var animationPreviewEncoders = {};
+function renderAnimationThumbnail(id,frameA,frameB,imgId) {
+	var hexPalette = []; // TODO this is a bit repetitive to do all the time, huh?
+	for (pal in palette) {
+		for (i in palette[pal]){
+			var hexStr = rgbToHex( palette[pal][i][0], palette[pal][i][1], palette[pal][i][2] ).slice(1);
+			hexPalette.push( hexStr );
+		}
+	}
+
+	var img = document.getElementById(imgId);
+
+	var drawingFrameData = [];
+	if( paintMode == TileType.Tile ) {
+		// console.log(tile[id]);
+		drawTile( getTileImage( tile[id], getRoomPal(curRoom), frameA ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+		drawTile( getTileImage( tile[id], getRoomPal(curRoom), frameB ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+	}
+	else {
+		// console.log(sprite[id]);
+		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), frameA ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), frameB ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+	}
+
+	// create encoder
+	var gifData = {
+		frames: drawingFrameData,
+		width: 8*scale,
+		height: 8*scale,
+		palette: hexPalette,
+		loops: 0,
+		delay: animationTime / 10 // TODO why divide by 10???
+	};
+	var encoder = new gif();
+
+	// cancel old encoder (if in progress already)
+	if( animationPreviewEncoders[imgId] != null )
+		animationPreviewEncoders[imgId].cancel();
+	animationPreviewEncoders[imgId] = encoder;
+
+	// start encoding new GIF
+	encoder.encode( gifData, createThumbnailRenderCallback(img) );
+}
+
+function renderAnimationPreview(id) {
+	renderAnimationThumbnail( id, 0, 1, "animationThumbnailPreview" );
+	renderAnimationThumbnail( id, 0, 0, "animationThumbnailFrame1" );
+	renderAnimationThumbnail( id, 1, 1, "animationThumbnailFrame2" );
 }
 
 function createThumbnailRenderCallback(img) {
@@ -2392,36 +2397,6 @@ function drawExitDestinationRoom() {
 	}
 }
 
-function paint_nav_onMouseDown(e) {
-	var off = getOffset(e);
-	var x = Math.floor(off.x / (tilesize*scale));
-	console.log("MOUSE THUMBNAIL");
-	console.log(x);
-	if ( paintMode === TileType.Tile ) {
-		var tileList = sortedTileIdList();
-		var tileIndex = tileList.indexOf( drawingId );
-		tileIndex += (x-3);
-		console.log(tileIndex);
-		if (tileIndex >= 0 && tileIndex < tileList.length) {
-			drawingId = tileList[tileIndex];
-			curDrawingFrameIndex = 0;
-			reloadTile();
-			drawPaintNavThumbnailCanvas();
-		}
-	}
-	else if ( paintMode === TileType.Sprite ) {
-		var spriteList = sortedSpriteIdList();
-		var spriteIndex = spriteList.indexOf( drawingId );
-		spriteIndex += (x-3);
-		if (spriteIndex >= 0 && spriteIndex < spriteList.length) {
-			drawingId = spriteList[spriteIndex];
-			curDrawingFrameIndex = 0;
-			reloadSprite();
-			drawPaintNavThumbnailCanvas();
-		}
-	}
-}
-
 var exit_scale = 16;
 function exit_onMouseDown(e) {
 	var off = getOffset(e);
@@ -2650,6 +2625,7 @@ function on_toggle_animated() {
 		}
 		document.getElementById("animation").setAttribute("style","display:block;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
+		renderAnimationPreview( drawingId );
 	}
 	else {
 		if ( paintMode === TileType.Sprite || paintMode === TileType.Avatar ) {

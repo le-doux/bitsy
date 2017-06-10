@@ -207,3 +207,41 @@ input {
 	image-rendering: pixelated;
 	border: solid 4px white;
 }
+
+#animation img {
+	width:64px;
+	height:64px;
+	margin:0px;
+	margin-right:2px;
+	display:inline-block;
+	image-rendering: pixelated;
+}
+
+.animationThumbnail {
+	display:inline-block;
+	padding: 4px;
+	margin:0px;
+	margin-left:-4px; /*why?*/
+}
+
+.animationThumbnail.preview {
+	margin-right:10px;
+}
+
+.animationThumbnail.selected {
+	background: #6767b2;
+	color: white;
+}
+
+.animationThumbnail.unselected {
+	background: #ccccff;
+	color: #6767b2;
+}
+
+.left {
+	border-radius: 2px 0px 0px 2px;
+}
+
+.right {
+	border-radius: 0px 2px 2px 0px;
+}
