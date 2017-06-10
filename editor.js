@@ -2633,7 +2633,6 @@ function on_toggle_animated() {
 		document.getElementById("animation").setAttribute("style","display:block;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
 		renderAnimationPreview( drawingId );
-		parseWorld(document.getElementById("game_data").value); // hack to make animation show up in edit map (why?)
 	}
 	else {
 		if ( paintMode === TileType.Sprite || paintMode === TileType.Avatar ) {
@@ -2655,6 +2654,8 @@ function addSpriteAnimation() {
 
 	//mark sprite as animated
 	sprite[drawingId].animation.isAnimated = true;
+	sprite[drawingId].animation.frameIndex = 0;
+	sprite[drawingId].animation.frameCount = 2;
 
 	//add blank frame to sprite (or restore removed animation)
 	var spriteImageId = "SPR_" + drawingId;
@@ -2675,6 +2676,8 @@ function removeSpriteAnimation() {
 
 	//mark sprite as non-animated
 	sprite[drawingId].animation.isAnimated = false;
+	sprite[drawingId].animation.frameIndex = 0;
+	sprite[drawingId].animation.frameCount = 0;
 
 	//remove all but the first frame of the sprite
 	var spriteImageId = "SPR_" + drawingId;
@@ -2694,6 +2697,8 @@ function addTileAnimation() {
 
 	//mark tile as animated
 	tile[drawingId].animation.isAnimated = true;
+	tile[drawingId].animation.frameIndex = 0;
+	tile[drawingId].animation.frameCount = 2;
 
 	//add blank frame to tile (or restore removed animation)
 	var tileImageId = "TIL_" + drawingId;
@@ -2714,6 +2719,8 @@ function removeTileAnimation() {
 
 	//mark tile as non-animated
 	tile[drawingId].animation.isAnimated = false;
+	tile[drawingId].animation.frameIndex = 0;
+	tile[drawingId].animation.frameCount = 0;
 
 	//remove all but the first frame of the tile
 	var tileImageId = "TIL_" + drawingId;
