@@ -120,7 +120,7 @@
 						</button>
 						<div title="about window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">favorite</i>
-							about bitsy v3.3
+							about bitsy v3.4
 						</div>
 					</div>
 					<div id="aboutInner">
@@ -181,11 +181,17 @@
 
 							<input type="checkbox" id="versionNotesCheck" onclick="toggleVersionNotes(event);"/>
 							<label title="show / hide version notes" for="versionNotesCheck">
-								what's new in v3.3
+								what's new in v3.4
 								<i id="versionNotesCheckIcon" class="material-icons">expand_less</i>
 							</label>
 
 							<div id="versionNotes" style="display:none;">
+								<br>
+								v3.4:<br>
+								- new "find drawing" window<br>
+								--> browse list of all tiles and sprites<br>
+								- new animation preview UI<br>
+								- rooms animate in edit mode<br>
 								<br>
 								v3.3:<br>
 								- drag exits and endings to move them!<br>
@@ -428,7 +434,7 @@
 						<button title="previous drawing" class="color0" onclick="next();">
 							<i class="material-icons">navigate_next</i>
 						</button>
-						<button title="find drawing: look through list of all drawings" class="color0" onclick="showPanel('paintExplorerPanel');">
+						<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('paintExplorerPanel');">
 							<i class="material-icons">search</i>
 						</button>
 					</div>

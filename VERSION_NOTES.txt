@@ -1,3 +1,9 @@
+v3.4:
+- new "find drawing" window
+--> browse list of all tiles and sprites
+- new animation preview UI
+- rooms animate in edit mode
+
 v3.3:
 - drag exits and endings to move them!
 - show entrances in room view

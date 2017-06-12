@@ -1,10 +1,6 @@
 /* 
-v3.3 so far
-- new "find drawing" tool
---> lets you scroll through tiles and sprites
-
-v3.3 to do
-- animated gif animation preview
+v3.4 to do
+- show/hide animation on edit map
 
 NEW TODO
 - update TODOs from project and community
