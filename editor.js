@@ -1,4 +1,7 @@
 /* 
+DONE vNext
+- bug: no title game can't start
+
 v3.4 to do
 - show/hide animation on edit map
 

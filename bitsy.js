@@ -1583,6 +1583,12 @@ function startNarrating(dialogStr,end=false) {
 }
 
 function startDialog(dialogStr) {
+	if(dialogStr.length <= 0) {
+		//end dialog mode
+		isDialogMode = false;
+		onExitDialog();
+		return;
+	}
 
 	//process dialog so it's easier to display
 	var words = dialogStr.split(" ");
