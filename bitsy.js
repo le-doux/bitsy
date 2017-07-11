@@ -1302,6 +1302,11 @@ function renderImages() {
 		var til = tile[t];
 		renderImageForAllPalettes( til );
 	}
+	//render images required by tiles
+	for (i in item) {
+		var itm = item[i];
+		renderImageForAllPalettes( itm );
+	}
 }
 
 function renderImageForAllPalettes(drawing) {
@@ -1393,6 +1398,10 @@ function drawSprite(img,x,y,context) { //this may differ later (or not haha)
 	drawTile(img,x,y,context);
 }
 
+function drawItem(img,x,y,context) {
+	drawTile(img,x,y,context); //TODO these methods are dumb and repetitive
+}
+
 function drawRoom(room,context) {
 	//draw tiles
 	for (i in room.tilemap) {
@@ -1410,6 +1419,11 @@ function drawRoom(room,context) {
 				}
 			}
 		}
+	}
+	//draw items
+	for (var i = 0; i < room.items.length; i++) {
+		var itm = room.items[i];
+		drawItem( getItemImage(item[itm.id],getRoomPal(room.id)), itm.x, itm.y, context );
 	}
 	//draw sprites
 	for (id in sprite) {
@@ -1452,6 +1466,26 @@ function getSpriteImage(s,palId,frameIndex=null) {
 	}
 
 	return imageStore.render[ palId ][ s.col ][ drwId ];
+}
+
+function getItemImage(itm,palId,frameIndex=null) { //aren't these all the same????
+	var drwId = itm.drw;
+	console.log(drwId);
+
+	if (!palId) palId = curPal();
+
+	if ( itm.animation.isAnimated ) {
+		if (frameIndex != null) {
+			drwId += "_" + frameIndex;
+		}
+		else {
+			drwId += "_" + itm.animation.frameIndex;
+		}
+	}
+
+	console.log(imageStore.render[ palId ][ itm.col ]);
+	console.log(imageStore.render[ palId ][ itm.col ][ drwId ]);
+	return imageStore.render[ palId ][ itm.col ][ drwId ];
 }
 
 function curPal() {
