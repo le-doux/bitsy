@@ -1,6 +1,10 @@
 /* 
-DONE vNext
-- bug: no title game can't start
+v3.5:
+- bugfix: games with no title couldn't start
+
+NEW NOTES
+- can't put ending on top of sprite (should you be able to? trigger ending by talking to sprite)
+- a way to share tilesets would be cool
 
 v3.4 to do
 - show/hide animation on edit map
