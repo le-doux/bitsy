@@ -599,6 +599,7 @@ function onkeydown(e) {
 		
 		var ext = getExit( player().room, player().x, player().y );
 		var end = getEnding( player().room, player().x, player().y );
+		var itm = getItem( player().room, player().x, player().y ); // TODO - what about touch?
 		if (end) {
 			startNarrating( ending[end.id], true /*isEnding*/ );
 		}
@@ -613,6 +614,10 @@ function onkeydown(e) {
 				startDialog(dialog[spr]);
 			}
 		}
+		else if (itm) {
+			// TODO pick up items
+			console.log("HIT ITM " + itm.id);
+		}
 
 		/* RESTART GAME */
 		if ( e.keyCode === key.r && ( e.getModifierState("Control") || e.getModifierState("Meta") ) ) {
@@ -622,6 +627,15 @@ function onkeydown(e) {
 		}
 	}
 
+}
+
+function getItem( roomId, x, y ) {
+	for( var i = 0; i < room[roomId].items.length; i++ ) {
+		var itm = room[roomId].items[i];
+		if ( itm.x == x && itm.y == y)
+			return itm;
+	}
+	return null;
 }
 
 function getSpriteLeft() { //repetitive?
@@ -645,7 +659,7 @@ function getSpriteAt(x,y) {
 	for (s in sprite) {
 		if (sprite[s].room === curRoom) {
 			if (sprite[s].x == x && sprite[s].y == y) {
-				console.log(s);
+				// console.log(s);
 				return s;
 			}
 		}
@@ -670,7 +684,7 @@ function isWallDown() {
 }
 
 function isWall(x,y) {
-	console.log(x + " " + y);
+	// console.log(x + " " + y);
 	var i = getRoom().walls.indexOf( getTile(x,y) );
 	return i > -1;
 }
@@ -696,7 +710,7 @@ function getEnding(roomId,x,y) {
 }
 
 function getTile(x,y) {
-	console.log(x + " " + y);
+	// console.log(x + " " + y);
 	var t = getRoom().tilemap[y][x];
 	return t;
 }
@@ -1182,7 +1196,8 @@ function parseSprite(lines, i) {
 			isAnimated : (imageStore.source[drwId].length > 1),
 			frameIndex : 0,
 			frameCount : imageStore.source[drwId].length
-		}
+		},
+		inventory : {}
 	};
 	return i;
 }
@@ -1238,8 +1253,8 @@ function parseItem(lines, i) {
 		}
 	};
 
-	console.log("ITM " + id);
-	console.log(item[id]);
+	// console.log("ITM " + id);
+	// console.log(item[id]);
 
 	return i;
 }
@@ -1470,7 +1485,7 @@ function getSpriteImage(s,palId,frameIndex=null) {
 
 function getItemImage(itm,palId,frameIndex=null) { //aren't these all the same????
 	var drwId = itm.drw;
-	console.log(drwId);
+	// console.log(drwId);
 
 	if (!palId) palId = curPal();
 
@@ -1483,8 +1498,8 @@ function getItemImage(itm,palId,frameIndex=null) { //aren't these all the same??
 		}
 	}
 
-	console.log(imageStore.render[ palId ][ itm.col ]);
-	console.log(imageStore.render[ palId ][ itm.col ][ drwId ]);
+	// console.log(imageStore.render[ palId ][ itm.col ]);
+	// console.log(imageStore.render[ palId ][ itm.col ][ drwId ]);
 	return imageStore.render[ palId ][ itm.col ][ drwId ];
 }
 
