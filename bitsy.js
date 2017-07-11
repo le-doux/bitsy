@@ -826,6 +826,14 @@ function serializeWorld() {
 			}
 			worldStr += "\n";
 		}
+		if (room[id].items.length > 0) {
+			/* ITEMS */
+			for (j in room[id].items) {
+				var itm = room[id].items[j];
+				worldStr += "ITM " + itm.id + " " + itm.x + "," + itm.y;
+				worldStr += "\n";
+			}
+		}
 		if (room[id].exits.length > 0) {
 			/* EXITS */
 			for (j in room[id].exits) {
@@ -953,6 +961,7 @@ function parseRoom(lines, i) {
 		walls : [],
 		exits : [],
 		endings : [],
+		items : [],
 		pal : null
 	};
 	i++;
@@ -1017,6 +1026,16 @@ function parseRoom(lines, i) {
 					}
 				}
 			}
+		}
+		else if (getType(lines[i]) === "ITM") {
+			var itmId = getId(lines[i]);
+			var itmCoord = lines[i].split(" ")[2].split(",");
+			var itm = {
+				id: itmId,
+				x : parseInt(itmCoord[0]),
+				y : parseInt(itmCoord[1])
+			};
+			room[id].items.push( itm );
 		}
 		else if (getType(lines[i]) === "WAL") {
 			/* DEFINE COLLISIONS (WALLS) */
