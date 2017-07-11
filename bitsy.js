@@ -599,7 +599,7 @@ function onkeydown(e) {
 		
 		var ext = getExit( player().room, player().x, player().y );
 		var end = getEnding( player().room, player().x, player().y );
-		var itm = getItem( player().room, player().x, player().y ); // TODO - what about touch?
+		var itmIndex = getItemIndex( player().room, player().x, player().y ); // TODO - what about touch?
 		if (end) {
 			startNarrating( ending[end.id], true /*isEnding*/ );
 		}
@@ -614,9 +614,19 @@ function onkeydown(e) {
 				startDialog(dialog[spr]);
 			}
 		}
-		else if (itm) {
-			// TODO pick up items
-			console.log("HIT ITM " + itm.id);
+		else if (itmIndex > -1) {
+			// TODO pick up items (what about touch?)
+			// console.log("HIT ITM ");
+			// console.log( itmIndex );
+			var itm = room[ player().room ].items[ itmIndex ];
+			// console.log(itm);
+			room[ player().room ].items.splice( itmIndex, 1 );
+			if( player().inventory[ itm.id ] )
+				player().inventory[ itm.id ] += 1;
+			else
+				player().inventory[ itm.id ] = 1;
+
+			// console.log( player().inventory );
 		}
 
 		/* RESTART GAME */
@@ -629,13 +639,13 @@ function onkeydown(e) {
 
 }
 
-function getItem( roomId, x, y ) {
+function getItemIndex( roomId, x, y ) {
 	for( var i = 0; i < room[roomId].items.length; i++ ) {
 		var itm = room[roomId].items[i];
 		if ( itm.x == x && itm.y == y)
-			return itm;
+			return i;
 	}
-	return null;
+	return -1;
 }
 
 function getSpriteLeft() { //repetitive?
