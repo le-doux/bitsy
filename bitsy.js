@@ -7,6 +7,7 @@ var title = "";
 var room = {};
 var tile = {};
 var sprite = {};
+var item = {};
 var dialog = {};
 var palette = {
 	"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
@@ -741,6 +742,9 @@ function parseWorld(file) {
 		else if (getType(curLine) === "SPR") {
 			i = parseSprite(lines, i);
 		}
+		else if (getType(curLine) === "ITM") {
+			i = parseItem(lines, i);
+		}
 		else if (getType(curLine) === "DRW") {
 			i = parseDrawing(lines, i);
 		}
@@ -861,6 +865,12 @@ function serializeWorld() {
 			/* SPRITE POSITION */
 			worldStr += "POS " + sprite[id].room + " " + sprite[id].x + "," + sprite[id].y + "\n";
 		}
+		worldStr += "\n";
+	}
+	/* ITEMS */
+	for (id in item) {
+		worldStr += "ITM " + id + "\n";
+		worldStr += serializeDrawing( "ITM_" + id );
 		worldStr += "\n";
 	}
 	/* DIALOG */
@@ -1155,6 +1165,63 @@ function parseSprite(lines, i) {
 			frameCount : imageStore.source[drwId].length
 		}
 	};
+	return i;
+}
+
+function parseItem(lines, i) {
+	var id = getId(lines[i]);
+	var drwId = null;
+
+	i++;
+
+	if (getType(lines[i]) === "DRW") { //load existing drawing
+		drwId = getId(lines[i]);
+		i++;
+	}
+	else {
+		// store item source
+		drwId = "ITM_" + id; // these prefixes are maybe a terrible way to differentiate drawing tyepes :/
+		i = parseDrawingCore( lines, i, drwId );
+	}
+
+	//other properties
+	var colorIndex = 2; //default palette color index is 2
+	while (i < lines.length && lines[i].length > 0) { //look for empty line
+		if (getType(lines[i]) === "COL") {
+			/* COLOR OFFSET INDEX */
+			colorIndex = parseInt( getId(lines[i]) );
+		}
+		// else if (getType(lines[i]) === "POS") {
+		// 	/* STARTING POSITION */
+		// 	var posArgs = lines[i].split(" ");
+		// 	var roomId = posArgs[1];
+		// 	var coordArgs = posArgs[2].split(",");
+		// 	spriteStartLocations[id] = {
+		// 		room : roomId,
+		// 		x : parseInt(coordArgs[0]),
+		// 		y : parseInt(coordArgs[1])
+		// 	};
+		// }
+		i++;
+	}
+
+	//item data
+	item[id] = {
+		drw : drwId, //drawing id
+		col : colorIndex,
+		// room : null, //default location is "offstage"
+		// x : -1,
+		// y : -1,
+		animation : {
+			isAnimated : (imageStore.source[drwId].length > 1),
+			frameIndex : 0,
+			frameCount : imageStore.source[drwId].length
+		}
+	};
+
+	console.log("ITM " + id);
+	console.log(item[id]);
+
 	return i;
 }
 

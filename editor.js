@@ -1,6 +1,7 @@
 /* 
-v3.5:
-- bugfix: games with no title couldn't start
+TODO next
+- items
+? music (how)
 
 NEW NOTES
 - can't put ending on top of sprite (should you be able to? trigger ending by talking to sprite)
