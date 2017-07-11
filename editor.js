@@ -1,6 +1,15 @@
 /* 
 TODO next
 - items
+-> UI
+-> how do you use them?
+--> dialog
+----> dialog trees?
+--> exits
+----> exit dialog?
+--> lock blocks?
+-> how to do item messages/dialog (special thing? or extend existing dialog system?)
+
 ? music (how)
 
 NEW NOTES

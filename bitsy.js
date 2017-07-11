@@ -619,12 +619,17 @@ function onkeydown(e) {
 			// console.log("HIT ITM ");
 			// console.log( itmIndex );
 			var itm = room[ player().room ].items[ itmIndex ];
-			// console.log(itm);
+			console.log(itm);
 			room[ player().room ].items.splice( itmIndex, 1 );
 			if( player().inventory[ itm.id ] )
 				player().inventory[ itm.id ] += 1;
 			else
 				player().inventory[ itm.id ] = 1;
+
+			var dialog = item[itm.id].dlg;
+			console.log(item[itm.id]);
+			if(dialog != null)
+				startDialog(dialog);
 
 			// console.log( player().inventory );
 		}
@@ -903,6 +908,9 @@ function serializeWorld() {
 	for (id in item) {
 		worldStr += "ITM " + id + "\n";
 		worldStr += serializeDrawing( "ITM_" + id );
+		if (item[id].dlg != null) {
+			worldStr += "DLG " + item[id].dlg + "\n";
+		}
 		worldStr += "\n";
 	}
 	/* DIALOG */
@@ -1230,10 +1238,11 @@ function parseItem(lines, i) {
 
 	//other properties
 	var colorIndex = 2; //default palette color index is 2
+	var dialog = null;
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		if (getType(lines[i]) === "COL") {
 			/* COLOR OFFSET INDEX */
-			colorIndex = parseInt( getId(lines[i]) );
+			colorIndex = parseInt( getArg( lines[i], 1 ) );
 		}
 		// else if (getType(lines[i]) === "POS") {
 		// 	/* STARTING POSITION */
@@ -1246,6 +1255,9 @@ function parseItem(lines, i) {
 		// 		y : parseInt(coordArgs[1])
 		// 	};
 		// }
+		else if(getType(lines[i]) === "DLG") {
+			dialog = lines[i].split(/\s(.+)/)[1]; // capture everything after the first space
+		}
 		i++;
 	}
 
@@ -1253,6 +1265,7 @@ function parseItem(lines, i) {
 	item[id] = {
 		drw : drwId, //drawing id
 		col : colorIndex,
+		dlg : dialog,
 		// room : null, //default location is "offstage"
 		// x : -1,
 		// y : -1,
