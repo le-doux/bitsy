@@ -493,6 +493,14 @@ function updateAnimation() {
 			}
 		}
 
+		// animate items
+		for (id in item) {
+			var itm = item[id];
+			if (itm.animation.isAnimated) {
+				itm.animation.frameIndex = ( itm.animation.frameIndex + 1 ) % itm.animation.frameCount;
+			}
+		}
+
 		// reset counter
 		animationCounter = 0;
 
