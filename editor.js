@@ -9,6 +9,72 @@ TODO next
 ----> exit dialog?
 --> lock blocks?
 -> how to do item messages/dialog (special thing? or extend existing dialog system?)
+***
+- advanced dialog system
+--> player choices
+--> conditional stuff (item count, etc)
+-----> conditionals lead to dialog directly, or to named sections
+--> page breaks?
+--> styles & effects
+--> new font?
+--> named sections
+--> links to sections
+(do this in a text editor? or via a GUI?)
+-> three objects: choice, branch, dialog (combinable?) --- also: header, link, ending
+-> everything happens in order top to bottom
+
+how should exits be defined?
+- in one line?
+- or should they get their own objects?
+- if they get their own blocks, are they still exits?
+- or something more complex... (triggers)
+
+TRG a
+IF ITM_b > 7
+EXT c 4,4
+ELSEIF ITM_c < 2
+DLG a
+EXT e 1,2
+ELSE
+AVA 8
+ENDIF
+
+^cool, but how do I dispaly it to users
+^could it use the same stuff as dialog?
+
+<if ITM_b>7> <exit room=c pos=1,2> <else> <script run=doScript></if>
+^ok, this shit is crazy --- how do I expose to users?
+
+the ULTIMATE version: the dialog editor itself is the script editor?????? what is v0.1 of this?
+
+// how can I help users do this?
+<if condition>
+dialog
+<elseif condition> //or just else? or just another if?
+dialog 2
+<else>
+default <color>dialog</color>
+</if>
+
+Ex:
+DLG a
+Here is some dialog
+And another bit of dialog
+? Make your choice ##a
+? Or this other one ##b
+#c
+Section c will continue seamlessly
+#d
+Into section d which is the last section
+END
+#a
+This is section a
+if ITM_a > 5
+Say this additional thing
+Then go to c ##c
+#b
+This is section b ##c
+
 
 ? music (how)
 

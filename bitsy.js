@@ -13,6 +13,7 @@ var palette = {
 	"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
 };
 var ending = {};
+var playerId = "A";
 
 //stores all image data for tiles, sprites, drawings
 var imageStore = {
@@ -108,9 +109,12 @@ function attachCanvas(c) {
 var curGameData = null;
 function load_game(game_data) {
 	curGameData = game_data; //remember the current game (used to reset the game)
+	console.log(dialog);
 	parseWorld(game_data);
+	console.log(dialog);
 	renderImages();
 	onready();
+	console.log(dialog);
 }
 
 function reset_cur_game() {
@@ -129,7 +133,11 @@ function onready() {
 	console.log("hello");
 	update_interval = setInterval(update,-1);
 
+	console.log(dialog);
+
 	startNarrating(title);
+
+	console.log(dialog);
 }
 
 function onTouch(e) {
@@ -526,7 +534,7 @@ function moveSprites() {
 				var end = getEnding( spr.room, spr.x, spr.y );
 				var ext = getExit( spr.room, spr.x, spr.y );
 				if (end) { //if the sprite hits an ending
-					if (id === "A") { // only the player can end the game
+					if (id === playerId) { // only the player can end the game
 						startNarrating( ending[end.id], true /*isEnding*/ );
 					}
 				}
@@ -535,13 +543,13 @@ function moveSprites() {
 					spr.room = ext.dest.room;
 					spr.x = ext.dest.x;
 					spr.y = ext.dest.y;
-					if (id === "A") {
+					if (id === playerId) {
 						//if the player changes scenes, change the visible scene
 						curRoom = ext.dest.room;
 					}
 				}
 
-				if (id === "A") didPlayerMoveThisFrame = true;
+				if (id === playerId) didPlayerMoveThisFrame = true;
 			}
 		}
 
@@ -564,6 +572,7 @@ function getSpriteAt(x,y) {
 
 function onkeydown(e) {
 	console.log(e.keyCode);
+	console.log(dialog);
 	e.preventDefault();
 
 	if (isDialogMode) {
@@ -618,6 +627,8 @@ function onkeydown(e) {
 			curRoom = ext.dest.room;
 		}
 		else if (spr) {
+			console.log(spr);
+			console.log(dialog);
 			if (dialog[spr]) {
 				startDialog(dialog[spr]);
 			}
@@ -634,10 +645,10 @@ function onkeydown(e) {
 			else
 				player().inventory[ itm.id ] = 1;
 
-			var dialog = item[itm.id].dlg;
+			var message = item[itm.id].dlg;
 			console.log(item[itm.id]);
-			if(dialog != null)
-				startDialog(dialog);
+			if(message != null)
+				startDialog(message);
 
 			// console.log( player().inventory );
 		}
@@ -739,7 +750,7 @@ function getTile(x,y) {
 }
 
 function player() {
-	return sprite["A"];
+	return sprite[playerId];
 }
 
 function getRoom() {
@@ -1084,7 +1095,7 @@ function parseRoom(lines, i) {
 		else if (getType(lines[i]) === "EXT") {
 			/* ADD EXIT */
 			var exitArgs = lines[i].split(" ");
-			//arg format: EXT 10,5 M 3,2
+			//arg format: EXT 10,5 M 3,2 [AVA:7 LCK:a,9] [AVA 7 LCK a 9]
 			var exitCoords = exitArgs[1].split(",");
 			var destName = exitArgs[2];
 			var destCoords = exitArgs[3].split(",");
@@ -1410,9 +1421,15 @@ function imageDataFromImageSource(imageSource, pal, col) {
 function parseDialog(lines, i) {
 	var id = getId(lines[i]);
 	i++;
-	var text = lines[i];
-	i++;
+	var text = "";
+	while (lines[i].length > 0) {
+		text += lines[i];
+		i++;
+	}
+	console.log(text);
 	dialog[id] = text;
+	console.log(dialog[id]);
+	console.log(dialog);
 	return i;
 }
 
