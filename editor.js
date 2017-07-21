@@ -23,6 +23,12 @@ TODO next
 -> three objects: choice, branch, dialog (combinable?) --- also: header, link, ending
 -> everything happens in order top to bottom
 
+<if item="a">
+You found the sock!
+<else>
+Where oh where is my sock?
+</if>
+
 how should exits be defined?
 - in one line?
 - or should they get their own objects?
