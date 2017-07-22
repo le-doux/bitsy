@@ -23,6 +23,8 @@ TODO next
 -> three objects: choice, branch, dialog (combinable?) --- also: header, link, ending
 -> everything happens in order top to bottom
 
+dialog vs script?
+
 <if item="a">
 You found the sock!
 <else>
@@ -533,7 +535,7 @@ function start() {
 			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
 	};
 	onDialogUpdate = function() {
-		console.log("dialog update!");
+		// console.log("dialog update!");
 		if (isRecordingGif) {
 			// copy frame 5x to slow it down (hacky)
 			gifFrameData.push( ctx.getImageData(0,0,512,512).data );

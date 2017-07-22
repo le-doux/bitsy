@@ -95,7 +95,7 @@ var onDialogUpdate = null;
 
 function getGameNameFromURL() {
 	var game = window.location.hash.substring(1);
-	console.log("game name --- " + game);
+	// console.log("game name --- " + game);
 	return game;
 }
 
@@ -109,12 +109,12 @@ function attachCanvas(c) {
 var curGameData = null;
 function load_game(game_data) {
 	curGameData = game_data; //remember the current game (used to reset the game)
-	console.log(dialog);
+	// console.log(dialog);
 	parseWorld(game_data);
-	console.log(dialog);
+	// console.log(dialog);
 	renderImages();
 	onready();
-	console.log(dialog);
+	// console.log(dialog);
 }
 
 function reset_cur_game() {
@@ -130,14 +130,8 @@ function onready() {
 
 	document.addEventListener('keydown', onkeydown);
 	canvas.addEventListener("mousedown", onTouch);
-	console.log("hello");
 	update_interval = setInterval(update,-1);
-
-	console.log(dialog);
-
 	startNarrating(title);
-
-	console.log(dialog);
 }
 
 function onTouch(e) {
@@ -183,8 +177,8 @@ function onTouch(e) {
 	//respond to sprite touch
 	if (touchedSprite) {
 		var spr = sprite[touchedSprite];
-		console.log(Math.abs(player().x - spr.x));
-		console.log(Math.abs(player().y - spr.y));
+		// console.log(Math.abs(player().x - spr.x));
+		// console.log(Math.abs(player().y - spr.y));
 		if ( Math.abs(player().x - spr.x) == 0
 				&& Math.abs(player().y - spr.y) == 1 )
 		{
@@ -201,7 +195,6 @@ function onTouch(e) {
 		}
 
 		if (dialog[touchedSprite]) {
-			console.log()
 			startDialog( dialog[touchedSprite] );
 		}
 
@@ -210,9 +203,9 @@ function onTouch(e) {
 
 	//did we touch an open square?
 	var row = room[curRoom].tilemap[y];
-	console.log(row);
+	// console.log(row);
 	var til = row[x];
-	console.log(til);
+	// console.log(til);
 	if ( room[curRoom].walls.indexOf(til) != -1 ) {
 		//touched a wall
 		return;
@@ -349,7 +342,6 @@ function getOffset(evt) {
 }
 
 function stopGame() {
-	console.log("STOP GAME?");
 	document.removeEventListener('keydown', onkeydown);
 	clearInterval(update_interval);
 }
@@ -437,7 +429,6 @@ function loadingAnimation() {
 	//update frame
 	loading_anim_frame++;
 	if (loading_anim_frame >= 5) loading_anim_frame = 0;
-	console.log(loading_anim_frame);
 }
 
 function update() {
@@ -571,8 +562,8 @@ function getSpriteAt(x,y) {
 }
 
 function onkeydown(e) {
-	console.log(e.keyCode);
-	console.log(dialog);
+	// console.log(e.keyCode);
+	// console.log(dialog);
 	e.preventDefault();
 
 	if (isDialogMode) {
@@ -627,8 +618,8 @@ function onkeydown(e) {
 			curRoom = ext.dest.room;
 		}
 		else if (spr) {
-			console.log(spr);
-			console.log(dialog);
+			// console.log(spr);
+			// console.log(dialog);
 			if (dialog[spr]) {
 				startDialog(dialog[spr]);
 			}
@@ -638,7 +629,7 @@ function onkeydown(e) {
 			// console.log("HIT ITM ");
 			// console.log( itmIndex );
 			var itm = room[ player().room ].items[ itmIndex ];
-			console.log(itm);
+			// console.log(itm);
 			room[ player().room ].items.splice( itmIndex, 1 );
 			if( player().inventory[ itm.id ] )
 				player().inventory[ itm.id ] += 1;
@@ -646,7 +637,7 @@ function onkeydown(e) {
 				player().inventory[ itm.id ] = 1;
 
 			var message = item[itm.id].dlg;
-			console.log(item[itm.id]);
+			// console.log(item[itm.id]);
 			if(message != null)
 				startDialog(message);
 
@@ -1426,10 +1417,10 @@ function parseDialog(lines, i) {
 		text += lines[i];
 		i++;
 	}
-	console.log(text);
+	// console.log(text);
 	dialog[id] = text;
-	console.log(dialog[id]);
-	console.log(dialog);
+	// console.log(dialog[id]);
+	// console.log(dialog);
 	return i;
 }
 
@@ -1677,7 +1668,7 @@ var arrowdata = [
 	0,0,1,0,0
 ];
 function drawNextDialogArrow() {
-	console.log("draw arrow!");
+	// console.log("draw arrow!");
 	var top = (dialogbox.height-5) * scale;
 	var left = (dialogbox.width-(5+4)) * scale;
 	for (var y = 0; y < 3; y++) {
@@ -1702,7 +1693,6 @@ function drawNextDialogArrow() {
 }
 
 function continueDialog() {
-	console.log("continue!!!");
 	if (curLine + 1 < curDialog.length) {
 		//start next line
 		isDialogReadyToContinue = false;
@@ -1765,7 +1755,98 @@ function startNarrating(dialogStr,end=false) {
 	startDialog(dialogStr);
 }
 
+function DialogMarkup() {
+	this.Parse = function(dialogStr) {
+		// console.log("NEW PARSING!!!");
+		var parsingState = {
+			rootNode : new DialogNode("root"),
+			src: dialogStr,
+			i: 0,
+			Done : function() {
+				return parsingState.i >= parsingState.src.length;
+			},
+			Char : function() {
+				return parsingState.src[ parsingState.i ];
+			},
+			Increment : function() {
+				parsingState.i++;
+			}
+		};
+		// console.log(parsingState);
+		while(!parsingState.Done()) {
+			var char = parsingState.Char();
+			// console.log(char);
+			if(char === "<"){
+				parsingState = parseTag(parsingState)
+			}
+			else {
+				parsingState = parseText(parsingState);
+			}
+			// parsingState.Increment();
+		}
+		console.log( parsingState.rootNode );
+	}
+	function parseTag(parsingState) {
+		// console.log("TAG");
+		var tagStr = "";
+		while(!parsingState.Done() && parsingState.Char() != ">") {
+			tagStr += parsingState.Char();
+			parsingState.Increment();
+		}
+
+		if(parsingState.Done())
+			return parsingState; // exit if done
+		
+		//add final angle bracket
+		tagStr += parsingState.Char();
+		parsingState.Increment();
+		// console.log(tagStr);
+
+		//cut off angle brackets
+		tagStr = tagStr.slice(1,tagStr.length-1);
+		
+		//create node
+		tagArgs = tagStr.split(" ");
+		var tagNode = new DialogNode(tagArgs[0]);
+		for(var i = 1; i < tagArgs.length; i++) {
+			console.log(tagArgs[i]);
+		}
+
+		parsingState.rootNode.AddChild( tagNode );
+
+		return parsingState;
+	}
+	function parseText(parsingState) {
+		//TODO
+		// console.log("TEXT");
+		var textStr = "";
+		while(!parsingState.Done() && parsingState.Char() != "<") {
+			textStr += parsingState.Char();
+			parsingState.Increment();
+		}
+		// console.log(textStr);
+		var textNode = new DialogNode("text");
+		textNode.text = textStr;
+		parsingState.rootNode.AddChild( textNode );
+		return parsingState;
+	}
+}
+
+function DialogNode(type) {
+	this.type = type;
+	this.children = [];
+	this.parent = null;
+	this.text = "";
+	this.AddChild = function(node) {
+		this.children.push( node );
+		node.parent = this;
+	};
+}
+
 function startDialog(dialogStr) {
+	var dml = new DialogMarkup();
+	dml.Parse(dialogStr);
+
 	if(dialogStr.length <= 0) {
 		//end dialog mode
 		isDialogMode = false;
@@ -1807,7 +1888,7 @@ function startDialog(dialogStr) {
 		curDialog.push(curLineArr);
 	}
 
-	console.log(curDialog);
+	// console.log(curDialog);
 
 	curLine = 0;
 	curRow = 0;
