@@ -1806,10 +1806,15 @@ function DialogMarkup() {
 		tagStr = tagStr.slice(1,tagStr.length-1);
 		
 		//create node
-		tagArgs = tagStr.split(" ");
+		tagArgs = tagStr.split(" "); // is there a better approach?
 		var tagNode = new DialogNode(tagArgs[0]);
 		for(var i = 1; i < tagArgs.length; i++) {
 			console.log(tagArgs[i]);
+			var attrStr = tagArgs[i];
+			var attrArgs = attrStr.split("=");
+			var attrName = attrArgs[0];
+			var attrVal = attrArgs[1].slice(1,tagStr.length-1); // slice off quotes... could be bad
+			tagNode.AddAttribute( attrName, attrVal );
 		}
 
 		parsingState.rootNode.AddChild( tagNode );
@@ -1835,11 +1840,15 @@ function DialogMarkup() {
 function DialogNode(type) {
 	this.type = type;
 	this.children = [];
+	this.attributes = [];
 	this.parent = null;
 	this.text = "";
 	this.AddChild = function(node) {
 		this.children.push( node );
 		node.parent = this;
+	};
+	this.AddAttribute = function(name,value) {
+		this.attributes.push( { name:name, value:value });
 	};
 }
 
