@@ -1804,18 +1804,36 @@ function DialogMarkup() {
 
 		//cut off angle brackets
 		tagStr = tagStr.slice(1,tagStr.length-1);
+
+		console.log(tagStr);
+
+		//get node type
+		var i = 0;
+		var type = "";
+		while(tagStr[i] != " " && i <= tagStr.length) {
+			type += tagStr[i];
+			i++;
+		}
+		tagStr = tagStr.slice(i);
+		console.log(type);
+		console.log(tagStr);
+
+		var tagArgs = tagStr.match(/([a-zA-Z]+)=\"([a-zA-Z\s]+)\"/g);
+		console.log(tagArgs);
 		
 		//create node
-		tagArgs = tagStr.split(" "); // is there a better approach?
-		var tagNode = new DialogNode(tagArgs[0]);
-		for(var i = 1; i < tagArgs.length; i++) {
-			console.log(tagArgs[i]);
-			var attrStr = tagArgs[i];
-			var attrArgs = attrStr.split("=");
-			var attrName = attrArgs[0];
-			var attrVal = attrArgs[1].slice(1,tagStr.length-1); // slice off quotes... could be bad
-			tagNode.AddAttribute( attrName, attrVal );
-		}
+		// var tagArgs = tagStr.split(" "); // is there a better approach?
+		// var tagNode = new DialogNode(tagArgs[0]);
+		// for(var i = 1; i < tagArgs.length; i++) {
+		// 	console.log(tagArgs[i]);
+		// 	var attrStr = tagArgs[i];
+		// 	var attrArgs = attrStr.split("=");
+		// 	var attrName = attrArgs[0];
+		// 	var attrVal = attrArgs[1].slice(1,tagStr.length-1); // slice off quotes... could be bad
+		// 	tagNode.AddAttribute( attrName, attrVal );
+		// }
+
+		var tagNode = new DialogNode(type);
 
 		parsingState.rootNode.AddChild( tagNode );
 

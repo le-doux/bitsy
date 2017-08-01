@@ -1,4 +1,11 @@
 /* 
+
+BUGS / FEEDBACK:
+* Thank you @adamledoux for Bitsy, it is so relaxing to use. Are you aware that in Safari deleted rooms do not disappear from the exit list?
+* @videodante: @adamledoux Hey! I was just wondering if it's possible to change the room size in bitsy, or if not, if you'd consider adding that?
+--> e.g. changing size of tiles wld change room size to compensate & vice versa. basically a picker of room px, tile px, and num tiles.
+* mobile issues (ios)
+
 TODO next
 - items
 -> UI
@@ -30,6 +37,12 @@ You found the sock!
 <else>
 Where oh where is my sock?
 </if>
+
+<if hasItem('a')>
+<if "hasItem('a'">
+<if condition="hasItem('a')">
+[if ~ hasItem('a') ~ otherThing('b') ]
+[color ~ 0]
 
 how should exits be defined?
 - in one line?
