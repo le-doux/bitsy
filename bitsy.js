@@ -1755,11 +1755,59 @@ function startNarrating(dialogStr,end=false) {
 	startDialog(dialogStr);
 }
 
+var DialogNode = function() {
+	this.type = "";
+	this.children = [];
+	this.attributes = [];
+	this.parent = null;
+	this.AddChild = function(node) {
+		this.children.push( node );
+		node.parent = this;
+	};
+	this.AddAttribute = function(name,value) {
+		this.attributes.push( { name:name, value:value } );
+	};
+	this.canHaveChildren = false;
+};
+
+var DialogNodeFactory = {
+	baseConstructor : DialogNode,
+	typeConstructors : {},
+	AddType : function(constructor) {
+		var node = new constructor();
+		this.typeConstructors[ node.type ] = constructor;
+	},
+	Create : function(type) {
+		var node = Object.assign( new this.baseConstructor(), new this.typeConstructors[type]() );
+		return node;
+	}
+};
+
+DialogNodeFactory.AddType( function() {
+	this.type = "root";
+	this.canHaveChildren = true;
+} );
+
+DialogNodeFactory.AddType( function() {
+	this.type = "text";
+	this.text = "";
+} );
+
+DialogNodeFactory.AddType( function() {
+	this.type = "if";
+	this.canHaveChildren = true;
+} );
+
+DialogNodeFactory.AddType( function() {
+	this.type = "else";
+} );
+
 function DialogMarkup() {
 	this.Parse = function(dialogStr) {
 		// console.log("NEW PARSING!!!");
 		var parsingState = {
-			rootNode : new DialogNode("root"),
+			rootNode : DialogNodeFactory.Create("root"),
+			curParentNode : null,
 			src: dialogStr,
 			i: 0,
 			Done : function() {
@@ -1772,6 +1820,7 @@ function DialogMarkup() {
 				parsingState.i++;
 			}
 		};
+		parsingState.curParentNode = parsingState.rootNode;
 		// console.log(parsingState);
 		while(!parsingState.Done()) {
 			var char = parsingState.Char();
@@ -1785,6 +1834,7 @@ function DialogMarkup() {
 			// parsingState.Increment();
 		}
 		console.log( parsingState.rootNode );
+		return parsingState.rootNode;
 	}
 	function parseTag(parsingState) {
 		// console.log("TAG");
@@ -1805,37 +1855,47 @@ function DialogMarkup() {
 		//cut off angle brackets
 		tagStr = tagStr.slice(1,tagStr.length-1);
 
-		console.log(tagStr);
+		// console.log(tagStr);
 
 		//get node type
 		var i = 0;
 		var type = "";
-		while(tagStr[i] != " " && i <= tagStr.length) {
+		while(tagStr[i] != " " && i < tagStr.length) {
 			type += tagStr[i];
 			i++;
 		}
 		tagStr = tagStr.slice(i);
+		// console.log(type);
+		// console.log(tagStr);
+
 		console.log(type);
-		console.log(tagStr);
+		if(type[0] === "/") {
+			// this is the end of a tag
+			type = type.slice(1);
+			console.log("tag end!!!");
+			console.log(type);
 
-		var tagArgs = tagStr.match(/([a-zA-Z]+)=\"([a-zA-Z\s]+)\"/g);
-		console.log(tagArgs);
-		
-		//create node
-		// var tagArgs = tagStr.split(" "); // is there a better approach?
-		// var tagNode = new DialogNode(tagArgs[0]);
-		// for(var i = 1; i < tagArgs.length; i++) {
-		// 	console.log(tagArgs[i]);
-		// 	var attrStr = tagArgs[i];
-		// 	var attrArgs = attrStr.split("=");
-		// 	var attrName = attrArgs[0];
-		// 	var attrVal = attrArgs[1].slice(1,tagStr.length-1); // slice off quotes... could be bad
-		// 	tagNode.AddAttribute( attrName, attrVal );
-		// }
+			if( parsingState.curParentNode.type === type && parsingState.curParentNode.parent != null )
+				parsingState.curParentNode = parsingState.curParentNode.parent;
 
-		var tagNode = new DialogNode(type);
+			return parsingState;
+		}
 
-		parsingState.rootNode.AddChild( tagNode );
+		var tagNode = DialogNodeFactory.Create(type);
+
+		var attributeRegex = /([a-zA-Z]+)=\"([a-zA-Z\s]+)\"/g;
+		var attributeMatch = attributeRegex.exec( tagStr );
+		while( attributeMatch != null ) {
+			tagNode.AddAttribute( attributeMatch[1] /*name*/, attributeMatch[2] /*value*/ );
+			attributeMatch = attributeRegex.exec( tagStr );
+		}
+
+		// console.log( tagNode );
+
+		parsingState.curParentNode.AddChild( tagNode );
+
+		if( tagNode.canHaveChildren )
+			parsingState.curParentNode = tagNode;
 
 		return parsingState;
 	}
@@ -1848,31 +1908,97 @@ function DialogMarkup() {
 			parsingState.Increment();
 		}
 		// console.log(textStr);
-		var textNode = new DialogNode("text");
+		var textNode = DialogNodeFactory.Create("text");
 		textNode.text = textStr;
-		parsingState.rootNode.AddChild( textNode );
+		parsingState.curParentNode.AddChild( textNode );
 		return parsingState;
 	}
 }
 
-function DialogNode(type) {
-	this.type = type;
-	this.children = [];
-	this.attributes = [];
-	this.parent = null;
-	this.text = "";
-	this.AddChild = function(node) {
-		this.children.push( node );
-		node.parent = this;
-	};
-	this.AddAttribute = function(name,value) {
-		this.attributes.push( { name:name, value:value });
-	};
+function addTextToDialog(textStr) {
+	//process dialog so it's easier to display
+	var words = textStr.split(" ");
+
+	/* OLD */
+	// var curPageArr = [];
+	// var curRowStr = words[0];
+
+	// var curPageArr = curDialog[ curDialog.length - 1 ];
+	// var curRowStr = curPageArr[ curPageArr.length - 1 ];
+
+	var curPageIndex = curDialog.length - 1;
+	var curRowIndex = curDialog[ curPageIndex ].length - 1;
+	var curRowStr = curDialog[ curPageIndex ][ curRowIndex ];
+	curRowStr += words[0];
+
+	console.log(curPageIndex);
+	console.log(curRowIndex);
+
+	for (var i = 1; i < words.length; i++) {
+		var word = words[i];
+		if (curRowStr.length + word.length + 1 <= dialogbox.charsPerRow) {
+			//stay on same row
+			curRowStr += " " + word;
+		}
+		else if (curRowIndex == 0) {
+			//start next row
+
+			/* OLD */
+			// curPageArr.push(curRowStr);
+			// curRowStr = word;
+
+			console.log(curRowStr);
+
+			curDialog[ curPageIndex ][ curRowIndex ] = curRowStr;
+			curDialog[ curPageIndex ].push( "" );
+			curRowIndex++;
+			curRowStr = curDialog[ curPageIndex ][ curRowIndex ];
+			curRowStr += word;
+
+			console.log(curRowStr);
+		}
+		else {
+			//start next page
+
+			/* OLD */
+			// curPageArr.push(curRowStr);
+			// curDialog.push(curPageArr);
+			// curPageArr = [];
+			// curRowStr = word;
+
+			console.log(curRowStr);
+
+			curDialog[ curPageIndex ][ curRowIndex ] = curRowStr;
+			curDialog.push( [] );
+			curPageIndex++;
+			curDialog[ curPageIndex ].push( "" );
+			curRowIndex = 0;
+			curRowStr = curDialog[ curPageIndex ][ curRowIndex ];
+			curRowStr += word;
+
+			console.log(curRowStr);
+		}
+		console.log(curRowStr);
+	}
+
+	//finish up 
+
+	/* OLD */
+	// if (curRowStr.length > 0) {
+	// 	curPageArr.push(curRowStr);
+	// }
+	// if (curPageArr.length > 0) {
+	// 	curDialog.push(curPageArr);
+	// }
+
+	if( curRowStr.length > 0 ) {
+		curDialog[ curPageIndex ][ curRowIndex ] = curRowStr;
+	}
 }
 
 function startDialog(dialogStr) {
 	var dml = new DialogMarkup();
-	dml.Parse(dialogStr);
+	var dialogTree = dml.Parse(dialogStr);
 
 	if(dialogStr.length <= 0) {
 		//end dialog mode
@@ -1881,39 +2007,20 @@ function startDialog(dialogStr) {
 		return;
 	}
 
-	//process dialog so it's easier to display
-	var words = dialogStr.split(" ");
-	curDialog = [];
-	var curLineArr = [];
-	var curRowStr = words[0];
+	curDialog = [[""]];
 
-	for (var i = 1; i < words.length; i++) {
-		var word = words[i];
-		if (curRowStr.length + word.length + 1 <= dialogbox.charsPerRow) {
-			//stay on same row
-			curRowStr += " " + word;
-		}
-		else if (curLineArr.length == 0) {
-			//start next row
-			curLineArr.push(curRowStr);
-			curRowStr = word;
-		}
-		else {
-			//start next line
-			curLineArr.push(curRowStr);
-			curDialog.push(curLineArr);
-			curLineArr = [];
-			curRowStr = word;
+	// addTextToDialog(dialogStr);
+
+	function addTextTree(node) {
+		if(node.type === "text")
+			addTextToDialog(node.text);
+		for(var i = 0; i < node.children.length; i++) {
+			addTextTree( node.children[i] );
 		}
 	}
 
-	//finish up 
-	if (curRowStr.length > 0) {
-		curLineArr.push(curRowStr);
-	}
-	if (curLineArr.length > 0) {
-		curDialog.push(curLineArr);
-	}
+	addTextTree( dialogTree );
+
 
 	// console.log(curDialog);
 
@@ -1923,6 +2030,8 @@ function startDialog(dialogStr) {
 
 	isDialogMode = true;
 	isDialogReadyToContinue = false;
+
+	console.log(curDialog);
 
 	clearDialogBox();
 	drawNextDialogChar();

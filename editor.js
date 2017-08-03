@@ -5,6 +5,9 @@ BUGS / FEEDBACK:
 * @videodante: @adamledoux Hey! I was just wondering if it's possible to change the room size in bitsy, or if not, if you'd consider adding that?
 --> e.g. changing size of tiles wld change room size to compensate & vice versa. basically a picker of room px, tile px, and num tiles.
 * mobile issues (ios)
+* hmm I need to add a setting to turn off mouse controls since it breaks more unconventional games
+* I also wonder, have you considered a more mobile friendly editor with vertically stacking collapsable tabs? I'd love to use bitsy on the go.
+* Thank you, That would be very helpful. On iOS and android you could replace it with a swipe to move like @increpare's puzzlescript.
 
 TODO next
 - items
