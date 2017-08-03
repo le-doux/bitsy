@@ -1609,7 +1609,7 @@ function drawDialogBox() {
 
 function updateDialog() {
 	if (isDialogReadyToContinue) {
-		return; //waiting for dialog to be advance by player
+		return; //waiting for dialog to be advanced by player
 	}
 
 	nextCharTimer += deltaTime; //tick timer
@@ -1769,16 +1769,18 @@ function startNarrating(dialogStr,end=false) {
 var DialogNode = function() {
 	this.type = "";
 	this.children = [];
-	this.attributes = [];
+	this.attributes = {};
 	this.parent = null;
 	this.AddChild = function(node) {
 		this.children.push( node );
 		node.parent = this;
 	};
 	this.AddAttribute = function(name,value) {
-		this.attributes.push( { name:name, value:value } );
+		this.attributes[name] = { name:name, value:value };
 	};
 	this.canHaveChildren = false;
+
+	this.OnCloseTag = function() {};
 
 	var traverseIndex = -1;
 	this.Visit = function() {
@@ -1832,10 +1834,63 @@ DialogNodeFactory.AddType( function() {
 DialogNodeFactory.AddType( function() {
 	this.type = "if";
 	this.canHaveChildren = true;
+
+	this.branches = [];
+	this.OnCloseTag = function() {
+		console.log("CLOSE IF");
+		var curBranch = {
+			node : this,
+			children : []
+		};
+
+		for (var i = 0; i < this.children.length; i++) {
+			var child = this.children[i];
+			if (child.type === "elseif" || child.type === "else") {
+				// save current branch
+				this.branches.push( curBranch );
+				// start new branch
+				curBranch = {
+					node : child,
+					children : []
+				};
+			}
+			else {
+				// add child to branch
+				curBranch.children.push( child );
+			}
+		}
+
+		// save current branch
+		this.branches.push( curBranch );
+	};
+
+	this.CheckCondition = function() {
+		if( this.attributes["item"] ) {
+			var itemId = this.attributes["item"].value;
+			return player().inventory[itemId] && player().inventory[itemId] > 0;
+		}
+		return false;
+	};
+
+	this.Visit = function() {
+		this.children = [];
+		for (var i = 0; i < this.branches.length; i++) {
+			var b = this.branches[i];
+			if( b.node.CheckCondition() == true ) {
+				this.children = b.children;
+				break;
+			}
+		}
+		return true;
+	}
 } );
 
 DialogNodeFactory.AddType( function() {
 	this.type = "else";
+
+	this.CheckCondition = function() {
+		return true;
+	};
 } );
 
 function DialogMarkup() {
@@ -1912,7 +1967,10 @@ function DialogMarkup() {
 			console.log(type);
 
 			if( parsingState.curParentNode.type === type && parsingState.curParentNode.parent != null )
+			{
+				parsingState.curParentNode.OnCloseTag();
 				parsingState.curParentNode = parsingState.curParentNode.parent;
+			}
 
 			return parsingState;
 		}
