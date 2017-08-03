@@ -1718,6 +1718,17 @@ function drawNextDialogChar() {
 	var nextChar = curDialog[curLine][curRow][curChar]; //todo - there's a bug here sometimes on speed text (but it doesn't really break anything)
 	drawDialogChar(nextChar, curRow, curChar);
 
+	// todo: rename curLine curPage
+	// after drawing the last character in the current dialog buffer, do the next dialog tree traversal
+	// TODO: this NEEDS to live in a better place
+	// console.log( curLine + " " + curRow + " " + curChar );
+	// console.log( (curDialog.length-1) + " " + (curDialog[curLine].length-1) + " " + (curDialog[curLine][curRow].length-1) );
+	if( curLine === curDialog.length-1 && curRow === curDialog[curLine].length-1 && curChar === curDialog[curLine][curRow].length-1 )
+	{
+		// console.log("NEXT!!!");
+		curDialogTree.Traverse();
+	}	
+
 	nextCharTimer = 0; //reset timer
 }
 
@@ -1768,6 +1779,27 @@ var DialogNode = function() {
 		this.attributes.push( { name:name, value:value } );
 	};
 	this.canHaveChildren = false;
+
+	var traverseIndex = -1;
+	this.Visit = function() {
+		console.log("node!! " + this.type);
+		return true;
+	};
+	this.Traverse = function() {
+		// console.log("TRAVERSE!!");
+		var doContinue = true;
+		if (traverseIndex < 0) { // traverseIndex == -1 means visit self
+			doContinue = this.Visit();
+			traverseIndex++;
+		}
+		while( doContinue && traverseIndex < this.children.length ) {
+			// console.log(traverseIndex);
+			doContinue = this.children[ traverseIndex ].Traverse();
+			if(doContinue)
+				traverseIndex++;
+		}
+		return doContinue;
+	};
 };
 
 var DialogNodeFactory = {
@@ -1791,6 +1823,10 @@ DialogNodeFactory.AddType( function() {
 DialogNodeFactory.AddType( function() {
 	this.type = "text";
 	this.text = "";
+	this.Visit = function() {
+		addTextToDialog( this.text ); // TODO remove use of global method?
+		return false;
+	};
 } );
 
 DialogNodeFactory.AddType( function() {
@@ -1916,6 +1952,8 @@ function DialogMarkup() {
 }
 
 function addTextToDialog(textStr) {
+	console.log("ADD TEXT:: " + textStr);
+
 	//process dialog so it's easier to display
 	var words = textStr.split(" ");
 
@@ -1931,8 +1969,8 @@ function addTextToDialog(textStr) {
 	var curRowStr = curDialog[ curPageIndex ][ curRowIndex ];
 	curRowStr += words[0];
 
-	console.log(curPageIndex);
-	console.log(curRowIndex);
+	// console.log(curPageIndex);
+	// console.log(curRowIndex);
 
 	for (var i = 1; i < words.length; i++) {
 		var word = words[i];
@@ -1947,7 +1985,7 @@ function addTextToDialog(textStr) {
 			// curPageArr.push(curRowStr);
 			// curRowStr = word;
 
-			console.log(curRowStr);
+			// console.log(curRowStr);
 
 			curDialog[ curPageIndex ][ curRowIndex ] = curRowStr;
 			curDialog[ curPageIndex ].push( "" );
@@ -1955,7 +1993,7 @@ function addTextToDialog(textStr) {
 			curRowStr = curDialog[ curPageIndex ][ curRowIndex ];
 			curRowStr += word;
 
-			console.log(curRowStr);
+			// console.log(curRowStr);
 		}
 		else {
 			//start next page
@@ -1966,7 +2004,7 @@ function addTextToDialog(textStr) {
 			// curPageArr = [];
 			// curRowStr = word;
 
-			console.log(curRowStr);
+			// console.log(curRowStr);
 
 			curDialog[ curPageIndex ][ curRowIndex ] = curRowStr;
 			curDialog.push( [] );
@@ -1976,9 +2014,9 @@ function addTextToDialog(textStr) {
 			curRowStr = curDialog[ curPageIndex ][ curRowIndex ];
 			curRowStr += word;
 
-			console.log(curRowStr);
+			// console.log(curRowStr);
 		}
-		console.log(curRowStr);
+		// console.log(curRowStr);
 	}
 
 	//finish up 
@@ -1996,9 +2034,8 @@ function addTextToDialog(textStr) {
 	}
 }
 
+var curDialogTree = null;
 function startDialog(dialogStr) {
-	var dml = new DialogMarkup();
-	var dialogTree = dml.Parse(dialogStr);
 
 	if(dialogStr.length <= 0) {
 		//end dialog mode
@@ -2007,19 +2044,16 @@ function startDialog(dialogStr) {
 		return;
 	}
 
+	var dml = new DialogMarkup();
+	curDialogTree = dml.Parse(dialogStr);
+
+	// clear out current dialog buffer (make into its own object)
 	curDialog = [[""]];
 
 	// addTextToDialog(dialogStr);
 
-	function addTextTree(node) {
-		if(node.type === "text")
-			addTextToDialog(node.text);
-		for(var i = 0; i < node.children.length; i++) {
-			addTextTree( node.children[i] );
-		}
-	}
-
-	addTextTree( dialogTree );
+	// addTextTree( dialogTree );
+	curDialogTree.Traverse();
 
 
 	// console.log(curDialog);
