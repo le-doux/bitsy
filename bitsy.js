@@ -90,7 +90,7 @@ var deltaTime = 0;
 //methods used to trigger gif recording
 var didPlayerMoveThisFrame = false;
 var onPlayerMoved = null;
-var didDialogUpdateThisFrame = false;
+// var didDialogUpdateThisFrame = false;
 var onDialogUpdate = null;
 
 function getGameNameFromURL() {
@@ -445,8 +445,8 @@ function update() {
 	}
 
 	if (isDialogMode) { // dialog mode
+		dialogRenderer.Draw( dialogBuffer, deltaTime );
 		dialogBuffer.Update( deltaTime );
-		// drawDialogBox();
 	}
 	else if (!isEnding) {
 		moveSprites();
@@ -465,8 +465,11 @@ function update() {
 	//for gif recording
 	if (didPlayerMoveThisFrame && onPlayerMoved != null) onPlayerMoved();
 	didPlayerMoveThisFrame = false;
-	if (didDialogUpdateThisFrame && onDialogUpdate != null) onDialogUpdate();
-	didDialogUpdateThisFrame = false;
+	// if (didDialogUpdateThisFrame && onDialogUpdate != null) onDialogUpdate();
+	// didDialogUpdateThisFrame = false;
+	/* hacky replacement */
+	if (onDialogUpdate != null)
+		dialogRenderer.SetPageFinishHandler( onDialogUpdate );
 }
 
 var animationCounter = 0;
@@ -1565,33 +1568,152 @@ function getRoomPal(roomId) {
 }
 
 /* DIALOG */
-var font = new Font();
+var DialogRenderer = function() {
+	var textboxInfo = {
+		img : null,
+		width : 104,
+		height : 8+4+2+5, //8 for text, 4 for top-bottom padding, 2 for line padding, 5 for arrow
+		top : 12,
+		left : 12,
+		bottom : 12, //for drawing it from the bottom
+	};
+	
+	var font = new Font();
 
-var dialogbox = {
-	img : null,
-	width : 104,
-	height : 8+4+2+5, //8 for text, 4 for top-bottom padding, 2 for line padding, 5 for arrow
-	top : 12,
-	left : 12,
-	bottom : 12, //for drawing it from the bottom
-	charsPerRow : 32
-};
+	this.ClearTextbox = function() {
+		textboxInfo.img = ctx.createImageData(textboxInfo.width*scale, textboxInfo.height*scale);
+	};
+
+	var isCentered = false;
+	this.SetCentered = function(centered) {
+		isCentered = centered;
+	};
+
+	this.DrawTextbox = function() {
+		if (isCentered) {
+			ctx.putImageData(textboxInfo.img, textboxInfo.left*scale, ((height/2)-(textboxInfo.height/2))*scale);
+		}
+		else if (player().y < mapsize/2) {
+			//bottom
+			ctx.putImageData(textboxInfo.img, textboxInfo.left*scale, (height-textboxInfo.bottom-textboxInfo.height)*scale);
+		}
+		else {
+			//top
+			ctx.putImageData(textboxInfo.img, textboxInfo.left*scale, textboxInfo.top*scale);
+		}
+	};
+
+	var arrowdata = [
+		1,1,1,1,1,
+		0,1,1,1,0,
+		0,0,1,0,0
+	];
+	this.DrawNextArrow = function() {
+		// console.log("draw arrow!");
+		var top = (textboxInfo.height-5) * scale;
+		var left = (textboxInfo.width-(5+4)) * scale;
+		for (var y = 0; y < 3; y++) {
+			for (var x = 0; x < 5; x++) {
+				var i = (y * 5) + x;
+				if (arrowdata[i] == 1) {
+					//scaling nonsense
+					for (var sy = 0; sy < scale; sy++) {
+						for (var sx = 0; sx < scale; sx++) {
+							var pxl = 4 * ( ((top+(y*scale)+sy) * (textboxInfo.width*scale)) + (left+(x*scale)+sx) );
+							textboxInfo.img.data[pxl+0] = 255;
+							textboxInfo.img.data[pxl+1] = 255;
+							textboxInfo.img.data[pxl+2] = 255;
+							textboxInfo.img.data[pxl+3] = 255;
+						}
+					}
+				}
+			}
+		}
+	};
+
+	var text_scale = 2; //using a different scaling factor for text feels like cheating... but it looks better
+	this.DrawChar = function(char, row, col) {
+		char.SetPosition(row,col);
+		char.ApplyEffects(effectTime);
+		var charData = font.getChar( char.char );
+		var top = (4 * scale) + (row * 2 * scale) + (row * 8 * text_scale);
+		var left = (4 * scale) + (col * 6 * text_scale);
+		for (var y = 0; y < 8; y++) {
+			for (var x = 0; x < 6; x++) {
+				var i = (y * 6) + x;
+				if ( charData[i] == 1 ) {
+
+					//scaling nonsense
+					for (var sy = 0; sy < text_scale; sy++) {
+						for (var sx = 0; sx < text_scale; sx++) {
+							var pxl = 4 * ( ((top+(y*text_scale)+sy) * (textboxInfo.width*scale)) + (left+(x*text_scale)+sx) );
+							textboxInfo.img.data[pxl+0] = char.color.r;
+							textboxInfo.img.data[pxl+1] = char.color.g;
+							textboxInfo.img.data[pxl+2] = char.color.b;
+							textboxInfo.img.data[pxl+3] = char.color.a;
+						}
+					}
+
+					
+				}
+			}
+		}
+	};
+
+	var effectTime = 0; // TODO this variable should live somewhere better
+	this.Draw = function(buffer,dt) { // TODO move out of the buffer?? (into say a dialog box renderer)
+		effectTime += dt;
+
+		this.ClearTextbox();
+
+		buffer.ForEachActiveChar( this.DrawChar );
+
+		if( buffer.CanContinue() )
+			this.DrawNextArrow();
+
+		this.DrawTextbox();
+
+		if( buffer.DidPageFinishThisFrame() && onPageFinish != null )
+			onPageFinish();
+	};
+
+	/* this is a hook for GIF rendering */
+	var onPageFinish = null;
+	this.SetPageFinishHandler = function(handler) {
+		onPageFinish = handler;
+	};
+}
+var dialogRenderer = new DialogRenderer();
 
 var DialogBuffer = function() {
-	var buffer = [[[]]];
+	var buffer = [[[]]]; // holds dialog in an array buffer
 	var pageIndex = 0;
 	var rowIndex = 0;
 	var charIndex = 0;
 	var nextCharTimer = 0;
 	var nextCharMaxTime = 50; // in milliseconds
 	var isDialogReadyToContinue = false;
-	var tree = null;
+	var tree = null; // holds dialog and command nodes in a tree structure
+	
 	this.CurPage = function() { return buffer[ pageIndex ]; };
 	this.CurRow = function() { return this.CurPage()[ rowIndex ]; };
 	this.CurChar = function() { return this.CurRow()[ charIndex ]; };
 	this.CurPageCount = function() { return buffer.length; };
 	this.CurRowCount = function() { return this.CurPage().length; };
 	this.CurCharCount = function() { return this.CurRow().length; };
+
+	this.ForEachActiveChar = function(handler) { // Iterates over visible characters on the active page
+		var rowCount = rowIndex + 1;
+		for (var i = 0; i < rowCount; i++) {
+			var row = this.CurPage()[i];
+			var charCount = (i == rowIndex) ? charIndex+1 : row.length;
+			for(var j = 0; j < charCount; j++) {
+				var char = row[j];
+				handler( char, i /*rowIndex*/, j /*colIndex*/ );
+			}
+		}
+	}
+
 	this.Reset = function() {
 		buffer = [[[]]];
 		pageIndex = 0;
@@ -1599,17 +1721,24 @@ var DialogBuffer = function() {
 		charIndex = 0;
 		isDialogReadyToContinue = false;
 	};
-	this.Start = function(dialogSourceStr) {
+	
+	var onExit = null;
+	this.Start = function(dialogSourceStr,exitHandler) {
 		this.Reset();
+
+		onExit = exitHandler;
+
 		var dml = new DialogMarkup();
 		tree = dml.Parse( dialogSourceStr );
 		tree.SetBuffer( this );
 		tree.Traverse();
+
 		this.NextChar(); // draw first char
 	};
-	this.Update = function(dt) {
-		this.Draw(dt); // TODO move into a renderer object
 
+	this.Update = function(dt) {
+		didPageFinishThisFrame = false;
+		// this.Draw(dt); // TODO move into a renderer object
 		if (isDialogReadyToContinue) {
 			return; //waiting for dialog to be advanced by player
 		}
@@ -1630,13 +1759,15 @@ var DialogBuffer = function() {
 			else {
 				//the page is full!
 				isDialogReadyToContinue = true;
-				didDialogUpdateThisFrame = true; // TODO enclose
+				didPageFinishThisFrame = true; // TODO enclose
 			}
 
 			this.NextChar();
 		}
 	};
+
 	this.Skip = function() {
+		didPageFinishThisFrame = false;
 		// add new characters until you get to the end of the current line of dialog
 		while (rowIndex < this.CurRowCount()) {
 			if (charIndex + 1 < this.CurCharCount()) {
@@ -1651,7 +1782,7 @@ var DialogBuffer = function() {
 			else {
 				//the page is full!
 				isDialogReadyToContinue = true;
-				didDialogUpdateThisFrame = true; // TODO enclose
+				didPageFinishThisFrame = true; // TODO enclose
 				//make sure to push the rowIndex past the end to break out of the loop
 				rowIndex++;
 				charIndex = 0;
@@ -1662,6 +1793,7 @@ var DialogBuffer = function() {
 		rowIndex = this.CurRowCount()-1;
 		charIndex = this.CurCharCount()-1;
 	};
+
 	this.Continue = function() {
 		if (pageIndex + 1 < this.CurPageCount()) {
 			//start next page
@@ -1669,17 +1801,17 @@ var DialogBuffer = function() {
 			pageIndex++;
 			rowIndex = 0;
 			charIndex = 0;
-			clearDialogBox();
 			this.NextChar();
 		}
 		else {
-			console.log("CONTINUE END");
 			//end dialog mode
-			isDialogMode = false; // TODO enclose?
-			onExitDialog();
+			if(onExit != null)
+				onExit();
 		}
 	};
+
 	this.CanContinue = function() { return isDialogReadyToContinue; };
+
 	this.NextChar = function() {
 		// after drawing the last character in the current dialog buffer, do the next dialog tree traversal
 		if( pageIndex === this.CurPageCount()-1 
@@ -1689,29 +1821,6 @@ var DialogBuffer = function() {
 			tree.Traverse();
 		}
 		nextCharTimer = 0; //reset timer
-	}
-	this.DrawNextChar = function() {
-		//draw the character
-		var nextChar = this.CurChar(); //todo - there's a bug here sometimes on speed text (but it doesn't really break anything)
-		drawDialogChar(nextChar, rowIndex, charIndex);
-		this.NextChar();
-	};
-	var effectTime = 0; // TODO this variable should live somewhere better
-	this.Draw = function(dt) { // TODO move out of the buffer?? (into say a dialog box renderer)
-		effectTime += dt;
-		clearDialogBox();
-		var rowCount = rowIndex + 1;
-		for (var i = 0; i < rowCount; i++) {
-			var row = this.CurPage()[i];
-			var charCount = (i == rowIndex) ? charIndex+1 : row.length;
-			for(var j = 0; j < charCount; j++) {
-				var char = row[j];
-				drawDialogChar( char, i /*rowIndex*/, j /*colIndex*/ );
-			}
-		}
-		if(isDialogReadyToContinue)
-			drawNextDialogArrow();
-		drawDialogBox();
 	}
 
 	function DialogChar(char,nodeTrail) {
@@ -1726,10 +1835,10 @@ var DialogBuffer = function() {
 			this.col = col;
 		};
 
-		this.ApplyEffects = function() {
+		this.ApplyEffects = function(time) {
 			for(var i = 0; i < this.nodeTrail.length; i++) {
 				var node = this.nodeTrail[i];
-				node.DoEffect(this,effectTime);
+				node.DoEffect(this,time);
 			}
 		}
 	};
@@ -1741,6 +1850,7 @@ var DialogBuffer = function() {
 		return charArray;
 	}
 
+	var charsPerRow = 32;
 	this.AddText = function(textStr,nodeTrail) {
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
@@ -1752,7 +1862,7 @@ var DialogBuffer = function() {
 
 		for (var i = 1; i < words.length; i++) {
 			var word = words[i];
-			if (curRowArr.length + word.length + 1 <= dialogbox.charsPerRow) {
+			if (curRowArr.length + word.length + 1 <= charsPerRow) {
 				//stay on same row
 				curRowArr = AddWordToCharArray( curRowArr, " " + word, nodeTrail );
 			}
@@ -1781,6 +1891,11 @@ var DialogBuffer = function() {
 			buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
 		}
 	};
+
+	/* this is a hook for GIF rendering */
+	var didPageFinishThisFrame = false;
+	this.DidPageFinishThisFrame = function(){ return didPageFinishThisFrame; };
+
 };
 var dialogBuffer = new DialogBuffer();
 
@@ -1788,88 +1903,9 @@ var isDialogMode = false;
 var isNarrating = false;
 var isEnding = false;
 
-function clearDialogBox() {
-	dialogbox.img = ctx.createImageData(dialogbox.width*scale, dialogbox.height*scale);
-}
-
-function drawDialogBox() {
-	if (isNarrating) {
-		ctx.putImageData(dialogbox.img, dialogbox.left*scale, ((height/2)-(dialogbox.height/2))*scale);
-	}
-	else if (player().y < mapsize/2) {
-		//bottom
-		ctx.putImageData(dialogbox.img, dialogbox.left*scale, (height-dialogbox.bottom-dialogbox.height)*scale);
-	}
-	else {
-		//top
-		ctx.putImageData(dialogbox.img, dialogbox.left*scale, dialogbox.top*scale);
-	}
-}
-
-var arrowdata = [
-	1,1,1,1,1,
-	0,1,1,1,0,
-	0,0,1,0,0
-];
-function drawNextDialogArrow() {
-	// console.log("draw arrow!");
-	var top = (dialogbox.height-5) * scale;
-	var left = (dialogbox.width-(5+4)) * scale;
-	for (var y = 0; y < 3; y++) {
-		for (var x = 0; x < 5; x++) {
-			var i = (y * 5) + x;
-			if (arrowdata[i] == 1) {
-				//scaling nonsense
-				for (var sy = 0; sy < scale; sy++) {
-					for (var sx = 0; sx < scale; sx++) {
-						var pxl = 4 * ( ((top+(y*scale)+sy) * (dialogbox.width*scale)) + (left+(x*scale)+sx) );
-						dialogbox.img.data[pxl+0] = 255;
-						dialogbox.img.data[pxl+1] = 255;
-						dialogbox.img.data[pxl+2] = 255;
-						dialogbox.img.data[pxl+3] = 255;
-					}
-				}
-
-				
-			}
-		}
-	}
-}
-
 function onExitDialog() {
+	isDialogMode = false;
 	if (isNarrating) isNarrating = false;
-}
-
-var text_scale = 2; //using a different scaling factor for text feels like cheating... but it looks better
-function drawDialogChar(char, row, col) {
-
-	char.SetPosition(row,col);
-	// console.log(char.color);
-	char.ApplyEffects();
-	// console.log(char.color);
-	var charData = font.getChar( char.char );
-	var top = (4 * scale) + (row * 2 * scale) + (row * 8 * text_scale);
-	var left = (4 * scale) + (col * 6 * text_scale);
-	for (var y = 0; y < 8; y++) {
-		for (var x = 0; x < 6; x++) {
-			var i = (y * 6) + x;
-			if ( charData[i] == 1 ) {
-
-				//scaling nonsense
-				for (var sy = 0; sy < text_scale; sy++) {
-					for (var sx = 0; sx < text_scale; sx++) {
-						var pxl = 4 * ( ((top+(y*text_scale)+sy) * (dialogbox.width*scale)) + (left+(x*text_scale)+sx) );
-						dialogbox.img.data[pxl+0] = char.color.r;
-						dialogbox.img.data[pxl+1] = char.color.g;
-						dialogbox.img.data[pxl+2] = char.color.b;
-						dialogbox.img.data[pxl+3] = char.color.a;
-					}
-				}
-
-				
-			}
-		}
-	}
 }
 
 function startNarrating(dialogStr,end=false) {
@@ -2110,7 +2146,6 @@ function hslToRgb(h, s, l) {
   return [ r * 255, g * 255, b * 255 ];
 }
 
-
 function DialogMarkup() {
 	this.Parse = function(dialogStr) {
 		// console.log("NEW PARSING!!!");
@@ -2231,15 +2266,12 @@ function DialogMarkup() {
 
 function startDialog(dialogStr) {
 	if(dialogStr.length <= 0) {
-		//end dialog mode
-		isDialogMode = false;
 		onExitDialog();
 		return;
 	}
 
 	isDialogMode = true;
 
-	clearDialogBox();
-
-	dialogBuffer.Start( dialogStr );
+	dialogRenderer.SetCentered( isNarrating /*centered*/ );
+	dialogBuffer.Start( dialogStr, onExitDialog );
 }
