@@ -138,7 +138,7 @@ function onTouch(e) {
 	//dialog mode
 	if (isDialogMode) {
 
-		if (isDialogReadyToContinue) {
+		if (dialogBuffer.CanContinue()) {
 			dialogBuffer.Continue();
 		}
 		else {
@@ -570,7 +570,7 @@ function onkeydown(e) {
 
 		/* CONTINUE DIALOG */
 
-		if (isDialogReadyToContinue) {
+		if (dialogBuffer.CanContinue()) {
 			dialogBuffer.Continue();
 		}
 		else {
@@ -1578,12 +1578,13 @@ var dialogbox = {
 };
 
 var DialogBuffer = function() {
-	var buffer = [[""]];
+	var buffer = [[[]]];
 	var pageIndex = 0;
 	var rowIndex = 0;
 	var charIndex = 0;
 	var nextCharTimer = 0;
 	var nextCharMaxTime = 50; // in milliseconds
+	var isDialogReadyToContinue = false;
 	var tree = null;
 	this.CurPage = function() { return buffer[ pageIndex ]; };
 	this.CurRow = function() { return this.CurPage()[ rowIndex ]; };
@@ -1592,10 +1593,11 @@ var DialogBuffer = function() {
 	this.CurRowCount = function() { return this.CurPage().length; };
 	this.CurCharCount = function() { return this.CurRow().length; };
 	this.Reset = function() {
-		buffer = [[""]];
+		buffer = [[[]]];
 		pageIndex = 0;
 		rowIndex = 0;
 		charIndex = 0;
+		isDialogReadyToContinue = false;
 	};
 	this.Start = function(dialogSourceStr) {
 		this.Reset();
@@ -1618,16 +1620,16 @@ var DialogBuffer = function() {
 				//add char to current row
 				charIndex++;
 			}
-			else if (this.rowIndex + 1 < this.CurRowCount()) {
+			else if (rowIndex + 1 < this.CurRowCount()) {
 				//start next row
 				rowIndex++;
 				charIndex = 0;
 			}
 			else {
-				//the line is full!
+				//the page is full!
 				drawNextDialogArrow();
 				isDialogReadyToContinue = true;
-				didDialogUpdateThisFrame = true;
+				didDialogUpdateThisFrame = true; // TODO enclose
 			}
 
 			this.DrawNextChar();
@@ -1649,7 +1651,7 @@ var DialogBuffer = function() {
 				//the page is full!
 				drawNextDialogArrow();
 				isDialogReadyToContinue = true;
-				didDialogUpdateThisFrame = true;
+				didDialogUpdateThisFrame = true; // TODO enclose
 				//make sure to push the rowIndex past the end to break out of the loop
 				rowIndex++;
 				charIndex = 0;
@@ -1670,10 +1672,11 @@ var DialogBuffer = function() {
 		}
 		else {
 			//end dialog mode
-			isDialogMode = false;
+			isDialogMode = false; // TODO enclose?
 			onExitDialog();
 		}
 	};
+	this.CanContinue = function() { return isDialogReadyToContinue; };
 	this.DrawNextChar = function() {
 		//draw the character
 		var nextChar = this.CurChar(); //todo - there's a bug here sometimes on speed text (but it doesn't really break anything)
@@ -1690,44 +1693,72 @@ var DialogBuffer = function() {
 
 		nextCharTimer = 0; //reset timer
 	};
+
+	function DialogChar(char,nodeTrail) {
+		this.char = char;
+		this.nodeTrail = nodeTrail;
+
+		this.color = { r:255, g:255, b:255, a:255 };
+		this.row = 0;
+		this.col = 0;
+		this.SetPosition = function(row,col) {
+			this.row = row;
+			this.col = col;
+		};
+
+		this.ApplyEffects = function() {
+			for(var i = 0; i < this.nodeTrail.length; i++) {
+				var node = this.nodeTrail[i];
+				node.DoEffect(this);
+			}
+		}
+	};
+
+	function AddWordToCharArray(charArray,word,nodeTrail) {
+		for(var i = 0; i < word.length; i++) {
+			charArray.push( new DialogChar( word[i], nodeTrail ) );
+		}
+		return charArray;
+	}
+
 	this.AddText = function(textStr,nodeTrail) {
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
 
 		var curPageIndex = this.CurPageCount() - 1;
 		var curRowIndex = this.CurRowCount() - 1;
-		var curRowStr = this.CurRow();
-		curRowStr += words[0];
+		var curRowArr = this.CurRow();
+		curRowArr = AddWordToCharArray( curRowArr, words[0], nodeTrail );
 
 		for (var i = 1; i < words.length; i++) {
 			var word = words[i];
-			if (curRowStr.length + word.length + 1 <= dialogbox.charsPerRow) {
+			if (curRowArr.length + word.length + 1 <= dialogbox.charsPerRow) {
 				//stay on same row
-				curRowStr += " " + word;
+				curRowArr = AddWordToCharArray( curRowArr, " " + word, nodeTrail );
 			}
 			else if (curRowIndex == 0) {
 				//start next row
-				buffer[ curPageIndex ][ curRowIndex ] = curRowStr;
-				buffer[ curPageIndex ].push( "" );
+				buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
+				buffer[ curPageIndex ].push( [] );
 				curRowIndex++;
-				curRowStr = buffer[ curPageIndex ][ curRowIndex ];
-				curRowStr += word;
+				curRowArr = buffer[ curPageIndex ][ curRowIndex ];
+				curRowArr = AddWordToCharArray( curRowArr, word, nodeTrail );
 			}
 			else {
 				//start next page
-				buffer[ curPageIndex ][ curRowIndex ] = curRowStr;
+				buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
 				buffer.push( [] );
 				curPageIndex++;
-				buffer[ curPageIndex ].push( "" );
+				buffer[ curPageIndex ].push( [] );
 				curRowIndex = 0;
-				curRowStr = buffer[ curPageIndex ][ curRowIndex ];
-				curRowStr += word;
+				curRowArr = buffer[ curPageIndex ][ curRowIndex ];
+				curRowArr = AddWordToCharArray( curRowArr, word, nodeTrail );
 			}
 		}
 
 		//finish up 
-		if( curRowStr.length > 0 ) {
-			buffer[ curPageIndex ][ curRowIndex ] = curRowStr;
+		if( curRowArr.length > 0 ) {
+			buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
 		}
 	};
 };
@@ -1736,7 +1767,6 @@ var dialogBuffer = new DialogBuffer();
 var isDialogMode = false;
 var isNarrating = false;
 var isEnding = false;
-var isDialogReadyToContinue = false;
 
 function clearDialogBox() {
 	dialogbox.img = ctx.createImageData(dialogbox.width*scale, dialogbox.height*scale);
@@ -1793,9 +1823,13 @@ function onExitDialog() {
 var text_scale = 2; //using a different scaling factor for text feels like cheating... but it looks better
 function drawDialogChar(char, row, col) {
 
+	char.SetPosition(row,col);
+	// console.log(char.color);
+	char.ApplyEffects();
+	// console.log(char.color);
+	var charData = font.getChar( char.char );
 	var top = (4 * scale) + (row * 2 * scale) + (row * 8 * text_scale);
 	var left = (4 * scale) + (col * 6 * text_scale);
-	var charData = font.getChar( char );
 	for (var y = 0; y < 8; y++) {
 		for (var x = 0; x < 6; x++) {
 			var i = (y * 6) + x;
@@ -1805,10 +1839,10 @@ function drawDialogChar(char, row, col) {
 				for (var sy = 0; sy < text_scale; sy++) {
 					for (var sx = 0; sx < text_scale; sx++) {
 						var pxl = 4 * ( ((top+(y*text_scale)+sy) * (dialogbox.width*scale)) + (left+(x*text_scale)+sx) );
-						dialogbox.img.data[pxl+0] = 255;
-						dialogbox.img.data[pxl+1] = 255;
-						dialogbox.img.data[pxl+2] = 255;
-						dialogbox.img.data[pxl+3] = 255;
+						dialogbox.img.data[pxl+0] = char.color.r;
+						dialogbox.img.data[pxl+1] = char.color.g;
+						dialogbox.img.data[pxl+2] = char.color.b;
+						dialogbox.img.data[pxl+3] = char.color.a;
 					}
 				}
 
@@ -1835,6 +1869,7 @@ var DialogNode = function() {
 		node.parent = this;
 	};
 	this.AddAttribute = function(name,value) {
+		// console.log("ADD ATTR " + name);
 		this.attributes[name] = { name:name, value:value };
 	};
 	this.canHaveChildren = false;
@@ -1864,7 +1899,7 @@ var DialogNode = function() {
 	this.Trail = function() {
 		var trail = [this];
 		if(this.parent != null)
-			trail = trail.concat( this.parent.Trail() );
+			trail = this.parent.Trail().concat( trail );
 		return trail;
 	};
 	this.SetBuffer = function(buffer) {
@@ -1872,6 +1907,9 @@ var DialogNode = function() {
 		for(var i = 0; i < this.children.length; i++) {
 			this.children[i].SetBuffer( buffer );
 		}
+	};
+	this.DoEffect = function(char) {
+		// console.log("DO EFFECT " + this.type + " " + char.char);
 	};
 };
 
@@ -1898,7 +1936,7 @@ DialogNodeFactory.AddType( function() {
 	this.text = "";
 	this.Visit = function() {
 		if(this.buffer != null)
-			this.buffer.AddText( this.text );
+			this.buffer.AddText( this.text, this.Trail() );
 		return false;
 	};
 } );
@@ -1959,10 +1997,27 @@ DialogNodeFactory.AddType( function() {
 
 DialogNodeFactory.AddType( function() {
 	this.type = "else";
-
 	this.CheckCondition = function() {
 		return true;
 	};
+} );
+
+DialogNodeFactory.AddType( function() {
+	this.type = "color";
+	this.canHaveChildren = true;
+	this.DoEffect = function(char) {
+		// console.log("DO EFFECT COLOR");
+		// console.log(this.attributes);
+		if (this.attributes["index"] != null) {
+			var pal = palette[ curPal() ];
+			var color = pal[ parseInt( this.attributes["index"].value ) ];
+			// console.log(color);
+			char.color.r = color[0];
+			char.color.g = color[1];
+			char.color.b = color[2];
+			char.color.a = 255;
+		}
+	}
 } );
 
 function DialogMarkup() {
@@ -2049,8 +2104,10 @@ function DialogMarkup() {
 
 		var tagNode = DialogNodeFactory.Create(type);
 
-		var attributeRegex = /([a-zA-Z]+)=\"([a-zA-Z\s]+)\"/g;
+		// console.log(tagStr);
+		var attributeRegex = /([a-zA-Z]+)=\"([a-zA-Z0-9\s]+)\"/g;
 		var attributeMatch = attributeRegex.exec( tagStr );
+		// console.log(attributeMatch);
 		while( attributeMatch != null ) {
 			tagNode.AddAttribute( attributeMatch[1] /*name*/, attributeMatch[2] /*value*/ );
 			attributeMatch = attributeRegex.exec( tagStr );
@@ -2090,7 +2147,6 @@ function startDialog(dialogStr) {
 	}
 
 	isDialogMode = true;
-	isDialogReadyToContinue = false;
 
 	clearDialogBox();
 
