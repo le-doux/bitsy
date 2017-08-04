@@ -446,7 +446,7 @@ function update() {
 
 	if (isDialogMode) { // dialog mode
 		dialogBuffer.Update( deltaTime );
-		drawDialogBox();
+		// drawDialogBox();
 	}
 	else if (!isEnding) {
 		moveSprites();
@@ -1605,9 +1605,11 @@ var DialogBuffer = function() {
 		tree = dml.Parse( dialogSourceStr );
 		tree.SetBuffer( this );
 		tree.Traverse();
-		this.DrawNextChar(); // draw first char
+		this.NextChar(); // draw first char
 	};
 	this.Update = function(dt) {
+		this.Draw(); // TODO move into a renderer object
+
 		if (isDialogReadyToContinue) {
 			return; //waiting for dialog to be advanced by player
 		}
@@ -1627,12 +1629,11 @@ var DialogBuffer = function() {
 			}
 			else {
 				//the page is full!
-				drawNextDialogArrow();
 				isDialogReadyToContinue = true;
 				didDialogUpdateThisFrame = true; // TODO enclose
 			}
 
-			this.DrawNextChar();
+			this.NextChar();
 		}
 	};
 	this.Skip = function() {
@@ -1649,7 +1650,6 @@ var DialogBuffer = function() {
 			}
 			else {
 				//the page is full!
-				drawNextDialogArrow();
 				isDialogReadyToContinue = true;
 				didDialogUpdateThisFrame = true; // TODO enclose
 				//make sure to push the rowIndex past the end to break out of the loop
@@ -1657,8 +1657,10 @@ var DialogBuffer = function() {
 				charIndex = 0;
 			}
 
-			this.DrawNextChar();
+			this.NextChar();
 		}
+		rowIndex = this.CurRowCount()-1;
+		charIndex = this.CurCharCount()-1;
 	};
 	this.Continue = function() {
 		if (pageIndex + 1 < this.CurPageCount()) {
@@ -1668,31 +1670,47 @@ var DialogBuffer = function() {
 			rowIndex = 0;
 			charIndex = 0;
 			clearDialogBox();
-			this.DrawNextChar();
+			this.NextChar();
 		}
 		else {
+			console.log("CONTINUE END");
 			//end dialog mode
 			isDialogMode = false; // TODO enclose?
 			onExitDialog();
 		}
 	};
 	this.CanContinue = function() { return isDialogReadyToContinue; };
-	this.DrawNextChar = function() {
-		//draw the character
-		var nextChar = this.CurChar(); //todo - there's a bug here sometimes on speed text (but it doesn't really break anything)
-		drawDialogChar(nextChar, rowIndex, charIndex);
-
+	this.NextChar = function() {
 		// after drawing the last character in the current dialog buffer, do the next dialog tree traversal
-		// TODO= this NEEDS to live in a better place
 		if( pageIndex === this.CurPageCount()-1 
 			&& rowIndex === this.CurRowCount()-1 
 			&& charIndex === this.CurCharCount()-1 )
 		{
 			tree.Traverse();
 		}
-
 		nextCharTimer = 0; //reset timer
+	}
+	this.DrawNextChar = function() {
+		//draw the character
+		var nextChar = this.CurChar(); //todo - there's a bug here sometimes on speed text (but it doesn't really break anything)
+		drawDialogChar(nextChar, rowIndex, charIndex);
+		this.NextChar();
 	};
+	this.Draw = function() { // TODO move out of the buffer?? (into say a dialog box renderer)
+		clearDialogBox();
+		var rowCount = rowIndex + 1;
+		for (var i = 0; i < rowCount; i++) {
+			var row = this.CurPage()[i];
+			var charCount = (i == rowIndex) ? charIndex+1 : row.length;
+			for(var j = 0; j < charCount; j++) {
+				var char = row[j];
+				drawDialogChar( char, i /*rowIndex*/, j /*colIndex*/ );
+			}
+		}
+		if(isDialogReadyToContinue)
+			drawNextDialogArrow();
+		drawDialogBox();
+	}
 
 	function DialogChar(char,nodeTrail) {
 		this.char = char;

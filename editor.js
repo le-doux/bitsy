@@ -10,6 +10,9 @@ BUGS / FEEDBACK:
 * Thank you, That would be very helpful. On iOS and android you could replace it with a swipe to move like @increpare's puzzlescript.
 * finally inventory feature with branching becz it was so hard to do that now. If u can add the same sprite in diff scenes it will be great
 
+TODO
+- separate dialog stuff and create a module for all of it
+
 TODO next
 - items
 -> UI
