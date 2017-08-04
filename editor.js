@@ -464,10 +464,7 @@ function start() {
 	detectBrowserFeatures();
 
 	//game canvas & context (also the map editor)
-	canvas = document.getElementById("game");
-	canvas.width = width * scale;
-	canvas.height = width * scale;
-	ctx = canvas.getContext("2d");
+	attachCanvas( document.getElementById("game") );
 	//map edit events
 	listenMapEditEvents();
 
