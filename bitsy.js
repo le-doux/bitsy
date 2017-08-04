@@ -1608,7 +1608,7 @@ var DialogBuffer = function() {
 		this.NextChar(); // draw first char
 	};
 	this.Update = function(dt) {
-		this.Draw(); // TODO move into a renderer object
+		this.Draw(dt); // TODO move into a renderer object
 
 		if (isDialogReadyToContinue) {
 			return; //waiting for dialog to be advanced by player
@@ -1696,7 +1696,9 @@ var DialogBuffer = function() {
 		drawDialogChar(nextChar, rowIndex, charIndex);
 		this.NextChar();
 	};
-	this.Draw = function() { // TODO move out of the buffer?? (into say a dialog box renderer)
+	var effectTime = 0; // TODO this variable should live somewhere better
+	this.Draw = function(dt) { // TODO move out of the buffer?? (into say a dialog box renderer)
+		effectTime += dt;
 		clearDialogBox();
 		var rowCount = rowIndex + 1;
 		for (var i = 0; i < rowCount; i++) {
@@ -1727,7 +1729,7 @@ var DialogBuffer = function() {
 		this.ApplyEffects = function() {
 			for(var i = 0; i < this.nodeTrail.length; i++) {
 				var node = this.nodeTrail[i];
-				node.DoEffect(this);
+				node.DoEffect(this,effectTime);
 			}
 		}
 	};
@@ -1944,12 +1946,13 @@ var DialogNodeFactory = {
 	}
 };
 
-DialogNodeFactory.AddType( function() {
+var RootNode = function() {
 	this.type = "root";
 	this.canHaveChildren = true;
-} );
+};
+DialogNodeFactory.AddType( RootNode );
 
-DialogNodeFactory.AddType( function() {
+var TextNode = function() {
 	this.type = "text";
 	this.text = "";
 	this.Visit = function() {
@@ -1957,9 +1960,10 @@ DialogNodeFactory.AddType( function() {
 			this.buffer.AddText( this.text, this.Trail() );
 		return false;
 	};
-} );
+};
+DialogNodeFactory.AddType( TextNode );
 
-DialogNodeFactory.AddType( function() {
+var IfNode = function() {
 	this.type = "if";
 	this.canHaveChildren = true;
 
@@ -2011,16 +2015,30 @@ DialogNodeFactory.AddType( function() {
 		}
 		return true;
 	}
-} );
+};
+DialogNodeFactory.AddType( IfNode );
 
-DialogNodeFactory.AddType( function() {
+var ElseIfNode = function() {
+	this.type = "elseif";
+	this.CheckCondition = function() {
+		if( this.attributes["item"] ) {
+			var itemId = this.attributes["item"].value;
+			return player().inventory[itemId] && player().inventory[itemId] > 0;
+		}
+		return false;
+	};
+};
+DialogNodeFactory.AddType( ElseIfNode );
+
+var ElseNode = function() {
 	this.type = "else";
 	this.CheckCondition = function() {
 		return true;
 	};
-} );
+};
+DialogNodeFactory.AddType( ElseNode );
 
-DialogNodeFactory.AddType( function() {
+var ColorNode = function() {
 	this.type = "color";
 	this.canHaveChildren = true;
 	this.DoEffect = function(char) {
@@ -2036,7 +2054,62 @@ DialogNodeFactory.AddType( function() {
 			char.color.a = 255;
 		}
 	}
-} );
+};
+DialogNodeFactory.AddType( ColorNode );
+
+var RainbowNode = function() {
+	this.type = "rainbow";
+	this.canHaveChildren = true;
+	this.DoEffect = function(char,time) {
+		var h = Math.abs( Math.sin( (time / 600) - (char.col / 8) ) );
+		var rgb = hslToRgb( h, 1, 0.5 );
+		char.color.r = rgb[0];
+		char.color.g = rgb[1];
+		char.color.b = rgb[2];
+		char.color.a = 255;
+	}
+};
+DialogNodeFactory.AddType( RainbowNode );
+
+
+// source : https://gist.github.com/mjackson/5311256
+/**
+ * Converts an HSL color value to RGB. Conversion formula
+ * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+ * Assumes h, s, and l are contained in the set [0, 1] and
+ * returns r, g, and b in the set [0, 255].
+ *
+ * @param   Number  h       The hue
+ * @param   Number  s       The saturation
+ * @param   Number  l       The lightness
+ * @return  Array           The RGB representation
+ */
+function hslToRgb(h, s, l) {
+  var r, g, b;
+
+  if (s == 0) {
+    r = g = b = l; // achromatic
+  } else {
+    function hue2rgb(p, q, t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    }
+
+    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    var p = 2 * l - q;
+
+    r = hue2rgb(p, q, h + 1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1/3);
+  }
+
+  return [ r * 255, g * 255, b * 255 ];
+}
+
 
 function DialogMarkup() {
 	this.Parse = function(dialogStr) {
