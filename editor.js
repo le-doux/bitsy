@@ -8,6 +8,7 @@ BUGS / FEEDBACK:
 * hmm I need to add a setting to turn off mouse controls since it breaks more unconventional games
 * I also wonder, have you considered a more mobile friendly editor with vertically stacking collapsable tabs? I'd love to use bitsy on the go.
 * Thank you, That would be very helpful. On iOS and android you could replace it with a swipe to move like @increpare's puzzlescript.
+* finally inventory feature with branching becz it was so hard to do that now. If u can add the same sprite in diff scenes it will be great
 
 TODO next
 - items
