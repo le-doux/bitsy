@@ -1,3 +1,19 @@
+/*
+DIALOG NODES ideas
+<pagebreak>
+<pause>
+<fast></fast>
+<slow></slow>
+<speed mult="2"></speed>
+<shakey></shakey>
+<wavy></wavy>
+<move> -- move character
+<mark name="blah"> -- mark spot
+<goto mark="blah"> -- jump to a mark
+<choice> -- player dialog choice
+<changeAvatar>
+*/
+
 function Dialog() {
 
 this.CreateRenderer = function() {
@@ -83,8 +99,8 @@ var DialogRenderer = function() {
 		char.SetPosition(row,col);
 		char.ApplyEffects(effectTime);
 		var charData = font.getChar( char.char );
-		var top = (4 * scale) + (row * 2 * scale) + (row * 8 * text_scale);
-		var left = (4 * scale) + (col * 6 * text_scale);
+		var top = (4 * scale) + (row * 2 * scale) + (row * 8 * text_scale) + Math.floor( char.offset.y );
+		var left = (4 * scale) + (col * 6 * text_scale) + Math.floor( char.offset.x );
 		for (var y = 0; y < 8; y++) {
 			for (var x = 0; x < 6; x++) {
 				var i = (y * 6) + x;
@@ -274,6 +290,7 @@ var DialogBuffer = function() {
 		this.nodeTrail = nodeTrail;
 
 		this.color = { r:255, g:255, b:255, a:255 };
+		this.offset = { x:0, y:0 }; // in pixels (screen pixels?)
 		this.row = 0;
 		this.col = 0;
 		this.SetPosition = function(row,col) {
@@ -536,6 +553,15 @@ var RainbowNode = function() {
 	}
 };
 DialogNodeFactory.AddType( RainbowNode );
+
+var WavyNode = function() {
+	this.type = "wavy";
+	this.canHaveChildren = true;
+	this.DoEffect = function(char,time) {
+		char.offset.y = Math.sin( (time / 250) - (char.col / 2) ) * 4;
+	}
+};
+DialogNodeFactory.AddType( WavyNode );
 
 
 // source : https://gist.github.com/mjackson/5311256
