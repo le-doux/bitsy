@@ -5,8 +5,6 @@ DIALOG NODES ideas
 <fast></fast>
 <slow></slow>
 <speed mult="2"></speed>
-<shakey></shakey>
-<wavy></wavy>
 <move> -- move character
 <mark name="blah"> -- mark spot
 <goto mark="blah"> -- jump to a mark
@@ -96,6 +94,7 @@ var DialogRenderer = function() {
 
 	var text_scale = 2; //using a different scaling factor for text feels like cheating... but it looks better
 	this.DrawChar = function(char, row, col) {
+		char.offset = {x:0, y:0};
 		char.SetPosition(row,col);
 		char.ApplyEffects(effectTime);
 		var charData = font.getChar( char.char );
@@ -145,6 +144,11 @@ var DialogRenderer = function() {
 	this.SetPageFinishHandler = function(handler) {
 		onPageFinish = handler;
 	};
+
+	this.Reset = function() {
+		effectTime = 0;
+		// TODO - anything else?
+	}
 }
 
 var DialogBuffer = function() {
@@ -194,12 +198,43 @@ var DialogBuffer = function() {
 		tree = dml.Parse( dialogSourceStr );
 		tree.SetBuffer( this );
 		tree.Traverse();
+	};
 
-		this.NextChar(); // draw first char
+	this.TryFillBuffer = function() {
+		// after drawing the last character in the current dialog buffer, do the next dialog tree traversal
+		if( pageIndex === this.CurPageCount()-1 
+			&& rowIndex === this.CurRowCount()-1 
+			&& charIndex === this.CurCharCount()-1 )
+		{
+			tree.Traverse();
+		}
+	};
+
+	this.DoNextChar = function() {
+		nextCharTimer = 0; //reset timer
+
+		//time to update characters
+		if (charIndex + 1 < this.CurCharCount()) {
+			//add char to current row
+			charIndex++;
+		}
+		else if (rowIndex + 1 < this.CurRowCount()) {
+			//start next row
+			rowIndex++;
+			charIndex = 0;
+		}
+		else {
+			//the page is full!
+			isDialogReadyToContinue = true;
+			didPageFinishThisFrame = true;
+		}
+
+		this.TryFillBuffer();
 	};
 
 	this.Update = function(dt) {
 		didPageFinishThisFrame = false;
+		didFlipPageThisFrame = false;
 		// this.Draw(dt); // TODO move into a renderer object
 		if (isDialogReadyToContinue) {
 			return; //waiting for dialog to be advanced by player
@@ -208,82 +243,54 @@ var DialogBuffer = function() {
 		nextCharTimer += dt; //tick timer
 
 		if (nextCharTimer > nextCharMaxTime) {
-			//time to update characters
-			if (charIndex + 1 < this.CurCharCount()) {
-				//add char to current row
-				charIndex++;
-			}
-			else if (rowIndex + 1 < this.CurRowCount()) {
-				//start next row
-				rowIndex++;
-				charIndex = 0;
-			}
-			else {
-				//the page is full!
-				isDialogReadyToContinue = true;
-				didPageFinishThisFrame = true; // TODO enclose
-			}
-
-			this.NextChar();
+			this.DoNextChar();
 		}
 	};
 
 	this.Skip = function() {
 		didPageFinishThisFrame = false;
+		didFlipPageThisFrame = false;
 		// add new characters until you get to the end of the current line of dialog
 		while (rowIndex < this.CurRowCount()) {
-			if (charIndex + 1 < this.CurCharCount()) {
-				//add char to current row
-				charIndex++;
-			}
-			else if (rowIndex + 1 < this.CurRowCount()) {
-				//start next row
-				rowIndex++;
-				charIndex = 0;
-			}
-			else {
-				//the page is full!
-				isDialogReadyToContinue = true;
-				didPageFinishThisFrame = true; // TODO enclose
+			this.DoNextChar();
+
+			if(isDialogReadyToContinue) {
 				//make sure to push the rowIndex past the end to break out of the loop
 				rowIndex++;
 				charIndex = 0;
 			}
-
-			this.NextChar();
 		}
 		rowIndex = this.CurRowCount()-1;
 		charIndex = this.CurCharCount()-1;
 	};
 
+	this.FlipPage = function() {
+		didFlipPageThisFrame = true;
+		isDialogReadyToContinue = false;
+		pageIndex++;
+		rowIndex = 0;
+		charIndex = 0;
+	}
+
+	this.EndDialog = function() {
+		if(onExit != null)
+			onExit();
+	}
+
 	this.Continue = function() {
+		console.log("CONTINUE");
+		this.TryFillBuffer();
 		if (pageIndex + 1 < this.CurPageCount()) {
 			//start next page
-			isDialogReadyToContinue = false;
-			pageIndex++;
-			rowIndex = 0;
-			charIndex = 0;
-			this.NextChar();
+			this.FlipPage();
 		}
 		else {
 			//end dialog mode
-			if(onExit != null)
-				onExit();
+			this.EndDialog();
 		}
 	};
 
 	this.CanContinue = function() { return isDialogReadyToContinue; };
-
-	this.NextChar = function() {
-		// after drawing the last character in the current dialog buffer, do the next dialog tree traversal
-		if( pageIndex === this.CurPageCount()-1 
-			&& rowIndex === this.CurRowCount()-1 
-			&& charIndex === this.CurCharCount()-1 )
-		{
-			tree.Traverse();
-		}
-		nextCharTimer = 0; //reset timer
-	}
 
 	function DialogChar(char,nodeTrail) {
 		this.char = char;
@@ -321,13 +328,14 @@ var DialogBuffer = function() {
 		var curPageIndex = this.CurPageCount() - 1;
 		var curRowIndex = this.CurRowCount() - 1;
 		var curRowArr = this.CurRow();
-		curRowArr = AddWordToCharArray( curRowArr, words[0], nodeTrail );
 
-		for (var i = 1; i < words.length; i++) {
+		for (var i = 0; i < words.length; i++) {
 			var word = words[i];
-			if (curRowArr.length + word.length + 1 <= charsPerRow) {
+			var wordLength = word.length + ((i == 0) ? 0 : 1);
+			if (curRowArr.length + wordLength <= charsPerRow) {
 				//stay on same row
-				curRowArr = AddWordToCharArray( curRowArr, " " + word, nodeTrail );
+				var wordWithPrecedingSpace = ((i == 0) ? "" : " ") + word;
+				curRowArr = AddWordToCharArray( curRowArr, wordWithPrecedingSpace, nodeTrail );
 			}
 			else if (curRowIndex == 0) {
 				//start next row
@@ -353,12 +361,22 @@ var DialogBuffer = function() {
 		if( curRowArr.length > 0 ) {
 			buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
 		}
+
+		//destroy any empty stuff
+		var lastPage = buffer[ buffer.length-1 ];
+		var lastRow = lastPage[ lastPage.length-1 ];
+		if( lastRow.length == 0 )
+			lastPage.splice( lastPage.length-1, 1 );
+		if( lastPage.length == 0 )
+			buffer.splice( buffer.length-1, 1 );
 	};
 
 	/* this is a hook for GIF rendering */
 	var didPageFinishThisFrame = false;
 	this.DidPageFinishThisFrame = function(){ return didPageFinishThisFrame; };
 
+	var didFlipPageThisFrame = false;
+	this.DidFlipPageThisFrame = function(){ return didFlipPageThisFrame; };
 };
 
 var DialogNode = function() {
@@ -439,6 +457,7 @@ var TextNode = function() {
 	this.type = "text";
 	this.text = "";
 	this.Visit = function() {
+		console.log(this.text);
 		if(this.buffer != null)
 			this.buffer.AddText( this.text, this.Trail() );
 		return false;
@@ -558,10 +577,31 @@ var WavyNode = function() {
 	this.type = "wavy";
 	this.canHaveChildren = true;
 	this.DoEffect = function(char,time) {
-		char.offset.y = Math.sin( (time / 250) - (char.col / 2) ) * 4;
+		char.offset.y += Math.sin( (time / 250) - (char.col / 2) ) * 4;
 	}
 };
 DialogNodeFactory.AddType( WavyNode );
+
+var ShakyNode = function() {
+	this.type = "shaky";
+	this.canHaveChildren = true;
+
+	function disturb(func,time,offset,mult1,mult2) {
+		return func( (time * mult1) - (offset * mult2) );
+	}
+
+	this.DoEffect = function(char,time) {
+		char.offset.y += 3
+						* disturb(Math.sin,time,char.col,0.1,0.5)
+						* disturb(Math.cos,time,char.col,0.3,0.2)
+						* disturb(Math.sin,time,char.row,2.0,1.0);
+		char.offset.x += 3
+						* disturb(Math.cos,time,char.row,0.1,1.0)
+						* disturb(Math.sin,time,char.col,3.0,0.7)
+						* disturb(Math.cos,time,char.col,0.2,0.3);
+	}
+};
+DialogNodeFactory.AddType( ShakyNode );
 
 
 // source : https://gist.github.com/mjackson/5311256

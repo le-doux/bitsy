@@ -1594,6 +1594,7 @@ function startDialog(dialogStr) {
 
 	isDialogMode = true;
 
+	dialogRenderer.Reset();
 	dialogRenderer.SetCentered( isNarrating /*centered*/ );
 	dialogBuffer.Start( dialogStr, onExitDialog );
 }
