@@ -1,17 +1,3 @@
-/*
-DIALOG NODES ideas
-<pagebreak>
-<pause>
-<fast></fast>
-<slow></slow>
-<speed mult="2"></speed>
-<move> -- move character
-<mark name="blah"> -- mark spot
-<goto mark="blah"> -- jump to a mark
-<choice> -- player dialog choice
-<changeAvatar>
-*/
-
 function Dialog() {
 
 this.CreateRenderer = function() {

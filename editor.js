@@ -11,7 +11,23 @@ BUGS / FEEDBACK:
 * finally inventory feature with branching becz it was so hard to do that now. If u can add the same sprite in diff scenes it will be great
 
 TODO
-- separate dialog stuff and create a module for all of it
+- names
+- item UI
+- advanced dialog UI
+- how does new dialog work with: endings? exits? (items?)
+- more dialog nodes?
+
+DIALOG NODES ideas
+<pagebreak>
+<pause>
+<fast></fast>
+<slow></slow>
+<speed mult="2"></speed>
+<move> -- move character
+<mark name="blah"> -- mark spot
+<goto mark="blah"> -- jump to a mark
+<choice> -- player dialog choice
+<changeAvatar>
 
 TODO next
 - items

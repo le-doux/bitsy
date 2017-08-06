@@ -15,6 +15,14 @@ var palette = {
 var ending = {};
 var playerId = "A";
 
+var names = {
+	room : new Map(),
+	/*tile : new Map(),*/
+	sprite : new Map(),
+	item : new Map(),
+	/*dialog : new Map()*/
+};
+
 //stores all image data for tiles, sprites, drawings
 var imageStore = {
 	source: {},
@@ -858,6 +866,10 @@ function serializeWorld() {
 				worldStr += "\n";
 			}
 		}
+		if (room[id].name != null) {
+			/* NAME */
+			worldStr += "NAME " + room[id].name + "\n";
+		}
 		if (room[id].walls.length > 0) {
 			/* WALLS */
 			worldStr += "WAL ";
@@ -912,6 +924,10 @@ function serializeWorld() {
 	for (id in sprite) {
 		worldStr += "SPR " + id + "\n";
 		worldStr += serializeDrawing( "SPR_" + id );
+		if (sprite[id].name != null) {
+			/* NAME */
+			worldStr += "NAME " + sprite[id].name + "\n";
+		}
 		if (sprite[id].room != null) {
 			/* SPRITE POSITION */
 			worldStr += "POS " + sprite[id].room + " " + sprite[id].x + "," + sprite[id].y + "\n";
@@ -922,6 +938,10 @@ function serializeWorld() {
 	for (id in item) {
 		worldStr += "ITM " + id + "\n";
 		worldStr += serializeDrawing( "ITM_" + id );
+		if (item[id].name != null) {
+			/* NAME */
+			worldStr += "NAME " + item[id].name + "\n";
+		}
 		if (item[id].dlg != null) {
 			worldStr += "DLG " + item[id].dlg + "\n";
 		}
@@ -1008,7 +1028,8 @@ function parseRoom(lines, i) {
 		exits : [],
 		endings : [],
 		items : [],
-		pal : null
+		pal : null,
+		name : null
 	};
 	i++;
 
@@ -1120,6 +1141,11 @@ function parseRoom(lines, i) {
 			/* CHOOSE PALETTE (that's not default) */
 			room[id].pal = getId(lines[i]);
 		}
+		else if (getType(lines[i]) === "NAME") {
+			var name = lines[i].split(/\s(.+)/)[1];
+			room[id].name = name;
+			names.room[ name ] = id;
+		}
 		i++;
 	}
 	return i;
@@ -1182,6 +1208,7 @@ function parseTile(lines, i) {
 function parseSprite(lines, i) {
 	var id = getId(lines[i]);
 	var drwId = null;
+	var name = null;
 
 	i++;
 
@@ -1213,6 +1240,11 @@ function parseSprite(lines, i) {
 				y : parseInt(coordArgs[1])
 			};
 		}
+		else if (getType(lines[i]) === "NAME") {
+			/* NAME */
+			name = lines[i].split(/\s(.+)/)[1];
+			names.sprite[name] = id;
+		}
 		i++;
 	}
 
@@ -1229,7 +1261,8 @@ function parseSprite(lines, i) {
 			frameIndex : 0,
 			frameCount : imageStore.source[drwId].length
 		},
-		inventory : {}
+		inventory : {},
+		name : name
 	};
 	return i;
 }
@@ -1237,6 +1270,7 @@ function parseSprite(lines, i) {
 function parseItem(lines, i) {
 	var id = getId(lines[i]);
 	var drwId = null;
+	var name = null;
 
 	i++;
 
@@ -1272,6 +1306,11 @@ function parseItem(lines, i) {
 		else if(getType(lines[i]) === "DLG") {
 			dialog = lines[i].split(/\s(.+)/)[1]; // capture everything after the first space
 		}
+		else if (getType(lines[i]) === "NAME") {
+			/* NAME */
+			name = lines[i].split(/\s(.+)/)[1];
+			names.sprite[name] = id;
+		}
 		i++;
 	}
 
@@ -1287,7 +1326,8 @@ function parseItem(lines, i) {
 			isAnimated : (imageStore.source[drwId].length > 1),
 			frameIndex : 0,
 			frameCount : imageStore.source[drwId].length
-		}
+		},
+		name : name
 	};
 
 	// console.log("ITM " + id);
