@@ -816,6 +816,8 @@ function parseWorld(file) {
 	if (player().room != null) {
 		curRoom = player().room;
 	}
+
+	console.log(names);
 }
 
 //TODO this is in progress and doesn't support all features
@@ -1309,7 +1311,7 @@ function parseItem(lines, i) {
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
 			name = lines[i].split(/\s(.+)/)[1];
-			names.sprite[name] = id;
+			names.item[name] = id;
 		}
 		i++;
 	}
