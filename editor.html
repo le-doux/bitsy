@@ -424,9 +424,15 @@
 						</label>
 
 						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite">
-						<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="right">
+						<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
 							<i class="material-icons">nature_people</i>
 							sprite
+						</label>
+
+						<input type="radio" name="paint mode" value="item" onclick="on_paint_item();" id="paintOptionItem">
+						<label title="edit items: things the player can pick up" for="paintOptionItem" class="right">
+							<i class="material-icons">vpn_key</i>
+							item
 						</label>
 					</form>
 					<canvas id="paint"></canvas>
@@ -540,9 +546,15 @@
 						</label>
 
 						<input type="radio" name="paint explorer mode" value="sprite" onclick="on_paint_sprite();" id="paintExplorerOptionSprite">
-						<label title="find sprites: non-player characters and interactive objects" for="paintExplorerOptionSprite" class="right">
+						<label title="find sprites: non-player characters and interactive objects" for="paintExplorerOptionSprite" class="middle">
 							<i class="material-icons">nature_people</i>
 							sprite
+						</label>
+
+						<input type="radio" name="paint explorer mode" value="item" onclick="on_paint_sprite();" id="paintExplorerOptionItem">
+						<label title="find items: things the player can pick up" for="paintExplorerOptionItem" class="right">
+							<i class="material-icons">vpn_key</i>
+							item
 						</label>
 					</form>
 

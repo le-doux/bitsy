@@ -343,7 +343,8 @@ NOTES
 var TileType = {
 	Tile : 0,
 	Sprite : 1,
-	Avatar : 2
+	Avatar : 2,
+	Item : 3
 };
 var EditMode = {
 	Edit : 0,
@@ -367,6 +368,7 @@ var curDrawingFrameIndex = 0;
 
 var tileIndex = 0;
 var spriteIndex = 0;
+var itemIndex = 0;
 
 /* ROOM */
 var drawMapGrid = true;
@@ -1165,6 +1167,49 @@ function reloadSprite() {
 
 }
 
+// TODO consolidate these drawing related methods
+function reloadItem() {
+	// animation UI
+	if ( item[drawingId] && item[drawingId].animation.isAnimated ) {
+		isCurDrawingAnimated = true;
+		document.getElementById("animatedCheckbox").checked = true;
+
+		if( curDrawingFrameIndex == 0)
+		{
+			document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
+			document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
+		}
+		else if( curDrawingFrameIndex == 1 )
+		{
+			document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
+			document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
+		}
+
+		document.getElementById("animation").setAttribute("style","display:block;");
+		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
+		renderAnimationPreview( drawingId );
+	}
+	else {
+		isCurDrawingAnimated = false;
+		document.getElementById("animatedCheckbox").checked = false;
+		document.getElementById("animation").setAttribute("style","display:none;");
+		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
+	}
+
+	// TODO
+	// dialog UI
+	// if (drawingId in dialog) {
+	// 	document.getElementById("dialogText").value = dialog[drawingId];
+	// }
+	// else {
+	// 	document.getElementById("dialogText").value = "";
+	// }
+
+	// update paint canvas
+	drawPaintCanvas();
+
+}
+
 /* UNIQUE ID METHODS */ // TODO - lots of duplicated code around stuff (ex: all these things with IDs)
 function nextTileId() {
 	return nextObjectId( sortedTileIdList() );
@@ -1199,6 +1244,10 @@ function sortedTileIdList() {
 
 function sortedSpriteIdList() {
 	return sortedBase36IdList( sprite );
+}
+
+function sortedItemIdList() {
+	return sortedBase36IdList( item );
 }
 
 function sortedRoomIdList() {
@@ -1414,7 +1463,7 @@ function drawPaintCanvas() {
 	if (paintMode == TileType.Tile) {
 		paint_ctx.fillStyle = "rgb("+palette[curPal()][1][0]+","+palette[curPal()][1][1]+","+palette[curPal()][1][2]+")";
 	}
-	else if (paintMode == TileType.Sprite || paintMode == TileType.Avatar) {
+	else if (paintMode == TileType.Sprite || paintMode == TileType.Avatar || paintMode == TileType.Item) {
 		paint_ctx.fillStyle = "rgb("+palette[curPal()][2][0]+","+palette[curPal()][2][1]+","+palette[curPal()][2][2]+")";
 	}
 
@@ -1550,8 +1599,17 @@ function drawEditMap() {
 
 
 function curDrawingData() {
-	var imgId = (paintMode == TileType.Tile ? "TIL_" : "SPR_") + drawingId;
+	var imgId = "";
+	if( paintMode == TileType.Tile )
+		imgId += "TIL_";
+	else if( paintMode == TileType.Sprite || paintMode == TileType.Avatar )
+		imgId += "SPR_";
+	else if( paintMode == TileType.Item )
+		imgId += "ITM_";
+	imgId += drawingId;
+	console.log(imgId);
 	var frameIndex = (isCurDrawingAnimated ? curDrawingFrameIndex : 0);
+	console.log(imageStore.source[ imgId ]);
 	return imageStore.source[ imgId ][ frameIndex ];
 }
 
@@ -1997,6 +2055,24 @@ function on_paint_sprite() {
 	refreshPaintExplorer();
 	document.getElementById("paintOptionSprite").checked = true;
 	document.getElementById("paintExplorerOptionSprite").checked = true;
+}
+function on_paint_item() {
+	console.log("PAINT ITEM");
+	paintMode = TileType.Item;
+	itemIndex = 0;
+	drawingId = sortedItemIdList()[itemIndex];
+	console.log(drawingId);
+	curDrawingFrameIndex = 0;
+	reloadItem();
+	document.getElementById("dialog").setAttribute("style","display:block;");
+	document.getElementById("wall").setAttribute("style","display:none;");
+	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
+	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
+	document.getElementById("animationOuter").setAttribute("style","display:block;");
+	//document.getElementById("animation").setAttribute("style","display:block;");
+	refreshPaintExplorer();
+	document.getElementById("paintOptionItem").checked = true;
+	document.getElementById("paintExplorerOptionItem").checked = true;
 }
 
 var drawingThumbnailCanvas, drawingThumbnailCtx;
