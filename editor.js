@@ -19,6 +19,7 @@ TODO
 - how does new dialog work with: endings? exits? (items?)
 - more dialog nodes?
 - mouse control plus item
+- TODO what about default dialog ID bug for sprites??
 
 DIALOG NODES ideas
 <pagebreak>
@@ -2419,7 +2420,10 @@ function deletePaintThumbnail(id) {
 function getCurDialogId() {
 	var dialogId = null;
 	if(paintMode == TileType.Sprite) {
-		dialogId = sprite[drawingId].dlg ? sprite[drawingId].dlg : drawingId;
+		dialogId = sprite[drawingId].dlg;
+		if(dialogId == null && dialog[drawingId] != null) {
+			dialogId = drawingId;
+		}
 	}
 	else if(paintMode == TileType.Item) {
 		dialogId = item[drawingId].dlg;
@@ -2427,14 +2431,46 @@ function getCurDialogId() {
 	return dialogId;
 }
 
+function getCurPaintObject() {
+	if(paintMode == TileType.Sprite || paintMode == TileType.Avatar) {
+		return sprite[drawingId];
+	}
+	else if(paintMode == TileType.Item) {
+		return item[drawingId];
+	}
+	else if(paintMode == TileType.Tile) {
+		return tile[drawingId];
+	}
+}
+
+function nextAvailableDialogId() {
+	var i = 0;
+	var id = i.toString(36);
+	while( dialog[id] != null ) {
+		i++;
+		id = i.toString(36);
+	}
+	return id;
+}
+
 function on_change_dialog() {
 	var dialogId = getCurDialogId();
 
-	if(dialogId) {	
-		dialog[dialogId] = document.getElementById("dialogText").value;
-		console.log("NEW DIALOG " + dialog[dialogId]);
-		refreshGameData();
+	var dialogStr = document.getElementById("dialogText").value;
+	if(dialogStr.length <= 0){
+		if(dialogId) {
+			getCurPaintObject().dlg = null;
+			delete dialog[dialogId];
+		}
 	}
+	else {
+		if(!dialogId) {
+			dialogId = nextAvailableDialogId();
+			getCurPaintObject().dlg = dialogId;
+		}
+		dialog[dialogId] = dialogStr;
+	}
+	refreshGameData();
 }
 
 function on_game_data_change() {
