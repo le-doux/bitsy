@@ -1,4 +1,6 @@
 /* 
+v4.0
+- bug: deleting drawing would delete preview even if you cancelled
 
 BUGS / FEEDBACK:
 * Thank you @adamledoux for Bitsy, it is so relaxing to use. Are you aware that in Safari deleted rooms do not disappear from the exit list?
@@ -739,7 +741,6 @@ function nextTile() {
 	drawingId = ids[tileIndex];
 	curDrawingFrameIndex = 0;
 	reloadTile();
-	drawPaintNavThumbnailCanvas();
 }
 
 function prevTile() {
@@ -749,7 +750,6 @@ function prevTile() {
 	drawingId = ids[tileIndex];
 	curDrawingFrameIndex = 0;
 	reloadTile();
-	drawPaintNavThumbnailCanvas();
 }
 
 function newSprite(id) {
@@ -765,6 +765,21 @@ function newSprite(id) {
 	refreshGameData();
 
 	spriteIndex = Object.keys(sprite).length - 1;
+}
+
+function newItem(id) {
+	if (id)
+		drawingId = id; //this optional parameter lets me override the default next id
+	else
+		drawingId = nextItemId();
+
+	makeItem(drawingId);
+	reloadItem(); //hack (order matters for animated tiles)
+
+	drawPaintCanvas();
+	refreshGameData();
+
+	itemIndex = Object.keys(item).length - 1;
 }
 
 function nextRoom() {
@@ -923,6 +938,23 @@ function deleteRoom() {
 	}
 }
 
+function nextItem() {
+	var ids = sortedItemIdList();
+	itemIndex = (itemIndex + 1) % ids.length;
+	drawingId = ids[itemIndex];
+	curDrawingFrameIndex = 0;
+	reloadItem();
+}
+
+function prevItem() {
+	var ids = sortedItemIdList();
+	itemIndex = (itemIndex - 1) % ids.length;
+	if (itemIndex < 0) itemIndex = (ids.length-1); // loop
+	drawingId = ids[itemIndex];
+	curDrawingFrameIndex = 0;
+	reloadItem();
+}
+
 function nextSprite() {
 	var ids = sortedSpriteIdList();
 	spriteIndex = (spriteIndex + 1) % ids.length;
@@ -930,7 +962,6 @@ function nextSprite() {
 	drawingId = ids[spriteIndex];
 	curDrawingFrameIndex = 0;
 	reloadSprite();
-	drawPaintNavThumbnailCanvas();
 }
 
 function prevSprite() {
@@ -940,7 +971,6 @@ function prevSprite() {
 	drawingId = ids[spriteIndex];
 	curDrawingFrameIndex = 0;
 	reloadSprite();
-	drawPaintNavThumbnailCanvas();
 }
 
 function next() {
@@ -1014,7 +1044,7 @@ function duplicateDrawing() {
 
 		reloadTile(); //hack for ui consistency
 	}
-	else {
+	else if(paintMode == TileType.Avatar || paintMode == TileType.Sprite) {
 
 		//copy drawing data -- hacky duplication as usual between sprite and tile :(
 		var sourceImageData = imageStore.source[ "SPR_" + drawingId ];
@@ -1044,13 +1074,42 @@ function duplicateDrawing() {
 
 		reloadSprite(); //hack
 	}
+	else if(paintMode == TileType.Item) {
+
+		//copy drawing data -- hacky duplication as usual between sprite and tile :(
+		var sourceImageData = imageStore.source[ "ITM_" + drawingId ];
+		var copiedImageData = [];
+		for (f in sourceImageData) {
+			copiedImageData.push([]);
+			for (y in sourceImageData[f]) {
+				copiedImageData[f].push([]);
+				for (x in sourceImageData[f][y]) {
+					copiedImageData[f][y].push( sourceImageData[f][y][x] );
+				}
+			}
+		}
+
+		drawingId = nextItemId();
+
+		console.log("DUPLICATE ITEM");	
+		console.log(drawingId);
+		console.log(copiedImageData);
+
+		makeItem( drawingId, copiedImageData );
+
+		drawPaintCanvas();
+		refreshGameData();
+
+		itemIndex = Object.keys(item).length - 1;
+
+		reloadItem(); //hack
+	}
 	addPaintThumbnail( drawingId );
 	changePaintExplorerSelection( drawingId );
 }
 
 function deleteDrawing() {
 	if ( confirm("Are you sure you want to delete this drawing?") ) {
-		deletePaintThumbnail( drawingId );
 		if (paintMode == TileType.Tile) {
 			if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
 			delete tile[ drawingId ];
@@ -1060,7 +1119,7 @@ function deleteDrawing() {
 			drawEditMap();
 			nextTile();
 		}
-		else {
+		else if( paintMode == TileType.Avatar || paintMode == TileType.Sprite ){
 			if ( Object.keys( sprite ).length <= 2 ) { alert("You can't delete your last sprite!"); return; }
 			delete sprite[ drawingId ];
 			refreshGameData();
@@ -1068,6 +1127,15 @@ function deleteDrawing() {
 			drawEditMap();
 			nextSprite();
 		}
+		else if( paintMode == TileType.Item ){
+			if ( Object.keys( item ).length <= 1 ) { alert("You can't delete your last item!"); return; }
+			delete item[ drawingId ];
+			refreshGameData();
+			renderImages();
+			drawEditMap();
+			nextItem();
+		}
+		deletePaintThumbnail( drawingId );
 		changePaintExplorerSelection( drawingId );
 	}
 }
@@ -1226,6 +1294,10 @@ function nextTileId() {
 
 function nextSpriteId() {
 	return nextObjectId( sortedSpriteIdList() );
+}
+
+function nextItemId() {
+	return nextObjectId( sortedItemIdList() );
 }
 
 function nextRoomId() {
@@ -1651,6 +1723,22 @@ function makeSprite(id,imageData) {
 		room : null,
 		x : -1,
 		y : -1,
+		animation : { //todo
+			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
+			frameIndex : 0,
+			frameCount : (!imageData) ? 2 : imageData.length
+		}
+	};
+	makeDrawing(drwId,imageData);
+}
+
+function makeItem(id,imageData) { // NOTE : same as tile right now? make more like sprite?
+	console.log(id);
+	var drwId = "ITM_" + id;
+	console.log(drwId);
+	item[id] = {
+		drw : drwId,
+		col : 2, // TODO color not column (bad name)
 		animation : { //todo
 			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
 			frameIndex : 0,

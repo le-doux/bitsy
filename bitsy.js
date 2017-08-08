@@ -1411,6 +1411,8 @@ function renderImageForAllPalettes(drawing) {
 		if ( imgSrc.length <= 1 ) {
 			// non-animated drawing
 			var frameSrc = imgSrc[0];
+			console.log(drawing);
+			console.log(imageStore);
 			imageStore.render[pal][colStr][drawing.drw] = imageDataFromImageSource( frameSrc, pal, col );
 		}
 		else {
