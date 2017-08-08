@@ -1678,8 +1678,7 @@ function drawEditMap() {
 	}
 }
 
-
-function curDrawingData() {
+function curDrawingImgId() {
 	var imgId = "";
 	if( paintMode == TileType.Tile )
 		imgId += "TIL_";
@@ -1688,6 +1687,11 @@ function curDrawingData() {
 	else if( paintMode == TileType.Item )
 		imgId += "ITM_";
 	imgId += drawingId;
+	return imgId;
+}
+
+function curDrawingData() {
+	var imgId = curDrawingImgId();
 	// console.log(imgId);
 	var frameIndex = (isCurDrawingAnimated ? curDrawingFrameIndex : 0);
 	// console.log(imageStore.source[ imgId ]);
@@ -1696,7 +1700,7 @@ function curDrawingData() {
 
 // todo: assumes 2 frames
 function curDrawingAltFrameData() {
-	var imgId = (paintMode == TileType.Tile ? "TIL_" : "SPR_") + drawingId;
+	var imgId = curDrawingImgId();
 	var frameIndex = (curDrawingFrameIndex === 0 ? 1 : 0);
 	return imageStore.source[ imgId ][ frameIndex ];
 }
@@ -2308,7 +2312,9 @@ function renderAnimationThumbnail(id,frameA,frameB,imgId) {
 		}
 	}
 
+	console.log(imgId);
 	var img = document.getElementById(imgId);
+	console.log(img);
 
 	var drawingFrameData = [];
 	if( paintMode == TileType.Tile ) {
@@ -2319,11 +2325,17 @@ function renderAnimationThumbnail(id,frameA,frameB,imgId) {
 		drawTile( getTileImage( tile[id], getRoomPal(curRoom), frameB ), 0, 0, drawingThumbnailCtx );
 		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 	}
-	else {
+	else if( paintMode == TileType.Avatar || paintMode == TileType.Sprite ) {
 		// console.log(sprite[id]);
 		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), frameA ), 0, 0, drawingThumbnailCtx );
 		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), frameB ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+	}
+	else if( paintMode == TileType.Item ) {
+		drawItem( getItemImage( item[id], getRoomPal(curRoom), frameA ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+		drawItem( getItemImage( item[id], getRoomPal(curRoom), frameB ), 0, 0, drawingThumbnailCtx );
 		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 	}
 
@@ -2934,6 +2946,9 @@ function on_toggle_animated() {
 		else if ( paintMode === TileType.Tile ) {
 			addTileAnimation();
 		}
+		else if ( paintMode === TileType.Item ) {
+			addItemAnimation();
+		}
 		document.getElementById("animation").setAttribute("style","display:block;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
 		renderAnimationPreview( drawingId );
@@ -2944,6 +2959,9 @@ function on_toggle_animated() {
 		}
 		else if ( paintMode === TileType.Tile ) {
 			removeTileAnimation();			
+		}
+		else if ( paintMode === TileType.Item ) {
+			removeItemAnimation();
 		}
 		document.getElementById("animation").setAttribute("style","display:none;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
@@ -3037,6 +3055,50 @@ function removeTileAnimation() {
 	reloadTile();
 }
 
+// TODO : so much duplication it makes me sad :(
+function addItemAnimation() {
+	//set editor mode
+	isCurDrawingAnimated = true;
+	curDrawingFrameIndex = 0;
+
+	//mark item as animated
+	item[drawingId].animation.isAnimated = true;
+	item[drawingId].animation.frameIndex = 0;
+	item[drawingId].animation.frameCount = 2;
+
+	//add blank frame to item (or restore removed animation)
+	var itemImageId = "ITM_" + drawingId;
+	if (item[drawingId].cachedAnimation != null)
+		restoreDrawingAnimation( itemImageId, item[drawingId].cachedAnimation )
+	else
+		addNewFrameToDrawing( itemImageId );
+
+	//refresh data model
+	renderImages();
+	refreshGameData();
+	reloadSprite();
+}
+
+function removeItemAnimation() {
+	//set editor mode
+	isCurDrawingAnimated = false;
+
+	//mark item as non-animated
+	item[drawingId].animation.isAnimated = false;
+	item[drawingId].animation.frameIndex = 0;
+	item[drawingId].animation.frameCount = 0;
+
+	//remove all but the first frame of the item
+	var itemImageId = "ITM_" + drawingId;
+	cacheDrawingAnimation( item[drawingId], itemImageId );
+	removeDrawingAnimation( itemImageId );
+
+	//refresh data model
+	renderImages();
+	refreshGameData();
+	reloadItem();
+}
+
 function addNewFrameToDrawing(drwId) {
 	var newFrame = [
 		[0,0,0,0,0,0,0,0],
@@ -3068,24 +3130,26 @@ function restoreDrawingAnimation(imageStoreId,cachedAnimation) {
 	}
 }
 
-function on_paint_frame1() {
-	curDrawingFrameIndex = 0;
+function reloadCurDrawing() {
 	if ( paintMode === TileType.Tile) {
 		reloadTile();
 	}
-	else {
+	else if( paintMode === TileType.Avatar || paintMode === TileType.Sprite ) {
 		reloadSprite();
 	}
+	else if( paintMode === TileType.Item ) {
+		reloadItem();
+	}
+}
+
+function on_paint_frame1() {
+	curDrawingFrameIndex = 0;
+	reloadCurDrawing();
 }
 
 function on_paint_frame2() {
 	curDrawingFrameIndex = 1;
-	if ( paintMode === TileType.Tile) {
-		reloadTile();
-	}
-	else {
-		reloadSprite();
-	}
+	reloadCurDrawing();
 }
 
 
