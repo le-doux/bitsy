@@ -947,8 +947,11 @@ function next() {
 	if (paintMode == TileType.Tile) {
 		nextTile();
 	}
-	else {
+	else if( paintMode == TileType.Avatar || paintMode == TileType.Sprite ) {
 		nextSprite();
+	}
+	else if( paintMode == TileType.Item ) {
+		nextItem();
 	}
 	changePaintExplorerSelection( drawingId );
 }
@@ -957,8 +960,11 @@ function prev() {
 	if (paintMode == TileType.Tile) {
 		prevTile();
 	}
-	else {
+	else if( paintMode == TileType.Avatar || paintMode == TileType.Sprite ) {
 		prevSprite();
+	}
+	else if( paintMode == TileType.Item ) {
+		prevItem();
 	}
 	changePaintExplorerSelection( drawingId );
 }
@@ -967,8 +973,11 @@ function newDrawing() {
 	if (paintMode == TileType.Tile) {
 		newTile();
 	}
-	else {
+	else if( paintMode == TileType.Avatar || paintMode == TileType.Sprite ) {
 		newSprite();
+	}
+	else if( paintMode == TileType.Item ) {
+		newItem();
 	}
 	addPaintThumbnail( drawingId );
 	changePaintExplorerSelection( drawingId );
@@ -1607,9 +1616,9 @@ function curDrawingData() {
 	else if( paintMode == TileType.Item )
 		imgId += "ITM_";
 	imgId += drawingId;
-	console.log(imgId);
+	// console.log(imgId);
 	var frameIndex = (isCurDrawingAnimated ? curDrawingFrameIndex : 0);
-	console.log(imageStore.source[ imgId ]);
+	// console.log(imageStore.source[ imgId ]);
 	return imageStore.source[ imgId ][ frameIndex ];
 }
 
@@ -2087,6 +2096,9 @@ function refreshPaintExplorer( doKeepOldThumbnails = false ) {
 	else if ( paintMode == TileType.Tile ) {
 		idList = sortedTileIdList();
 	}
+	else if ( paintMode == TileType.Item ) {
+		idList = sortedItemIdList();
+	}
 
 	var hexPalette = [];
 	for (id in palette) {
@@ -2131,8 +2143,10 @@ function addPaintThumbnail(id) {
 		img.title = "tile " + id;
 	else if( paintMode === TileType.Sprite )
 		img.title = "sprite " + id;
-	else
+	else if( paintMode === TileType.Avatar )
 		img.title = "player avatar";
+	else if( paintMode === TileType.Item )
+		img.title = "item " + id;
 	label.appendChild(img);
 	paintExplorerForm.appendChild(label);
 
@@ -2162,11 +2176,17 @@ function renderPaintThumbnail(id) {
 		drawTile( getTileImage( tile[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
 		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 	}
-	else {
+	else if( paintMode == TileType.Sprite || paintMode == TileType.Avatar ){
 		// console.log(sprite[id]);
 		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
 		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+	}
+	else if( paintMode == TileType.Item ) {
+		drawItem( getItemImage( item[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
+		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+		drawItem( getItemImage( item[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
 		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 	}
 
