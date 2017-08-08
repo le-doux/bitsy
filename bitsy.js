@@ -204,7 +204,7 @@ function onTouch(e) {
 		}
 
 		if (dialog[touchedSprite]) {
-			startDialog( dialog[touchedSprite] );
+			startSpriteDialog( touchedSprite /*spriteId*/ );
 		}
 
 		return;
@@ -630,11 +630,7 @@ function onkeydown(e) {
 			curRoom = ext.dest.room;
 		}
 		else if (spr) {
-			// console.log(spr);
-			// console.log(dialog);
-			if (dialog[spr]) {
-				startDialog(dialog[spr]);
-			}
+			startSpriteDialog( spr /*spriteId*/ );
 		}
 		else if (itmIndex > -1) {
 			// TODO pick up items (what about touch?)
@@ -927,6 +923,9 @@ function serializeWorld() {
 		if (sprite[id].name != null) {
 			/* NAME */
 			worldStr += "NAME " + sprite[id].name + "\n";
+		}
+		if (sprite[id].dlg != null) {
+			worldStr += "DLG " + sprite[id].dlg + "\n";
 		}
 		if (sprite[id].room != null) {
 			/* SPRITE POSITION */
@@ -1631,6 +1630,15 @@ function startNarrating(dialogStr,end=false) {
 	isNarrating = true;
 	isEnding = end;
 	startDialog(dialogStr);
+}
+
+function startSpriteDialog(spriteId) {
+	var spr = sprite[spriteId];
+	var dialogId = spr.dlg ? spr.dlg : spriteId;
+	if(dialog[dialogId]){
+		var dialogStr = dialog[dialogId];
+		startDialog(dialogStr);
+	}
 }
 
 function startDialog(dialogStr) {
