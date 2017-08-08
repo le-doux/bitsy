@@ -1397,7 +1397,7 @@ function map_onMouseDown(e) {
 			}
 			//room[curRoom].tilemap[y] = row;
 		}
-		else {
+		else if( paintMode == TileType.Avatar || paintMode == TileType.Sprite ) {
 			var otherSprite = getSpriteAt(x,y);
 			var isThisSpriteAlreadyHere = sprite[drawingId].room === curRoom &&
 										sprite[drawingId].x === x &&
@@ -1422,6 +1422,20 @@ function map_onMouseDown(e) {
 				sprite[drawingId].room = null;
 				sprite[drawingId].x = -1;
 				sprite[drawingId].y = -1;
+			}
+		}
+		else if( paintMode == TileType.Item ) {
+			// TODO : is this the final behavior I want?
+
+			var otherItem = getItem(curRoom,x,y);
+			var isThisItemAlreadyHere = otherItem != null && otherItem.id === drawingId;
+
+			if(otherItem) {
+				getRoom().items.splice( getRoom().items.indexOf(otherItem), 1 );
+			}
+
+			if(!isThisItemAlreadyHere) {
+				getRoom().items.push( {id:drawingId, x:x, y:y} );
 			}
 		}
 		refreshGameData();

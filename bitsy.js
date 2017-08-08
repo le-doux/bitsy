@@ -691,19 +691,6 @@ function getSpriteDown() {
 	return getSpriteAt( player().x, player().y + 1 );
 }
 
-
-function getSpriteAt(x,y) {
-	for (s in sprite) {
-		if (sprite[s].room === curRoom) {
-			if (sprite[s].x == x && sprite[s].y == y) {
-				// console.log(s);
-				return s;
-			}
-		}
-	}
-	return null;
-}
-
 function isWallLeft() {
 	return isWall( player().x - 1, player().y ) || (player().x - 1 < 0);
 }
@@ -724,6 +711,16 @@ function isWall(x,y) {
 	// console.log(x + " " + y);
 	var i = getRoom().walls.indexOf( getTile(x,y) );
 	return i > -1;
+}
+
+function getItem(roomId,x,y) {
+	for (i in room[roomId].items) {
+		var item = room[roomId].items[i];
+		if (x == item.x && y == item.y) {
+			return item;
+		}
+	}
+	return null;
 }
 
 function getExit(roomId,x,y) {
