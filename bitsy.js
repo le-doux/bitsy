@@ -203,9 +203,7 @@ function onTouch(e) {
 			return; //oh no! touched a sprite that's out of range
 		}
 
-		if (dialog[touchedSprite]) {
-			startSpriteDialog( touchedSprite /*spriteId*/ );
-		}
+		startSpriteDialog( touchedSprite /*spriteId*/ );
 
 		return;
 	}
@@ -536,6 +534,7 @@ function moveSprites() {
 
 				var end = getEnding( spr.room, spr.x, spr.y );
 				var ext = getExit( spr.room, spr.x, spr.y );
+				var itmIndex = getItemIndex( spr.room, spr.x, spr.y );
 				if (end) { //if the sprite hits an ending
 					if (id === playerId) { // only the player can end the game
 						startNarrating( ending[end.id], true /*isEnding*/ );
@@ -550,6 +549,20 @@ function moveSprites() {
 						//if the player changes scenes, change the visible scene
 						curRoom = ext.dest.room;
 					}
+				}
+				else if(itmIndex > -1) {
+					var itm = room[ spr.room ].items[ itmIndex ];
+					room[ spr.room ].items.splice( itmIndex, 1 );
+					if( spr.inventory[ itm.id ] )
+						spr.inventory[ itm.id ] += 1;
+					else
+						spr.inventory[ itm.id ] = 1;
+
+					if(id === playerId)
+						startItemDialog( itm.id  /*itemId*/ );
+
+					// stop moving : is this a good idea?
+					spr.walkingPath = [];
 				}
 
 				if (id === playerId) didPlayerMoveThisFrame = true;
@@ -619,7 +632,7 @@ function onkeydown(e) {
 		
 		var ext = getExit( player().room, player().x, player().y );
 		var end = getEnding( player().room, player().x, player().y );
-		var itmIndex = getItemIndex( player().room, player().x, player().y ); // TODO - what about touch?
+		var itmIndex = getItemIndex( player().room, player().x, player().y );
 		if (end) {
 			startNarrating( ending[end.id], true /*isEnding*/ );
 		}
