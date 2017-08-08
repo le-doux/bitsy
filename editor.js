@@ -1204,6 +1204,17 @@ function updateWallCheckboxOnCurrentTile() {
 	}
 }
 
+function reloadDialogUI() {
+	var dialogId = getCurDialogId();
+
+	if (dialogId in dialog) {
+		document.getElementById("dialogText").value = dialog[dialogId];
+	}
+	else {
+		document.getElementById("dialogText").value = "";
+	}
+}
+
 function reloadSprite() {
 	// animation UI
 	if ( sprite[drawingId] && sprite[drawingId].animation.isAnimated ) {
@@ -1233,12 +1244,7 @@ function reloadSprite() {
 	}
 
 	// dialog UI
-	if (drawingId in dialog) {
-		document.getElementById("dialogText").value = dialog[drawingId];
-	}
-	else {
-		document.getElementById("dialogText").value = "";
-	}
+	reloadDialogUI()
 
 	// update paint canvas
 	drawPaintCanvas();
@@ -1274,14 +1280,8 @@ function reloadItem() {
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
 	}
 
-	// TODO
 	// dialog UI
-	// if (drawingId in dialog) {
-	// 	document.getElementById("dialogText").value = dialog[drawingId];
-	// }
-	// else {
-	// 	document.getElementById("dialogText").value = "";
-	// }
+	reloadDialogUI()
 
 	// update paint canvas
 	drawPaintCanvas();
@@ -2416,10 +2416,25 @@ function deletePaintThumbnail(id) {
 	paintExplorerForm.removeChild( document.getElementById( "paintExplorerLabel_" + id ) );
 }
 
+function getCurDialogId() {
+	var dialogId = null;
+	if(paintMode == TileType.Sprite) {
+		dialogId = sprite[drawingId].dlg ? sprite[drawingId].dlg : drawingId;
+	}
+	else if(paintMode == TileType.Item) {
+		dialogId = item[drawingId].dlg;
+	}
+	return dialogId;
+}
+
 function on_change_dialog() {
-	dialog[drawingId] = document.getElementById("dialogText").value;
-	console.log("NEW DIALOG " + dialog[drawingId]);
-	refreshGameData();
+	var dialogId = getCurDialogId();
+
+	if(dialogId) {	
+		dialog[dialogId] = document.getElementById("dialogText").value;
+		console.log("NEW DIALOG " + dialog[dialogId]);
+		refreshGameData();
+	}
 }
 
 function on_game_data_change() {

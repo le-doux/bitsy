@@ -644,11 +644,7 @@ function onkeydown(e) {
 			else
 				player().inventory[ itm.id ] = 1;
 
-			var dialogId = item[itm.id].dlg;
-			if( dialogId ) {
-				var message = dialog[ dialogId ];
-				startDialog( message );
-			}
+			startItemDialog( itm.id  /*itemId*/ );
 
 			// console.log( player().inventory );
 		}
@@ -1630,6 +1626,14 @@ function startNarrating(dialogStr,end=false) {
 	isNarrating = true;
 	isEnding = end;
 	startDialog(dialogStr);
+}
+
+function startItemDialog(itemId) {
+	var dialogId = item[itemId].dlg;
+	if(dialog[dialogId]){
+		var dialogStr = dialog[dialogId];
+		startDialog(dialogStr);
+	}
 }
 
 function startSpriteDialog(spriteId) {
