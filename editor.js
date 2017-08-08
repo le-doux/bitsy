@@ -19,7 +19,6 @@ TODO
 - how does new dialog work with: endings? exits? (items?)
 - more dialog nodes?
 - mouse control plus item
-- TODO what about default dialog ID bug for sprites??
 
 DIALOG NODES ideas
 <pagebreak>
@@ -2443,12 +2442,12 @@ function getCurPaintObject() {
 	}
 }
 
-function nextAvailableDialogId() {
+function nextAvailableDialogId(prefix = "") {
 	var i = 0;
-	var id = i.toString(36);
+	var id = prefix + i.toString(36);
 	while( dialog[id] != null ) {
 		i++;
-		id = i.toString(36);
+		id = prefix + i.toString(36);
 	}
 	return id;
 }
@@ -2465,7 +2464,8 @@ function on_change_dialog() {
 	}
 	else {
 		if(!dialogId) {
-			dialogId = nextAvailableDialogId();
+			var prefix = (paintMode == TileType.Item) ? "ITM_" : "SPR_";
+			dialogId = nextAvailableDialogId( prefix );
 			getCurPaintObject().dlg = dialogId;
 		}
 		dialog[dialogId] = dialogStr;
