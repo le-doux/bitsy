@@ -18,6 +18,7 @@ TODO
 - advanced dialog UI
 - how does new dialog work with: endings? exits? (items?)
 - more dialog nodes?
+- mouse control plus item
 
 DIALOG NODES ideas
 <pagebreak>

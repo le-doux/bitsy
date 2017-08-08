@@ -648,10 +648,11 @@ function onkeydown(e) {
 			else
 				player().inventory[ itm.id ] = 1;
 
-			var message = item[itm.id].dlg;
-			// console.log(item[itm.id]);
-			if(message != null)
-				startDialog(message);
+			var dialogId = item[itm.id].dlg;
+			if( dialogId ) {
+				var message = dialog[ dialogId ];
+				startDialog( message );
+			}
 
 			// console.log( player().inventory );
 		}
@@ -1223,6 +1224,7 @@ function parseSprite(lines, i) {
 
 	//other properties
 	var colorIndex = 2; //default palette color index is 2
+	var dialogId = null;
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		if (getType(lines[i]) === "COL") {
 			/* COLOR OFFSET INDEX */
@@ -1239,6 +1241,9 @@ function parseSprite(lines, i) {
 				y : parseInt(coordArgs[1])
 			};
 		}
+		else if(getType(lines[i]) === "DLG") {
+			dialogId = getId(lines[i]);
+		}
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
 			name = lines[i].split(/\s(.+)/)[1];
@@ -1251,6 +1256,7 @@ function parseSprite(lines, i) {
 	sprite[id] = {
 		drw : drwId, //drawing id
 		col : colorIndex,
+		dlg : dialogId,
 		room : null, //default location is "offstage"
 		x : -1,
 		y : -1,
@@ -1285,7 +1291,7 @@ function parseItem(lines, i) {
 
 	//other properties
 	var colorIndex = 2; //default palette color index is 2
-	var dialog = null;
+	var dialogId = null;
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		if (getType(lines[i]) === "COL") {
 			/* COLOR OFFSET INDEX */
@@ -1303,7 +1309,7 @@ function parseItem(lines, i) {
 		// 	};
 		// }
 		else if(getType(lines[i]) === "DLG") {
-			dialog = lines[i].split(/\s(.+)/)[1]; // capture everything after the first space
+			dialogId = getId(lines[i]);
 		}
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
@@ -1317,7 +1323,7 @@ function parseItem(lines, i) {
 	item[id] = {
 		drw : drwId, //drawing id
 		col : colorIndex,
-		dlg : dialog,
+		dlg : dialogId,
 		// room : null, //default location is "offstage"
 		// x : -1,
 		// y : -1,
