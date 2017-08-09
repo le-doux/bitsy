@@ -143,6 +143,13 @@ input {
 	border-radius: 2px;
 }
 
+.controlSpan {
+	padding: 3px;
+	margin-bottom: 5px;
+	margin-right: 5px;
+	border-radius: 2px;
+}
+
 /* random hacks */
 #instructionsOuter {
 	padding-top: 10px; /*why*/

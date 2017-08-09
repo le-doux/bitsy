@@ -81,6 +81,10 @@ input[type=radio]:checked + label {
 	background: #e8e8ff;
 }
 
+.controlSpan {
+	background: #ccccff;
+}
+
 /*topbar*/
 #topbar input[type=checkbox]:not(:checked) + label {
 	background: none;

@@ -554,6 +554,7 @@ function start() {
 	drawPaintCanvas();
 	drawEditMap();
 	updateRoomPaletteSelect(); //dumb to have to specify this here --- wrap up room UI method?
+	updateRoomName(); // init the room UI
 	reloadEnding();
 
 
@@ -783,6 +784,25 @@ function newItem(id) {
 	itemIndex = Object.keys(item).length - 1;
 }
 
+function updateRoomName() {
+	// document.getElementById("roomId").innerHTML = curRoom;
+	document.getElementById("roomName").placeholder = "room " + curRoom;
+	if(room[curRoom].name != null)
+		document.getElementById("roomName").value = room[curRoom].name;
+	else
+		document.getElementById("roomName").value = "";
+}
+
+function on_room_name_change() {
+	var str = document.getElementById("roomName").value;
+	if(str.length > 0)
+		room[curRoom].name = str;
+	else
+		room[curRoom].name = null;
+	refreshGameData();
+	updateExitOptionsFromGameData();
+}
+
 function nextRoom() {
 	var ids = sortedRoomIdList();
 	roomIndex = (roomIndex + 1) % ids.length;
@@ -795,7 +815,7 @@ function nextRoom() {
 	if (paintMode === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
 
-	document.getElementById("roomId").innerHTML = curRoom;
+	updateRoomName();
 }
 
 function prevRoom() {
@@ -811,7 +831,7 @@ function prevRoom() {
 	if (paintMode === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
 
-	document.getElementById("roomId").innerHTML = curRoom;
+	updateRoomName();
 }
 
 function duplicateRoom() {
@@ -842,7 +862,8 @@ function duplicateRoom() {
 		walls : roomToCopy.walls.slice(0),
 		exits : duplicateExits,
 		endings : roomToCopy.endings.slice(0),
-		pal : roomToCopy.pal
+		pal : roomToCopy.pal,
+		items : []
 	};
 	refreshGameData();
 
@@ -852,7 +873,7 @@ function duplicateRoom() {
 	drawPaintCanvas();
 	updateRoomPaletteSelect();
 
-	document.getElementById("roomId").innerHTML = curRoom;
+	updateRoomName();
 
 	// add new exit destination option to exits panel
 	var select = document.getElementById("exitDestinationSelect");
@@ -903,7 +924,8 @@ function newRoom() {
 		walls : [],
 		exits : [],
 		endings : [],
-		pal : "0"
+		pal : "0",
+		items : []
 	};
 	refreshGameData();
 
@@ -913,7 +935,7 @@ function newRoom() {
 	drawPaintCanvas();
 	updateRoomPaletteSelect();
 
-	document.getElementById("roomId").innerHTML = curRoom;
+	updateRoomName();
 
 	// add new exit destination option to exits panel
 	var select = document.getElementById("exitDestinationSelect");
@@ -1644,7 +1666,8 @@ function drawEditMap() {
 					ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
 
 					ctx.font = '14px sans-serif';
-					ctx.fillText( "To room " + e.dest.room, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
+					var roomStr = "To " + ( (room[e.dest.room].name != null) ? room[e.dest.room].name : ("room " + e.dest.room) );
+					ctx.fillText( roomStr, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
 
 					//todo (tilesize*scale) should be a function
 				}
@@ -1661,7 +1684,8 @@ function drawEditMap() {
 						ctx.strokeRect( (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
 	
 						ctx.font = '14px sans-serif';
-						ctx.fillText( "From room " + r, (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 5 );
+						var roomStr = "From " + ( (room[r].name != null) ? room[r].name : ("room " + r) );
+						ctx.fillText( roomStr, (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 5 );
 					}
 				}
 			}
@@ -2548,6 +2572,8 @@ function on_game_data_change_core() {
 }
 
 function updateExitOptionsFromGameData() {
+	console.log("UPDATE EXIT OPTIONS");
+
 	var select = document.getElementById("exitDestinationSelect");
 
 	// first, remove all current options
@@ -2559,11 +2585,15 @@ function updateExitOptionsFromGameData() {
 	// then, add an option for each room
 	for (roomId in room) {
 		var option = document.createElement("option");
-		option.text = "room " + roomId;
+		if(room[roomId].name != null)
+			option.text = room[roomId].name;
+		else
+			option.text = "room " + roomId;
 		option.value = roomId;
 		select.add(option);
 	}
 
+	updateRoomChoiceForSelectedExit();
 }
 
 function on_toggle_wall(e) {
@@ -2686,6 +2716,16 @@ function addExitToCurRoom(x,y) {
 	setSelectedExit(newExit);
 }
 
+function updateRoomChoiceForSelectedExit() {
+	var destOptions = document.getElementById("exitDestinationSelect").options;
+	for (i in destOptions) {
+		var o = destOptions[i];
+		if (o.value === selectedExitRoom) {
+			o.selected = true;
+		}
+	}
+}
+
 function setSelectedExit(e) {
 	// var didChange = selectedExit != e;
 	var didChange = (e != null) || (e == null && selectedExit != null);
@@ -2701,13 +2741,7 @@ function setSelectedExit(e) {
 		document.getElementById("exitSelected").style.display = "block";
 
 		selectedExitRoom = selectedExit.dest.room;
-		var destOptions = document.getElementById("exitDestinationSelect").options;
-		for (i in destOptions) {
-			var o = destOptions[i];
-			if (o.value === selectedExitRoom) {
-				o.selected = true;
-			}
-		}
+		updateRoomChoiceForSelectedExit();
 
 		drawExitDestinationRoom();
 	}

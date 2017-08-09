@@ -259,7 +259,11 @@
 						
 						<div id="roomTools" style="display:none;">
 							<div id="roomNav" class="buttonGroup">
-								room <span id="roomId">0</span>
+								<span title="room name" class="controlSpan">
+									name
+									<!-- <span id="roomId">0</span> -->
+									<input type="text" id="roomName" onchange="on_room_name_change();" style="width:100px;"></input>
+								</span>
 								<button title="previous room" class="color0" onclick="prevRoom();">
 									<i class="material-icons">navigate_before</i>
 								</button>
