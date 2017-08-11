@@ -14,11 +14,19 @@ BUGS / FEEDBACK:
 
 TODO
 - names
+	X room 
+	- sprite
+	- item
+	- palette
+	- endings
+	- other??
 X item UI
 - advanced dialog UI
 - how does new dialog work with: endings? exits? (items?)
 - more dialog nodes?
 X mouse control plus item
+- double click on exits to go to room
+- test item drawing model
 
 DIALOG NODES ideas
 <pagebreak>
@@ -1862,10 +1870,12 @@ function toggleRoomTools(e) {
 function toggleRoomToolsCore(visible) {
 	if( visible ) {
 		document.getElementById("roomTools").style.display = "block";
+		document.getElementById("roomToolsCheck").checked = true;
 		document.getElementById("roomToolsCheckIcon").innerHTML = "expand_more";
 	}
 	else {
 		document.getElementById("roomTools").style.display = "none";
+		document.getElementById("roomToolsCheck").checked = false;
 		document.getElementById("roomToolsCheckIcon").innerHTML = "expand_less";
 	}
 }
@@ -2154,6 +2164,7 @@ function on_paint_avatar() {
 	document.getElementById("paintNav").setAttribute("style","display:none;");
 	document.getElementById("paintCommands").setAttribute("style","display:none;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
+	document.getElementById("drawingNameSpan").setAttribute("style","display:none;");
 	//document.getElementById("animation").setAttribute("style","display:none;");
 	refreshPaintExplorer();
 	document.getElementById("paintOptionAvatar").checked = true;
@@ -2169,6 +2180,7 @@ function on_paint_tile() {
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
+	document.getElementById("drawingNameSpan").setAttribute("style","display:none;");
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	refreshPaintExplorer();
 	document.getElementById("paintOptionTile").checked = true;
@@ -2191,6 +2203,7 @@ function on_paint_sprite() {
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
+	document.getElementById("drawingNameSpan").setAttribute("style","display:initial;");
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	refreshPaintExplorer();
 	document.getElementById("paintOptionSprite").checked = true;
@@ -2209,6 +2222,7 @@ function on_paint_item() {
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
+	document.getElementById("drawingNameSpan").setAttribute("style","display:initial;");
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	refreshPaintExplorer();
 	document.getElementById("paintOptionItem").checked = true;

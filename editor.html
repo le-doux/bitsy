@@ -259,7 +259,7 @@
 						
 						<div id="roomTools" style="display:none;">
 							<div id="roomNav" class="buttonGroup">
-								<span title="room name" class="controlSpan">
+								<span title="a name to refer to this room" class="controlSpan">
 									name
 									<!-- <span id="roomId">0</span> -->
 									<input type="text" id="roomName" onchange="on_room_name_change();" style="width:100px;"></input>
@@ -441,34 +441,39 @@
 					</form>
 					<canvas id="paint"></canvas>
 					<br>
-					<div id="paintNav" class="buttonGroup">
-						<button title="next drawing" class="color0" onclick="prev();">
-							<i class="material-icons">navigate_before</i>
-						</button>
-						<button title="previous drawing" class="color0" onclick="next();">
-							<i class="material-icons">navigate_next</i>
-						</button>
-						<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('paintExplorerPanel');">
-							<i class="material-icons">search</i>
-						</button>
-					</div>
-					<div id="paintCommands" class="buttonGroup">
-						<button title="add drawing" class="color0" onclick="newDrawing();">
-							<i class="material-icons">add</i>
-						</button>
-						<button title="duplicate drawing" class="color0" onclick="duplicateDrawing();">
-							<i class="material-icons">content_copy</i>
-						</button>
-						<button title="delete drawing" class="color0" onclick="deleteDrawing();">
-							<i class="material-icons">remove_circle</i>
-						</button>
-					</div>
-
-					<div class="buttonGroup">
-						<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" checked/>
-						<label title="show / hide grid" for="paintGridCheck">
-							<i class="material-icons" id="paintGridIcon">visibility</i> grid
-						</label>
+					<div id="paintEditMain">
+						<div id="paintNav" class="buttonGroup">
+							<span id="drawingNameSpan" title="a name to refer to this drawing" class="controlSpan">
+								name
+								<input type="text" id="drawingName" onchange="on_room_name_change();" style="width:100px;"></input>
+							</span>
+							<button title="next drawing" class="color0" onclick="prev();">
+								<i class="material-icons">navigate_before</i>
+							</button>
+							<button title="previous drawing" class="color0" onclick="next();" style="margin-left:-5px;">
+								<i class="material-icons">navigate_next</i>
+							</button>
+							<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('paintExplorerPanel');">
+								<i class="material-icons">search</i>
+							</button>
+						</div>
+						<div id="paintCommands" class="buttonGroup">
+							<button title="add drawing" class="color0" onclick="newDrawing();">
+								<i class="material-icons">add</i>
+							</button>
+							<button title="duplicate drawing" class="color0" onclick="duplicateDrawing();">
+								<i class="material-icons">content_copy</i>
+							</button>
+							<button title="delete drawing" class="color0" onclick="deleteDrawing();">
+								<i class="material-icons">remove_circle</i>
+							</button>
+						</div>
+						<div class="buttonGroup">
+							<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" checked/>
+							<label title="show / hide grid" for="paintGridCheck">
+								<i class="material-icons" id="paintGridIcon">visibility</i> grid
+							</label>
+						</div>
 					</div>
 
 					<div id="wall" class="controlBox" style="display:none;">

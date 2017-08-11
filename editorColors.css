@@ -82,6 +82,10 @@ input[type=radio]:checked + label {
 }
 
 .controlSpan {
+	background: #e8e8ff;
+}
+
+.controlBox .controlSpan {
 	background: #ccccff;
 }
 

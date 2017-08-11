@@ -7,6 +7,7 @@ button {
 	margin: 0px;
 	margin-right: 2px;
 	margin-bottom: 2px;
+	margin-left: none;
 	/*margin-top: 2px;*/
 	border: none;
 	vertical-align: middle;
@@ -41,6 +42,7 @@ input[type=checkbox] + label {
 	margin-top: 0px;
 	margin-right: 2px;
 	margin-bottom: 2px;
+	margin-left: none;
 	vertical-align: middle;
 	line-height: 100%;
 	border:none;
