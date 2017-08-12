@@ -811,6 +811,16 @@ function on_room_name_change() {
 	updateExitOptionsFromGameData();
 }
 
+function on_drawing_name_change() {
+	var str = document.getElementById("drawingName").value;
+	var obj = getCurPaintObject();
+	if(str.length > 0)
+		obj.name = str;
+	else
+		obj.name = null;
+	refreshGameData();
+}
+
 function nextRoom() {
 	var ids = sortedRoomIdList();
 	roomIndex = (roomIndex + 1) % ids.length;
@@ -1218,6 +1228,8 @@ function reloadTile() {
 	// wall UI
 	updateWallCheckboxOnCurrentTile();
 
+	updateDrawingNameUI(false);
+
 	drawPaintCanvas();
 }
 
@@ -1276,6 +1288,8 @@ function reloadSprite() {
 	// dialog UI
 	reloadDialogUI()
 
+	updateDrawingNameUI( drawingId != playerId );
+
 	// update paint canvas
 	drawPaintCanvas();
 
@@ -1312,6 +1326,8 @@ function reloadItem() {
 
 	// dialog UI
 	reloadDialogUI()
+
+	updateDrawingNameUI(true);
 
 	// update paint canvas
 	drawPaintCanvas();
@@ -2155,6 +2171,18 @@ function rgbToHex(r, g, b) {
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
+function updateDrawingNameUI(visible) {
+	document.getElementById("drawingNameUI").setAttribute("style", visible ? "display:initial;" : "display:none;");
+	var obj = getCurPaintObject();
+	console.log("update drawing name ui");
+	console.log(obj);
+	if( obj.name != null )
+		document.getElementById("drawingName").value = obj.name;
+	else
+		document.getElementById("drawingName").value = "";
+	document.getElementById("drawingName").placeholder = getCurPaintModeStr() + " " + drawingId;
+}
+
 function on_paint_avatar() {
 	paintMode = TileType.Avatar;
 	drawingId = "A";
@@ -2164,7 +2192,7 @@ function on_paint_avatar() {
 	document.getElementById("paintNav").setAttribute("style","display:none;");
 	document.getElementById("paintCommands").setAttribute("style","display:none;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
-	document.getElementById("drawingNameSpan").setAttribute("style","display:none;");
+	updateDrawingNameUI(false);
 	//document.getElementById("animation").setAttribute("style","display:none;");
 	refreshPaintExplorer();
 	document.getElementById("paintOptionAvatar").checked = true;
@@ -2180,7 +2208,7 @@ function on_paint_tile() {
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
-	document.getElementById("drawingNameSpan").setAttribute("style","display:none;");
+	updateDrawingNameUI(false);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	refreshPaintExplorer();
 	document.getElementById("paintOptionTile").checked = true;
@@ -2203,7 +2231,7 @@ function on_paint_sprite() {
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
-	document.getElementById("drawingNameSpan").setAttribute("style","display:initial;");
+	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	refreshPaintExplorer();
 	document.getElementById("paintOptionSprite").checked = true;
@@ -2222,7 +2250,7 @@ function on_paint_item() {
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
-	document.getElementById("drawingNameSpan").setAttribute("style","display:initial;");
+	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	refreshPaintExplorer();
 	document.getElementById("paintOptionItem").checked = true;
@@ -2285,13 +2313,13 @@ function addPaintThumbnail(id) {
 	var img = document.createElement("img");
 	img.id = "paintExplorerThumbnail_" + id;
 	if( paintMode === TileType.Tile )
-		img.title = "tile " + id;
+		img.title = tile[id].name ? tile[id].name : "tile " + id;
 	else if( paintMode === TileType.Sprite )
-		img.title = "sprite " + id;
+		img.title = sprite[id].name ? sprite[id].name : "sprite " + id;
 	else if( paintMode === TileType.Avatar )
 		img.title = "player avatar";
 	else if( paintMode === TileType.Item )
-		img.title = "item " + id;
+		img.title = item[id].name ? item[id].name : "item " + id;
 	label.appendChild(img);
 	paintExplorerForm.appendChild(label);
 
@@ -2420,7 +2448,7 @@ function renderAnimationPreview(id) {
 }
 
 function createThumbnailRenderCallback(img) {
-	return function(uri) { img.src = uri; };
+	return function(uri) { img.src = uri; img.style.background = "none"; };
 }
 
 function selectPaint() {
@@ -2469,6 +2497,7 @@ function getCurDialogId() {
 }
 
 function getCurPaintObject() {
+	console.log(drawingId);
 	if(paintMode == TileType.Sprite || paintMode == TileType.Avatar) {
 		return sprite[drawingId];
 	}
@@ -2477,6 +2506,18 @@ function getCurPaintObject() {
 	}
 	else if(paintMode == TileType.Tile) {
 		return tile[drawingId];
+	}
+}
+
+function getCurPaintModeStr() {
+	if(paintMode == TileType.Sprite || paintMode == TileType.Avatar) {
+		return "sprite";
+	}
+	else if(paintMode == TileType.Item) {
+		return "item";
+	}
+	else if(paintMode == TileType.Tile) {
+		return "tile";
 	}
 }
 

@@ -443,10 +443,6 @@
 					<br>
 					<div id="paintEditMain">
 						<div id="paintNav" class="buttonGroup">
-							<span id="drawingNameSpan" title="a name to refer to this drawing" class="controlSpan">
-								name
-								<input type="text" id="drawingName" onchange="on_room_name_change();" style="width:100px;"></input>
-							</span>
 							<button title="next drawing" class="color0" onclick="prev();">
 								<i class="material-icons">navigate_before</i>
 							</button>
@@ -473,6 +469,12 @@
 							<label title="show / hide grid" for="paintGridCheck">
 								<i class="material-icons" id="paintGridIcon">visibility</i> grid
 							</label>
+						</div>
+						<div style="margin-bottom: 5px;">
+							<span id="drawingNameUI" title="a name to refer to this drawing" class="controlSpan">
+								name
+								<input type="text" id="drawingName" onchange="on_drawing_name_change();" style="width:100px;"></input>
+							</span>
 						</div>
 					</div>
 

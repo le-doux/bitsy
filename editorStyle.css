@@ -211,6 +211,9 @@ input {
 #paintExplorerContent {
 	width:224px;margin:0px;
 }
+/*#paintExplorerContent label {
+	border: none;
+}*/
 #paintExplorerContent img {
 	width:64px;
 	height:64px;
@@ -220,6 +223,7 @@ input {
 	display:inline-block;
 	image-rendering: pixelated;
 	border: solid 4px white;
+	/*border: none;*/
 }
 
 #animation img {
