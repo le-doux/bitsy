@@ -1164,11 +1164,17 @@ function parsePalette(lines,i) { //todo this has to go first right now :(
 	i++;
 	var pal = [];
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
-		var col = [];
-		lines[i].split(",").forEach(function(i) {
-			col.push(parseInt(i));
-		});
-		pal.push(col);
+		var args = lines[i].split(" ");
+		if(args[0] === "NAME") {
+			// TODO
+		}
+		else {
+			var col = [];
+			lines[i].split(",").forEach(function(i) {
+				col.push(parseInt(i));
+			});
+			pal.push(col);
+		}
 		i++;
 	}
 	palette[id] = pal;
