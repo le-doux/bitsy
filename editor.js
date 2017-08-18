@@ -30,6 +30,8 @@ X item UI
 X mouse control plus item
 - double click on exits to go to room
 - test item drawing model
+X need a default item (tea)
+- need to fix up defaults to deal with new dialog
 
 DIALOG NODES ideas
 <pagebreak>
@@ -346,6 +348,8 @@ USER FEEDBACK
 - add dialog choices?
 
 - room transition animations
+
+first bitsy tweet: https://twitter.com/adamledoux/status/787434344776241153
 */
 
 /*
@@ -614,11 +618,16 @@ function setDefaultGameState() {
 	//default values
 	title = "Write your game's title here";
 	paletteIndex = 0;
-	palette[selectedColorPal()] = [
-		[0,82,204],
-		[128,159,255],
-		[255,255,255]
-	];
+	palette[ selectedColorPal() ] = {
+		name : null,
+		colors : 
+			[
+				[0,82,204],
+				[128,159,255],
+				[255,255,255]
+			]
+	};
+	console.log(palette);
 	//default avatar
 	console.log("A");
 	paintMode = TileType.Avatar;
@@ -658,7 +667,8 @@ function setDefaultGameState() {
 	sprite["a"].room = "0";
 	sprite["a"].x = 8;
 	sprite["a"].y = 12;
-	dialog["a"] = "I'm a cat";
+	sprite["a"].dlg = "SPR_0";
+	dialog["SPR_0"] = "I'm a cat";
 	//default tile
 	console.log("C");
 	paintMode = TileType.Tile;
@@ -676,9 +686,26 @@ function setDefaultGameState() {
 		[1,1,1,1,1,1,1,1]
 	]];
 	makeTile( drawingId, square_data );
+	// default item
+	paintMode = TileType.Item;
+	drawingId = "0";
+	var tea_data = [[
+		[0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0],
+		[0,0,1,1,1,1,0,0],
+		[0,1,1,0,0,1,0,0],
+		[0,0,1,0,0,1,0,0],
+		[0,0,0,1,1,0,0,0],
+		[0,0,0,0,0,0,0,0]
+	]];
+	makeItem( drawingId, tea_data );
+	item["0"].dlg = "ITM_0";
+	dialog["ITM_0"] = "You got a cup of tea! Nice.";
 	renderImages();
 	console.log("D");
-	//default room
+
+	//default room // TODO : there is definitely a better way to instantiate common objects
 	room["0"] = {
 		id : "0",
 		tilemap : [
@@ -702,6 +729,7 @@ function setDefaultGameState() {
 		walls : [],
 		exits : [],
 		endings : [],
+		items : [],
 		pal : "0"
 	};
 	console.log("E");
@@ -1601,15 +1629,15 @@ function paint_onMouseUp(e) {
 
 function drawPaintCanvas() {
 	//background
-	paint_ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
+	paint_ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
 	paint_ctx.fillRect(0,0,canvas.width,canvas.height);
 
 	//pixel color
 	if (paintMode == TileType.Tile) {
-		paint_ctx.fillStyle = "rgb("+palette[curPal()][1][0]+","+palette[curPal()][1][1]+","+palette[curPal()][1][2]+")";
+		paint_ctx.fillStyle = "rgb("+getPal(curPal())[1][0]+","+getPal(curPal())[1][1]+","+getPal(curPal())[1][2]+")";
 	}
 	else if (paintMode == TileType.Sprite || paintMode == TileType.Avatar || paintMode == TileType.Item) {
-		paint_ctx.fillStyle = "rgb("+palette[curPal()][2][0]+","+palette[curPal()][2][1]+","+palette[curPal()][2][2]+")";
+		paint_ctx.fillStyle = "rgb("+getPal(curPal())[2][0]+","+getPal(curPal())[2][1]+","+getPal(curPal())[2][2]+")";
 	}
 
 	//draw pixels
@@ -1641,9 +1669,9 @@ function drawPaintCanvas() {
 	}
 }
 
-function drawEditMap() {	
+function drawEditMap() {
 	//clear screen
-	ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
+	ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 
 	//draw map
@@ -1780,7 +1808,8 @@ function makeTile(id,imageData) {
 			isAnimated : (!imageData) ? false : (imageData.length>1),
 			frameIndex : 0,
 			frameCount : (!imageData) ? 2 : imageData.length
-		}
+		},
+		name : null
 	};
 	makeDrawing(drwId,imageData);
 }
@@ -1797,7 +1826,25 @@ function makeSprite(id,imageData) {
 			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
 			frameIndex : 0,
 			frameCount : (!imageData) ? 2 : imageData.length
-		}
+		},
+		dlg : null,
+		name : null
+	};
+	makeDrawing(drwId,imageData);
+}
+
+function makeItem(id,imageData) {
+	var drwId = "ITM_" + id;
+	item[id] = { //todo create default item creation method
+		drw : drwId,
+		col : 2,
+		animation : { //todo
+			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
+			frameIndex : 0,
+			frameCount : (!imageData) ? 2 : imageData.length
+		},
+		dlg : null,
+		name : null
 	};
 	makeDrawing(drwId,imageData);
 }
@@ -2022,9 +2069,9 @@ function on_change_color_bg() {
 	// document.body.style.background = document.getElementById("backgroundColor").value;
 
 	var rgb = hexToRgb( document.getElementById("backgroundColor").value );
-	palette[selectedColorPal()][0][0] = rgb.r;
-	palette[selectedColorPal()][0][1] = rgb.g;
-	palette[selectedColorPal()][0][2] = rgb.b;
+	getPal(selectedColorPal())[0][0] = rgb.r;
+	getPal(selectedColorPal())[0][1] = rgb.g;
+	getPal(selectedColorPal())[0][2] = rgb.b;
 	refreshGameData();
 	renderImages();
 	drawPaintCanvas();
@@ -2048,9 +2095,9 @@ function on_change_color_tile() {
 	// }
 
 	var rgb = hexToRgb( document.getElementById("tileColor").value );
-	palette[selectedColorPal()][1][0] = rgb.r;
-	palette[selectedColorPal()][1][1] = rgb.g;
-	palette[selectedColorPal()][1][2] = rgb.b;
+	getPal(selectedColorPal())[1][0] = rgb.r;
+	getPal(selectedColorPal())[1][1] = rgb.g;
+	getPal(selectedColorPal())[1][2] = rgb.b;
 	refreshGameData();
 	renderImages();
 	drawPaintCanvas();
@@ -2069,9 +2116,9 @@ function on_change_color_sprite() {
 	// document.getElementById("topbar").style.background = document.getElementById("spriteColor").value;
 
 	var rgb = hexToRgb( document.getElementById("spriteColor").value );
-	palette[selectedColorPal()][2][0] = rgb.r;
-	palette[selectedColorPal()][2][1] = rgb.g;
-	palette[selectedColorPal()][2][2] = rgb.b;
+	getPal(selectedColorPal())[2][0] = rgb.r;
+	getPal(selectedColorPal())[2][1] = rgb.g;
+	getPal(selectedColorPal())[2][2] = rgb.b;
 	refreshGameData();
 	renderImages();
 	drawPaintCanvas();
@@ -2104,9 +2151,9 @@ function updatePaletteOptionsFromGameData() {
 }
 
 function updatePaletteControlsFromGameData() {
-	document.getElementById("backgroundColor").value = rgbToHex(palette[selectedColorPal()][0][0], palette[selectedColorPal()][0][1], palette[selectedColorPal()][0][2]);
-	document.getElementById("tileColor").value = rgbToHex(palette[selectedColorPal()][1][0], palette[selectedColorPal()][1][1], palette[selectedColorPal()][1][2]);
-	document.getElementById("spriteColor").value = rgbToHex(palette[selectedColorPal()][2][0], palette[selectedColorPal()][2][1], palette[selectedColorPal()][2][2]);
+	document.getElementById("backgroundColor").value = rgbToHex(getPal(selectedColorPal())[0][0], getPal(selectedColorPal())[0][1], getPal(selectedColorPal())[0][2]);
+	document.getElementById("tileColor").value = rgbToHex(getPal(selectedColorPal())[1][0], getPal(selectedColorPal())[1][1], getPal(selectedColorPal())[1][2]);
+	document.getElementById("spriteColor").value = rgbToHex(getPal(selectedColorPal())[2][0], getPal(selectedColorPal())[2][1], getPal(selectedColorPal())[2][2]);
 }
 
 function prevPalette() {
@@ -2130,11 +2177,13 @@ function nextPalette() {
 function newPalette() {
 	// create new ending and save the data
 	var id = nextPaletteId();
-	palette[ id ] = [
+	palette[ id ] = {
+		name : null,
+		colors : [
 		[255,255,255],
 		[255,255,255],
-		[255,255,255]
-	];
+		[255,255,255] ]
+	};
 	refreshGameData();
 
 	// change the UI
@@ -2278,8 +2327,8 @@ function refreshPaintExplorer( doKeepOldThumbnails = false ) {
 
 	var hexPalette = [];
 	for (id in palette) {
-		for (i in palette[id]){
-			var hexStr = rgbToHex( palette[id][i][0], palette[id][i][1], palette[id][i][2] ).slice(1);
+		for (i in getPal(id)){
+			var hexStr = rgbToHex( getPal(id)[i][0], getPal(id)[i][1], getPal(id)[i][2] ).slice(1);
 			hexPalette.push( hexStr );
 		}
 	}
@@ -2335,8 +2384,8 @@ var thumbnailRenderEncoders = {};
 function renderPaintThumbnail(id) {
 	var hexPalette = []; // TODO this is a bit repetitive to do all the time, huh?
 	for (pal in palette) {
-		for (i in palette[pal]){
-			var hexStr = rgbToHex( palette[pal][i][0], palette[pal][i][1], palette[pal][i][2] ).slice(1);
+		for (i in getPal(pal)){
+			var hexStr = rgbToHex( getPal(pal)[i][0], getPal(pal)[i][1], getPal(pal)[i][2] ).slice(1);
 			hexPalette.push( hexStr );
 		}
 	}
@@ -2390,8 +2439,8 @@ var animationPreviewEncoders = {};
 function renderAnimationThumbnail(id,frameA,frameB,imgId) {
 	var hexPalette = []; // TODO this is a bit repetitive to do all the time, huh?
 	for (pal in palette) {
-		for (i in palette[pal]){
-			var hexStr = rgbToHex( palette[pal][i][0], palette[pal][i][1], palette[pal][i][2] ).slice(1);
+		for (i in getPal(pal)){
+			var hexStr = rgbToHex( getPal(pal)[i][0], getPal(pal)[i][1], getPal(pal)[i][2] ).slice(1);
 			hexPalette.push( hexStr );
 		}
 	}
@@ -2826,7 +2875,7 @@ function drawExitDestinationRoom() {
 	//clear screen
 	console.log(selectedExitRoom);
 	var roomPal = getRoomPal(selectedExitRoom);
-	exit_ctx.fillStyle = "rgb("+palette[roomPal][0][0]+","+palette[roomPal][0][1]+","+palette[roomPal][0][2]+")";
+	exit_ctx.fillStyle = "rgb("+getPal(roomPal)[0][0]+","+getPal(roomPal)[0][1]+","+getPal(roomPal)[0][2]+")";
 	exit_ctx.fillRect(0,0,canvas.width,canvas.height);
 
 	//draw map
@@ -3050,8 +3099,8 @@ function stopRecordingGif() {
 	setTimeout( function() {
 		var hexPalette = [];
 		for (id in palette) {
-			for (i in palette[id]){
-				var hexStr = rgbToHex( palette[id][i][0], palette[id][i][1], palette[id][i][2] ).slice(1);
+			for (i in getPal(id)){
+				var hexStr = rgbToHex( getPal(id)[i][0], getPal(id)[i][1], getPal(id)[i][2] ).slice(1);
 				hexPalette.push( hexStr );
 			}
 		}
@@ -3477,7 +3526,7 @@ function rgbToHsl(r, g, b){
 
 function getContrastingColor(palId) {
 	if (!palId) palId = curPal();
-	var hsl = rgbToHsl( palette[palId][0][0], palette[palId][0][1], palette[palId][0][2] );
+	var hsl = rgbToHsl( getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2] );
 	// console.log(hsl);
 	var lightness = hsl[2];
 	if (lightness > 0.5) {
@@ -3490,7 +3539,7 @@ function getContrastingColor(palId) {
 
 function getComplimentingColor(palId) {
 	if (!palId) palId = curPal();
-	var hsl = rgbToHsl( palette[palId][0][0], palette[palId][0][1], palette[palId][0][2] );
+	var hsl = rgbToHsl( getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2] );
 	// console.log(hsl);
 	var lightness = hsl[2];
 	if (lightness > 0.5) {

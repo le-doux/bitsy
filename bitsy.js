@@ -54,9 +54,13 @@ function clearGameData() {
 	room = {};
 	tile = {};
 	sprite = {};
+	item = {};
 	dialog = {};
-	palette = {
-		"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
+	palette = { //start off with a default palette (can be overriden)
+		"0" : {
+			name : null,
+			colors : [[0,0,0],[255,0,0],[255,255,255]]
+		}
 	};
 	ending = {};
 	isEnding = false; //todo - correct place for this?
@@ -443,7 +447,7 @@ function update() {
 	deltaTime = curTime - prevTime;
 	
 	//clear screen
-	ctx.fillStyle = "rgb("+palette[curPal()][0][0]+","+palette[curPal()][0][1]+","+palette[curPal()][0][2]+")";
+	ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 	
 	if (!isNarrating && !isEnding) {
@@ -759,6 +763,11 @@ function player() {
 	return sprite[playerId];
 }
 
+// Sort of a hack for legacy palette code (when it was just an array)
+function getPal(id) {
+	return palette[ id ].colors;
+}
+
 function getRoom() {
 	return room[curRoom];
 }
@@ -840,9 +849,9 @@ function serializeWorld() {
 	/* PALETTE */
 	for (id in palette) {
 		worldStr += "PAL " + id + "\n";
-		for (i in palette[id]) {
-			for (j in palette[id][i]) {
-				worldStr += palette[id][i][j];
+		for (i in getPal(id)) {
+			for (j in getPal(id)[i]) {
+				worldStr += getPal(id)[i][j];
 				if (j < 2) worldStr += ",";
 			}
 			worldStr += "\n";
@@ -1162,7 +1171,8 @@ function parseRoom(lines, i) {
 function parsePalette(lines,i) { //todo this has to go first right now :(
 	var id = getId(lines[i]);
 	i++;
-	var pal = [];
+	var colors = [];
+	var name = null;
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		var args = lines[i].split(" ");
 		if(args[0] === "NAME") {
@@ -1173,11 +1183,14 @@ function parsePalette(lines,i) { //todo this has to go first right now :(
 			lines[i].split(",").forEach(function(i) {
 				col.push(parseInt(i));
 			});
-			pal.push(col);
+			colors.push(col);
 		}
 		i++;
 	}
-	palette[id] = pal;
+	palette[id] = {
+		name : name,
+		colors : colors
+	};
 	return i;
 }
 
@@ -1421,9 +1434,14 @@ function renderImages() {
 }
 
 function renderImageForAllPalettes(drawing) {
+	console.log("RENDER IMAGE");
 	for (pal in palette) {
+		console.log(pal);
 		var col = drawing.col;
 		var colStr = "" + col;
+		console.log(drawing);
+		console.log(drawing.drw);
+		console.log(imageStore);
 		var imgSrc = imageStore.source[ drawing.drw ];
 		if ( imgSrc.length <= 1 ) {
 			// non-animated drawing
@@ -1456,15 +1474,15 @@ function imageDataFromImageSource(imageSource, pal, col) {
 				for (var sx = 0; sx < scale; sx++) {
 					var pxl = (((y * scale) + sy) * tilesize * scale * 4) + (((x*scale) + sx) * 4);
 					if (px === 1) {
-						img.data[pxl + 0] = palette[pal][col][0]; //ugly
-						img.data[pxl + 1] = palette[pal][col][1];
-						img.data[pxl + 2] = palette[pal][col][2];
+						img.data[pxl + 0] = getPal(pal)[col][0]; //ugly
+						img.data[pxl + 1] = getPal(pal)[col][1];
+						img.data[pxl + 2] = getPal(pal)[col][2];
 						img.data[pxl + 3] = 255;
 					}
 					else { //ch === 0
-						img.data[pxl + 0] = palette[pal][0][0];
-						img.data[pxl + 1] = palette[pal][0][1];
-						img.data[pxl + 2] = palette[pal][0][2];
+						img.data[pxl + 0] = getPal(pal)[0][0];
+						img.data[pxl + 1] = getPal(pal)[0][1];
+						img.data[pxl + 2] = getPal(pal)[0][2];
 						img.data[pxl + 3] = 255;
 					}
 				}
