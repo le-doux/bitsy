@@ -849,6 +849,8 @@ function serializeWorld() {
 	/* PALETTE */
 	for (id in palette) {
 		worldStr += "PAL " + id + "\n";
+		if( palette[id].name != null )
+			worldStr += "NAME " + palette[id].name + "\n";
 		for (i in getPal(id)) {
 			for (j in getPal(id)[i]) {
 				worldStr += getPal(id)[i][j];
@@ -1176,7 +1178,7 @@ function parsePalette(lines,i) { //todo this has to go first right now :(
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		var args = lines[i].split(" ");
 		if(args[0] === "NAME") {
-			// TODO
+			name = lines[i].split(/\s(.+)/)[1];
 		}
 		else {
 			var col = [];

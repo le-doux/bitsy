@@ -20,7 +20,7 @@ TODO
 	X room 
 	X sprite
 	X item
-	- palette
+	X palette
 	- endings
 	- other??
 X item UI
@@ -32,6 +32,8 @@ X mouse control plus item
 - test item drawing model
 X need a default item (tea)
 - need to fix up defaults to deal with new dialog
+- need a good GUI for advanced dialog
+- need a better syntax than XML?
 
 DIALOG NODES ideas
 <pagebreak>
@@ -832,6 +834,7 @@ function updateRoomName() {
 		document.getElementById("roomName").value = "";
 }
 
+// TODO : consolidate these function and rename them something nicer
 function on_room_name_change() {
 	var str = document.getElementById("roomName").value;
 	if(str.length > 0)
@@ -850,6 +853,17 @@ function on_drawing_name_change() {
 	else
 		obj.name = null;
 	refreshGameData();
+}
+
+function on_palette_name_change() {
+	var str = document.getElementById("paletteName").value;
+	var obj = palette[ selectedColorPal() ];
+	if(str.length > 0)
+		obj.name = str;
+	else
+		obj.name = null;
+	refreshGameData();
+	updatePaletteOptionsFromGameData();
 }
 
 function nextRoom() {
@@ -2029,7 +2043,14 @@ function on_change_title() {
 
 /* PALETTE STUFF */
 function updatePaletteUI() {
-	document.getElementById("paletteId").innerHTML = selectedColorPal();
+	// document.getElementById("paletteId").innerHTML = selectedColorPal();
+	document.getElementById("paletteName").placeholder = "palette " + selectedColorPal();
+	var name = palette[ selectedColorPal() ].name;
+	if( name )
+		document.getElementById("paletteName").value = name;
+	else
+		document.getElementById("paletteName").value = "";
+
 	// if ( Object.keys(palette).length > 1 ) {
 	// 	document.getElementById("paletteIdContainer").style.display = "block";
 	// 	document.getElementById("paletteNav").style.display = "block";
@@ -2038,6 +2059,7 @@ function updatePaletteUI() {
 	// 	document.getElementById("paletteIdContainer").style.display = "none";
 	// 	document.getElementById("paletteNav").style.display = "none";
 	// }
+
 	updatePaletteOptionsFromGameData();
 	updatePaletteControlsFromGameData();
 	if (!browserFeatures.colorPicker) {
@@ -2144,8 +2166,9 @@ function updatePaletteOptionsFromGameData() {
 	// then, add an option for each room
 	for (palId in palette) {
 		var option = document.createElement("option");
-		option.text = "palette " + palId;
+		option.text = palette[palId].name ? palette[palId].name : "palette " + palId;
 		option.value = palId;
+		option.selected = ( palId === room[ curRoom ].pal );
 		select.add(option);
 	}
 }
