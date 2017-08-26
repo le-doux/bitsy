@@ -14,6 +14,100 @@ BUGS / FEEDBACK:
 * mailing list for game jams?
 * Art: Non-english characters
 * Yukon: Endings on sprites
+* radiosoap: dialog portraits
+
+MY GOALS
+- good syntax
+- good UI
+- scenario: item changes dialog
+
+POSSIBLE NEW SYNTAX
+if/else
+{
+	- condition:
+	a
+	- condition:
+	b
+}
+choice
+{
+	* prompt:
+	a
+	* prompt:
+	b
+}
+choice
+* prompt
+a
+* prompt
+b
+if/else
+? condition
+a
+? condition
+b
+?
+default text
+OR
+? condition : a ?
+ternary ?
+{ condition ? a | condition ? b | c }
+{
+	? condition:
+		a
+	? condition:
+		b
+	?:
+		c
+} // optional colon??
+{} --> scope (optional?)
+other crazy ideas
+-- color 1 --
+--- color 2 --- 
+---- color 3 ----
+~~ wavy text ~~
+** shaky text **
+^^ rainbow text ^^
+or: <color 1>color 1</color>
+or: {color 1: color text }
+
+NOTES from reading ink docs
+- syntax is more specialized and minimalist
+	== headers ==
+	-> goto_scene
+	* choices
+	{ conditions }
+	newlines have meaning
+	-> END dedicated end symbol
+- special lists for cycles, random, etc
+	{|||} sequence, {&|||} cycle, {!|||} once only, {~|||} shuffle (why not use commas?)
+- global variables (instead of items?? where set them?)
+	VAR variable = value
+	~ means do numerical work on this line (not so sure about this symbol)
+- choices can only be used once (not sure if that works for bitsy?)
+- "" quotes for strings sometimes??? (what's the logic?)
+- conditional choice
+	* { condition } choice
+- conditional text
+	{ condition : the text }
+- if/else block
+	{
+		- condition0 : 
+			stuff
+		- condition1 :
+			other stuff
+		- else :
+			default stuff
+	}
+- idea: END of game vs END of dialog? (maybe use END vs STOP)
+- what I like about INK
+	- flexibility of global variables (vs items)
+	- the way all section headers are automatically tracked as a variable
+	- uncluttered syntax
+- what I don't like about INK
+	- gathers are confusing
+	- in some ways it's not linear enough
+
 
 TODO
 - names

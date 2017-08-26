@@ -1499,7 +1499,7 @@ function parseDialog(lines, i) {
 	i++;
 	var text = "";
 	while (lines[i].length > 0) {
-		text += lines[i];
+		text += lines[i] + "\n";
 		i++;
 	}
 	// console.log(text);

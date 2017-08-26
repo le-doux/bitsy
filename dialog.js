@@ -628,9 +628,99 @@ function hslToRgb(h, s, l) {
   return [ r * 255, g * 255, b * 255 ];
 }
 
+/* new markup tests */
+var NewParse = function(dialogStr) {
+	console.log("NEW PARSE");
+	console.log(dialogStr);
+
+	function ParserState( rootNode, str ) {
+		this.rootNode = rootNode;
+		this.curNode = this.rootNode;
+
+		var sourceStr = str;
+		var i = 0;
+		this.Done = function() { return i >= sourceStr.length; };
+		this.Char = function() { return sourceStr[i]; };
+		this.Increment = function() { i++; };
+
+		// var saveIndex = 0;
+		// this.Save = function() { saveIndex = i; };
+		// this.Restore = function() { i = saveIndex; };
+	};
+
+	function ParseBreak(state) {
+		state.curNode.children.push( {type:"break"} );
+		return state;
+	};
+
+	function ParseBlock(state) {
+		console.log("BLOCK!");
+		state.Increment();
+		var blockStr = "";
+		while( !state.Done() && state.Char() != "}" ) {
+			blockStr += state.Char();
+			state.Increment();
+		}
+		state.Increment();
+
+		var blockNode = { type:"block", children:[] };
+		ParseDialog( blockNode, blockStr );
+		state.curNode.children.push( blockNode );
+
+		return state;
+
+	};
+
+	// TODO what about things that only work on the first character of a line?
+
+	function ParseDialog(rootNode, str) {
+		var state = new ParserState( rootNode, str );
+		var text = "";
+
+		while( !state.Done() ) {
+			if( state.Char() === "\n" ) {
+				if( text.length > 0 )
+					state.curNode.children.push( { type:"text", text:text } );
+				text = "";
+
+				state = ParseBreak( state );
+			}
+			else if ( state.Char() === "{" ) {
+				if( text.length > 0 )
+					state.curNode.children.push( { type:"text", text:text } );
+				text = "";
+
+				state = ParseBlock( state );
+			}
+			else {
+				text += state.Char();
+			}
+			state.Increment();
+		}
+
+		if( text.length > 0 )
+			state.curNode.children.push( { type:"text", text:text } );
+
+		return state.rootNode;
+	};
+
+	var rootNode = {
+		type : "root", // TODO : should be block?
+		children : []
+	};
+
+	var rootNode = ParseDialog( rootNode, dialogStr );
+
+	console.log( rootNode );
+
+	console.log("END NEW PARSE");
+}
+
 function DialogMarkup() {
 	this.Parse = function(dialogStr) {
-		// console.log("NEW PARSING!!!");
+		/* TEST */
+		NewParse(dialogStr);
+
 		var parsingState = {
 			rootNode : DialogNodeFactory.Create("root"),
 			curParentNode : null,
