@@ -75,7 +75,13 @@ function Script() {
 
 			- scriptEnvironment -> fills -> dialogBuffer
 			- dialogRenderer -> draws -> dialogBuffer
+
 			- is code called immediately? or after dialog finishes rendering?
+			- IDEA: use special "script characters" injected into dialog buffer to launch scripts and effects during dialog
+				- what about scripts with no dialog? should they depend on the buffer?
+
+			- ScriptParser -> outputs -> ScriptTree
+			- ScriptEnvirontment -> runs -> ScriptTree
 		*/
 		console.log("NEW PARSE");
 		console.log(dialogStr);
