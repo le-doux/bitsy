@@ -641,12 +641,56 @@ var NewParse = function(dialogStr) {
 		var i = 0;
 		this.Done = function() { return i >= sourceStr.length; };
 		this.Char = function() { return sourceStr[i]; };
-		this.Increment = function() { i++; };
+		this.Step = function(n=1) { i += n; };
+		this.MatchAhead = function(str) {
+			// console.log(str);
+			str = "" + str; // hack to turn single chars into strings
+			// console.log(str);
+			// console.log(str.length);
+			for(var j = 0; j < str.length; j++) {
+				if( i + j >= sourceStr.length )
+					return false;
+				else if( str[j] != sourceStr[i+j] )
+					return false;
+			}
+			return true;
+		}
+		this.ConsumeBlock = function( open, close ) {
+			var startIndex = i;
+
+			var matchCount = 0;
+			if( this.MatchAhead( open ) ) {
+				matchCount++;
+				this.Step( open.length );
+			}
+
+			while( matchCount > 0 && !this.Done() ) {
+				if( this.MatchAhead( close ) ) {
+					matchCount--;
+					this.Step( close.length );
+				}
+				else if( this.MatchAhead( open ) ) {
+					matchCount++;
+					this.Step( open.length );
+				}
+				else {
+					this.Step();
+				}
+			}
+
+			console.log("!!! " + startIndex + " " + i);
+
+			return sourceStr.slice( startIndex + open.length, i - close.length );
+		}
 
 		// var saveIndex = 0;
 		// this.Save = function() { saveIndex = i; };
 		// this.Restore = function() { i = saveIndex; };
 	};
+
+	function ContentInBlock( state, open, close ) {
+		// TODO
+	}
 
 	function ParseBreak(state) {
 		state.curNode.children.push( {type:"break"} );
@@ -671,13 +715,108 @@ var NewParse = function(dialogStr) {
 
 	};
 
-	// TODO what about things that only work on the first character of a line?
+	var Sym = {
+		DialogOpen : "/\"",
+		DialogClose : "\"/",
+		CodeOpen : "{",
+		CodeClose : "}",
+		Newline : "\n",
+		Separator : ":",
+		List : "*"
+	};
 
-	function ParseDialog(rootNode, str) {
+	console.log("!!!!!!!");
+	console.log("" + Sym.DialogOpen);
+	console.log(Sym.DialogOpen.length);
+
+	/* QUESTIONS
+		shallow dialog blocks? ''' dialog block '''
+		or nestable dialog blocks?
+			/"
+				dialog block 
+				{
+					code block
+					/"dialog"/
+					code
+				}
+				dialog
+			"/
+
+		significant whitespace?
+
+		{code} is a single expression? or a block?
+		{exp}
+		{exp}
+		vs
+		{
+			exp
+			exp
+		}
+
+		separate syntax for code block vs expression? e.g. double braces
+
+		return value from expression/code block?
+
+		{case
+			* condition
+				result
+			* condition
+				result
+		}
+		vs
+		{
+		if condition
+			result
+		elseif condition
+			result
+		}
+
+		{choice
+			* choice1
+				result
+			* choice2
+				result
+		}
+		vs
+		{
+		* choice1
+			result
+		* choice2
+			result
+		}
+	*/
+
+	function ParseDialogBlock(state) {
+		var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
+		console.log("DIALOG " + dialogStr);
+		return state;
+	}
+
+	function ParseCodeBlock(state) {
+		var codeStr = state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose );
+		console.log("CODE " + codeStr);
+		return state;
+	}
+
+	function Parse(rootNode, str) {
 		var state = new ParserState( rootNode, str );
 		var text = "";
 
 		while( !state.Done() ) {
+			console.log( state.Char() );
+			if( state.MatchAhead(Sym.DialogOpen) ) {
+				state = ParseDialogBlock( state );
+			}
+			else if( state.MatchAhead(Sym.CodeOpen) ) {
+				state = ParseCodeBlock( state );
+			}
+			else {
+				state.Step();
+			}
+		}
+			
+
+/*
 			if( state.Char() === "\n" ) {
 				if( text.length > 0 )
 					state.curNode.children.push( { type:"text", text:text } );
@@ -702,6 +841,7 @@ var NewParse = function(dialogStr) {
 			state.curNode.children.push( { type:"text", text:text } );
 
 		return state.rootNode;
+*/
 	};
 
 	var rootNode = {
@@ -709,7 +849,7 @@ var NewParse = function(dialogStr) {
 		children : []
 	};
 
-	var rootNode = ParseDialog( rootNode, dialogStr );
+	var rootNode = Parse( rootNode, dialogStr );
 
 	console.log( rootNode );
 

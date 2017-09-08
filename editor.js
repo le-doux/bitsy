@@ -15,11 +15,130 @@ BUGS / FEEDBACK:
 * Art: Non-english characters
 * Yukon: Endings on sprites
 * radiosoap: dialog portraits
+* Edited: 1) variables 2) map of connected rooms 3) transparent avatar background
+* Mimic: While working on the game, there were a few things I think would improve the editor. One would be the ability to copy sections within the map and paste it in other sections, so this would speed up tile placement. The second thing is the naming of the rooms and endings. It would have been nice to edit the names for the sake of organization. This as well as the ability to move the tiles in the find drawing window. Other then that, the editor helps make games quite quickly. :)
+* zetef: I really did not thought about that, but it would be cool if in the future update you can change the player's speed in a specific room, or all the rooms. I enjoyed your tool!
+* thetoolong: if a first time player of bitsy... and i like the top-down aspect. you should add more colors and some king of simple coding (like scratch) to make more complex games.
+* saranomy: Is it possible to add a dialog to the exit itself? So, when player walks into exit (teleport tile), it will force player to read important messages before going to the next room. This feature will add dialog box into "exits" window in the editor.
 
 MY GOALS
 - good syntax
 - good UI
 - scenario: item changes dialog
+
+{!choice
+	* choice 1
+	test 1
+	* choice 2
+	text 2
+	* choice 3
+	text 3
+}
+
+{choice:
+	* choice 1
+	text 1
+	* choice 2
+	text 2
+}
+
+!choice
+	* choice 1
+		text 1
+	* choice 2
+		text 2
+
+!if
+	* condition 1
+		branch 1
+	* condition 2
+		branch 2
+
+{if
+	* condition 1
+		branch 1
+	* condition 2
+		branch 2
+}
+
+<if condition="aaa">
+	branch 1
+<else>
+	branch 2
+</if>
+
+stuff {!if condition: result} stuff
+!if condition
+	result
+!if condition: result
+
+stuff {!if: *condition:result * default}
+{!if condition result * default}
+
+lists:
+* key : value
+* key
+	value
+* value (???)
+
+*? condition 1
+	branch 1
+*? conditoin 2
+	branch 2
+**
+
+*? condition : result **
+*? condition : result *? default **
+
+*? condition 1
+	branch 1
+? condition 2
+	branch 2
+?
+	default
+**
+
+** color text **
+*** color 2 text **
+
+?? condition 1
+	branch 1
+?? condition 2
+	branch 2
+**
+
+*& cycle
+*& cycle
+**
+
+*> choice 1
+	option 1
+*> choice 2
+	option 2
+**
+
+*rainbow: text :*
+
+*~ rainbow text **
+
+*color 1: color text **
+
+{? condition 1
+	text
+{? condition 2
+	text
+}
+
+* choice 1
+	text 1
+* choice 2
+	text 2
+-
+? if 1
+	result 1
+? if 2
+	result 2
+-
 
 POSSIBLE NEW SYNTAX
 if/else
