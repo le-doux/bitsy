@@ -786,6 +786,19 @@ var NewParse = function(dialogStr) {
 		}
 	*/
 
+	/* NEW PARSE TODO
+		- attach dialog commands to dialog renderer
+		- parse code
+		- parse functions
+		- parse special functions: case, choice?
+		- formatting / text effects
+		- replace old parsing code
+		- expressions parsing
+		- function library
+		- variable library
+		- nail down syntax of case statements, multline code, whitespace, etc.
+	*/
+
 	function ParseDialog(state) {
 		var text = "";
 		var addTextNode = function() {
