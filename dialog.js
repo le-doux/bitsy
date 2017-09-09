@@ -137,6 +137,10 @@ var DialogRenderer = function() {
 	}
 }
 
+/* NEW SCRIPT STUFF */
+var featureNewScript = true;
+var script = new Script();
+
 var DialogBuffer = function() {
 	var buffer = [[[]]]; // holds dialog in an array buffer
 	var pageIndex = 0;
@@ -146,6 +150,9 @@ var DialogBuffer = function() {
 	var nextCharMaxTime = 50; // in milliseconds
 	var isDialogReadyToContinue = false;
 	var tree = null; // holds dialog and command nodes in a tree structure
+
+	/* NEW SCRIPT STUFF */
+	var scriptTree = null;
 	
 	this.CurPage = function() { return buffer[ pageIndex ]; };
 	this.CurRow = function() { return this.CurPage()[ rowIndex ]; };
@@ -159,9 +166,11 @@ var DialogBuffer = function() {
 		for (var i = 0; i < rowCount; i++) {
 			var row = this.CurPage()[i];
 			var charCount = (i == rowIndex) ? charIndex+1 : row.length;
+			console.log(charCount);
 			for(var j = 0; j < charCount; j++) {
 				var char = row[j];
-				handler( char, i /*rowIndex*/, j /*colIndex*/ );
+				if(char)
+					handler( char, i /*rowIndex*/, j /*colIndex*/ );
 			}
 		}
 	}
@@ -180,10 +189,16 @@ var DialogBuffer = function() {
 
 		onExit = exitHandler;
 
-		var dml = new DialogMarkup();
-		tree = dml.Parse( dialogSourceStr );
-		tree.SetBuffer( this );
-		tree.Traverse();
+		if( featureNewScript ) {
+			scriptTree = script.NewParse( dialogSourceStr );
+			console.log( scriptTree );
+		}
+		else {
+			var dml = new DialogMarkup();
+			tree = dml.Parse( dialogSourceStr );
+			tree.SetBuffer( this );
+			tree.Traverse();
+		}
 	};
 
 	this.TryFillBuffer = function() {
@@ -192,7 +207,12 @@ var DialogBuffer = function() {
 			&& rowIndex === this.CurRowCount()-1 
 			&& charIndex === this.CurCharCount()-1 )
 		{
-			tree.Traverse();
+			if( featureNewScript ) {
+				// TODO
+			}
+			else {
+				tree.Traverse();	
+			}
 		}
 	};
 
@@ -630,10 +650,6 @@ function hslToRgb(h, s, l) {
 
 function DialogMarkup() {
 	this.Parse = function(dialogStr) {
-		/* TEST */
-		var script = new Script();
-		script.NewParse(dialogStr);
-
 		var parsingState = {
 			rootNode : DialogNodeFactory.Create("root"),
 			curParentNode : null,

@@ -1,88 +1,90 @@
+/* QUESTIONS
+shallow dialog blocks? ''' dialog block '''
+or nestable dialog blocks?
+	/"
+		dialog block 
+		{
+			code block
+			/"dialog"/
+			code
+		}
+		dialog
+	"/
+
+significant whitespace?
+
+{code} is a single expression? or a block?
+{exp}
+{exp}
+vs
+{
+	exp
+	exp
+}
+
+separate syntax for code block vs expression? e.g. double braces
+
+return value from expression/code block?
+
+{case
+	* condition
+		result
+	* condition
+		result
+}
+vs
+{
+if condition
+	result
+elseif condition
+	result
+}
+
+{choice
+	* choice1
+		result
+	* choice2
+		result
+}
+vs
+{
+* choice1
+	result
+* choice2
+	result
+}
+*/
+
+/* NEW PARSE TODO
+- attach dialog commands to dialog renderer
+- parse code
+- parse functions
+- parse special functions: case, choice?
+- formatting / text effects
+- replace old parsing code
+- expressions parsing
+- function library
+- variable library
+- nail down syntax of case statements, multline code, whitespace, etc.
+- replace root node with block (of either type)
+	- should blocks be "type:block" "kind:dialog"??
+	- or do they even need to be identified???
+
+- scriptEnvironment -> fills -> dialogBuffer
+- dialogRenderer -> draws -> dialogBuffer
+
+- is code called immediately? or after dialog finishes rendering?
+- IDEA: use special "script characters" injected into dialog buffer to launch scripts and effects during dialog
+	- what about scripts with no dialog? should they depend on the buffer?
+
+- ScriptParser -> outputs -> ScriptTree
+- ScriptEnvironment -> runs -> ScriptTree
+- environment needs a way to wait on dialog buffer (handler)
+*/
+
 function Script() {
 	/* new markup tests */
 	this.NewParse = function(dialogStr) {
-		/* QUESTIONS
-			shallow dialog blocks? ''' dialog block '''
-			or nestable dialog blocks?
-				/"
-					dialog block 
-					{
-						code block
-						/"dialog"/
-						code
-					}
-					dialog
-				"/
-
-			significant whitespace?
-
-			{code} is a single expression? or a block?
-			{exp}
-			{exp}
-			vs
-			{
-				exp
-				exp
-			}
-
-			separate syntax for code block vs expression? e.g. double braces
-
-			return value from expression/code block?
-
-			{case
-				* condition
-					result
-				* condition
-					result
-			}
-			vs
-			{
-			if condition
-				result
-			elseif condition
-				result
-			}
-
-			{choice
-				* choice1
-					result
-				* choice2
-					result
-			}
-			vs
-			{
-			* choice1
-				result
-			* choice2
-				result
-			}
-		*/
-
-		/* NEW PARSE TODO
-			- attach dialog commands to dialog renderer
-			- parse code
-			- parse functions
-			- parse special functions: case, choice?
-			- formatting / text effects
-			- replace old parsing code
-			- expressions parsing
-			- function library
-			- variable library
-			- nail down syntax of case statements, multline code, whitespace, etc.
-			- replace root node with block (of either type)
-				- should blocks be "type:block" "kind:dialog"??
-				- or do they even need to be identified???
-
-			- scriptEnvironment -> fills -> dialogBuffer
-			- dialogRenderer -> draws -> dialogBuffer
-
-			- is code called immediately? or after dialog finishes rendering?
-			- IDEA: use special "script characters" injected into dialog buffer to launch scripts and effects during dialog
-				- what about scripts with no dialog? should they depend on the buffer?
-
-			- ScriptParser -> outputs -> ScriptTree
-			- ScriptEnvirontment -> runs -> ScriptTree
-		*/
 		console.log("NEW PARSE");
 		console.log(dialogStr);
 
@@ -133,7 +135,7 @@ function Script() {
 					}
 				}
 
-				console.log("!!! " + startIndex + " " + i);
+				// console.log("!!! " + startIndex + " " + i);
 
 				return sourceStr.slice( startIndex + open.length, i - close.length );
 			}
@@ -212,7 +214,7 @@ function Script() {
 
 		function ParseDialogBlock(state) {
 			var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
-			console.log("DIALOG " + dialogStr);
+			// console.log("DIALOG " + dialogStr);
 
 			var dialogBlockNode = {
 				type : "dialog", // names: text vs dialog is bad
@@ -236,7 +238,7 @@ function Script() {
 
 		function ParseCodeBlock(state) {
 			var codeStr = state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose );
-			console.log("CODE " + codeStr);
+			// console.log("CODE " + codeStr);
 
 			var codeBlockNode = {
 				type : "code",
@@ -285,8 +287,10 @@ function Script() {
 
 		var rootNode = Parse( rootNode, dialogStr );
 
-		console.log( rootNode );
+		// console.log( rootNode );
 
-		console.log("END NEW PARSE");
+		// console.log("END NEW PARSE");
+
+		return rootNode;
 	}
 } // Script
