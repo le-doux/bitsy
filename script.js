@@ -82,215 +82,279 @@ vs
 - environment needs a way to wait on dialog buffer (handler)
 */
 
+/*
+function
+	name
+	parameters
+variable
+	type (needed?)
+block
+	type
+*/
+
 function Script() {
-	/* new markup tests */
-	this.NewParse = function(dialogStr) {
-		console.log("NEW PARSE");
-		console.log(dialogStr);
 
-		function ParserState( rootNode, str ) {
-			this.rootNode = rootNode;
-			this.curNode = this.rootNode;
+var Environment = function() {
+	var dialogBuffer = null;
+	this.SetBuffer = function(buffer) { dialogBuffer = buffer; };
 
-			var sourceStr = str;
-			var i = 0;
-			this.Index = function() { return i; };
-			this.Count = function() { return sourceStr.length; };
-			this.Done = function() { return i >= sourceStr.length; };
-			this.Char = function() { return sourceStr[i]; };
-			this.Step = function(n=1) { i += n; };
-			this.MatchAhead = function(str) {
-				// console.log(str);
-				str = "" + str; // hack to turn single chars into strings
-				// console.log(str);
-				// console.log(str.length);
-				for(var j = 0; j < str.length; j++) {
-					if( i + j >= sourceStr.length )
-						return false;
-					else if( str[j] != sourceStr[i+j] )
-						return false;
-				}
-				return true;
+	// TODO
+}
+
+
+/* SyntaxTree Nodes */
+// var NodeFactory = function() {
+// 	var Constructors : {};
+// 	this.AddType = function(constructor) {
+// 		var node = new constructor();
+// 		this.Constructors[ node.type ] = constructor;
+// 	}
+// 	this.Create = function(type) {
+// 		var node = Object.assign( new this.Constructors[ "node" ](), new this.Constructors[ type ]() );
+// 		return node;
+// 	}
+// }
+
+// TODO: improve with multiple supers, recursive composition
+// function compose(child,base) {
+// 	return Object.assign( new base(), child );
+// }
+
+function compose(constructor) {
+	// TODO...
+}
+
+var Node = function() {
+	this.super = null;
+
+	this.type = "node";
+
+	this.parent = null;
+	this.children = [];
+	this.AddChild = function(node) {
+		this.children.push( node );
+		node.parent = this;
+	};
+}
+
+var BlockNode = function(mode) {
+	this.super = Node;
+
+	this.type = "block";
+	this.mode = mode;
+}
+
+var FuncNode = function(name,parameters) {
+	this.type = "function";
+	this.name = name;
+	this.parameters = parameters;
+}
+
+var VarNode = function(name,value) { // TODO: are variables really nodes by themselves?
+	this.type = "variable";
+	this.name = name;
+	this.value = value;
+}
+
+var Parser = function() {
+	var Sym = {
+		DialogOpen : "/\"",
+		DialogClose : "\"/",
+		CodeOpen : "{",
+		CodeClose : "}",
+		Linebreak : "\n", // just call it "break" ?
+		Separator : ":",
+		List : "*"
+	};
+
+	var ParserState = function( rootNode, str ) {
+		this.rootNode = rootNode;
+		this.curNode = this.rootNode;
+
+		var sourceStr = str;
+		var i = 0;
+		this.Index = function() { return i; };
+		this.Count = function() { return sourceStr.length; };
+		this.Done = function() { return i >= sourceStr.length; };
+		this.Char = function() { return sourceStr[i]; };
+		this.Step = function(n=1) { i += n; };
+		this.MatchAhead = function(str) {
+			// console.log(str);
+			str = "" + str; // hack to turn single chars into strings
+			// console.log(str);
+			// console.log(str.length);
+			for(var j = 0; j < str.length; j++) {
+				if( i + j >= sourceStr.length )
+					return false;
+				else if( str[j] != sourceStr[i+j] )
+					return false;
 			}
-			this.ConsumeBlock = function( open, close ) {
-				var startIndex = i;
+			return true;
+		}
+		this.ConsumeBlock = function( open, close ) {
+			var startIndex = i;
 
-				var matchCount = 0;
-				if( this.MatchAhead( open ) ) {
+			var matchCount = 0;
+			if( this.MatchAhead( open ) ) {
+				matchCount++;
+				this.Step( open.length );
+			}
+
+			while( matchCount > 0 && !this.Done() ) {
+				if( this.MatchAhead( close ) ) {
+					matchCount--;
+					this.Step( close.length );
+				}
+				else if( this.MatchAhead( open ) ) {
 					matchCount++;
 					this.Step( open.length );
 				}
-
-				while( matchCount > 0 && !this.Done() ) {
-					if( this.MatchAhead( close ) ) {
-						matchCount--;
-						this.Step( close.length );
-					}
-					else if( this.MatchAhead( open ) ) {
-						matchCount++;
-						this.Step( open.length );
-					}
-					else {
-						this.Step();
-					}
+				else {
+					this.Step();
 				}
-
-				// console.log("!!! " + startIndex + " " + i);
-
-				return sourceStr.slice( startIndex + open.length, i - close.length );
 			}
 
-			// var saveIndex = 0;
-			// this.Save = function() { saveIndex = i; };
-			// this.Restore = function() { i = saveIndex; };
-		};
+			// console.log("!!! " + startIndex + " " + i);
 
-		var Sym = {
-			DialogOpen : "/\"",
-			DialogClose : "\"/",
-			CodeOpen : "{",
-			CodeClose : "}",
-			Linebreak : "\n", // just call it "break" ?
-			Separator : ":",
-			List : "*"
-		};
+			return sourceStr.slice( startIndex + open.length, i - close.length );
+		}
 
-		function ParseDialog(state) {
-			var text = "";
-			var lineCount = 0;
-			var addTextNode = function() {
-				if (text.length > 0) {
-					var textNode = {
-						type : "text", // names: "say" instead? or this that a "function"
-						parent : state.curNode,
-						// children : [], // can't have children?
-						text : text
-					};
-					state.curNode.children.push( textNode );
+		// var saveIndex = 0;
+		// this.Save = function() { saveIndex = i; };
+		// this.Restore = function() { i = saveIndex; };
+	};
+
+	this.Parse = function(scriptStr) {
+		var state = new ParserState( null /*rootNode*/, str );
+
+		if( state.MatchAhead(Sym.DialogOpen) ) {
+			state = ParseDialogBlock( state );
+		}
+		else if( state.MatchAhead(Sym.CodeOpen) ) {
+			state = ParseCodeBlock( state );
+		}
+
+		// while( !state.Done() ) {
+		// 	// console.log( state.Char() );
+		// 	if( state.MatchAhead(Sym.DialogOpen) ) {
+		// 		state = ParseDialogBlock( state );
+		// 	}
+		// 	else if( state.MatchAhead(Sym.CodeOpen) ) {
+		// 		state = ParseCodeBlock( state );
+		// 	}
+		// 	else {
+		// 		state.Step();
+		// 	}
+		// }
+
+		// return state.rootNode;
+	};
+
+	function ParseDialog(state) {
+		var text = "";
+		var lineCount = 0;
+		var addTextNode = function() {
+			if (text.length > 0) {
+				var textNode = {
+					type : "text", // names: "say" instead? or this that a "function"
+					parent : state.curNode,
+					// children : [], // can't have children?
+					text : text
+				};
+				state.curNode.children.push( textNode );
+
+				text = "";
+				lineCount++;
+			}
+		}
+
+		while ( !state.Done() ) {
+
+			if( state.MatchAhead(Sym.DialogOpen) ) {
+				addTextNode();
+				state = ParseDialogBlock( state ); // These can be nested
+			}
+			else if( state.MatchAhead(Sym.CodeOpen) ) {
+				addTextNode();
+				state = ParseCodeBlock( state );
+			}
+			else {
+				if ( state.MatchAhead(Sym.Linebreak) ) {
+					addTextNode();
+
+					// NOTE: don't add linebreaks at the very beginning or end of the block
+					// TODO: also skip ones right after a code block??
+					var shouldAddLineBreak = (lineCount > 0) && ((state.Count() - state.Index()) > 1);
+					if( shouldAddLineBreak ) {
+						var linebreakNode = {
+							type : "linebreak",
+							parent : state.curNode
+						}
+						state.curNode.children.push( linebreakNode );	
+					}
 
 					text = "";
-					lineCount++;
-				}
-			}
-
-			while ( !state.Done() ) {
-
-				if( state.MatchAhead(Sym.DialogOpen) ) {
-					addTextNode();
-					state = ParseDialogBlock( state ); // These can be nested
-				}
-				else if( state.MatchAhead(Sym.CodeOpen) ) {
-					addTextNode();
-					state = ParseCodeBlock( state );
 				}
 				else {
-					if ( state.MatchAhead(Sym.Linebreak) ) {
-						addTextNode();
-
-						// NOTE: don't add linebreaks at the very beginning or end of the block
-						// TODO: also skip ones right after a code block??
-						var shouldAddLineBreak = (lineCount > 0) && ((state.Count() - state.Index()) > 1);
-						if( shouldAddLineBreak ) {
-							var linebreakNode = {
-								type : "linebreak",
-								parent : state.curNode
-							}
-							state.curNode.children.push( linebreakNode );	
-						}
-
-						text = "";
-					}
-					else {
-						text += state.Char();
-					}
-					state.Step();
+					text += state.Char();
 				}
-
-			}
-			addTextNode();
-
-			return state;
-		}
-
-		function ParseDialogBlock(state) {
-			var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
-			// console.log("DIALOG " + dialogStr);
-
-			var dialogBlockNode = {
-				type : "dialog", // names: text vs dialog is bad
-				parent : null,
-				children : []
-			};
-
-			var dialogState = new ParserState( dialogBlockNode, dialogStr );
-			dialogState = ParseDialog( dialogState );
-
-			dialogState.rootNode.parent = state.curNode; // TODO : make this a method
-			state.curNode.children.push( dialogState.rootNode );
-
-			return state;
-		}
-
-		function ParseCode(state) {
-			// TODO
-			return state;
-		}
-
-		function ParseCodeBlock(state) {
-			var codeStr = state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose );
-			// console.log("CODE " + codeStr);
-
-			var codeBlockNode = {
-				type : "code",
-				parent : null,
-				children : [],
-				content : codeStr
-			};
-
-			var codeState = new ParserState( codeBlockNode, codeStr );
-			codeState = ParseCode( codeState );
-
-			codeState.rootNode.parent = state.curNode; // TODO : make this a method
-			state.curNode.children.push( codeState.rootNode );
-
-			// eat next linebreak
-			if( state.MatchAhead( Sym.Linebreak ) )
 				state.Step();
-
-			return state;
-		}
-
-		function Parse(rootNode, str) {
-			var state = new ParserState( rootNode, str );
-
-			while( !state.Done() ) {
-				// console.log( state.Char() );
-				if( state.MatchAhead(Sym.DialogOpen) ) {
-					state = ParseDialogBlock( state );
-				}
-				else if( state.MatchAhead(Sym.CodeOpen) ) {
-					state = ParseCodeBlock( state );
-				}
-				else {
-					state.Step();
-				}
 			}
 
-			return state.rootNode;
-		};
+		}
+		addTextNode();
 
-		var rootNode = {
-			type : "root", // TODO : should be block?
-			children : [],
-			parent : null
-		};
-
-		var rootNode = Parse( rootNode, dialogStr );
-
-		// console.log( rootNode );
-
-		// console.log("END NEW PARSE");
-
-		return rootNode;
+		return state;
 	}
-} // Script
+
+	function ParseDialogBlock(state) {
+		var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
+		// console.log("DIALOG " + dialogStr);
+
+		var dialogBlockNode = {
+			type : "dialog", // names: text vs dialog is bad
+			parent : null,
+			children : []
+		};
+
+		var dialogState = new ParserState( dialogBlockNode, dialogStr );
+		dialogState = ParseDialog( dialogState );
+
+		dialogState.rootNode.parent = state.curNode; // TODO : make this a method
+		state.curNode.children.push( dialogState.rootNode );
+
+		return state;
+	}
+
+	function ParseCode(state) {
+		// TODO
+		return state;
+	}
+
+	function ParseCodeBlock(state) {
+		var codeStr = state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose );
+		// console.log("CODE " + codeStr);
+
+		var codeBlockNode = {
+			type : "code",
+			parent : null,
+			children : [],
+			content : codeStr
+		};
+
+		var codeState = new ParserState( codeBlockNode, codeStr );
+		codeState = ParseCode( codeState );
+
+		codeState.rootNode.parent = state.curNode; // TODO : make this a method
+		state.curNode.children.push( codeState.rootNode );
+
+		// eat next linebreak
+		if( state.MatchAhead( Sym.Linebreak ) )
+			state.Step();
+
+		return state;
+	}
+
+}
+
+} // Script()
