@@ -265,8 +265,10 @@
 							<div id="roomNav" class="buttonGroup">
 								<span title="a name to refer to this room" class="controlSpan">
 									name
-									<!-- <span id="roomId">0</span> -->
+									<span id="roomId">0</span>
+									<!--
 									<input type="text" id="roomName" onchange="on_room_name_change();" style="width:100px;"></input>
+									-->
 								</span>
 								<button title="previous room" class="color0" onclick="prevRoom();">
 									<i class="material-icons">navigate_before</i>
@@ -432,16 +434,18 @@
 						</label>
 
 						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite">
-						<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
+						<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="right">
 							<i class="material-icons">nature_people</i>
 							sprite
 						</label>
 
+						<!--
 						<input type="radio" name="paint mode" value="item" onclick="on_paint_item();" id="paintOptionItem">
 						<label title="edit items: things the player can pick up" for="paintOptionItem" class="right">
 							<i class="material-icons">vpn_key</i>
 							item
 						</label>
+						-->
 					</form>
 					<canvas id="paint"></canvas>
 					<br>
@@ -475,10 +479,12 @@
 							</label>
 						</div>
 						<div style="margin-bottom: 5px;">
+							<!--
 							<span id="drawingNameUI" title="a name to refer to this drawing" class="controlSpan">
 								name
 								<input type="text" id="drawingName" onchange="on_drawing_name_change();" style="width:100px;"></input>
 							</span>
+							-->
 						</div>
 					</div>
 
@@ -561,16 +567,16 @@
 						</label>
 
 						<input type="radio" name="paint explorer mode" value="sprite" onclick="on_paint_sprite();" id="paintExplorerOptionSprite">
-						<label title="find sprites: non-player characters and interactive objects" for="paintExplorerOptionSprite" class="middle">
+						<label title="find sprites: non-player characters and interactive objects" for="paintExplorerOptionSprite" class="right">
 							<i class="material-icons">nature_people</i>
 							sprite
 						</label>
 
-						<input type="radio" name="paint explorer mode" value="item" onclick="on_paint_item();" id="paintExplorerOptionItem">
+<!-- 						<input type="radio" name="paint explorer mode" value="item" onclick="on_paint_item();" id="paintExplorerOptionItem">
 						<label title="find items: things the player can pick up" for="paintExplorerOptionItem" class="right">
 							<i class="material-icons">vpn_key</i>
 							item
-						</label>
+						</label> -->
 					</form>
 
 					<div id="paintExplorerViewport">
@@ -618,15 +624,17 @@
 						<br>
 						
 						<div id="paletteTools" style="display:none;">
-							<!-- <div class="buttonGroup">
+							<div class="buttonGroup" id="paletteIdContainer">
 								palette <span id="paletteId">0</span>
-							</div> -->
+							</div>
+							<!--
 							<span id="paletteNameUI" title="a name to refer to this drawing" class="controlSpan">
 								name
 								<input type="text" id="paletteName" onchange="on_palette_name_change();" style="width:80px;"></input>
 							</span>
+							-->
 							<br>
-							<div class="buttonGroup">
+							<div class="buttonGroup" id="paletteNav">
 								<button title="previous color palette" class="color0" onclick="prevPalette();">
 									<i class="material-icons">navigate_before</i>
 								</button>

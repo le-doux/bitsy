@@ -1039,44 +1039,44 @@ function newItem(id) {
 }
 
 function updateRoomName() {
-	// document.getElementById("roomId").innerHTML = curRoom;
-	document.getElementById("roomName").placeholder = "room " + curRoom;
-	if(room[curRoom].name != null)
-		document.getElementById("roomName").value = room[curRoom].name;
-	else
-		document.getElementById("roomName").value = "";
+	document.getElementById("roomId").innerHTML = curRoom;
+	// document.getElementById("roomName").placeholder = "room " + curRoom;
+	// if(room[curRoom].name != null)
+	// 	document.getElementById("roomName").value = room[curRoom].name;
+	// else
+	// 	document.getElementById("roomName").value = "";
 }
 
 // TODO : consolidate these function and rename them something nicer
 function on_room_name_change() {
-	var str = document.getElementById("roomName").value;
-	if(str.length > 0)
-		room[curRoom].name = str;
-	else
-		room[curRoom].name = null;
-	refreshGameData();
-	updateExitOptionsFromGameData();
+	// var str = document.getElementById("roomName").value;
+	// if(str.length > 0)
+	// 	room[curRoom].name = str;
+	// else
+	// 	room[curRoom].name = null;
+	// refreshGameData();
+	// updateExitOptionsFromGameData();
 }
 
 function on_drawing_name_change() {
-	var str = document.getElementById("drawingName").value;
-	var obj = getCurPaintObject();
-	if(str.length > 0)
-		obj.name = str;
-	else
-		obj.name = null;
-	refreshGameData();
+	// var str = document.getElementById("drawingName").value;
+	// var obj = getCurPaintObject();
+	// if(str.length > 0)
+	// 	obj.name = str;
+	// else
+	// 	obj.name = null;
+	// refreshGameData();
 }
 
 function on_palette_name_change() {
-	var str = document.getElementById("paletteName").value;
-	var obj = palette[ selectedColorPal() ];
-	if(str.length > 0)
-		obj.name = str;
-	else
-		obj.name = null;
-	refreshGameData();
-	updatePaletteOptionsFromGameData();
+	// var str = document.getElementById("paletteName").value;
+	// var obj = palette[ selectedColorPal() ];
+	// if(str.length > 0)
+	// 	obj.name = str;
+	// else
+	// 	obj.name = null;
+	// refreshGameData();
+	// updatePaletteOptionsFromGameData();
 }
 
 function nextRoom() {
@@ -2256,22 +2256,23 @@ function on_change_title() {
 
 /* PALETTE STUFF */
 function updatePaletteUI() {
-	// document.getElementById("paletteId").innerHTML = selectedColorPal();
-	document.getElementById("paletteName").placeholder = "palette " + selectedColorPal();
-	var name = palette[ selectedColorPal() ].name;
-	if( name )
-		document.getElementById("paletteName").value = name;
-	else
-		document.getElementById("paletteName").value = "";
+	document.getElementById("paletteId").innerHTML = selectedColorPal();
+	if ( Object.keys(palette).length > 1 ) {
+		document.getElementById("paletteIdContainer").style.display = "block";
+		document.getElementById("paletteNav").style.display = "block";
+	}
+	else {
+		document.getElementById("paletteIdContainer").style.display = "none";
+		document.getElementById("paletteNav").style.display = "none";
+	}
 
-	// if ( Object.keys(palette).length > 1 ) {
-	// 	document.getElementById("paletteIdContainer").style.display = "block";
-	// 	document.getElementById("paletteNav").style.display = "block";
-	// }
-	// else {
-	// 	document.getElementById("paletteIdContainer").style.display = "none";
-	// 	document.getElementById("paletteNav").style.display = "none";
-	// }
+	// document.getElementById("paletteName").placeholder = "palette " + selectedColorPal();
+	// var name = palette[ selectedColorPal() ].name;
+	// if( name )
+	// 	document.getElementById("paletteName").value = name;
+	// else
+	// 	document.getElementById("paletteName").value = "";
+
 
 	updatePaletteOptionsFromGameData();
 	updatePaletteControlsFromGameData();
@@ -2460,15 +2461,15 @@ function rgbToHex(r, g, b) {
 }
 
 function updateDrawingNameUI(visible) {
-	document.getElementById("drawingNameUI").setAttribute("style", visible ? "display:initial;" : "display:none;");
-	var obj = getCurPaintObject();
-	console.log("update drawing name ui");
-	console.log(obj);
-	if( obj.name != null )
-		document.getElementById("drawingName").value = obj.name;
-	else
-		document.getElementById("drawingName").value = "";
-	document.getElementById("drawingName").placeholder = getCurPaintModeStr() + " " + drawingId;
+	// document.getElementById("drawingNameUI").setAttribute("style", visible ? "display:initial;" : "display:none;");
+	// var obj = getCurPaintObject();
+	// console.log("update drawing name ui");
+	// console.log(obj);
+	// if( obj.name != null )
+	// 	document.getElementById("drawingName").value = obj.name;
+	// else
+	// 	document.getElementById("drawingName").value = "";
+	// document.getElementById("drawingName").placeholder = getCurPaintModeStr() + " " + drawingId;
 }
 
 function on_paint_avatar() {
