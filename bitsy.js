@@ -1498,9 +1498,14 @@ function parseDialog(lines, i) {
 	var id = getId(lines[i]);
 	i++;
 	var text = "";
-	while (lines[i].length > 0) {
-		text += lines[i] + "\n";
-		i++;
+	if( featureNewScript ) {
+		while (lines[i].length > 0) {
+			text += lines[i] + "\n";
+			i++;
+		}
+	}
+	else {
+		text = lines[i];
 	}
 	// console.log(text);
 	dialog[id] = text;
@@ -1696,3 +1701,8 @@ function startDialog(dialogStr) {
 	dialogRenderer.SetCentered( isNarrating /*centered*/ );
 	dialogBuffer.Start( dialogStr, onExitDialog );
 }
+
+/* NEW SCRIPT STUFF */
+var featureNewScript = false;
+var featureNewDialog = false;
+var script = new Script();

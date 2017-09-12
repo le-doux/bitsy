@@ -102,59 +102,62 @@ var Environment = function() {
 }
 
 
-/* SyntaxTree Nodes */
-// var NodeFactory = function() {
-// 	var Constructors : {};
-// 	this.AddType = function(constructor) {
-// 		var node = new constructor();
-// 		this.Constructors[ node.type ] = constructor;
-// 	}
-// 	this.Create = function(type) {
-// 		var node = Object.assign( new this.Constructors[ "node" ](), new this.Constructors[ type ]() );
-// 		return node;
-// 	}
-// }
-
-// TODO: improve with multiple supers, recursive composition
-// function compose(child,base) {
-// 	return Object.assign( new base(), child );
-// }
-
-function compose(constructor) {
-	// TODO...
+/* NODES */
+function AddCreate(obj, func) {
+	return Object.assign( obj, {
+		Create : function(param) {
+			return Object.assign( Object.create(this), new func( param ) );
+		}
+	});
 }
 
-var Node = function() {
-	this.super = null;
-
-	this.type = "node";
-
-	this.parent = null;
-	this.children = [];
-	this.AddChild = function(node) {
+var TreeRelationship = {
+	parent : null,
+	children : [],
+	AddChild : function(node) {
 		this.children.push( node );
 		node.parent = this;
-	};
+	}
+};
+
+var BlockMode = {
+	Dialog : "dialog",
+	Code : "code"
+};
+
+var BlockNode = {
+	type : "block",
+	Create : function(mode) {
+		var block = Object.create( BlockNode );
+		block.mode = mode;
+		return block;
+	}
+}
+Object.assign( BlockNode, TreeRelationship );
+AddCreate( BlockNode, 
+	function(param) {
+		this.mode = param.mode;
+	}
+);
+
+function Create(obj, init) {
+	var obj = Object.create(obj);
+	Object.assign( obj, init() );
+	return obj;
 }
 
-var BlockNode = function(mode) {
-	this.super = Node;
-
-	this.type = "block";
-	this.mode = mode;
+var FuncNode = {
+	type : "function"
 }
+Object.assign( FuncNode, TreeRelationship );
+AddCreate( FuncNode,
+	function(param){
+		for(name in param) {
+			this[name] = param[name];
+		}
+	}
+);
 
-var FuncNode = function(name,parameters) {
-	this.type = "function";
-	this.name = name;
-	this.parameters = parameters;
-}
-
-var VarNode = function(name,value) { // TODO: are variables really nodes by themselves?
-	this.type = "variable";
-	this.name = name;
-	this.value = value;
-}
 
 var Parser = function() {
 	var Sym = {

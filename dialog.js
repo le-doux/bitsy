@@ -137,9 +137,6 @@ var DialogRenderer = function() {
 	}
 }
 
-/* NEW SCRIPT STUFF */
-var featureNewScript = true;
-var script = new Script();
 
 var DialogBuffer = function() {
 	var buffer = [[[]]]; // holds dialog in an array buffer
@@ -190,7 +187,7 @@ var DialogBuffer = function() {
 		onExit = exitHandler;
 
 		if( featureNewScript ) {
-			scriptTree = script.NewParse( dialogSourceStr );
+			// scriptTree = script.NewParse( dialogSourceStr );
 			console.log( scriptTree );
 		}
 		else {
@@ -670,10 +667,16 @@ function DialogMarkup() {
 		while(!parsingState.Done()) {
 			var char = parsingState.Char();
 			// console.log(char);
-			if(char === "<"){
-				parsingState = parseTag(parsingState)
+			if( featureNewDialog ) {
+				if(char === "<"){
+					parsingState = parseTag(parsingState)
+				}
+				else {
+					parsingState = parseText(parsingState);
+				}
 			}
 			else {
+				// only parse text
 				parsingState = parseText(parsingState);
 			}
 			// parsingState.Increment();
@@ -753,9 +756,17 @@ function DialogMarkup() {
 		//TODO
 		// console.log("TEXT");
 		var textStr = "";
-		while(!parsingState.Done() && parsingState.Char() != "<") {
-			textStr += parsingState.Char();
-			parsingState.Increment();
+		if( featureNewDialog ) {
+			while(!parsingState.Done() && parsingState.Char() != "<") {
+				textStr += parsingState.Char();
+				parsingState.Increment();
+			}
+		}
+		else {
+			while(!parsingState.Done()) {
+				textStr += parsingState.Char();
+				parsingState.Increment();
+			}
 		}
 		// console.log(textStr);
 		var textNode = DialogNodeFactory.Create("text");
