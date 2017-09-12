@@ -1758,4 +1758,4 @@ var script = new Script();
 var featureNewScript = false;
 var featureNewDialog = false;
 var featureOldTouch = false;
-var featureTouchDpad = true;
+var featureTouchDpad = false;
