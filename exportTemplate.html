@@ -48,6 +48,10 @@ function startExportedGame() {
 </script>
 
 <script>
+@@S
+</script>
+
+<script>
 @@L
 </script>
 
@@ -60,7 +64,21 @@ function startExportedGame() {
 
 <!-- DOCUMENT BODY -->
 <body onload='startExportedGame()'>
-	<canvas id='game'></canvas>
+	<div id="gameHolder">
+		<canvas id='game'></canvas>
+		<div id="dpad">
+			<div>
+				<button id="dpadUp" onmousedown="dpadUp(event);"/>
+			</div>
+			<div id="dpadMiddle">
+				<button id="dpadLeft" onmousedown="dpadLeft(event);"/>
+				<button id="dpadRight" onmousedown="dpadRight(event);"/>
+			</div>
+			<div>
+				<button id="dpadDown" onmousedown="dpadDown(event);"/>
+			</div>
+		</button>
+	</div>
 </body>
 
 

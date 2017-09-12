@@ -16,6 +16,7 @@ loadResource("exportTemplate.html");
 loadResource("bitsy.js");
 loadResource("font.js");
 loadResource("dialog.js");
+loadResource("script.js");
 
 
 /* exporting */
@@ -52,6 +53,7 @@ this.exportGame = function(gameData, title, pageColor, filename) {
 	html = replaceTemplateMarker( html, "@@T", title );
 	html = replaceTemplateMarker( html, "@@B", pageColor );
 	html = replaceTemplateMarker( html, "@@F", resources["font.js"] );
+	html = replaceTemplateMarker( html, "@@S", resources["script.js"] );
 	html = replaceTemplateMarker( html, "@@L", resources["dialog.js"] );
 	html = replaceTemplateMarker( html, "@@E", resources["bitsy.js"] );
 	html = replaceTemplateMarker( html, "@@D", gameData );

@@ -142,12 +142,40 @@ function onready() {
 	clearInterval(loading_interval);
 
 	document.addEventListener('keydown', onkeydown);
+	
+	if( featureTouchDpad ) {
+		// TODO	
+	}
+
 	canvas.addEventListener("mousedown", onTouch);
+	
 	update_interval = setInterval(update,-1);
 	startNarrating(title);
 }
 
+function fullscreen(el) {
+    if (el.requestFullscreen) {
+        return el.requestFullscreen();
+    } else if (el.msRequestFullscreen) {
+        return el.msRequestFullscreen();
+    } else if (el.mozRequestFullScreen) {
+        return el.mozRequestFullScreen();
+    } else if (el.webkitRequestFullscreen) {
+        return el.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+}
+
 function onTouch(e) {
+	console.log("MOUSEDOWN");
+
+	if( featureTouchDpad ) {
+		console.log("FULLSCREEN");
+		fullscreen( document.getElementById("gameHolder") );
+	}
+
+	if( !featureOldTouch ) // Don't use old touch controls
+		return;
+
 	//dialog mode
 	if (isDialogMode) {
 
@@ -674,6 +702,27 @@ function onkeydown(e) {
 		}
 	}
 
+}
+
+function dpad(e, keyCode) {
+	e.keyCode = keyCode; // turn this mouse event into a fake key event
+	onkeydown( e );
+}
+
+function dpadUp(e) {
+	dpad( e, key.up );
+}
+
+function dpadDown(e) {
+	dpad( e, key.down );
+}
+
+function dpadLeft(e) {
+	dpad( e, key.left );
+}
+
+function dpadRight(e) {
+	dpad( e, key.right );
 }
 
 function getItemIndex( roomId, x, y ) {
@@ -1703,6 +1752,10 @@ function startDialog(dialogStr) {
 }
 
 /* NEW SCRIPT STUFF */
+var script = new Script();
+
+/* FEATURE FLAGS */
 var featureNewScript = false;
 var featureNewDialog = false;
-var script = new Script();
+var featureOldTouch = false;
+var featureTouchDpad = true;
