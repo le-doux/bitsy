@@ -1,3 +1,6 @@
+v3.6:
+- bugfix: remove broken mouse controls
+
 v3.5:
 - bugfix: games with no title couldn't start
 
