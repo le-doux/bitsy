@@ -32,6 +32,15 @@
 	html { height: 592px; }
 	body { width:100%; height:100%; overflow:hidden; background:@@B; }
 	#game { background:black; margin: 0 auto; margin-top: 40px; display: block; }
+	#gameHolder { background:rgba(0,0,0,0); }
+	#dpad { width:512px; margin:0px; }
+	.dpadRow { display:block; }
+	.dpadBox { width: 30px; height: 30px; /*border: solid 1px white;*/ display:inline-block; }
+	#dpadUp { background: black; border: solid 1px white; border-bottom: 0px; }
+	#dpadDown { background: black; border: solid 1px white; border-top: 0px; }
+	#dpadLeft { background: black; border: solid 1px white; border-right: 0px; }
+	#dpadRight { background: black; border: solid 1px white; border-left: 0px; }
+	#dpadMiddle { background: black; }
 </style>
 
 <!-- SCRIPTS -->
@@ -65,19 +74,36 @@ function startExportedGame() {
 <!-- DOCUMENT BODY -->
 <body onload='startExportedGame()'>
 	<div id="gameHolder">
+		<!-- GAME CANVAS -->
 		<canvas id='game'></canvas>
+
+		<!-- VIRTUAL D-PAD -->
 		<div id="dpad" style="display:none;">
-			<div>
-				<button id="dpadUp" onmousedown="dpadUp(event);"/>
+			<div class="dpadRow">
+				<div class="dpadBox"></div>
+				<div class="dpadBox" id="dpadUp">
+					<!-- <button id="dpadUp"/> -->
+				</div>
+				<div class="dpadBox"></div>
 			</div>
-			<div id="dpadMiddle">
-				<button id="dpadLeft" onmousedown="dpadLeft(event);"/>
-				<button id="dpadRight" onmousedown="dpadRight(event);"/>
+			<div class="dpadRow">
+				<div class="dpadBox" id="dpadLeft">
+					<!-- <button id="dpadLeft"/> -->
+				</div>
+				<div class="dpadBox" id="dpadMiddle"></div>
+				<div class="dpadBox" id="dpadRight">
+					<!-- <button id="dpadRight"/> -->
+				</div>
 			</div>
-			<div>
-				<button id="dpadDown" onmousedown="dpadDown(event);"/>
+			<div class="dpadRow">
+				<div class="dpadBox"></div>
+				<div class="dpadBox" id="dpadDown">
+					<!-- <button id="dpadDown"/> -->
+				</div>
+				<div class="dpadBox"></div>
 			</div>
 		</button>
+
 	</div>
 </body>
 

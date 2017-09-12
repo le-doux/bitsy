@@ -144,7 +144,10 @@ function onready() {
 	document.addEventListener('keydown', onkeydown);
 	
 	if( featureTouchDpad ) {
-		// TODO	
+		document.getElementById("dpadUp").addEventListener('mousedown', dpadUp);
+		document.getElementById("dpadDown").addEventListener('mousedown', dpadDown);
+		document.getElementById("dpadLeft").addEventListener('mousedown', dpadLeft);
+		document.getElementById("dpadRight").addEventListener('mousedown', dpadRight);
 	}
 
 	canvas.addEventListener("mousedown", onTouch);
@@ -170,6 +173,7 @@ function onTouch(e) {
 
 	if( featureTouchDpad ) {
 		console.log("FULLSCREEN");
+		document.getElementById("dpad").style.display = "block";
 		fullscreen( document.getElementById("gameHolder") );
 	}
 
@@ -1758,4 +1762,4 @@ var script = new Script();
 var featureNewScript = false;
 var featureNewDialog = false;
 var featureOldTouch = false;
-var featureTouchDpad = false;
+var featureTouchDpad = true;
