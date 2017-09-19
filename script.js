@@ -180,7 +180,7 @@ var Parser = function() {
 		this.Count = function() { return sourceStr.length; };
 		this.Done = function() { return i >= sourceStr.length; };
 		this.Char = function() { return sourceStr[i]; };
-		this.Step = function(n=1) { i += n; };
+		this.Step = function(n) { if(n===undefined) n=1; i += n; };
 		this.MatchAhead = function(str) {
 			// console.log(str);
 			str = "" + str; // hack to turn single chars into strings

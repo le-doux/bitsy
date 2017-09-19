@@ -26,15 +26,14 @@
 <!-- HEADER -->
 <head>
 
-<title>@@T</title>
+<title>dpad test</title>
 
 <style>
 	html { height: 592px; }
-	body { width:100%; height:100%; overflow:hidden; background:@@B; }
-	#game { background:black; margin: 0 auto; margin-top: 40px; display: block; }
+	body { width:100%; height:100%; overflow:hidden; background:black; }
+	#game { background:white; margin: 0 auto; margin-top: 40px; display: block; width:512px; height:512px; }
 	#gameHolder { background:rgba(0,0,0,0); }
-	/* D-PAD */
-	#dpad { width:182px; margin:auto; /*background:red;*/ margin-top: 30px; }
+	#dpad { width:200px; margin:auto; /*background:red;*/ margin-top: 30px; }
 	.dpadRow { display:table-row; /*background:blue;*/ margin:0px; padding:0px; height:32px; }
 	.dpadBox { width: 60px; height: 60px; /*border: solid 1px white;*/ display:table-cell; }
 	#dpadUp { background: black; border: solid 1px white; border-bottom: 0px; }
@@ -44,42 +43,17 @@
 	#dpadMiddle { background: black; }
 </style>
 
-<!-- SCRIPTS -->
-<script>
-var exportedGameData = "@@D";
-function startExportedGame() {
-	attachCanvas( document.getElementById("game") );
-	load_game(exportedGameData);
-}
-</script>
-
-<script>
-@@F
-</script>
-
-<script>
-@@S
-</script>
-
-<script>
-@@L
-</script>
-
-<script>
-@@E
-</script>
-
 </head>
 
 
 <!-- DOCUMENT BODY -->
-<body onload='startExportedGame()'>
+<body>
 	<div id="gameHolder">
 		<!-- GAME CANVAS -->
 		<canvas id='game'></canvas>
 
 		<!-- VIRTUAL D-PAD -->
-<!-- 		<div id="dpad" style="display:none;">
+		<div id="dpad">
 			<div class="dpadRow">
 				<div class="dpadBox"></div>
 				<div class="dpadBox" id="dpadUp"></div>
@@ -95,7 +69,7 @@ function startExportedGame() {
 				<div class="dpadBox" id="dpadDown"></div>
 				<div class="dpadBox"></div>
 			</div>
-		</div> -->
+		</div>
 
 	</div>
 </body>

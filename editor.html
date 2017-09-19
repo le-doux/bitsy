@@ -122,7 +122,7 @@
 						</button>
 						<div title="about window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">favorite</i>
-							about bitsy v3.6
+							about bitsy v3.7
 						</div>
 					</div>
 					<div id="aboutInner">
@@ -183,11 +183,15 @@
 
 							<input type="checkbox" id="versionNotesCheck" onclick="toggleVersionNotes(event);"/>
 							<label title="show / hide version notes" for="versionNotesCheck">
-								what's new in v3.6
+								what's new in v3.7
 								<i id="versionNotesCheckIcon" class="material-icons">expand_less</i>
 							</label>
 
 							<div id="versionNotes" style="display:none;">
+								<br>
+								v3.7:<br>
+								- bugfix: can't add color palettes<br>
+								- bugfix: games don't run on iOS<br>
 								<br>
 								v3.6:<br>
 								- bugfix: remove broken mouse controls<br>
@@ -632,8 +636,8 @@
 								name
 								<input type="text" id="paletteName" onchange="on_palette_name_change();" style="width:80px;"></input>
 							</span>
-							-->
 							<br>
+							-->
 							<div class="buttonGroup" id="paletteNav">
 								<button title="previous color palette" class="color0" onclick="prevPalette();">
 									<i class="material-icons">navigate_before</i>

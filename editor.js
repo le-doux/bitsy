@@ -2257,14 +2257,16 @@ function on_change_title() {
 /* PALETTE STUFF */
 function updatePaletteUI() {
 	document.getElementById("paletteId").innerHTML = selectedColorPal();
-	if ( Object.keys(palette).length > 1 ) {
-		document.getElementById("paletteIdContainer").style.display = "block";
-		document.getElementById("paletteNav").style.display = "block";
-	}
-	else {
-		document.getElementById("paletteIdContainer").style.display = "none";
-		document.getElementById("paletteNav").style.display = "none";
-	}
+
+	// NOTE: TURNING ON THIS BLOCK BREAKS THINGS - CAN I DELETE IT????
+	// if ( Object.keys(palette).length > 1 ) {
+	// 	document.getElementById("paletteIdContainer").style.display = "block";
+	// 	document.getElementById("paletteNav").style.display = "block";
+	// }
+	// else {
+	// 	document.getElementById("paletteIdContainer").style.display = "none";
+	// 	document.getElementById("paletteNav").style.display = "none";
+	// }
 
 	// document.getElementById("paletteName").placeholder = "palette " + selectedColorPal();
 	// var name = palette[ selectedColorPal() ].name;

@@ -1,3 +1,7 @@
+v3.7:
+- bugfix: can't add color palettes
+- bugfix: games don't run on iOS
+
 v3.6:
 - bugfix: remove broken mouse controls
 

@@ -34,7 +34,7 @@ var spriteStartLocations = {};
 /* VERSION */
 var version = {
 	major: 3, // for file format / engine changes
-	minor: 6 // for editor changes and bugfixes
+	minor: 7 // for editor changes and bugfixes
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
@@ -148,6 +148,7 @@ function onready() {
 		document.getElementById("dpadDown").addEventListener('mousedown', dpadDown);
 		document.getElementById("dpadLeft").addEventListener('mousedown', dpadLeft);
 		document.getElementById("dpadRight").addEventListener('mousedown', dpadRight);
+		document.getElementById("dpadMiddle").addEventListener('mousedown', dpadMiddle);
 	}
 
 	canvas.addEventListener("mousedown", onTouch);
@@ -727,6 +728,10 @@ function dpadLeft(e) {
 
 function dpadRight(e) {
 	dpad( e, key.right );
+}
+
+function dpadMiddle(e) {
+	dpad( e, key.space );
 }
 
 function getItemIndex( roomId, x, y ) {
@@ -1631,7 +1636,9 @@ function drawRoom(room,context) {
 	}
 }
 
-function getTileImage(t,palId,frameIndex=null) {
+function getTileImage(t,palId,frameIndex) {
+	if( frameIndex === undefined ) frameIndex = null; // no default parameter support on iOS
+
 	var drwId = t.drw;
 
 	if (!palId) palId = curPal();
@@ -1648,7 +1655,9 @@ function getTileImage(t,palId,frameIndex=null) {
 	return imageStore.render[ palId ][ t.col ][ drwId ];
 }
 
-function getSpriteImage(s,palId,frameIndex=null) {
+function getSpriteImage(s,palId,frameIndex) {
+	if( frameIndex === undefined ) frameIndex = null; // no default parameter support on iOS
+
 	var drwId = s.drw;
 
 	if (!palId) palId = curPal();
@@ -1665,7 +1674,9 @@ function getSpriteImage(s,palId,frameIndex=null) {
 	return imageStore.render[ palId ][ s.col ][ drwId ];
 }
 
-function getItemImage(itm,palId,frameIndex=null) { //aren't these all the same????
+function getItemImage(itm,palId,frameIndex) { //aren't these all the same????
+	if( frameIndex === undefined ) frameIndex = null; // no default parameter support on iOS
+
 	var drwId = itm.drw;
 	// console.log(drwId);
 
@@ -1719,7 +1730,9 @@ function onExitDialog() {
 	if (isNarrating) isNarrating = false;
 }
 
-function startNarrating(dialogStr,end=false) {
+function startNarrating(dialogStr,end) {
+	if(end === undefined) end = false;
+
 	isNarrating = true;
 	isEnding = end;
 	startDialog(dialogStr);
@@ -1762,4 +1775,4 @@ var script = new Script();
 var featureNewScript = false;
 var featureNewDialog = false;
 var featureOldTouch = false;
-var featureTouchDpad = true;
+var featureTouchDpad = false;
