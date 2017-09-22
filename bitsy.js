@@ -1557,10 +1557,25 @@ function parseDialog(lines, i) {
 	i++;
 	var text = "";
 	if( featureNewScript ) {
-		while (lines[i].length > 0) {
+		if( lines[i] === '/"' ) { // TODO : finalize the "text block" open / close symbols
+			// this is a real script
+			while( lines[i] != '"/' ) {
+				text += lines[i] + "\n";
+				i++;
+			}
 			text += lines[i] + "\n";
 			i++;
+			console.log("PARSE DIALOG");
+			console.log(text);
 		}
+		else {
+			text = '/"' + lines[i] + '"/'; // read old-style one line dialogs into the new scripting format
+		}
+
+		// while (lines[i].length > 0) {
+		// 	text += lines[i] + "\n";
+		// 	i++;
+		// }
 	}
 	else {
 		text = lines[i];
@@ -1772,7 +1787,7 @@ function startDialog(dialogStr) {
 var script = new Script();
 
 /* FEATURE FLAGS */
-var featureNewScript = false;
+var featureNewScript = true;
 var featureNewDialog = false;
 var featureOldTouch = false;
 var featureTouchDpad = false;

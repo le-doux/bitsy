@@ -163,7 +163,7 @@ var DialogBuffer = function() {
 		for (var i = 0; i < rowCount; i++) {
 			var row = this.CurPage()[i];
 			var charCount = (i == rowIndex) ? charIndex+1 : row.length;
-			console.log(charCount);
+			// console.log(charCount);
 			for(var j = 0; j < charCount; j++) {
 				var char = row[j];
 				if(char)
@@ -188,7 +188,10 @@ var DialogBuffer = function() {
 
 		if( featureNewScript ) {
 			// scriptTree = script.NewParse( dialogSourceStr );
-			console.log( scriptTree );
+			var interp = script.CreateInterpreter();
+			interp.SetDialogBuffer(this); // hacky
+			interp.Run( dialogSourceStr ); // hacky
+			// console.log( scriptTree );
 		}
 		else {
 			var dml = new DialogMarkup();
@@ -328,14 +331,18 @@ var DialogBuffer = function() {
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
 
-		var curPageIndex = this.CurPageCount() - 1;
-		var curRowIndex = this.CurRowCount() - 1;
-		var curRowArr = this.CurRow();
+		// var curPageIndex = this.CurPageCount() - 1;
+		// var curRowIndex = this.CurRowCount() - 1;
+		// var curRowArr = this.CurRow();
+
+		var curPageIndex = buffer.length - 1;
+		var curRowIndex = buffer[curPageIndex].length - 1;
+		var curRowArr = buffer[curPageIndex][curRowIndex];
 
 		for (var i = 0; i < words.length; i++) {
 			var word = words[i];
 			var wordLength = word.length + ((i == 0) ? 0 : 1);
-			if (curRowArr.length + wordLength <= charsPerRow) {
+			if (curRowArr.length + wordLength <= charsPerRow || curRowArr.length <= 0) {
 				//stay on same row
 				var wordWithPrecedingSpace = ((i == 0) ? "" : " ") + word;
 				curRowArr = AddWordToCharArray( curRowArr, wordWithPrecedingSpace, nodeTrail );
@@ -372,7 +379,23 @@ var DialogBuffer = function() {
 			lastPage.splice( lastPage.length-1, 1 );
 		if( lastPage.length == 0 )
 			buffer.splice( buffer.length-1, 1 );
+
+		console.log(buffer);
 	};
+
+	this.AddLinebreak = function() {
+		var lastPage = buffer[ buffer.length-1 ];
+		if( lastPage.length <= 1 ) {
+			console.log("LINEBREAK - NEW ROW ");
+			// add new row
+			lastPage.push( [] );
+		}
+		else {
+			// add new page
+			buffer.push( [[]] );
+		}
+		console.log(buffer);
+	}
 
 	/* this is a hook for GIF rendering */
 	var didPageFinishThisFrame = false;

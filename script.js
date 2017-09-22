@@ -92,72 +92,135 @@ block
 	type
 */
 
+/* MORE SYNTAX QUESTIONS
+
+	dialog: /" text text "/ vs << text text >> vs (more limited) ''' text text '''
+
+	should there even BE a dialog block? or is that just default behavior for top level?
+
+	in IF STATEMENT, default code or default dialog?
+
+	IF vs CASE
+
+	{single expression per bracket} <- more LISP-like
+	vs
+	{
+		multiple expressions
+		on each
+		new line
+	} <- more like inserting a JS block
+*/
+
 function Script() {
 
+this.CreateInterpreter = function() {
+	return new Interpreter();
+};
+
+var Interpreter = function() {
+	var env = new Environment();
+	var parser = new Parser();
+
+	this.SetDialogBuffer = function(buffer) { env.SetDialogBuffer(buffer); };
+
+	this.Run = function(scriptStr) {
+		var tree = parser.Parse( scriptStr );
+		tree.Run( env );
+	}
+}
+
+/* BUILT-IN FUNCTIONS */ // TODO: better way to encapsulate these?
+function say(environment,parameters) {
+	console.log("SAY FUNC");
+	environment.GetDialogBuffer().AddText( parameters[0] /*textStr*/, [] /*nodeTrail*/ );
+}
+
+function linebreak(environment,parameters) {
+	console.log("LINEBREAK FUNC");
+	environment.GetDialogBuffer().AddLinebreak();
+}
+
+/* ENVIRONMENT */
 var Environment = function() {
 	var dialogBuffer = null;
-	this.SetBuffer = function(buffer) { dialogBuffer = buffer; };
+	this.SetDialogBuffer = function(buffer) { dialogBuffer = buffer; };
+	this.GetDialogBuffer = function() { return dialogBuffer; };
 
-	// TODO
+	var functionMap = new Map();
+	functionMap["say"] = say;
+	functionMap["linebreak"] = linebreak;
+
+	this.RunFunction = function(name,parameters) {
+		functionMap[name](this,parameters);
+	}
 }
 
-
+/* node ideas
+	- TreeRelationship -> HasChildren
+	- NodeCore / NodeBase : type
+	- do I really need modes for blocks?
+	- do I really need a special command for linebreaks? or just use it as a character?
+*/
 /* NODES */
-function AddCreate(obj, func) {
-	return Object.assign( obj, {
-		Create : function(param) {
-			return Object.assign( Object.create(this), new func( param ) );
-		}
-	});
-}
-
-var TreeRelationship = {
-	parent : null,
-	children : [],
-	AddChild : function(node) {
+var TreeRelationship = function() {
+	this.parent = null;
+	this.children = [];
+	this.AddChild = function(node) {
 		this.children.push( node );
 		node.parent = this;
-	}
-};
+	};
+	this.Traverse = function() {
+		if( this.Visit )
+			this.Visit();
 
-var BlockMode = {
-	Dialog : "dialog",
-	Code : "code"
-};
+		var i = 0;
+		while (i < this.children.length) {
+			this.children[i].Traverse();
+			i++;
+		}
 
-var BlockNode = {
-	type : "block",
-	Create : function(mode) {
-		var block = Object.create( BlockNode );
-		block.mode = mode;
-		return block;
+		// TODO need a way to pause while text is rendering?
 	}
 }
-Object.assign( BlockNode, TreeRelationship );
-AddCreate( BlockNode, 
-	function(param) {
-		this.mode = param.mode;
-	}
-);
 
-function Create(obj, init) {
-	var obj = Object.create(obj);
-	Object.assign( obj, init() );
-	return obj;
-}
+var Runnable = function() {
+	this.Run = function(environment) {
+		if( this.Eval )
+			this.Eval(environment);
 
-var FuncNode = {
-	type : "function"
-}
-Object.assign( FuncNode, TreeRelationship );
-AddCreate( FuncNode,
-	function(param){
-		for(name in param) {
-			this[name] = param[name];
+		var i = 0;
+		while (i < this.children.length) {
+			this.children[i].Run(environment);
+			i++;
 		}
 	}
-);
+}
 
+// TEMP: trying without mode
+// var BlockMode = {
+// 	Dialog : "dialog",
+// 	Code : "code"
+// };
+
+var BlockNode = function(/*mode*/) {
+	Object.assign( this, new TreeRelationship() );
+	Object.assign( this, new Runnable() );
+	this.type = "block";
+	// this.mode = mode;
+}
+
+// ???: Make FuncNode subclasses with functionality? or separate the nodes from the functions?
+var FuncNode = function(name,arguments) {
+	Object.assign( this, new TreeRelationship() );
+	Object.assign( this, new Runnable() );
+	this.type = "function";
+	this.name = name;
+	this.arguments = arguments;
+
+	this.Eval = function(environment) {
+		environment.RunFunction( this.name, this.arguments );
+	}
+}
 
 var Parser = function() {
 	var Sym = {
@@ -228,7 +291,9 @@ var Parser = function() {
 	};
 
 	this.Parse = function(scriptStr) {
-		var state = new ParserState( null /*rootNode*/, str );
+		console.log("NEW PARSE!!!!!!");
+
+		var state = new ParserState( new BlockNode(), scriptStr );
 
 		if( state.MatchAhead(Sym.DialogOpen) ) {
 			state = ParseDialogBlock( state );
@@ -237,20 +302,8 @@ var Parser = function() {
 			state = ParseCodeBlock( state );
 		}
 
-		// while( !state.Done() ) {
-		// 	// console.log( state.Char() );
-		// 	if( state.MatchAhead(Sym.DialogOpen) ) {
-		// 		state = ParseDialogBlock( state );
-		// 	}
-		// 	else if( state.MatchAhead(Sym.CodeOpen) ) {
-		// 		state = ParseCodeBlock( state );
-		// 	}
-		// 	else {
-		// 		state.Step();
-		// 	}
-		// }
-
-		// return state.rootNode;
+		console.log( state.rootNode );
+		return state.rootNode;
 	};
 
 	function ParseDialog(state) {
@@ -258,13 +311,7 @@ var Parser = function() {
 		var lineCount = 0;
 		var addTextNode = function() {
 			if (text.length > 0) {
-				var textNode = {
-					type : "text", // names: "say" instead? or this that a "function"
-					parent : state.curNode,
-					// children : [], // can't have children?
-					text : text
-				};
-				state.curNode.children.push( textNode );
+				state.curNode.AddChild( new FuncNode( "say", [text] ) );
 
 				text = "";
 				lineCount++;
@@ -275,7 +322,7 @@ var Parser = function() {
 
 			if( state.MatchAhead(Sym.DialogOpen) ) {
 				addTextNode();
-				state = ParseDialogBlock( state ); // These can be nested
+				state = ParseDialogBlock( state ); // These can be nested (should they though???)
 			}
 			else if( state.MatchAhead(Sym.CodeOpen) ) {
 				addTextNode();
@@ -289,11 +336,7 @@ var Parser = function() {
 					// TODO: also skip ones right after a code block??
 					var shouldAddLineBreak = (lineCount > 0) && ((state.Count() - state.Index()) > 1);
 					if( shouldAddLineBreak ) {
-						var linebreakNode = {
-							type : "linebreak",
-							parent : state.curNode
-						}
-						state.curNode.children.push( linebreakNode );	
+						state.curNode.AddChild( new FuncNode( "linebreak", [] ) ); // use function or character?
 					}
 
 					text = "";
@@ -307,24 +350,18 @@ var Parser = function() {
 		}
 		addTextNode();
 
+		console.log("PARSE DIALOG");
+		console.log(state);
 		return state;
 	}
 
 	function ParseDialogBlock(state) {
 		var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
-		// console.log("DIALOG " + dialogStr);
 
-		var dialogBlockNode = {
-			type : "dialog", // names: text vs dialog is bad
-			parent : null,
-			children : []
-		};
-
-		var dialogState = new ParserState( dialogBlockNode, dialogStr );
+		var dialogState = new ParserState( new BlockNode(), dialogStr );
 		dialogState = ParseDialog( dialogState );
 
-		dialogState.rootNode.parent = state.curNode; // TODO : make this a method
-		state.curNode.children.push( dialogState.rootNode );
+		state.curNode.AddChild( dialogState.rootNode );
 
 		return state;
 	}
@@ -336,20 +373,11 @@ var Parser = function() {
 
 	function ParseCodeBlock(state) {
 		var codeStr = state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose );
-		// console.log("CODE " + codeStr);
 
-		var codeBlockNode = {
-			type : "code",
-			parent : null,
-			children : [],
-			content : codeStr
-		};
-
-		var codeState = new ParserState( codeBlockNode, codeStr );
+		var codeState = new ParserState( new BlockMode(), codeStr );
 		codeState = ParseCode( codeState );
-
-		codeState.rootNode.parent = state.curNode; // TODO : make this a method
-		state.curNode.children.push( codeState.rootNode );
+		
+		state.curNode.AddChild( codeState.rootNode );
 
 		// eat next linebreak
 		if( state.MatchAhead( Sym.Linebreak ) )
@@ -359,5 +387,11 @@ var Parser = function() {
 	}
 
 }
+
+// hack
+// this.NewParse = function(dialogStr) {
+// 	var p = new Parser();
+// 	return p.Parse( dialogStr );
+// }
 
 } // Script()
