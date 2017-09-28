@@ -131,8 +131,6 @@ var Interpreter = function() {
 
 
 /* BUILT-IN FUNCTIONS */ // TODO: better way to encapsulate these?
-
-
 /*
 possitble names
 	- print
@@ -152,6 +150,13 @@ function linebreak(environment,parameters) {
 	environment.GetDialogBuffer().AddLinebreak();
 }
 
+function rainbow(environment,parameters) {
+	if( environment.GetDialogBuffer().HasTextEffect("rainbow") )
+		environment.GetDialogBuffer().RemoveTextEffect("rainbow");
+	else
+		environment.GetDialogBuffer().AddTextEffect("rainbow");
+}
+
 /* ENVIRONMENT */
 var Environment = function() {
 	var dialogBuffer = null;
@@ -161,6 +166,7 @@ var Environment = function() {
 	var functionMap = new Map();
 	functionMap["say"] = say;
 	functionMap["linebreak"] = linebreak;
+	functionMap["rainbow"] = rainbow;
 
 	this.HasFunction = function(name) { return functionMap[name] != null; };
 	this.RunFunction = function(name,parameters) {
@@ -342,6 +348,14 @@ var Parser = function(env) {
 		return state.rootNode;
 	};
 
+	/*
+	TODO
+	improve rules for adding linebreak nodes
+	- empty lines: YES
+	- lines with text: YES
+	- lines with JUST CODE: NO
+	- first line of dialog block: NO
+	*/
 	function ParseDialog(state) {
 		var shouldAddLinebreak = false;
 
@@ -534,8 +548,8 @@ var Parser = function(env) {
 		state.curNode.AddChild( codeState.rootNode );
 
 		// eat next linebreak
-		if( state.MatchAhead( Sym.Linebreak ) )
-			state.Step();
+		// if( state.MatchAhead( Sym.Linebreak ) )
+		// 	state.Step();
 
 		return state;
 	}

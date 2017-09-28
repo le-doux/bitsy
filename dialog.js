@@ -150,6 +150,7 @@ var DialogBuffer = function() {
 
 	/* NEW SCRIPT STUFF */
 	var scriptTree = null;
+	var activeTextEffects = [];
 	
 	this.CurPage = function() { return buffer[ pageIndex ]; };
 	this.CurRow = function() { return this.CurPage()[ rowIndex ]; };
@@ -298,9 +299,9 @@ var DialogBuffer = function() {
 
 	this.CanContinue = function() { return isDialogReadyToContinue; };
 
-	function DialogChar(char,nodeTrail) {
+	function DialogChar(char,effectList) {
 		this.char = char;
-		this.nodeTrail = nodeTrail;
+		this.effectList = effectList.slice(); // clone effect list (since it can change between chars)
 
 		this.color = { r:255, g:255, b:255, a:255 };
 		this.offset = { x:0, y:0 }; // in pixels (screen pixels?)
@@ -312,22 +313,22 @@ var DialogBuffer = function() {
 		};
 
 		this.ApplyEffects = function(time) {
-			for(var i = 0; i < this.nodeTrail.length; i++) {
-				var node = this.nodeTrail[i];
-				node.DoEffect(this,time);
+			for(var i = 0; i < this.effectList.length; i++) {
+				var effectName = this.effectList[i];
+				TextEffects[ effectName ].DoEffect( this, time );
 			}
 		}
 	};
 
-	function AddWordToCharArray(charArray,word,nodeTrail) {
+	function AddWordToCharArray(charArray,word,effectList) {
 		for(var i = 0; i < word.length; i++) {
-			charArray.push( new DialogChar( word[i], nodeTrail ) );
+			charArray.push( new DialogChar( word[i], effectList ) );
 		}
 		return charArray;
 	}
 
 	var charsPerRow = 32;
-	this.AddText = function(textStr,nodeTrail) { // TODO : change "nodeTrail" to "effectList"
+	this.AddText = function(textStr) {
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
 
@@ -345,7 +346,7 @@ var DialogBuffer = function() {
 			if (curRowArr.length + wordLength <= charsPerRow || curRowArr.length <= 0) {
 				//stay on same row
 				var wordWithPrecedingSpace = ((i == 0) ? "" : " ") + word;
-				curRowArr = AddWordToCharArray( curRowArr, wordWithPrecedingSpace, nodeTrail );
+				curRowArr = AddWordToCharArray( curRowArr, wordWithPrecedingSpace, activeTextEffects );
 			}
 			else if (curRowIndex == 0) {
 				//start next row
@@ -353,7 +354,7 @@ var DialogBuffer = function() {
 				buffer[ curPageIndex ].push( [] );
 				curRowIndex++;
 				curRowArr = buffer[ curPageIndex ][ curRowIndex ];
-				curRowArr = AddWordToCharArray( curRowArr, word, nodeTrail );
+				curRowArr = AddWordToCharArray( curRowArr, word, activeTextEffects );
 			}
 			else {
 				//start next page
@@ -363,7 +364,7 @@ var DialogBuffer = function() {
 				buffer[ curPageIndex ].push( [] );
 				curRowIndex = 0;
 				curRowArr = buffer[ curPageIndex ][ curRowIndex ];
-				curRowArr = AddWordToCharArray( curRowArr, word, nodeTrail );
+				curRowArr = AddWordToCharArray( curRowArr, word, activeTextEffects );
 			}
 		}
 
@@ -397,6 +398,17 @@ var DialogBuffer = function() {
 		console.log(buffer);
 	}
 
+	/* new text effects */
+	this.HasTextEffect = function(name) {
+		return activeTextEffects.indexOf( name ) > -1;
+	}
+	this.AddTextEffect = function(name) {
+		activeTextEffects.push( name );
+	}
+	this.RemoveTextEffect = function(name) {
+		activeTextEffects.splice( activeTextEffects.indexOf( name ), 1 );
+	}
+
 	/* this is a hook for GIF rendering */
 	var didPageFinishThisFrame = false;
 	this.DidPageFinishThisFrame = function(){ return didPageFinishThisFrame; };
@@ -404,6 +416,70 @@ var DialogBuffer = function() {
 	var didFlipPageThisFrame = false;
 	this.DidFlipPageThisFrame = function(){ return didFlipPageThisFrame; };
 };
+
+/* NEW TEXT EFFECTS */
+var TextEffects = new Map();
+
+var RainbowEffect = function() { // TODO - should it be an object or just a method?
+	this.DoEffect = function(char,time) {
+		var h = Math.abs( Math.sin( (time / 600) - (char.col / 8) ) );
+		var rgb = hslToRgb( h, 1, 0.5 );
+		char.color.r = rgb[0];
+		char.color.g = rgb[1];
+		char.color.b = rgb[2];
+		char.color.a = 255;
+	}
+};
+TextEffects["rainbow"] = new RainbowEffect();
+
+// var ColorNode = function() {
+// 	this.type = "color";
+// 	this.canHaveChildren = true;
+// 	this.DoEffect = function(char) {
+// 		// console.log("DO EFFECT COLOR");
+// 		// console.log(this.attributes);
+// 		if (this.attributes["index"] != null) {
+// 			var pal = palette[ curPal() ];
+// 			var color = pal[ parseInt( this.attributes["index"].value ) ];
+// 			// console.log(color);
+// 			char.color.r = color[0];
+// 			char.color.g = color[1];
+// 			char.color.b = color[2];
+// 			char.color.a = 255;
+// 		}
+// 	}
+// };
+// DialogNodeFactory.AddType( ColorNode );
+
+// var WavyNode = function() {
+// 	this.type = "wavy";
+// 	this.canHaveChildren = true;
+// 	this.DoEffect = function(char,time) {
+// 		char.offset.y += Math.sin( (time / 250) - (char.col / 2) ) * 4;
+// 	}
+// };
+// DialogNodeFactory.AddType( WavyNode );
+
+// var ShakyNode = function() {
+// 	this.type = "shaky";
+// 	this.canHaveChildren = true;
+
+// 	function disturb(func,time,offset,mult1,mult2) {
+// 		return func( (time * mult1) - (offset * mult2) );
+// 	}
+
+// 	this.DoEffect = function(char,time) {
+// 		char.offset.y += 3
+// 						* disturb(Math.sin,time,char.col,0.1,0.5)
+// 						* disturb(Math.cos,time,char.col,0.3,0.2)
+// 						* disturb(Math.sin,time,char.row,2.0,1.0);
+// 		char.offset.x += 3
+// 						* disturb(Math.cos,time,char.row,0.1,1.0)
+// 						* disturb(Math.sin,time,char.col,3.0,0.7)
+// 						* disturb(Math.cos,time,char.col,0.2,0.3);
+// 	}
+// };
+// DialogNodeFactory.AddType( ShakyNode );
 
 var DialogNode = function() {
 	this.type = "";
