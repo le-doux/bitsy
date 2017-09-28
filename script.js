@@ -119,9 +119,9 @@ this.CreateInterpreter = function() {
 
 var Interpreter = function() {
 	var env = new Environment();
-	var parser = new Parser();
+	var parser = new Parser( env );
 
-	this.SetDialogBuffer = function(buffer) { env.SetDialogBuffer(buffer); };
+	this.SetDialogBuffer = function(buffer) { env.SetDialogBuffer( buffer ); };
 
 	this.Run = function(scriptStr) {
 		var tree = parser.Parse( scriptStr );
@@ -129,7 +129,19 @@ var Interpreter = function() {
 	}
 }
 
+
 /* BUILT-IN FUNCTIONS */ // TODO: better way to encapsulate these?
+
+
+/*
+possitble names
+	- print
+	- say
+	- speak
+	- text
+	- talk
+	- dialog
+*/
 function say(environment,parameters) {
 	console.log("SAY FUNC");
 	environment.GetDialogBuffer().AddText( parameters[0] /*textStr*/, [] /*nodeTrail*/ );
@@ -150,6 +162,7 @@ var Environment = function() {
 	functionMap["say"] = say;
 	functionMap["linebreak"] = linebreak;
 
+	this.HasFunction = function(name) { return functionMap[name] != null; };
 	this.RunFunction = function(name,parameters) {
 		functionMap[name](this,parameters);
 	}
@@ -218,11 +231,34 @@ var FuncNode = function(name,arguments) {
 	this.arguments = arguments;
 
 	this.Eval = function(environment) {
-		environment.RunFunction( this.name, this.arguments );
+		var argumentValues = [];
+		for(var i = 0; i < this.arguments.length; i++) {
+			argumentValues.push( this.arguments[i].Eval() );
+		}
+		environment.RunFunction( this.name, argumentValues );
 	}
 }
 
-var Parser = function() {
+// TODO : do literals and variables need to be nodes?
+// IF SO: should they be children of functions???
+var LiteralNode = function(value) {
+	Object.assign( this, new TreeRelationship() );
+	Object.assign( this, new Runnable() );
+	this.type = "literal";
+	this.value = value;
+
+	this.Eval = function(environment) {
+		return this.value; // TODO all Eval should return something, not just literals
+	}
+}
+
+var VarNode = function() {
+	// TODO
+}
+
+var Parser = function(env) {
+	var environment = env;
+
 	var Sym = {
 		DialogOpen : "/\"",
 		DialogClose : "\"/",
@@ -307,14 +343,15 @@ var Parser = function() {
 	};
 
 	function ParseDialog(state) {
+		var shouldAddLinebreak = false;
+
 		var text = "";
-		var lineCount = 0;
 		var addTextNode = function() {
 			if (text.length > 0) {
-				state.curNode.AddChild( new FuncNode( "say", [text] ) );
-
+				state.curNode.AddChild( new FuncNode( "say", [new LiteralNode(text)] ) );
 				text = "";
-				lineCount++;
+
+				shouldAddLinebreak = true; // can add linebreaks after text
 			}
 		}
 
@@ -332,12 +369,10 @@ var Parser = function() {
 				if ( state.MatchAhead(Sym.Linebreak) ) {
 					addTextNode();
 
-					// NOTE: don't add linebreaks at the very beginning or end of the block
-					// TODO: also skip ones right after a code block??
-					var shouldAddLineBreak = (lineCount > 0) && ((state.Count() - state.Index()) > 1);
-					if( shouldAddLineBreak ) {
+					if( shouldAddLinebreak )
 						state.curNode.AddChild( new FuncNode( "linebreak", [] ) ); // use function or character?
-					}
+					else
+						shouldAddLinebreak = true; // can add linebreaks after the first non-linebreak
 
 					text = "";
 				}
@@ -366,15 +401,134 @@ var Parser = function() {
 		return state;
 	}
 
+
+	/*
+	THINGS TO PARSE:
+		- functions: func param1 param2
+		- expressions: x = 5, x = y + z, etc.
+		- nested blocks: { code }, /" text "/
+			- the nested code blocks are especially tricky... do they return something?
+		- special blocks:
+			{case
+				* condition
+					result
+				* condition
+					result
+			}
+
+		if we assume block contains only one expression
+			look at first symbol
+				is it a function name?
+					parse function
+				else
+					look for expressions, etc.
+	*/
+
+	/*
+	PARAMETER possibilities
+	- string
+	- float
+	- bool?
+	- variable
+	*/
+	function ParseFunction(state, funcName) {
+		var args = [];
+
+		var curSymbol = "";
+		function OnSymbolEnd() {
+			console.log("SYMBOL " + curSymbol);
+			var num = parseFloat(curSymbol);
+			console.log(num);
+			if(num) {
+				/* NUMBER LITERAL */
+				console.log("ADD NUM");
+				args.push( new LiteralNode(num) );
+			}
+			else {
+				// TODO : variable???
+			}
+			curSymbol = "";
+		}
+
+		while( !( state.Char() === "\n" || state.Done() ) ) {
+			if(state.Char() === '"') {
+				/* STRING LITERAL */
+				var str = state.ConsumeBlock('"', '"');
+				console.log("STRING " + str);
+				args.push( new LiteralNode(str) );
+				curSymbol = "";
+			}
+			else if(state.Char() === " " && curSymbol.length > 0) {
+				OnSymbolEnd();
+			}
+			else {
+				curSymbol += state.Char();
+			}
+			state.Step();
+		}
+
+		if(curSymbol.length > 0) {
+			OnSymbolEnd();
+		}
+
+		state.curNode.AddChild( new FuncNode( funcName, args ) );
+
+		return state;
+	}
+
 	function ParseCode(state) {
-		// TODO
+		// TODO : how do I do this parsing??? one expression per block? or per line?
+
+		var curSymbol = "";
+		function OnSymbolEnd() {
+			console.log("SYMBOL");
+			console.log(curSymbol);
+			if(environment.HasFunction(curSymbol))
+			{
+				state = ParseFunction( state, curSymbol );
+			}
+			else {
+				return state; // TODO
+			}
+
+			curSymbol = "";
+		}
+
+		while ( !state.Done() ) {
+
+			if( state.MatchAhead(Sym.DialogOpen) ) {
+				state = ParseDialogBlock( state ); // These can be nested (should they though???)
+			}
+			else if( state.MatchAhead(Sym.CodeOpen) ) {
+				state = ParseCodeBlock( state );
+			}
+			else {
+				console.log(state.Char());
+				if(state.Char() === " ") {
+					OnSymbolEnd();
+				}
+				else {
+					curSymbol += state.Char();
+					// console.log(curSymbol);
+				}
+				state.Step();
+			}
+		}
+
+		if(curSymbol.length > 0) {
+			OnSymbolEnd();
+		}
+
 		return state;
 	}
 
 	function ParseCodeBlock(state) {
 		var codeStr = state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose );
 
-		var codeState = new ParserState( new BlockMode(), codeStr );
+		console.log("PARSE CODE");
+		console.log(codeStr);
+
+		var codeState = new ParserState( new BlockNode(), codeStr );
 		codeState = ParseCode( codeState );
 		
 		state.curNode.AddChild( codeState.rootNode );

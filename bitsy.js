@@ -1569,8 +1569,8 @@ function parseDialog(lines, i) {
 			console.log(text);
 		}
 		else {
-			text = '/"' + lines[i] + '"/'; // read old-style one line dialogs into the new scripting format
-		}
+			text = '/"\n' + lines[i] + '\n"/'; // read old-style one line dialogs into the new scripting format
+		} // DO WE REALLY NEED THE DIALOG BLOCKS?
 
 		// while (lines[i].length > 0) {
 		// 	text += lines[i] + "\n";
