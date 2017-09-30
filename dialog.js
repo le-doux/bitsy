@@ -182,41 +182,59 @@ var DialogBuffer = function() {
 		isDialogReadyToContinue = false;
 	};
 	
-	var onExit = null;
-	this.Start = function(dialogSourceStr,exitHandler) {
-		this.Reset();
+	// var onExit = null;
+	// this.Start = function(dialogSourceStr,exitHandler) {
+	// 	this.Reset();
 
-		onExit = exitHandler;
+	// 	onExit = exitHandler;
 
-		if( featureNewScript ) {
-			scriptInterpreter.Run( dialogSourceStr, 
-					function() { console.log("SCRIPT DONE!!!!!!!!!"); }
-				); // still hacky but less so
-		}
-		else {
-			var dml = new DialogMarkup();
-			tree = dml.Parse( dialogSourceStr );
-			tree.SetBuffer( this );
-			tree.Traverse();
-		}
-	};
+	// 	if( featureNewScript ) {
+	// 		scriptInterpreter.Run( dialogSourceStr, 
+	// 				function() { console.log("SCRIPT DONE!!!!!!!!!"); }
+	// 			); // still hacky but less so
+	// 	}
+	// 	else {
+	// 		var dml = new DialogMarkup();
+	// 		tree = dml.Parse( dialogSourceStr );
+	// 		tree.SetBuffer( this );
+	// 		tree.Traverse();
+	// 	}
+	// };
 
 	this.TryFillBuffer = function() {
+		console.log("TRY FILL BUFFER!!!!!");
+
 		// after drawing the last character in the current dialog buffer, do the next dialog tree traversal
+		// if( pageIndex === this.CurPageCount()-1 
+		// 	&& rowIndex === this.CurRowCount()-1 
+		// 	&& charIndex === this.CurCharCount()-1 )
+		// {
+		// 	// if( featureNewScript ) {
+		// 	// 	// TODO
+		// 	// }
+		// 	// else {
+		// 	// 	tree.Traverse();	
+		// 	// }
+
+		// 	// tell script to continue
+		// 	if(continueFlag != null)
+		// 		continueFlag.ready = true;
+
+		// }
+
 		if( pageIndex === this.CurPageCount()-1 
 			&& rowIndex === this.CurRowCount()-1 
-			&& charIndex === this.CurCharCount()-1 )
+			&& charIndex === this.CurCharCount()-1 
+			&& continueFlag != null && !continueFlag.ready )
 		{
-			if( featureNewScript ) {
-				// TODO
-			}
-			else {
-				tree.Traverse();	
-			}
+			console.log("SCRIPT CAN CONTINUE")
+			continueFlag.ready = true;
 		}
 	};
 
 	this.DoNextChar = function() {
+		console.log("DO NEXT CHAR");
+
 		nextCharTimer = 0; //reset timer
 
 		//time to update characters
@@ -233,6 +251,8 @@ var DialogBuffer = function() {
 			//the page is full!
 			isDialogReadyToContinue = true;
 			didPageFinishThisFrame = true;
+
+			console.log("WAITING FOR INPUT");
 		}
 
 		this.TryFillBuffer();
@@ -279,8 +299,16 @@ var DialogBuffer = function() {
 	}
 
 	this.EndDialog = function() {
-		if(onExit != null)
-			onExit();
+		// if(onExit != null)
+		// 	onExit();
+
+		// TODO - do I need this function anymore?
+		console.log("END!!!!");
+		// onExitDialog(); // TODO: this global so it's bad
+
+		// make sure scripting engine knows we can close this down now
+		if(endFlag != null)
+			endFlag.ready = true;
 	}
 
 	this.Continue = function() {
@@ -326,8 +354,9 @@ var DialogBuffer = function() {
 		return charArray;
 	}
 
+	var continueFlag = null;
 	var charsPerRow = 32;
-	this.AddText = function(textStr) {
+	this.AddText = function(textStr,flag) {
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
 
@@ -381,6 +410,8 @@ var DialogBuffer = function() {
 			buffer.splice( buffer.length-1, 1 );
 
 		console.log(buffer);
+
+		continueFlag = flag;
 	};
 
 	this.AddLinebreak = function() {
@@ -395,6 +426,13 @@ var DialogBuffer = function() {
 			buffer.push( [[]] );
 		}
 		console.log(buffer);
+	}
+
+	// used by script interpreter to tell buffer to tell it when it's done
+	var endFlag = null;
+	this.WaitToEnd = function(flag) {
+		console.log("PLZ WAIT");
+		endFlag = flag;
 	}
 
 	/* new text effects */

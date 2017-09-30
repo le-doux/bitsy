@@ -1742,6 +1742,7 @@ var dialogRenderer = dialogModule.CreateRenderer();
 var dialogBuffer = dialogModule.CreateBuffer();
 
 function onExitDialog() {
+	console.log("EXIT DIALOG");
 	isDialogMode = false;
 	if (isNarrating) isNarrating = false;
 }
@@ -1782,12 +1783,12 @@ function startDialog(dialogStr) {
 	dialogRenderer.Reset();
 	dialogRenderer.SetCentered( isNarrating /*centered*/ );
 
-	scriptInterpreter.SetDialogBuffer( dialogBuffer );
-	dialogBuffer.Start( dialogStr, onExitDialog );
-
-	// NEWWWW
 	// scriptInterpreter.SetDialogBuffer( dialogBuffer );
-	// scriptInterpreter.Run( dialogStr, onExitDialog );
+	// dialogBuffer.Start( dialogStr, onExitDialog );
+
+	dialogBuffer.Reset();
+	scriptInterpreter.SetDialogBuffer( dialogBuffer );
+	scriptInterpreter.Run( dialogStr, onExitDialog );
 }
 
 /* NEW SCRIPT STUFF */

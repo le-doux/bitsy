@@ -123,11 +123,44 @@ var Interpreter = function() {
 
 	this.SetDialogBuffer = function(buffer) { env.SetDialogBuffer( buffer ); };
 
-	var onExit = null;
 	this.Run = function(scriptStr, exitHandler) {
-		onExit = exitHandler;
+		console.log("RUNNNN");
 		var tree = parser.Parse( scriptStr );
-		tree.Eval( env, exitHandler );
+		tree.Eval( env, 
+			function() {
+
+				console.log("MAIN SRIPT DONE!!!");
+				console.log( env.GetDialogBuffer() != null );
+
+				// if( env.GetDialogBuffer() != null && env.GetDialogBuffer().CanContinue() ) {
+
+					console.log("WAIT TO END");
+
+					// we have a dialog buffer we need to wait for!
+					var endFlag = { ready:false };
+					env.GetDialogBuffer().WaitToEnd( endFlag );
+
+					function checkContinue() {
+						console.log("END? " + endFlag.ready);
+						if(endFlag.ready) {
+							console.log("SCRIPT DONE!!!!!!!!");
+							if(exitHandler != null) exitHandler(); // the end!
+						}
+						else {
+							setTimeout( function() {
+								checkContinue();
+							}, 0);
+						}
+					}
+					checkContinue();
+				// }
+				// else {					
+				// 	console.log("SCRIPT DONE!!!!!!!!");
+				// 	if(exitHandler != null) exitHandler(); // the end!
+				// }
+
+			}
+		);
 	}
 
 	this.ResetEnvironment = function() {
@@ -149,9 +182,28 @@ possitble names
 */
 function sayFunc(environment,parameters,onReturn) {
 	console.log("SAY FUNC");
-	if( parameters[0] )
-		environment.GetDialogBuffer().AddText( parameters[0].toString() /*textStr*/, [] /*nodeTrail*/ );
-	onReturn(null); // TODO wait for text to finish
+	if( parameters[0] ) {
+		var textStr = parameters[0].toString();
+		var continueFlag = {
+			ready : false
+		};
+		environment.GetDialogBuffer().AddText( textStr, continueFlag );
+
+		// wait until the dialog is finished before continuing with the script
+		function checkContinue() {
+			if(continueFlag.ready) {
+				onReturn(null); // return null or return the string?
+			}
+			else {
+				setTimeout( function() {
+					checkContinue();
+				}, 0);
+			}
+		}
+		checkContinue();
+	}
+	else
+		onReturn(null);
 }
 
 function linebreakFunc(environment,parameters,onReturn) {
