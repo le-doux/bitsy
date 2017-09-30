@@ -122,6 +122,7 @@ function attachCanvas(c) {
 var curGameData = null;
 function load_game(game_data) {
 	curGameData = game_data; //remember the current game (used to reset the game)
+	scriptInterpreter.ResetEnvironment(); // ensures variables are reset -- is this the best way?
 	// console.log(dialog);
 	parseWorld(game_data);
 	// console.log(dialog);
@@ -1736,9 +1737,9 @@ function getRoomPal(roomId) {
 var isDialogMode = false;
 var isNarrating = false;
 var isEnding = false;
-var dialog = new Dialog();
-var dialogRenderer = dialog.CreateRenderer();
-var dialogBuffer = dialog.CreateBuffer();
+var dialogModule = new Dialog();
+var dialogRenderer = dialogModule.CreateRenderer();
+var dialogBuffer = dialogModule.CreateBuffer();
 
 function onExitDialog() {
 	isDialogMode = false;
@@ -1780,11 +1781,14 @@ function startDialog(dialogStr) {
 
 	dialogRenderer.Reset();
 	dialogRenderer.SetCentered( isNarrating /*centered*/ );
+	scriptInterpreter.SetDialogBuffer( dialogBuffer );
 	dialogBuffer.Start( dialogStr, onExitDialog );
 }
 
 /* NEW SCRIPT STUFF */
-var script = new Script();
+var scriptModule = new Script();
+var scriptInterpreter = scriptModule.CreateInterpreter();
+// scriptInterpreter.SetDialogBuffer( dialogBuffer );
 
 /* FEATURE FLAGS */
 var featureNewScript = true;

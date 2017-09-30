@@ -128,6 +128,11 @@ var Interpreter = function() {
 		// tree.Run( env );
 		tree.Eval( env );
 	}
+
+	this.ResetEnvironment = function() {
+		env = new Environment();
+		parser = new Parser( env );
+	}
 }
 
 

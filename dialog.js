@@ -189,10 +189,12 @@ var DialogBuffer = function() {
 
 		if( featureNewScript ) {
 			// scriptTree = script.NewParse( dialogSourceStr );
-			var interp = script.CreateInterpreter();
-			interp.SetDialogBuffer(this); // hacky
-			interp.Run( dialogSourceStr ); // hacky
+			// var interp = script.CreateInterpreter();
+			// interp.SetDialogBuffer(this); // hacky
+			// interp.Run( dialogSourceStr ); // hacky
 			// console.log( scriptTree );
+
+			scriptInterpreter.Run( dialogSourceStr ); // still hacky but less so
 		}
 		else {
 			var dml = new DialogMarkup();
