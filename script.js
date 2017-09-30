@@ -125,7 +125,8 @@ var Interpreter = function() {
 
 	this.Run = function(scriptStr) {
 		var tree = parser.Parse( scriptStr );
-		tree.Run( env );
+		// tree.Run( env );
+		tree.Eval( env );
 	}
 }
 
@@ -171,22 +172,22 @@ var Environment = function() {
 	this.GetDialogBuffer = function() { return dialogBuffer; };
 
 	var functionMap = new Map();
-	functionMap["say"] = say;
-	functionMap["linebreak"] = linebreak;
-	functionMap["rainbow"] = rainbow;
-	functionMap["item"] = item;
+	functionMap.set("say", say);
+	functionMap.set("linebreak", linebreak);
+	functionMap.set("rainbow", rainbow);
+	functionMap.set("item", item);
 
-	this.HasFunction = function(name) { return functionMap[name] != null; };
+	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.RunFunction = function(name,parameters) {
-		return functionMap[name](this,parameters);
+		return functionMap.get( name )( this, parameters );
 	}
 
 	var variableMap = new Map();
-	variableMap["x"] = "0"; // TODO : remove test variable
+	variableMap.set("x", "0"); // TODO : remove test variable
 
 	this.HasVariable = function(name) { return variableMap.has(name); };
-	this.GetVariable = function(name) { return variableMap[name]; };
-	this.SetVariable = function(name,value) { variableMap[name] = value; };
+	this.GetVariable = function(name) { return variableMap.get(name); };
+	this.SetVariable = function(name,value) { variableMap.set(name, value); };
 }
 
 /* node ideas
@@ -217,18 +218,18 @@ var TreeRelationship = function() {
 	}
 }
 
-var Runnable = function() {
-	this.Run = function(environment) {
-		if( this.Eval )
-			this.Eval(environment);
+// var Runnable = function() {
+// 	this.Run = function(environment) {
+// 		if( this.Eval )
+// 			this.Eval(environment);
 
-		var i = 0;
-		while (i < this.children.length) {
-			this.children[i].Run(environment);
-			i++;
-		}
-	}
-}
+// 		var i = 0;
+// 		while (i < this.children.length) {
+// 			this.children[i].Run(environment);
+// 			i++;
+// 		}
+// 	}
+// }
 
 // TEMP: trying without mode
 // var BlockMode = {
@@ -238,15 +239,25 @@ var Runnable = function() {
 
 var BlockNode = function(/*mode*/) {
 	Object.assign( this, new TreeRelationship() );
-	Object.assign( this, new Runnable() );
+	// Object.assign( this, new Runnable() );
 	this.type = "block";
 	// this.mode = mode;
+
+	this.Eval = function(environment) {
+		var lastVal = null;
+		var i = 0;
+		while (i < this.children.length) {
+			lastVal = this.children[i].Eval(environment);
+			i++;
+		}
+		return lastVal;
+	}
 }
 
 // ???: Make FuncNode subclasses with functionality? or separate the nodes from the functions?
 var FuncNode = function(name,arguments) {
 	Object.assign( this, new TreeRelationship() );
-	Object.assign( this, new Runnable() );
+	// Object.assign( this, new Runnable() );
 	this.type = "function";
 	this.name = name;
 	this.arguments = arguments;
@@ -254,8 +265,10 @@ var FuncNode = function(name,arguments) {
 	this.Eval = function(environment) {
 		var argumentValues = [];
 		for(var i = 0; i < this.arguments.length; i++) {
-			argumentValues.push( this.arguments[i].Eval() );
+			argumentValues.push( this.arguments[i].Eval( environment ) );
 		}
+		console.log("ARGS");
+		console.log(argumentValues);
 		return environment.RunFunction( this.name, argumentValues );
 	}
 }
@@ -264,7 +277,7 @@ var FuncNode = function(name,arguments) {
 // IF SO: should they be children of functions???
 var LiteralNode = function(value) {
 	Object.assign( this, new TreeRelationship() );
-	Object.assign( this, new Runnable() );
+	// Object.assign( this, new Runnable() );
 	this.type = "literal";
 	this.value = value;
 
@@ -275,7 +288,7 @@ var LiteralNode = function(value) {
 
 var VarNode = function(name) {
 	Object.assign( this, new TreeRelationship() );
-	Object.assign( this, new Runnable() );
+	// Object.assign( this, new Runnable() );
 	this.type = "variable";
 	this.name = name;
 
@@ -294,7 +307,8 @@ var Parser = function(env) {
 		CodeClose : "}",
 		Linebreak : "\n", // just call it "break" ?
 		Separator : ":",
-		List : "*"
+		List : "*",
+		String : '"'
 	};
 
 	var ParserState = function( rootNode, str ) {
@@ -488,21 +502,30 @@ var Parser = function(env) {
 			console.log("SYMBOL " + curSymbol);
 			var num = parseFloat(curSymbol);
 			console.log(num);
+			console.log(environment.HasVariable(curSymbol));
 			if(num) {
 				/* NUMBER LITERAL */
 				console.log("ADD NUM");
 				args.push( new LiteralNode(num) );
 			}
-			else {
-				// TODO : variable???
+			else if( environment.HasVariable(curSymbol) ) {
+				/* VARIABLE */
+				args.push( new VarNode(curSymbol) );
 			}
 			curSymbol = "";
 		}
 
 		while( !( state.Char() === "\n" || state.Done() ) ) {
-			if(state.Char() === '"') {
+			if( state.MatchAhead(Sym.CodeOpen) ) {
+				var codeBlockState = new ParserState( new BlockNode(), state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose ) );
+				codeBlockState = ParseCode( codeBlockState );
+				var codeBlock = codeBlockState.rootNode;
+				args.push( codeBlock );
+				curSymbol = "";
+			}
+			else if( state.MatchAhead(Sym.String) ) {
 				/* STRING LITERAL */
-				var str = state.ConsumeBlock('"', '"');
+				var str = state.ConsumeBlock(Sym.String, Sym.String);
 				console.log("STRING " + str);
 				args.push( new LiteralNode(str) );
 				curSymbol = "";
