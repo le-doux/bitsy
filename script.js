@@ -180,6 +180,13 @@ var Environment = function() {
 	this.RunFunction = function(name,parameters) {
 		return functionMap[name](this,parameters);
 	}
+
+	var variableMap = new Map();
+	variableMap["x"] = "0"; // TODO : remove test variable
+
+	this.HasVariable = function(name) { return variableMap.has(name); };
+	this.GetVariable = function(name) { return variableMap[name]; };
+	this.SetVariable = function(name,value) { variableMap[name] = value; };
 }
 
 /* node ideas
@@ -266,8 +273,15 @@ var LiteralNode = function(value) {
 	}
 }
 
-var VarNode = function() {
-	// TODO
+var VarNode = function(name) {
+	Object.assign( this, new TreeRelationship() );
+	Object.assign( this, new Runnable() );
+	this.type = "variable";
+	this.name = name;
+
+	this.Eval = function(environment) {
+		return environment.GetVariable( this.name );
+	}
 }
 
 var Parser = function(env) {
