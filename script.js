@@ -157,6 +157,13 @@ function rainbow(environment,parameters) {
 		environment.GetDialogBuffer().AddTextEffect("rainbow");
 }
 
+function item(environment,parameters) {
+	var itemId = parameters[0];
+	var itemCount = player().inventory[itemId] ? player().inventory[itemId] : 0; // TODO : ultimately the environment should include a reference to the game state
+	console.log("ITEM FUNC " + itemId + " " + itemCount);
+	return itemCount;
+}
+
 /* ENVIRONMENT */
 var Environment = function() {
 	var dialogBuffer = null;
@@ -167,10 +174,11 @@ var Environment = function() {
 	functionMap["say"] = say;
 	functionMap["linebreak"] = linebreak;
 	functionMap["rainbow"] = rainbow;
+	functionMap["item"] = item;
 
 	this.HasFunction = function(name) { return functionMap[name] != null; };
 	this.RunFunction = function(name,parameters) {
-		functionMap[name](this,parameters);
+		return functionMap[name](this,parameters);
 	}
 }
 
@@ -241,7 +249,7 @@ var FuncNode = function(name,arguments) {
 		for(var i = 0; i < this.arguments.length; i++) {
 			argumentValues.push( this.arguments[i].Eval() );
 		}
-		environment.RunFunction( this.name, argumentValues );
+		return environment.RunFunction( this.name, argumentValues );
 	}
 }
 
@@ -357,7 +365,10 @@ var Parser = function(env) {
 	- first line of dialog block: NO
 	*/
 	function ParseDialog(state) {
-		var shouldAddLinebreak = false;
+		// for linebreak logic: add linebreaks after lines with dialog or empty lines (if it's not the very first line)
+		var hasBlock = false;
+		var hasDialog = false;
+		var isFirstLine = true;
 
 		var text = "";
 		var addTextNode = function() {
@@ -365,7 +376,7 @@ var Parser = function(env) {
 				state.curNode.AddChild( new FuncNode( "say", [new LiteralNode(text)] ) );
 				text = "";
 
-				shouldAddLinebreak = true; // can add linebreaks after text
+				hasDialog = true;
 			}
 		}
 
@@ -374,19 +385,29 @@ var Parser = function(env) {
 			if( state.MatchAhead(Sym.DialogOpen) ) {
 				addTextNode();
 				state = ParseDialogBlock( state ); // These can be nested (should they though???)
+
+				hasBlock = true;
 			}
 			else if( state.MatchAhead(Sym.CodeOpen) ) {
 				addTextNode();
 				state = ParseCodeBlock( state );
+
+				hasBlock = true;
 			}
 			else {
 				if ( state.MatchAhead(Sym.Linebreak) ) {
 					addTextNode();
 
+					var isLastLine = (state.Index() + 1) == state.Count();
+					var hasBlockOnly = hasBlock && !hasDialog;
+					var shouldAddLinebreak = !hasBlockOnly && !(isFirstLine || isLastLine);
 					if( shouldAddLinebreak )
 						state.curNode.AddChild( new FuncNode( "linebreak", [] ) ); // use function or character?
-					else
-						shouldAddLinebreak = true; // can add linebreaks after the first non-linebreak
+
+					// linebreak logic
+					isFirstLine = false;
+					hasBlock = false;
+					hasDialog = true;
 
 					text = "";
 				}
