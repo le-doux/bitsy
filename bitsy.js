@@ -1781,8 +1781,13 @@ function startDialog(dialogStr) {
 
 	dialogRenderer.Reset();
 	dialogRenderer.SetCentered( isNarrating /*centered*/ );
+
 	scriptInterpreter.SetDialogBuffer( dialogBuffer );
 	dialogBuffer.Start( dialogStr, onExitDialog );
+
+	// NEWWWW
+	// scriptInterpreter.SetDialogBuffer( dialogBuffer );
+	// scriptInterpreter.Run( dialogStr, onExitDialog );
 }
 
 /* NEW SCRIPT STUFF */

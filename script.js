@@ -123,10 +123,11 @@ var Interpreter = function() {
 
 	this.SetDialogBuffer = function(buffer) { env.SetDialogBuffer( buffer ); };
 
-	this.Run = function(scriptStr) {
+	var onExit = null;
+	this.Run = function(scriptStr, exitHandler) {
+		onExit = exitHandler;
 		var tree = parser.Parse( scriptStr );
-		// tree.Run( env );
-		tree.Eval( env );
+		tree.Eval( env, exitHandler );
 	}
 
 	this.ResetEnvironment = function() {
@@ -146,61 +147,123 @@ possitble names
 	- talk
 	- dialog
 */
-function sayFunc(environment,parameters) {
+function sayFunc(environment,parameters,onReturn) {
 	console.log("SAY FUNC");
-	environment.GetDialogBuffer().AddText( parameters[0].toString() /*textStr*/, [] /*nodeTrail*/ );
+	if( parameters[0] )
+		environment.GetDialogBuffer().AddText( parameters[0].toString() /*textStr*/, [] /*nodeTrail*/ );
+	onReturn(null); // TODO wait for text to finish
 }
 
-function linebreakFunc(environment,parameters) {
+function linebreakFunc(environment,parameters,onReturn) {
 	console.log("LINEBREAK FUNC");
 	environment.GetDialogBuffer().AddLinebreak();
+	onReturn(null);
 }
 
-function rainbowFunc(environment,parameters) {
+function rainbowFunc(environment,parameters,onReturn) {
 	if( environment.GetDialogBuffer().HasTextEffect("rainbow") )
 		environment.GetDialogBuffer().RemoveTextEffect("rainbow");
 	else
 		environment.GetDialogBuffer().AddTextEffect("rainbow");
+	onReturn(null);
 }
 
-function itemFunc(environment,parameters) {
+function itemFunc(environment,parameters,onReturn) {
 	var itemId = parameters[0];
 	var itemCount = player().inventory[itemId] ? player().inventory[itemId] : 0; // TODO : ultimately the environment should include a reference to the game state
 	console.log("ITEM FUNC " + itemId + " " + itemCount);
-	return itemCount;
+	onReturn(itemCount);
 }
 
 /* BUILT-IN OPERATORS */
-function setExp(environment,left,right) {
-	environment.SetVariable( left.name, right.Eval(environment) );
-	return left.Eval(environment);
+function setExp(environment,left,right,onReturn) {
+	// environment.SetVariable( left.name, right.Eval(environment) );
+	// return left.Eval(environment);
+
+	if(left.type != "variable") {
+		// not a variable! return null and hope for the best D:
+		onReturn( null );
+		return;
+	}
+
+	right.Eval(environment,function(rVal) {
+		environment.SetVariable( left.name, rVal );
+		left.Eval(environment,function(lVal) {
+			onReturn( lVal );
+		});
+	});
 }
-function equalExp(environment,left,right) {
-	return left.Eval(environment) === right.Eval(environment); 
+function equalExp(environment,left,right,onReturn) {
+	// return left.Eval(environment) === right.Eval(environment); 
+	right.Eval(environment,function(rVal){
+		left.Eval(environment,function(lVal){
+			onReturn( lVal === rVal );
+		});
+	});
 }
-function greaterExp(environment,left,right) {
-	return left.Eval(environment) > right.Eval(environment);
+function greaterExp(environment,left,right,onReturn) {
+	// return left.Eval(environment) > right.Eval(environment);
+	right.Eval(environment,function(rVal){
+		left.Eval(environment,function(lVal){
+			onReturn( lVal > rVal );
+		});
+	});
 }
-function lessExp(environment,left,right) {
-	return left.Eval(environment) < right.Eval(environment);
+function lessExp(environment,left,right,onReturn) {
+	// return left.Eval(environment) < right.Eval(environment);
+	right.Eval(environment,function(rVal){
+		left.Eval(environment,function(lVal){
+			onReturn( lVal < rVal );
+		});
+	});
 }
-function greaterEqExp(environment,left,right) {
-	return left.Eval(environment) >= right.Eval(environment);
+function greaterEqExp(environment,left,right,onReturn) {
+	// return left.Eval(environment) >= right.Eval(environment);
+	right.Eval(environment,function(rVal){
+		left.Eval(environment,function(lVal){
+			onReturn( lVal >= rVal );
+		});
+	});
 }
-function lessEqExp(environment,left,right) {
-	return left.Eval(environment) <= right.Eval(environment);
+function lessEqExp(environment,left,right,onReturn) {
+	// return left.Eval(environment) <= right.Eval(environment);
+	right.Eval(environment,function(rVal){
+		left.Eval(environment,function(lVal){
+			onReturn( lVal <= rVal );
+		});
+	});
 }
-function multExp(environment,left,right) {
-	return left.Eval(environment) * right.Eval(environment);
+function multExp(environment,left,right,onReturn) {
+	// return left.Eval(environment) * right.Eval(environment);
+	right.Eval(environment,function(rVal){
+		left.Eval(environment,function(lVal){
+			onReturn( lVal * rVal );
+		});
+	});
 }
-function divExp(environment,left,right) {
-	return left.Eval(environment) / right.Eval(environment);
+function divExp(environment,left,right,onReturn) {
+	// return left.Eval(environment) / right.Eval(environment);
+	right.Eval(environment,function(rVal){
+		left.Eval(environment,function(lVal){
+			onReturn( lVal / rVal );
+		});
+	});
 }
-function addExp(environment,left,right) {
-	return left.Eval(environment) + right.Eval(environment);
+function addExp(environment,left,right,onReturn) {
+	// return left.Eval(environment) + right.Eval(environment);
+	right.Eval(environment,function(rVal){
+		left.Eval(environment,function(lVal){
+			onReturn( lVal + rVal );
+		});
+	});
 }
-function subExp(environment,left,right) {
-	return left.Eval(environment) - right.Eval(environment);
+function subExp(environment,left,right,onReturn) {
+	// return left.Eval(environment) - right.Eval(environment);
+	right.Eval(environment,function(rVal){
+		left.Eval(environment,function(lVal){
+			onReturn( lVal - rVal );
+		});
+	});
 }
 
 /* ENVIRONMENT */
@@ -216,8 +279,13 @@ var Environment = function() {
 	functionMap.set("rbw", rainbowFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
-	this.EvalFunction = function(name,parameters) {
-		return functionMap.get( name )( this, parameters );
+	// this.EvalFunction = function(name,parameters) {
+	// 	return functionMap.get( name )( this, parameters );
+	// }
+	this.EvalFunction = function(name,parameters,onReturn) {
+		console.log(functionMap);
+		console.log(name);
+		functionMap.get( name )( this, parameters, onReturn );
 	}
 
 	var variableMap = new Map();
@@ -242,8 +310,11 @@ var Environment = function() {
 	operatorMap.set("-", subExp);
 
 	this.HasOperator = function(sym) { return operatorMap.get(sym); };
-	this.EvalOperator = function(sym,left,right) {
-		return operatorMap.get( sym )( this, left, right );
+	// this.EvalOperator = function(sym,left,right) {
+	// 	return operatorMap.get( sym )( this, left, right );
+	// }
+	this.EvalOperator = function(sym,left,right,onReturn) {
+		operatorMap.get( sym )( this, left, right, onReturn );
 	}
 }
 
@@ -261,18 +332,6 @@ var TreeRelationship = function() {
 		this.children.push( node );
 		node.parent = this;
 	};
-	this.Traverse = function() {
-		if( this.Visit )
-			this.Visit();
-
-		var i = 0;
-		while (i < this.children.length) {
-			this.children[i].Traverse();
-			i++;
-		}
-
-		// TODO need a way to pause while text is rendering?
-	}
 }
 
 // var Runnable = function() {
@@ -300,14 +359,33 @@ var BlockNode = function(/*mode*/) {
 	this.type = "block";
 	// this.mode = mode;
 
-	this.Eval = function(environment) {
+	// this.Eval = function(environment) {
+	// 	var lastVal = null;
+	// 	var i = 0;
+	// 	while (i < this.children.length) {
+	// 		lastVal = this.children[i].Eval(environment);
+	// 		i++;
+	// 	}
+	// 	return lastVal;
+	// }
+	this.Eval = function(environment,onReturn) {
 		var lastVal = null;
 		var i = 0;
-		while (i < this.children.length) {
-			lastVal = this.children[i].Eval(environment);
-			i++;
-		}
-		return lastVal;
+		function evalChildren(children,done) {
+			if(i < children.length) {
+				children[i].Eval( environment, function(val) {
+					lastVal = val;
+					i++;
+					evalChildren(children,done);
+				} );
+			}
+			else {
+				done();
+			}
+		};
+		evalChildren( this.children, function() {
+			onReturn(lastVal);
+		} );
 	}
 }
 
@@ -319,14 +397,38 @@ var FuncNode = function(name,arguments) {
 	this.name = name;
 	this.arguments = arguments;
 
-	this.Eval = function(environment) {
+	// this.Eval = function(environment) {
+	// 	var argumentValues = [];
+	// 	for(var i = 0; i < this.arguments.length; i++) {
+	// 		argumentValues.push( this.arguments[i].Eval( environment ) );
+	// 	}
+	// 	console.log("ARGS");
+	// 	console.log(argumentValues);
+	// 	return environment.EvalFunction( this.name, argumentValues );
+	// }
+	this.Eval = function(environment,onReturn) {
 		var argumentValues = [];
-		for(var i = 0; i < this.arguments.length; i++) {
-			argumentValues.push( this.arguments[i].Eval( environment ) );
-		}
-		console.log("ARGS");
-		console.log(argumentValues);
-		return environment.EvalFunction( this.name, argumentValues );
+		var i = 0;
+		function evalArgs(arguments,done) {
+			if(i < arguments.length) {
+				// Evaluate each argument
+				arguments[i].Eval( environment, function(val) {
+					argumentValues.push( val );
+					i++;
+					evalArgs(arguments,done);
+				} );
+			}
+			else {
+				done();
+			}
+		};
+		var self = this; // hack to deal with scope
+		evalArgs( this.arguments, function() {
+			// Then evaluate the function
+			console.log("ARGS");
+			console.log(argumentValues);
+			environment.EvalFunction( self.name, argumentValues, onReturn );
+		} );
 	}
 }
 
@@ -338,8 +440,11 @@ var LiteralNode = function(value) {
 	this.type = "literal";
 	this.value = value;
 
-	this.Eval = function(environment) {
-		return this.value; // TODO all Eval should return something, not just literals
+	// this.Eval = function(environment) {
+	// 	return this.value;
+	// }
+	this.Eval = function(environment,onReturn) {
+		onReturn(this.value);
 	}
 }
 
@@ -349,9 +454,12 @@ var VarNode = function(name) {
 	this.type = "variable";
 	this.name = name;
 
-	this.Eval = function(environment) {
-		return environment.GetVariable( this.name );
-	}
+	// this.Eval = function(environment) {
+	// 	return environment.GetVariable( this.name );
+	// }
+	this.Eval = function(environment,onReturn) {
+		onReturn( environment.GetVariable( this.name ) );
+	} // TODO: might want to store nodes in the variableMap instead of values???
 }
 
 var ExpNode = function(operator, left, right) {
@@ -361,10 +469,19 @@ var ExpNode = function(operator, left, right) {
 	this.left = left;
 	this.right = right;
 
-	this.Eval = function(environment) {
-		var expVal = environment.EvalOperator( this.operator, this.left, this.right );
-		console.log("EVAL EXP " + this.operator + " " + expVal);
-		return expVal;
+	// this.Eval = function(environment) {
+	// 	var expVal = environment.EvalOperator( this.operator, this.left, this.right );
+	// 	console.log("EVAL EXP " + this.operator + " " + expVal);
+	// 	return expVal;
+	// }
+	this.Eval = function(environment,onReturn) {
+		var self = this; // hack to deal with scope
+		environment.EvalOperator( this.operator, this.left, this.right, 
+			function(val){
+				console.log("EVAL EXP " + self.operator + " " + val);
+				onReturn(val);
+			} );
+		// NOTE : sadly this pushes a lot of complexity down onto the actual operator methods
 	}
 }
 

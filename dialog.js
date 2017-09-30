@@ -146,7 +146,8 @@ var DialogBuffer = function() {
 	var nextCharTimer = 0;
 	var nextCharMaxTime = 50; // in milliseconds
 	var isDialogReadyToContinue = false;
-	var tree = null; // holds dialog and command nodes in a tree structure
+
+	// var tree = null; // holds dialog and command nodes in a tree structure
 
 	/* NEW SCRIPT STUFF */
 	var scriptTree = null;
@@ -188,13 +189,9 @@ var DialogBuffer = function() {
 		onExit = exitHandler;
 
 		if( featureNewScript ) {
-			// scriptTree = script.NewParse( dialogSourceStr );
-			// var interp = script.CreateInterpreter();
-			// interp.SetDialogBuffer(this); // hacky
-			// interp.Run( dialogSourceStr ); // hacky
-			// console.log( scriptTree );
-
-			scriptInterpreter.Run( dialogSourceStr ); // still hacky but less so
+			scriptInterpreter.Run( dialogSourceStr, 
+					function() { console.log("SCRIPT DONE!!!!!!!!!"); }
+				); // still hacky but less so
 		}
 		else {
 			var dml = new DialogMarkup();
