@@ -141,28 +141,61 @@ possitble names
 	- talk
 	- dialog
 */
-function say(environment,parameters) {
+function sayFunc(environment,parameters) {
 	console.log("SAY FUNC");
-	environment.GetDialogBuffer().AddText( parameters[0] /*textStr*/, [] /*nodeTrail*/ );
+	environment.GetDialogBuffer().AddText( parameters[0].toString() /*textStr*/, [] /*nodeTrail*/ );
 }
 
-function linebreak(environment,parameters) {
+function linebreakFunc(environment,parameters) {
 	console.log("LINEBREAK FUNC");
 	environment.GetDialogBuffer().AddLinebreak();
 }
 
-function rainbow(environment,parameters) {
+function rainbowFunc(environment,parameters) {
 	if( environment.GetDialogBuffer().HasTextEffect("rainbow") )
 		environment.GetDialogBuffer().RemoveTextEffect("rainbow");
 	else
 		environment.GetDialogBuffer().AddTextEffect("rainbow");
 }
 
-function item(environment,parameters) {
+function itemFunc(environment,parameters) {
 	var itemId = parameters[0];
 	var itemCount = player().inventory[itemId] ? player().inventory[itemId] : 0; // TODO : ultimately the environment should include a reference to the game state
 	console.log("ITEM FUNC " + itemId + " " + itemCount);
 	return itemCount;
+}
+
+/* BUILT-IN OPERATORS */
+function setExp(environment,left,right) {
+	environment.SetVariable( left.name, right.Eval(environment) );
+	return left.Eval(environment);
+}
+function equalExp(environment,left,right) {
+	return left.Eval(environment) === right.Eval(environment); 
+}
+function greaterExp(environment,left,right) {
+	return left.Eval(environment) > right.Eval(environment);
+}
+function lessExp(environment,left,right) {
+	return left.Eval(environment) < right.Eval(environment);
+}
+function greaterEqExp(environment,left,right) {
+	return left.Eval(environment) >= right.Eval(environment);
+}
+function lessEqExp(environment,left,right) {
+	return left.Eval(environment) <= right.Eval(environment);
+}
+function multExp(environment,left,right) {
+	return left.Eval(environment) * right.Eval(environment);
+}
+function divExp(environment,left,right) {
+	return left.Eval(environment) / right.Eval(environment);
+}
+function addExp(environment,left,right) {
+	return left.Eval(environment) + right.Eval(environment);
+}
+function subExp(environment,left,right) {
+	return left.Eval(environment) - right.Eval(environment);
 }
 
 /* ENVIRONMENT */
@@ -172,22 +205,41 @@ var Environment = function() {
 	this.GetDialogBuffer = function() { return dialogBuffer; };
 
 	var functionMap = new Map();
-	functionMap.set("say", say);
-	functionMap.set("linebreak", linebreak);
-	functionMap.set("rainbow", rainbow);
-	functionMap.set("item", item);
+	functionMap.set("say", sayFunc);
+	functionMap.set("linebreak", linebreakFunc);
+	functionMap.set("item", itemFunc);
+	functionMap.set("rbw", rainbowFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
-	this.RunFunction = function(name,parameters) {
+	this.EvalFunction = function(name,parameters) {
 		return functionMap.get( name )( this, parameters );
 	}
 
 	var variableMap = new Map();
 	variableMap.set("x", "0"); // TODO : remove test variable
+	variableMap.set("msg", "A variable message!");
+	variableMap.set("y", 5);
 
 	this.HasVariable = function(name) { return variableMap.has(name); };
 	this.GetVariable = function(name) { return variableMap.get(name); };
 	this.SetVariable = function(name,value) { variableMap.set(name, value); };
+
+	var operatorMap = new Map();
+	operatorMap.set("=", setExp);
+	operatorMap.set("==", equalExp);
+	operatorMap.set(">", greaterExp);
+	operatorMap.set("<", lessExp);
+	operatorMap.set(">=", greaterEqExp);
+	operatorMap.set("<=", lessEqExp);
+	operatorMap.set("*", multExp);
+	operatorMap.set("/", divExp);
+	operatorMap.set("+", addExp);
+	operatorMap.set("-", subExp);
+
+	this.HasOperator = function(sym) { return operatorMap.get(sym); };
+	this.EvalOperator = function(sym,left,right) {
+		return operatorMap.get( sym )( this, left, right );
+	}
 }
 
 /* node ideas
@@ -269,7 +321,7 @@ var FuncNode = function(name,arguments) {
 		}
 		console.log("ARGS");
 		console.log(argumentValues);
-		return environment.RunFunction( this.name, argumentValues );
+		return environment.EvalFunction( this.name, argumentValues );
 	}
 }
 
@@ -294,6 +346,20 @@ var VarNode = function(name) {
 
 	this.Eval = function(environment) {
 		return environment.GetVariable( this.name );
+	}
+}
+
+var ExpNode = function(operator, left, right) {
+	Object.assign( this, new TreeRelationship() );
+	this.type = "operator";
+	this.operator = operator;
+	this.left = left;
+	this.right = right;
+
+	this.Eval = function(environment) {
+		var expVal = environment.EvalOperator( this.operator, this.left, this.right );
+		console.log("EVAL EXP " + this.operator + " " + expVal);
+		return expVal;
 	}
 }
 
@@ -334,6 +400,17 @@ var Parser = function(env) {
 					return false;
 			}
 			return true;
+		}
+		this.Peak = function(end) {
+			var str = "";
+			var j = i;
+			// console.log(j);
+			while(j < sourceStr.length && sourceStr[j] != end) {
+				str += sourceStr[j];
+				j++;
+			}
+			console.log("PEAK ::" + str + "::");
+			return str;
 		}
 		this.ConsumeBlock = function( open, close ) {
 			var startIndex = i;
@@ -499,6 +576,7 @@ var Parser = function(env) {
 
 		var curSymbol = "";
 		function OnSymbolEnd() {
+			curSymbol = curSymbol.trim();
 			console.log("SYMBOL " + curSymbol);
 			var num = parseFloat(curSymbol);
 			console.log(num);
@@ -548,24 +626,71 @@ var Parser = function(env) {
 		return state;
 	}
 
-	function ParseCode(state) {
-		// TODO : how do I do this parsing??? one expression per block? or per line?
+	var setSymbol = "=";
+	var operatorSymbols = ["==", ">", "<", ">=", "<=", "*", "/", "+", "-"];
+	function CreateExpression(expStr) {
+		expStr = expStr.trim();
+	
+		var operator = null;
 
-		var curSymbol = "";
-		function OnSymbolEnd() {
-			console.log("SYMBOL");
-			console.log(curSymbol);
-			if(environment.HasFunction(curSymbol))
-			{
-				state = ParseFunction( state, curSymbol );
+		// set is special because other operator can look like it, and it has to go first in the order of operations
+		var setIndex = expStr.indexOf(setSymbol);
+		if(setIndex > -1) { // it might be a set operator
+			if( expStr[setIndex+1] != "=" && expStr[setIndex-1] != ">" && expStr[setIndex-1] != "<" ) {
+				// ok it actually IS a set operator and not ==, >=, or <=
+				operator = setSymbol;
+				var left = CreateExpression( expStr.substring(0,setIndex) );
+				var right = CreateExpression( expStr.substring(setIndex+setSymbol.length) );
+				var exp = new ExpNode( operator, left, right );
+				return exp;
 			}
-			else {
-				return state; // TODO
-			}
-
-			curSymbol = "";
 		}
 
+		for( var i = 0; (operator == null) && (i < operatorSymbols.length); i++ ) {
+			var opSym = operatorSymbols[i];
+			var opIndex = expStr.indexOf( opSym );
+			if( opIndex > -1 ) {
+				operator = opSym;
+				var left = CreateExpression( expStr.substring(0,opIndex) );
+				var right = CreateExpression( expStr.substring(opIndex+opSym.length) );
+				var exp = new ExpNode( operator, left, right );
+				return exp;
+			}
+		}
+
+		if( operator == null ) {
+			if(expStr[0] === Sym.CodeOpen) {
+				// CODE BLOCK!!!
+				var codeBlockState = new ParserState( new BlockNode(), expStr );
+				codeBlockState = ParseCodeBlock( codeBlockState ); // TODO: I think this will create too many nested blocks
+				return codeBlockState.rootNode;
+			}
+			else if( environment.HasVariable(expStr) ) {
+				return new VarNode(expStr);
+			}
+			else if( parseFloat(expStr) ) {
+				return new LiteralNode( parseFloat(expStr) );
+			}
+			else {
+				// uh oh
+				return new LiteralNode(null);
+			}
+			// TODO : strings I guess
+		}
+	}
+
+	function ParseExpression(state) {
+		var line = state.Peak( Sym.Linebreak );
+		console.log("EXPRESSION " + line);
+		var exp = CreateExpression( line );
+		console.log(exp);
+		state.curNode.AddChild( exp );
+		state.Step( line.length );
+		return state;
+	}
+
+	function ParseCode(state) {
+		// TODO : how do I do this parsing??? one expression per block? or per line?
 		while ( !state.Done() ) {
 
 			if( state.MatchAhead(Sym.DialogOpen) ) {
@@ -574,21 +699,14 @@ var Parser = function(env) {
 			else if( state.MatchAhead(Sym.CodeOpen) ) {
 				state = ParseCodeBlock( state );
 			}
-			else {
-				console.log(state.Char());
-				if(state.Char() === " ") {
-					OnSymbolEnd();
-				}
-				else {
-					curSymbol += state.Char();
-					// console.log(curSymbol);
-				}
-				state.Step();
+			else if( environment.HasFunction( state.Peak(" ") ) ) { // TODO --- what about newlines???
+				var funcName = state.Peak(" ");
+				state.Step( funcName.length );
+				state = ParseFunction( state, funcName );
 			}
-		}
-
-		if(curSymbol.length > 0) {
-			OnSymbolEnd();
+			else {
+				state = ParseExpression( state );
+			}
 		}
 
 		return state;
