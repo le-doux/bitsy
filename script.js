@@ -123,48 +123,13 @@ var Interpreter = function() {
 
 	this.SetDialogBuffer = function(buffer) { env.SetDialogBuffer( buffer ); };
 
-	this.Run = function(scriptStr, exitHandler) {
+	this.Run = function(scriptStr, exitHandler) { // TODO : do I need the exit handler
 		console.log("RUNNNN");
 		var tree = parser.Parse( scriptStr );
-		tree.Eval( env, 
-			function() {
-
-				console.log("MAIN SRIPT DONE!!!");
-				console.log( env.GetDialogBuffer() != null );
-
-				// if( env.GetDialogBuffer() != null && env.GetDialogBuffer().CanContinue() ) {
-
-
-					// console.log("WAIT TO END");
-
-					// // we have a dialog buffer we need to wait for!
-					// var endFlag = { ready:false };
-					// env.GetDialogBuffer().WaitToEnd( endFlag );
-
-					// function checkContinue() {
-					// 	console.log("END? " + endFlag.ready);
-					// 	if(endFlag.ready) {
-					// 		console.log("SCRIPT DONE!!!!!!!!");
-					// 		if(exitHandler != null) exitHandler(); // the end!
-					// 	}
-					// 	else {
-					// 		setTimeout( function() {
-					// 			checkContinue();
-					// 		}, 0);
-					// 	}
-					// }
-					// checkContinue();
-
-
-
-				// }
-				// else {					
-				// 	console.log("SCRIPT DONE!!!!!!!!");
-				// 	if(exitHandler != null) exitHandler(); // the end!
-				// }
-
-			}
-		);
+		tree.Eval( env, function() {
+			if(exitHandler != null)
+				exitHandler();
+		} );
 	}
 
 	this.ResetEnvironment = function() {
@@ -204,19 +169,49 @@ function linebreakFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
-function rainbowFunc(environment,parameters,onReturn) {
-	if( environment.GetDialogBuffer().HasTextEffect("rainbow") )
-		environment.GetDialogBuffer().RemoveTextEffect("rainbow");
-	else
-		environment.GetDialogBuffer().AddTextEffect("rainbow");
-	onReturn(null);
-}
-
 function itemFunc(environment,parameters,onReturn) {
 	var itemId = parameters[0];
 	var itemCount = player().inventory[itemId] ? player().inventory[itemId] : 0; // TODO : ultimately the environment should include a reference to the game state
 	console.log("ITEM FUNC " + itemId + " " + itemCount);
 	onReturn(itemCount);
+}
+
+function addOrRemoveTextEffect(environment,name) {
+	if( environment.GetDialogBuffer().HasTextEffect(name) )
+		environment.GetDialogBuffer().RemoveTextEffect(name);
+	else
+		environment.GetDialogBuffer().AddTextEffect(name);
+}
+
+function rainbowFunc(environment,parameters,onReturn) {
+	addOrRemoveTextEffect(environment,"rbw");
+	onReturn(null);
+}
+
+// TODO : should the colors use a parameter instead of special names?
+function color1Func(environment,parameters,onReturn) {
+	addOrRemoveTextEffect(environment,"clr1");
+	onReturn(null);
+}
+
+function color2Func(environment,parameters,onReturn) {
+	addOrRemoveTextEffect(environment,"clr2");
+	onReturn(null);
+}
+
+function color3Func(environment,parameters,onReturn) {
+	addOrRemoveTextEffect(environment,"clr3");
+	onReturn(null);
+}
+
+function wavyFunc(environment,parameters,onReturn) {
+	addOrRemoveTextEffect(environment,"wvy");
+	onReturn(null);
+}
+
+function shakyFunc(environment,parameters,onReturn) {
+	addOrRemoveTextEffect(environment,"shk");
+	onReturn(null);
 }
 
 /* BUILT-IN OPERATORS */
@@ -321,6 +316,11 @@ var Environment = function() {
 	functionMap.set("linebreak", linebreakFunc);
 	functionMap.set("item", itemFunc);
 	functionMap.set("rbw", rainbowFunc);
+	functionMap.set("clr1", color1Func);
+	functionMap.set("clr2", color2Func);
+	functionMap.set("clr3", color3Func);
+	functionMap.set("wvy", wavyFunc);
+	functionMap.set("shk", shakyFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	// this.EvalFunction = function(name,parameters) {

@@ -1750,6 +1750,8 @@ var dialogRenderer = dialogModule.CreateRenderer();
 var dialogBuffer = dialogModule.CreateBuffer();
 
 function onExitDialog() {
+	// var breakShit = null;
+	// breakShit();
 	console.log("EXIT DIALOG");
 	isDialogMode = false;
 	if (isNarrating) isNarrating = false;
@@ -1796,7 +1798,10 @@ function startDialog(dialogStr) {
 
 	dialogBuffer.Reset();
 	scriptInterpreter.SetDialogBuffer( dialogBuffer );
-	scriptInterpreter.Run( dialogStr, onExitDialog );
+	scriptInterpreter.Run( dialogStr, function() {
+		if(!dialogBuffer.IsActive())
+			onExitDialog();
+	} );
 }
 
 /* NEW SCRIPT STUFF */
