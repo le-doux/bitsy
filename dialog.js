@@ -183,6 +183,8 @@ var DialogBuffer = function() {
 		rowIndex = 0;
 		charIndex = 0;
 		isDialogReadyToContinue = false;
+
+		isActive = false;
 	};
 	
 	// var onExit = null;
@@ -317,6 +319,8 @@ var DialogBuffer = function() {
 		// make sure scripting engine knows we can close this down now
 		// if(endFlag != null)
 		// 	endFlag.ready = true;
+
+		isActive = false; // no more text to show... this should be a sign to stop rendering dialog
 	}
 
 	this.Continue = function() {
@@ -325,12 +329,17 @@ var DialogBuffer = function() {
 		if (pageIndex + 1 < this.CurPageCount()) {
 			//start next page
 			this.FlipPage();
+			return true; /* hasMoreDialog */
 		}
 		else {
 			//end dialog mode
 			this.EndDialog();
+			return false; /* hasMoreDialog */
 		}
 	};
+
+	var isActive = false;
+	this.IsActive = function() { return isActive; };
 
 	this.CanContinue = function() { return isDialogReadyToContinue; };
 
@@ -430,6 +439,8 @@ var DialogBuffer = function() {
 			buffer.splice( buffer.length-1, 1 );
 
 		console.log(buffer);
+
+		isActive = true;
 	};
 
 	this.AddLinebreak = function() {

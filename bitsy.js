@@ -183,10 +183,14 @@ function onTouch(e) {
 		return;
 
 	//dialog mode
-	if (isDialogMode) {
+	// if (isDialogMode) {
+	if(dialogBuffer.IsActive()) {
 
 		if (dialogBuffer.CanContinue()) {
-			dialogBuffer.Continue();
+			var hasMoreDialog = dialogBuffer.Continue();
+			if(!hasMoreDialog) {
+				onExitDialog();
+			}
 		}
 		else {
 			dialogBuffer.Skip();
@@ -489,7 +493,8 @@ function update() {
 		drawRoom( room[curRoom] ); // draw world if game has begun
 	}
 
-	if (isDialogMode) { // dialog mode
+	// if (isDialogMode) { // dialog mode
+	if(dialogBuffer.IsActive()) {
 		dialogRenderer.Draw( dialogBuffer, deltaTime );
 		dialogBuffer.Update( deltaTime );
 	}
@@ -629,12 +634,15 @@ function onkeydown(e) {
 	// console.log(dialog);
 	e.preventDefault();
 
-	if (isDialogMode) {
-
+	// if (isDialogMode) {
+	if(dialogBuffer.IsActive()) {
 		/* CONTINUE DIALOG */
 
 		if (dialogBuffer.CanContinue()) {
-			dialogBuffer.Continue();
+			var hasMoreDialog = dialogBuffer.Continue();
+			if(!hasMoreDialog) {
+				onExitDialog();
+			}
 		}
 		else {
 			dialogBuffer.Skip();
