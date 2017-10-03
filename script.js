@@ -134,25 +134,29 @@ var Interpreter = function() {
 
 				// if( env.GetDialogBuffer() != null && env.GetDialogBuffer().CanContinue() ) {
 
-					console.log("WAIT TO END");
 
-					// we have a dialog buffer we need to wait for!
-					var endFlag = { ready:false };
-					env.GetDialogBuffer().WaitToEnd( endFlag );
+					// console.log("WAIT TO END");
 
-					function checkContinue() {
-						console.log("END? " + endFlag.ready);
-						if(endFlag.ready) {
-							console.log("SCRIPT DONE!!!!!!!!");
-							if(exitHandler != null) exitHandler(); // the end!
-						}
-						else {
-							setTimeout( function() {
-								checkContinue();
-							}, 0);
-						}
-					}
-					checkContinue();
+					// // we have a dialog buffer we need to wait for!
+					// var endFlag = { ready:false };
+					// env.GetDialogBuffer().WaitToEnd( endFlag );
+
+					// function checkContinue() {
+					// 	console.log("END? " + endFlag.ready);
+					// 	if(endFlag.ready) {
+					// 		console.log("SCRIPT DONE!!!!!!!!");
+					// 		if(exitHandler != null) exitHandler(); // the end!
+					// 	}
+					// 	else {
+					// 		setTimeout( function() {
+					// 			checkContinue();
+					// 		}, 0);
+					// 	}
+					// }
+					// checkContinue();
+
+
+
 				// }
 				// else {					
 				// 	console.log("SCRIPT DONE!!!!!!!!");
@@ -184,23 +188,11 @@ function sayFunc(environment,parameters,onReturn) {
 	console.log("SAY FUNC");
 	if( parameters[0] ) {
 		var textStr = parameters[0].toString();
-		var continueFlag = {
-			ready : false
-		};
-		environment.GetDialogBuffer().AddText( textStr, continueFlag );
-
-		// wait until the dialog is finished before continuing with the script
-		function checkContinue() {
-			if(continueFlag.ready) {
-				onReturn(null); // return null or return the string?
-			}
-			else {
-				setTimeout( function() {
-					checkContinue();
-				}, 0);
-			}
-		}
-		checkContinue();
+		var onFinishHandler = function() {
+			console.log("FINISHED PRINTING ---- SCRIPT");
+			onReturn(null);
+		}; // called when dialog is finished printing
+		environment.GetDialogBuffer().AddText( textStr, onFinishHandler );
 	}
 	else
 		onReturn(null);

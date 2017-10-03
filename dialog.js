@@ -106,6 +106,9 @@ var DialogRenderer = function() {
 				}
 			}
 		}
+		
+		// call printHandler for character
+		char.OnPrint();
 	};
 
 	var effectTime = 0; // TODO this variable should live somewhere better
@@ -202,7 +205,7 @@ var DialogBuffer = function() {
 	// };
 
 	this.TryFillBuffer = function() {
-		console.log("TRY FILL BUFFER!!!!!");
+		// console.log("TRY FILL BUFFER!!!!!");
 
 		// after drawing the last character in the current dialog buffer, do the next dialog tree traversal
 		// if( pageIndex === this.CurPageCount()-1 
@@ -222,18 +225,20 @@ var DialogBuffer = function() {
 
 		// }
 
-		if( pageIndex === this.CurPageCount()-1 
-			&& rowIndex === this.CurRowCount()-1 
-			&& charIndex === this.CurCharCount()-1 
-			&& continueFlag != null && !continueFlag.ready )
-		{
-			console.log("SCRIPT CAN CONTINUE")
-			continueFlag.ready = true;
-		}
+
+		/* CONTINUE FLAG VERSION */
+		// if( pageIndex === this.CurPageCount()-1 
+		// 	&& rowIndex === this.CurRowCount()-1 
+		// 	&& charIndex === this.CurCharCount()-1 
+		// 	&& continueFlag != null && !continueFlag.ready )
+		// {
+		// 	console.log("SCRIPT CAN CONTINUE")
+		// 	continueFlag.ready = true;
+		// }
 	};
 
 	this.DoNextChar = function() {
-		console.log("DO NEXT CHAR");
+		// console.log("DO NEXT CHAR");
 
 		nextCharTimer = 0; //reset timer
 
@@ -252,8 +257,10 @@ var DialogBuffer = function() {
 			isDialogReadyToContinue = true;
 			didPageFinishThisFrame = true;
 
-			console.log("WAITING FOR INPUT");
+			// console.log("WAITING FOR INPUT");
 		}
+
+		this.CurChar().OnPrint(); // make sure we hit the callback before we run out of text
 
 		this.TryFillBuffer();
 	};
@@ -274,6 +281,7 @@ var DialogBuffer = function() {
 	};
 
 	this.Skip = function() {
+		console.log("SKIPPP");
 		didPageFinishThisFrame = false;
 		didFlipPageThisFrame = false;
 		// add new characters until you get to the end of the current line of dialog
@@ -307,8 +315,8 @@ var DialogBuffer = function() {
 		// onExitDialog(); // TODO: this global so it's bad
 
 		// make sure scripting engine knows we can close this down now
-		if(endFlag != null)
-			endFlag.ready = true;
+		// if(endFlag != null)
+		// 	endFlag.ready = true;
 	}
 
 	this.Continue = function() {
@@ -345,6 +353,18 @@ var DialogBuffer = function() {
 				TextEffects[ effectName ].DoEffect( this, time );
 			}
 		}
+
+		var printHandler = null; // optional function to be called once on printing character
+		this.SetPrintHandler = function(handler) {
+			printHandler = handler;
+		}
+		this.OnPrint = function() {
+			if (printHandler != null) {
+				console.log("PRINT HANDLER ---- DIALOG BUFFER");
+				printHandler();
+				printHandler = null; // only call handler once (hacky)
+			}
+		}
 	};
 
 	function AddWordToCharArray(charArray,word,effectList) {
@@ -354,9 +374,8 @@ var DialogBuffer = function() {
 		return charArray;
 	}
 
-	var continueFlag = null;
 	var charsPerRow = 32;
-	this.AddText = function(textStr,flag) {
+	this.AddText = function(textStr,onFinishHandler) {
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
 
@@ -399,6 +418,7 @@ var DialogBuffer = function() {
 		//finish up 
 		if( curRowArr.length > 0 ) {
 			buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
+			curRowArr[ curRowArr.length - 1 ].SetPrintHandler( onFinishHandler );
 		}
 
 		//destroy any empty stuff
@@ -410,8 +430,6 @@ var DialogBuffer = function() {
 			buffer.splice( buffer.length-1, 1 );
 
 		console.log(buffer);
-
-		continueFlag = flag;
 	};
 
 	this.AddLinebreak = function() {
@@ -429,11 +447,11 @@ var DialogBuffer = function() {
 	}
 
 	// used by script interpreter to tell buffer to tell it when it's done
-	var endFlag = null;
-	this.WaitToEnd = function(flag) {
-		console.log("PLZ WAIT");
-		endFlag = flag;
-	}
+	// var endFlag = null;
+	// this.WaitToEnd = function(flag) {
+	// 	console.log("PLZ WAIT");
+	// 	endFlag = flag;
+	// }
 
 	/* new text effects */
 	this.HasTextEffect = function(name) {
