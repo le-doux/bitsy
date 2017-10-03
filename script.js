@@ -111,6 +111,64 @@ block
 	} <- more like inserting a JS block
 */
 
+/* IF SYNTAX OPTIONS
+{when
+	* cond1
+	    result1
+	* cond2
+	    result2
+	* otherwise
+	    default
+}
+{if
+	* cond1
+	    result1
+	* cond2
+	    result2
+	* else
+	    default
+}
+{case
+	* cond1
+	    result1
+	* cond2
+	    result2
+	* default
+	    default
+}
+{branch
+	* cond1
+	    result1
+	* cond2
+	    result2
+	* default
+	    default
+}
+{cond
+	{cond1
+	  result1}
+	{cond2
+	  result2}
+	{else
+	  default}
+}
+{if cond1
+	result1
+ elseif cond2
+    result2
+ else
+    default
+}
+
+compare with choice
+{choice
+	* choice1
+	    path1
+	* choice2
+	    path2
+}
+*/
+
 function Script() {
 
 this.CreateInterpreter = function() {
