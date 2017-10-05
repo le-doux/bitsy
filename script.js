@@ -82,15 +82,6 @@ vs
 - environment needs a way to wait on dialog buffer (handler)
 */
 
-/*
-function
-	name
-	parameters
-variable
-	type (needed?)
-block
-	type
-*/
 
 /* MORE SYNTAX QUESTIONS
 
@@ -112,61 +103,46 @@ block
 */
 
 /* IF SYNTAX OPTIONS
-{when
-	* cond1
-	    result1
-	* cond2
-	    result2
-	* otherwise
-	    default
-}
-{if
-	* cond1
-	    result1
-	* cond2
-	    result2
-	* else
-	    default
-}
-{case
-	* cond1
-	    result1
-	* cond2
-	    result2
-	* default
-	    default
-}
-{branch
-	* cond1
-	    result1
-	* cond2
-	    result2
-	* default
-	    default
-}
-{cond
-	{cond1
-	  result1}
-	{cond2
-	  result2}
-	{else
-	  default}
-}
-{if cond1
-	result1
- elseif cond2
-    result2
- else
-    default
+NOTE: they use escape characters! (so could I potentially)
+	NOTE: for now... I could get rid of problematic characters in the UI (later I can escape them)
+NOTE: what to do about whitespace?
+
+{choice:
+	- go to the forest
+		the forest is full of trees
+	- go to the cave
+		the cave is full of rocks!
 }
 
-compare with choice
-{choice
-	* choice1
-	    path1
-	* choice2
-	    path2
+
+{cycle:
+	- hi
+	- how are you?
+	- quit talking to me
 }
+
+IFs
+{
+	- x < 3:
+		say this text
+	- x > 3:
+		say this other text
+	- else:
+		default text
+}
+{ x < 3 : say this text }
+
+{
+	- x < 3 ?
+		say this text
+	- x > 3 ?
+		say this text
+	-
+		default text
+}
+{ x < 3 ? say this text }
+{ x < 3 ? say this text - default }
+
 */
 
 function Script() {
