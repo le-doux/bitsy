@@ -385,6 +385,8 @@ var DialogBuffer = function() {
 			buffer.push( [[]] );
 		}
 		console.log(buffer);
+
+		isActive = true;
 	}
 
 	/* new text effects */

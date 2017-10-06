@@ -563,6 +563,18 @@ var ExpNode = function(operator, left, right) {
 	}
 }
 
+var ShuffleNode = function(options) {
+	Object.assign( this, new TreeRelationship() );
+	this.type = "shuffle";
+	this.options = options;
+
+	this.Eval = function(environment,onReturn) {
+		var index = Math.floor(Math.random() * this.options.length);
+		console.log("SHUFFLE " + index);
+		this.options[index].Eval( environment, onReturn );
+	}
+}
+
 var Parser = function(env) {
 	var environment = env;
 
@@ -605,11 +617,11 @@ var Parser = function(env) {
 			var str = "";
 			var j = i;
 			// console.log(j);
-			while(j < sourceStr.length && sourceStr[j] != end) {
+			while(j < sourceStr.length && end.indexOf( sourceStr[j] ) == -1 ) {
 				str += sourceStr[j];
 				j++;
 			}
-			console.log("PEAK ::" + str + "::");
+			// console.log("PEAK ::" + str + "::");
 			return str;
 		}
 		this.ConsumeBlock = function( open, close ) {
@@ -639,6 +651,7 @@ var Parser = function(env) {
 
 			return sourceStr.slice( startIndex + open.length, i - close.length );
 		}
+		this.Print = function() {console.log(sourceStr);};
 
 		// var saveIndex = 0;
 		// this.Save = function() { saveIndex = i; };
@@ -670,6 +683,9 @@ var Parser = function(env) {
 	- first line of dialog block: NO
 	*/
 	function ParseDialog(state) {
+		console.log("PARSE DIALOG");
+		state.Print();
+
 		// for linebreak logic: add linebreaks after lines with dialog or empty lines (if it's not the very first line)
 		var hasBlock = false;
 		var hasDialog = false;
@@ -678,6 +694,8 @@ var Parser = function(env) {
 		var text = "";
 		var addTextNode = function() {
 			if (text.length > 0) {
+				console.log("TEXT " + text);
+
 				state.curNode.AddChild( new FuncNode( "say", [new LiteralNode(text)] ) );
 				text = "";
 
@@ -703,9 +721,29 @@ var Parser = function(env) {
 				if ( state.MatchAhead(Sym.Linebreak) ) {
 					addTextNode();
 
+					/*
+					NOTES:
+					linebreaks SHOULD happen on
+					- lines with text (including the first or last line)
+					- empty lines (that are NOT the first or last line)
+					linebreaks should NOT happen on
+					- lines with only CODE blocks
+					- empty FIRST or LAST lines
+
+					also, apparently:
+					- NEVER line break on the last line
+					*/
 					var isLastLine = (state.Index() + 1) == state.Count();
-					var hasBlockOnly = hasBlock && !hasDialog;
-					var shouldAddLinebreak = !hasBlockOnly && !(isFirstLine || isLastLine);
+					var isEmptyLine = !hasBlock && !hasDialog;
+					// console.log("--linebreak???--");
+					// console.log("hasDialog " + hasDialog);
+					// console.log("isEmptyLine " + isEmptyLine);
+					// console.log("isFirstLine " + isFirstLine);
+					// console.log("isLastLine " + isLastLine);
+					var isValidEmptyLine = isEmptyLine && !(isFirstLine || isLastLine);
+					var shouldAddLinebreak = (hasDialog || isValidEmptyLine) && !isLastLine; // last clause is a hack (but it works - why?)
+					// console.log("--- shouldAddLinebreak " + shouldAddLinebreak);
+
 					if( shouldAddLinebreak )
 						state.curNode.AddChild( new FuncNode( "linebreak", [] ) ); // use function or character?
 
@@ -725,7 +763,6 @@ var Parser = function(env) {
 		}
 		addTextNode();
 
-		console.log("PARSE DIALOG");
 		console.log(state);
 		return state;
 	}
@@ -763,6 +800,59 @@ var Parser = function(env) {
 				else
 					look for expressions, etc.
 	*/
+
+	function IsSequence(str) {
+		// console.log("IsSequence? " + str);
+		return str === "sequence" || str === "cycle" || str === "shuffle";
+	}
+
+	// TODO: don't forget about eating whitespace
+	function ParseSequence(state, sequenceType) {
+		console.log("SEQUENCE " + sequenceType);
+		state.Print();
+
+		var isNewline = false;
+		var itemStrings = [];
+		var curItemIndex = -1; // -1 indicates not reading an item yet
+		while( !state.Done() ) {
+			var isWhitespace = (state.Char() === " " || state.Char() === "\t");
+			var isSkippableWhitespace = isNewline && isWhitespace;
+			var isNewListItem = isNewline && (state.Char() === "-");
+
+			if(isNewListItem) {
+				// console.log("found next list item");
+				curItemIndex++;
+				itemStrings[curItemIndex] = "";
+			}
+			else if(curItemIndex > -1) {
+				if(!isSkippableWhitespace)
+					itemStrings[curItemIndex] += state.Char();
+			}
+
+			isNewline = (state.Char() === Sym.Linebreak) || isSkippableWhitespace || isNewListItem;
+
+			// console.log(state.Char());
+			state.Step();
+		}
+		// console.log(itemStrings);
+		// console.log("SEQUENCE DONE");
+
+		var options = [];
+		for(var i = 0; i < itemStrings.length; i++) {
+			var str = itemStrings[i];
+			var dialogBlockState = new ParserState( new BlockNode(), str );
+			dialogBlockState = ParseDialog( dialogBlockState );
+			var dialogBlock = dialogBlockState.rootNode;
+			options.push( dialogBlock );
+		}
+
+		// console.log(options);
+
+		if(sequenceType === "shuffle")
+			state.curNode.AddChild( new ShuffleNode( options ) );
+
+		return state;
+	}
 
 	/*
 	PARAMETER possibilities
@@ -880,7 +970,7 @@ var Parser = function(env) {
 	}
 
 	function ParseExpression(state) {
-		var line = state.Peak( Sym.Linebreak );
+		var line = state.Peak( [Sym.Linebreak] );
 		console.log("EXPRESSION " + line);
 		var exp = CreateExpression( line );
 		console.log(exp);
@@ -899,10 +989,15 @@ var Parser = function(env) {
 			else if( state.MatchAhead(Sym.CodeOpen) ) {
 				state = ParseCodeBlock( state );
 			}
-			else if( environment.HasFunction( state.Peak(" ") ) ) { // TODO --- what about newlines???
-				var funcName = state.Peak(" ");
+			else if( environment.HasFunction( state.Peak( [" "] ) ) ) { // TODO --- what about newlines???
+				var funcName = state.Peak( [" "] );
 				state.Step( funcName.length );
 				state = ParseFunction( state, funcName );
+			}
+			else if( IsSequence( state.Peak( [" ", Sym.Linebreak] ) ) ) {
+				var sequenceType = state.Peak( [" ", Sym.Linebreak] );
+				state.Step( sequenceType.length );
+				state = ParseSequence( state, sequenceType );
 			}
 			else {
 				state = ParseExpression( state );
@@ -922,10 +1017,6 @@ var Parser = function(env) {
 		codeState = ParseCode( codeState );
 		
 		state.curNode.AddChild( codeState.rootNode );
-
-		// eat next linebreak
-		// if( state.MatchAhead( Sym.Linebreak ) )
-		// 	state.Step();
 
 		return state;
 	}
