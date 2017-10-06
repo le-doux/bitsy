@@ -194,7 +194,10 @@ possitble names
 */
 function sayFunc(environment,parameters,onReturn) {
 	console.log("SAY FUNC");
+	console.log(parameters);
 	if( parameters[0] ) {
+		console.log(parameters[0]);
+		console.log(parameters[0].toString());
 		var textStr = parameters[0].toString();
 		var onFinishHandler = function() {
 			console.log("FINISHED PRINTING ---- SCRIPT");
@@ -259,6 +262,7 @@ function shakyFunc(environment,parameters,onReturn) {
 
 /* BUILT-IN OPERATORS */
 function setExp(environment,left,right,onReturn) {
+	console.log("SET " + left.name);
 	// environment.SetVariable( left.name, right.Eval(environment) );
 	// return left.Eval(environment);
 
@@ -270,6 +274,7 @@ function setExp(environment,left,right,onReturn) {
 
 	right.Eval(environment,function(rVal) {
 		environment.SetVariable( left.name, rVal );
+		console.log("VAL " + environment.GetVariable( left.name ) );
 		left.Eval(environment,function(lVal) {
 			onReturn( lVal );
 		});
@@ -376,9 +381,9 @@ var Environment = function() {
 	}
 
 	var variableMap = new Map();
-	variableMap.set("x", "0"); // TODO : remove test variable
-	variableMap.set("msg", "A variable message!");
-	variableMap.set("y", 5);
+	// variableMap.set("x", "0"); // TODO : remove test variable
+	// variableMap.set("msg", "A variable message!");
+	// variableMap.set("y", 5);
 
 	this.HasVariable = function(name) { return variableMap.has(name); };
 	this.GetVariable = function(name) { return variableMap.get(name); };
@@ -499,6 +504,8 @@ var FuncNode = function(name,arguments) {
 	// 	return environment.EvalFunction( this.name, argumentValues );
 	// }
 	this.Eval = function(environment,onReturn) {
+		console.log("FUNC");
+		console.log(this.arguments);
 		var argumentValues = [];
 		var i = 0;
 		function evalArgs(arguments,done) {
@@ -550,7 +557,10 @@ var VarNode = function(name) {
 	// 	return environment.GetVariable( this.name );
 	// }
 	this.Eval = function(environment,onReturn) {
-		onReturn( environment.GetVariable( this.name ) );
+		if( environment.HasVariable(this.name) )
+			onReturn( environment.GetVariable( this.name ) );
+		else
+			onReturn(null); // not a valid variable
 	} // TODO: might want to store nodes in the variableMap instead of values???
 }
 
@@ -928,7 +938,8 @@ var Parser = function(env) {
 				console.log("ADD NUM");
 				args.push( new LiteralNode(num) );
 			}
-			else if( environment.HasVariable(curSymbol) ) {
+			// else if( environment.HasVariable(curSymbol) ) { // TODO : need some verfication that this variable will be valid?
+			else {
 				/* VARIABLE */
 				args.push( new VarNode(curSymbol) );
 			}
@@ -981,7 +992,8 @@ var Parser = function(env) {
 			if( expStr[setIndex+1] != "=" && expStr[setIndex-1] != ">" && expStr[setIndex-1] != "<" ) {
 				// ok it actually IS a set operator and not ==, >=, or <=
 				operator = setSymbol;
-				var left = CreateExpression( expStr.substring(0,setIndex) );
+				var variableName = expStr.substring(0,setIndex).trim(); // TODO : valid variable name testing
+				var left = new VarNode( variableName ); // CreateExpression( expStr.substring(0,setIndex) );
 				var right = CreateExpression( expStr.substring(setIndex+setSymbol.length) );
 				var exp = new ExpNode( operator, left, right );
 				return exp;
