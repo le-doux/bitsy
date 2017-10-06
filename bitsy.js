@@ -1757,6 +1757,13 @@ function onExitDialog() {
 	if (isNarrating) isNarrating = false;
 }
 
+/*
+TODO
+- titles and endings should also take advantage of the script pre-compilation if possible??
+- could there be a namespace collision?
+- what about dialog NAMEs vs IDs?
+- what about a special script block separate from DLG?
+*/
 function startNarrating(dialogStr,end) {
 	if(end === undefined) end = false;
 
@@ -1769,7 +1776,7 @@ function startItemDialog(itemId) {
 	var dialogId = item[itemId].dlg;
 	if(dialog[dialogId]){
 		var dialogStr = dialog[dialogId];
-		startDialog(dialogStr);
+		startDialog(dialogStr,dialogId);
 	}
 }
 
@@ -1778,11 +1785,11 @@ function startSpriteDialog(spriteId) {
 	var dialogId = spr.dlg ? spr.dlg : spriteId;
 	if(dialog[dialogId]){
 		var dialogStr = dialog[dialogId];
-		startDialog(dialogStr);
+		startDialog(dialogStr,dialogId);
 	}
 }
 
-function startDialog(dialogStr) {
+function startDialog(dialogStr,scriptId) {
 	if(dialogStr.length <= 0) {
 		onExitDialog();
 		return;
@@ -1792,16 +1799,23 @@ function startDialog(dialogStr) {
 
 	dialogRenderer.Reset();
 	dialogRenderer.SetCentered( isNarrating /*centered*/ );
-
-	// scriptInterpreter.SetDialogBuffer( dialogBuffer );
-	// dialogBuffer.Start( dialogStr, onExitDialog );
-
 	dialogBuffer.Reset();
 	scriptInterpreter.SetDialogBuffer( dialogBuffer );
-	scriptInterpreter.Run( dialogStr, function() {
+
+	var onScriptEnd = function() {
 		if(!dialogBuffer.IsActive())
 			onExitDialog();
-	} );
+	};
+
+	if(scriptId === undefined) {
+		scriptInterpreter.Interpret( dialogStr, onScriptEnd );		
+	}
+	else {
+		if( !scriptInterpreter.HasScript(scriptId) )
+			scriptInterpreter.Compile( scriptId, dialogStr );
+		scriptInterpreter.Run( scriptId, onScriptEnd );
+	}
+
 }
 
 /* NEW SCRIPT STUFF */

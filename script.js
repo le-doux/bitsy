@@ -157,14 +157,23 @@ var Interpreter = function() {
 
 	this.SetDialogBuffer = function(buffer) { env.SetDialogBuffer( buffer ); };
 
-	this.Run = function(scriptStr, exitHandler) { // TODO : do I need the exit handler
-		console.log("RUNNNN");
-		var tree = parser.Parse( scriptStr );
-		tree.Eval( env, function() {
-			if(exitHandler != null)
-				exitHandler();
-		} );
+	// TODO -- maybe this should return a string instead othe actual script??
+	this.Compile = function(scriptName, scriptStr) {
+		console.log("COMPILE");
+		var script = parser.Parse( scriptStr );
+		env.SetScript( scriptName, script );
 	}
+	this.Run = function(scriptName, exitHandler) { // Runs pre-compiled script
+		console.log("RUN");
+		env.GetScript( scriptName )
+			.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
+	}
+	this.Interpret = function(scriptStr, exitHandler) { // Compiles and runs code immediately
+		console.log("INTERPRET");
+		var script = parser.Parse( scriptStr );
+		script.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
+	}
+	this.HasScript = function(name) { return env.HasScript(name); };
 
 	this.ResetEnvironment = function() {
 		env = new Environment();
@@ -394,6 +403,11 @@ var Environment = function() {
 	this.EvalOperator = function(sym,left,right,onReturn) {
 		operatorMap.get( sym )( this, left, right, onReturn );
 	}
+
+	var scriptMap = new Map();
+	this.HasScript = function(name) { return scriptMap.has(name); };
+	this.GetScript = function(name) { return scriptMap.get(name); };
+	this.SetScript = function(name,script) { scriptMap.set(name, script); };
 }
 
 /* node ideas
@@ -560,6 +574,40 @@ var ExpNode = function(operator, left, right) {
 				onReturn(val);
 			} );
 		// NOTE : sadly this pushes a lot of complexity down onto the actual operator methods
+	}
+}
+
+var SequenceNode = function(options) {
+	Object.assign( this, new TreeRelationship() );
+	this.type = "shuffle";
+	this.options = options;
+
+	var index = 0;
+	this.Eval = function(environment,onReturn) {
+		console.log("SEQUENCE " + index);
+		this.options[index].Eval( environment, onReturn );
+
+		var next = index + 1;
+		if(next < this.options.length)
+			index = next;
+	}
+}
+
+var CycleNode = function(options) {
+	Object.assign( this, new TreeRelationship() );
+	this.type = "shuffle";
+	this.options = options;
+
+	var index = 0;
+	this.Eval = function(environment,onReturn) {
+		console.log("CYCLE " + index);
+		this.options[index].Eval( environment, onReturn );
+
+		var next = index + 1;
+		if(next < this.options.length)
+			index = next;
+		else
+			index = 0;
 	}
 }
 
@@ -848,7 +896,11 @@ var Parser = function(env) {
 
 		// console.log(options);
 
-		if(sequenceType === "shuffle")
+		if(sequenceType === "sequence")
+			state.curNode.AddChild( new SequenceNode( options ) );
+		else if(sequenceType === "cycle")
+			state.curNode.AddChild( new CycleNode( options ) );
+		else if(sequenceType === "shuffle")
 			state.curNode.AddChild( new ShuffleNode( options ) );
 
 		return state;
