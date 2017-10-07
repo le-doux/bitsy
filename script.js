@@ -281,7 +281,6 @@ function setExp(environment,left,right,onReturn) {
 	});
 }
 function equalExp(environment,left,right,onReturn) {
-	// return left.Eval(environment) === right.Eval(environment); 
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal === rVal );
@@ -289,7 +288,6 @@ function equalExp(environment,left,right,onReturn) {
 	});
 }
 function greaterExp(environment,left,right,onReturn) {
-	// return left.Eval(environment) > right.Eval(environment);
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal > rVal );
@@ -297,7 +295,6 @@ function greaterExp(environment,left,right,onReturn) {
 	});
 }
 function lessExp(environment,left,right,onReturn) {
-	// return left.Eval(environment) < right.Eval(environment);
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal < rVal );
@@ -305,7 +302,6 @@ function lessExp(environment,left,right,onReturn) {
 	});
 }
 function greaterEqExp(environment,left,right,onReturn) {
-	// return left.Eval(environment) >= right.Eval(environment);
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal >= rVal );
@@ -313,7 +309,6 @@ function greaterEqExp(environment,left,right,onReturn) {
 	});
 }
 function lessEqExp(environment,left,right,onReturn) {
-	// return left.Eval(environment) <= right.Eval(environment);
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal <= rVal );
@@ -321,7 +316,6 @@ function lessEqExp(environment,left,right,onReturn) {
 	});
 }
 function multExp(environment,left,right,onReturn) {
-	// return left.Eval(environment) * right.Eval(environment);
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal * rVal );
@@ -329,7 +323,6 @@ function multExp(environment,left,right,onReturn) {
 	});
 }
 function divExp(environment,left,right,onReturn) {
-	// return left.Eval(environment) / right.Eval(environment);
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal / rVal );
@@ -337,7 +330,6 @@ function divExp(environment,left,right,onReturn) {
 	});
 }
 function addExp(environment,left,right,onReturn) {
-	// return left.Eval(environment) + right.Eval(environment);
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal + rVal );
@@ -345,7 +337,6 @@ function addExp(environment,left,right,onReturn) {
 	});
 }
 function subExp(environment,left,right,onReturn) {
-	// return left.Eval(environment) - right.Eval(environment);
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal - rVal );
@@ -415,12 +406,6 @@ var Environment = function() {
 	this.SetScript = function(name,script) { scriptMap.set(name, script); };
 }
 
-/* node ideas
-	- TreeRelationship -> HasChildren
-	- NodeCore / NodeBase : type
-	- do I really need modes for blocks?
-	- do I really need a special command for linebreaks? or just use it as a character?
-*/
 /* NODES */
 var TreeRelationship = function() {
 	this.parent = null;
@@ -431,40 +416,12 @@ var TreeRelationship = function() {
 	};
 }
 
-// var Runnable = function() {
-// 	this.Run = function(environment) {
-// 		if( this.Eval )
-// 			this.Eval(environment);
-
-// 		var i = 0;
-// 		while (i < this.children.length) {
-// 			this.children[i].Run(environment);
-// 			i++;
-// 		}
-// 	}
-// }
-
-// TEMP: trying without mode
-// var BlockMode = {
-// 	Dialog : "dialog",
-// 	Code : "code"
-// };
-
 var BlockNode = function(/*mode*/) {
 	Object.assign( this, new TreeRelationship() );
 	// Object.assign( this, new Runnable() );
 	this.type = "block";
 	// this.mode = mode;
 
-	// this.Eval = function(environment) {
-	// 	var lastVal = null;
-	// 	var i = 0;
-	// 	while (i < this.children.length) {
-	// 		lastVal = this.children[i].Eval(environment);
-	// 		i++;
-	// 	}
-	// 	return lastVal;
-	// }
 	this.Eval = function(environment,onReturn) {
 		var lastVal = null;
 		var i = 0;
@@ -494,15 +451,6 @@ var FuncNode = function(name,arguments) {
 	this.name = name;
 	this.arguments = arguments;
 
-	// this.Eval = function(environment) {
-	// 	var argumentValues = [];
-	// 	for(var i = 0; i < this.arguments.length; i++) {
-	// 		argumentValues.push( this.arguments[i].Eval( environment ) );
-	// 	}
-	// 	console.log("ARGS");
-	// 	console.log(argumentValues);
-	// 	return environment.EvalFunction( this.name, argumentValues );
-	// }
 	this.Eval = function(environment,onReturn) {
 		console.log("FUNC");
 		console.log(this.arguments);
@@ -539,9 +487,6 @@ var LiteralNode = function(value) {
 	this.type = "literal";
 	this.value = value;
 
-	// this.Eval = function(environment) {
-	// 	return this.value;
-	// }
 	this.Eval = function(environment,onReturn) {
 		onReturn(this.value);
 	}
@@ -553,9 +498,6 @@ var VarNode = function(name) {
 	this.type = "variable";
 	this.name = name;
 
-	// this.Eval = function(environment) {
-	// 	return environment.GetVariable( this.name );
-	// }
 	this.Eval = function(environment,onReturn) {
 		if( environment.HasVariable(this.name) )
 			onReturn( environment.GetVariable( this.name ) );
@@ -571,11 +513,6 @@ var ExpNode = function(operator, left, right) {
 	this.left = left;
 	this.right = right;
 
-	// this.Eval = function(environment) {
-	// 	var expVal = environment.EvalOperator( this.operator, this.left, this.right );
-	// 	console.log("EVAL EXP " + this.operator + " " + expVal);
-	// 	return expVal;
-	// }
 	this.Eval = function(environment,onReturn) {
 		var self = this; // hack to deal with scope
 		environment.EvalOperator( this.operator, this.left, this.right, 
@@ -1140,11 +1077,5 @@ var Parser = function(env) {
 	}
 
 }
-
-// hack
-// this.NewParse = function(dialogStr) {
-// 	var p = new Parser();
-// 	return p.Parse( dialogStr );
-// }
 
 } // Script()
