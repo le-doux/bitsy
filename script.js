@@ -999,6 +999,8 @@ var Parser = function(env) {
 	}
 
 	var setSymbol = "=";
+	var ifSymbol = "?";
+	var elseSymbol = ":";
 	var operatorSymbols = ["==", ">", "<", ">=", "<=", "*", "/", "+", "-"];
 	function CreateExpression(expStr) {
 		expStr = expStr.trim();
@@ -1017,6 +1019,39 @@ var Parser = function(env) {
 				var exp = new ExpNode( operator, left, right );
 				return exp;
 			}
+		}
+
+		// special if "expression" for single-line if statements
+		var ifIndex = expStr.indexOf(ifSymbol);
+		if(ifIndex > -1) {
+			operator = ifSymbol;
+			var conditionStr = expStr.substring(0,ifIndex).trim();
+			var conditions = [ CreateExpression(conditionStr) ];
+
+			var resultStr = expStr.substring(ifIndex+ifSymbol.length);
+			var results = [];
+			function AddResult(str) {
+				var dialogBlockState = new ParserState( new BlockNode(), str );
+				dialogBlockState = ParseDialog( dialogBlockState );
+				var dialogBlock = dialogBlockState.rootNode;
+				results.push( dialogBlock );
+			}
+
+			var elseIndex = resultStr.indexOf(elseSymbol);
+			if(elseIndex > -1) {
+				conditions.push( new LiteralNode(true) ); // push else condition
+
+				var elseStr = resultStr.substring(elseIndex+elseSymbol.length);
+				var resultStr = resultStr.substring(0,elseIndex);
+
+				AddResult( resultStr );
+				AddResult( elseStr );
+			}
+			else {
+				AddResult( resultStr );
+			}
+
+			return new IfNode( conditions, results );
 		}
 
 		for( var i = 0; (operator == null) && (i < operatorSymbols.length); i++ ) {
