@@ -1,150 +1,3 @@
-/* QUESTIONS
-shallow dialog blocks? ''' dialog block '''
-or nestable dialog blocks?
-	/"
-		dialog block 
-		{
-			code block
-			/"dialog"/
-			code
-		}
-		dialog
-	"/
-
-significant whitespace?
-
-{code} is a single expression? or a block?
-{exp}
-{exp}
-vs
-{
-	exp
-	exp
-}
-
-separate syntax for code block vs expression? e.g. double braces
-
-return value from expression/code block?
-
-{case
-	* condition
-		result
-	* condition
-		result
-}
-vs
-{
-if condition
-	result
-elseif condition
-	result
-}
-
-{choice
-	* choice1
-		result
-	* choice2
-		result
-}
-vs
-{
-* choice1
-	result
-* choice2
-	result
-}
-*/
-
-/* NEW PARSE TODO
-- attach dialog commands to dialog renderer
-- parse code
-- parse functions
-- parse special functions: case, choice?
-- formatting / text effects
-- replace old parsing code
-- expressions parsing
-- function library
-- variable library
-- nail down syntax of case statements, multline code, whitespace, etc.
-- replace root node with block (of either type)
-	- should blocks be "type:block" "kind:dialog"??
-	- or do they even need to be identified???
-
-- scriptEnvironment -> fills -> dialogBuffer
-- dialogRenderer -> draws -> dialogBuffer
-
-- is code called immediately? or after dialog finishes rendering?
-- IDEA: use special "script characters" injected into dialog buffer to launch scripts and effects during dialog
-	- what about scripts with no dialog? should they depend on the buffer?
-
-- ScriptParser -> outputs -> ScriptTree
-- ScriptEnvironment -> runs -> ScriptTree
-- environment needs a way to wait on dialog buffer (handler)
-*/
-
-
-/* MORE SYNTAX QUESTIONS
-
-	dialog: /" text text "/ vs << text text >> vs (more limited) ''' text text '''
-
-	should there even BE a dialog block? or is that just default behavior for top level?
-
-	in IF STATEMENT, default code or default dialog?
-
-	IF vs CASE
-
-	{single expression per bracket} <- more LISP-like
-	vs
-	{
-		multiple expressions
-		on each
-		new line
-	} <- more like inserting a JS block
-*/
-
-/* IF SYNTAX OPTIONS
-NOTE: they use escape characters! (so could I potentially)
-	NOTE: for now... I could get rid of problematic characters in the UI (later I can escape them)
-NOTE: what to do about whitespace?
-
-{choice:
-	- go to the forest
-		the forest is full of trees
-	- go to the cave
-		the cave is full of rocks!
-}
-
-
-{cycle:
-	- hi
-	- how are you?
-	- quit talking to me
-}
-
-IFs
-{
-	- x < 3:
-		say this text
-	- x > 3:
-		say this other text
-	- else:
-		default text
-}
-{ x < 3 : say this text }
-
-{
-	- x < 3 ?
-		say this text
-	- x > 3 ?
-		say this text
-	-
-		default text
-}
-{ x < 3 ? say this text }
-{ x < 3 ? say this text - default }
-
-*/
-
 function Script() {
 
 this.CreateInterpreter = function() {
@@ -159,17 +12,17 @@ var Interpreter = function() {
 
 	// TODO -- maybe this should return a string instead othe actual script??
 	this.Compile = function(scriptName, scriptStr) {
-		console.log("COMPILE");
+		// console.log("COMPILE");
 		var script = parser.Parse( scriptStr );
 		env.SetScript( scriptName, script );
 	}
 	this.Run = function(scriptName, exitHandler) { // Runs pre-compiled script
-		console.log("RUN");
+		// console.log("RUN");
 		env.GetScript( scriptName )
 			.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
 	}
 	this.Interpret = function(scriptStr, exitHandler) { // Compiles and runs code immediately
-		console.log("INTERPRET");
+		// console.log("INTERPRET");
 		var script = parser.Parse( scriptStr );
 		script.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
 	}
@@ -183,24 +36,15 @@ var Interpreter = function() {
 
 
 /* BUILT-IN FUNCTIONS */ // TODO: better way to encapsulate these?
-/*
-possitble names
-	- print
-	- say
-	- speak
-	- text
-	- talk
-	- dialog
-*/
 function sayFunc(environment,parameters,onReturn) {
-	console.log("SAY FUNC");
-	console.log(parameters);
+	// console.log("SAY FUNC");
+	// console.log(parameters);
 	if( parameters[0] ) {
-		console.log(parameters[0]);
-		console.log(parameters[0].toString());
+		// console.log(parameters[0]);
+		// console.log(parameters[0].toString());
 		var textStr = parameters[0].toString();
 		var onFinishHandler = function() {
-			console.log("FINISHED PRINTING ---- SCRIPT");
+			// console.log("FINISHED PRINTING ---- SCRIPT");
 			onReturn(null);
 		}; // called when dialog is finished printing
 		environment.GetDialogBuffer().AddText( textStr, onFinishHandler );
@@ -210,7 +54,7 @@ function sayFunc(environment,parameters,onReturn) {
 }
 
 function linebreakFunc(environment,parameters,onReturn) {
-	console.log("LINEBREAK FUNC");
+	// console.log("LINEBREAK FUNC");
 	environment.GetDialogBuffer().AddLinebreak();
 	onReturn(null);
 }
@@ -218,7 +62,7 @@ function linebreakFunc(environment,parameters,onReturn) {
 function itemFunc(environment,parameters,onReturn) {
 	var itemId = parameters[0];
 	var itemCount = player().inventory[itemId] ? player().inventory[itemId] : 0; // TODO : ultimately the environment should include a reference to the game state
-	console.log("ITEM FUNC " + itemId + " " + itemCount);
+	// console.log("ITEM FUNC " + itemId + " " + itemCount);
 	onReturn(itemCount);
 }
 
@@ -263,8 +107,6 @@ function shakyFunc(environment,parameters,onReturn) {
 /* BUILT-IN OPERATORS */
 function setExp(environment,left,right,onReturn) {
 	console.log("SET " + left.name);
-	// environment.SetVariable( left.name, right.Eval(environment) );
-	// return left.Eval(environment);
 
 	if(left.type != "variable") {
 		// not a variable! return null and hope for the best D:
@@ -281,9 +123,9 @@ function setExp(environment,left,right,onReturn) {
 	});
 }
 function equalExp(environment,left,right,onReturn) {
-	console.log("EVAL EQUAL");
-	console.log(left);
-	console.log(right);
+	// console.log("EVAL EQUAL");
+	// console.log(left);
+	// console.log(right);
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal === rVal );
@@ -365,19 +207,13 @@ var Environment = function() {
 	functionMap.set("shk", shakyFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
-	// this.EvalFunction = function(name,parameters) {
-	// 	return functionMap.get( name )( this, parameters );
-	// }
 	this.EvalFunction = function(name,parameters,onReturn) {
-		console.log(functionMap);
-		console.log(name);
+		// console.log(functionMap);
+		// console.log(name);
 		functionMap.get( name )( this, parameters, onReturn );
 	}
 
 	var variableMap = new Map();
-	// variableMap.set("x", "0"); // TODO : remove test variable
-	// variableMap.set("msg", "A variable message!");
-	// variableMap.set("y", 5);
 
 	this.HasVariable = function(name) { return variableMap.has(name); };
 	this.GetVariable = function(name) { return variableMap.get(name); };
@@ -396,9 +232,6 @@ var Environment = function() {
 	operatorMap.set("-", subExp);
 
 	this.HasOperator = function(sym) { return operatorMap.get(sym); };
-	// this.EvalOperator = function(sym,left,right) {
-	// 	return operatorMap.get( sym )( this, left, right );
-	// }
 	this.EvalOperator = function(sym,left,right,onReturn) {
 		operatorMap.get( sym )( this, left, right, onReturn );
 	}
@@ -446,7 +279,6 @@ var BlockNode = function(/*mode*/) {
 	}
 }
 
-// ???: Make FuncNode subclasses with functionality? or separate the nodes from the functions?
 var FuncNode = function(name,arguments) {
 	Object.assign( this, new TreeRelationship() );
 	// Object.assign( this, new Runnable() );
@@ -455,8 +287,8 @@ var FuncNode = function(name,arguments) {
 	this.arguments = arguments;
 
 	this.Eval = function(environment,onReturn) {
-		console.log("FUNC");
-		console.log(this.arguments);
+		// console.log("FUNC");
+		// console.log(this.arguments);
 		var argumentValues = [];
 		var i = 0;
 		function evalArgs(arguments,done) {
@@ -475,15 +307,13 @@ var FuncNode = function(name,arguments) {
 		var self = this; // hack to deal with scope
 		evalArgs( this.arguments, function() {
 			// Then evaluate the function
-			console.log("ARGS");
-			console.log(argumentValues);
+			// console.log("ARGS");
+			// console.log(argumentValues);
 			environment.EvalFunction( self.name, argumentValues, onReturn );
 		} );
 	}
 }
 
-// TODO : do literals and variables need to be nodes?
-// IF SO: should they be children of functions???
 var LiteralNode = function(value) {
 	Object.assign( this, new TreeRelationship() );
 	// Object.assign( this, new Runnable() );
@@ -502,7 +332,7 @@ var VarNode = function(name) {
 	this.name = name;
 
 	this.Eval = function(environment,onReturn) {
-		console.log("EVAL " + this.name + " " + environment.HasVariable(this.name) + " " + environment.GetVariable(this.name));
+		// console.log("EVAL " + this.name + " " + environment.HasVariable(this.name) + " " + environment.GetVariable(this.name));
 		if( environment.HasVariable(this.name) )
 			onReturn( environment.GetVariable( this.name ) );
 		else
@@ -521,7 +351,7 @@ var ExpNode = function(operator, left, right) {
 		var self = this; // hack to deal with scope
 		environment.EvalOperator( this.operator, this.left, this.right, 
 			function(val){
-				console.log("EVAL EXP " + self.operator + " " + val);
+				// console.log("EVAL EXP " + self.operator + " " + val);
 				onReturn(val);
 			} );
 		// NOTE : sadly this pushes a lot of complexity down onto the actual operator methods
@@ -535,7 +365,7 @@ var SequenceNode = function(options) {
 
 	var index = 0;
 	this.Eval = function(environment,onReturn) {
-		console.log("SEQUENCE " + index);
+		// console.log("SEQUENCE " + index);
 		this.options[index].Eval( environment, onReturn );
 
 		var next = index + 1;
@@ -551,7 +381,7 @@ var CycleNode = function(options) {
 
 	var index = 0;
 	this.Eval = function(environment,onReturn) {
-		console.log("CYCLE " + index);
+		// console.log("CYCLE " + index);
 		this.options[index].Eval( environment, onReturn );
 
 		var next = index + 1;
@@ -569,7 +399,7 @@ var ShuffleNode = function(options) {
 
 	this.Eval = function(environment,onReturn) {
 		var index = Math.floor(Math.random() * this.options.length);
-		console.log("SHUFFLE " + index);
+		// console.log("SHUFFLE " + index);
 		this.options[index].Eval( environment, onReturn );
 	}
 }
@@ -581,13 +411,13 @@ var IfNode = function(conditions, results) {
 	this.results = results;
 
 	this.Eval = function(environment,onReturn) {
-		console.log("EVAL IF");
+		// console.log("EVAL IF");
 		var i = 0;
 		var self = this;
 		function TestCondition() {
-			console.log("EVAL " + i);
+			// console.log("EVAL " + i);
 			self.conditions[i].Eval(environment, function(val) {
-				console.log(val);
+				// console.log(val);
 				if(val == true) {
 					self.results[i].Eval(environment, onReturn);
 				}
@@ -681,14 +511,10 @@ var Parser = function(env) {
 			return sourceStr.slice( startIndex + open.length, i - close.length );
 		}
 		this.Print = function() {console.log(sourceStr);};
-
-		// var saveIndex = 0;
-		// this.Save = function() { saveIndex = i; };
-		// this.Restore = function() { i = saveIndex; };
 	};
 
 	this.Parse = function(scriptStr) {
-		console.log("NEW PARSE!!!!!!");
+		// console.log("NEW PARSE!!!!!!");
 
 		var state = new ParserState( new BlockNode(), scriptStr );
 
@@ -699,20 +525,12 @@ var Parser = function(env) {
 			state = ParseCodeBlock( state );
 		}
 
-		console.log( state.rootNode );
+		// console.log( state.rootNode );
 		return state.rootNode;
 	};
 
-	/*
-	TODO
-	improve rules for adding linebreak nodes
-	- empty lines: YES
-	- lines with text: YES
-	- lines with JUST CODE: NO
-	- first line of dialog block: NO
-	*/
 	function ParseDialog(state) {
-		console.log("PARSE DIALOG");
+		// console.log("PARSE DIALOG");
 		state.Print();
 
 		// for linebreak logic: add linebreaks after lines with dialog or empty lines (if it's not the very first line)
@@ -723,7 +541,7 @@ var Parser = function(env) {
 		var text = "";
 		var addTextNode = function() {
 			if (text.length > 0) {
-				console.log("TEXT " + text);
+				// console.log("TEXT " + text);
 
 				state.curNode.AddChild( new FuncNode( "say", [new LiteralNode(text)] ) );
 				text = "";
@@ -764,15 +582,8 @@ var Parser = function(env) {
 					*/
 					var isLastLine = (state.Index() + 1) == state.Count();
 					var isEmptyLine = !hasBlock && !hasDialog;
-					// console.log("--linebreak???--");
-					// console.log("hasDialog " + hasDialog);
-					// console.log("isEmptyLine " + isEmptyLine);
-					// console.log("isFirstLine " + isFirstLine);
-					// console.log("isLastLine " + isLastLine);
 					var isValidEmptyLine = isEmptyLine && !(isFirstLine || isLastLine);
 					var shouldAddLinebreak = (hasDialog || isValidEmptyLine) && !isLastLine; // last clause is a hack (but it works - why?)
-					// console.log("--- shouldAddLinebreak " + shouldAddLinebreak);
-
 					if( shouldAddLinebreak )
 						state.curNode.AddChild( new FuncNode( "br", [] ) ); // use function or character?
 
@@ -792,7 +603,7 @@ var Parser = function(env) {
 		}
 		addTextNode();
 
-		console.log(state);
+		// console.log(state);
 		return state;
 	}
 
@@ -848,9 +659,9 @@ var Parser = function(env) {
 			state.Step();
 		}
 
-		console.log("PARSE IF:");
-		console.log(conditionStrings);
-		console.log(resultStrings);
+		// console.log("PARSE IF:");
+		// console.log(conditionStrings);
+		// console.log(resultStrings);
 
 		var conditions = [];
 		for(var i = 0; i < conditionStrings.length; i++) {
@@ -885,7 +696,7 @@ var Parser = function(env) {
 
 	// TODO: don't forget about eating whitespace
 	function ParseSequence(state, sequenceType) {
-		console.log("SEQUENCE " + sequenceType);
+		// console.log("SEQUENCE " + sequenceType);
 		state.Print();
 
 		var isNewline = false;
@@ -948,20 +759,9 @@ var Parser = function(env) {
 		var curSymbol = "";
 		function OnSymbolEnd() {
 			curSymbol = curSymbol.trim();
-			console.log("SYMBOL " + curSymbol);
-			var num = parseFloat(curSymbol);
-			console.log(num);
-			console.log(environment.HasVariable(curSymbol));
-			if(num) {
-				/* NUMBER LITERAL */
-				console.log("ADD NUM");
-				args.push( new LiteralNode(num) );
-			}
-			// else if( environment.HasVariable(curSymbol) ) { // TODO : need some verfication that this variable will be valid?
-			else {
-				/* VARIABLE */
-				args.push( new VarNode(curSymbol) );
-			}
+			console.log("PARAMTER " + curSymbol);
+			args.push( StringToValue(curSymbol) );
+			console.log(args);
 			curSymbol = "";
 		}
 
@@ -976,7 +776,7 @@ var Parser = function(env) {
 			else if( state.MatchAhead(Sym.String) ) {
 				/* STRING LITERAL */
 				var str = state.ConsumeBlock(Sym.String, Sym.String);
-				console.log("STRING " + str);
+				// console.log("STRING " + str);
 				args.push( new LiteralNode(str) );
 				curSymbol = "";
 			}
@@ -998,18 +798,70 @@ var Parser = function(env) {
 		return state;
 	}
 
+	function StringToValue(valStr) {
+		if(valStr[0] === Sym.CodeOpen) {
+			// CODE BLOCK!!!
+			var codeBlockState = new ParserState( new BlockNode(), valStr );
+			codeBlockState = ParseCodeBlock( codeBlockState ); // TODO: I think this will create too many nested blocks
+			return codeBlockState.rootNode;
+		}
+		else if(valStr[0] === Sym.String) {
+			// STRING!!
+			console.log("STRING");
+			var str = "";
+			var i = 1;
+			while (i < valStr.length && valStr[i] != Sym.String) {
+				str += valStr[i];
+				i++;
+			}
+			console.log(str);
+			return new LiteralNode( str );
+		}
+		else if(valStr === "true") {
+			// BOOL
+			return new LiteralNode( true );
+		}
+		else if(valStr === "false") {
+			// BOOL
+			return new LiteralNode( false );
+		}
+		else if( parseFloat(valStr) ) {
+			// NUMBER!!
+			return new LiteralNode( parseFloat(valStr) );
+		}
+		else {
+			// VARIABLE!!
+			console.log("VARIABLE");
+			return new VarNode(valStr); // TODO : check for valid potential variables
+		}
+		// TODO: invalid variables
+	}
+
 	var setSymbol = "=";
 	var ifSymbol = "?";
 	var elseSymbol = ":";
 	var operatorSymbols = ["==", ">", "<", ">=", "<=", "*", "/", "+", "-"];
 	function CreateExpression(expStr) {
 		expStr = expStr.trim();
+
+		var stringIndices = [];
+		for(var i = 0; i < expStr.length; i++) {
+			if(expStr[i] === Sym.String)
+				stringIndices.push(i);
+		}
+		function IsIndexInsideString(index) {
+			for(var i = 1; i < stringIndices.length; i+=2) {
+				if(index > stringIndices[i-1] && index < stringIndices[i])
+					return true;
+			}
+			return false;
+		}
 	
 		var operator = null;
 
 		// set is special because other operator can look like it, and it has to go first in the order of operations
 		var setIndex = expStr.indexOf(setSymbol);
-		if(setIndex > -1) { // it might be a set operator
+		if( setIndex > -1 && !IsIndexInsideString(setIndex) ) { // it might be a set operator
 			if( expStr[setIndex+1] != "=" && expStr[setIndex-1] != ">" && expStr[setIndex-1] != "<" ) {
 				// ok it actually IS a set operator and not ==, >=, or <=
 				operator = setSymbol;
@@ -1023,7 +875,7 @@ var Parser = function(env) {
 
 		// special if "expression" for single-line if statements
 		var ifIndex = expStr.indexOf(ifSymbol);
-		if(ifIndex > -1) {
+		if( ifIndex > -1 && !IsIndexInsideString(ifIndex) ) {
 			operator = ifSymbol;
 			var conditionStr = expStr.substring(0,ifIndex).trim();
 			var conditions = [ CreateExpression(conditionStr) ];
@@ -1037,7 +889,7 @@ var Parser = function(env) {
 				results.push( dialogBlock );
 			}
 
-			var elseIndex = resultStr.indexOf(elseSymbol);
+			var elseIndex = resultStr.indexOf(elseSymbol); // does this need to test for strings?
 			if(elseIndex > -1) {
 				conditions.push( new LiteralNode(true) ); // push else condition
 
@@ -1057,7 +909,7 @@ var Parser = function(env) {
 		for( var i = 0; (operator == null) && (i < operatorSymbols.length); i++ ) {
 			var opSym = operatorSymbols[i];
 			var opIndex = expStr.indexOf( opSym );
-			if( opIndex > -1 ) {
+			if( opIndex > -1 && !IsIndexInsideString(opIndex) ) {
 				operator = opSym;
 				var left = CreateExpression( expStr.substring(0,opIndex) );
 				var right = CreateExpression( expStr.substring(opIndex+opSym.length) );
@@ -1067,36 +919,15 @@ var Parser = function(env) {
 		}
 
 		if( operator == null ) {
-			if(expStr[0] === Sym.CodeOpen) {
-				// CODE BLOCK!!!
-				var codeBlockState = new ParserState( new BlockNode(), expStr );
-				codeBlockState = ParseCodeBlock( codeBlockState ); // TODO: I think this will create too many nested blocks
-				return codeBlockState.rootNode;
-			}
-			// else if( environment.HasVariable(expStr) ) {
-			// 	return new VarNode(expStr);
-			// }
-			else if( parseFloat(expStr) ) {
-				return new LiteralNode( parseFloat(expStr) );
-			}
-			else {
-				return new VarNode(expStr); // TODO : check for valid potential variables
-			}
-			// else {
-			// 	// uh oh
-			// 	return new LiteralNode(null);
-			// }
-			
-
-			// TODO : strings I guess
+			return StringToValue(expStr);
 		}
 	}
 
 	function ParseExpression(state) {
 		var line = state.Peak( [Sym.Linebreak] );
-		console.log("EXPRESSION " + line);
+		// console.log("EXPRESSION " + line);
 		var exp = CreateExpression( line );
-		console.log(exp);
+		// console.log(exp);
 		state.curNode.AddChild( exp );
 		state.Step( line.length );
 		return state;
@@ -1139,8 +970,8 @@ var Parser = function(env) {
 	function ParseCodeBlock(state) {
 		var codeStr = state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose );
 
-		console.log("PARSE CODE");
-		console.log(codeStr);
+		// console.log("PARSE CODE");
+		// console.log(codeStr);
 
 		var codeState = new ParserState( new BlockNode(), codeStr );
 		codeState = ParseCode( codeState );
