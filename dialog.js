@@ -205,6 +205,8 @@ var DialogBuffer = function() {
 			// console.log("WAITING FOR INPUT");
 		}
 
+		// console.log(this.CurChar());
+
 		this.CurChar().OnPrint(); // make sure we hit the callback before we run out of text
 	};
 
@@ -315,6 +317,8 @@ var DialogBuffer = function() {
 
 	var charsPerRow = 32;
 	this.AddText = function(textStr,onFinishHandler) {
+		console.log("ADD TEXT " + textStr);
+
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
 

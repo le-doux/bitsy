@@ -37,12 +37,14 @@ var Interpreter = function() {
 
 /* BUILT-IN FUNCTIONS */ // TODO: better way to encapsulate these?
 function sayFunc(environment,parameters,onReturn) {
-	// console.log("SAY FUNC");
-	// console.log(parameters);
-	if( parameters[0] ) {
+	console.log("SAY FUNC");
+	console.log(parameters);
+	if( parameters[0] != undefined && parameters[0] != null ) {
 		// console.log(parameters[0]);
 		// console.log(parameters[0].toString());
-		var textStr = parameters[0].toString();
+		// var textStr = parameters[0].toString();
+		var textStr = "" + parameters[0];
+		console.log(textStr);
 		var onFinishHandler = function() {
 			// console.log("FINISHED PRINTING ---- SCRIPT");
 			onReturn(null);
@@ -825,8 +827,9 @@ var Parser = function(env) {
 			// BOOL
 			return new LiteralNode( false );
 		}
-		else if( parseFloat(valStr) ) {
+		else if( !isNaN(parseFloat(valStr)) ) {
 			// NUMBER!!
+			console.log("NUMBER!!! " + valStr);
 			return new LiteralNode( parseFloat(valStr) );
 		}
 		else {
@@ -840,19 +843,33 @@ var Parser = function(env) {
 	var setSymbol = "=";
 	var ifSymbol = "?";
 	var elseSymbol = ":";
-	var operatorSymbols = ["==", ">", "<", ">=", "<=", "*", "/", "+", "-"];
+	// var operatorSymbols = ["==", ">", "<", ">=", "<=", "*", "/", "+", "-"];
+	var operatorSymbols = ["-", "+", "/", "*", "<=", ">=", "<", ">", "=="]; // operators need to be in reverse order
 	function CreateExpression(expStr) {
 		expStr = expStr.trim();
 
-		var stringIndices = [];
-		for(var i = 0; i < expStr.length; i++) {
-			if(expStr[i] === Sym.String)
-				stringIndices.push(i);
+		function IsInsideString(index) {
+			var inString = false;
+			for(var i = 0; i < expStr.length; i++) {
+				if(expStr[i] === Sym.String)
+					inString = !inString;
+
+				if(index === i)
+					return inString;
+			}
+			return false;
 		}
-		function IsIndexInsideString(index) {
-			for(var i = 1; i < stringIndices.length; i+=2) {
-				if(index > stringIndices[i-1] && index < stringIndices[i])
-					return true;
+
+		function IsInsideCode(index) {
+			var count = 0;
+			for(var i = 0; i < expStr.length; i++) {
+				if(expStr[i] === Sym.CodeOpen)
+					count++;
+				else if(expStr[i] === Sym.CodeClose)
+					count--;
+
+				if(index === i)
+					return count > 0;
 			}
 			return false;
 		}
@@ -861,7 +878,7 @@ var Parser = function(env) {
 
 		// set is special because other operator can look like it, and it has to go first in the order of operations
 		var setIndex = expStr.indexOf(setSymbol);
-		if( setIndex > -1 && !IsIndexInsideString(setIndex) ) { // it might be a set operator
+		if( setIndex > -1 && !IsInsideString(setIndex) && !IsInsideCode(setIndex) ) { // it might be a set operator
 			if( expStr[setIndex+1] != "=" && expStr[setIndex-1] != ">" && expStr[setIndex-1] != "<" ) {
 				// ok it actually IS a set operator and not ==, >=, or <=
 				operator = setSymbol;
@@ -875,7 +892,7 @@ var Parser = function(env) {
 
 		// special if "expression" for single-line if statements
 		var ifIndex = expStr.indexOf(ifSymbol);
-		if( ifIndex > -1 && !IsIndexInsideString(ifIndex) ) {
+		if( ifIndex > -1 && !IsInsideString(ifIndex) && !IsInsideCode(ifIndex) ) {
 			operator = ifSymbol;
 			var conditionStr = expStr.substring(0,ifIndex).trim();
 			var conditions = [ CreateExpression(conditionStr) ];
@@ -909,7 +926,7 @@ var Parser = function(env) {
 		for( var i = 0; (operator == null) && (i < operatorSymbols.length); i++ ) {
 			var opSym = operatorSymbols[i];
 			var opIndex = expStr.indexOf( opSym );
-			if( opIndex > -1 && !IsIndexInsideString(opIndex) ) {
+			if( opIndex > -1 && !IsInsideString(opIndex) && !IsInsideCode(opIndex) ) {
 				operator = opSym;
 				var left = CreateExpression( expStr.substring(0,opIndex) );
 				var right = CreateExpression( expStr.substring(opIndex+opSym.length) );
