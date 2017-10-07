@@ -361,7 +361,7 @@ var Environment = function() {
 
 	var functionMap = new Map();
 	functionMap.set("say", sayFunc);
-	functionMap.set("linebreak", linebreakFunc);
+	functionMap.set("br", linebreakFunc);
 	functionMap.set("item", itemFunc);
 	functionMap.set("rbw", rainbowFunc);
 	functionMap.set("clr1", color1Func);
@@ -803,7 +803,7 @@ var Parser = function(env) {
 					// console.log("--- shouldAddLinebreak " + shouldAddLinebreak);
 
 					if( shouldAddLinebreak )
-						state.curNode.AddChild( new FuncNode( "linebreak", [] ) ); // use function or character?
+						state.curNode.AddChild( new FuncNode( "br", [] ) ); // use function or character?
 
 					// linebreak logic
 					isFirstLine = false;
@@ -836,28 +836,53 @@ var Parser = function(env) {
 		return state;
 	}
 
+	function ParseIf(state) {
+		var conditionStrings = [];
+		var resultStrings = [];
+		var curIndex = -1;
+		var isNewline = true;
+		var isConditionDone = false;
 
-	/*
-	THINGS TO PARSE:
-		- functions: func param1 param2
-		- expressions: x = 5, x = y + z, etc.
-		- nested blocks: { code }, /" text "/
-			- the nested code blocks are especially tricky... do they return something?
-		- special blocks:
-			{case
-				* condition
-					result
-				* condition
-					result
+		while( !state.Done() ) {
+			var isWhitespace = (state.Char() === " " || state.Char() === "\t");
+			var isSkippableWhitespace = isNewline && isWhitespace;
+			var isNewListItem = isNewline && (state.Char() === "-");
+
+			if(isNewListItem) {
+				curIndex++;
+				isConditionDone = false;
+				conditionStrings[curIndex] = "";
+				resultStrings[curIndex] = "";
+			}
+			else if(curIndex > -1) {
+				if(!isConditionDone) {
+					if(state.Char() === "?" || state.Char() === "\n") { // TODO: use Sym
+						// end of condition
+						isConditionDone = true;
+					}
+					else {
+						// read in condition
+						conditionStrings[curIndex] += state.Char();
+					}
+				}
+				else {
+					// read in result
+					if(!isSkippableWhitespace)
+						resultStrings[curIndex] += state.Char();
+				}
 			}
 
-		if we assume block contains only one expression
-			look at first symbol
-				is it a function name?
-					parse function
-				else
-					look for expressions, etc.
-	*/
+			isNewline = (state.Char() === Sym.Linebreak) || isSkippableWhitespace || isNewListItem;
+
+			state.Step();
+		}
+
+		console.log("PARSE IF:");
+		console.log(conditionStrings);
+		console.log(resultStrings);
+
+		return state;
+	}
 
 	function IsSequence(str) {
 		// console.log("IsSequence? " + str);
@@ -1047,11 +1072,17 @@ var Parser = function(env) {
 		// TODO : how do I do this parsing??? one expression per block? or per line?
 		while ( !state.Done() ) {
 
-			if( state.MatchAhead(Sym.DialogOpen) ) {
+			if( state.Char() === " " || state.Char() === "\t" || state.Char() === "\n" ) { // TODO: symbols? IsWhitespace func?
+				state.Step(); // consume whitespace
+			}
+			else if( state.MatchAhead(Sym.DialogOpen) ) {
 				state = ParseDialogBlock( state ); // These can be nested (should they though???)
 			}
 			else if( state.MatchAhead(Sym.CodeOpen) ) {
 				state = ParseCodeBlock( state );
+			}
+			else if( state.Char() === "-" ) { // TODO : symbols? matchahead?
+				state = ParseIf( state );
 			}
 			else if( environment.HasFunction( state.Peak( [" "] ) ) ) { // TODO --- what about newlines???
 				var funcName = state.Peak( [" "] );
