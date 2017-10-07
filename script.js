@@ -281,6 +281,9 @@ function setExp(environment,left,right,onReturn) {
 	});
 }
 function equalExp(environment,left,right,onReturn) {
+	console.log("EVAL EQUAL");
+	console.log(left);
+	console.log(right);
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal === rVal );
@@ -499,10 +502,11 @@ var VarNode = function(name) {
 	this.name = name;
 
 	this.Eval = function(environment,onReturn) {
+		console.log("EVAL " + this.name + " " + environment.HasVariable(this.name) + " " + environment.GetVariable(this.name));
 		if( environment.HasVariable(this.name) )
 			onReturn( environment.GetVariable( this.name ) );
 		else
-			onReturn(null); // not a valid variable
+			onReturn(null); // not a valid variable -- return null and hope that's ok
 	} // TODO: might want to store nodes in the variableMap instead of values???
 }
 
@@ -577,15 +581,22 @@ var IfNode = function(conditions, results) {
 	this.results = results;
 
 	this.Eval = function(environment,onReturn) {
+		console.log("EVAL IF");
 		var i = 0;
+		var self = this;
 		function TestCondition() {
-			this.conditions[i].Eval(environment, function(val) {
-				if(val) {
-					this.results[i].Eval(environment, onReturn);
+			console.log("EVAL " + i);
+			self.conditions[i].Eval(environment, function(val) {
+				console.log(val);
+				if(val == true) {
+					self.results[i].Eval(environment, onReturn);
+				}
+				else if(i+1 < self.conditions.length) {
+					i++;
+					TestCondition(); // test next condition
 				}
 				else {
-					i++;
-					TestCondition();
+					onReturn(null); // out of conditions and none were true
 				}
 			});
 		};
@@ -841,6 +852,29 @@ var Parser = function(env) {
 		console.log(conditionStrings);
 		console.log(resultStrings);
 
+		var conditions = [];
+		for(var i = 0; i < conditionStrings.length; i++) {
+			var str = conditionStrings[i].trim();
+			if(str === "else") {
+				conditions.push( new LiteralNode(true) ); // else? is always true
+			}
+			else {
+				var exp = CreateExpression( str );
+				conditions.push( exp );
+			}
+		}
+
+		var results = [];
+		for(var i = 0; i < resultStrings.length; i++) {
+			var str = resultStrings[i];
+			var dialogBlockState = new ParserState( new BlockNode(), str );
+			dialogBlockState = ParseDialog( dialogBlockState );
+			var dialogBlock = dialogBlockState.rootNode;
+			results.push( dialogBlock );
+		}
+
+		state.curNode.AddChild( new IfNode( conditions, results ) );
+
 		return state;
 	}
 
@@ -1004,16 +1038,21 @@ var Parser = function(env) {
 				codeBlockState = ParseCodeBlock( codeBlockState ); // TODO: I think this will create too many nested blocks
 				return codeBlockState.rootNode;
 			}
-			else if( environment.HasVariable(expStr) ) {
-				return new VarNode(expStr);
-			}
+			// else if( environment.HasVariable(expStr) ) {
+			// 	return new VarNode(expStr);
+			// }
 			else if( parseFloat(expStr) ) {
 				return new LiteralNode( parseFloat(expStr) );
 			}
 			else {
-				// uh oh
-				return new LiteralNode(null);
+				return new VarNode(expStr); // TODO : check for valid potential variables
 			}
+			// else {
+			// 	// uh oh
+			// 	return new LiteralNode(null);
+			// }
+			
+
 			// TODO : strings I guess
 		}
 	}
