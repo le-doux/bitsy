@@ -542,8 +542,11 @@ var Parser = function(env) {
 
 		var text = "";
 		var addTextNode = function() {
+			console.log("TEXT " + text.length);
 			if (text.length > 0) {
 				// console.log("TEXT " + text);
+				// console.log("text!!");
+				// console.log([text]);
 
 				state.curNode.AddChild( new FuncNode( "say", [new LiteralNode(text)] ) );
 				text = "";
@@ -583,16 +586,21 @@ var Parser = function(env) {
 					- NEVER line break on the last line
 					*/
 					var isLastLine = (state.Index() + 1) == state.Count();
+					// console.log("block " + hasBlock);
+					// console.log("dialog " + hasDialog);
 					var isEmptyLine = !hasBlock && !hasDialog;
+					// console.log("empty " + isEmptyLine);
 					var isValidEmptyLine = isEmptyLine && !(isFirstLine || isLastLine);
+					// console.log("valid empty " + isValidEmptyLine);
 					var shouldAddLinebreak = (hasDialog || isValidEmptyLine) && !isLastLine; // last clause is a hack (but it works - why?)
+					// console.log("LINEBREAK? " + shouldAddLinebreak);
 					if( shouldAddLinebreak )
 						state.curNode.AddChild( new FuncNode( "br", [] ) ); // use function or character?
 
 					// linebreak logic
 					isFirstLine = false;
 					hasBlock = false;
-					hasDialog = true;
+					hasDialog = false;
 
 					text = "";
 				}
