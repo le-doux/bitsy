@@ -633,6 +633,29 @@ var ShuffleNode = function(options) {
 	}
 }
 
+var IfNode = function(conditions, results) {
+	Object.assign( this, new TreeRelationship() );
+	this.type = "if";
+	this.conditions = conditions;
+	this.results = results;
+
+	this.Eval = function(environment,onReturn) {
+		var i = 0;
+		function TestCondition() {
+			this.conditions[i].Eval(environment, function(val) {
+				if(val) {
+					this.results[i].Eval(environment, onReturn);
+				}
+				else {
+					i++;
+					TestCondition();
+				}
+			});
+		};
+		TestCondition();
+	}
+}
+
 var Parser = function(env) {
 	var environment = env;
 
