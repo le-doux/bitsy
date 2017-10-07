@@ -808,6 +808,13 @@ var Parser = function(env) {
 		return state;
 	}
 
+	function IsValidVariableName(str) {
+		var reg = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
+		var isValid = reg.test(str);
+		console.log("VALID variable??? " + isValid);
+		return isValid;
+	}
+
 	function StringToValue(valStr) {
 		if(valStr[0] === Sym.CodeOpen) {
 			// CODE BLOCK!!!
@@ -840,12 +847,15 @@ var Parser = function(env) {
 			console.log("NUMBER!!! " + valStr);
 			return new LiteralNode( parseFloat(valStr) );
 		}
-		else {
+		else if(IsValidVariableName(valStr)) {
 			// VARIABLE!!
 			console.log("VARIABLE");
 			return new VarNode(valStr); // TODO : check for valid potential variables
 		}
-		// TODO: invalid variables
+		else {
+			// uh oh
+			return new LiteralNode(null);
+		}
 	}
 
 	var setSymbol = "=";
@@ -891,7 +901,7 @@ var Parser = function(env) {
 				// ok it actually IS a set operator and not ==, >=, or <=
 				operator = setSymbol;
 				var variableName = expStr.substring(0,setIndex).trim(); // TODO : valid variable name testing
-				var left = new VarNode( variableName ); // CreateExpression( expStr.substring(0,setIndex) );
+				var left = IsValidVariableName(variableName) ? new VarNode( variableName ) : new LiteralNode(null);
 				var right = CreateExpression( expStr.substring(setIndex+setSymbol.length) );
 				var exp = new ExpNode( operator, left, right );
 				return exp;
