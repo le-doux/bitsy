@@ -1564,35 +1564,33 @@ function imageDataFromImageSource(imageSource, pal, col) {
 function parseDialog(lines, i) {
 	var id = getId(lines[i]);
 	i++;
-	var text = "";
-	if( featureNewScript ) {
-		if( lines[i] === '/"' ) { // TODO : finalize the "text block" open / close symbols
-			// this is a real script
-			while( lines[i] != '"/' ) {
-				text += lines[i] + "\n";
-				i++;
-			}
-			text += lines[i] + "\n";
-			i++;
-			console.log("PARSE DIALOG");
-			console.log(text);
-		}
-		else {
-			text = '/"\n' + lines[i] + '\n"/'; // read old-style one line dialogs into the new scripting format
-		} // DO WE REALLY NEED THE DIALOG BLOCKS?
 
-		// while (lines[i].length > 0) {
-		// 	text += lines[i] + "\n";
-		// 	i++;
-		// }
-	}
-	else {
-		text = lines[i];
-	}
-	// console.log(text);
-	dialog[id] = text;
-	// console.log(dialog[id]);
-	// console.log(dialog);
+	// var text = "";
+	// if( featureNewScript ) {
+	// 	if( lines[i] === '/"' ) { // TODO : finalize the "text block" open / close symbols
+	// 		// this is a real script
+	// 		while( lines[i] != '"/' ) {
+	// 			text += lines[i] + "\n";
+	// 			i++;
+	// 		}
+	// 		text += lines[i] + "\n";
+	// 		i++;
+	// 		console.log("PARSE DIALOG");
+	// 		console.log(text);
+	// 	}
+	// 	else {
+	// 		text = '/"\n' + lines[i] + '\n"/'; // read old-style one line dialogs into the new scripting format
+	// 	} // DO WE REALLY NEED THE DIALOG BLOCKS?
+	// }
+	// else {
+	// 	text = lines[i];
+	// }
+	// dialog[id] = text;
+
+	var results = scriptInterpreter.ReadDialogScript(lines,i);
+	dialog[id] = results.script;
+	i = results.index;
+
 	return i;
 }
 

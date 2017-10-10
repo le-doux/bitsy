@@ -32,6 +32,11 @@ var Interpreter = function() {
 		env = new Environment();
 		parser = new Parser( env );
 	}
+
+	// for reading in dialog from the larger file format
+	this.ReadDialogScript = function(lines, i) {
+		return parser.ReadDialogScript(lines,i);
+	}
 }
 
 
@@ -440,8 +445,10 @@ var Parser = function(env) {
 	var environment = env;
 
 	var Sym = {
-		DialogOpen : "/\"",
-		DialogClose : "\"/",
+		// DialogOpen : "/\"",
+		// DialogClose : "\"/",
+		DialogOpen : '"""',
+		DialogClose : '"""',
 		CodeOpen : "{",
 		CodeClose : "}",
 		Linebreak : "\n", // just call it "break" ?
@@ -518,6 +525,8 @@ var Parser = function(env) {
 	this.Parse = function(scriptStr) {
 		// console.log("NEW PARSE!!!!!!");
 
+		// TODO : make this work for single-line, no dialog block scripts
+
 		var state = new ParserState( new BlockNode(), scriptStr );
 
 		if( state.MatchAhead(Sym.DialogOpen) ) {
@@ -557,18 +566,19 @@ var Parser = function(env) {
 
 		while ( !state.Done() ) {
 
-			if( state.MatchAhead(Sym.DialogOpen) ) {
-				addTextNode();
-				state = ParseDialogBlock( state ); // These can be nested (should they though???)
-
-				hasBlock = true;
-			}
-			else if( state.MatchAhead(Sym.CodeOpen) ) {
+			if( state.MatchAhead(Sym.CodeOpen) ) {
 				addTextNode();
 				state = ParseCodeBlock( state );
 
 				hasBlock = true;
 			}
+			// NOTE: nested dialog blocks disabled for now
+			// else if( state.MatchAhead(Sym.DialogOpen) ) {
+			// 	addTextNode();
+			// 	state = ParseDialogBlock( state ); // These can be nested (should they though???)
+
+			// 	hasBlock = true;
+			// }
 			else {
 				if ( state.MatchAhead(Sym.Linebreak) ) {
 					addTextNode();
@@ -756,13 +766,6 @@ var Parser = function(env) {
 		return state;
 	}
 
-	/*
-	PARAMETER possibilities
-	- string
-	- float
-	- bool?
-	- variable
-	*/
 	function ParseFunction(state, funcName) {
 		var args = [];
 
@@ -975,12 +978,13 @@ var Parser = function(env) {
 			if( state.Char() === " " || state.Char() === "\t" || state.Char() === "\n" ) { // TODO: symbols? IsWhitespace func?
 				state.Step(); // consume whitespace
 			}
-			else if( state.MatchAhead(Sym.DialogOpen) ) {
-				state = ParseDialogBlock( state ); // These can be nested (should they though???)
-			}
 			else if( state.MatchAhead(Sym.CodeOpen) ) {
 				state = ParseCodeBlock( state );
 			}
+			// NOTE: nested dialog blocks disabled for now
+			// else if( state.MatchAhead(Sym.DialogOpen) ) {
+			// 	state = ParseDialogBlock( state ); // These can be nested (should they though???)
+			// }
 			else if( state.Char() === "-" ) { // TODO : symbols? matchahead?
 				state = ParseIf( state );
 			}
@@ -1014,6 +1018,24 @@ var Parser = function(env) {
 		state.curNode.AddChild( codeState.rootNode );
 
 		return state;
+	}
+
+	this.ReadDialogScript = function(lines, i) {
+		var scriptStr = "";
+		if (lines[i] === Sym.DialogOpen) {
+			scriptStr += lines[i] + "\n";
+			i++;
+			while(lines[i] != Sym.DialogClose) {
+				scriptStr += lines[i] + "\n";
+				i++;
+			}
+			scriptStr += lines[i] + "\n";
+			i++;
+		}
+		else {
+			scriptStr += lines[i];
+		}
+		return { script:scriptStr, index:i };
 	}
 
 }
