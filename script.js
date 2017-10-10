@@ -530,10 +530,16 @@ var Parser = function(env) {
 		var state = new ParserState( new BlockNode(), scriptStr );
 
 		if( state.MatchAhead(Sym.DialogOpen) ) {
-			state = ParseDialogBlock( state );
+			// state = ParseDialogBlock( state );
+			var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
+			state = new ParserState( new BlockNode(), dialogStr );
+			state = ParseDialog( state );
 		}
 		else if( state.MatchAhead(Sym.CodeOpen) ) {
 			state = ParseCodeBlock( state );
+		}
+		else {
+			state = ParseDialog( state );
 		}
 
 		// console.log( state.rootNode );
