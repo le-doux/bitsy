@@ -20,6 +20,9 @@ var Interpreter = function() {
 		// console.log("RUN");
 		env.GetScript( scriptName )
 			.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
+
+		console.log("SERIALIZE!!!!");
+		console.log( env.GetScript( scriptName ).Serialize() );
 	}
 	this.Interpret = function(scriptStr, exitHandler) { // Compiles and runs code immediately
 		// console.log("INTERPRET");
@@ -259,11 +262,16 @@ var TreeRelationship = function() {
 	};
 }
 
-var BlockNode = function(/*mode*/) {
+var BlockMode = {
+	Code : "code",
+	Dialog : "dialog"
+};
+
+var BlockNode = function(mode) {
 	Object.assign( this, new TreeRelationship() );
 	// Object.assign( this, new Runnable() );
 	this.type = "block";
-	// this.mode = mode;
+	this.mode = mode;
 
 	this.Eval = function(environment,onReturn) {
 		var lastVal = null;
@@ -283,6 +291,16 @@ var BlockNode = function(/*mode*/) {
 		evalChildren( this.children, function() {
 			onReturn(lastVal);
 		} );
+	}
+
+	this.Serialize = function() {
+		var str = "";
+		if (this.mode === BlockMode.Code) str += "{"; // todo: increase scope of Sym?
+		for (var i = 0; i < this.children.length; i++) {
+			str += this.children[i].Serialize();
+		}
+		if (this.mode === BlockMode.Code) str += "}";
+		return str;
 	}
 }
 
@@ -319,6 +337,26 @@ var FuncNode = function(name,arguments) {
 			environment.EvalFunction( self.name, argumentValues, onReturn );
 		} );
 	}
+
+	this.Serialize = function() {
+		var isDialogBlock = this.parent.mode && this.parent.mode === BlockMode.Dialog;
+		if(isDialogBlock && this.name === "say") {
+			// TODO this could cause problems with "real" say functions
+			return this.arguments[0].value; // first argument should be the text of the {say} func
+		}
+		else if(isDialogBlock && this.name === "br") {
+			return "\n";
+		}
+		else {
+			var str = "";
+			str += this.name;
+			for(var i = 0; i < this.arguments.length; i++) {
+				str += " ";
+				str += this.arguments[i].Serialize();
+			}
+			return str;
+		}
+	}
 }
 
 var LiteralNode = function(value) {
@@ -329,6 +367,14 @@ var LiteralNode = function(value) {
 
 	this.Eval = function(environment,onReturn) {
 		onReturn(this.value);
+	}
+
+	this.Serialize = function() {
+		var str = "";
+		if(typeof this.value === "string") str += '"';
+		str += this.value;
+		if(typeof this.value === "string") str += '"';
+		return str;
 	}
 }
 
@@ -345,6 +391,11 @@ var VarNode = function(name) {
 		else
 			onReturn(null); // not a valid variable -- return null and hope that's ok
 	} // TODO: might want to store nodes in the variableMap instead of values???
+
+	this.Serialize = function() {
+		var str = "" + this.name;
+		return str;
+	}
 }
 
 var ExpNode = function(operator, left, right) {
@@ -363,11 +414,19 @@ var ExpNode = function(operator, left, right) {
 			} );
 		// NOTE : sadly this pushes a lot of complexity down onto the actual operator methods
 	}
+
+	this.Serialize = function() {
+		var str = "";
+		str += this.left.Serialize();
+		str += " " + this.operator + " ";
+		str += this.right.Serialize();
+		return str;
+	}
 }
 
 var SequenceNode = function(options) {
 	Object.assign( this, new TreeRelationship() );
-	this.type = "shuffle";
+	this.type = "sequence";
 	this.options = options;
 
 	var index = 0;
@@ -379,11 +438,21 @@ var SequenceNode = function(options) {
 		if(next < this.options.length)
 			index = next;
 	}
+
+	this.Serialize = function() {
+		// todo : make this pretty
+		var str = "";
+		str += this.type + "\n";
+		for (var i = 0; i < this.options.length; i++) {
+			str += " - " + this.options[i].Serialize() + "\n";
+		}
+		return str;
+	}
 }
 
 var CycleNode = function(options) {
 	Object.assign( this, new TreeRelationship() );
-	this.type = "shuffle";
+	this.type = "cycle";
 	this.options = options;
 
 	var index = 0;
@@ -397,6 +466,17 @@ var CycleNode = function(options) {
 		else
 			index = 0;
 	}
+
+	// duplicate!
+	this.Serialize = function() {
+		// todo : make this pretty
+		var str = "";
+		str += this.type + "\n";
+		for (var i = 0; i < this.options.length; i++) {
+			str += " - " + this.options[i].Serialize() + "\n";
+		}
+		return str;
+	}
 }
 
 var ShuffleNode = function(options) {
@@ -408,6 +488,17 @@ var ShuffleNode = function(options) {
 		var index = Math.floor(Math.random() * this.options.length);
 		// console.log("SHUFFLE " + index);
 		this.options[index].Eval( environment, onReturn );
+	}
+
+	// duplicate!
+	this.Serialize = function() {
+		// todo : make this pretty
+		var str = "";
+		str += this.type + "\n";
+		for (var i = 0; i < this.options.length; i++) {
+			str += " - " + this.options[i].Serialize() + "\n";
+		}
+		return str;
 	}
 }
 
@@ -438,6 +529,16 @@ var IfNode = function(conditions, results) {
 			});
 		};
 		TestCondition();
+	}
+
+	this.Serialize = function() {
+		var str = "";
+		str += "\n";
+		for (var i = 0; i < this.conditions.length; i++) {
+			str += " - " + this.conditions[i].Serialize() + " ?\n";
+			str += "   " + this.results[i].Serialize() + "\n";
+		}
+		return str;
 	}
 }
 
@@ -527,12 +628,12 @@ var Parser = function(env) {
 
 		// TODO : make this work for single-line, no dialog block scripts
 
-		var state = new ParserState( new BlockNode(), scriptStr );
+		var state = new ParserState( new BlockNode(BlockMode.Dialog), scriptStr );
 
 		if( state.MatchAhead(Sym.DialogOpen) ) {
 			// state = ParseDialogBlock( state );
 			var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
-			state = new ParserState( new BlockNode(), dialogStr );
+			state = new ParserState( new BlockNode(BlockMode.Dialog), dialogStr );
 			state = ParseDialog( state );
 		}
 		else if( state.MatchAhead(Sym.CodeOpen) ) {
@@ -636,7 +737,7 @@ var Parser = function(env) {
 	function ParseDialogBlock(state) {
 		var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
 
-		var dialogState = new ParserState( new BlockNode(), dialogStr );
+		var dialogState = new ParserState( new BlockNode(BlockMode.Dialog), dialogStr );
 		dialogState = ParseDialog( dialogState );
 
 		state.curNode.AddChild( dialogState.rootNode );
@@ -704,7 +805,7 @@ var Parser = function(env) {
 		var results = [];
 		for(var i = 0; i < resultStrings.length; i++) {
 			var str = resultStrings[i];
-			var dialogBlockState = new ParserState( new BlockNode(), str );
+			var dialogBlockState = new ParserState( new BlockNode(BlockMode.Dialog), str );
 			dialogBlockState = ParseDialog( dialogBlockState );
 			var dialogBlock = dialogBlockState.rootNode;
 			results.push( dialogBlock );
@@ -754,7 +855,7 @@ var Parser = function(env) {
 		var options = [];
 		for(var i = 0; i < itemStrings.length; i++) {
 			var str = itemStrings[i];
-			var dialogBlockState = new ParserState( new BlockNode(), str );
+			var dialogBlockState = new ParserState( new BlockNode(BlockMode.Dialog), str );
 			dialogBlockState = ParseDialog( dialogBlockState );
 			var dialogBlock = dialogBlockState.rootNode;
 			options.push( dialogBlock );
@@ -786,7 +887,7 @@ var Parser = function(env) {
 
 		while( !( state.Char() === "\n" || state.Done() ) ) {
 			if( state.MatchAhead(Sym.CodeOpen) ) {
-				var codeBlockState = new ParserState( new BlockNode(), state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose ) );
+				var codeBlockState = new ParserState( new BlockNode(BlockMode.Code), state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose ) );
 				codeBlockState = ParseCode( codeBlockState );
 				var codeBlock = codeBlockState.rootNode;
 				args.push( codeBlock );
@@ -827,7 +928,7 @@ var Parser = function(env) {
 	function StringToValue(valStr) {
 		if(valStr[0] === Sym.CodeOpen) {
 			// CODE BLOCK!!!
-			var codeBlockState = new ParserState( new BlockNode(), valStr );
+			var codeBlockState = new ParserState( new BlockNode(BlockMode.Code), valStr );
 			codeBlockState = ParseCodeBlock( codeBlockState ); // TODO: I think this will create too many nested blocks
 			return codeBlockState.rootNode;
 		}
@@ -927,7 +1028,7 @@ var Parser = function(env) {
 			var resultStr = expStr.substring(ifIndex+ifSymbol.length);
 			var results = [];
 			function AddResult(str) {
-				var dialogBlockState = new ParserState( new BlockNode(), str );
+				var dialogBlockState = new ParserState( new BlockNode(BlockMode.Dialog), str );
 				dialogBlockState = ParseDialog( dialogBlockState );
 				var dialogBlock = dialogBlockState.rootNode;
 				results.push( dialogBlock );
@@ -1018,7 +1119,7 @@ var Parser = function(env) {
 		// console.log("PARSE CODE");
 		// console.log(codeStr);
 
-		var codeState = new ParserState( new BlockNode(), codeStr );
+		var codeState = new ParserState( new BlockNode(BlockMode.Code), codeStr );
 		codeState = ParseCode( codeState );
 		
 		state.curNode.AddChild( codeState.rootNode );
