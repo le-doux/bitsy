@@ -295,9 +295,13 @@ var BlockNode = function(mode) {
 
 	this.Serialize = function() {
 		var str = "";
+		var lastNode = "";
 		if (this.mode === BlockMode.Code) str += "{"; // todo: increase scope of Sym?
 		for (var i = 0; i < this.children.length; i++) {
+			if(this.children[i].type === "block" && lastNode === "block")
+				str += "\n";
 			str += this.children[i].Serialize();
+			lastNode = this.children[i].type;
 		}
 		if (this.mode === BlockMode.Code) str += "}";
 		return str;
@@ -542,6 +546,19 @@ var IfNode = function(conditions, results) {
 	}
 }
 
+var ElseNode = function() {
+	Object.assign( this, new TreeRelationship() );
+	this.type = "else";
+
+	this.Eval = function(environment,onReturn) {
+		onReturn(true);
+	}
+
+	this.Serialize = function() {
+		return "else";
+	}
+}
+
 var Parser = function(env) {
 	var environment = env;
 
@@ -557,6 +574,50 @@ var Parser = function(env) {
 		List : "*",
 		String : '"'
 	};
+
+	this.Parse = function(scriptStr) {
+		// console.log("NEW PARSE!!!!!!");
+
+		// TODO : make this work for single-line, no dialog block scripts
+
+		var state = new ParserState( new BlockNode(BlockMode.Dialog), scriptStr );
+
+		if( state.MatchAhead(Sym.DialogOpen) ) {
+			// multi-line dialog block
+			var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
+			state = new ParserState( new BlockNode(BlockMode.Dialog), dialogStr );
+			state = ParseDialog( state );
+		}
+		// else if( state.MatchAhead(Sym.CodeOpen) ) { // NOTE: This causes problems when you lead with a code block
+		// 	// code-block: should this ever happen?
+		// 	state = ParseCodeBlock( state );
+		// }
+		else {
+			// single-line dialog block
+			state = ParseDialog( state );
+		}
+
+		// console.log( state.rootNode );
+		return state.rootNode;
+	};
+
+	this.ReadDialogScript = function(lines, i) {
+		var scriptStr = "";
+		if (lines[i] === Sym.DialogOpen) {
+			scriptStr += lines[i] + "\n";
+			i++;
+			while(lines[i] != Sym.DialogClose) {
+				scriptStr += lines[i] + "\n";
+				i++;
+			}
+			scriptStr += lines[i] + "\n";
+			i++;
+		}
+		else {
+			scriptStr += lines[i];
+		}
+		return { script:scriptStr, index:i };
+	}
 
 	var ParserState = function( rootNode, str ) {
 		this.rootNode = rootNode;
@@ -621,30 +682,6 @@ var Parser = function(env) {
 			return sourceStr.slice( startIndex + open.length, i - close.length );
 		}
 		this.Print = function() {console.log(sourceStr);};
-	};
-
-	this.Parse = function(scriptStr) {
-		// console.log("NEW PARSE!!!!!!");
-
-		// TODO : make this work for single-line, no dialog block scripts
-
-		var state = new ParserState( new BlockNode(BlockMode.Dialog), scriptStr );
-
-		if( state.MatchAhead(Sym.DialogOpen) ) {
-			// state = ParseDialogBlock( state );
-			var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
-			state = new ParserState( new BlockNode(BlockMode.Dialog), dialogStr );
-			state = ParseDialog( state );
-		}
-		else if( state.MatchAhead(Sym.CodeOpen) ) {
-			state = ParseCodeBlock( state );
-		}
-		else {
-			state = ParseDialog( state );
-		}
-
-		// console.log( state.rootNode );
-		return state.rootNode;
 	};
 
 	function ParseDialog(state) {
@@ -751,11 +788,17 @@ var Parser = function(env) {
 		var curIndex = -1;
 		var isNewline = true;
 		var isConditionDone = false;
+		var codeBlockCount = 0;
 
 		while( !state.Done() ) {
+			if(state.Char() === Sym.CodeOpen)
+				codeBlockCount++;
+			else if(state.Char() === Sym.CodeClose)
+				codeBlockCount--;
+
 			var isWhitespace = (state.Char() === " " || state.Char() === "\t");
 			var isSkippableWhitespace = isNewline && isWhitespace;
-			var isNewListItem = isNewline && (state.Char() === "-");
+			var isNewListItem = isNewline && (codeBlockCount <= 0) && (state.Char() === "-");
 
 			if(isNewListItem) {
 				curIndex++;
@@ -794,7 +837,7 @@ var Parser = function(env) {
 		for(var i = 0; i < conditionStrings.length; i++) {
 			var str = conditionStrings[i].trim();
 			if(str === "else") {
-				conditions.push( new LiteralNode(true) ); // else? is always true
+				conditions.push( new ElseNode() );
 			}
 			else {
 				var exp = CreateExpression( str );
@@ -928,8 +971,9 @@ var Parser = function(env) {
 	function StringToValue(valStr) {
 		if(valStr[0] === Sym.CodeOpen) {
 			// CODE BLOCK!!!
-			var codeBlockState = new ParserState( new BlockNode(BlockMode.Code), valStr );
-			codeBlockState = ParseCodeBlock( codeBlockState ); // TODO: I think this will create too many nested blocks
+			var codeStr = (new ParserState( null, valStr )).ConsumeBlock(Sym.CodeOpen, Sym.CodeClose); //hacky
+			var codeBlockState = new ParserState( new BlockNode( BlockMode.Code ), codeStr );
+			codeBlockState = ParseCode( codeBlockState );
 			return codeBlockState.rootNode;
 		}
 		else if(valStr[0] === Sym.String) {
@@ -1036,10 +1080,10 @@ var Parser = function(env) {
 
 			var elseIndex = resultStr.indexOf(elseSymbol); // does this need to test for strings?
 			if(elseIndex > -1) {
-				conditions.push( new LiteralNode(true) ); // push else condition
+				conditions.push( new ElseNode() );
 
-				var elseStr = resultStr.substring(elseIndex+elseSymbol.length);
-				var resultStr = resultStr.substring(0,elseIndex);
+				var elseStr = resultStr.substring(elseIndex+elseSymbol.length).trim();
+				var resultStr = resultStr.substring(0,elseIndex).trim();
 
 				AddResult( resultStr );
 				AddResult( elseStr );
@@ -1125,24 +1169,6 @@ var Parser = function(env) {
 		state.curNode.AddChild( codeState.rootNode );
 
 		return state;
-	}
-
-	this.ReadDialogScript = function(lines, i) {
-		var scriptStr = "";
-		if (lines[i] === Sym.DialogOpen) {
-			scriptStr += lines[i] + "\n";
-			i++;
-			while(lines[i] != Sym.DialogClose) {
-				scriptStr += lines[i] + "\n";
-				i++;
-			}
-			scriptStr += lines[i] + "\n";
-			i++;
-		}
-		else {
-			scriptStr += lines[i];
-		}
-		return { script:scriptStr, index:i };
 	}
 
 }
