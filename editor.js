@@ -1508,11 +1508,32 @@ function reloadDialogUI() {
 	var dialogId = getCurDialogId();
 
 	if (dialogId in dialog) {
-		document.getElementById("dialogText").value = dialog[dialogId];
+		var dialogLines = dialog[dialogId].split("\n");
+		if(dialogLines[0] === '"""') {
+			// multi line
+			var dialogStr = "";
+			var i = 1;
+			while (i < dialogLines.length && dialogLines[i] != '"""') {
+				dialogStr += dialogLines[i] + (dialogLines[i+1] != '"""' ? '\n' : '');
+				i++;
+			}
+			document.getElementById("dialogText").value = dialogStr;
+		}
+		else {
+			// single line
+			document.getElementById("dialogText").value = dialog[dialogId];
+		}
 	}
 	else {
 		document.getElementById("dialogText").value = "";
 	}
+
+	reloadAdvDialogUI();
+}
+
+// TODO : better name?
+function reloadAdvDialogUI() {
+	document.getElementById("dialogCodeText").value = document.getElementById("dialogText").value;
 }
 
 function reloadSprite() {
@@ -2838,9 +2859,18 @@ function on_change_dialog() {
 			dialogId = nextAvailableDialogId( prefix );
 			getCurPaintObject().dlg = dialogId;
 		}
+		if( dialogStr.indexOf('\n') > -1 ) dialogStr = '"""\n' + dialogStr + '\n"""';
 		dialog[dialogId] = dialogStr;
 	}
+
+	reloadAdvDialogUI();
+
 	refreshGameData();
+}
+
+function on_change_adv_dialog() {
+	document.getElementById("dialogText").value = document.getElementById("dialogCodeText").value;
+	on_change_dialog();
 }
 
 function on_game_data_change() {

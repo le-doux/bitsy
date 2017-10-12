@@ -642,7 +642,7 @@ var Parser = function(env) {
 				scriptStr += lines[i] + "\n";
 				i++;
 			}
-			scriptStr += lines[i] + "\n";
+			scriptStr += lines[i];
 			i++;
 		}
 		else {
