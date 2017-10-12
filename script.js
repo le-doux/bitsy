@@ -71,6 +71,7 @@ function linebreakFunc(environment,parameters,onReturn) {
 
 function itemFunc(environment,parameters,onReturn) {
 	var itemId = parameters[0];
+	if(names.item.has(itemId)) itemId = names.item.get(itemId); // id is actually a name
 	var itemCount = player().inventory[itemId] ? player().inventory[itemId] : 0; // TODO : ultimately the environment should include a reference to the game state
 	// console.log("ITEM FUNC " + itemId + " " + itemCount);
 	onReturn(itemCount);

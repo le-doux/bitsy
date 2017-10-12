@@ -17,10 +17,11 @@ var playerId = "A";
 
 var names = {
 	room : new Map(),
-	/*tile : new Map(),*/
+	tile : new Map(), // Note: Not currently enabled in the UI
 	sprite : new Map(),
 	item : new Map(),
-	/*dialog : new Map()*/
+	/*dialog : new Map()*/ // TODO
+	/*ending : new Map()*/ // TODO
 };
 
 //stores all image data for tiles, sprites, drawings
@@ -1001,6 +1002,10 @@ function serializeWorld() {
 	for (id in tile) {
 		worldStr += "TIL " + id + "\n";
 		worldStr += serializeDrawing( "TIL_" + id );
+		if (tile[id].name != null) {
+			/* NAME */
+			worldStr += "NAME " + tile[id].name + "\n";
+		}
 		worldStr += "\n";
 	}
 	/* SPRITES */
@@ -1230,7 +1235,7 @@ function parseRoom(lines, i) {
 		else if (getType(lines[i]) === "NAME") {
 			var name = lines[i].split(/\s(.+)/)[1];
 			room[id].name = name;
-			names.room[ name ] = id;
+			names.room.set( name, id);
 		}
 		i++;
 	}
@@ -1284,6 +1289,11 @@ function parseTile(lines, i) {
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		if (getType(lines[i]) === "COL") {
 			colorIndex = parseInt( getId(lines[i]) );
+		}	
+		else if (getType(lines[i]) === "NAME") {
+			/* NAME */
+			name = lines[i].split(/\s(.+)/)[1];
+			names.tile.set( name, id );
 		}
 		i++;
 	}
@@ -1296,7 +1306,8 @@ function parseTile(lines, i) {
 			isAnimated : (imageStore.source[drwId].length > 1),
 			frameIndex : 0,
 			frameCount : imageStore.source[drwId].length
-		}
+		},
+		name : name
 	};
 	return i;
 }
@@ -1343,7 +1354,7 @@ function parseSprite(lines, i) {
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
 			name = lines[i].split(/\s(.+)/)[1];
-			names.sprite[name] = id;
+			names.sprite.set( name, id );
 		}
 		i++;
 	}
@@ -1410,7 +1421,7 @@ function parseItem(lines, i) {
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
 			name = lines[i].split(/\s(.+)/)[1];
-			names.item[name] = id;
+			names.item.set( name, id );
 		}
 		i++;
 	}
@@ -1565,28 +1576,7 @@ function parseDialog(lines, i) {
 	var id = getId(lines[i]);
 	i++;
 
-	// var text = "";
-	// if( featureNewScript ) {
-	// 	if( lines[i] === '/"' ) { // TODO : finalize the "text block" open / close symbols
-	// 		// this is a real script
-	// 		while( lines[i] != '"/' ) {
-	// 			text += lines[i] + "\n";
-	// 			i++;
-	// 		}
-	// 		text += lines[i] + "\n";
-	// 		i++;
-	// 		console.log("PARSE DIALOG");
-	// 		console.log(text);
-	// 	}
-	// 	else {
-	// 		text = '/"\n' + lines[i] + '\n"/'; // read old-style one line dialogs into the new scripting format
-	// 	} // DO WE REALLY NEED THE DIALOG BLOCKS?
-	// }
-	// else {
-	// 	text = lines[i];
-	// }
-	// dialog[id] = text;
-
+	// TODO : use this for titles & endings too
 	var results = scriptInterpreter.ReadDialogScript(lines,i);
 	dialog[id] = results.script;
 	i = results.index;
@@ -1822,7 +1812,5 @@ var scriptInterpreter = scriptModule.CreateInterpreter();
 // scriptInterpreter.SetDialogBuffer( dialogBuffer );
 
 /* FEATURE FLAGS */
-var featureNewScript = true;
-var featureNewDialog = false;
 var featureOldTouch = false;
 var featureTouchDpad = false;
