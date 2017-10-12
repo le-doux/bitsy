@@ -21,8 +21,8 @@ var Interpreter = function() {
 		env.GetScript( scriptName )
 			.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
 
-		console.log("SERIALIZE!!!!");
-		console.log( env.GetScript( scriptName ).Serialize() );
+		// console.log("SERIALIZE!!!!");
+		// console.log( env.GetScript( scriptName ).Serialize() );
 	}
 	this.Interpret = function(scriptStr, exitHandler) { // Compiles and runs code immediately
 		// console.log("INTERPRET");
@@ -45,14 +45,14 @@ var Interpreter = function() {
 
 /* BUILT-IN FUNCTIONS */ // TODO: better way to encapsulate these?
 function sayFunc(environment,parameters,onReturn) {
-	console.log("SAY FUNC");
-	console.log(parameters);
+	// console.log("SAY FUNC");
+	// console.log(parameters);
 	if( parameters[0] != undefined && parameters[0] != null ) {
 		// console.log(parameters[0]);
 		// console.log(parameters[0].toString());
 		// var textStr = parameters[0].toString();
 		var textStr = "" + parameters[0];
-		console.log(textStr);
+		// console.log(textStr);
 		var onFinishHandler = function() {
 			// console.log("FINISHED PRINTING ---- SCRIPT");
 			onReturn(null);
@@ -116,7 +116,7 @@ function shakyFunc(environment,parameters,onReturn) {
 
 /* BUILT-IN OPERATORS */
 function setExp(environment,left,right,onReturn) {
-	console.log("SET " + left.name);
+	// console.log("SET " + left.name);
 
 	if(left.type != "variable") {
 		// not a variable! return null and hope for the best D:
@@ -126,7 +126,7 @@ function setExp(environment,left,right,onReturn) {
 
 	right.Eval(environment,function(rVal) {
 		environment.SetVariable( left.name, rVal );
-		console.log("VAL " + environment.GetVariable( left.name ) );
+		// console.log("VAL " + environment.GetVariable( left.name ) );
 		left.Eval(environment,function(lVal) {
 			onReturn( lVal );
 		});
@@ -252,6 +252,15 @@ var Environment = function() {
 	this.SetScript = function(name,script) { scriptMap.set(name, script); };
 }
 
+function leadingWhitespace(depth) {
+	var str = "";
+	for(var i = 0; i < depth; i++) {
+		str += "  "; // two spaces per indent
+	}
+	// console.log("WHITESPACE " + depth + " ::" + str + "::");
+	return str;
+}
+
 /* NODES */
 var TreeRelationship = function() {
 	this.parent = null;
@@ -267,7 +276,7 @@ var BlockMode = {
 	Dialog : "dialog"
 };
 
-var BlockNode = function(mode) {
+var BlockNode = function(mode, doIndentFirstLine) {
 	Object.assign( this, new TreeRelationship() );
 	// Object.assign( this, new Runnable() );
 	this.type = "block";
@@ -293,15 +302,24 @@ var BlockNode = function(mode) {
 		} );
 	}
 
-	this.Serialize = function() {
+	if(doIndentFirstLine === undefined) doIndentFirstLine = true; // This is just for serialization
+
+	this.Serialize = function(depth) {
+		if(depth === undefined) depth = 0;
 		var str = "";
-		var lastNode = "";
+		var lastNode = null;
 		if (this.mode === BlockMode.Code) str += "{"; // todo: increase scope of Sym?
 		for (var i = 0; i < this.children.length; i++) {
-			if(this.children[i].type === "block" && lastNode === "block")
+
+			if(this.children[i].type === "block" && lastNode && lastNode.type === "block")
 				str += "\n";
-			str += this.children[i].Serialize();
-			lastNode = this.children[i].type;
+
+			var shouldIndentFirstLine = (i == 0 && doIndentFirstLine);
+			var shouldIndentAfterLinebreak = (lastNode && lastNode.type === "function" && lastNode.name === "br");
+			if(this.mode === BlockMode.Dialog && (shouldIndentFirstLine || shouldIndentAfterLinebreak))
+				str += leadingWhitespace(depth);
+			str += this.children[i].Serialize(depth);
+			lastNode = this.children[i];
 		}
 		if (this.mode === BlockMode.Code) str += "}";
 		return str;
@@ -342,7 +360,7 @@ var FuncNode = function(name,arguments) {
 		} );
 	}
 
-	this.Serialize = function() {
+	this.Serialize = function(depth) {
 		var isDialogBlock = this.parent.mode && this.parent.mode === BlockMode.Dialog;
 		if(isDialogBlock && this.name === "say") {
 			// TODO this could cause problems with "real" say functions
@@ -356,7 +374,7 @@ var FuncNode = function(name,arguments) {
 			str += this.name;
 			for(var i = 0; i < this.arguments.length; i++) {
 				str += " ";
-				str += this.arguments[i].Serialize();
+				str += this.arguments[i].Serialize(depth);
 			}
 			return str;
 		}
@@ -373,7 +391,7 @@ var LiteralNode = function(value) {
 		onReturn(this.value);
 	}
 
-	this.Serialize = function() {
+	this.Serialize = function(depth) {
 		var str = "";
 		if(typeof this.value === "string") str += '"';
 		str += this.value;
@@ -396,7 +414,7 @@ var VarNode = function(name) {
 			onReturn(null); // not a valid variable -- return null and hope that's ok
 	} // TODO: might want to store nodes in the variableMap instead of values???
 
-	this.Serialize = function() {
+	this.Serialize = function(depth) {
 		var str = "" + this.name;
 		return str;
 	}
@@ -419,11 +437,11 @@ var ExpNode = function(operator, left, right) {
 		// NOTE : sadly this pushes a lot of complexity down onto the actual operator methods
 	}
 
-	this.Serialize = function() {
+	this.Serialize = function(depth) {
 		var str = "";
-		str += this.left.Serialize();
+		str += this.left.Serialize(depth);
 		str += " " + this.operator + " ";
-		str += this.right.Serialize();
+		str += this.right.Serialize(depth);
 		return str;
 	}
 }
@@ -443,13 +461,14 @@ var SequenceNode = function(options) {
 			index = next;
 	}
 
-	this.Serialize = function() {
+	this.Serialize = function(depth) {
 		// todo : make this pretty
 		var str = "";
 		str += this.type + "\n";
 		for (var i = 0; i < this.options.length; i++) {
-			str += " - " + this.options[i].Serialize() + "\n";
+			str += leadingWhitespace(depth + 1) + "- " + this.options[i].Serialize(depth + 2) + "\n";
 		}
+		str += leadingWhitespace(depth);
 		return str;
 	}
 }
@@ -472,13 +491,14 @@ var CycleNode = function(options) {
 	}
 
 	// duplicate!
-	this.Serialize = function() {
+	this.Serialize = function(depth) {
 		// todo : make this pretty
 		var str = "";
 		str += this.type + "\n";
 		for (var i = 0; i < this.options.length; i++) {
-			str += " - " + this.options[i].Serialize() + "\n";
+			str += leadingWhitespace(depth + 1) + "- " + this.options[i].Serialize(depth + 2) + "\n";
 		}
+		str += leadingWhitespace(depth);
 		return str;
 	}
 }
@@ -495,18 +515,19 @@ var ShuffleNode = function(options) {
 	}
 
 	// duplicate!
-	this.Serialize = function() {
+	this.Serialize = function(depth) {
 		// todo : make this pretty
 		var str = "";
 		str += this.type + "\n";
 		for (var i = 0; i < this.options.length; i++) {
-			str += " - " + this.options[i].Serialize() + "\n";
+			str += leadingWhitespace(depth + 1) + "- " + this.options[i].Serialize(depth + 2) + "\n";
 		}
+		str += leadingWhitespace(depth);
 		return str;
 	}
 }
 
-var IfNode = function(conditions, results) {
+var IfNode = function(conditions, results, isSingleLine) {
 	Object.assign( this, new TreeRelationship() );
 	this.type = "if";
 	this.conditions = conditions;
@@ -535,12 +556,22 @@ var IfNode = function(conditions, results) {
 		TestCondition();
 	}
 
-	this.Serialize = function() {
+	if(isSingleLine === undefined) isSingleLine = false; // This is just for serialization
+
+	this.Serialize = function(depth) {
 		var str = "";
-		str += "\n";
-		for (var i = 0; i < this.conditions.length; i++) {
-			str += " - " + this.conditions[i].Serialize() + " ?\n";
-			str += "   " + this.results[i].Serialize() + "\n";
+		if(isSingleLine) {
+			str += this.conditions[0].Serialize(depth) + " ? " + this.results[0].Serialize(depth);
+			if(this.conditions.length > 1 && this.conditions[1].type === "else")
+				str += " : " + this.results[1].Serialize(depth);
+		}
+		else {
+			str += "\n";
+			for (var i = 0; i < this.conditions.length; i++) {
+				str += leadingWhitespace(depth + 1) + "- " + this.conditions[i].Serialize(depth) + " ?\n";
+				str += this.results[i].Serialize(depth + 2) + "\n";
+			}
+			str += leadingWhitespace(depth);
 		}
 		return str;
 	}
@@ -872,10 +903,17 @@ var Parser = function(env) {
 		var isNewline = false;
 		var itemStrings = [];
 		var curItemIndex = -1; // -1 indicates not reading an item yet
+		var codeBlockCount = 0;
+
 		while( !state.Done() ) {
+			if(state.Char() === Sym.CodeOpen)
+				codeBlockCount++;
+			else if(state.Char() === Sym.CodeClose)
+				codeBlockCount--;
+
 			var isWhitespace = (state.Char() === " " || state.Char() === "\t");
 			var isSkippableWhitespace = isNewline && isWhitespace;
-			var isNewListItem = isNewline && (state.Char() === "-");
+			var isNewListItem = isNewline && (codeBlockCount <= 0) && (state.Char() === "-");
 
 			if(isNewListItem) {
 				// console.log("found next list item");
@@ -898,7 +936,7 @@ var Parser = function(env) {
 		var options = [];
 		for(var i = 0; i < itemStrings.length; i++) {
 			var str = itemStrings[i];
-			var dialogBlockState = new ParserState( new BlockNode(BlockMode.Dialog), str );
+			var dialogBlockState = new ParserState( new BlockNode( BlockMode.Dialog, false /* doIndentFirstLine */ ), str );
 			dialogBlockState = ParseDialog( dialogBlockState );
 			var dialogBlock = dialogBlockState.rootNode;
 			options.push( dialogBlock );
@@ -998,12 +1036,12 @@ var Parser = function(env) {
 		}
 		else if( !isNaN(parseFloat(valStr)) ) {
 			// NUMBER!!
-			console.log("NUMBER!!! " + valStr);
+			// console.log("NUMBER!!! " + valStr);
 			return new LiteralNode( parseFloat(valStr) );
 		}
 		else if(IsValidVariableName(valStr)) {
 			// VARIABLE!!
-			console.log("VARIABLE");
+			// console.log("VARIABLE");
 			return new VarNode(valStr); // TODO : check for valid potential variables
 		}
 		else {
@@ -1082,17 +1120,17 @@ var Parser = function(env) {
 			if(elseIndex > -1) {
 				conditions.push( new ElseNode() );
 
-				var elseStr = resultStr.substring(elseIndex+elseSymbol.length).trim();
-				var resultStr = resultStr.substring(0,elseIndex).trim();
+				var elseStr = resultStr.substring(elseIndex+elseSymbol.length);
+				var resultStr = resultStr.substring(0,elseIndex);
 
-				AddResult( resultStr );
-				AddResult( elseStr );
+				AddResult( resultStr.trim() );
+				AddResult( elseStr.trim() );
 			}
 			else {
-				AddResult( resultStr );
+				AddResult( resultStr.trim() );
 			}
 
-			return new IfNode( conditions, results );
+			return new IfNode( conditions, results, true /*isSingleLine*/ );
 		}
 
 		for( var i = 0; (operator == null) && (i < operatorSymbols.length); i++ ) {
