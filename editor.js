@@ -3824,16 +3824,32 @@ var SeqBlockUI = function(node) {
 
 	div.appendChild( document.createElement("br") );
 
-	for(var j = 0; j < sequenceNode.options.length; j++) {
+	var addOptionEl = document.createElement("button");
+	addOptionEl.innerText = "add";
+	function addOption(option,index) {
 		var textArea = document.createElement("textarea");
 		textArea.classList.add('advDialogTextOption');
-		textArea.value = sequenceNode.options[j].Serialize();
-		var onChangeOption = createOnChangeOption(j);
+		textArea.value = option.Serialize();
+		var onChangeOption = createOnChangeOption( index );
 		textArea.addEventListener('change', onChangeOption);
 		textArea.addEventListener('keyup', onChangeOption);
 		textArea.addEventListener('keydown', onChangeOption);
-		div.appendChild( textArea );
-		div.appendChild( document.createElement("br") );
+		div.insertBefore( textArea, addOptionEl );
+		var deleteOptionEl = document.createElement("button");
+		deleteOptionEl.innerText = "delete";
+		div.insertBefore( deleteOptionEl, addOptionEl );
+		div.insertBefore( document.createElement("br"), addOptionEl );
+	}
+	addOptionEl.addEventListener('click', function() {
+		var newOption = scriptUtils.CreateDialogBlock([], false);
+		sequenceNode.options.push( newOption );
+		addOption(newOption, sequenceNode.options.length-1);
+		serializeAdvDialog();
+	});
+	div.appendChild(addOptionEl);
+
+	for(var j = 0; j < sequenceNode.options.length; j++) {
+		addOption( sequenceNode.options[j], j );
 	}
 
 	this.GetEl = function() {
