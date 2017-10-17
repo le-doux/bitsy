@@ -62,6 +62,19 @@ var Utils = function() {
 		}
 		return block;
 	}
+
+	this.ChangeSequenceType = function(oldSequence,type) {
+		if(type === "sequence") {
+			return new SequenceNode( oldSequence.options );
+		}
+		else if(type === "cycle") {
+			return new CycleNode( oldSequence.options );
+		}
+		else if(type === "shuffle") {
+			return new ShuffleNode( oldSequence.options );
+		}
+		return oldSequence;
+	}
 }
 
 

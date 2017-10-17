@@ -1234,6 +1234,12 @@ function updateWallCheckboxOnCurrentTile() {
 }
 
 function reloadDialogUI() {
+	reloadDialogUICore();
+
+	reloadAdvDialogUI();
+}
+
+function reloadDialogUICore() { // TODO: name is terrible
 	var dialogId = getCurDialogId();
 
 	if (dialogId in dialog) {
@@ -1255,9 +1261,7 @@ function reloadDialogUI() {
 	}
 	else {
 		document.getElementById("dialogText").value = "";
-	}
-
-	reloadAdvDialogUI();
+	}	
 }
 
 // TODO : better name?
@@ -3789,6 +3793,13 @@ var SeqBlockUI = function(node) {
 	div.appendChild( formEl );
 	var sequenceTypes = ["sequence","cycle","shuffle"];
 	var sequenceIcons = ["trending_flat", "repeat", "shuffle"];
+
+	function onClickSequenceType(event) {
+		sequenceNode = scriptUtils.ChangeSequenceType( sequenceNode, event.target.value );
+		node.children[0] = sequenceNode;
+		serializeAdvDialog();
+	}
+
 	for(var i = 0; i < sequenceTypes.length; i++) {
 		var radioEl = document.createElement("input");
 		radioEl.type = "radio";
@@ -3796,6 +3807,7 @@ var SeqBlockUI = function(node) {
 		radioEl.id = "seqRadio" + seqRadioCount + "_" + i;
 		radioEl.value = sequenceTypes[i];
 		if(sequenceNode.type === sequenceTypes[i]) radioEl.checked = true;
+		radioEl.addEventListener('click', onClickSequenceType);
 		formEl.appendChild( radioEl );
 		var labelEl = document.createElement("label");
 		labelEl.innerHTML = '<i class="material-icons">' + sequenceIcons[i] + '</i>' + sequenceTypes[i];
@@ -3847,10 +3859,10 @@ function serializeAdvDialog() {
 	var dialogStr = '"""\n' + scriptRoot.Serialize() + '\n"""'; // todo cleanup quotes
 	console.log(dialogStr);
 
-	document.getElementById("dialogText").value = dialogStr;
-	document.getElementById("dialogCodeText").value = dialogStr;
 	var dialogId = getCurDialogId();
 	dialog[dialogId] = dialogStr; //TODO: do I need to do more here?
+	reloadDialogUICore();
+	document.getElementById("dialogCodeText").value = document.getElementById("dialogText").value;
 
 	refreshGameData();
 }
