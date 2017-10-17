@@ -4,6 +4,10 @@ this.CreateInterpreter = function() {
 	return new Interpreter();
 };
 
+this.CreateUtils = function() {
+	return new Utils();
+};
+
 var Interpreter = function() {
 	var env = new Environment();
 	var parser = new Parser( env );
@@ -36,9 +40,27 @@ var Interpreter = function() {
 		parser = new Parser( env );
 	}
 
+	// TODO : move to utils?
 	// for reading in dialog from the larger file format
 	this.ReadDialogScript = function(lines, i) {
 		return parser.ReadDialogScript(lines,i);
+	}
+
+	this.Parse = function(scriptStr) {
+		return parser.Parse( scriptStr );
+	}
+}
+
+
+var Utils = function() {
+	// for editor ui
+	this.CreateDialogBlock = function(children,doIndentFirstLine) {
+		if(doIndentFirstLine === undefined) doIndentFirstLine = true;
+		var block = new BlockNode( BlockMode.Dialog, doIndentFirstLine );
+		for(var i = 0; i < children.length; i++) {
+			block.AddChild( children[i] );
+		}
+		return block;
 	}
 }
 
@@ -307,6 +329,11 @@ var BlockNode = function(mode, doIndentFirstLine) {
 
 	this.Serialize = function(depth) {
 		if(depth === undefined) depth = 0;
+
+		console.log("SERIALIZE BLOCK!!!");
+		console.log(depth);
+		console.log(doIndentFirstLine);
+
 		var str = "";
 		var lastNode = null;
 		if (this.mode === BlockMode.Code) str += "{"; // todo: increase scope of Sym?
@@ -447,8 +474,23 @@ var ExpNode = function(operator, left, right) {
 	}
 }
 
+var SequenceBase = function() {
+	this.Serialize = function(depth) {
+		var str = "";
+		str += this.type + "\n";
+		for (var i = 0; i < this.options.length; i++) {
+			console.log("SERIALIZE SEQUENCE ");
+			console.log(depth);
+			str += leadingWhitespace(depth + 1) + "- " + this.options[i].Serialize(depth + 2) + "\n";
+		}
+		str += leadingWhitespace(depth);
+		return str;
+	}
+}
+
 var SequenceNode = function(options) {
 	Object.assign( this, new TreeRelationship() );
+	Object.assign( this, new SequenceBase() );
 	this.type = "sequence";
 	this.options = options;
 
@@ -461,21 +503,11 @@ var SequenceNode = function(options) {
 		if(next < this.options.length)
 			index = next;
 	}
-
-	this.Serialize = function(depth) {
-		// todo : make this pretty
-		var str = "";
-		str += this.type + "\n";
-		for (var i = 0; i < this.options.length; i++) {
-			str += leadingWhitespace(depth + 1) + "- " + this.options[i].Serialize(depth + 2) + "\n";
-		}
-		str += leadingWhitespace(depth);
-		return str;
-	}
 }
 
 var CycleNode = function(options) {
 	Object.assign( this, new TreeRelationship() );
+	Object.assign( this, new SequenceBase() );
 	this.type = "cycle";
 	this.options = options;
 
@@ -490,22 +522,11 @@ var CycleNode = function(options) {
 		else
 			index = 0;
 	}
-
-	// duplicate!
-	this.Serialize = function(depth) {
-		// todo : make this pretty
-		var str = "";
-		str += this.type + "\n";
-		for (var i = 0; i < this.options.length; i++) {
-			str += leadingWhitespace(depth + 1) + "- " + this.options[i].Serialize(depth + 2) + "\n";
-		}
-		str += leadingWhitespace(depth);
-		return str;
-	}
 }
 
 var ShuffleNode = function(options) {
 	Object.assign( this, new TreeRelationship() );
+	Object.assign( this, new SequenceBase() );
 	this.type = "shuffle";
 	this.options = options;
 
@@ -513,18 +534,6 @@ var ShuffleNode = function(options) {
 		var index = Math.floor(Math.random() * this.options.length);
 		// console.log("SHUFFLE " + index);
 		this.options[index].Eval( environment, onReturn );
-	}
-
-	// duplicate!
-	this.Serialize = function(depth) {
-		// todo : make this pretty
-		var str = "";
-		str += this.type + "\n";
-		for (var i = 0; i < this.options.length; i++) {
-			str += leadingWhitespace(depth + 1) + "- " + this.options[i].Serialize(depth + 2) + "\n";
-		}
-		str += leadingWhitespace(depth);
-		return str;
 	}
 }
 
@@ -562,9 +571,9 @@ var IfNode = function(conditions, results, isSingleLine) {
 	this.Serialize = function(depth) {
 		var str = "";
 		if(isSingleLine) {
-			str += this.conditions[0].Serialize(depth) + " ? " + this.results[0].Serialize(depth);
+			str += this.conditions[0].Serialize() + " ? " + this.results[0].Serialize();
 			if(this.conditions.length > 1 && this.conditions[1].type === "else")
-				str += " : " + this.results[1].Serialize(depth);
+				str += " : " + this.results[1].Serialize();
 		}
 		else {
 			str += "\n";

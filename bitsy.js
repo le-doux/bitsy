@@ -1809,6 +1809,7 @@ function startDialog(dialogStr,scriptId) {
 /* NEW SCRIPT STUFF */
 var scriptModule = new Script();
 var scriptInterpreter = scriptModule.CreateInterpreter();
+var scriptUtils = scriptModule.CreateUtils(); // TODO: move to editor.js?
 // scriptInterpreter.SetDialogBuffer( dialogBuffer );
 
 /* FEATURE FLAGS */

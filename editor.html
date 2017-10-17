@@ -667,12 +667,15 @@
 					</div>
 
 					<div>
-						<div id="dialogCode">
-							<textarea id="dialogCodeText" style="width:300px;height:300px;" onkeydown="on_change_adv_dialog();" onkeyup="on_change_adv_dialog();" onchange="on_change_adv_dialog();"></textarea>
+						<div id="dialogCode" style="display:none;">
+							<textarea id="dialogCodeText" onkeydown="on_change_adv_dialog();" onkeyup="on_change_adv_dialog();" onchange="on_change_adv_dialog();"></textarea>
 						</div>
 						<div id="dialogEditor">
-							WYSIWIG TBD
+							<div id="advDialogViewport">
+							</div>
 						</div>
+						<button id="dialogShowCode" onclick="showDialogCode();">show code</button>
+						<button id="dialogHideCode" onclick="hideDialogCode();" style="display:none;">hide code</button>
 					</div>
 				</div>
 

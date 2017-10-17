@@ -21,213 +21,6 @@ BUGS / FEEDBACK:
 * thetoolong: if a first time player of bitsy... and i like the top-down aspect. you should add more colors and some king of simple coding (like scratch) to make more complex games.
 * saranomy: Is it possible to add a dialog to the exit itself? So, when player walks into exit (teleport tile), it will force player to read important messages before going to the next room. This feature will add dialog box into "exits" window in the editor.
 
-MY GOALS
-- good syntax
-- good UI
-- scenario: item changes dialog
-
-{!choice
-	* choice 1
-	test 1
-	* choice 2
-	text 2
-	* choice 3
-	text 3
-}
-
-{choice:
-	* choice 1
-	text 1
-	* choice 2
-	text 2
-}
-
-!choice
-	* choice 1
-		text 1
-	* choice 2
-		text 2
-
-!if
-	* condition 1
-		branch 1
-	* condition 2
-		branch 2
-
-{if
-	* condition 1
-		branch 1
-	* condition 2
-		branch 2
-}
-
-<if condition="aaa">
-	branch 1
-<else>
-	branch 2
-</if>
-
-stuff {!if condition: result} stuff
-!if condition
-	result
-!if condition: result
-
-stuff {!if: *condition:result * default}
-{!if condition result * default}
-
-lists:
-* key : value
-* key
-	value
-* value (???)
-
-*? condition 1
-	branch 1
-*? conditoin 2
-	branch 2
-**
-
-*? condition : result **
-*? condition : result *? default **
-
-*? condition 1
-	branch 1
-? condition 2
-	branch 2
-?
-	default
-**
-
-** color text **
-*** color 2 text **
-
-?? condition 1
-	branch 1
-?? condition 2
-	branch 2
-**
-
-*& cycle
-*& cycle
-**
-
-*> choice 1
-	option 1
-*> choice 2
-	option 2
-**
-
-*rainbow: text :*
-
-*~ rainbow text **
-
-*color 1: color text **
-
-{? condition 1
-	text
-{? condition 2
-	text
-}
-
-* choice 1
-	text 1
-* choice 2
-	text 2
--
-? if 1
-	result 1
-? if 2
-	result 2
--
-
-POSSIBLE NEW SYNTAX
-if/else
-{
-	- condition:
-	a
-	- condition:
-	b
-}
-choice
-{
-	* prompt:
-	a
-	* prompt:
-	b
-}
-choice
-* prompt
-a
-* prompt
-b
-if/else
-? condition
-a
-? condition
-b
-?
-default text
-OR
-? condition : a ?
-ternary ?
-{ condition ? a | condition ? b | c }
-{
-	? condition:
-		a
-	? condition:
-		b
-	?:
-		c
-} // optional colon??
-{} --> scope (optional?)
-other crazy ideas
--- color 1 --
---- color 2 --- 
----- color 3 ----
-~~ wavy text ~~
-** shaky text **
-^^ rainbow text ^^
-or: <color 1>color 1</color>
-or: {color 1: color text }
-
-NOTES from reading ink docs
-- syntax is more specialized and minimalist
-	== headers ==
-	-> goto_scene
-	* choices
-	{ conditions }
-	newlines have meaning
-	-> END dedicated end symbol
-- special lists for cycles, random, etc
-	{|||} sequence, {&|||} cycle, {!|||} once only, {~|||} shuffle (why not use commas?)
-- global variables (instead of items?? where set them?)
-	VAR variable = value
-	~ means do numerical work on this line (not so sure about this symbol)
-- choices can only be used once (not sure if that works for bitsy?)
-- "" quotes for strings sometimes??? (what's the logic?)
-- conditional choice
-	* { condition } choice
-- conditional text
-	{ condition : the text }
-- if/else block
-	{
-		- condition0 : 
-			stuff
-		- condition1 :
-			other stuff
-		- else :
-			default stuff
-	}
-- idea: END of game vs END of dialog? (maybe use END vs STOP)
-- what I like about INK
-	- flexibility of global variables (vs items)
-	- the way all section headers are automatically tracked as a variable
-	- uncluttered syntax
-- what I don't like about INK
-	- gathers are confusing
-	- in some ways it's not linear enough
-
-
 TODO
 - names
 	X room 
@@ -248,17 +41,15 @@ X need a default item (tea)
 - need a good GUI for advanced dialog
 - need a better syntax than XML?
 
-DIALOG NODES ideas
-<pagebreak>
-<pause>
-<fast></fast>
-<slow></slow>
-<speed mult="2"></speed>
-<move> -- move character
-<mark name="blah"> -- mark spot
-<goto mark="blah"> -- jump to a mark
-<choice> -- player dialog choice
-<changeAvatar>
+SCRIPTING FUNCTION IDEAS
+- pause
+- fast
+- slow
+- speed
+- mark / goto
+- move character
+- choice
+- change avatar
 
 TODO next
 - items
@@ -284,72 +75,11 @@ TODO next
 -> three objects: choice, branch, dialog (combinable?) --- also: header, link, ending
 -> everything happens in order top to bottom
 
-dialog vs script?
-
-<if item="a">
-You found the sock!
-<else>
-Where oh where is my sock?
-</if>
-
-<if hasItem('a')>
-<if "hasItem('a'">
-<if condition="hasItem('a')">
-[if ~ hasItem('a') ~ otherThing('b') ]
-[color ~ 0]
-
 how should exits be defined?
 - in one line?
 - or should they get their own objects?
 - if they get their own blocks, are they still exits?
 - or something more complex... (triggers)
-
-TRG a
-IF ITM_b > 7
-EXT c 4,4
-ELSEIF ITM_c < 2
-DLG a
-EXT e 1,2
-ELSE
-AVA 8
-ENDIF
-
-^cool, but how do I dispaly it to users
-^could it use the same stuff as dialog?
-
-<if ITM_b>7> <exit room=c pos=1,2> <else> <script run=doScript></if>
-^ok, this shit is crazy --- how do I expose to users?
-
-the ULTIMATE version: the dialog editor itself is the script editor?????? what is v0.1 of this?
-
-// how can I help users do this?
-<if condition>
-dialog
-<elseif condition> //or just else? or just another if?
-dialog 2
-<else>
-default <color>dialog</color>
-</if>
-
-Ex:
-DLG a
-Here is some dialog
-And another bit of dialog
-? Make your choice ##a
-? Or this other one ##b
-#c
-Section c will continue seamlessly
-#d
-Into section d which is the last section
-END
-#a
-This is section a
-if ITM_a > 5
-Say this additional thing
-Then go to c ##c
-#b
-This is section b ##c
-
 
 ? music (how)
 
@@ -387,7 +117,6 @@ editor UI problems to solve
 - can't see all the tiles you want to work on
 - dialog UI could be improved
 - feedback for exits and ending creation is not good enough
-
 
 v4 features
 - refactor
@@ -1533,7 +1262,12 @@ function reloadDialogUI() {
 
 // TODO : better name?
 function reloadAdvDialogUI() {
-	document.getElementById("dialogCodeText").value = document.getElementById("dialogText").value;
+	// var dialogId = getCurDialogId(); // necessary?
+	var dialogStr = document.getElementById("dialogText").value;
+	document.getElementById("dialogCodeText").value = dialogStr;
+	var scriptTree = scriptInterpreter.Parse( dialogStr );
+	console.log(scriptTree);
+	createAdvDialogEditor(scriptTree);
 }
 
 function reloadSprite() {
@@ -3931,4 +3665,233 @@ function blockScrollBackpage(e) {
 		e.preventDefault();
 		el.scrollLeft = Math.max(0, Math.min(maxX, el.scrollLeft + event.deltaX));
 	}
+}
+
+
+/* ADVANCED DIALOG EDITOR */
+/*
+TODO
+- delete blocks
+- re-serialize on change
+- delete sequence options
+- add sequence options
+- change if conditions
+- delete if conditions
+- add if conditions
+- add blocks
+*/
+
+
+var DialogBlockUI = function(nodes) {
+	var dialogNode = scriptUtils.CreateDialogBlock( nodes );
+
+	var div = document.createElement('div');
+	div.classList.add('controlBox');
+	var typeEl = document.createElement("span");
+	typeEl.innerText = "dialog";
+	div.appendChild( typeEl );
+	div.appendChild( document.createElement("br") );
+
+	var textArea = document.createElement("textarea");
+	function onChangeDialogBlock() {
+		dialogNode = scriptInterpreter.Parse( '"""\n' +  textArea.value + '\n"""' );
+		nodes = dialogNode.children;
+		console.log(nodes);
+		serializeAdvDialog();
+	}
+	textArea.classList.add('advDialogTextBlock');
+	textArea.value = dialogNode.Serialize();
+	textArea.addEventListener('change', onChangeDialogBlock);
+	textArea.addEventListener('keyup', onChangeDialogBlock);
+	textArea.addEventListener('keydown', onChangeDialogBlock);
+	div.appendChild( textArea );
+
+	this.GetEl = function() {
+		return div;
+	}
+
+	// this.Delete = function() {
+	// 	div.parentNode.removeChild(div);
+	// 	advDialogUIComponents.
+	// }
+
+	this.GetScriptNodes = function() {
+		return nodes;
+	}
+}
+
+var IfBlockUI = function(node) {
+	var ifNode = node.children[0];
+
+	function createOnChangeResult(index) {
+		return function(event) {
+			ifNode.results[index] = scriptInterpreter.Parse( '"""\n' + event.target.value + '\n"""' );
+			serializeAdvDialog();
+		}
+	}
+
+	var div = document.createElement('div');
+	div.classList.add('controlBox');
+	var typeEl = document.createElement("span");
+	typeEl.innerText = ifNode.type;
+	div.appendChild( typeEl );
+	div.appendChild( document.createElement("br") );
+	for(var j = 0; j < ifNode.conditions.length; j++) {
+		var condEl = document.createElement("span");
+		condEl.innerText = ifNode.conditions[j].Serialize();
+		div.appendChild( condEl );
+		div.appendChild( document.createElement("br") );
+
+		var textArea = document.createElement("textarea");
+		textArea.classList.add('advDialogTextOption');
+		textArea.value = ifNode.results[j].Serialize();
+		var onChangeResult = createOnChangeResult(j);
+		textArea.addEventListener('change', onChangeResult);
+		textArea.addEventListener('keyup', onChangeResult);
+		textArea.addEventListener('keydown', onChangeResult);
+		div.appendChild( textArea );
+		div.appendChild( document.createElement("br") );
+	}
+
+	this.GetEl = function() {
+		return div;
+	}
+
+	this.GetScriptNodes = function() {
+		return [node];
+	}
+}
+
+var SeqBlockUI = function(node) {
+	var sequenceNode = node.children[0];
+
+	function createOnChangeOption(index) {
+		return function(event) {
+			sequenceNode.options[index] = scriptUtils.CreateDialogBlock( scriptInterpreter.Parse( '"""\n' + event.target.value + '\n"""' ).children, false ); // hacky way to avoid indenting first line (think of something better please!)
+			serializeAdvDialog();
+		}
+	}
+
+	var div = document.createElement('div');
+	div.classList.add('controlBox');
+	var typeEl = document.createElement("span");
+	typeEl.innerText = sequenceNode.type;
+	div.appendChild( typeEl );
+	div.appendChild( document.createElement("br") );
+	for(var j = 0; j < sequenceNode.options.length; j++) {
+		var textArea = document.createElement("textarea");
+		textArea.classList.add('advDialogTextOption');
+		textArea.value = sequenceNode.options[j].Serialize();
+		var onChangeOption = createOnChangeOption(j);
+		textArea.addEventListener('change', onChangeOption);
+		textArea.addEventListener('keyup', onChangeOption);
+		textArea.addEventListener('keydown', onChangeOption);
+		div.appendChild( textArea );
+		div.appendChild( document.createElement("br") );
+	}
+
+	this.GetEl = function() {
+		return div;
+	}
+
+	this.GetScriptNodes = function() {
+		return [node];
+	}
+}
+
+var advDialogUIComponents = [];
+
+function serializeAdvDialog() {
+	console.log("SERIALIZE ADVANCED DIALOG");
+
+	var allNodes = [];
+	for(var i = 0; i < advDialogUIComponents.length; i++) {
+		allNodes = allNodes.concat( advDialogUIComponents[i].GetScriptNodes() );
+	}
+	var scriptRoot = scriptUtils.CreateDialogBlock( allNodes );
+	console.log(scriptRoot);
+	var dialogStr = '"""\n' + scriptRoot.Serialize() + '\n"""'; // todo cleanup quotes
+	console.log(dialogStr);
+
+	document.getElementById("dialogText").value = dialogStr;
+	document.getElementById("dialogCodeText").value = dialogStr;
+	var dialogId = getCurDialogId();
+	dialog[dialogId] = dialogStr; //TODO: do I need to do more here?
+
+	refreshGameData();
+}
+
+function createAdvDialogEditor(scriptTree) {
+	console.log("~~~ ADVANCED DIALOG EDITOR ~~~");
+
+	advDialogUIComponents = [];
+
+	function isBlock(node) { return node.type === "block"; };
+	function isChildType(node,type) { return node.children[0].type === type; };
+	function isIf(node) { return isBlock(node) && isChildType(node,"if"); };
+	function isSeq(node) { return isBlock(node) && (isChildType(node,"sequence") || isChildType(node,"cycle") || isChildType(node,"shuffle")); };
+
+	var dialogFormDiv = document.getElementById("advDialogViewport");
+	dialogFormDiv.innerHTML = "";
+
+	var textBlockNodes = [];
+	function addText() {
+		if(textBlockNodes.length > 0) {
+			console.log("TEXT BLOCK!!");
+
+			var b = new DialogBlockUI( textBlockNodes );
+			dialogFormDiv.appendChild( b.GetEl() );
+
+			advDialogUIComponents.push( b );
+
+			textBlockNodes = [];
+		}
+	}
+
+	for (var i = 0; i < scriptTree.children.length; i++) {
+		var node = scriptTree.children[i];
+		if( isIf(node) ) {
+			addText();
+
+			// TODO
+			console.log("IF NODE!!");
+			// console.log(node.Serialize());
+
+			var b = new IfBlockUI(node);
+			dialogFormDiv.appendChild( b.GetEl() );
+
+			advDialogUIComponents.push( b );
+
+		}
+		else if( isSeq(node) ) {
+			addText();
+
+			// TODO
+			console.log("SEQ NODE!!");
+
+			var b = new SeqBlockUI(node);
+			dialogFormDiv.appendChild( b.GetEl() );
+
+			advDialogUIComponents.push( b );
+		}
+		else {
+			textBlockNodes.push( node );
+		}
+	}
+
+	addText();
+}
+
+function showDialogCode() {
+	document.getElementById("dialogCode").style.display = "block";
+	document.getElementById("dialogEditor").style.display = "none";
+	document.getElementById("dialogShowCode").style.display = "none";
+	document.getElementById("dialogHideCode").style.display = "block";
+}
+
+function hideDialogCode() {
+	document.getElementById("dialogCode").style.display = "none";
+	document.getElementById("dialogEditor").style.display = "block";
+	document.getElementById("dialogShowCode").style.display = "block";
+	document.getElementById("dialogHideCode").style.display = "none";
 }

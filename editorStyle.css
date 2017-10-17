@@ -271,3 +271,36 @@ input {
 	margin:none;
 	/*background: red;*/
 }
+
+/* ADVANCED DIALOG */
+.advDialogTextBlock {
+	width: 300px;
+	height: 60px;
+	resize: none;
+}
+
+.advDialogTextOption {
+	width: 300px;
+	height: 30px;
+	resize: none;
+}
+
+#advDialogViewport {
+	padding: 12px;
+	width:320px;
+	height:450px;
+	overflow:scroll;
+	display:block;
+	border: solid 1px #ccccff;
+	border-radius: 2px;
+	margin-bottom: 10px;
+}
+
+#dialogCodeText {
+	width: 320px;
+	height: 450px;
+	padding: 12px;
+	resize: none;
+	background: black;
+	color: white;
+}
