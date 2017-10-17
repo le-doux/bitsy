@@ -3762,6 +3762,7 @@ var IfBlockUI = function(node) {
 	}
 }
 
+var seqRadioCount = 0;
 var SeqBlockUI = function(node) {
 	var sequenceNode = node.children[0];
 
@@ -3775,9 +3776,42 @@ var SeqBlockUI = function(node) {
 	var div = document.createElement('div');
 	div.classList.add('controlBox');
 	var typeEl = document.createElement("span");
-	typeEl.innerText = sequenceNode.type;
+	typeEl.innerText = "sequence"; //sequenceNode.type;
 	div.appendChild( typeEl );
+
 	div.appendChild( document.createElement("br") );
+
+	var orderEl = document.createElement("span");
+	orderEl.innerText = "order:";
+	div.appendChild( orderEl );
+
+	var formEl = document.createElement("form");
+	div.appendChild( formEl );
+	var sequenceTypes = ["sequence","cycle","shuffle"];
+	var sequenceIcons = ["trending_flat", "repeat", "shuffle"];
+	for(var i = 0; i < sequenceTypes.length; i++) {
+		var radioEl = document.createElement("input");
+		radioEl.type = "radio";
+		radioEl.name = "seqRadio" + seqRadioCount;
+		radioEl.id = "seqRadio" + seqRadioCount + "_" + i;
+		radioEl.value = sequenceTypes[i];
+		if(sequenceNode.type === sequenceTypes[i]) radioEl.checked = true;
+		formEl.appendChild( radioEl );
+		var labelEl = document.createElement("label");
+		labelEl.innerHTML = '<i class="material-icons">' + sequenceIcons[i] + '</i>' + sequenceTypes[i];
+		labelEl.htmlFor = "seqRadio" + seqRadioCount + "_" + i;
+		if(i == 0)
+			labelEl.classList.add('left');
+		else if(i+1 == sequenceTypes.length)
+			labelEl.classList.add('right');
+		else
+			labelEl.classList.add('middle');
+		formEl.appendChild( labelEl );
+	}
+	seqRadioCount++;
+
+	div.appendChild( document.createElement("br") );
+
 	for(var j = 0; j < sequenceNode.options.length; j++) {
 		var textArea = document.createElement("textarea");
 		textArea.classList.add('advDialogTextOption');
@@ -3825,6 +3859,7 @@ function createAdvDialogEditor(scriptTree) {
 	console.log("~~~ ADVANCED DIALOG EDITOR ~~~");
 
 	advDialogUIComponents = [];
+	seqRadioCount = 0;
 
 	function isBlock(node) { return node.type === "block"; };
 	function isChildType(node,type) { return node.children[0].type === type; };
