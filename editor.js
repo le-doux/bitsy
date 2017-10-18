@@ -3685,16 +3685,49 @@ TODO
 - add blocks
 */
 
+function createIconElement(iconName) {
+	var icon = document.createElement("i");
+	icon.classList.add('material-icons');
+	icon.innerText = iconName;
+	return icon;
+}
 
 var DialogBlockUI = function(nodes) {
 	var dialogNode = scriptUtils.CreateDialogBlock( nodes );
 
 	var div = document.createElement('div');
 	div.classList.add('controlBox');
+
+	var topDiv = document.createElement('div');
+	topDiv.classList.add('advDialogTop');
+	div.appendChild(topDiv);
+
+	var topIcon = createIconElement("subject");
+	topIcon.classList.add('advDialogIcon');
+	topDiv.appendChild( topIcon );
+
 	var typeEl = document.createElement("span");
 	typeEl.innerText = "dialog";
-	div.appendChild( typeEl );
-	div.appendChild( document.createElement("br") );
+	topDiv.appendChild( typeEl );
+
+	//
+	var deleteEl = document.createElement("button");
+	deleteEl.appendChild( createIconElement("clear") );
+	deleteEl.style.float = "right";
+	deleteEl.classList.add('light');
+	var self = this; // hack
+	deleteEl.addEventListener('click', function() {
+		var i = advDialogUIComponents.indexOf(self);
+		if(i>-1) {
+			console.log("DELETE SEQ " + i);
+			advDialogUIComponents.splice( i, 1 );
+			serializeAdvDialog();
+			reloadAdvDialogUI();
+		}
+	});
+	topDiv.appendChild( deleteEl );
+
+	// div.appendChild( document.createElement("br") );
 
 	var textArea = document.createElement("textarea");
 	function onChangeDialogBlock() {
@@ -3736,9 +3769,31 @@ var IfBlockUI = function(node) {
 
 	var div = document.createElement('div');
 	div.classList.add('controlBox');
+
+	div.appendChild( createIconElement("call_split") );
+	// div.appendChild( createIconElement("help_outline") );
+
 	var typeEl = document.createElement("span");
 	typeEl.innerText = ifNode.type;
 	div.appendChild( typeEl );
+
+	//
+	var deleteEl = document.createElement("button");
+	deleteEl.appendChild( createIconElement("clear") );
+	deleteEl.style.float = "right";
+	deleteEl.classList.add('light');
+	var self = this; // hack
+	deleteEl.addEventListener('click', function() {
+		var i = advDialogUIComponents.indexOf(self);
+		if(i>-1) {
+			console.log("DELETE SEQ " + i);
+			advDialogUIComponents.splice( i, 1 );
+			serializeAdvDialog();
+			reloadAdvDialogUI();
+		}
+	});
+	div.appendChild( deleteEl );
+
 	div.appendChild( document.createElement("br") );
 	for(var j = 0; j < ifNode.conditions.length; j++) {
 		var condEl = document.createElement("span");
@@ -3779,66 +3834,104 @@ var SeqBlockUI = function(node) {
 
 	var div = document.createElement('div');
 	div.classList.add('controlBox');
+
+	var topDiv = document.createElement('div');
+	// topDiv.style.background = "red";
+	topDiv.classList.add('advDialogTop');
+	topDiv.style.marginBottom = "5px";
+	div.appendChild(topDiv);
+
+	var topIcon = createIconElement("list");
+	topIcon.classList.add('advDialogIcon');
+	topDiv.appendChild( topIcon );
+
 	var typeEl = document.createElement("span");
 	typeEl.innerText = "sequence"; //sequenceNode.type;
-	div.appendChild( typeEl );
+	topDiv.appendChild( typeEl );
+	
+	//
+	var deleteEl = document.createElement("button");
+	deleteEl.appendChild( createIconElement("clear") );
+	deleteEl.style.float = "right";
+	deleteEl.classList.add('light');
+	var self = this; // hack
+	deleteEl.addEventListener('click', function() {
+		var i = advDialogUIComponents.indexOf(self);
+		if(i>-1) {
+			console.log("DELETE SEQ " + i);
+			advDialogUIComponents.splice( i, 1 );
+			serializeAdvDialog();
+			reloadAdvDialogUI();
+		}
+	});
+	topDiv.appendChild( deleteEl );
 
-	div.appendChild( document.createElement("br") );
+	// div.appendChild( document.createElement("br") );
 
 	var orderEl = document.createElement("span");
-	orderEl.innerText = "order:";
+	orderEl.innerText = "order: ";
 	div.appendChild( orderEl );
 
-	var formEl = document.createElement("form");
-	div.appendChild( formEl );
-	var sequenceTypes = ["sequence","cycle","shuffle"];
-	var sequenceIcons = ["trending_flat", "repeat", "shuffle"];
-
-	function onClickSequenceType(event) {
+	// var formEl = document.createElement("form");
+	// div.appendChild( formEl );
+	var selectEl = document.createElement("select");
+	selectEl.addEventListener('change', function(event) {
 		sequenceNode = scriptUtils.ChangeSequenceType( sequenceNode, event.target.value );
 		node.children[0] = sequenceNode;
 		serializeAdvDialog();
-	}
-
+	});
+	div.appendChild(selectEl);
+	var sequenceTypes = ["sequence","cycle","shuffle"];
+	var sequenceDesc = ["sequence (say each line once)", "cycle (say each line, then repeat)", "shuffle (say lines randomly)"];
 	for(var i = 0; i < sequenceTypes.length; i++) {
-		var radioEl = document.createElement("input");
-		radioEl.type = "radio";
-		radioEl.name = "seqRadio" + seqRadioCount;
-		radioEl.id = "seqRadio" + seqRadioCount + "_" + i;
-		radioEl.value = sequenceTypes[i];
-		if(sequenceNode.type === sequenceTypes[i]) radioEl.checked = true;
-		radioEl.addEventListener('click', onClickSequenceType);
-		formEl.appendChild( radioEl );
-		var labelEl = document.createElement("label");
-		labelEl.innerHTML = '<i class="material-icons">' + sequenceIcons[i] + '</i>' + sequenceTypes[i];
-		labelEl.htmlFor = "seqRadio" + seqRadioCount + "_" + i;
-		if(i == 0)
-			labelEl.classList.add('left');
-		else if(i+1 == sequenceTypes.length)
-			labelEl.classList.add('right');
-		else
-			labelEl.classList.add('middle');
-		formEl.appendChild( labelEl );
+		var optionEl = document.createElement("option");
+		optionEl.value = sequenceTypes[i];
+		optionEl.innerText = sequenceDesc[i];
+		optionEl.selected = (sequenceNode.type === sequenceTypes[i]);
+		selectEl.appendChild( optionEl );
 	}
 	seqRadioCount++;
 
-	div.appendChild( document.createElement("br") );
+	// div.appendChild( document.createElement("br") );
 
 	var addOptionEl = document.createElement("button");
-	addOptionEl.innerText = "add";
+	// addOptionEl.innerText = "add";
+	addOptionEl.appendChild( createIconElement("add") );
+	var addOptionText = document.createElement("span");
+	addOptionText.innerText = "add line";
+	addOptionEl.appendChild( addOptionText );
+
 	function addOption(option,index) {
+		var optionDiv = document.createElement('div');
+		optionDiv.style.display = "block";
+		optionDiv.classList.add('advDialogOptionDiv');
+		div.insertBefore( optionDiv, addOptionEl );
+
 		var textArea = document.createElement("textarea");
 		textArea.classList.add('advDialogTextOption');
 		textArea.value = option.Serialize();
+		textArea.style.float = "left";
 		var onChangeOption = createOnChangeOption( index );
 		textArea.addEventListener('change', onChangeOption);
 		textArea.addEventListener('keyup', onChangeOption);
 		textArea.addEventListener('keydown', onChangeOption);
-		div.insertBefore( textArea, addOptionEl );
+		// div.insertBefore( textArea, addOptionEl );
+		optionDiv.appendChild( textArea );
+
 		var deleteOptionEl = document.createElement("button");
-		deleteOptionEl.innerText = "delete";
-		div.insertBefore( deleteOptionEl, addOptionEl );
-		div.insertBefore( document.createElement("br"), addOptionEl );
+		// deleteOptionEl.innerText = "delete";
+		deleteOptionEl.appendChild( createIconElement("clear") );
+		// deleteOptionEl.style.float = "right";
+		// deleteOptionEl.classList.add('light');
+		deleteOptionEl.addEventListener('click', function() {
+			sequenceNode.options.splice(index,1);
+			serializeAdvDialog();
+			reloadAdvDialogUI();
+		});
+		// div.insertBefore( deleteOptionEl, addOptionEl );
+		optionDiv.appendChild( deleteOptionEl );
+
+		// div.insertBefore( document.createElement("br"), addOptionEl );
 	}
 	addOptionEl.addEventListener('click', function() {
 		var newOption = scriptUtils.CreateDialogBlock([], false);

@@ -279,15 +279,49 @@ input {
 	resize: none;
 }
 
-.advDialogTextOption {
+.advDialogOptionDiv {
 	width: 300px;
+	height: 40px;
+	padding: 5px;
+	margin: 5px;
+	margin-left: 0px;
+	/*border: 1px solid #6767b2;*/
+	background: #ccccff;
+	border-radius: 2px;
+}
+
+.advDialogOptionDiv button {
+	height: 35px;
+	/*margin-top: 2px;*/
+	/*margin-left: -5px;*/
+	/*border: solid 1px black;*/
+	float: right;
+}
+
+.advDialogOptionDiv button:hover {
+	background: #6767b2;
+	color: white;
+	opacity: 0.5;
+}
+
+.advDialogOptionDiv button .material-icons {
+	font-size: 12px;
+}
+
+/*.advDialogOptionDiv .light:hover {
+	background: #6767b2;
+}*/
+
+.advDialogTextOption {
+	width: 270px;
 	height: 30px;
 	resize: none;
+	/*margin-right: 0px;*/
 }
 
 #advDialogViewport {
 	padding: 12px;
-	width:320px;
+	width:340px;
 	height:450px;
 	overflow:scroll;
 	display:block;
@@ -296,11 +330,28 @@ input {
 	margin-bottom: 10px;
 }
 
+#advDialogViewport .controlBox {
+	margin-bottom: 10px;
+	border: solid 1px #6767b2;
+	padding: 10px;
+}
+
 #dialogCodeText {
-	width: 320px;
+	width: 340px;
 	height: 450px;
 	padding: 12px;
 	resize: none;
 	background: black;
 	color: white;
+}
+
+.advDialogTop {
+	margin-bottom: 10px;
+}
+
+.advDialogIcon {
+	line-height: 150%;
+	vertical-align: middle;
+	font-size: 24px;
+	margin-right: 10px;
 }
