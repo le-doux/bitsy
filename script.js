@@ -53,6 +53,10 @@ var Interpreter = function() {
 	this.CreateExpression = function(expStr) {
 		return parser.CreateExpression( expStr );
 	}
+
+	this.SetVariable = function(name,value) {
+		// TODO
+	}
 }
 
 

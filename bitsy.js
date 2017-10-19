@@ -13,6 +13,7 @@ var palette = {
 	"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
 };
 var ending = {};
+var variable = {}; // these are starting variable values -- they don't update (or I don't think they will)
 var playerId = "A";
 
 var names = {
@@ -65,6 +66,7 @@ function clearGameData() {
 	};
 	ending = {};
 	isEnding = false; //todo - correct place for this?
+	variable = {};
 
 	//stores all image data for tiles, sprites, drawings
 	imageStore = {
@@ -127,6 +129,9 @@ function load_game(game_data) {
 	// console.log(dialog);
 	parseWorld(game_data);
 	// console.log(dialog);
+
+	// TODO - set initial variables in environment
+
 	renderImages();
 	onready();
 	// console.log(dialog);
@@ -885,6 +890,9 @@ function parseWorld(file) {
 		else if (getType(curLine) === "END") {
 			i = parseEnding(lines, i);
 		}
+		else if (getType(curLine) === "VAR") {
+			i = parseVariable(lines, i);
+		}
 		else if (getType(curLine) === "!") {
 			i = parseFlag(lines, i);
 		}
@@ -1048,6 +1056,12 @@ function serializeWorld() {
 	for (id in ending) {
 		worldStr += "END " + id + "\n";
 		worldStr += ending[id] + "\n";
+		worldStr += "\n";
+	}
+	/* VARIABLES */
+	for (id in variable) {
+		worldStr += "VAR " + id + "\n";
+		worldStr += variable[id] + "\n";
 		worldStr += "\n";
 	}
 	return worldStr;
@@ -1590,6 +1604,15 @@ function parseEnding(lines, i) {
 	var text = lines[i];
 	i++;
 	ending[id] = text;
+	return i;
+}
+
+function parseVariable(lines, i) {
+	var id = getId(lines[i]);
+	i++;
+	var value = lines[i];
+	i++;
+	variable[id] = value;
 	return i;
 }
 
