@@ -3770,12 +3770,20 @@ var IfBlockUI = function(node) {
 	var div = document.createElement('div');
 	div.classList.add('controlBox');
 
-	div.appendChild( createIconElement("call_split") );
+	var topDiv = document.createElement('div');
+	topDiv.classList.add('advDialogTop');
+	// topDiv.style.marginBottom = "5px";
+	div.appendChild(topDiv);
+
+	var topIcon = createIconElement("call_split");
+	topIcon.classList.add('advDialogIcon');
+	topDiv.appendChild( topIcon );
+	// topDiv.appendChild( createIconElement("call_split") );
 	// div.appendChild( createIconElement("help_outline") );
 
 	var typeEl = document.createElement("span");
-	typeEl.innerText = ifNode.type;
-	div.appendChild( typeEl );
+	typeEl.innerText = "conditional";
+	topDiv.appendChild( typeEl );
 
 	//
 	var deleteEl = document.createElement("button");
@@ -3792,24 +3800,225 @@ var IfBlockUI = function(node) {
 			reloadAdvDialogUI();
 		}
 	});
-	div.appendChild( deleteEl );
+	topDiv.appendChild( deleteEl );
 
-	div.appendChild( document.createElement("br") );
-	for(var j = 0; j < ifNode.conditions.length; j++) {
-		var condEl = document.createElement("span");
-		condEl.innerText = ifNode.conditions[j].Serialize();
-		div.appendChild( condEl );
-		div.appendChild( document.createElement("br") );
+	// div.appendChild( document.createElement("br") );
+
+	function createOnDelete(index) {
+		var onDelete = function() {
+			ifNode.conditions.splice(index,1);
+			ifNode.results.splice(index,1);
+			serializeAdvDialog();
+			reloadAdvDialogUI();	
+		};
+		return onDelete;
+	}
+
+	var conditionTypes = ["item","variable","default","custom"];
+	// var comparisonNames = ["equals","greater than","less than","greater than or equal to","less than or equal to"];
+	var comparisonTypes = ["==", ">", "<", ">=", "<="];
+
+	function createOnConditionTypeChange(index, condItemSelect, condCompareSelect, condValueInput, condCustomTextInput) {
+		return function(event) {
+			console.log("CHANGE CONDITIONAL TYPE " + event.target.value);
+
+			var condition = ifNode.conditions[index];
+
+			condItemSelect.style.display = "none";
+			condCompareSelect.style.display = "none";
+			condValueInput.style.display = "none";
+			condCustomTextInput.style.display = "none";
+
+			var doesConditionMatchUI = event.target.value === getConditionType( condition );
+
+			if(event.target.value === "item") { // TODO: negative numbers don't work
+				condItemSelect.style.display = "inline";
+				condCompareSelect.style.display = "inline";
+				condValueInput.style.display = "inline";
+
+				if(doesConditionMatchUI) {
+					var itemId = condition.left.children[0].arguments[0].value;
+					if(names.item.has(itemId)) itemId = names.item.get(itemId);
+					condItemSelect.value = itemId;
+
+					var operator = condition.operator;
+					condCompareSelect.value = operator;
+
+					var compareVal = condition.right.value;
+					condValueInput.value = compareVal;
+				}
+				else {
+					var itemId = condItemSelect.value;
+					if(item[itemId].name != null) itemId = item[itemId].name;
+					var condStr = '{item "' + itemId + '"} ' + condCompareSelect.value + ' ' + condValueInput.value;
+					console.log(condStr);
+					ifNode.conditions[index] = scriptInterpreter.CreateExpression( condStr );
+					serializeAdvDialog();
+				}
+			}
+			else if(event.target.value === "variable") {
+				// TODO
+			}
+			else if(event.target.value === "default") {
+				if(!doesConditionMatchUI) {
+					ifNode.conditions[index] = scriptInterpreter.CreateExpression( "else" );
+					serializeAdvDialog();
+				}
+			}
+			else if(event.target.value === "custom") {
+				condCustomTextInput.style.display = "inline";
+
+				// custom conditions can contain anything so no need to change the existing condition
+				condCustomTextInput.value = condition.Serialize();
+			}
+		}
+	};
+
+	function createOnConditionPartialChange(index, condTypeSelect, condItemSelect, condCompareSelect, condValueInput) {
+		return function() {
+			if(condTypeSelect.value === "item") {
+				var itemId = condItemSelect.value;
+				if(item[itemId].name != null) itemId = item[itemId].name;
+				var condStr = '{item "' + itemId + '"} ' + condCompareSelect.value + ' ' + condValueInput.value;
+				ifNode.conditions[index] = scriptInterpreter.CreateExpression( condStr );
+				serializeAdvDialog();
+			}
+			else if(condTypeSelect.value === "variable") {
+				// TODO
+			}
+		}
+	}
+
+	function createOnConditionCustomChange(index, condCustomTextInput) {
+		return function() {
+			var condStr = condCustomTextInput.value;
+			ifNode.conditions[index] = scriptInterpreter.CreateExpression( condStr );
+			serializeAdvDialog();
+		}
+	}
+
+	function getConditionType(condition) {
+		if(condition.type === "else") {
+			return "default";
+		}
+		else if(condition.type === "operator") {
+			if (condition.right.type === "literal" && !isNaN(condition.right.value)) {
+				if(condition.left.type === "block") {
+					var child = condition.left.children[0];
+					if(child.type === "function" && child.name === "item") {
+						return "item";
+					}
+				}
+				if(condition.left.type === "variable") {
+					return "variable";
+				}
+			}
+		}
+		return "custom";
+	}
+
+	var addConditionEl = document.createElement("button");
+	addConditionEl.appendChild( createIconElement("add") );
+	var addConditionText = document.createElement("span");
+	addConditionText.innerText = "add option";
+	addConditionEl.appendChild( addConditionText );
+
+	function addCondition(condition, result, index) {
+		var conditionDiv = document.createElement('div');
+		conditionDiv.style.display = "block";
+		conditionDiv.classList.add('advDialogConditionDiv');
+		div.insertBefore( conditionDiv, addConditionEl );
+
+		var condInnerDiv = document.createElement("div");
+		// condInnerDiv.style.overflow = "none";
+		condInnerDiv.style.width = "300px";
+		// condInnerDiv.style.background = "red";
+		condInnerDiv.style.whiteSpace = "normal";
+		conditionDiv.appendChild(condInnerDiv);
+		var condSpan = document.createElement("span");
+		condSpan.innerText = "when ";
+		condInnerDiv.appendChild(condSpan);
+		var condTypeSelect = document.createElement("select");
+		condInnerDiv.appendChild(condTypeSelect);
+		for(var i = 0; i < conditionTypes.length; i++) {
+			var condTypeOption = document.createElement("option");
+			condTypeOption.value = conditionTypes[i];
+			condTypeOption.innerText = conditionTypes[i];
+			condTypeSelect.appendChild(condTypeOption);
+		}
+		var condItemSelect = document.createElement("select");
+		condInnerDiv.appendChild(condItemSelect);
+		for(id in item) {
+			var condItemOption = document.createElement("option");
+			condItemOption.value = id;
+			condItemOption.innerText = (item[id].name != null ? item[id].name : id); //"item " + id;
+			condItemSelect.appendChild(condItemOption);
+		}
+		// var condSpan2 = document.createElement("span");
+		// condSpan2.innerText = " is ";
+		// condInnerDiv.appendChild(condSpan2);
+		var condCompareSelect = document.createElement("select");
+		condInnerDiv.appendChild(condCompareSelect);
+		for(var i = 0; i < comparisonTypes.length; i++) {
+			var condCompareOption = document.createElement("option");
+			condCompareOption.value = comparisonTypes[i];
+			condCompareOption.innerText = comparisonTypes[i]; //comparisonNames[i];
+			condCompareSelect.appendChild(condCompareOption);
+		}
+		var condValueInput = document.createElement("input");
+		condValueInput.type = "number";
+		condValueInput.value = 1;
+		condValueInput.style.width = "35px";
+		condInnerDiv.appendChild(condValueInput);
+		var condCustomTextInput = document.createElement("input");
+		condCustomTextInput.type = "text";
+		condCustomTextInput.placeholder = 'ex: x+1 < {item "1"}';
+		condInnerDiv.appendChild(condCustomTextInput);
+
+		var onConditionTypeChange = createOnConditionTypeChange(index,condItemSelect,condCompareSelect,condValueInput,condCustomTextInput);
+		condTypeSelect.addEventListener( 'change', onConditionTypeChange );
+		var fakeEvent = { target : { value : getConditionType( condition ) } };
+		onConditionTypeChange( fakeEvent );
+		condTypeSelect.value = getConditionType( condition );
+
+		var onConditionPartialChange = createOnConditionPartialChange(index,condTypeSelect,condItemSelect,condCompareSelect,condValueInput);
+		condItemSelect.addEventListener( 'change', onConditionPartialChange );
+		condCompareSelect.addEventListener( 'change', onConditionPartialChange );
+		condValueInput.addEventListener( 'change', onConditionPartialChange );
+
+		var onConditionCustomChange = createOnConditionCustomChange(index,condCustomTextInput);
+		condCustomTextInput.addEventListener('change', onConditionCustomChange);
+		condCustomTextInput.addEventListener('keyup', onConditionCustomChange);
+		condCustomTextInput.addEventListener('keydown', onConditionCustomChange);
 
 		var textArea = document.createElement("textarea");
 		textArea.classList.add('advDialogTextOption');
-		textArea.value = ifNode.results[j].Serialize();
-		var onChangeResult = createOnChangeResult(j);
+		textArea.value = result.Serialize();
+		var onChangeResult = createOnChangeResult(index);
 		textArea.addEventListener('change', onChangeResult);
 		textArea.addEventListener('keyup', onChangeResult);
 		textArea.addEventListener('keydown', onChangeResult);
-		div.appendChild( textArea );
-		div.appendChild( document.createElement("br") );
+		conditionDiv.appendChild( textArea );
+		// div.appendChild( document.createElement("br") );
+
+		var deleteConditionEl = document.createElement("button");
+		deleteConditionEl.appendChild( createIconElement("clear") );
+		deleteConditionEl.addEventListener( 'click', createOnDelete(index) );
+		conditionDiv.appendChild( deleteConditionEl );
+	}
+
+	addConditionEl.addEventListener('click', function() {
+		var newCondition = scriptInterpreter.CreateExpression('{item "0"} == 1');
+		var newResult = scriptUtils.CreateDialogBlock([]);
+		ifNode.conditions.push( newCondition );
+		ifNode.results.push( newResult );
+		addCondition(newCondition, newResult, ifNode.conditions.length-1);
+		serializeAdvDialog();
+	});
+	div.appendChild(addConditionEl);
+
+	for(var j = 0; j < ifNode.conditions.length; j++) {
+		addCondition( ifNode.conditions[j], ifNode.results[j], j );
 	}
 
 	this.GetEl = function() {

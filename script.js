@@ -49,6 +49,10 @@ var Interpreter = function() {
 	this.Parse = function(scriptStr) {
 		return parser.Parse( scriptStr );
 	}
+
+	this.CreateExpression = function(expStr) {
+		return parser.CreateExpression( expStr );
+	}
 }
 
 
@@ -1172,6 +1176,7 @@ var Parser = function(env) {
 			return StringToValue(expStr);
 		}
 	}
+	this.CreateExpression = CreateExpression;
 
 	function ParseExpression(state) {
 		var line = state.Peak( [Sym.Linebreak] );
