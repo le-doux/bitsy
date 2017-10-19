@@ -55,7 +55,7 @@ var Interpreter = function() {
 	}
 
 	this.SetVariable = function(name,value) {
-		// TODO
+		env.SetVariable(name,value);
 	}
 }
 

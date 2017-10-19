@@ -129,9 +129,7 @@ function load_game(game_data) {
 	// console.log(dialog);
 	parseWorld(game_data);
 	// console.log(dialog);
-
-	// TODO - set initial variables in environment
-
+	setInitialVariables();
 	renderImages();
 	onready();
 	// console.log(dialog);
@@ -162,6 +160,22 @@ function onready() {
 	
 	update_interval = setInterval(update,-1);
 	startNarrating(title);
+}
+
+function setInitialVariables() {
+	for(id in variable) {
+		var value = variable[id]; // default to string
+		if(value === "true") {
+			value = true;
+		}
+		else if(value === "false") {
+			value = false;
+		}
+		else if(!isNaN(parseFloat(value))) {
+			value = parseFloat(value);
+		}
+		scriptInterpreter.SetVariable(id,value);
+	}
 }
 
 function fullscreen(el) {
@@ -1031,6 +1045,11 @@ function serializeWorld() {
 			/* SPRITE POSITION */
 			worldStr += "POS " + sprite[id].room + " " + sprite[id].x + "," + sprite[id].y + "\n";
 		}
+		if (sprite[id].inventory != null) {
+			for(itemId in sprite[id].inventory) {
+				worldStr += "ITM " + itemId + " " + sprite[id].inventory[itemId] + "\n";
+			}
+		}
 		worldStr += "\n";
 	}
 	/* ITEMS */
@@ -1346,6 +1365,7 @@ function parseSprite(lines, i) {
 	//other properties
 	var colorIndex = 2; //default palette color index is 2
 	var dialogId = null;
+	var startingInventory = {};
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		if (getType(lines[i]) === "COL") {
 			/* COLOR OFFSET INDEX */
@@ -1370,6 +1390,12 @@ function parseSprite(lines, i) {
 			name = lines[i].split(/\s(.+)/)[1];
 			names.sprite.set( name, id );
 		}
+		else if (getType(lines[i]) === "ITM") {
+			/* ITEM STARTING INVENTORY */
+			var itemId = getId(lines[i]);
+			var itemCount = parseFloat( getArg(lines[i], 2) );
+			startingInventory[itemId] = itemCount;
+		}
 		i++;
 	}
 
@@ -1387,7 +1413,7 @@ function parseSprite(lines, i) {
 			frameIndex : 0,
 			frameCount : imageStore.source[drwId].length
 		},
-		inventory : {},
+		inventory : startingInventory,
 		name : name
 	};
 	return i;
