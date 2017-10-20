@@ -4372,35 +4372,54 @@ function updateInventoryItemUI(){
 	}
 }
 
+/*
+TODO
+- add variables
+- delete variables
+- make sure variable names are valid
+*/
 function updateInventoryVariableUI(){
 	var viewport = document.getElementById("inventoryVariable");
 	viewport.innerHTML = "";
 
-	function createOnVariableValueChange(id) {
+	function createOnVariableValueChange(varInfo) {
 		return function(event) {
 			console.log("VARIABLE CHANGE " + event.target.value);
 			if(isPlayMode) {
 				// TODO
 			}
 			else {
-				variable[id] = event.target.value;
+				variable[varInfo.id] = event.target.value;
 				refreshGameData();
 			}
 		};
 	}
 
-	function createOnVariableNameChange(id,varDiv) {
+	function createOnVariableNameChange(varInfo,varDiv) {
 		return function(event) {
 			console.log("VARIABLE NAME CHANGE " + event.target.value);
 			if(isPlayMode) {
 				// TODO
 			}
 			else {
-				variable[event.target.value] = "" + variable[id] + "";
-				var oldId = id;
+				variable[event.target.value] = "" + variable[varInfo.id] + "";
+				var oldId = varInfo.id;
 				setTimeout(function() {delete variable[oldId]; refreshGameData();}, 0); //hack to avoid some kind of delete race condition? (there has to be a better way)
-				id = event.target.value;
-				varDiv.id = "inventoryVariable_" + id;
+				varInfo.id = event.target.value;
+				varDiv.id = "inventoryVariable_" + varInfo.id;
+			}
+		}
+	}
+
+	function createOnVariableDelete(varInfo) {
+		return function () {
+			if(isPlayMode) {
+				// TODO
+			}
+			else {
+				delete variable[varInfo.id];
+				refreshGameData();
+				updateInventoryVariableUI();
 			}
 		}
 	}
@@ -4409,16 +4428,28 @@ function updateInventoryVariableUI(){
 		var varName = id;
 		var varValue = isPlayMode ? scriptInterpreter.GetVariable(id) : variable[id];
 
+		if(id === null)
+		{
+			id = "";
+			varName = "";
+			varValue = "";
+		}
+
+		var varInfo = {
+			id : id
+		};
+
 		var varDiv = document.createElement("div");
 		varDiv.classList.add("controlBox");
+		varDiv.classList.add("inventoryVariableBox");
 		varDiv.id = "inventoryVariable_" + id;
 		viewport.appendChild(varDiv);
 
 		var varNameInput = document.createElement("input");
 		varNameInput.type = "text";
 		varNameInput.value = varName;
-		varNameInput.style.width = "40px";
-		varNameInput.addEventListener('change', createOnVariableNameChange(id));
+		varNameInput.style.width = "30px";
+		varNameInput.addEventListener('change', createOnVariableNameChange(varInfo,varDiv));
 		varDiv.appendChild( varNameInput );
 
 		var varSplitSpan = document.createElement("span");
@@ -4428,12 +4459,17 @@ function updateInventoryVariableUI(){
 		var varValueInput = document.createElement("input");
 		varValueInput.type = "text";
 		varValueInput.value = varValue;
-		varValueInput.style.width = "80px";
-		var onVariableValueChange = createOnVariableValueChange(id,varDiv);
+		varValueInput.style.width = "60px";
+		var onVariableValueChange = createOnVariableValueChange(varInfo);
 		varValueInput.addEventListener('change', onVariableValueChange);
 		varValueInput.addEventListener('keyup', onVariableValueChange);
 		varValueInput.addEventListener('keydown', onVariableValueChange);
-		varDiv.appendChild( varValueInput );		
+		varDiv.appendChild( varValueInput );
+
+		var deleteVarEl = document.createElement("button");
+		deleteVarEl.appendChild( createIconElement("clear") );
+		deleteVarEl.addEventListener('click', createOnVariableDelete(varInfo));
+		varDiv.appendChild(deleteVarEl);	
 	}
 
 	if(isPlayMode) {
@@ -4448,6 +4484,21 @@ function updateInventoryVariableUI(){
 			addVariableRegister(id);
 		}
 	}
+
+	function createAddButton() {
+		var addVarEl = document.createElement("button");
+		addVarEl.appendChild( createIconElement("add") );
+		var addVarText = document.createElement("span");
+		addVarText.innerText = "add variable";
+		addVarEl.appendChild( addVarText );
+		addVarEl.addEventListener('click', function() {
+			viewport.removeChild(addVarEl);
+			addVariableRegister(null);
+			createAddButton();
+		});
+		viewport.appendChild(addVarEl);
+	};
+	createAddButton();
 }
 
 function showInventoryItem() {

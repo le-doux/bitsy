@@ -396,3 +396,20 @@ input {
 	margin-top: 5px;
 	/*margin-bottom: 10px;*/
 }
+
+.inventoryVariableBox button {
+	height: 30px;
+	/*float: right;*/
+	margin-left: 5px;
+	/*background: #e8e8ff;*/
+}
+
+.inventoryVariableBox button:hover {
+	background: #6767b2;
+	color: white;
+	opacity: 0.5;
+}
+
+.inventoryVariableBox button .material-icons {
+	font-size: 12px;
+}

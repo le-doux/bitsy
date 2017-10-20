@@ -119,3 +119,7 @@ input[type=radio]:checked + label {
 #paintExplorerContent img {
 	background:#6767b2;
 }
+
+.inventoryVariableBox button {
+	background: #e8e8ff;
+}
