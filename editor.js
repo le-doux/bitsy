@@ -516,6 +516,7 @@ function start() {
 	updateRoomName(); // init the room UI
 	reloadEnding();
 
+	updateInventoryUI();
 
 	//unsupported feature stuff
 	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
@@ -542,6 +543,34 @@ function start() {
 			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
 			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
 		}
+	};
+
+	onInventoryChanged = function(id) {
+		updateInventoryUI();
+	
+		// animate to draw attention to change
+		document.getElementById("inventoryItem_" + id).classList.add("flash");
+		setTimeout(
+			function() {
+				// reset animations
+				document.getElementById("inventoryItem_" + id).classList.remove("flash");
+			},
+			400
+		);
+	};
+
+	onVariableChanged = function(id) {
+		updateInventoryUI();
+	
+		// animate to draw attention to change
+		document.getElementById("inventoryVariable_" + id).classList.add("flash");
+		setTimeout(
+			function() {
+				// reset animations
+				document.getElementById("inventoryVariable_" + id).classList.remove("flash");
+			},
+			400
+		);
 	};
 
 	//color testing
@@ -1976,6 +2005,8 @@ function on_edit_mode() {
 	curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
 	drawEditMap();
 	listenMapEditEvents();
+
+	updateInventoryUI();
 }
 
 function on_play_mode() {
@@ -2679,6 +2710,8 @@ function on_game_data_change_core() {
 
 
 	updatePaletteUI();
+
+	updateInventoryUI();
 
 	updateExitOptionsFromGameData();
 
@@ -4289,4 +4322,140 @@ function hideDialogCode() {
 	document.getElementById("dialogEditor").style.display = "block";
 	document.getElementById("dialogShowCode").style.display = "block";
 	document.getElementById("dialogHideCode").style.display = "none";
+}
+
+
+/* INVENTORY UI */
+function updateInventoryUI() {
+	console.log("~~~ UPDATE INVENTORY ~~~");
+	updateInventoryItemUI();
+	updateInventoryVariableUI();
+}
+
+function updateInventoryItemUI(){
+	var viewport = document.getElementById("inventoryItem");
+	viewport.innerHTML = "";
+
+	function createOnItemValueChange(id) {
+		return function(event) {
+			if(event.target.value <= 0) {
+				delete player().inventory[id];
+			}
+			else {
+				player().inventory[id] = parseFloat( event.target.value );
+			}
+			if(!isPlayMode)
+				refreshGameData();
+		}
+	}
+
+	for(id in item) {
+		var itemName = item[id].name != null ? item[id].name : "item " + id;
+		var itemCount = player().inventory[id] != undefined ? parseFloat( player().inventory[id] ) : 0;
+
+		var itemDiv = document.createElement("div");
+		itemDiv.classList.add("controlBox");
+		itemDiv.id = "inventoryItem_" + id;
+		viewport.appendChild(itemDiv);
+
+		var itemNameSpan = document.createElement("span");
+		itemNameSpan.innerText = itemName + " : ";
+		itemDiv.appendChild( itemNameSpan );
+
+		var itemValueInput = document.createElement("input");
+		itemValueInput.type = "number";
+		itemValueInput.min = 0;
+		itemValueInput.value = itemCount;
+		itemValueInput.style.width = "60px";
+		itemValueInput.addEventListener('change', createOnItemValueChange(id));
+		itemDiv.appendChild( itemValueInput );
+	}
+}
+
+function updateInventoryVariableUI(){
+	var viewport = document.getElementById("inventoryVariable");
+	viewport.innerHTML = "";
+
+	function createOnVariableValueChange(id) {
+		return function(event) {
+			console.log("VARIABLE CHANGE " + event.target.value);
+			if(isPlayMode) {
+				// TODO
+			}
+			else {
+				variable[id] = event.target.value;
+				refreshGameData();
+			}
+		};
+	}
+
+	function createOnVariableNameChange(id,varDiv) {
+		return function(event) {
+			console.log("VARIABLE NAME CHANGE " + event.target.value);
+			if(isPlayMode) {
+				// TODO
+			}
+			else {
+				variable[event.target.value] = "" + variable[id] + "";
+				var oldId = id;
+				setTimeout(function() {delete variable[oldId]; refreshGameData();}, 0); //hack to avoid some kind of delete race condition? (there has to be a better way)
+				id = event.target.value;
+				varDiv.id = "inventoryVariable_" + id;
+			}
+		}
+	}
+
+	function addVariableRegister(id) {
+		var varName = id;
+		var varValue = isPlayMode ? scriptInterpreter.GetVariable(id) : variable[id];
+
+		var varDiv = document.createElement("div");
+		varDiv.classList.add("controlBox");
+		varDiv.id = "inventoryVariable_" + id;
+		viewport.appendChild(varDiv);
+
+		var varNameInput = document.createElement("input");
+		varNameInput.type = "text";
+		varNameInput.value = varName;
+		varNameInput.style.width = "40px";
+		varNameInput.addEventListener('change', createOnVariableNameChange(id));
+		varDiv.appendChild( varNameInput );
+
+		var varSplitSpan = document.createElement("span");
+		varSplitSpan.innerText = " : ";
+		varDiv.appendChild( varSplitSpan );
+
+		var varValueInput = document.createElement("input");
+		varValueInput.type = "text";
+		varValueInput.value = varValue;
+		varValueInput.style.width = "80px";
+		var onVariableValueChange = createOnVariableValueChange(id,varDiv);
+		varValueInput.addEventListener('change', onVariableValueChange);
+		varValueInput.addEventListener('keyup', onVariableValueChange);
+		varValueInput.addEventListener('keydown', onVariableValueChange);
+		varDiv.appendChild( varValueInput );		
+	}
+
+	if(isPlayMode) {
+		var variableNames = scriptInterpreter.GetVariableNames();
+		for(var i = 0; i < variableNames.length; i++) {
+			var id = variableNames[i];
+			addVariableRegister(id);
+		}
+	}
+	else {
+		for(id in variable) {
+			addVariableRegister(id);
+		}
+	}
+}
+
+function showInventoryItem() {
+	document.getElementById("inventoryItem").style.display = "block";
+	document.getElementById("inventoryVariable").style.display = "none";
+}
+
+function showInventoryVariable() {
+	document.getElementById("inventoryItem").style.display = "none";
+	document.getElementById("inventoryVariable").style.display = "block";
 }

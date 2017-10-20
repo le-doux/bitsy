@@ -108,6 +108,10 @@ var onPlayerMoved = null;
 // var didDialogUpdateThisFrame = false;
 var onDialogUpdate = null;
 
+//inventory update UI handles
+var onInventoryChanged = null;
+var onVariableChanged = null;
+
 function getGameNameFromURL() {
 	var game = window.location.hash.substring(1);
 	// console.log("game name --- " + game);
@@ -176,6 +180,7 @@ function setInitialVariables() {
 		}
 		scriptInterpreter.SetVariable(id,value);
 	}
+	scriptInterpreter.SetOnVariableChangeHandler( onVariableChanged );
 }
 
 function fullscreen(el) {
@@ -621,6 +626,9 @@ function moveSprites() {
 					else
 						spr.inventory[ itm.id ] = 1;
 
+					if(onInventoryChanged != null)
+						onInventoryChanged( itm.id );
+
 					if(id === playerId)
 						startItemDialog( itm.id  /*itemId*/ );
 
@@ -722,6 +730,9 @@ function onkeydown(e) {
 				player().inventory[ itm.id ] += 1;
 			else
 				player().inventory[ itm.id ] = 1;
+
+			if(onInventoryChanged != null)
+				onInventoryChanged( itm.id );
 
 			startItemDialog( itm.id  /*itemId*/ );
 

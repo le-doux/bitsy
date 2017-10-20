@@ -57,6 +57,16 @@ var Interpreter = function() {
 	this.SetVariable = function(name,value) {
 		env.SetVariable(name,value);
 	}
+
+	this.SetOnVariableChangeHandler = function(onVariableChange) {
+		env.SetOnVariableChangeHandler(onVariableChange);
+	}
+	this.GetVariableNames = function() {
+		return env.GetVariableNames();
+	}
+	this.GetVariable = function(name) {
+		return env.GetVariable(name);
+	}
 }
 
 
@@ -271,7 +281,11 @@ var Environment = function() {
 
 	this.HasVariable = function(name) { return variableMap.has(name); };
 	this.GetVariable = function(name) { return variableMap.get(name); };
-	this.SetVariable = function(name,value) { variableMap.set(name, value); };
+	this.SetVariable = function(name,value) {
+		variableMap.set(name, value);
+		if(onVariableChangeHandler != null)
+			onVariableChangeHandler(name);
+	};
 
 	var operatorMap = new Map();
 	operatorMap.set("=", setExp);
@@ -294,6 +308,14 @@ var Environment = function() {
 	this.HasScript = function(name) { return scriptMap.has(name); };
 	this.GetScript = function(name) { return scriptMap.get(name); };
 	this.SetScript = function(name,script) { scriptMap.set(name, script); };
+
+	var onVariableChangeHandler = null;
+	this.SetOnVariableChangeHandler = function(onVariableChange) {
+		onVariableChangeHandler = onVariableChange;
+	}
+	this.GetVariableNames = function() {
+		return Array.from( variableMap.keys() );
+	}
 }
 
 function leadingWhitespace(depth) {

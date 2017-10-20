@@ -384,3 +384,15 @@ input {
 	font-size: 24px;
 	margin-right: 10px;
 }
+
+.inventoryViewport {
+	padding: 6px;
+	/*width:140px;*/
+	height:400px;
+	overflow:scroll;
+	display:block;
+	border: solid 1px #ccccff;
+	border-radius: 2px;
+	margin-top: 5px;
+	/*margin-bottom: 10px;*/
+}

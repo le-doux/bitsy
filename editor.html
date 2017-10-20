@@ -685,6 +685,42 @@
 					</div>
 				</div>
 
+				<div id="inventoryPanel" class="panel color3">
+					<div class="bar color3">
+
+						<button title="minimize inventory window" class="light" style="float:right;" onclick="hidePanel('inventoryPanel');">
+							<i class="material-icons">close</i>
+						</button>
+
+						<div title="inventory window" class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">vpn_key</i>
+							inventory
+						</div>
+					</div>
+
+					<div>
+						<!-- TODO -->
+						<form>
+							<input type="radio" name="inventory mode" value="item" onclick="showInventoryItem();" id="inventoryOptionItem" checked>
+							<label title="" for="inventoryOptionItem" class="left">
+								<i class="material-icons">vpn_key</i>
+								items
+							</label>
+							<input type="radio" name="inventory mode" value="variable" onclick="showInventoryVariable()" id="inventoryOptionVariable">
+							<label title="" for="inventoryOptionVariable" class="right">
+								<i class="material-icons">code</i>
+								variables
+							</label>
+						</form>
+
+						<div id="inventoryItem" class="inventoryViewport">
+						</div>
+
+						<div id="inventoryVariable" class="inventoryViewport" style="display:none;">
+						</div>
+					</div>
+				</div>				
+
 				<div id="downloadPanel" class="panel color2">
 					<div class="bar color2">
 
