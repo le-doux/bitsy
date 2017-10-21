@@ -1,3 +1,6 @@
+v4.0:
+TODO
+
 v3.7:
 - bugfix: can't add color palettes
 - bugfix: games don't run on iOS

@@ -403,24 +403,26 @@ function hideUnsupportedFeatureWarning() {
 // This is the panel arrangement you get if you are new or your editor settings are out-of-date
 var defaultPanelPrefs = {
 	workspace : [
-		{ id:"aboutPanel", 			visible:true, 	position:0 },
-		{ id:"roomPanel", 			visible:true, 	position:1 },
-		{ id:"paintPanel", 			visible:true, 	position:2 },
-		{ id:"colorsPanel", 		visible:true, 	position:3 },
-		{ id:"downloadPanel", 		visible:true, 	position:4 },
-		{ id:"gifPanel", 			visible:false, 	position:5 },
-		{ id:"dataPanel", 			visible:false, 	position:6 },
-		{ id:"exitsPanel", 			visible:false, 	position:7 },
-		{ id:"endingsPanel", 		visible:false, 	position:8 },
-		{ id:"paintExplorerPanel",	visible:false,	position:9 }
+		{ id:"aboutPanel", 			visible:true, 	position:0  },
+		{ id:"roomPanel", 			visible:true, 	position:1  },
+		{ id:"paintPanel", 			visible:true, 	position:2  },
+		{ id:"colorsPanel", 		visible:true, 	position:3  },
+		{ id:"downloadPanel", 		visible:true, 	position:4  },
+		{ id:"gifPanel", 			visible:false, 	position:5  },
+		{ id:"dataPanel", 			visible:false, 	position:6  },
+		{ id:"exitsPanel", 			visible:false, 	position:7  },
+		{ id:"endingsPanel", 		visible:false, 	position:8  },
+		{ id:"paintExplorerPanel",	visible:false,	position:9  },
+		{ id:"dialogPanel",			visible:false,	position:10 },
+		{ id:"inventoryPanel",		visible:false,	position:11 }
 	]
 };
 function getPanelPrefs() {
 	// (TODO: weird that engine version and editor version are the same??)
 	var useDefaultPrefs = ( localStorage.engine_version == null ) ||
 							( localStorage.panel_prefs == null ) ||
-							( JSON.parse(localStorage.engine_version).major < 3 ) ||
-							( JSON.parse(localStorage.engine_version).minor < 2 );
+							( JSON.parse(localStorage.engine_version).major < 4 ) ||
+							( JSON.parse(localStorage.engine_version).minor < 0 );
 	console.log("USE DEFAULT?? " + useDefaultPrefs);
 	var prefs = useDefaultPrefs ? defaultPanelPrefs : JSON.parse( localStorage.panel_prefs );
 	// add missing panel prefs (if any)

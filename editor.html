@@ -84,6 +84,16 @@
 				<label title="show / hide color palette window" for="colorsCheck">
 					<i class="material-icons">palette</i> colors
 				</label>
+
+				<input type="checkbox" value="dialogPanel" id="dialogCheck" onclick="togglePanelAnimated(event);"  checked/>
+				<label title="show / hide dialog window" for="dialogCheck">
+					<i class="material-icons">chat</i> dialog
+				</label>
+
+				<input type="checkbox" value="inventoryPanel" id="inventoryCheck" onclick="togglePanelAnimated(event);"  checked/>
+				<label title="show / hide inventory window" for="inventoryCheck">
+					<i class="material-icons">vpn_key</i> inventory
+				</label>
 				
 				<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide download window" for="downloadCheck">
@@ -122,7 +132,7 @@
 						</button>
 						<div title="about window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">favorite</i>
-							about bitsy v3.7
+							about bitsy v4.0
 						</div>
 					</div>
 					<div id="aboutInner">
@@ -130,12 +140,14 @@
 						the goal is to make it easy to make games where you <br>
 						can walk around and talk to people and be somewhere. <br><br>
 
-						if you need inspiration, you can <a href="https://itch.io/c/90743/bitsy-games">play other bitsy games</a> 
-						<br>on <a href="https://itch.io">itch.io</a>, which is a great place to share games!<br><br>
+						not sure where to start? try this helpful <a target="_blank" href="http://www.clairemorleyart.com/a-bitsy-tutorial">bitsy tutorial!</a><br><br>
+
+						if you need inspiration, you can <a target="_blank" href="https://itch.io/c/90743/bitsy-games">play other bitsy games</a> 
+						<br>on <a target="_blank" href="https://itch.io">itch.io</a>, which is a great place to share games!<br><br>
 
 
 						have fun making things with bitsy! <br>
-						- <a href="https://www.twitter.com/adamledoux">adam</a> <br><br>
+						- <a target="_blank" href="https://www.twitter.com/adamledoux">adam</a> <br><br>
 
 						<!-- <span class="toggleText" onclick="toggleInstructions();">instructions</span> <br> -->
 
@@ -183,11 +195,14 @@
 
 							<input type="checkbox" id="versionNotesCheck" onclick="toggleVersionNotes(event);"/>
 							<label title="show / hide version notes" for="versionNotesCheck">
-								what's new in v3.7
+								what's new in v4.0
 								<i id="versionNotesCheckIcon" class="material-icons">expand_less</i>
 							</label>
 
 							<div id="versionNotes" style="display:none;">
+								<br>
+								v4.0:<br>
+								TODO<br>
 								<br>
 								v3.7:<br>
 								- bugfix: can't add color palettes<br>
