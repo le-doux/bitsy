@@ -667,6 +667,53 @@
 					</div>
 
 					<div>
+						<div id="dialogTools" class="controlBox">
+							<form>
+								<input type="radio" name="dialogTools" value="section" id="dialogToolsOptionSection" onclick="showDialogToolsSection();" checked>
+								<label for="dialogToolsOptionSection" class="left">
+									<i class="material-icons">add_circle</i> new section
+								</label>
+								<input type="radio" name="dialogTools" value="format" id="dialogToolsOptionEffects" onclick="showDialogToolsEffects();">
+								<label for="dialogToolsOptionEffects" class="right">
+									<i class="material-icons">text_format</i> text effects
+								</label>
+							</form>
+							<hr style="background:#6767b2;border:0px;height:1px;margin:4px;margin-left:0px;margin-right:0px;">
+							<div id="dialogToolsSection">
+								<button onclick="addDialogBlockUI();">
+									<i class="material-icons">subject</i>
+									dialog
+								</button>
+								<button onclick="addSeqBlockUI();">
+									<i class="material-icons">list</i>
+									sequence
+								</button>
+								<button onclick="addIfBlockUI();">
+									<i class="material-icons">call_split</i>
+									conditional
+								</button>
+							</div>
+							<div id="dialogToolsEffects" style="display:none;">
+								<button>
+									color 1
+								</button>
+								<button>
+									color 2
+								</button>
+								<button>
+									color 3
+								</button>
+								<button>
+									wavy
+								</button>
+								<button>
+									shaky
+								</button>
+								<button>
+									rainbow
+								</button>
+							</div>
+						</div>
 						<div id="dialogCode" style="display:none;">
 							<textarea id="dialogCodeText" onkeydown="on_change_adv_dialog();" onkeyup="on_change_adv_dialog();" onchange="on_change_adv_dialog();"></textarea>
 						</div>

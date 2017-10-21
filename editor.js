@@ -4228,6 +4228,39 @@ var SeqBlockUI = function(node) {
 
 var advDialogUIComponents = [];
 
+function addDialogBlockUI() {
+	var dialogFormDiv = document.getElementById("advDialogViewport");
+
+	var block = new DialogBlockUI([]);
+	dialogFormDiv.appendChild( block.GetEl() );
+
+	advDialogUIComponents.push( block );
+
+	serializeAdvDialog();
+}
+
+function addSeqBlockUI() {
+	var dialogFormDiv = document.getElementById("advDialogViewport");
+
+	var block = new SeqBlockUI( scriptUtils.CreateSequenceBlock() );
+	dialogFormDiv.appendChild( block.GetEl() );
+
+	advDialogUIComponents.push( block );
+
+	serializeAdvDialog();
+}
+
+function addIfBlockUI() {
+	var dialogFormDiv = document.getElementById("advDialogViewport");
+
+	var block = new IfBlockUI( scriptUtils.CreateIfBlock() );
+	dialogFormDiv.appendChild( block.GetEl() );
+
+	advDialogUIComponents.push( block );
+
+	serializeAdvDialog();
+}
+
 function serializeAdvDialog() {
 	console.log("SERIALIZE ADVANCED DIALOG");
 
@@ -4315,6 +4348,7 @@ function showDialogCode() {
 	document.getElementById("dialogEditor").style.display = "none";
 	document.getElementById("dialogShowCode").style.display = "none";
 	document.getElementById("dialogHideCode").style.display = "block";
+	document.getElementById("dialogTools").style.display = "none";
 }
 
 function hideDialogCode() {
@@ -4322,8 +4356,18 @@ function hideDialogCode() {
 	document.getElementById("dialogEditor").style.display = "block";
 	document.getElementById("dialogShowCode").style.display = "block";
 	document.getElementById("dialogHideCode").style.display = "none";
+	document.getElementById("dialogTools").style.display = "block";
 }
 
+function showDialogToolsSection() {
+	document.getElementById("dialogToolsSection").style.display = "block";
+	document.getElementById("dialogToolsEffects").style.display = "none";
+}
+
+function showDialogToolsEffects() {
+	document.getElementById("dialogToolsSection").style.display = "none";
+	document.getElementById("dialogToolsEffects").style.display = "block";
+}
 
 /* INVENTORY UI */
 function updateInventoryUI() {

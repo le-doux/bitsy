@@ -93,6 +93,32 @@ var Utils = function() {
 		}
 		return oldSequence;
 	}
+
+	this.CreateSequenceBlock = function() {
+		var option1 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		var option2 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		var sequence = new SequenceNode( [ option1, option2 ] );
+		var block = new BlockNode( BlockMode.Code );
+		block.AddChild( sequence );
+		return block;
+	}
+
+	this.CreateIfBlock = function() {
+		var leftNode = new BlockNode( BlockMode.Code );
+		leftNode.AddChild( new FuncNode("item", [new LiteralNode("0")] ) );
+		var rightNode = new LiteralNode( 1 );
+		var condition1 = new ExpNode("==", leftNode, rightNode );
+
+		var condition2 = new ElseNode();
+
+		var result1 = new BlockNode( BlockMode.Dialog );
+		var result2 = new BlockNode( BlockMode.Dialog );
+
+		var ifNode = new IfNode( [ condition1, condition2 ], [ result1, result2 ] );
+		var block = new BlockNode( BlockMode.Code );
+		block.AddChild( ifNode );
+		return block;
+	}
 }
 
 
