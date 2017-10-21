@@ -670,11 +670,11 @@
 						<div id="dialogTools" class="controlBox">
 							<form>
 								<input type="radio" name="dialogTools" value="section" id="dialogToolsOptionSection" onclick="showDialogToolsSection();" checked>
-								<label for="dialogToolsOptionSection" class="left">
+								<label for="dialogToolsOptionSection" class="left" onmousedown="preventTextDeselectAndClick(event);">
 									<i class="material-icons">add_circle</i> new section
 								</label>
 								<input type="radio" name="dialogTools" value="format" id="dialogToolsOptionEffects" onclick="showDialogToolsEffects();">
-								<label for="dialogToolsOptionEffects" class="right">
+								<label for="dialogToolsOptionEffects" class="right" onmousedown="preventTextDeselectAndClick(event);">
 									<i class="material-icons">text_format</i> text effects
 								</label>
 							</form>
@@ -694,22 +694,22 @@
 								</button>
 							</div>
 							<div id="dialogToolsEffects" style="display:none;">
-								<button>
+								<button onclick="wrapTextSelection('{clr1}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
 									color 1
 								</button>
-								<button>
+								<button onclick="wrapTextSelection('{clr2}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
 									color 2
 								</button>
-								<button>
+								<button onclick="wrapTextSelection('{clr3}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
 									color 3
 								</button>
-								<button>
+								<button onclick="wrapTextSelection('{wvy}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
 									wavy
 								</button>
-								<button>
+								<button onclick="wrapTextSelection('{shk}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
 									shaky
 								</button>
-								<button>
+								<button onclick="wrapTextSelection('{rbw}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
 									rainbow
 								</button>
 							</div>

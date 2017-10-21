@@ -3725,6 +3725,63 @@ function createIconElement(iconName) {
 	return icon;
 }
 
+var dialogSel = {
+	target : null,
+	start : 0,
+	end : 0,
+	onchange : null
+}
+
+function createOnTextSelectionChange(onchange) {
+	return function(event) {
+		dialogSel.target = event.target;
+		dialogSel.start = event.target.selectionStart;
+		dialogSel.end = event.target.selectionEnd;
+		dialogSel.onchange = onchange;
+
+		var effectButtons = document.getElementsByClassName("dialogEffectButton");
+		for(var i = 0; i < effectButtons.length; i++) {
+			effectButtons[i].disabled = false;
+		}
+	}
+}
+
+function onTextSelectionLeave(event) {
+	dialogSel.target = null;
+	dialogSel.start = 0;
+	dialogSel.end = 0;
+
+	var effectButtons = document.getElementsByClassName("dialogEffectButton");
+	for(var i = 0; i < effectButtons.length; i++) {
+		effectButtons[i].disabled = true;
+	}
+}
+
+function preventTextDeselect(event) {
+	if(dialogSel.target != null) {
+		event.preventDefault();
+	}
+}
+
+function preventTextDeselectAndClick(event) {
+	if(dialogSel.target != null) {
+		event.preventDefault();
+		event.target.click();
+	}
+}
+
+function wrapTextSelection(effect) {
+	if( dialogSel.target != null ) {
+		var curText = dialogSel.target.value;
+		var effectText = effect + curText.slice(dialogSel.start, dialogSel.end) + effect;
+		var newText = curText.slice(0, dialogSel.start) + effectText + curText.slice(dialogSel.end);
+		dialogSel.target.value = newText;
+		dialogSel.target.setSelectionRange(dialogSel.start,dialogSel.start + effectText.length);
+		if(dialogSel.onchange != null)
+			dialogSel.onchange( dialogSel ); // dialogSel needs to mimic the event the onchange would usually receive
+	}
+}
+
 var DialogBlockUI = function(nodes) {
 	var dialogNode = scriptUtils.CreateDialogBlock( nodes );
 
@@ -3773,7 +3830,10 @@ var DialogBlockUI = function(nodes) {
 	textArea.value = dialogNode.Serialize();
 	textArea.addEventListener('change', onChangeDialogBlock);
 	textArea.addEventListener('keyup', onChangeDialogBlock);
-	textArea.addEventListener('keydown', onChangeDialogBlock);
+	var textChangeHandler = createOnTextSelectionChange( onChangeDialogBlock );
+	textArea.addEventListener('click', textChangeHandler);
+	textArea.addEventListener('select', textChangeHandler);
+	textArea.addEventListener('blur', textChangeHandler);
 	div.appendChild( textArea );
 
 	this.GetEl = function() {
@@ -4061,6 +4121,10 @@ var IfBlockUI = function(node) {
 		textArea.addEventListener('change', onChangeResult);
 		textArea.addEventListener('keyup', onChangeResult);
 		textArea.addEventListener('keydown', onChangeResult);
+		var textChangeHandler = createOnTextSelectionChange( onChangeResult );
+		textArea.addEventListener('click', textChangeHandler);
+		textArea.addEventListener('select', textChangeHandler);
+		textArea.addEventListener('blur', textChangeHandler);
 		conditionDiv.appendChild( textArea );
 		// div.appendChild( document.createElement("br") );
 
@@ -4187,6 +4251,10 @@ var SeqBlockUI = function(node) {
 		textArea.addEventListener('change', onChangeOption);
 		textArea.addEventListener('keyup', onChangeOption);
 		textArea.addEventListener('keydown', onChangeOption);
+		var textChangeHandler = createOnTextSelectionChange( onChangeOption );
+		textArea.addEventListener('click', textChangeHandler);
+		textArea.addEventListener('select', textChangeHandler);
+		textArea.addEventListener('blur', textChangeHandler);
 		// div.insertBefore( textArea, addOptionEl );
 		optionDiv.appendChild( textArea );
 

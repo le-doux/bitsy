@@ -123,3 +123,7 @@ input[type=radio]:checked + label {
 .inventoryVariableBox button {
 	background: #e8e8ff;
 }
+
+button:disabled {
+	opacity: 0.5;
+}
