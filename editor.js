@@ -4504,6 +4504,7 @@ function updateInventoryItemUI(){
 		var itemDiv = document.createElement("div");
 		itemDiv.classList.add("controlBox");
 		itemDiv.id = "inventoryItem_" + id;
+		itemDiv.title = itemName;
 		viewport.appendChild(itemDiv);
 
 		var itemNameSpan = document.createElement("span");
@@ -4555,6 +4556,7 @@ function updateInventoryVariableUI(){
 				setTimeout(function() {delete variable[oldId]; refreshGameData();}, 0); //hack to avoid some kind of delete race condition? (there has to be a better way)
 				varInfo.id = event.target.value;
 				varDiv.id = "inventoryVariable_" + varInfo.id;
+				varDiv.title = "variable " + varInfo.id;
 			}
 		}
 	}
@@ -4591,6 +4593,7 @@ function updateInventoryVariableUI(){
 		varDiv.classList.add("controlBox");
 		varDiv.classList.add("inventoryVariableBox");
 		varDiv.id = "inventoryVariable_" + id;
+		varDiv.title = "variable " + id;
 		viewport.appendChild(varDiv);
 
 		var varNameInput = document.createElement("input");
@@ -4617,6 +4620,7 @@ function updateInventoryVariableUI(){
 		var deleteVarEl = document.createElement("button");
 		deleteVarEl.appendChild( createIconElement("clear") );
 		deleteVarEl.addEventListener('click', createOnVariableDelete(varInfo));
+		deleteVarEl.title = "delete this variable";
 		varDiv.appendChild(deleteVarEl);	
 	}
 
@@ -4635,6 +4639,7 @@ function updateInventoryVariableUI(){
 
 	function createAddButton() {
 		var addVarEl = document.createElement("button");
+		addVarEl.title = "add new variable";
 		addVarEl.appendChild( createIconElement("add") );
 		var addVarText = document.createElement("span");
 		addVarText.innerText = "add variable";
