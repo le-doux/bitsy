@@ -599,10 +599,30 @@ var ShuffleNode = function(options) {
 	this.type = "shuffle";
 	this.options = options;
 
+	var optionsShuffled = [];
+	function shuffle(options) {
+		optionsShuffled = [];
+		var optionsUnshuffled = options.slice();
+		while(optionsUnshuffled.length > 0) {
+			var i = Math.floor( Math.random() * optionsUnshuffled.length );
+			optionsShuffled.push( optionsUnshuffled.splice(i,1)[0] );
+		}
+	}
+	shuffle(this.options);
+
+	var index = 0;
 	this.Eval = function(environment,onReturn) {
-		var index = Math.floor(Math.random() * this.options.length);
-		// console.log("SHUFFLE " + index);
-		this.options[index].Eval( environment, onReturn );
+		// OLD RANDOM VERSION
+		// var index = Math.floor(Math.random() * this.options.length);
+		// this.options[index].Eval( environment, onReturn );
+
+		optionsShuffled[index].Eval( environment, onReturn );
+		
+		index++;
+		if (index >= this.options.length) {
+			shuffle(this.options);
+			index = 0;
+		}
 	}
 }
 

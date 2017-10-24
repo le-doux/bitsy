@@ -4250,7 +4250,7 @@ var SeqBlockUI = function(node) {
 	});
 	div.appendChild(selectEl);
 	var sequenceTypes = ["sequence","cycle","shuffle"];
-	var sequenceDesc = ["sequence (say each line once)", "cycle (say each line, then repeat)", "shuffle (say lines randomly)"];
+	var sequenceDesc = ["sequence (say each line once)", "cycle (say each line, then repeat)", "shuffle (say lines in random order)"];
 	for(var i = 0; i < sequenceTypes.length; i++) {
 		var optionEl = document.createElement("option");
 		optionEl.value = sequenceTypes[i];
