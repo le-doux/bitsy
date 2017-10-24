@@ -413,3 +413,7 @@ input {
 .inventoryVariableBox button .material-icons {
 	font-size: 12px;
 }
+
+.niceHr {
+	background:#6767b2;border:0px;height:1px;margin:4px;margin-left:0px;margin-right:0px;
+}

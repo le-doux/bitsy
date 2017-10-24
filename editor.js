@@ -3800,6 +3800,7 @@ var DialogBlockUI = function(nodes) {
 
 	var typeEl = document.createElement("span");
 	typeEl.innerText = "dialog";
+	typeEl.title = "this dialog is said once on each interaction";
 	topDiv.appendChild( typeEl );
 
 	//
@@ -3817,6 +3818,7 @@ var DialogBlockUI = function(nodes) {
 			reloadAdvDialogUI();
 		}
 	});
+	deleteEl.title = "delete this dialog section";
 	topDiv.appendChild( deleteEl );
 
 	// div.appendChild( document.createElement("br") );
@@ -3836,6 +3838,7 @@ var DialogBlockUI = function(nodes) {
 	textArea.addEventListener('click', textChangeHandler);
 	textArea.addEventListener('select', textChangeHandler);
 	textArea.addEventListener('blur', textChangeHandler);
+	textArea.title = "type dialog here";
 	div.appendChild( textArea );
 
 	this.GetEl = function() {
@@ -3874,6 +3877,7 @@ var IfBlockUI = function(node) {
 
 	var typeEl = document.createElement("span");
 	typeEl.innerText = "conditional";
+	typeEl.title = "which dialog option is said is determined by conditions you define"
 	topDiv.appendChild( typeEl );
 
 	//
@@ -3891,6 +3895,7 @@ var IfBlockUI = function(node) {
 			reloadAdvDialogUI();
 		}
 	});
+	deleteEl.title = "delete this conditional dialog section"
 	topDiv.appendChild( deleteEl );
 
 	// div.appendChild( document.createElement("br") );
@@ -3906,8 +3911,11 @@ var IfBlockUI = function(node) {
 	}
 
 	var conditionTypes = ["item","variable","default","custom"];
+	// var conditionTypesVerbose = ["the player's inventory of the item", "the value of the variable", "no other condition is met (default)", "a custom condition is met"]
 	// var comparisonNames = ["equals","greater than","less than","greater than or equal to","less than or equal to"];
 	var comparisonTypes = ["==", ">", "<", ">=", "<="];
+	// var comparisonTypesVerbose = ["is equal to", "is greater than", "is less than", "is greater than or equal to", "is less than or equal to"];
+	// NOTE: verbose names seemed too hard to understand
 
 	function createOnConditionTypeChange(index, condItemSelect, condVariableSelect, condCompareSelect, condValueInput, condCustomTextInput) {
 		return function(event) {
@@ -4034,6 +4042,7 @@ var IfBlockUI = function(node) {
 	}
 
 	var addConditionEl = document.createElement("button");
+	addConditionEl.title = "add a new dialog option to this conditional dialog section"
 	addConditionEl.appendChild( createIconElement("add") );
 	var addConditionText = document.createElement("span");
 	addConditionText.innerText = "add option";
@@ -4053,8 +4062,10 @@ var IfBlockUI = function(node) {
 		conditionDiv.appendChild(condInnerDiv);
 		var condSpan = document.createElement("span");
 		condSpan.innerText = "when ";
+		condSpan.title = "define the condition for which this dialog option is said";
 		condInnerDiv.appendChild(condSpan);
 		var condTypeSelect = document.createElement("select");
+		condTypeSelect.title = "choose type of condition to check";
 		condInnerDiv.appendChild(condTypeSelect);
 		for(var i = 0; i < conditionTypes.length; i++) {
 			var condTypeOption = document.createElement("option");
@@ -4062,15 +4073,18 @@ var IfBlockUI = function(node) {
 			condTypeOption.innerText = conditionTypes[i];
 			condTypeSelect.appendChild(condTypeOption);
 		}
+		// condInnerDiv.appendChild( document.createElement("br") );
 		var condItemSelect = document.createElement("select");
+		condItemSelect.title = "choose item to check";
 		condInnerDiv.appendChild(condItemSelect);
 		for(id in item) {
 			var condItemOption = document.createElement("option");
 			condItemOption.value = id;
-			condItemOption.innerText = (item[id].name != null ? item[id].name : id); //"item " + id;
+			condItemOption.innerText = (item[id].name != null ? item[id].name : "item " + id); //"item " + id;
 			condItemSelect.appendChild(condItemOption);
 		}
 		var condVariableSelect = document.createElement("select");
+		condVariableSelect.title = "choose variable to check";
 		condInnerDiv.appendChild(condVariableSelect);
 		for(id in variable) {
 			var condVariableOption = document.createElement("option");
@@ -4082,6 +4096,7 @@ var IfBlockUI = function(node) {
 		// condSpan2.innerText = " is ";
 		// condInnerDiv.appendChild(condSpan2);
 		var condCompareSelect = document.createElement("select");
+		condCompareSelect.title = "choose a comparison type";
 		condInnerDiv.appendChild(condCompareSelect);
 		for(var i = 0; i < comparisonTypes.length; i++) {
 			var condCompareOption = document.createElement("option");
@@ -4091,12 +4106,14 @@ var IfBlockUI = function(node) {
 		}
 		var condValueInput = document.createElement("input");
 		condValueInput.type = "number";
+		condValueInput.title = "choose number to compare";
 		condValueInput.value = 1;
 		condValueInput.style.width = "35px";
 		condInnerDiv.appendChild(condValueInput);
 		var condCustomTextInput = document.createElement("input");
 		condCustomTextInput.type = "text";
 		condCustomTextInput.placeholder = 'ex: x+1 < {item "1"}';
+		condCustomTextInput.title = "type custom condition here";
 		condInnerDiv.appendChild(condCustomTextInput);
 
 		var onConditionTypeChange = createOnConditionTypeChange(index,condItemSelect,condVariableSelect,condCompareSelect,condValueInput,condCustomTextInput);
@@ -4116,6 +4133,14 @@ var IfBlockUI = function(node) {
 		condCustomTextInput.addEventListener('keyup', onConditionCustomChange);
 		condCustomTextInput.addEventListener('keydown', onConditionCustomChange);
 
+		// var hr = document.createElement("hr");
+		// hr.classList.add('niceHr');
+		// conditionDiv.appendChild(hr);
+		// var condSaySpan = document.createElement("span");
+		// condSaySpan.innerText = "say: ";
+		// conditionDiv.appendChild(condSaySpan);
+		// conditionDiv.appendChild( document.createElement("br") );
+
 		var textArea = document.createElement("textarea");
 		textArea.classList.add('advDialogTextOption');
 		textArea.value = result.Serialize();
@@ -4127,12 +4152,14 @@ var IfBlockUI = function(node) {
 		textArea.addEventListener('click', textChangeHandler);
 		textArea.addEventListener('select', textChangeHandler);
 		textArea.addEventListener('blur', textChangeHandler);
+		textArea.title = "type dialog option to say when this condition is true"
 		conditionDiv.appendChild( textArea );
 		// div.appendChild( document.createElement("br") );
 
 		var deleteConditionEl = document.createElement("button");
 		deleteConditionEl.appendChild( createIconElement("clear") );
 		deleteConditionEl.addEventListener( 'click', createOnDelete(index) );
+		deleteConditionEl.title = "delete this option from this conditional dialog section"
 		conditionDiv.appendChild( deleteConditionEl );
 	}
 
@@ -4184,7 +4211,8 @@ var SeqBlockUI = function(node) {
 	topDiv.appendChild( topIcon );
 
 	var typeEl = document.createElement("span");
-	typeEl.innerText = "sequence"; //sequenceNode.type;
+	typeEl.innerText = "list"; //sequenceNode.type;
+	typeEl.title = "one line of dialog in the list is said on each interaction, in the order you choose";
 	topDiv.appendChild( typeEl );
 	
 	//
@@ -4202,12 +4230,14 @@ var SeqBlockUI = function(node) {
 			reloadAdvDialogUI();
 		}
 	});
+	deleteEl.title = "delete this dialog list section";
 	topDiv.appendChild( deleteEl );
 
 	// div.appendChild( document.createElement("br") );
 
 	var orderEl = document.createElement("span");
 	orderEl.innerText = "order: ";
+	orderEl.title = "select the order in which lines are said";
 	div.appendChild( orderEl );
 
 	// var formEl = document.createElement("form");
@@ -4228,6 +4258,7 @@ var SeqBlockUI = function(node) {
 		optionEl.selected = (sequenceNode.type === sequenceTypes[i]);
 		selectEl.appendChild( optionEl );
 	}
+	selectEl.title = "select the order in which lines are said";
 	seqRadioCount++;
 
 	// div.appendChild( document.createElement("br") );
@@ -4237,6 +4268,7 @@ var SeqBlockUI = function(node) {
 	addOptionEl.appendChild( createIconElement("add") );
 	var addOptionText = document.createElement("span");
 	addOptionText.innerText = "add line";
+	addOptionEl.title = "add a new line of dialog to the list";
 	addOptionEl.appendChild( addOptionText );
 
 	function addOption(option,index) {
@@ -4257,6 +4289,7 @@ var SeqBlockUI = function(node) {
 		textArea.addEventListener('click', textChangeHandler);
 		textArea.addEventListener('select', textChangeHandler);
 		textArea.addEventListener('blur', textChangeHandler);
+		textArea.title = "type line of dialog here"
 		// div.insertBefore( textArea, addOptionEl );
 		optionDiv.appendChild( textArea );
 
@@ -4270,6 +4303,7 @@ var SeqBlockUI = function(node) {
 			serializeAdvDialog();
 			reloadAdvDialogUI();
 		});
+		deleteOptionEl.title = "delete this line from this list"
 		// div.insertBefore( deleteOptionEl, addOptionEl );
 		optionDiv.appendChild( deleteOptionEl );
 

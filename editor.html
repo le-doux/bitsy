@@ -685,46 +685,46 @@
 						<div id="dialogTools" class="controlBox">
 							<form>
 								<input type="radio" name="dialogTools" value="section" id="dialogToolsOptionSection" onclick="showDialogToolsSection();" checked>
-								<label for="dialogToolsOptionSection" class="left" onmousedown="preventTextDeselectAndClick(event);">
+								<label for="dialogToolsOptionSection" class="left" onmousedown="preventTextDeselectAndClick(event);" title="add new dialog sections">
 									<i class="material-icons">add_circle</i> new section
 								</label>
 								<input type="radio" name="dialogTools" value="format" id="dialogToolsOptionEffects" onclick="showDialogToolsEffects();">
-								<label for="dialogToolsOptionEffects" class="right" onmousedown="preventTextDeselectAndClick(event);">
+								<label for="dialogToolsOptionEffects" class="right" onmousedown="preventTextDeselectAndClick(event);" title="add special effects to selected text">
 									<i class="material-icons">text_format</i> text effects
 								</label>
 							</form>
 							<hr style="background:#6767b2;border:0px;height:1px;margin:4px;margin-left:0px;margin-right:0px;">
 							<div id="dialogToolsSection">
-								<button onclick="addDialogBlockUI();">
+								<button onclick="addDialogBlockUI();" title="add new dialog: the same line is said each time">
 									<i class="material-icons">subject</i>
 									dialog
 								</button>
-								<button onclick="addSeqBlockUI();">
+								<button onclick="addSeqBlockUI();" title="add new dialog list: different lines said each time, in the order you choose">
 									<i class="material-icons">list</i>
-									sequence
+									list
 								</button>
-								<button onclick="addIfBlockUI();">
+								<button onclick="addIfBlockUI();" title="add new conditional dialog: what option is said is determined by conditions you define">
 									<i class="material-icons">call_split</i>
 									conditional
 								</button>
 							</div>
 							<div id="dialogToolsEffects" style="display:none;">
-								<button onclick="wrapTextSelection('{clr1}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
+								<button onclick="wrapTextSelection('{clr1}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 1st color in the palette">
 									color 1
 								</button>
-								<button onclick="wrapTextSelection('{clr2}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
+								<button onclick="wrapTextSelection('{clr2}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 2nd color in the palette">
 									color 2
 								</button>
-								<button onclick="wrapTextSelection('{clr3}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
+								<button onclick="wrapTextSelection('{clr3}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 3rd color in the palette">
 									color 3
 								</button>
-								<button onclick="wrapTextSelection('{wvy}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
+								<button onclick="wrapTextSelection('{wvy}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags waves up and down">
 									wavy
 								</button>
-								<button onclick="wrapTextSelection('{shk}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
+								<button onclick="wrapTextSelection('{shk}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags shakes constantly">
 									shaky
 								</button>
-								<button onclick="wrapTextSelection('{rbw}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled>
+								<button onclick="wrapTextSelection('{rbw}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags is rainbow colored">
 									rainbow
 								</button>
 							</div>
@@ -736,11 +736,11 @@
 							<div id="advDialogViewport">
 							</div>
 						</div>
-						<button id="dialogShowCode" onclick="showDialogCode();">
+						<button id="dialogShowCode" onclick="showDialogCode();" title="show the code for this dialog">
 							<i class="material-icons">code</i>
 							show code
 						</button>
-						<button id="dialogHideCode" onclick="hideDialogCode();" style="display:none;">
+						<button id="dialogHideCode" onclick="hideDialogCode();" style="display:none;" title="hide the code for this dialog, and show the dialog editing interface">
 							<i class="material-icons">code</i>
 							hide code
 						</button>
