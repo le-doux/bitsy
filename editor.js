@@ -3775,16 +3775,31 @@ function preventTextDeselectAndClick(event) {
 function wrapTextSelection(effect) {
 	if( dialogSel.target != null ) {
 		var curText = dialogSel.target.value;
-		var effectText = effect + curText.slice(dialogSel.start, dialogSel.end) + effect;
-		var newText = curText.slice(0, dialogSel.start) + effectText + curText.slice(dialogSel.end);
-		dialogSel.target.value = newText;
-		dialogSel.target.setSelectionRange(dialogSel.start,dialogSel.start + effectText.length);
-		if(dialogSel.onchange != null)
-			dialogSel.onchange( dialogSel ); // dialogSel needs to mimic the event the onchange would usually receive
+		var selText = curText.slice(dialogSel.start, dialogSel.end);
+
+		var isEffectAlreadyApplied = selText.indexOf( effect ) > -1;
+		if(isEffectAlreadyApplied) {
+			//remove all instances of effect
+			var effectlessText = selText.split( effect ).join( "" );
+			var newText = curText.slice(0, dialogSel.start) + effectlessText + curText.slice(dialogSel.end);
+			dialogSel.target.value = newText;
+			dialogSel.target.setSelectionRange(dialogSel.start,dialogSel.start + effectlessText.length);
+			if(dialogSel.onchange != null)
+				dialogSel.onchange( dialogSel ); // dialogSel needs to mimic the event the onchange would usually receive
+		}
+		else {
+			// add effect
+			var effectText = effect + selText + effect;
+			var newText = curText.slice(0, dialogSel.start) + effectText + curText.slice(dialogSel.end);
+			dialogSel.target.value = newText;
+			dialogSel.target.setSelectionRange(dialogSel.start,dialogSel.start + effectText.length);
+			if(dialogSel.onchange != null)
+				dialogSel.onchange( dialogSel ); // dialogSel needs to mimic the event the onchange would usually receive
+		}
 	}
 }
 
-var DialogBlockUI = function(nodes) {
+var DialogBlockUI = function(nodes, num) {
 	var dialogNode = scriptUtils.CreateDialogBlock( nodes );
 
 	var div = document.createElement('div');
@@ -3797,6 +3812,10 @@ var DialogBlockUI = function(nodes) {
 	var topIcon = createIconElement("subject");
 	topIcon.classList.add('advDialogIcon');
 	topDiv.appendChild( topIcon );
+
+	var numSpan = document.createElement("span");
+	numSpan.innerText = num + ". ";
+	topDiv.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
 	typeEl.innerText = "dialog";
@@ -3851,7 +3870,7 @@ var DialogBlockUI = function(nodes) {
 }
 
 // TODO : rename everything something more sensible
-var IfBlockUI = function(node) {
+var IfBlockUI = function(node, num) {
 	var ifNode = node.children[0];
 
 	function createOnChangeResult(index) {
@@ -3874,6 +3893,10 @@ var IfBlockUI = function(node) {
 	topDiv.appendChild( topIcon );
 	// topDiv.appendChild( createIconElement("call_split") );
 	// div.appendChild( createIconElement("help_outline") );
+
+	var numSpan = document.createElement("span");
+	numSpan.innerText = num + ". ";
+	topDiv.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
 	typeEl.innerText = "conditional";
@@ -4060,6 +4083,23 @@ var IfBlockUI = function(node) {
 		// condInnerDiv.style.background = "red";
 		condInnerDiv.style.whiteSpace = "normal";
 		conditionDiv.appendChild(condInnerDiv);
+
+		// var subNumSpan = document.createElement("div");
+		// subNumSpan.innerText = num + numToLetter(index) + ". ";
+		// subNumSpan.style.fontSize = "12px";
+		// subNumSpan.style.display = "inline";
+		// condInnerDiv.appendChild( subNumSpan );
+
+
+		// // new experiment
+		// var deleteConditionEl = document.createElement("button");
+		// deleteConditionEl.appendChild( createIconElement("clear") );
+		// deleteConditionEl.addEventListener( 'click', createOnDelete(index) );
+		// deleteConditionEl.title = "delete this option from this conditional dialog section"
+		// condInnerDiv.appendChild( deleteConditionEl );
+		// condInnerDiv.appendChild( document.createElement("br") );
+
+
 		var condSpan = document.createElement("span");
 		condSpan.innerText = "when ";
 		condSpan.title = "define the condition for which this dialog option is said";
@@ -4187,7 +4227,7 @@ var IfBlockUI = function(node) {
 }
 
 var seqRadioCount = 0;
-var SeqBlockUI = function(node) {
+var SeqBlockUI = function(node, num) {
 	var sequenceNode = node.children[0];
 
 	function createOnChangeOption(index) {
@@ -4209,6 +4249,10 @@ var SeqBlockUI = function(node) {
 	var topIcon = createIconElement("list");
 	topIcon.classList.add('advDialogIcon');
 	topDiv.appendChild( topIcon );
+
+	var numSpan = document.createElement("span");
+	numSpan.innerText = num + ". ";
+	topDiv.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
 	typeEl.innerText = "list"; //sequenceNode.type;
@@ -4277,10 +4321,25 @@ var SeqBlockUI = function(node) {
 		optionDiv.classList.add('advDialogOptionDiv');
 		div.insertBefore( optionDiv, addOptionEl );
 
+		// var subNumSpan = document.createElement("div");
+		// subNumSpan.innerText = num + numToLetter(index) + ". ";
+		// // subNumSpan.style.background = "black";
+		// subNumSpan.style.fontSize = "12px";
+		// subNumSpan.style.display = "block";
+		// // subNumSpan.style.verticalAlign = "middle";
+		// // subNumSpan.style.height = "20px";
+		// // subNumSpan.style.float = "left";
+		// // subNumSpan.style.position = "relative";
+		// // subNumSpan.style.top = "-20px";
+		// // subNumSpan.style.lineHeight = "100%";
+		// // subNumSpan.style.height = "10px";
+		// // subNumSpan.style.marginTop = "-30px";
+		// optionDiv.appendChild( subNumSpan );
+
 		var textArea = document.createElement("textarea");
 		textArea.classList.add('advDialogTextOption');
 		textArea.value = option.Serialize();
-		textArea.style.float = "left";
+		// textArea.style.float = "left";
 		var onChangeOption = createOnChangeOption( index );
 		textArea.addEventListener('change', onChangeOption);
 		textArea.addEventListener('keyup', onChangeOption);
@@ -4330,12 +4389,44 @@ var SeqBlockUI = function(node) {
 	}
 }
 
+function numToLetter(num) {
+	var str = "";
+	var base26 = num.toString(26);
+	for(var i = 0; i < base26.length; i++) {
+		var base10digit = parseInt( base26[i], 26 );
+		var char = String.fromCharCode(97 + base10digit + (i < base26.length-1 ? -1 : 0));
+		str += char;
+	}
+	return str;
+}
+
 var advDialogUIComponents = [];
+
+function addDownArrowToDialogFlow() {
+	var dialogFormDiv = document.getElementById("advDialogViewport");
+
+	if(advDialogUIComponents.length > 0) {
+		var iconDiv = document.createElement("div");
+		iconDiv.align = "center";
+		// iconDiv.style.background = "red";
+		// iconDiv.style.margin = "0px";
+
+		var iconEl = createIconElement("arrow_downward");
+		iconEl.style.fontSize = "16px";
+		iconEl.style.marginBottom = "5px";
+		// iconEl.classList.add("downArrowDialog");
+		iconDiv.appendChild(iconEl);
+
+		dialogFormDiv.appendChild( iconDiv );
+	}
+}
 
 function addDialogBlockUI() {
 	var dialogFormDiv = document.getElementById("advDialogViewport");
 
-	var block = new DialogBlockUI([]);
+	addDownArrowToDialogFlow();
+
+	var block = new DialogBlockUI( [], advDialogUIComponents.length+1 );
 	dialogFormDiv.appendChild( block.GetEl() );
 
 	advDialogUIComponents.push( block );
@@ -4346,7 +4437,9 @@ function addDialogBlockUI() {
 function addSeqBlockUI() {
 	var dialogFormDiv = document.getElementById("advDialogViewport");
 
-	var block = new SeqBlockUI( scriptUtils.CreateSequenceBlock() );
+	addDownArrowToDialogFlow();
+
+	var block = new SeqBlockUI( scriptUtils.CreateSequenceBlock(), advDialogUIComponents.length+1 );
 	dialogFormDiv.appendChild( block.GetEl() );
 
 	advDialogUIComponents.push( block );
@@ -4357,7 +4450,9 @@ function addSeqBlockUI() {
 function addIfBlockUI() {
 	var dialogFormDiv = document.getElementById("advDialogViewport");
 
-	var block = new IfBlockUI( scriptUtils.CreateIfBlock() );
+	addDownArrowToDialogFlow();
+
+	var block = new IfBlockUI( scriptUtils.CreateIfBlock(), advDialogUIComponents.length+1 );
 	dialogFormDiv.appendChild( block.GetEl() );
 
 	advDialogUIComponents.push( block );
@@ -4404,7 +4499,9 @@ function createAdvDialogEditor(scriptTree) {
 		if(textBlockNodes.length > 0) {
 			console.log("TEXT BLOCK!!");
 
-			var b = new DialogBlockUI( textBlockNodes );
+			addDownArrowToDialogFlow();
+
+			var b = new DialogBlockUI( textBlockNodes, advDialogUIComponents.length+1 );
 			dialogFormDiv.appendChild( b.GetEl() );
 
 			advDialogUIComponents.push( b );
@@ -4422,7 +4519,9 @@ function createAdvDialogEditor(scriptTree) {
 			console.log("IF NODE!!");
 			// console.log(node.Serialize());
 
-			var b = new IfBlockUI(node);
+			addDownArrowToDialogFlow();
+
+			var b = new IfBlockUI(node, advDialogUIComponents.length+1);
 			dialogFormDiv.appendChild( b.GetEl() );
 
 			advDialogUIComponents.push( b );
@@ -4434,7 +4533,9 @@ function createAdvDialogEditor(scriptTree) {
 			// TODO
 			console.log("SEQ NODE!!");
 
-			var b = new SeqBlockUI(node);
+			addDownArrowToDialogFlow();
+
+			var b = new SeqBlockUI(node, advDialogUIComponents.length+1);
 			dialogFormDiv.appendChild( b.GetEl() );
 
 			advDialogUIComponents.push( b );
