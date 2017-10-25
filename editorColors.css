@@ -127,3 +127,18 @@ input[type=radio]:checked + label {
 button:disabled {
 	opacity: 0.5;
 }
+
+#dialogTools input[type=checkbox] + label {
+	background: #ccccff;
+	color: #6767b2;
+	float: right;
+}
+
+#dialogTools input[type=checkbox]:checked + label {
+	background: #6767b2;
+	color: white;
+}
+
+#dialogTools input[type=checkbox]:disabled + label {
+	opacity: 0.5;
+}

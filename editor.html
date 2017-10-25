@@ -683,7 +683,7 @@
 
 					<div>
 						<div id="dialogTools" class="controlBox">
-							<form>
+							<form style="display:inline;">
 								<input type="radio" name="dialogTools" value="section" id="dialogToolsOptionSection" onclick="showDialogToolsSection();" checked>
 								<label for="dialogToolsOptionSection" class="left" onmousedown="preventTextDeselectAndClick(event);" title="add new dialog sections">
 									<i class="material-icons">add_circle</i> new section
@@ -693,6 +693,13 @@
 									<i class="material-icons">text_format</i> text effects
 								</label>
 							</form>
+
+							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
+							<label title="preview dialog" for="previewDialogCheck">
+								<i class="material-icons" id="previewDialogIcon">play_arrow</i>
+								<span id="previewDialogText"> preview </span>
+							</label>
+
 							<hr style="background:#6767b2;border:0px;height:1px;margin:4px;margin-left:0px;margin-right:0px;">
 							<div id="dialogToolsSection">
 								<button onclick="addDialogBlockUI();" title="add new dialog: the same line is said each time">

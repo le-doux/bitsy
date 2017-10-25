@@ -129,6 +129,7 @@ function attachCanvas(c) {
 var curGameData = null;
 function load_game(game_data) {
 	curGameData = game_data; //remember the current game (used to reset the game)
+	dialogBuffer.Reset();
 	scriptInterpreter.ResetEnvironment(); // ensures variables are reset -- is this the best way?
 	// console.log(dialog);
 	parseWorld(game_data);
@@ -416,6 +417,8 @@ function getOffset(evt) {
 }
 
 function stopGame() {
+	console.log("stop GAME!");
+
 	document.removeEventListener('keydown', onkeydown);
 	clearInterval(update_interval);
 }
@@ -1864,6 +1867,19 @@ function startDialog(dialogStr,scriptId) {
 		scriptInterpreter.Run( scriptId, onScriptEnd );
 	}
 
+}
+
+function startPreviewDialog(script, onScriptEnd) {
+	isNarrating = true;
+
+	isDialogMode = true;
+
+	dialogRenderer.Reset();
+	dialogRenderer.SetCentered( isNarrating /*centered*/ );
+	dialogBuffer.Reset();
+	scriptInterpreter.SetDialogBuffer( dialogBuffer );
+
+	scriptInterpreter.Eval( script, onScriptEnd );
 }
 
 /* NEW SCRIPT STUFF */

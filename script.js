@@ -46,8 +46,11 @@ var Interpreter = function() {
 		return parser.ReadDialogScript(lines,i);
 	}
 
-	this.Parse = function(scriptStr) {
+	this.Parse = function(scriptStr) { // parses a script but doesn't save it
 		return parser.Parse( scriptStr );
+	}
+	this.Eval = function(scripTree, exitHandler) { // runs a script stored externally
+		scripTree.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
 	}
 
 	this.CreateExpression = function(expStr) {

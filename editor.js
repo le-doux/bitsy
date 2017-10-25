@@ -1301,8 +1301,10 @@ function reloadAdvDialogUI() {
 	var dialogStr = document.getElementById("dialogText").value;
 	document.getElementById("dialogCodeText").value = dialogStr;
 	var scriptTree = scriptInterpreter.Parse( dialogStr );
+	console.log("~~~~ RELOAD ADV DIALOG UI ~~~~~");
 	console.log(scriptTree);
 	createAdvDialogEditor(scriptTree);
+	previewDialogScriptTree = scriptTree;
 }
 
 function reloadSprite() {
@@ -2009,17 +2011,34 @@ function on_edit_mode() {
 	listenMapEditEvents();
 
 	updateInventoryUI();
+
+	if(isPreviewDialogMode) {
+		isPreviewDialogMode = false;
+		updatePreviewDialogButton();
+	}
+	document.getElementById("previewDialogCheck").disabled = false;
 }
 
 function on_play_mode() {
 	isPlayMode = true;
 	unlistenMapEditEvents();
 	load_game(document.getElementById("game_data").value);
+
+	if(!isPreviewDialogMode) {
+		document.getElementById("previewDialogCheck").disabled = true;
+	}
 }
 
 function updatePlayModeButton() {
+	document.getElementById("playModeCheck").checked = isPlayMode;
 	document.getElementById("playModeIcon").innerHTML = isPlayMode ? "stop" : "play_arrow";
 	document.getElementById("playModeText").innerHTML = isPlayMode ? "stop" : "play";
+}
+
+function updatePreviewDialogButton() {
+	document.getElementById("previewDialogCheck").checked = isPreviewDialogMode;
+	document.getElementById("previewDialogIcon").innerHTML = isPreviewDialogMode ? "stop" : "play_arrow";
+	document.getElementById("previewDialogText").innerHTML = isPreviewDialogMode ? "stop" : "preview";
 }
 
 function togglePaintGrid(e) {
@@ -4471,6 +4490,7 @@ function serializeAdvDialog() {
 	console.log(scriptRoot);
 	var dialogStr = '"""\n' + scriptRoot.Serialize() + '\n"""'; // todo cleanup quotes
 	console.log(dialogStr);
+	previewDialogScriptTree = scriptInterpreter.Parse( dialogStr ); // hacky
 
 	var dialogId = getCurDialogId();
 	dialog[dialogId] = dialogStr; //TODO: do I need to do more here?
@@ -4763,4 +4783,38 @@ function showInventoryItem() {
 function showInventoryVariable() {
 	document.getElementById("inventoryItem").style.display = "none";
 	document.getElementById("inventoryVariable").style.display = "block";
+}
+
+function previewDialog() {
+	console.log("PREVIEW!");
+	var dialogId = getCurDialogId();
+	var dialogStr = dialog[dialogId];
+	on_play_mode();
+	updatePlayModeButton();
+	startNarrating( dialogStr );
+	// load_game(document.getElementById("game_data").value);
+}
+
+
+/* TODO 
+	- still need to quit this properly
+	- need to be able to highlight textboxes as they play (both preview and regular mode)
+*/
+var isPreviewDialogMode = false;
+var previewDialogScriptTree = null;
+function togglePreviewDialog(event) {
+	isPreviewDialogMode = event.target.checked;
+	if(isPreviewDialogMode) {
+		if(previewDialogScriptTree != null) {
+			on_play_mode();
+			startPreviewDialog( previewDialogScriptTree, function() {
+				console.log("END!!!");
+			});
+		}
+	}
+	else {
+		on_edit_mode();
+	}
+	updatePlayModeButton();
+	updatePreviewDialogButton();
 }
