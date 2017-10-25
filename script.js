@@ -378,6 +378,9 @@ var BlockNode = function(mode, doIndentFirstLine) {
 	this.mode = mode;
 
 	this.Eval = function(environment,onReturn) {
+
+		if( this.onEnter != null ) this.onEnter();
+
 		var lastVal = null;
 		var i = 0;
 		function evalChildren(children,done) {
@@ -392,7 +395,9 @@ var BlockNode = function(mode, doIndentFirstLine) {
 				done();
 			}
 		};
+		var self = this;
 		evalChildren( this.children, function() {
+			if( self.onExit != null ) self.onExit();
 			onReturn(lastVal);
 		} );
 	}
@@ -434,6 +439,9 @@ var FuncNode = function(name,arguments) {
 	this.arguments = arguments;
 
 	this.Eval = function(environment,onReturn) {
+
+		if( this.onEnter != null ) this.onEnter();
+
 		// console.log("FUNC");
 		// console.log(this.arguments);
 		var argumentValues = [];
@@ -456,6 +464,9 @@ var FuncNode = function(name,arguments) {
 			// Then evaluate the function
 			// console.log("ARGS");
 			// console.log(argumentValues);
+
+			if( self.onExit != null ) self.onExit();
+
 			environment.EvalFunction( self.name, argumentValues, onReturn );
 		} );
 	}

@@ -682,6 +682,24 @@
 					</div>
 
 					<div>
+						<div id="dialogTop" style="margin-bottom: 5px;">
+							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
+							<label title="preview dialog" for="previewDialogCheck">
+								<i class="material-icons" id="previewDialogIcon">play_arrow</i>
+								<span id="previewDialogText"> preview </span>
+							</label>
+
+							<button id="dialogShowCode" onclick="showDialogCode();" style="float:right;" title="show the code for this dialog">
+								<i class="material-icons">code</i>
+								show code
+							</button>
+
+							<button id="dialogHideCode" onclick="hideDialogCode();" style="display:none; float:right;" title="hide the code for this dialog, and show the dialog editing interface">
+								<i class="material-icons">code</i>
+								hide code
+							</button>
+						</div>
+
 						<div id="dialogTools" class="controlBox">
 							<form style="display:inline;">
 								<input type="radio" name="dialogTools" value="section" id="dialogToolsOptionSection" onclick="showDialogToolsSection();" checked>
@@ -693,12 +711,6 @@
 									<i class="material-icons">text_format</i> text effects
 								</label>
 							</form>
-
-							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
-							<label title="preview dialog" for="previewDialogCheck">
-								<i class="material-icons" id="previewDialogIcon">play_arrow</i>
-								<span id="previewDialogText"> preview </span>
-							</label>
 
 							<hr style="background:#6767b2;border:0px;height:1px;margin:4px;margin-left:0px;margin-right:0px;">
 							<div id="dialogToolsSection">
@@ -743,14 +755,6 @@
 							<div id="advDialogViewport">
 							</div>
 						</div>
-						<button id="dialogShowCode" onclick="showDialogCode();" title="show the code for this dialog">
-							<i class="material-icons">code</i>
-							show code
-						</button>
-						<button id="dialogHideCode" onclick="hideDialogCode();" style="display:none;" title="hide the code for this dialog, and show the dialog editing interface">
-							<i class="material-icons">code</i>
-							hide code
-						</button>
 					</div>
 				</div>
 

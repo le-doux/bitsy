@@ -1806,6 +1806,11 @@ function onExitDialog() {
 	console.log("EXIT DIALOG");
 	isDialogMode = false;
 	if (isNarrating) isNarrating = false;
+	if (isDialogPreview) {
+		isDialogPreview = false;
+		if (onDialogPreviewEnd != null)
+			onDialogPreviewEnd();
+	}
 }
 
 /*
@@ -1869,17 +1874,22 @@ function startDialog(dialogStr,scriptId) {
 
 }
 
+var isDialogPreview = false;
 function startPreviewDialog(script, onScriptEnd) {
 	isNarrating = true;
 
 	isDialogMode = true;
+
+	isDialogPreview = true;
 
 	dialogRenderer.Reset();
 	dialogRenderer.SetCentered( isNarrating /*centered*/ );
 	dialogBuffer.Reset();
 	scriptInterpreter.SetDialogBuffer( dialogBuffer );
 
-	scriptInterpreter.Eval( script, onScriptEnd );
+	onDialogPreviewEnd = onScriptEnd;
+
+	scriptInterpreter.Eval( script, null );
 }
 
 /* NEW SCRIPT STUFF */

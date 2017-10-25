@@ -2015,6 +2015,10 @@ function on_edit_mode() {
 	if(isPreviewDialogMode) {
 		isPreviewDialogMode = false;
 		updatePreviewDialogButton();
+
+		for(var i = 0; i < advDialogUIComponents.length; i++) {
+			advDialogUIComponents[i].GetEl().classList.remove("highlighted");
+		}
 	}
 	document.getElementById("previewDialogCheck").disabled = false;
 }
@@ -3824,6 +3828,14 @@ var DialogBlockUI = function(nodes, num) {
 	var div = document.createElement('div');
 	div.classList.add('controlBox');
 
+	dialogNode.children[0].onEnter = function() {
+		div.classList.add('highlighted');
+	}
+	dialogNode.children[dialogNode.children.length-1].onExit = function() {
+		div.classList.remove('highlighted');
+	}
+	// console.log( dialogNode.children[dialogNode.children.length-1] );
+
 	var topDiv = document.createElement('div');
 	topDiv.classList.add('advDialogTop');
 	div.appendChild(topDiv);
@@ -3866,6 +3878,14 @@ var DialogBlockUI = function(nodes, num) {
 		dialogNode = scriptInterpreter.Parse( '"""\n' +  textArea.value + '\n"""' );
 		nodes = dialogNode.children;
 		console.log(nodes);
+
+		dialogNode.children[0].onEnter = function() {
+			div.classList.add('highlighted');
+		}
+		dialogNode.children[dialogNode.children.length-1].onExit = function() {
+			div.classList.remove('highlighted');
+		}
+
 		serializeAdvDialog();
 	}
 	textArea.classList.add('advDialogTextBlock');
@@ -3901,6 +3921,13 @@ var IfBlockUI = function(node, num) {
 
 	var div = document.createElement('div');
 	div.classList.add('controlBox');
+
+	node.onEnter = function() {
+		div.classList.add('highlighted');
+	}
+	node.onExit = function() {
+		div.classList.remove('highlighted');
+	}
 
 	var topDiv = document.createElement('div');
 	topDiv.classList.add('advDialogTop');
@@ -4259,6 +4286,13 @@ var SeqBlockUI = function(node, num) {
 	var div = document.createElement('div');
 	div.classList.add('controlBox');
 
+	node.onEnter = function() {
+		div.classList.add('highlighted');
+	}
+	node.onExit = function() {
+		div.classList.remove('highlighted');
+	}
+
 	var topDiv = document.createElement('div');
 	// topDiv.style.background = "red";
 	topDiv.classList.add('advDialogTop');
@@ -4490,7 +4524,7 @@ function serializeAdvDialog() {
 	console.log(scriptRoot);
 	var dialogStr = '"""\n' + scriptRoot.Serialize() + '\n"""'; // todo cleanup quotes
 	console.log(dialogStr);
-	previewDialogScriptTree = scriptInterpreter.Parse( dialogStr ); // hacky
+	previewDialogScriptTree = scriptRoot; // scriptInterpreter.Parse( dialogStr ); // hacky
 
 	var dialogId = getCurDialogId();
 	dialog[dialogId] = dialogStr; //TODO: do I need to do more here?
@@ -4797,23 +4831,24 @@ function previewDialog() {
 
 
 /* TODO 
-	- still need to quit this properly
 	- need to be able to highlight textboxes as they play (both preview and regular mode)
 */
 var isPreviewDialogMode = false;
 var previewDialogScriptTree = null;
 function togglePreviewDialog(event) {
-	isPreviewDialogMode = event.target.checked;
-	if(isPreviewDialogMode) {
+	if(event.target.checked) {
+		isPreviewDialogMode = true;
 		if(previewDialogScriptTree != null) {
 			on_play_mode();
 			startPreviewDialog( previewDialogScriptTree, function() {
-				console.log("END!!!");
+				// console.log("END!!!");
+				togglePreviewDialog( { target : { checked : false } } );
 			});
 		}
 	}
 	else {
 		on_edit_mode();
+		isPreviewDialogMode = false;
 	}
 	updatePlayModeButton();
 	updatePreviewDialogButton();
