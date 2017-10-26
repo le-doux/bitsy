@@ -1,5 +1,24 @@
 v4.0:
-TODO
+- advanced dialog options, including:
+-> dialog that changes each time it's said
+-> dialog that changes based on items player has
+~~~~~
+- special effects for dialog, including:
+-> shaky text
+-> wavy text
+-> rainbow text
+~~~~~
+- items
+- inventory
+~~~~~
+- you can name objects, including:
+-> rooms
+-> sprites
+-> items
+-> palettes
+~~~~~
+- dialog scripting language with variables
+- bugfix: newline characters work in dialog
 
 v3.7:
 - bugfix: can't add color palettes
