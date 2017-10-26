@@ -129,7 +129,7 @@ function attachCanvas(c) {
 }
 
 var curGameData = null;
-function load_game(game_data) {
+function load_game(game_data, startWithTitle) {
 	curGameData = game_data; //remember the current game (used to reset the game)
 	dialogBuffer.Reset();
 	scriptInterpreter.ResetEnvironment(); // ensures variables are reset -- is this the best way?
@@ -138,7 +138,7 @@ function load_game(game_data) {
 	// console.log(dialog);
 	setInitialVariables();
 	renderImages();
-	onready();
+	onready(startWithTitle);
 	// console.log(dialog);
 }
 
@@ -150,7 +150,9 @@ function reset_cur_game() {
 }
 
 var update_interval = null;
-function onready() {
+function onready(startWithTitle) {
+	if(startWithTitle === undefined) startWithTitle = true;
+
 	clearInterval(loading_interval);
 
 	document.addEventListener('keydown', onkeydown);
@@ -166,7 +168,8 @@ function onready() {
 	canvas.addEventListener("mousedown", onTouch);
 	
 	update_interval = setInterval(update,-1);
-	startNarrating(title);
+	if(startWithTitle) // used by editor
+		startNarrating(title);
 }
 
 function setInitialVariables() {
@@ -676,6 +679,7 @@ function onkeydown(e) {
 		if (dialogBuffer.CanContinue()) {
 			var hasMoreDialog = dialogBuffer.Continue();
 			if(!hasMoreDialog) {
+				console.log("EXIT DIALOG --- onkeydown")
 				onExitDialog();
 			}
 		}
@@ -1851,6 +1855,7 @@ function startSpriteDialog(spriteId) {
 
 function startDialog(dialogStr,scriptId) {
 	if(dialogStr.length <= 0) {
+		console.log("ON EXIT DIALOG -- startDialog 1");
 		onExitDialog();
 		return;
 	}
@@ -1863,8 +1868,10 @@ function startDialog(dialogStr,scriptId) {
 	scriptInterpreter.SetDialogBuffer( dialogBuffer );
 
 	var onScriptEnd = function() {
-		if(!dialogBuffer.IsActive())
+		if(!dialogBuffer.IsActive()){
+			console.log("ON EXIT DIALOG -- startDialog 2");
 			onExitDialog();
+		}
 	};
 
 	if(scriptId === undefined) {
@@ -1887,7 +1894,7 @@ function startPreviewDialog(script, onScriptEnd) {
 	isDialogPreview = true;
 
 	dialogRenderer.Reset();
-	dialogRenderer.SetCentered( isNarrating /*centered*/ );
+	dialogRenderer.SetCentered( true );
 	dialogBuffer.Reset();
 	scriptInterpreter.SetDialogBuffer( dialogBuffer );
 

@@ -206,8 +206,8 @@ var DialogBuffer = function() {
 		}
 
 		// console.log(this.CurChar());
-
-		this.CurChar().OnPrint(); // make sure we hit the callback before we run out of text
+		if(this.CurChar() != null)
+			this.CurChar().OnPrint(); // make sure we hit the callback before we run out of text
 	};
 
 	this.Update = function(dt) {

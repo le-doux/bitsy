@@ -2058,9 +2058,11 @@ function on_edit_mode() {
 function on_play_mode() {
 	isPlayMode = true;
 	unlistenMapEditEvents();
-	load_game(document.getElementById("game_data").value);
+	load_game(document.getElementById("game_data").value, !isPreviewDialogMode /* startWithTitle */);
 
+	console.log("PLAY!! ~~ PREVIEW ? " + isPreviewDialogMode);
 	if(!isPreviewDialogMode) {
+		console.log("DISALBE PREVIEW!!!");
 		document.getElementById("previewDialogCheck").disabled = true;
 	}
 }
@@ -4881,29 +4883,33 @@ function showInventoryVariable() {
 	document.getElementById("inventoryVariable").style.display = "block";
 }
 
-function previewDialog() {
-	console.log("PREVIEW!");
-	var dialogId = getCurDialogId();
-	var dialogStr = dialog[dialogId];
-	on_play_mode();
-	updatePlayModeButton();
-	startNarrating( dialogStr );
-	// load_game(document.getElementById("game_data").value);
-}
+// function previewDialog() {
+// 	console.log("PREVIEW!");
+// 	var dialogId = getCurDialogId();
+// 	var dialogStr = dialog[dialogId];
+// 	on_play_mode();
+// 	updatePlayModeButton();
+// 	startNarrating( dialogStr );
+// 	// load_game(document.getElementById("game_data").value);
+// }
 
 var isPreviewDialogMode = false;
 var previewDialogScriptTree = null;
 function togglePreviewDialog(event) {
+	console.log("TOGGLE PREVIEW " + event.target.checked);
 	if(event.target.checked) {
 		isPreviewDialogMode = true;
+		console.log(isPreviewDialogMode);
 
 		if(previewDialogScriptTree != null) {
 			if (document.getElementById("roomPanel").style.display === "none")
 				showPanel("roomPanel");
 
+			console.log("PLAY MODE");
 			on_play_mode();
 		
 			startPreviewDialog( previewDialogScriptTree, function() {
+				console.log("CALLBACK!!!");
 				togglePreviewDialog( { target : { checked : false } } );
 			});
 		}
