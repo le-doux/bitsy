@@ -995,6 +995,7 @@ function deleteRoom() {
 		drawEditMap();
 		drawPaintCanvas();
 		updateRoomPaletteSelect();
+		updateExitOptionsFromGameData();
 		//recreate exit options
 	}
 }
@@ -3852,11 +3853,13 @@ var DialogBlockUI = function(nodes, num) {
 	var div = document.createElement('div');
 	div.classList.add('controlBox');
 
-	dialogNode.children[0].onEnter = function() {
-		div.classList.add('highlighted');
-	}
-	dialogNode.children[dialogNode.children.length-1].onExit = function() {
-		div.classList.remove('highlighted');
+	if(dialogNode.children.length > 0) {
+		dialogNode.children[0].onEnter = function() {
+			div.classList.add('highlighted');
+		}
+		dialogNode.children[dialogNode.children.length-1].onExit = function() {
+			div.classList.remove('highlighted');
+		}
 	}
 	// console.log( dialogNode.children[dialogNode.children.length-1] );
 
@@ -3903,11 +3906,13 @@ var DialogBlockUI = function(nodes, num) {
 		nodes = dialogNode.children;
 		console.log(nodes);
 
-		dialogNode.children[0].onEnter = function() {
-			div.classList.add('highlighted');
-		}
-		dialogNode.children[dialogNode.children.length-1].onExit = function() {
-			div.classList.remove('highlighted');
+		if(dialogNode.children.length > 0) {
+			dialogNode.children[0].onEnter = function() {
+				div.classList.add('highlighted');
+			}
+			dialogNode.children[dialogNode.children.length-1].onExit = function() {
+				div.classList.remove('highlighted');
+			}
 		}
 
 		serializeAdvDialog();
