@@ -1192,6 +1192,7 @@ function deleteDrawing() {
 		else if( paintMode == TileType.Item ){
 			if ( Object.keys( item ).length <= 1 ) { alert("You can't delete your last item!"); return; }
 			delete item[ drawingId ];
+			removeAllItems( drawingId );
 			refreshGameData();
 			renderImages();
 			drawEditMap();
@@ -1199,6 +1200,24 @@ function deleteDrawing() {
 		}
 		deletePaintThumbnail( drawingId );
 		changePaintExplorerSelection( drawingId );
+	}
+}
+
+function removeAllItems( id ) {
+	function getFirstItemIndex(roomId, itemId) {
+		for(var i = 0; i < room[roomId].items.length; i++) {
+			if(room[roomId].items[i].id === itemId)
+				return i;
+		}
+		return -1;
+	}
+
+	for(roomId in room) {
+		var i = getFirstItemIndex(roomId, id );
+		while(i > -1) {
+			room[roomId].items.splice(i,1);
+			i = getFirstItemIndex(roomId, id );
+		}
 	}
 }
 
@@ -3236,6 +3255,10 @@ function importGameFromFile(e) {
 
 /* ANIMATION EDITING*/
 function on_toggle_animated() {
+	console.log("ON TOGGLE ANIMATED");
+	console.log(document.getElementById("animatedCheckbox").checked);
+	console.log(paintMode);
+	console.log("~~~~~");
 	if ( document.getElementById("animatedCheckbox").checked ) {
 		if ( paintMode === TileType.Sprite || paintMode === TileType.Avatar ) {
 			addSpriteAnimation();
@@ -3244,10 +3267,11 @@ function on_toggle_animated() {
 			addTileAnimation();
 		}
 		else if ( paintMode === TileType.Item ) {
-			addItemAnimation();
+			addItemAnimation(); // TODO THERE IS A BUG HERE THAT BREAKS ANIMATION TOGGLE BUTTON
 		}
 		document.getElementById("animation").setAttribute("style","display:block;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
+		console.log(drawingId);
 		renderAnimationPreview( drawingId );
 	}
 	else {
@@ -3258,6 +3282,7 @@ function on_toggle_animated() {
 			removeTileAnimation();			
 		}
 		else if ( paintMode === TileType.Item ) {
+			console.log("REMOVE ITEM ANIMATION");
 			removeItemAnimation();
 		}
 		document.getElementById("animation").setAttribute("style","display:none;");

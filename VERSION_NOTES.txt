@@ -19,6 +19,7 @@ v4.0:
 ~~~~~
 - dialog scripting language with variables
 - bugfix: newline characters work in dialog
+- additional bugfixes
 
 v3.7:
 - bugfix: can't add color palettes
