@@ -187,7 +187,8 @@
 								<br>
 								special thanks to: <br>
 								* mary-margaret <br>
-								* seattle game meetup peeps
+								* seattle game meetup folks <br>
+								* everyone in the bitsy community!
 							</div>
 						</div>
 
@@ -503,6 +504,10 @@
 								name
 								<input type="text" id="drawingName" onchange="on_drawing_name_change();" style="width:100px;"></input>
 							</span>
+
+							<button id="showInventoryButton" title="show inventory" onclick="showPanel('inventoryPanel');">
+								<i class="material-icons">vpn_key</i> inventory
+							</button>
 							
 						</div>
 					</div>
@@ -521,6 +526,9 @@
 					</div>
 					<div id="dialog" class="controlBox" style="display:none;">
 						dialog
+						<button title="open in advanced dialog editor" style="float:right;" onclick="showPanel('dialogPanel');">
+							<i class="material-icons">open_in_new</i>
+						</button>
 						<br>
 						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"></textarea> <!-- rows="2" cols="32" -->
 					</div>
@@ -681,7 +689,7 @@
 						</div>
 					</div>
 
-					<div>
+					<div id="dialogEditorHasContent">
 						<div id="dialogTop" style="margin-bottom: 5px;">
 							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
 							<label title="preview dialog" for="previewDialogCheck">
@@ -755,6 +763,10 @@
 							<div id="advDialogViewport">
 							</div>
 						</div>
+					</div>
+
+					<div id="dialogEditorNoContent" class="controlBox" style="display:none;">
+						Select a sprite or item to edit its dialog.
 					</div>
 				</div>
 

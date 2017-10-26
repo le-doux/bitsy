@@ -1298,13 +1298,23 @@ function reloadDialogUICore() { // TODO: name is terrible
 // TODO : better name?
 function reloadAdvDialogUI() {
 	// var dialogId = getCurDialogId(); // necessary?
-	var dialogStr = document.getElementById("dialogText").value;
-	document.getElementById("dialogCodeText").value = dialogStr;
-	var scriptTree = scriptInterpreter.Parse( dialogStr );
-	console.log("~~~~ RELOAD ADV DIALOG UI ~~~~~");
-	console.log(scriptTree);
-	createAdvDialogEditor(scriptTree);
-	previewDialogScriptTree = scriptTree;
+	if( paintMode === TileType.Sprite || paintMode === TileType.Item ) {
+
+		document.getElementById("dialogEditorHasContent").style.display = "block";
+		document.getElementById("dialogEditorNoContent").style.display = "none";
+
+		var dialogStr = document.getElementById("dialogText").value;
+		document.getElementById("dialogCodeText").value = dialogStr;
+		var scriptTree = scriptInterpreter.Parse( dialogStr );
+		console.log("~~~~ RELOAD ADV DIALOG UI ~~~~~");
+		console.log(scriptTree);
+		createAdvDialogEditor(scriptTree);
+		previewDialogScriptTree = scriptTree;
+	}
+	else {
+		document.getElementById("dialogEditorHasContent").style.display = "none";
+		document.getElementById("dialogEditorNoContent").style.display = "block";
+	}
 }
 
 function reloadSprite() {
@@ -2303,6 +2313,9 @@ function on_paint_avatar() {
 	refreshPaintExplorer();
 	document.getElementById("paintOptionAvatar").checked = true;
 	document.getElementById("paintExplorerOptionAvatar").checked = true;
+	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
+
+	reloadAdvDialogUI();
 }
 function on_paint_tile() {
 	paintMode = TileType.Tile;
@@ -2319,6 +2332,9 @@ function on_paint_tile() {
 	refreshPaintExplorer();
 	document.getElementById("paintOptionTile").checked = true;
 	document.getElementById("paintExplorerOptionTile").checked = true;
+	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
+
+	reloadAdvDialogUI();
 }
 function on_paint_sprite() {
 	paintMode = TileType.Sprite;
@@ -2342,6 +2358,9 @@ function on_paint_sprite() {
 	refreshPaintExplorer();
 	document.getElementById("paintOptionSprite").checked = true;
 	document.getElementById("paintExplorerOptionSprite").checked = true;
+	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
+
+	reloadAdvDialogUI();
 }
 function on_paint_item() {
 	console.log("PAINT ITEM");
@@ -2361,6 +2380,9 @@ function on_paint_item() {
 	refreshPaintExplorer();
 	document.getElementById("paintOptionItem").checked = true;
 	document.getElementById("paintExplorerOptionItem").checked = true;
+	document.getElementById("showInventoryButton").setAttribute("style","display:inline-block;");
+
+	reloadAdvDialogUI();
 }
 
 var drawingThumbnailCanvas, drawingThumbnailCtx;
@@ -4829,19 +4851,19 @@ function previewDialog() {
 	// load_game(document.getElementById("game_data").value);
 }
 
-
-/* TODO 
-	- need to be able to highlight textboxes as they play (both preview and regular mode)
-*/
 var isPreviewDialogMode = false;
 var previewDialogScriptTree = null;
 function togglePreviewDialog(event) {
 	if(event.target.checked) {
 		isPreviewDialogMode = true;
+
 		if(previewDialogScriptTree != null) {
+			if (document.getElementById("roomPanel").style.display === "none")
+				showPanel("roomPanel");
+
 			on_play_mode();
+		
 			startPreviewDialog( previewDialogScriptTree, function() {
-				// console.log("END!!!");
 				togglePreviewDialog( { target : { checked : false } } );
 			});
 		}
