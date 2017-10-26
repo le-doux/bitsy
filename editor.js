@@ -3267,7 +3267,7 @@ function on_toggle_animated() {
 			addTileAnimation();
 		}
 		else if ( paintMode === TileType.Item ) {
-			addItemAnimation(); // TODO THERE IS A BUG HERE THAT BREAKS ANIMATION TOGGLE BUTTON
+			addItemAnimation();
 		}
 		document.getElementById("animation").setAttribute("style","display:block;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
@@ -3398,7 +3398,7 @@ function addItemAnimation() {
 	//refresh data model
 	renderImages();
 	refreshGameData();
-	reloadSprite();
+	reloadItem();
 }
 
 function removeItemAnimation() {
