@@ -112,6 +112,8 @@ var onDialogUpdate = null;
 var onInventoryChanged = null;
 var onVariableChanged = null;
 
+var isPlayerEmbeddedInEditor = false;
+
 function getGameNameFromURL() {
 	var game = window.location.hash.substring(1);
 	// console.log("game name --- " + game);
@@ -663,7 +665,9 @@ function getSpriteAt(x,y) {
 function onkeydown(e) {
 	// console.log(e.keyCode);
 	// console.log(dialog);
-	e.preventDefault();
+
+	if(e.keyCode == key.left || e.keyCode == key.right || e.keyCode == key.up || e.keyCode == key.down || !isPlayerEmbeddedInEditor)
+		e.preventDefault();
 
 	// if (isDialogMode) {
 	if(dialogBuffer.IsActive()) {

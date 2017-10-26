@@ -57,8 +57,15 @@ var Interpreter = function() {
 		return parser.CreateExpression( expStr );
 	}
 
-	this.SetVariable = function(name,value) {
-		env.SetVariable(name,value);
+	this.SetVariable = function(name,value,useHandler) {
+		env.SetVariable(name,value,useHandler);
+	}
+
+	this.DeleteVariable = function(name,useHandler) {
+		env.DeleteVariable(name,useHandler);
+	}
+	this.HasVariable = function(name) {
+		return env.HasVariable(name);
 	}
 
 	this.SetOnVariableChangeHandler = function(onVariableChange) {
@@ -310,10 +317,19 @@ var Environment = function() {
 
 	this.HasVariable = function(name) { return variableMap.has(name); };
 	this.GetVariable = function(name) { return variableMap.get(name); };
-	this.SetVariable = function(name,value) {
+	this.SetVariable = function(name,value,useHandler) {
+		if(useHandler === undefined) useHandler = true;
 		variableMap.set(name, value);
-		if(onVariableChangeHandler != null)
+		if(onVariableChangeHandler != null && useHandler)
 			onVariableChangeHandler(name);
+	};
+	this.DeleteVariable = function(name,useHandler) {
+		if(useHandler === undefined) useHandler = true;
+		if(variableMap.has(name)) {
+			variableMap.delete(name);
+			if(onVariableChangeHandler != null && useHandler)
+				onVariableChangeHandler(name);
+		}
 	};
 
 	var operatorMap = new Map();

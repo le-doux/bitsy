@@ -575,6 +575,8 @@ function start() {
 		);
 	};
 
+	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
+
 	//color testing
 	// on_change_color_bg();
 	// on_change_color_tile();
@@ -4712,7 +4714,7 @@ function updateInventoryVariableUI(){
 		return function(event) {
 			console.log("VARIABLE CHANGE " + event.target.value);
 			if(isPlayMode) {
-				// TODO
+				scriptInterpreter.SetVariable( varInfo.id, event.target.value, false /*useHandler*/ );
 			}
 			else {
 				variable[varInfo.id] = event.target.value;
@@ -4725,12 +4727,20 @@ function updateInventoryVariableUI(){
 		return function(event) {
 			console.log("VARIABLE NAME CHANGE " + event.target.value);
 			if(isPlayMode) {
-				// TODO
+				var value = ""; // default empty string in case there is no variable yet
+				if( scriptInterpreter.HasVariable(varInfo.id) ) {
+					value = scriptInterpreter.GetVariable( varInfo.id );
+					scriptInterpreter.DeleteVariable( varInfo.id, false /*useHandler*/ );
+				}
+				scriptInterpreter.SetVariable( event.target.value, value, false /*useHandler*/ );
+
+				varInfo.id = event.target.value;
 			}
 			else {
 				variable[event.target.value] = "" + variable[varInfo.id] + "";
 				var oldId = varInfo.id;
 				setTimeout(function() {delete variable[oldId]; refreshGameData();}, 0); //hack to avoid some kind of delete race condition? (there has to be a better way)
+
 				varInfo.id = event.target.value;
 				varDiv.id = "inventoryVariable_" + varInfo.id;
 				varDiv.title = "variable " + varInfo.id;
@@ -4741,7 +4751,7 @@ function updateInventoryVariableUI(){
 	function createOnVariableDelete(varInfo) {
 		return function () {
 			if(isPlayMode) {
-				// TODO
+				scriptInterpreter.DeleteVariable( varInfo.id );
 			}
 			else {
 				delete variable[varInfo.id];
