@@ -432,30 +432,37 @@ var BlockNode = function(mode, doIndentFirstLine) {
 		if (this.mode === BlockMode.Code) str += "{"; // todo: increase scope of Sym?
 		for (var i = 0; i < this.children.length; i++) {
 
-			/*
-			SOME THOUGHTS:
-			- regular functions should get their own line
-			- text effects should not
-			- list blocks???
-			*/
+			var curNode = this.children[i];
 
-			// this is causing some iconsistencies
-			// if(this.children[i].type === "block" && lastNode && lastNode.type === "block" && !isMultilineListBlock(lastNode))
-			// 	str += "\n";
-
-			// if(this.children[i].type === "block" || (lastNode && lastNode.type === "block"))
-			// 	str += "\n";
+			if(curNode.type === "block" && lastNode && lastNode.type === "block" && !isBlockWithNoNewline(curNode) && !isBlockWithNoNewline(lastNode))
+				str += "\n";
 
 			var shouldIndentFirstLine = (i == 0 && doIndentFirstLine);
 			var shouldIndentAfterLinebreak = (lastNode && lastNode.type === "function" && lastNode.name === "br");
 			if(this.mode === BlockMode.Dialog && (shouldIndentFirstLine || shouldIndentAfterLinebreak))
 				str += leadingWhitespace(depth);
-			str += this.children[i].Serialize(depth);
-			lastNode = this.children[i];
+			str += curNode.Serialize(depth);
+			lastNode = curNode;
 		}
 		if (this.mode === BlockMode.Code) str += "}";
 		return str;
 	}
+}
+
+function isBlockWithNoNewline(node) {
+	return isTextEffectBlock(node) || isMultilineListBlock(node);
+}
+
+function isTextEffectBlock(node) {
+	if(node.type === "block") {
+		if(node.children.length > 0 && node.children[0].type === "function") {
+			var func = node.children[0];
+			if(func.name === "clr1" || func.name === "clr2" || func.name === "clr3" || func.name === "wvy" || func.name === "shk" || func.name === "rbw") {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 function isMultilineListBlock(node) {
@@ -921,7 +928,7 @@ var Parser = function(env) {
 				if(len > 0 && state.curNode.children[len-1].type === "block") {
 					var block = state.curNode.children[len-1];
 					if(isMultilineListBlock(block))
-						hasDialog = false; // hack to get correct newline behavior for multiline blocks
+						hasDialog = true; // hack to get correct newline behavior for multiline blocks
 				}
 
 				hasBlock = true;

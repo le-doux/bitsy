@@ -1,8 +1,6 @@
 /* 
 LATEST THOUGHTS
-- list syntax: * vs -
-- whitespace: how to handle list blocks??
-- what about negative numbers?
+
 
 
 
