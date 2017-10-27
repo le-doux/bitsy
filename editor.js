@@ -1,6 +1,10 @@
 /* 
-v4.0
-- bug: deleting drawing would delete preview even if you cancelled
+LATEST THOUGHTS
+- list syntax: * vs -
+- whitespace: how to handle list blocks??
+- what about negative numbers?
+
+
 
 BUGS / FEEDBACK:
 * Thank you @adamledoux for Bitsy, it is so relaxing to use. Are you aware that in Safari deleted rooms do not disappear from the exit list?
@@ -4598,7 +4602,7 @@ function createAdvDialogEditor(scriptTree) {
 
 	function isBlock(node) { return node.type === "block"; };
 	function isChildType(node,type) { return node.children[0].type === type; };
-	function isIf(node) { return isBlock(node) && isChildType(node,"if"); };
+	function isIf(node) { return isBlock(node) && isChildType(node,"if") && !node.children[0].IsSingleLine(); };
 	function isSeq(node) { return isBlock(node) && (isChildType(node,"sequence") || isChildType(node,"cycle") || isChildType(node,"shuffle")); };
 
 	var dialogFormDiv = document.getElementById("advDialogViewport");

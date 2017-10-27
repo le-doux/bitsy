@@ -179,6 +179,8 @@ var DialogBuffer = function() {
 		charIndex = 0;
 		isDialogReadyToContinue = false;
 
+		activeTextEffects = [];
+
 		isActive = false;
 	};
 

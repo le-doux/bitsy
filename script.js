@@ -432,8 +432,19 @@ var BlockNode = function(mode, doIndentFirstLine) {
 		if (this.mode === BlockMode.Code) str += "{"; // todo: increase scope of Sym?
 		for (var i = 0; i < this.children.length; i++) {
 
-			if(this.children[i].type === "block" && lastNode && lastNode.type === "block")
-				str += "\n";
+			/*
+			SOME THOUGHTS:
+			- regular functions should get their own line
+			- text effects should not
+			- list blocks???
+			*/
+
+			// this is causing some iconsistencies
+			// if(this.children[i].type === "block" && lastNode && lastNode.type === "block" && !isMultilineListBlock(lastNode))
+			// 	str += "\n";
+
+			// if(this.children[i].type === "block" || (lastNode && lastNode.type === "block"))
+			// 	str += "\n";
 
 			var shouldIndentFirstLine = (i == 0 && doIndentFirstLine);
 			var shouldIndentAfterLinebreak = (lastNode && lastNode.type === "function" && lastNode.name === "br");
@@ -445,6 +456,18 @@ var BlockNode = function(mode, doIndentFirstLine) {
 		if (this.mode === BlockMode.Code) str += "}";
 		return str;
 	}
+}
+
+function isMultilineListBlock(node) {
+	if(node.type === "block") {
+		if(node.children.length > 0) {
+			var child = node.children[0];
+			if(child.type === "sequence" || child.type === "cycle" || child.type === "shuffle" || child.type === "if") {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 var FuncNode = function(name,arguments) {
@@ -520,9 +543,14 @@ var LiteralNode = function(value) {
 
 	this.Serialize = function(depth) {
 		var str = "";
+
+		if(this.value === null)
+			return str;
+
 		if(typeof this.value === "string") str += '"';
 		str += this.value;
 		if(typeof this.value === "string") str += '"';
+
 		return str;
 	}
 }
@@ -565,11 +593,18 @@ var ExpNode = function(operator, left, right) {
 	}
 
 	this.Serialize = function(depth) {
-		var str = "";
-		str += this.left.Serialize(depth);
-		str += " " + this.operator + " ";
-		str += this.right.Serialize(depth);
-		return str;
+		var isNegativeNumber = this.operator === "-" && this.left.type === "literal" && this.left.value === null;
+
+		if(!isNegativeNumber) {
+			var str = "";
+			str += this.left.Serialize(depth);
+			str += " " + this.operator + " ";
+			str += this.right.Serialize(depth);
+			return str;
+		}
+		else {
+			return this.operator + this.right.Serialize(depth); // hacky but seems to work
+		}
 	}
 }
 
@@ -580,7 +615,7 @@ var SequenceBase = function() {
 		for (var i = 0; i < this.options.length; i++) {
 			console.log("SERIALIZE SEQUENCE ");
 			console.log(depth);
-			str += leadingWhitespace(depth + 1) + "- " + this.options[i].Serialize(depth + 2) + "\n";
+			str += leadingWhitespace(depth + 1) + Sym.List + " " + this.options[i].Serialize(depth + 2) + "\n";
 		}
 		str += leadingWhitespace(depth);
 		return str;
@@ -697,12 +732,16 @@ var IfNode = function(conditions, results, isSingleLine) {
 		else {
 			str += "\n";
 			for (var i = 0; i < this.conditions.length; i++) {
-				str += leadingWhitespace(depth + 1) + "- " + this.conditions[i].Serialize(depth) + " ?\n";
+				str += leadingWhitespace(depth + 1) + Sym.List + " " + this.conditions[i].Serialize(depth) + " ?\n";
 				str += this.results[i].Serialize(depth + 2) + "\n";
 			}
 			str += leadingWhitespace(depth);
 		}
 		return str;
+	}
+
+	this.IsSingleLine = function() {
+		return isSingleLine;
 	}
 }
 
@@ -719,21 +758,21 @@ var ElseNode = function() {
 	}
 }
 
+var Sym = {
+	// DialogOpen : "/\"",
+	// DialogClose : "\"/",
+	DialogOpen : '"""',
+	DialogClose : '"""',
+	CodeOpen : "{",
+	CodeClose : "}",
+	Linebreak : "\n", // just call it "break" ?
+	Separator : ":",
+	List : "-",
+	String : '"'
+};
+
 var Parser = function(env) {
 	var environment = env;
-
-	var Sym = {
-		// DialogOpen : "/\"",
-		// DialogClose : "\"/",
-		DialogOpen : '"""',
-		DialogClose : '"""',
-		CodeOpen : "{",
-		CodeClose : "}",
-		Linebreak : "\n", // just call it "break" ?
-		Separator : ":",
-		List : "*",
-		String : '"'
-	};
 
 	this.Parse = function(scriptStr) {
 		// console.log("NEW PARSE!!!!!!");
@@ -853,11 +892,13 @@ var Parser = function(env) {
 		var hasDialog = false;
 		var isFirstLine = true;
 
+		console.log("---- PARSE DIALOG ----");
+
 		var text = "";
 		var addTextNode = function() {
-			console.log("TEXT " + text.length);
+			// console.log("TEXT " + text.length);
 			if (text.length > 0) {
-				// console.log("TEXT " + text);
+				console.log("TEXT " + text);
 				// console.log("text!!");
 				// console.log([text]);
 
@@ -873,6 +914,15 @@ var Parser = function(env) {
 			if( state.MatchAhead(Sym.CodeOpen) ) {
 				addTextNode();
 				state = ParseCodeBlock( state );
+
+				console.log("CODE");
+
+				var len = state.curNode.children.length;
+				if(len > 0 && state.curNode.children[len-1].type === "block") {
+					var block = state.curNode.children[len-1];
+					if(isMultilineListBlock(block))
+						hasDialog = false; // hack to get correct newline behavior for multiline blocks
+				}
 
 				hasBlock = true;
 			}
@@ -908,8 +958,12 @@ var Parser = function(env) {
 					// console.log("valid empty " + isValidEmptyLine);
 					var shouldAddLinebreak = (hasDialog || isValidEmptyLine) && !isLastLine; // last clause is a hack (but it works - why?)
 					// console.log("LINEBREAK? " + shouldAddLinebreak);
-					if( shouldAddLinebreak )
+					if( shouldAddLinebreak ) {
+						console.log("NEWLINE");
+						console.log("empty? " + isEmptyLine);
+						console.log("dialog? " + hasDialog);
 						state.curNode.AddChild( new FuncNode( "br", [] ) ); // use function or character?
+					}
 
 					// linebreak logic
 					isFirstLine = false;
@@ -926,6 +980,8 @@ var Parser = function(env) {
 
 		}
 		addTextNode();
+
+		console.log("---- PARSE DIALOG ----");
 
 		// console.log(state);
 		return state;
@@ -958,7 +1014,7 @@ var Parser = function(env) {
 
 			var isWhitespace = (state.Char() === " " || state.Char() === "\t");
 			var isSkippableWhitespace = isNewline && isWhitespace;
-			var isNewListItem = isNewline && (codeBlockCount <= 0) && (state.Char() === "-");
+			var isNewListItem = isNewline && (codeBlockCount <= 0) && (state.Char() === Sym.List);
 
 			if(isNewListItem) {
 				curIndex++;
@@ -1042,7 +1098,7 @@ var Parser = function(env) {
 
 			var isWhitespace = (state.Char() === " " || state.Char() === "\t");
 			var isSkippableWhitespace = isNewline && isWhitespace;
-			var isNewListItem = isNewline && (codeBlockCount <= 0) && (state.Char() === "-");
+			var isNewListItem = isNewline && (codeBlockCount <= 0) && (state.Char() === Sym.List);
 
 			if(isNewListItem) {
 				// console.log("found next list item");
@@ -1304,7 +1360,8 @@ var Parser = function(env) {
 			// else if( state.MatchAhead(Sym.DialogOpen) ) {
 			// 	state = ParseDialogBlock( state ); // These can be nested (should they though???)
 			// }
-			else if( state.Char() === "-" ) { // TODO : symbols? matchahead?
+			else if( state.Char() === Sym.List && (state.Peak([]).indexOf("?") > -1) ) { // TODO : symbols? matchahead?
+				// console.log("PEAK IF " + state.Peak( ["?"] ));
 				state = ParseIf( state );
 			}
 			else if( environment.HasFunction( state.Peak( [" "] ) ) ) { // TODO --- what about newlines???
