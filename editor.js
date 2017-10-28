@@ -1,7 +1,6 @@
 /* 
-LATEST THOUGHTS
-
-
+NOTES WHILE GETTING READY TO RELEASE
+- need to redo GIF recording (snapshots, animation, text effects)
 
 
 BUGS / FEEDBACK:

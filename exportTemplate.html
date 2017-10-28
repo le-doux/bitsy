@@ -28,6 +28,10 @@
 
 <title>@@T</title>
 
+<script type="bitsyGameData" id="exportedGameData">
+@@D
+</script>
+
 <style>
 	html { height: 592px; }
 	body { width:100%; height:100%; overflow:hidden; background:@@B; }
@@ -46,10 +50,9 @@
 
 <!-- SCRIPTS -->
 <script>
-var exportedGameData = "@@D";
 function startExportedGame() {
 	attachCanvas( document.getElementById("game") );
-	load_game(exportedGameData);
+	load_game( document.getElementById("exportedGameData").text );
 }
 </script>
 

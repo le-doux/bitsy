@@ -46,8 +46,6 @@ function replaceTemplateMarker(template, marker, text) {
 }
 
 this.exportGame = function(gameData, title, pageColor, filename) {
-	gameData = escapeSpecialCharacters( gameData ); //escape quotes and slashes
-	gameData = gameData.split("\n").join("\\n"); //replace newlines with escaped newlines
 	var html = resources["exportTemplate.html"].substr(); //copy template
 	console.log(html);
 	html = replaceTemplateMarker( html, "@@T", title );
@@ -70,27 +68,62 @@ function unescapeSpecialCharacters(str) {
 }
 
 this.importGame = function( html ) {
+	// IMPORT : old style
 	// find start of game data
 	var i = html.indexOf("var exportedGameData");
-	while ( html.charAt(i) != '"' ) {
-		i++; // move to first quote
+	if(i > -1) {
+		while ( html.charAt(i) != '"' ) {
+			i++; // move to first quote
+		}
+		i++; // move past first quote
+
+		// isolate game data
+		var gameDataStr = "";
+		var isEscapeChar = false;
+		while ( html.charAt(i) != '"' || isEscapeChar ) {
+			gameDataStr += html.charAt(i);
+			isEscapeChar = html.charAt(i) == "\\";
+			i++;
+		}
+
+		// replace special characters
+		gameDataStr = gameDataStr.replace(/\\n/g, "\n"); //todo: move this into the method below
+		gameDataStr = unescapeSpecialCharacters( gameDataStr );
+
+		return gameDataStr;		
 	}
-	i++; // move past first quote
 
-	// isolate game data
-	var gameDataStr = "";
-	var isEscapeChar = false;
-	while ( html.charAt(i) != '"' || isEscapeChar ) {
-		gameDataStr += html.charAt(i);
-		isEscapeChar = html.charAt(i) == "\\";
-		i++;
+	// IMPORT : new style
+	var scriptStart = '<script type="bitsyGameData" id="exportedGameData">\n';
+	var scriptEnd = '</script>\n'
+	i = html.indexOf( scriptStart );
+	if(i > -1) {
+		i = i + scriptStart.length;
+		var gameStr = "";
+		var lineStr = "";
+		var isDone = false;
+		while(!isDone && i < html.length) {
+
+			lineStr += html.charAt(i);
+
+			if(html.charAt(i) === "\n") {
+				if(lineStr === scriptEnd) {
+					isDone = true;
+				}
+				else {
+					gameStr += lineStr;
+					lineStr = "";
+				}
+			}
+
+			i++;
+		}
+		return gameStr;
 	}
 
-	// replace special characters
-	gameDataStr = gameDataStr.replace(/\\n/g, "\n"); //todo: move this into the method below
-	gameDataStr = unescapeSpecialCharacters( gameDataStr );
+	console.log("FAIL!!!!");
 
-	return gameDataStr;
+	return "";
 }
 
 } // Exporter()
