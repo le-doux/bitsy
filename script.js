@@ -380,6 +380,13 @@ var TreeRelationship = function() {
 		this.children.push( node );
 		node.parent = this;
 	};
+
+	this.VisitAll = function(visitor) {
+		visitor.Visit( this );
+		for( var i = 0; i < this.children.length; i++ ) {
+			this.children[i].VisitAll( visitor );
+		}
+	};
 }
 
 var BlockMode = {
@@ -613,6 +620,14 @@ var ExpNode = function(operator, left, right) {
 			return this.operator + this.right.Serialize(depth); // hacky but seems to work
 		}
 	}
+
+	this.VisitAll = function(visitor) {
+		visitor.Visit( this );
+		if(this.left != null)
+			this.left.VisitAll( visitor );
+		if(this.right != null)
+			this.right.VisitAll( visitor );
+	};
 }
 
 var SequenceBase = function() {
@@ -620,13 +635,20 @@ var SequenceBase = function() {
 		var str = "";
 		str += this.type + "\n";
 		for (var i = 0; i < this.options.length; i++) {
-			console.log("SERIALIZE SEQUENCE ");
-			console.log(depth);
+			// console.log("SERIALIZE SEQUENCE ");
+			// console.log(depth);
 			str += leadingWhitespace(depth + 1) + Sym.List + " " + this.options[i].Serialize(depth + 2) + "\n";
 		}
 		str += leadingWhitespace(depth);
 		return str;
 	}
+
+	this.VisitAll = function(visitor) {
+		visitor.Visit( this );
+		for( var i = 0; i < this.options.length; i++ ) {
+			this.options[i].VisitAll( visitor );
+		}
+	};
 }
 
 var SequenceNode = function(options) {
@@ -750,6 +772,16 @@ var IfNode = function(conditions, results, isSingleLine) {
 	this.IsSingleLine = function() {
 		return isSingleLine;
 	}
+
+	this.VisitAll = function(visitor) {
+		visitor.Visit( this );
+		for( var i = 0; i < this.conditions.length; i++ ) {
+			this.conditions[i].VisitAll( visitor );
+		}
+		for( var i = 0; i < this.results.length; i++ ) {
+			this.results[i].VisitAll( visitor );
+		}
+	};
 }
 
 var ElseNode = function() {
@@ -899,13 +931,13 @@ var Parser = function(env) {
 		var hasDialog = false;
 		var isFirstLine = true;
 
-		console.log("---- PARSE DIALOG ----");
+		// console.log("---- PARSE DIALOG ----");
 
 		var text = "";
 		var addTextNode = function() {
 			// console.log("TEXT " + text.length);
 			if (text.length > 0) {
-				console.log("TEXT " + text);
+				// console.log("TEXT " + text);
 				// console.log("text!!");
 				// console.log([text]);
 
@@ -922,7 +954,7 @@ var Parser = function(env) {
 				addTextNode();
 				state = ParseCodeBlock( state );
 
-				console.log("CODE");
+				// console.log("CODE");
 
 				var len = state.curNode.children.length;
 				if(len > 0 && state.curNode.children[len-1].type === "block") {
@@ -966,9 +998,9 @@ var Parser = function(env) {
 					var shouldAddLinebreak = (hasDialog || isValidEmptyLine) && !isLastLine; // last clause is a hack (but it works - why?)
 					// console.log("LINEBREAK? " + shouldAddLinebreak);
 					if( shouldAddLinebreak ) {
-						console.log("NEWLINE");
-						console.log("empty? " + isEmptyLine);
-						console.log("dialog? " + hasDialog);
+						// console.log("NEWLINE");
+						// console.log("empty? " + isEmptyLine);
+						// console.log("dialog? " + hasDialog);
 						state.curNode.AddChild( new FuncNode( "br", [] ) ); // use function or character?
 					}
 
@@ -988,7 +1020,7 @@ var Parser = function(env) {
 		}
 		addTextNode();
 
-		console.log("---- PARSE DIALOG ----");
+		// console.log("---- PARSE DIALOG ----");
 
 		// console.log(state);
 		return state;

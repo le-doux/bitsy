@@ -1,6 +1,7 @@
 /* 
 NOTES WHILE GETTING READY TO RELEASE
 - need to redo GIF recording (snapshots, animation, text effects)
+- when item names change, need to update "item" functions that use those names
 
 
 BUGS / FEEDBACK:
@@ -817,6 +818,9 @@ function on_room_name_change() {
 		room[curRoom].name = str;
 	else
 		room[curRoom].name = null;
+
+	updateNamesFromCurData()
+
 	refreshGameData();
 	updateExitOptionsFromGameData();
 }
@@ -824,11 +828,66 @@ function on_room_name_change() {
 function on_drawing_name_change() {
 	var str = document.getElementById("drawingName").value;
 	var obj = getCurPaintObject();
+	var oldName = obj.name;
 	if(str.length > 0)
 		obj.name = str;
 	else
 		obj.name = null;
+
+	updateNamesFromCurData()
+
+	// make sure items referenced in scripts update their names
+	if(paintMode === TileType.Item) {
+		console.log("SWAP ITEM NAMES");
+
+		var ItemNameSwapVisitor = function() {
+			var didSwap = false;
+			this.DidSwap = function() { return didSwap; };
+
+			this.Visit = function(node) {
+				console.log("VISIT!");
+				console.log(node);
+
+				if( node.type != "function" || node.name != "item" )
+					return; // not the right type of node
+				
+				if( node.arguments.length <= 0 || node.arguments[0].type != "literal" )
+					return; // no argument available
+
+				if( node.arguments[0].value === oldName ) { // do swap
+					node.arguments[0].value = newName;
+					didSwap = true;
+				}
+			};
+		};
+
+		var newName = obj.name;
+		if(newName === null || newName === undefined) newName = drawingId;
+		if(oldName === null || oldName === undefined) oldName = drawingId;
+
+		console.log(oldName + " <-> " + newName);
+
+		if(newName != oldName) {
+			for(dlgId in dialog) {
+				console.log("DLG " + dlgId);
+				var dialogScript = scriptInterpreter.Parse( dialog[dlgId] );
+				var visitor = new ItemNameSwapVisitor();
+				dialogScript.VisitAll( visitor );
+				if( visitor.DidSwap() ) {
+					console.log("SWAP!");
+					console.log(dialog[dlgId]);
+					var newDialog = dialogScript.Serialize();
+					if(newDialog.indexOf("\n") > -1)
+						newDialog = '"""\n' + newDialog + '\n"""';
+					dialog[dlgId] = newDialog;
+					console.log(dialog[dlgId]);
+				}
+			}
+		}
+	}
+
 	refreshGameData();
+	console.log(names);
 }
 
 function on_palette_name_change() {
@@ -838,6 +897,9 @@ function on_palette_name_change() {
 		obj.name = str;
 	else
 		obj.name = null;
+
+	updateNamesFromCurData()
+
 	refreshGameData();
 	updatePaletteOptionsFromGameData();
 }
@@ -2378,7 +2440,7 @@ function on_paint_sprite() {
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
-	updateDrawingNameUI(true);
+	updateDrawingNameUI(false);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	refreshPaintExplorer();
 	document.getElementById("paintOptionSprite").checked = true;
@@ -2774,6 +2836,10 @@ function on_game_data_change_core() {
 	if ( paintMode == TileType.Tile ) {
 		drawingId = sortedTileIdList()[0];
 		reloadTile();
+	}
+	else if( paintMode === TileType.Item ) {
+		drawingId = sortedItemIdList()[0];
+		reloadItem();
 	}
 	else {
 		drawingId = sortedSpriteIdList()[0];

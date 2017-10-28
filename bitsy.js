@@ -24,6 +24,28 @@ var names = {
 	/*dialog : new Map()*/ // TODO
 	/*ending : new Map()*/ // TODO
 };
+function updateNamesFromCurData() {
+	names.room = new Map();
+	for(id in room) {
+		if(room[id].name != undefined && room[id].name != null)
+			names.room.set( room[id].name, id );
+	}
+	names.tile = new Map();
+	for(id in tile) {
+		if(tile[id].name != undefined && tile[id].name != null)
+			names.tile.set( tile[id].name, id );
+	}
+	names.sprite = new Map();
+	for(id in sprite) {
+		if(sprite[id].name != undefined && sprite[id].name != null)
+			names.sprite.set( sprite[id].name, id );
+	}
+	names.item = new Map();
+	for(id in item) {
+		if(item[id].name != undefined && item[id].name != null)
+			names.item.set( item[id].name, id );
+	}
+}
 
 //stores all image data for tiles, sprites, drawings
 var imageStore = {
@@ -75,6 +97,13 @@ function clearGameData() {
 	};
 
 	spriteStartLocations = {};
+
+	names = {
+		room : new Map(),
+		tile : new Map(),
+		sprite : new Map(),
+		item : new Map()
+	};
 }
 
 var width = 128;
