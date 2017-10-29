@@ -1,8 +1,6 @@
 /* 
 NOTES WHILE GETTING READY TO RELEASE
 - need to redo GIF recording (snapshots, animation, text effects)
-- need default variable (a = 42)
-- need default item (name? text good? what about importing old files?)
 - test browsers:
 	- mac
 		- chrome X
@@ -712,9 +710,12 @@ function setDefaultGameState() {
 	]];
 	makeItem( drawingId, tea_data );
 	item["0"].dlg = "ITM_0";
-	dialog["ITM_0"] = "You got a cup of tea! Nice.";
+	item["0"].name = "tea";
+	dialog["ITM_0"] = "You found a nice warm cup of tea";
 	renderImages();
 	console.log("D");
+	// default variable
+	variable["a"] = 42;
 
 	//default room // TODO : there is definitely a better way to instantiate common objects
 	room["0"] = {
@@ -2863,6 +2864,11 @@ function on_game_data_change_core() {
 			exits : [],
 			pal : "0"
 		};
+	}
+	if (Object.keys(item).length == 0) {
+		paintMode = TileType.Item;
+		drawingId = "0";
+		makeItem( drawingId );
 	}
 
 	renderImages();
