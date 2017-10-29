@@ -377,6 +377,7 @@ var isPlayMode = false;
 var exporter = new Exporter();
 
 function detectBrowserFeatures() {
+	console.log("BROWSER FEATURES");
 	//test feature support
 	try {
 		var input = document.createElement("input");
@@ -387,6 +388,15 @@ function detectBrowserFeatures() {
 			browserFeatures.colorPicker = true;
 		} else {
 			browserFeatures.colorPicker = false;
+		}
+
+		if(input.offsetWidth <= 10 && input.offsetHeight <= 10) {
+			console.log("WEIRD SAFARI COLOR PICKER IS BAD!");
+			browserFeatures.colorPicker = false;
+			document.getElementById("backgroundColor").type = "text";
+			document.getElementById("tileColor").type = "text";
+			document.getElementById("spriteColor").type = "text";
+			document.getElementById("pageColor").type = "text";
 		}
 	//document.body.removeChild(input);
 	} catch(e) {
