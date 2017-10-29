@@ -293,10 +293,12 @@ input {
 
 .advDialogOptionDiv button {
 	height: 35px;
-	/*margin-top: 2px;*/
-	/*margin-left: -5px;*/
+	/*margin-top: -12px;*/
+	margin-left: 5px;
 	/*border: solid 1px black;*/
-	float: right;
+	/*float: right;*/
+	display: inline-block;
+	vertical-align: top;
 }
 
 .advDialogOptionDiv button:hover {
@@ -322,11 +324,12 @@ input {
 
 .advDialogConditionDiv button {
 	height: 35px;
-
-	/*margin-top: 2px;*/
-	/*margin-left: -5px;*/
+	/*margin-top: -12px;*/
+	margin-left: 5px;
 	/*border: solid 1px black;*/
-	float: right;
+	/*float: right;*/
+	display: inline-block;
+	vertical-align: top;
 }
 
 .advDialogConditionDiv button:hover {
@@ -383,6 +386,7 @@ input {
 
 .advDialogTop {
 	margin-bottom: 10px;
+	height: 30px;
 }
 
 .advDialogIcon {

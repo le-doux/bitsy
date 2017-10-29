@@ -506,7 +506,9 @@
 						</button>
 					</div>
 					<div id="dialog" class="controlBox" style="display:none;">
-						dialog
+						<span style="float:left;">
+							dialog
+						</span>
 						<button title="open in advanced dialog editor" style="float:right;" onclick="showPanel('dialogPanel');">
 							<i class="material-icons">open_in_new</i>
 						</button>
@@ -671,9 +673,9 @@
 					</div>
 
 					<div id="dialogEditorHasContent">
-						<div id="dialogTop" style="margin-bottom: 5px;">
+						<div id="dialogTop" style="height: 30px;">
 							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
-							<label title="preview dialog" for="previewDialogCheck">
+							<label title="preview dialog" for="previewDialogCheck" style="float:left;">
 								<i class="material-icons" id="previewDialogIcon">play_arrow</i>
 								<span id="previewDialogText"> preview </span>
 							</label>

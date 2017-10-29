@@ -1,7 +1,18 @@
 /* 
 NOTES WHILE GETTING READY TO RELEASE
 - need to redo GIF recording (snapshots, animation, text effects)
-- when item names change, need to update "item" functions that use those names
+- need default variable (a = 42)
+- need default item (name? text good? what about importing old files?)
+- test browsers:
+	- mac
+		- chrome X
+		- firefox X
+		- safari
+	- windows
+		- chrome
+		- firefox
+		- edge
+		- IE
 
 
 BUGS / FEEDBACK:
@@ -797,6 +808,7 @@ function newItem(id) {
 	reloadItem(); //hack (order matters for animated tiles)
 
 	drawPaintCanvas();
+	updateInventoryItemUI();
 	refreshGameData();
 
 	itemIndex = Object.keys(item).length - 1;
@@ -884,6 +896,8 @@ function on_drawing_name_change() {
 				}
 			}
 		}
+
+		updateInventoryItemUI();
 	}
 
 	refreshGameData();
@@ -1228,6 +1242,7 @@ function duplicateDrawing() {
 		itemIndex = Object.keys(item).length - 1;
 
 		reloadItem(); //hack
+		updateInventoryItemUI();
 	}
 	addPaintThumbnail( drawingId );
 	changePaintExplorerSelection( drawingId );
@@ -1260,6 +1275,7 @@ function deleteDrawing() {
 			renderImages();
 			drawEditMap();
 			nextItem();
+			updateInventoryItemUI();
 		}
 		deletePaintThumbnail( drawingId );
 		changePaintExplorerSelection( drawingId );
@@ -3961,18 +3977,22 @@ var DialogBlockUI = function(nodes, num) {
 	topDiv.classList.add('advDialogTop');
 	div.appendChild(topDiv);
 
+	var leftSpan = document.createElement('span');
+	leftSpan.style.float = "left";
+	topDiv.appendChild(leftSpan);
+
 	var topIcon = createIconElement("subject");
 	topIcon.classList.add('advDialogIcon');
-	topDiv.appendChild( topIcon );
+	leftSpan.appendChild( topIcon );
 
 	var numSpan = document.createElement("span");
 	numSpan.innerText = num + ". ";
-	topDiv.appendChild( numSpan );
+	leftSpan.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
 	typeEl.innerText = "dialog";
 	typeEl.title = "this dialog is said once on each interaction";
-	topDiv.appendChild( typeEl );
+	leftSpan.appendChild( typeEl );
 
 	//
 	var deleteEl = document.createElement("button");
@@ -4057,20 +4077,24 @@ var IfBlockUI = function(node, num) {
 	// topDiv.style.marginBottom = "5px";
 	div.appendChild(topDiv);
 
+	var leftSpan = document.createElement('span');
+	leftSpan.style.float = "left";
+	topDiv.appendChild(leftSpan);
+
 	var topIcon = createIconElement("call_split");
 	topIcon.classList.add('advDialogIcon');
-	topDiv.appendChild( topIcon );
+	leftSpan.appendChild( topIcon );
 	// topDiv.appendChild( createIconElement("call_split") );
 	// div.appendChild( createIconElement("help_outline") );
 
 	var numSpan = document.createElement("span");
 	numSpan.innerText = num + ". ";
-	topDiv.appendChild( numSpan );
+	leftSpan.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
 	typeEl.innerText = "conditional";
 	typeEl.title = "which dialog option is said is determined by conditions you define"
-	topDiv.appendChild( typeEl );
+	leftSpan.appendChild( typeEl );
 
 	//
 	var deleteEl = document.createElement("button");
@@ -4362,6 +4386,7 @@ var IfBlockUI = function(node, num) {
 		textArea.addEventListener('select', textChangeHandler);
 		textArea.addEventListener('blur', textChangeHandler);
 		textArea.title = "type dialog option to say when this condition is true"
+		textArea.style.display = "inline-block";
 		conditionDiv.appendChild( textArea );
 		// div.appendChild( document.createElement("br") );
 
@@ -4422,18 +4447,22 @@ var SeqBlockUI = function(node, num) {
 	topDiv.style.marginBottom = "5px";
 	div.appendChild(topDiv);
 
+	var leftSpan = document.createElement('span');
+	leftSpan.style.float = "left";
+	topDiv.appendChild(leftSpan);
+
 	var topIcon = createIconElement("list");
 	topIcon.classList.add('advDialogIcon');
-	topDiv.appendChild( topIcon );
+	leftSpan.appendChild( topIcon );
 
 	var numSpan = document.createElement("span");
 	numSpan.innerText = num + ". ";
-	topDiv.appendChild( numSpan );
+	leftSpan.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
 	typeEl.innerText = "list"; //sequenceNode.type;
 	typeEl.title = "one line of dialog in the list is said on each interaction, in the order you choose";
-	topDiv.appendChild( typeEl );
+	leftSpan.appendChild( typeEl );
 	
 	//
 	var deleteEl = document.createElement("button");
@@ -4525,7 +4554,9 @@ var SeqBlockUI = function(node, num) {
 		textArea.addEventListener('select', textChangeHandler);
 		textArea.addEventListener('blur', textChangeHandler);
 		textArea.title = "type line of dialog here"
+		// textArea.style.float = "left";
 		// div.insertBefore( textArea, addOptionEl );
+		textArea.style.display = "inline-block";
 		optionDiv.appendChild( textArea );
 
 		var deleteOptionEl = document.createElement("button");
