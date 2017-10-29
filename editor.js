@@ -382,6 +382,7 @@ function detectBrowserFeatures() {
 	try {
 		var input = document.createElement("input");
 		input.type = "color";
+		document.body.appendChild(input);
 
 		if (input.type === "color") {
 			console.log("color picker supported!");
@@ -391,6 +392,7 @@ function detectBrowserFeatures() {
 		}
 
 		if(input.offsetWidth <= 10 && input.offsetHeight <= 10) {
+			// console.log(input.clientWidth);
 			console.log("WEIRD SAFARI COLOR PICKER IS BAD!");
 			browserFeatures.colorPicker = false;
 			document.getElementById("backgroundColor").type = "text";
@@ -398,7 +400,8 @@ function detectBrowserFeatures() {
 			document.getElementById("spriteColor").type = "text";
 			document.getElementById("pageColor").type = "text";
 		}
-	//document.body.removeChild(input);
+		
+		document.body.removeChild(input);
 	} catch(e) {
 		browserFeatures.colorPicker = false;
 	}
@@ -3326,7 +3329,9 @@ function stopRecordingGif() {
 			//console.log("encoding finished!");
 			//console.log(uri);
 			document.getElementById("gifPreview").src = uri;
-			document.getElementById("gifDownload").href = uri;
+
+			var downloadData = uri.replace("data:;", "data:attachment/file;"); // for safari
+			document.getElementById("gifDownload").href = downloadData;
 		});
 		isRecordingGif = false;
 	}, 10);

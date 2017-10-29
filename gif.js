@@ -115,8 +115,10 @@ function returnAsDataUri(gifArr, callback) {
 	reader.readAsDataURL(blob); 
 	reader.onloadend = function() {
 		base64data = reader.result;
-		//console.log("!!!!");
-		//console.log(base64data);
+		// base64data = base64data.replace("data:;", "data:image/gif;");
+		// base64data = base64data.replace("data:;", "data:attachment/file;"); // for safari
+		// console.log("!!!!");
+		// console.log(base64data);
 		callback( base64data );
 	}
 
