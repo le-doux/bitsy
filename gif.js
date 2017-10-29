@@ -119,7 +119,7 @@ function returnAsDataUri(gifArr, callback) {
 		// base64data = base64data.replace("data:;", "data:attachment/file;"); // for safari
 		// console.log("!!!!");
 		// console.log(base64data);
-		callback( base64data );
+		callback( base64data, blob ); // TODO: just return blob?
 	}
 
 	/*

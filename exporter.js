@@ -21,17 +21,33 @@ loadResource("script.js");
 
 /* exporting */
 function downloadFile(filename, text) {
-	var element = document.createElement('a');
-	element.setAttribute('href', 'data:attachment/file;charset=utf-8,' + encodeURIComponent(text));
-	element.setAttribute('download', filename);
-	element.setAttribute('target', '_blank');
 
-	element.style.display = 'none';
-	document.body.appendChild(element);
+	if( browserFeatures.blobURL ) {
+		// new blob version
+		var a = document.createElement('a');
+		var blob = new Blob( [text] );
+		a.download = filename;
+		a.href = makeURL.createObjectURL(blob);
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+	}
+	else {
+		// old version
+		var element = document.createElement('a');
 
-	element.click();
+		element.setAttribute('href', 'data:attachment/file;charset=utf-8,' + encodeURIComponent(text));
 
-	document.body.removeChild(element);
+		element.setAttribute('download', filename);
+		element.setAttribute('target', '_blank');
+
+		element.style.display = 'none';
+		document.body.appendChild(element);
+
+		element.click();
+
+		document.body.removeChild(element);
+	}
 }
 
 function escapeSpecialCharacters(str) {

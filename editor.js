@@ -13,8 +13,6 @@ NOTES WHILE GETTING READY TO RELEASE
 		- firefox
 		- edge
 		- IE
-- safari's new color picker sucks (disable or fix?)
-- downloading stuff in safari sucks
 
 
 BUGS / FEEDBACK:
@@ -364,7 +362,8 @@ function selectedColorPal() {
 /* BROWSER COMPATIBILITY */
 var browserFeatures = {
 	colorPicker : false,
-	fileDownload : false
+	fileDownload : false,
+	blobURL : false
 };
 
 /* SCREEN CAPTURE */
@@ -374,6 +373,7 @@ var gifFrameData = [];
 var isPlayMode = false;
 
 /* EXPORT HTML */
+var makeURL = null;
 var exporter = new Exporter();
 
 function detectBrowserFeatures() {
@@ -413,6 +413,12 @@ function detectBrowserFeatures() {
 	}
 	else {
 		browserFeatures.fileDownload = false;
+	}
+
+	browserFeatures.blobURL = (!!new Blob) && (URL != undefined || webkitURL != undefined);
+	if( browserFeatures.blobURL ) {
+		console.log("blob supported!");
+		makeURL = URL || webkitURL;
 	}
 }
 
@@ -3323,15 +3329,20 @@ function stopRecordingGif() {
 			loops: 0,
 			delay: 30
 		};
-		gifencoder.encode( gif, function(uri) {
+		gifencoder.encode( gif, function(uri, blob) {
 			document.getElementById("gifEncodingText").style.display="none";
 			document.getElementById("gifStartButton").style.display="inline";
 			//console.log("encoding finished!");
 			//console.log(uri);
 			document.getElementById("gifPreview").src = uri;
 
-			var downloadData = uri.replace("data:;", "data:attachment/file;"); // for safari
-			document.getElementById("gifDownload").href = downloadData;
+			if( browserFeatures.blobURL ) {
+				document.getElementById("gifDownload").href = makeURL.createObjectURL( blob );
+			}
+			else {
+				var downloadData = uri.replace("data:;", "data:attachment/file;"); // for safari
+				document.getElementById("gifDownload").href = downloadData;
+			}
 		});
 		isRecordingGif = false;
 	}, 10);

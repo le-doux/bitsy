@@ -180,7 +180,7 @@ function reset_cur_game() {
 
 var update_interval = null;
 function onready(startWithTitle) {
-	if(startWithTitle === undefined) startWithTitle = true;
+	if(startWithTitle === undefined || startWithTitle === null) startWithTitle = true;
 
 	clearInterval(loading_interval);
 
@@ -197,6 +197,8 @@ function onready(startWithTitle) {
 	canvas.addEventListener("mousedown", onTouch);
 	
 	update_interval = setInterval(update,-1);
+
+	console.log("TITLE ??? " + startWithTitle);
 	if(startWithTitle) // used by editor
 		startNarrating(title);
 }
@@ -1858,6 +1860,8 @@ TODO
 - what about a special script block separate from DLG?
 */
 function startNarrating(dialogStr,end) {
+	console.log("NARRATE " + dialogStr);
+
 	if(end === undefined) end = false;
 
 	isNarrating = true;
