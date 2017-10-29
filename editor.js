@@ -7,12 +7,14 @@ NOTES WHILE GETTING READY TO RELEASE
 	- mac
 		- chrome X
 		- firefox X
-		- safari
+		- safari X
 	- windows
 		- chrome
 		- firefox
 		- edge
 		- IE
+- safari's new color picker sucks (disable or fix?)
+- downloading stuff in safari sucks
 
 
 BUGS / FEEDBACK:
