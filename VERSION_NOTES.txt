@@ -12,9 +12,8 @@ v4.0:
 - inventory
 ~~~~~
 - you can name objects, including:
--> rooms
--> sprites
 -> items
+-> rooms
 -> palettes
 ~~~~~
 - dialog scripting language with variables
