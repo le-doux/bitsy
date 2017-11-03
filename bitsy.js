@@ -1871,6 +1871,7 @@ function startNarrating(dialogStr,end) {
 
 function startItemDialog(itemId) {
 	var dialogId = item[itemId].dlg;
+	// console.log("START ITEM DIALOG " + dialogId);
 	if(dialog[dialogId]){
 		var dialogStr = dialog[dialogId];
 		startDialog(dialogStr,dialogId);
@@ -1880,6 +1881,7 @@ function startItemDialog(itemId) {
 function startSpriteDialog(spriteId) {
 	var spr = sprite[spriteId];
 	var dialogId = spr.dlg ? spr.dlg : spriteId;
+	// console.log("START SPRITE DIALOG " + dialogId);
 	if(dialog[dialogId]){
 		var dialogStr = dialog[dialogId];
 		startDialog(dialogStr,dialogId);

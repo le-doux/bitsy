@@ -7,10 +7,12 @@ NOTES WHILE GETTING READY TO RELEASE
 		- firefox X
 		- safari X
 	- windows
-		- chrome
-		- firefox
-		- edge
-		- IE
+		- chrome X
+		- firefox X
+		- edge X
+		- IE (would need to do a LOT of work to fix this)
+- bugs discovered on windows:
+	- tile duplication bug (aliasing)
 
 
 BUGS / FEEDBACK:
@@ -1471,7 +1473,7 @@ function reloadSprite() {
 	// dialog UI
 	reloadDialogUI()
 
-	updateDrawingNameUI( drawingId != playerId );
+	updateDrawingNameUI(false);
 
 	// update paint canvas
 	drawPaintCanvas();

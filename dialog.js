@@ -360,12 +360,6 @@ var DialogBuffer = function() {
 			}
 		}
 
-		//finish up 
-		if( curRowArr.length > 0 ) {
-			buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
-			curRowArr[ curRowArr.length - 1 ].SetPrintHandler( onFinishHandler );
-		}
-
 		//destroy any empty stuff
 		var lastPage = buffer[ buffer.length-1 ];
 		var lastRow = lastPage[ lastPage.length-1 ];
@@ -373,6 +367,14 @@ var DialogBuffer = function() {
 			lastPage.splice( lastPage.length-1, 1 );
 		if( lastPage.length == 0 )
 			buffer.splice( buffer.length-1, 1 );
+
+		//finish up 
+		lastPage = buffer[ buffer.length-1 ];
+		lastRow = lastPage[ lastPage.length-1 ];
+		if( lastRow.length > 0 ) {
+			var lastChar = lastRow[ lastRow.length-1 ];
+			lastChar.SetPrintHandler( onFinishHandler );
+		}
 
 		console.log(buffer);
 

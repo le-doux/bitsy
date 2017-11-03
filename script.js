@@ -318,6 +318,7 @@ var Environment = function() {
 	this.HasVariable = function(name) { return variableMap.has(name); };
 	this.GetVariable = function(name) { return variableMap.get(name); };
 	this.SetVariable = function(name,value,useHandler) {
+		// console.log("SET VARIABLE " + name + " = " + value);
 		if(useHandler === undefined) useHandler = true;
 		variableMap.set(name, value);
 		if(onVariableChangeHandler != null && useHandler)
@@ -401,6 +402,7 @@ var BlockNode = function(mode, doIndentFirstLine) {
 	this.mode = mode;
 
 	this.Eval = function(environment,onReturn) {
+		// console.log("EVAL BLOCK " + this.children.length);
 
 		if( this.onEnter != null ) this.onEnter();
 
@@ -408,7 +410,9 @@ var BlockNode = function(mode, doIndentFirstLine) {
 		var i = 0;
 		function evalChildren(children,done) {
 			if(i < children.length) {
+				// console.log(">> CHILD " + i);
 				children[i].Eval( environment, function(val) {
+					// console.log("<< CHILD " + i);
 					lastVal = val;
 					i++;
 					evalChildren(children,done);
@@ -597,6 +601,7 @@ var ExpNode = function(operator, left, right) {
 	this.right = right;
 
 	this.Eval = function(environment,onReturn) {
+		// console.log("EVAL " + this.operator);
 		var self = this; // hack to deal with scope
 		environment.EvalOperator( this.operator, this.left, this.right, 
 			function(val){

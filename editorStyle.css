@@ -281,7 +281,7 @@ input {
 }
 
 .advDialogOptionDiv {
-	/*width: 300px;*/
+	width: 300px;
 	/*height: 40px;*/
 	padding: 5px;
 	margin: 5px;
@@ -358,7 +358,8 @@ input {
 
 #advDialogViewport {
 	padding: 12px;
-	width:340px;
+	/*width:340px;*/
+	min-width: 340px;
 	height:450px;
 	overflow:scroll;
 	display:block;
