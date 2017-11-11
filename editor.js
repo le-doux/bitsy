@@ -1,4 +1,12 @@
 /* 
+NEW BUGS
+- sprite dialog aliasing
+- too many sprites breaks new dialog window
+- need to delete dialog when all dialog nodes are gone
+- need to break sprite <-> dialog association when all dialog is deleted
+- DLG null: add dialog, delete it, recreate it (causes ALIASING)
+
+
 NOTES WHILE GETTING READY TO RELEASE
 - need to redo GIF recording (snapshots, animation, text effects)
 - test browsers:
@@ -13,6 +21,7 @@ NOTES WHILE GETTING READY TO RELEASE
 		- IE (would need to do a LOT of work to fix this)
 - bugs discovered on windows:
 	- tile duplication bug (aliasing)
+- DLG null bug... how's that happen?
 
 
 BUGS / FEEDBACK:
