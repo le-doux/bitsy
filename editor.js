@@ -1,10 +1,10 @@
 /* 
 NEW BUGS
-- sprite dialog aliasing
+X sprite dialog aliasing
 - too many sprites breaks new dialog window
-- need to delete dialog when all dialog nodes are gone
-- need to break sprite <-> dialog association when all dialog is deleted
-- DLG null: add dialog, delete it, recreate it (causes ALIASING)
+X need to delete dialog when all dialog nodes are gone
+X need to break sprite <-> dialog association when all dialog is deleted
+X DLG null: add dialog, delete it, recreate it (causes ALIASING)
 
 
 NOTES WHILE GETTING READY TO RELEASE
@@ -42,6 +42,7 @@ BUGS / FEEDBACK:
 * zetef: I really did not thought about that, but it would be cool if in the future update you can change the player's speed in a specific room, or all the rooms. I enjoyed your tool!
 * thetoolong: if a first time player of bitsy... and i like the top-down aspect. you should add more colors and some king of simple coding (like scratch) to make more complex games.
 * saranomy: Is it possible to add a dialog to the exit itself? So, when player walks into exit (teleport tile), it will force player to read important messages before going to the next room. This feature will add dialog box into "exits" window in the editor.
+* anoobus5 I was wondering if you could add a feature where you could link rooms, as creating 5-9 exits for each room gets tedious after a while.
 
 TODO
 - names
@@ -2757,6 +2758,7 @@ function getCurDialogId() {
 	else if(paintMode == TileType.Item) {
 		dialogId = item[drawingId].dlg;
 	}
+	console.log("DIALOG ID " + dialogId);
 	return dialogId;
 }
 
@@ -4715,21 +4717,39 @@ function addIfBlockUI() {
 function serializeAdvDialog() {
 	console.log("SERIALIZE ADVANCED DIALOG");
 
+	var dialogId = getCurDialogId();
+	console.log("SERIALIZE DIALOG " + dialogId);
+
 	var allNodes = [];
 	for(var i = 0; i < advDialogUIComponents.length; i++) {
 		allNodes = allNodes.concat( advDialogUIComponents[i].GetScriptNodes() );
 	}
 	var scriptRoot = scriptUtils.CreateDialogBlock( allNodes );
-	console.log(scriptRoot);
-	var dialogStr = '"""\n' + scriptRoot.Serialize() + '\n"""'; // todo cleanup quotes
-	console.log(dialogStr);
-	previewDialogScriptTree = scriptRoot; // scriptInterpreter.Parse( dialogStr ); // hacky
 
-	var dialogId = getCurDialogId();
-	dialog[dialogId] = dialogStr; //TODO: do I need to do more here?
+	var dialogStr = scriptRoot.Serialize();
+	if( dialogStr.length <= 0 )
+	{
+		getCurPaintObject().dlg = null;
+		delete dialog[dialogId];
+	}
+	else
+	{
+		if( dialogStr.indexOf("\n") > -1 )
+			dialogStr = '"""\n' + dialogStr + '\n"""';
+
+		previewDialogScriptTree = scriptRoot; // scriptInterpreter.Parse( dialogStr ); // hacky
+
+		if(!dialogId) {
+			var prefix = (paintMode == TileType.Item) ? "ITM_" : "SPR_";
+			dialogId = nextAvailableDialogId( prefix );
+			getCurPaintObject().dlg = dialogId;
+		}
+
+		dialog[dialogId] = dialogStr; //TODO: do I need to do more here?
+	}
+
 	reloadDialogUICore();
 	document.getElementById("dialogCodeText").value = document.getElementById("dialogText").value;
-
 	refreshGameData();
 }
 

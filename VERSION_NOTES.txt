@@ -1,3 +1,6 @@
+v4.1:
+- bugfix: sometimes new dialog would overwrite old dialog
+
 v4.0:
 - advanced dialog options, including:
 -> dialog that changes each time it's said
