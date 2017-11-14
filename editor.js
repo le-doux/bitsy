@@ -1,27 +1,21 @@
 /* 
-NEW BUGS
-X sprite dialog aliasing
-- too many sprites breaks new dialog window
-X need to delete dialog when all dialog nodes are gone
-X need to break sprite <-> dialog association when all dialog is deleted
-X DLG null: add dialog, delete it, recreate it (causes ALIASING)
+CONFIRMED BUGS
+- room panel name doesn't update on loading game from html or changing game data
+- inventory page doesn't always update (especially on new game)
 
+SPOTTED BUGS
+- start a new game, old dialog sticks around (no repro)
+- need to improve UI to teach how new dialog works
+- bug with room names? (investigate)
+- confusing that you can't add new items in the inventory window (rename them too?)
+- becklespinax: Not sure what causes it but sometimes when writing dialogue that uses the new text effects I'll go to play the scene and it won't fire the dialogue attached to the sprite when interacted with. (no repro yet)
+
+NEW FEATURE IDEAS
+- plugin
+- import / export tiles
 
 NOTES WHILE GETTING READY TO RELEASE
 - need to redo GIF recording (snapshots, animation, text effects)
-- test browsers:
-	- mac
-		- chrome X
-		- firefox X
-		- safari X
-	- windows
-		- chrome X
-		- firefox X
-		- edge X
-		- IE (would need to do a LOT of work to fix this)
-- bugs discovered on windows:
-	- tile duplication bug (aliasing)
-- DLG null bug... how's that happen?
 
 
 BUGS / FEEDBACK:
@@ -2066,6 +2060,7 @@ function resetGameData() {
 	updatePaletteUI();
 	// updatePaletteControlsFromGameData();
 	updateExitOptionsFromGameData();
+	updateRoomName();
 
 	on_paint_avatar();
 	document.getElementById('paintOptionAvatar').checked = true;
@@ -2830,6 +2825,9 @@ function on_change_adv_dialog() {
 function on_game_data_change() {
 	on_game_data_change_core();
 	refreshGameData();
+
+	// ui stuff
+	updateRoomName();
 }
 
 function on_game_data_change_core() {
