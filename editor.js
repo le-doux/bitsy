@@ -1,7 +1,5 @@
 /* 
 CONFIRMED BUGS
-- room panel name doesn't update on loading game from html or changing game data
-- inventory page doesn't always update (especially on new game)
 
 SPOTTED BUGS
 - start a new game, old dialog sticks around (no repro)
@@ -662,6 +660,7 @@ function setDefaultGameState() {
 	sprite["A"].room = "0";
 	sprite["A"].x = 4;
 	sprite["A"].y = 4;
+	sprite["A"].inventory = {}; // TODO : need a unified place to instantiate sprites instead of this ad hoc nonsense
 	console.log("B");
 	//defualt sprite
 	paintMode = TileType.Sprite;
@@ -2061,6 +2060,7 @@ function resetGameData() {
 	// updatePaletteControlsFromGameData();
 	updateExitOptionsFromGameData();
 	updateRoomName();
+	updateInventoryUI();
 
 	on_paint_avatar();
 	document.getElementById('paintOptionAvatar').checked = true;
@@ -4869,8 +4869,12 @@ function updateInventoryItemUI(){
 		}
 	}
 
+	console.log("UPDATE!!!!");
 	for(id in item) {
 		var itemName = item[id].name != null ? item[id].name : "item " + id;
+		console.log( id );
+		console.log( player() );
+		console.log( player().inventory );
 		var itemCount = player().inventory[id] != undefined ? parseFloat( player().inventory[id] ) : 0;
 
 		var itemDiv = document.createElement("div");

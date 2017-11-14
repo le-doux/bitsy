@@ -1,6 +1,6 @@
 v4.2:
 - bugfix: name in room window updates on import
--
+- bugfix: inventory updates correctly for new game
 
 v4.1:
 - bugfix: sometimes new dialog would overwrite old dialog
