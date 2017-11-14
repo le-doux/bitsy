@@ -36,66 +36,6 @@ BUGS / FEEDBACK:
 * saranomy: Is it possible to add a dialog to the exit itself? So, when player walks into exit (teleport tile), it will force player to read important messages before going to the next room. This feature will add dialog box into "exits" window in the editor.
 * anoobus5 I was wondering if you could add a feature where you could link rooms, as creating 5-9 exits for each room gets tedious after a while.
 
-TODO
-- names
-	X room 
-	X sprite
-	X item
-	X palette
-	- endings
-	- other??
-X item UI
-- advanced dialog UI
-- how does new dialog work with: endings? exits? (items?)
-- more dialog nodes?
-X mouse control plus item
-- double click on exits to go to room
-- test item drawing model
-X need a default item (tea)
-- need to fix up defaults to deal with new dialog
-- need a good GUI for advanced dialog
-- need a better syntax than XML?
-
-SCRIPTING FUNCTION IDEAS
-- pause
-- fast
-- slow
-- speed
-- mark / goto
-- move character
-- choice
-- change avatar
-
-TODO next
-- items
--> UI
--> how do you use them?
---> dialog
-----> dialog trees?
---> exits
-----> exit dialog?
---> lock blocks?
--> how to do item messages/dialog (special thing? or extend existing dialog system?)
-***
-- advanced dialog system
---> player choices
---> conditional stuff (item count, etc)
------> conditionals lead to dialog directly, or to named sections
---> page breaks?
---> styles & effects
---> new font?
---> named sections
---> links to sections
-(do this in a text editor? or via a GUI?)
--> three objects: choice, branch, dialog (combinable?) --- also: header, link, ending
--> everything happens in order top to bottom
-
-how should exits be defined?
-- in one line?
-- or should they get their own objects?
-- if they get their own blocks, are they still exits?
-- or something more complex... (triggers)
-
 ? music (how)
 
 NEW NOTES
@@ -111,7 +51,6 @@ NEW TODO
 - iOS mobile bug
 - android freezing bug
 - ? default workspaces
-- items
 - drawing selector
 - aliases
 - better gif async
@@ -128,7 +67,6 @@ editor UI problems to solve
 - unusable on mobile
 - gif UI is terrible and not findable
 - prev / next buttons everywhere are a pain to use if you have a lot of stuff
-- can't rename things
 - can't see all the tiles you want to work on
 - dialog UI could be improved
 - feedback for exits and ending creation is not good enough
@@ -151,41 +89,8 @@ v4 features
 
 TODO NOW
 - email leaf
-- item system ideas / requirements
-	- drawing of item in world
-	- item can be picked up
-	- text to go with pickup?
-	- inventory screen?
-	- give/receive items
-	- game responds ot having / not having an item (dialog, doors??)
 
 v5 candidate features
-- triggers
-	- first gen goal: extensible, enables "inventory" system
-		- or just create an inventory system? and let people re-appropriate it?
-	- goals: items, battles, choices
-	- variables (increment, decrement, add arbitrary val? multiply?)
-		- renamable?
-		- limited number?
-	- things that can happen
-		- move sprites or player (or remove them)
-		- change dialog
-		- end game?
-		- do something with tiles?
-	- triggers
-		- enter square
-		- talk (bump?) to sprite (before?after?)
-		- enter / exit room
-		- tile-based?
-	- ambient triggers
-		- based on state of a variable
-	- need to be able to name (alias) sprites, tiles, rooms
-	- trigger multiple things at once? (one trigger -> multiple effects)
-	- special trigger window? trigger in dialog / map / exit window?
-- new dialog editor / effects  / options
-	- text effects
-	- choices?
-	- multiple options
 - music / sfx tool
 - room map
 - fancier animations (transitions, arrow, walk?, etc)
@@ -214,8 +119,6 @@ from laura michet
 - character limit on sprite dialog (sort of fixed with the dialog box textarea)
 
 my ideas
-- text effects
-- triggers
 - transition animations
 - walking animations
 - bobbing arrow animations
@@ -224,11 +127,6 @@ my ideas
 - new dialog editor / preview pane
 	- bigger dialog box textbox?
 
-- hide "extra" UI better
-- bug: click to nav tiles and click on tile strip don't interoperate well
-
-- bug with extra tiles at the end of room rows breaks shit
-
 - BUG: after play mode, avatar ends up in wrong room
 - name rooms, sprites, etc (esp rooms tho)
 - make it show/hide exits, instead of "add" exits
@@ -236,7 +134,6 @@ my ideas
 - BUG: exit highlighting is on by default when engine starts up?
 - ONGOING: decrease duplicate code between tile / sprites
 - selection box? copy paste?
-- bug where word wrap doesn't work for words that are longer than a single line length
 - would be cool to select sprites and then find out who they are / what they say?
 - how do extra characters end up in the room maps?
 
@@ -246,8 +143,6 @@ now what?
 	- linkbacks to editor
 	- twitter api sharing
 	- link to bitsy list
-- email patrick about his friend who's done game jam
-- talk to game makers (can I feature your game? other questions..)
 
 - add preview canvas for rooms
 - the UI is getting cluttered :(
@@ -255,9 +150,6 @@ now what?
 
 from twitter
 - look at puzzlescript gist hosting of gamedata (from kool.tools)
-
-- Qs for creators
-- creator list (spreadsheet?)
 
 - async gif processings (IN PROGRESS)
 - undo / redo
@@ -272,39 +164,19 @@ from twitter
 TODO BACKLOG
 - export straight to itchio (is there a developer api?)
 - better icon for exits
-
-v2.0???
-- triggers
-- variables
-- dialog editor w/ special effects
 - character paths
-	ADAM'S TODOs
 
-		#feature ideas
-			#don't see you on exit for one frame?
-			#shortcut to sets?
-			#default tileset
-			#clear tilemap
-			#clear tileset
-
-		- bitsy player v2
-			- dialog effects
-				- color
-				- speed
-				- pauses
-			? animate player movement
-			? player face left/right
-			?? bouncing arrow
-			? sprite walking paths
-			? set variable command
-			?? narrative blocks
-			?? STRICT MODE where text can only fit on one page
-
-
-USER FEEDBACK
-- add an inventory system
-- add triggers
-- add dialog choices?
+old ideas
+	#shortcut to sets?
+	#default tileset
+	#clear tilemap
+	#clear tileset
+	? animate player movement
+	? player face left/right
+	?? bouncing arrow
+	? sprite walking paths
+	?? narrative blocks
+	?? STRICT MODE where text can only fit on one page
 
 - room transition animations
 
