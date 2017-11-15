@@ -3,6 +3,7 @@
 - expandable dialog textareas
 - resizable paint explorer
 - add drawing button in paint explorer
+- double click paint explorer icon to bring up paint panel
 
 CONFIRMED BUGS
 X when you delete a room, exits that reference it aren't deleted
@@ -2633,6 +2634,10 @@ function createThumbnailRenderCallback(img) {
 }
 
 function selectPaint() {
+	if(drawingId === this.value && document.getElementById("paintPanel").style.display === "none") {
+		togglePanelCore("paintPanel", true /*visible*/); // animate?
+	}
+
 	drawingId = this.value;
 	if( paintMode === TileType.Tile ) {
 		tileIndex = sortedTileIdList().indexOf( drawingId );
