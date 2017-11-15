@@ -1,5 +1,10 @@
 /* 
 CONFIRMED BUGS
+X when you delete a room, exits that reference it aren't deleted
+X when you delete a room, the exit options aren't updated
+X when you delete a drawing the paint explorer doesn't update correctly
+X delete dialog when deleting drawing associated with it
+X all tiles are named UNDEFINED
 
 SPOTTED BUGS
 - start a new game, old dialog sticks around (no repro)
@@ -11,6 +16,10 @@ SPOTTED BUGS
 NEW FEATURE IDEAS
 - plugin
 - import / export tiles
+- mobile ideas
+	- responsive window with min size, max size?
+	- swiping
+	- transparent iframe bg?
 
 NOTES WHILE GETTING READY TO RELEASE
 - need to redo GIF recording (snapshots, animation, text effects)
@@ -965,7 +974,23 @@ function deleteRoom() {
 	}
 	else if ( confirm("Are you sure you want to delete this room? You can't get it back.") ) {
 		var roomId = sortedRoomIdList()[roomIndex];
+
+		// delete exits in _other_ rooms that go to this room
+		for( r in room )
+		{
+			if( r != roomId) {
+				for( i in room[r].exits )
+				{
+					if( room[r].exits[i].dest.room === roomId )
+					{
+						room[r].exits.splice( i, 1 );
+					}
+				}
+			}
+		}
+
 		delete room[roomId];
+
 		refreshGameData();
 		nextRoom();
 		drawEditMap();
@@ -1149,6 +1174,7 @@ function duplicateDrawing() {
 
 function deleteDrawing() {
 	if ( confirm("Are you sure you want to delete this drawing?") ) {
+		deletePaintThumbnail( drawingId );
 		if (paintMode == TileType.Tile) {
 			if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
 			delete tile[ drawingId ];
@@ -1160,7 +1186,14 @@ function deleteDrawing() {
 		}
 		else if( paintMode == TileType.Avatar || paintMode == TileType.Sprite ){
 			if ( Object.keys( sprite ).length <= 2 ) { alert("You can't delete your last sprite!"); return; }
+
+			// todo: share with items
+			var dlgId = sprite[ drawingId ].dlg == null ? drawingId : sprite[ drawingId ].dlg;
+			if( dlgId && dialog[ dlgId ] )
+				delete dialog[ dlgId ];
+
 			delete sprite[ drawingId ];
+
 			refreshGameData();
 			renderImages();
 			drawEditMap();
@@ -1168,7 +1201,13 @@ function deleteDrawing() {
 		}
 		else if( paintMode == TileType.Item ){
 			if ( Object.keys( item ).length <= 1 ) { alert("You can't delete your last item!"); return; }
+
+			var dlgId = item[ drawingId ].dlg;
+			if( dlgId && dialog[ dlgId ] )
+				delete dialog[ dlgId ];
+
 			delete item[ drawingId ];
+
 			removeAllItems( drawingId );
 			refreshGameData();
 			renderImages();
@@ -1176,7 +1215,6 @@ function deleteDrawing() {
 			nextItem();
 			updateInventoryItemUI();
 		}
-		deletePaintThumbnail( drawingId );
 		changePaintExplorerSelection( drawingId );
 	}
 }
@@ -1736,6 +1774,9 @@ function drawEditMap() {
 			if( r === curRoom ) {
 				for (i in room[curRoom].exits) {
 					var e = room[curRoom].exits[i];
+					if( !room[e.dest.room] )
+						continue;
+
 					if (e == selectedExit) {
 						ctx.fillStyle = "#ff0";
 						ctx.globalAlpha = 0.9;
@@ -1759,6 +1800,9 @@ function drawEditMap() {
 			else {
 				for (i in room[r].exits) {
 					var e = room[r].exits[i];
+					if( !room[e.dest.room] )
+						continue;
+
 					if (e.dest.room === curRoom){
 						ctx.fillStyle = getContrastingColor();
 						ctx.globalAlpha = 0.3;

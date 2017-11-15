@@ -1077,7 +1077,7 @@ function serializeWorld() {
 	for (id in tile) {
 		worldStr += "TIL " + id + "\n";
 		worldStr += serializeDrawing( "TIL_" + id );
-		if (tile[id].name != null) {
+		if (tile[id].name != null && tile[id].name != undefined) {
 			/* NAME */
 			worldStr += "NAME " + tile[id].name + "\n";
 		}
@@ -1087,7 +1087,7 @@ function serializeWorld() {
 	for (id in sprite) {
 		worldStr += "SPR " + id + "\n";
 		worldStr += serializeDrawing( "SPR_" + id );
-		if (sprite[id].name != null) {
+		if (sprite[id].name != null && sprite[id].name != undefined) {
 			/* NAME */
 			worldStr += "NAME " + sprite[id].name + "\n";
 		}
@@ -1109,7 +1109,7 @@ function serializeWorld() {
 	for (id in item) {
 		worldStr += "ITM " + id + "\n";
 		worldStr += serializeDrawing( "ITM_" + id );
-		if (item[id].name != null) {
+		if (item[id].name != null && item[id].name != undefined) {
 			/* NAME */
 			worldStr += "NAME " + item[id].name + "\n";
 		}
