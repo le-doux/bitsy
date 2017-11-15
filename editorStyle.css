@@ -125,7 +125,7 @@ input {
 	line-height: 150%;
 }
 .dialogTextArea {
-	resize: none;
+	resize: vertical;
 	font-size: 12px;
 	width: 32ch;
 	margin-top: 5px;
@@ -277,7 +277,7 @@ input {
 .advDialogTextBlock {
 	width: 300px;
 	height: 60px;
-	resize: none;
+	resize: vertical;
 }
 
 .advDialogOptionDiv {
@@ -352,7 +352,7 @@ input {
 
 	/*width: 250px;*/
 	height: 30px;
-	resize: none;
+	resize: vertical;
 	/*margin-right: 0px;*/
 }
 

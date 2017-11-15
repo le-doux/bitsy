@@ -1,4 +1,7 @@
 /* 
+4.2 new features
+- expandable dialog textareas
+
 CONFIRMED BUGS
 X when you delete a room, exits that reference it aren't deleted
 X when you delete a room, the exit options aren't updated
