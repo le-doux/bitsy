@@ -2368,6 +2368,7 @@ function on_paint_avatar() {
 	document.getElementById("paintOptionAvatar").checked = true;
 	document.getElementById("paintExplorerOptionAvatar").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
+	document.getElementById("paintExplorerAdd").setAttribute("style","display:none;");
 
 	reloadAdvDialogUI();
 }
@@ -2387,6 +2388,7 @@ function on_paint_tile() {
 	document.getElementById("paintOptionTile").checked = true;
 	document.getElementById("paintExplorerOptionTile").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
+	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 
 	reloadAdvDialogUI();
 }
@@ -2413,6 +2415,7 @@ function on_paint_sprite() {
 	document.getElementById("paintOptionSprite").checked = true;
 	document.getElementById("paintExplorerOptionSprite").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
+	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 
 	reloadAdvDialogUI();
 }
@@ -2435,6 +2438,7 @@ function on_paint_item() {
 	document.getElementById("paintOptionItem").checked = true;
 	document.getElementById("paintExplorerOptionItem").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:inline-block;");
+	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 
 	reloadAdvDialogUI();
 }

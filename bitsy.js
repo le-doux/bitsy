@@ -1357,6 +1357,7 @@ function parsePalette(lines,i) { //todo this has to go first right now :(
 function parseTile(lines, i) {
 	var id = getId(lines[i]);
 	var drwId = null;
+	var name = null;
 
 	i++;
 
@@ -1395,6 +1396,7 @@ function parseTile(lines, i) {
 		},
 		name : name
 	};
+
 	return i;
 }
 
