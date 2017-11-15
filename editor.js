@@ -1,6 +1,8 @@
 /* 
 4.2 new features
 - expandable dialog textareas
+- resizable paint explorer
+- add drawing button in paint explorer
 
 CONFIRMED BUGS
 X when you delete a room, exits that reference it aren't deleted
@@ -2460,7 +2462,7 @@ function refreshPaintExplorer( doKeepOldThumbnails = false ) {
 		}
 	}
 
-	var paintExplorerForm = document.getElementById("paintExplorerForm");
+	var paintExplorerForm = document.getElementById("paintExplorerFormInner");
 	if( !doKeepOldThumbnails )
 		paintExplorerForm.innerHTML = "";
 	
@@ -2477,7 +2479,7 @@ function refreshPaintExplorer( doKeepOldThumbnails = false ) {
 }
 
 function addPaintThumbnail(id) {
-	var paintExplorerForm = document.getElementById("paintExplorerForm");
+	var paintExplorerForm = document.getElementById("paintExplorerFormInner");
 
 	var radio = document.createElement("input");
 	radio.type = "radio";
@@ -2643,7 +2645,7 @@ function selectPaint() {
 }
 
 function changePaintExplorerSelection(id) {
-	var paintExplorerForm = document.getElementById("paintExplorerForm");
+	var paintExplorerForm = document.getElementById("paintExplorerFormInner");
 	for( var i = 0; i < paintExplorerForm.childNodes.length; i++ ) {
 		var child = paintExplorerForm.childNodes[i];
 		if( child.type && child.type === "radio" ) {
@@ -2656,7 +2658,7 @@ function changePaintExplorerSelection(id) {
 }
 
 function deletePaintThumbnail(id) {
-	var paintExplorerForm = document.getElementById("paintExplorerForm");
+	var paintExplorerForm = document.getElementById("paintExplorerFormInner");
 	paintExplorerForm.removeChild( document.getElementById( "paintExplorerRadio_" + id ) );
 	paintExplorerForm.removeChild( document.getElementById( "paintExplorerLabel_" + id ) );
 }

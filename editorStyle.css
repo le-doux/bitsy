@@ -208,9 +208,12 @@ input {
 	white-space:normal;
 	border: solid 1px #ccccff;
 	border-radius: 2px;
+	resize: both;
+	width:224px;
 }
 #paintExplorerContent {
-	width:224px;margin:0px;
+	/*width:224px;*/
+	margin:0px;
 }
 /*#paintExplorerContent label {
 	border: none;
@@ -225,6 +228,27 @@ input {
 	image-rendering: pixelated;
 	border: solid 4px white;
 	/*border: none;*/
+}
+
+#paintExplorerAdd {
+	width:58px;
+	height:64px;
+	margin:0px;
+	margin-right:2px;
+	margin-bottom:-6px; /* should be unnecesarry really */
+	display:inline-block;
+	border: solid 4px white;
+	vertical-align: top;
+	/*background: red;*/
+}
+
+#paintExplorerAdd button { /* this style is a bit hacky but looks ok */
+	display:block;
+	margin:auto;
+	width: 40px;
+	height: 40px;
+	margin-top: 12px;
+	border: solid 1px #6767b2;
 }
 
 #animation img {
