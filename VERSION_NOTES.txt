@@ -1,6 +1,15 @@
 v4.2:
-- bugfix: name in room window updates on import
-- bugfix: inventory updates correctly for new game
+- dialog text fields are expandable
+- the find drawing window is resizable
+- add drawings in the find drawing window
+~~~~
+- bugs fixed:
+-- when you deleted a room, exits weren't deleted
+-- when you deleted a room, exit options didn't update
+-- find drawing window didn't update correctly when drawing deleted
+-- dialog wasn't delete when sprite was
+-- tiles were being named "undefined"
+-- find drawing window didn't refresh on new game
 
 v4.1:
 - bugfix: sometimes new dialog would overwrite old dialog

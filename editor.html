@@ -132,7 +132,7 @@
 						</button>
 						<div title="about window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">favorite</i>
-							about bitsy v4.1
+							about bitsy v4.2
 						</div>
 					</div>
 					<div id="aboutInner">
@@ -196,11 +196,24 @@
 
 							<input type="checkbox" id="versionNotesCheck" onclick="toggleVersionNotes(event);"/>
 							<label title="show / hide version notes" for="versionNotesCheck">
-								what's new in v4.1
+								what's new in v4.2
 								<i id="versionNotesCheckIcon" class="material-icons">expand_less</i>
 							</label>
 
 							<div id="versionNotes" style="display:none;">
+								<br>
+								v4.2:<br>
+								- dialog text fields are expandable<br>
+								- the find drawing window is resizable<br>
+								- add drawings in the find drawing window<br>
+								~~~~<br>
+								- bugs fixed:<br>
+								-- when you deleted a room, exits weren't deleted<br>
+								-- when you deleted a room, exit options didn't update<br>
+								-- find drawing window didn't update correctly when <br>drawing deleted<br>
+								-- dialog wasn't delete when sprite was<br>
+								-- tiles were being named "undefined"<br>
+								-- find drawing window didn't refresh on new game<br>
 								<br>
 								v4.1:<br>
 								- bugfix: sometimes new dialog would overwrite old dialog<br>

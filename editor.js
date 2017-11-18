@@ -1,16 +1,6 @@
 /* 
-4.2 new features
-- expandable dialog textareas
-- resizable paint explorer
-- add drawing button in paint explorer
-- double click paint explorer icon to bring up paint panel
-
 CONFIRMED BUGS
-X when you delete a room, exits that reference it aren't deleted
-X when you delete a room, the exit options aren't updated
-X when you delete a drawing the paint explorer doesn't update correctly
-X delete dialog when deleting drawing associated with it
-X all tiles are named UNDEFINED
+-
 
 SPOTTED BUGS
 - start a new game, old dialog sticks around (no repro)
@@ -18,6 +8,9 @@ SPOTTED BUGS
 - bug with room names? (investigate)
 - confusing that you can't add new items in the inventory window (rename them too?)
 - becklespinax: Not sure what causes it but sometimes when writing dialogue that uses the new text effects I'll go to play the scene and it won't fire the dialogue attached to the sprite when interacted with. (no repro yet)
+- weird ghost tiles in exit map
+- overlapping entrance & exit things on regular map
+- ending undefined bug (how repro?)
 
 NEW FEATURE IDEAS
 - plugin
@@ -26,6 +19,7 @@ NEW FEATURE IDEAS
 	- responsive window with min size, max size?
 	- swiping
 	- transparent iframe bg?
+- editor behaves odd in playtest mode -- disable more stuff (and make it more clear!)
 
 NOTES WHILE GETTING READY TO RELEASE
 - need to redo GIF recording (snapshots, animation, text effects)
@@ -2758,6 +2752,7 @@ function on_game_data_change() {
 
 	// ui stuff
 	updateRoomName();
+	refreshGameData();
 }
 
 function on_game_data_change_core() {
