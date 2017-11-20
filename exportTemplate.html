@@ -15,15 +15,6 @@
 	body { width:100%; height:100%; overflow:hidden; background:@@B; }
 	#game { background:black; margin: 0 auto; margin-top: 40px; display: block; }
 	#gameHolder { background:rgba(0,0,0,0); }
-	/* D-PAD */
-	#dpad { width:182px; margin:auto; /*background:red;*/ margin-top: 30px; }
-	.dpadRow { display:table-row; /*background:blue;*/ margin:0px; padding:0px; height:32px; }
-	.dpadBox { width: 60px; height: 60px; /*border: solid 1px white;*/ display:table-cell; }
-	#dpadUp { background: black; border: solid 1px white; border-bottom: 0px; }
-	#dpadDown { background: black; border: solid 1px white; border-top: 0px; }
-	#dpadLeft { background: black; border: solid 1px white; border-right: 0px; }
-	#dpadRight { background: black; border: solid 1px white; border-left: 0px; }
-	#dpadMiddle { background: black; }
 </style>
 
 <!-- SCRIPTS -->
@@ -58,26 +49,6 @@ function startExportedGame() {
 	<div id="gameHolder">
 		<!-- GAME CANVAS -->
 		<canvas id='game'></canvas>
-
-		<!-- VIRTUAL D-PAD -->
-<!-- 		<div id="dpad" style="display:none;">
-			<div class="dpadRow">
-				<div class="dpadBox"></div>
-				<div class="dpadBox" id="dpadUp"></div>
-				<div class="dpadBox"></div>
-			</div>
-			<div class="dpadRow">
-				<div class="dpadBox" id="dpadLeft"></div>
-				<div class="dpadBox" id="dpadMiddle"></div>
-				<div class="dpadBox" id="dpadRight"></div>
-			</div>
-			<div class="dpadRow">
-				<div class="dpadBox"></div>
-				<div class="dpadBox" id="dpadDown"></div>
-				<div class="dpadBox"></div>
-			</div>
-		</div> -->
-
 	</div>
 </body>
 

@@ -185,14 +185,7 @@ function onready(startWithTitle) {
 	clearInterval(loading_interval);
 
 	document.addEventListener('keydown', onkeydown);
-	
-	if( featureTouchDpad ) {
-		document.getElementById("dpadUp").addEventListener('mousedown', dpadUp);
-		document.getElementById("dpadDown").addEventListener('mousedown', dpadDown);
-		document.getElementById("dpadLeft").addEventListener('mousedown', dpadLeft);
-		document.getElementById("dpadRight").addEventListener('mousedown', dpadRight);
-		document.getElementById("dpadMiddle").addEventListener('mousedown', dpadMiddle);
-	}
+	document.addEventListener('keyup', onkeyup);
 
 	canvas.addEventListener("mousedown", onTouch);
 	
@@ -696,6 +689,18 @@ function getSpriteAt(x,y) {
 	return null;
 }
 
+var Direction = {
+	None : -1,
+	Up : 0,
+	Down : 1,
+	Left : 2,
+	Right : 3
+};
+
+var curDirection = Direction.None;
+
+var keyDownList = [];
+
 function onkeydown(e) {
 	// console.log(e.keyCode);
 	// console.log(dialog);
@@ -704,7 +709,30 @@ function onkeydown(e) {
 		e.preventDefault();
 
 	// if (isDialogMode) {
-	if(dialogBuffer.IsActive()) {
+	// if(dialogBuffer.IsActive()) {
+	// 	/* CONTINUE DIALOG */
+
+	// 	if (dialogBuffer.CanContinue()) {
+	// 		var hasMoreDialog = dialogBuffer.Continue();
+	// 		if(!hasMoreDialog) {
+	// 			console.log("EXIT DIALOG --- onkeydown")
+	// 			onExitDialog();
+	// 		}
+	// 	}
+	// 	else {
+	// 		dialogBuffer.Skip();
+	// 	}
+
+	// }
+	// else if (isEnding) {
+	// 	/* RESTART GAME */
+	// 	reset_cur_game();
+	// }
+
+	if( keyDownList.length > 0 ) {
+		// key already down --- do nothing
+	}
+	else if( dialogBuffer.IsActive() ) {
 		/* CONTINUE DIALOG */
 
 		if (dialogBuffer.CanContinue()) {
@@ -719,7 +747,7 @@ function onkeydown(e) {
 		}
 
 	}
-	else if (isEnding) {
+	else if ( isEnding ) {
 		/* RESTART GAME */
 		reset_cur_game();
 	}
@@ -789,31 +817,25 @@ function onkeydown(e) {
 		}
 	}
 
+	if( keyDownList.indexOf( e.keyCode ) == -1 )
+		keyDownList.push( e.keyCode );
+
+	console.log("KEY DOWN " + keyDownList.length );
+	console.log(keyDownList);
 }
 
-function dpad(e, keyCode) {
-	e.keyCode = keyCode; // turn this mouse event into a fake key event
-	onkeydown( e );
-}
+function onkeyup(e) {
 
-function dpadUp(e) {
-	dpad( e, key.up );
-}
+	if(e.keyCode == key.left || e.keyCode == key.right || e.keyCode == key.up || e.keyCode == key.down || !isPlayerEmbeddedInEditor)
+		e.preventDefault();
 
-function dpadDown(e) {
-	dpad( e, key.down );
-}
+	if( keyDownList.indexOf( e.keyCode ) != -1 )
+		keyDownList.splice( keyDownList.indexOf( e.keyCode ), 1 );
 
-function dpadLeft(e) {
-	dpad( e, key.left );
-}
-
-function dpadRight(e) {
-	dpad( e, key.right );
-}
-
-function dpadMiddle(e) {
-	dpad( e, key.space );
+	console.log(e.keyCode);
+	console.log("KEY UP " + keyDownList.length );
+	console.log(keyDownList);
+	console.log("_____");
 }
 
 function getItemIndex( roomId, x, y ) {
