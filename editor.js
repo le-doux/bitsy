@@ -20,10 +20,17 @@ NEW FEATURE IDEAS
 	- swiping
 	- transparent iframe bg?
 - editor behaves odd in playtest mode -- disable more stuff (and make it more clear!)
+- need newlines in endings
 
 NOTES WHILE GETTING READY TO RELEASE
 - need to redo GIF recording (snapshots, animation, text effects)
 
+Notes on controlled walking
+- need to respond to direction buttons even if you haven't lifted all the other buttons
+
+Other notes
+- string demarcation in programming language
+- comments for programming language
 
 BUGS / FEEDBACK:
 * Thank you @adamledoux for Bitsy, it is so relaxing to use. Are you aware that in Safari deleted rooms do not disappear from the exit list?
@@ -3759,7 +3766,7 @@ function grabCard(e) {
 	grabbedPanel.card.style.zIndex = 1000;
 }
 
-function onmousemove(e) {
+function panel_onMouseMove(e) {
 	if (grabbedPanel.card == null) return;
 
 	grabbedPanel.card.style.left = e.clientX - grabbedPanel.cursorOffset.x + "px";
@@ -3784,9 +3791,9 @@ function onmousemove(e) {
 		}
 	}
 }
-document.addEventListener("mousemove",onmousemove);
+document.addEventListener("mousemove",panel_onMouseMove);
 
-function onmouseup(e) {
+function panel_onMouseUp(e) {
 	if (grabbedPanel.card == null) return;
 
 	var editorContent = document.getElementById("editorContent");
@@ -3806,7 +3813,7 @@ function onmouseup(e) {
 
 	updatePanelPrefs();
 }
-document.addEventListener("mouseup",onmouseup);
+document.addEventListener("mouseup",panel_onMouseUp);
 
 // TODO consolidate these into one function?
 function getElementPosition(e) { /* gets absolute position on page */

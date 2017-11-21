@@ -187,8 +187,11 @@ function onready(startWithTitle) {
 	document.addEventListener('keydown', onkeydown);
 	document.addEventListener('keyup', onkeyup);
 
-	canvas.addEventListener("mousedown", onTouch);
-	
+	// canvas.addEventListener("mousedown", onTouch);
+	canvas.addEventListener('mousedown', onmousedown);
+	canvas.addEventListener('mousemove', onmousemove);
+	canvas.addEventListener('mouseup', onmouseup);
+
 	update_interval = setInterval(update,-1);
 
 	console.log("TITLE ??? " + startWithTitle);
@@ -225,6 +228,7 @@ function fullscreen(el) {
     }
 }
 
+// OLD VERSION: DEPRECATED
 function onTouch(e) {
 	console.log("MOUSEDOWN");
 
@@ -540,7 +544,7 @@ function loadingAnimation() {
 function update() {
 	var curTime = Date.now();
 	deltaTime = curTime - prevTime;
-	
+
 	//clear screen
 	ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
 	ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -564,6 +568,20 @@ function update() {
 			ctx.globalAlpha = 0.5;
 			ctx.fillRect( dest.x * tilesize*scale, dest.y * tilesize*scale, tilesize*scale, tilesize*scale );
 			ctx.globalAlpha = 1;
+		}
+	}
+
+	// keep moving avatar if player holds down button
+	if( !dialogBuffer.IsActive() && !isEnding )
+	{
+		if( curPlayerDirection != Direction.None ) {
+			playerHoldToMoveTimer -= deltaTime;
+
+			if( playerHoldToMoveTimer <= 0 )
+			{
+				movePlayer( curPlayerDirection );
+				playerHoldToMoveTimer = 150;
+			}
 		}
 	}
 
@@ -697,44 +715,24 @@ var Direction = {
 	Right : 3
 };
 
-var curDirection = Direction.None;
+var curPlayerDirection = Direction.None;
+var playerHoldToMoveTimer = 0;
 
 var keyDownList = [];
 
 function onkeydown(e) {
-	// console.log(e.keyCode);
-	// console.log(dialog);
-
 	if(e.keyCode == key.left || e.keyCode == key.right || e.keyCode == key.up || e.keyCode == key.down || !isPlayerEmbeddedInEditor)
 		e.preventDefault();
 
-	// if (isDialogMode) {
-	// if(dialogBuffer.IsActive()) {
-	// 	/* CONTINUE DIALOG */
-
-	// 	if (dialogBuffer.CanContinue()) {
-	// 		var hasMoreDialog = dialogBuffer.Continue();
-	// 		if(!hasMoreDialog) {
-	// 			console.log("EXIT DIALOG --- onkeydown")
-	// 			onExitDialog();
-	// 		}
-	// 	}
-	// 	else {
-	// 		dialogBuffer.Skip();
-	// 	}
-
-	// }
-	// else if (isEnding) {
-	// 	/* RESTART GAME */
-	// 	reset_cur_game();
-	// }
-
-	if( keyDownList.length > 0 ) {
+	if( keyDownList.indexOf( e.keyCode ) != -1 ) {
 		// key already down --- do nothing
+		return;
 	}
-	else if( dialogBuffer.IsActive() ) {
-		/* CONTINUE DIALOG */
 
+	curPlayerDirection = Direction.None;
+
+	if( dialogBuffer.IsActive() ) {
+		/* CONTINUE DIALOG */
 		if (dialogBuffer.CanContinue()) {
 			var hasMoreDialog = dialogBuffer.Continue();
 			if(!hasMoreDialog) {
@@ -745,68 +743,30 @@ function onkeydown(e) {
 		else {
 			dialogBuffer.Skip();
 		}
-
 	}
 	else if ( isEnding ) {
 		/* RESTART GAME */
 		reset_cur_game();
 	}
 	else {
-
 		/* WALK */
+		if ( e.keyCode == key.left || e.keyCode == key.a ) {
+			curPlayerDirection = Direction.Left;
+		}
+		else if ( e.keyCode == key.right || e.keyCode == key.d ) {
+			curPlayerDirection = Direction.Right;
+		}
+		else if ( e.keyCode == key.up || e.keyCode == key.w ) {
+			curPlayerDirection = Direction.Up;
+		}
+		else if ( e.keyCode == key.down || e.keyCode == key.s ) {
+			curPlayerDirection = Direction.Down;
+		}
+		movePlayer( curPlayerDirection );
 
-		var spr = null;
-
-		if ( (e.keyCode == key.left || e.keyCode == key.a) && !(spr = getSpriteLeft()) && !isWallLeft()) {
-			player().x -= 1;
-			didPlayerMoveThisFrame = true;
-		}
-		else if ( (e.keyCode == key.right || e.keyCode == key.d) && !(spr = getSpriteRight()) && !isWallRight()) {
-			player().x += 1;
-			didPlayerMoveThisFrame = true;
-		}
-		else if ( (e.keyCode == key.up || e.keyCode == key.w) && !(spr = getSpriteUp()) && !isWallUp()) {
-			player().y -= 1;
-			didPlayerMoveThisFrame = true;
-		}
-		else if ( (e.keyCode == key.down || e.keyCode == key.s) && !(spr = getSpriteDown()) && !isWallDown()) {
-			player().y += 1;
-			didPlayerMoveThisFrame = true;
-		}
-		
-		var ext = getExit( player().room, player().x, player().y );
-		var end = getEnding( player().room, player().x, player().y );
-		var itmIndex = getItemIndex( player().room, player().x, player().y );
-		if (end) {
-			startNarrating( ending[end.id], true /*isEnding*/ );
-		}
-		else if (ext) {
-			player().room = ext.dest.room;
-			player().x = ext.dest.x;
-			player().y = ext.dest.y;
-			curRoom = ext.dest.room;
-		}
-		else if (spr) {
-			startSpriteDialog( spr /*spriteId*/ );
-		}
-		else if (itmIndex > -1) {
-			// TODO pick up items (what about touch?)
-			// console.log("HIT ITM ");
-			// console.log( itmIndex );
-			var itm = room[ player().room ].items[ itmIndex ];
-			// console.log(itm);
-			room[ player().room ].items.splice( itmIndex, 1 );
-			if( player().inventory[ itm.id ] )
-				player().inventory[ itm.id ] += 1;
-			else
-				player().inventory[ itm.id ] = 1;
-
-			if(onInventoryChanged != null)
-				onInventoryChanged( itm.id );
-
-			startItemDialog( itm.id  /*itemId*/ );
-
-			// console.log( player().inventory );
+		if( curPlayerDirection != Direction.None )
+		{
+			playerHoldToMoveTimer = 500;
 		}
 
 		/* RESTART GAME */
@@ -824,6 +784,62 @@ function onkeydown(e) {
 	console.log(keyDownList);
 }
 
+function movePlayer(direction) {
+	var spr = null;
+
+	if ( curPlayerDirection == Direction.Left && !(spr = getSpriteLeft()) && !isWallLeft()) {
+		player().x -= 1;
+		didPlayerMoveThisFrame = true;
+	}
+	else if ( curPlayerDirection == Direction.Right && !(spr = getSpriteRight()) && !isWallRight()) {
+		player().x += 1;
+		didPlayerMoveThisFrame = true;
+	}
+	else if ( curPlayerDirection == Direction.Up && !(spr = getSpriteUp()) && !isWallUp()) {
+		player().y -= 1;
+		didPlayerMoveThisFrame = true;
+	}
+	else if ( curPlayerDirection == Direction.Down && !(spr = getSpriteDown()) && !isWallDown()) {
+		player().y += 1;
+		didPlayerMoveThisFrame = true;
+	}
+	
+	var ext = getExit( player().room, player().x, player().y );
+	var end = getEnding( player().room, player().x, player().y );
+	var itmIndex = getItemIndex( player().room, player().x, player().y );
+	if (end) {
+		startNarrating( ending[end.id], true /*isEnding*/ );
+	}
+	else if (ext) {
+		player().room = ext.dest.room;
+		player().x = ext.dest.x;
+		player().y = ext.dest.y;
+		curRoom = ext.dest.room;
+	}
+	else if (spr) {
+		startSpriteDialog( spr /*spriteId*/ );
+	}
+	else if (itmIndex > -1) {
+		// TODO pick up items (what about touch?)
+		// console.log("HIT ITM ");
+		// console.log( itmIndex );
+		var itm = room[ player().room ].items[ itmIndex ];
+		// console.log(itm);
+		room[ player().room ].items.splice( itmIndex, 1 );
+		if( player().inventory[ itm.id ] )
+			player().inventory[ itm.id ] += 1;
+		else
+			player().inventory[ itm.id ] = 1;
+
+		if(onInventoryChanged != null)
+			onInventoryChanged( itm.id );
+
+		startItemDialog( itm.id  /*itemId*/ );
+
+		// console.log( player().inventory );
+	}
+}
+
 function onkeyup(e) {
 
 	if(e.keyCode == key.left || e.keyCode == key.right || e.keyCode == key.up || e.keyCode == key.down || !isPlayerEmbeddedInEditor)
@@ -832,10 +848,92 @@ function onkeyup(e) {
 	if( keyDownList.indexOf( e.keyCode ) != -1 )
 		keyDownList.splice( keyDownList.indexOf( e.keyCode ), 1 );
 
+	// todo is this robust enough?
+	if( keyDownList.length <= 0 )
+		curPlayerDirection = Direction.None;
+
 	console.log(e.keyCode);
 	console.log("KEY UP " + keyDownList.length );
 	console.log(keyDownList);
 	console.log("_____");
+}
+
+var mouseInfo = {
+	isDown : false,
+	startX : 0,
+	startY : 0,
+	curX : 0,
+	curY : 0
+};
+
+function onmousedown(e) {
+	mouseInfo.isDown = true;
+
+	// console.log(e);
+	mouseInfo.startX = mouseInfo.curX = e.clientX;
+	mouseInfo.startY = mouseInfo.curY = e.clientY;
+	console.log(mouseInfo);
+
+	curPlayerDirection = Direction.None;
+}
+
+function onmousemove(e) {
+	if( mouseInfo.isDown ) {
+		mouseInfo.curX = e.clientX;
+		mouseInfo.curY = e.clientY;
+
+		var prevDirection = curPlayerDirection;
+
+		console.log( mouseInfo.curX - mouseInfo.startX );
+
+		if( mouseInfo.curX - mouseInfo.startX <= -60 ) {
+			curPlayerDirection = Direction.Left;
+		}
+		else if( mouseInfo.curX - mouseInfo.startX >= 60 ) {
+			curPlayerDirection = Direction.Right;
+		}
+		else if( mouseInfo.curY - mouseInfo.startY <= -60 ) {
+			curPlayerDirection = Direction.Up;
+		}
+		else if( mouseInfo.curY - mouseInfo.startY >= 60 ) {
+			curPlayerDirection = Direction.Down;
+		}
+
+		if( curPlayerDirection != prevDirection ) {
+			movePlayer( curPlayerDirection );
+			playerHoldToMoveTimer = 300;
+			// reset center
+			mouseInfo.startX = mouseInfo.curX;
+			mouseInfo.startY = mouseInfo.curY;
+		}
+	}
+}
+
+function onmouseup(e) {
+	mouseInfo.isDown = false;
+
+	if( curPlayerDirection == Direction.None ) {
+		// tap!
+		if( dialogBuffer.IsActive() ) {
+			/* CONTINUE DIALOG */
+			if (dialogBuffer.CanContinue()) {
+				var hasMoreDialog = dialogBuffer.Continue();
+				if(!hasMoreDialog) {
+					console.log("EXIT DIALOG --- onkeydown")
+					onExitDialog();
+				}
+			}
+			else {
+				dialogBuffer.Skip();
+			}
+		}
+		else if ( isEnding ) {
+			/* RESTART GAME */
+			reset_cur_game();
+		}
+	}
+
+	curPlayerDirection = Direction.None;
 }
 
 function getItemIndex( roomId, x, y ) {
