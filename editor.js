@@ -2,6 +2,20 @@
 CONFIRMED BUGS
 -
 
+TODO: touch controls
+X figure out scaling (_test windows / android)
+X rename touch event handlers
+- test on android
+- release
+- publicize
+- need more feedback for swiping controls (partial swipe, bump, select character)
+X swipe movements are too large
+-- updated style -- (also need a way to turn this off, looks good on mac but what about windows???)
+	html { margin:0px; padding:0px; }
+	body { margin:0px; padding:0px; overflow:hidden; background:#fff; }
+	#game { background:black; width:100vw; margin:auto; max-width:100vh; display: block; }
+------
+
 SPOTTED BUGS
 - start a new game, old dialog sticks around (no repro)
 - need to improve UI to teach how new dialog works
@@ -28,9 +42,20 @@ NOTES WHILE GETTING READY TO RELEASE
 Notes on controlled walking
 - need to respond to direction buttons even if you haven't lifted all the other buttons
 
-Other notes
+Other notes / feature ideas
 - string demarcation in programming language
 - comments for programming language
+- documentation for programming language
+- WASD / arrow keys should only control game when the game has focus?
+- not always clear when the editor is play-mode vs edit-mode (visuals? turn off editor controls? other?)
+- multiple avatars
+- multiple exits when you got different items
+- arrange windows more freely (vertical)
+- mobile version
+- better organization tools for tiles (e.g. naming, re-ordering them, grouping them (folders?), searching, etc.)
+- dialog when you change rooms
+- different color for character sprite vs everything else?
+- game ends after dialog from sprite (add to scripting)
 
 BUGS / FEEDBACK:
 * Thank you @adamledoux for Bitsy, it is so relaxing to use. Are you aware that in Safari deleted rooms do not disappear from the exit list?
@@ -2902,7 +2927,7 @@ function apply_wall_setting_all_rooms() {
 function exportGame() {
 	refreshGameData(); //just in case
 	var gameData = document.getElementById("game_data").value; //grab game data
-	exporter.exportGame( gameData, title, exportPageColor, "mygame.html" ); //download as html file
+	exporter.exportGame( gameData, title, exportPageColor, "mygame.html", true, 0 ); //download as html file
 }
 
 function hideAbout() {

@@ -188,9 +188,9 @@ function onready(startWithTitle) {
 	document.addEventListener('keyup', onkeyup);
 
 	// canvas.addEventListener("mousedown", onTouch);
-	canvas.addEventListener('mousedown', onmousedown);
-	canvas.addEventListener('mousemove', onmousemove);
-	canvas.addEventListener('mouseup', onmouseup);
+	canvas.addEventListener('touchstart', ontouchstart);
+	canvas.addEventListener('touchmove', ontouchmove);
+	canvas.addEventListener('touchend', ontouchend);
 
 	update_interval = setInterval(update,-1);
 
@@ -858,7 +858,7 @@ function onkeyup(e) {
 	console.log("_____");
 }
 
-var mouseInfo = {
+var touchInfo = {
 	isDown : false,
 	startX : 0,
 	startY : 0,
@@ -866,36 +866,49 @@ var mouseInfo = {
 	curY : 0
 };
 
-function onmousedown(e) {
-	mouseInfo.isDown = true;
+function ontouchstart(e) {
+	e.preventDefault();
 
-	// console.log(e);
-	mouseInfo.startX = mouseInfo.curX = e.clientX;
-	mouseInfo.startY = mouseInfo.curY = e.clientY;
-	console.log(mouseInfo);
+	if( e.changedTouches.length > 0 ) {
+		touchInfo.isDown = true;
 
-	curPlayerDirection = Direction.None;
+		console.log(e);
+
+		touchInfo.startX = touchInfo.curX = e.changedTouches[0].clientX;
+		touchInfo.startY = touchInfo.curY = e.changedTouches[0].clientY;
+
+		console.log("MOUSE DOWN");
+		console.log(touchInfo);
+
+		curPlayerDirection = Direction.None;
+	}
 }
 
-function onmousemove(e) {
-	if( mouseInfo.isDown ) {
-		mouseInfo.curX = e.clientX;
-		mouseInfo.curY = e.clientY;
+var swipeDistance = 30;
+function ontouchmove(e) {
+	e.preventDefault();
+
+	console.log("MOUSE MOVE");
+	console.log(touchInfo);
+
+	if( !dialogBuffer.IsActive() && touchInfo.isDown && e.changedTouches.length > 0 ) {
+		touchInfo.curX = e.changedTouches[0].clientX;
+		touchInfo.curY = e.changedTouches[0].clientY;
 
 		var prevDirection = curPlayerDirection;
 
-		console.log( mouseInfo.curX - mouseInfo.startX );
+		console.log( touchInfo.curX - touchInfo.startX );
 
-		if( mouseInfo.curX - mouseInfo.startX <= -60 ) {
+		if( touchInfo.curX - touchInfo.startX <= -swipeDistance ) {
 			curPlayerDirection = Direction.Left;
 		}
-		else if( mouseInfo.curX - mouseInfo.startX >= 60 ) {
+		else if( touchInfo.curX - touchInfo.startX >= swipeDistance ) {
 			curPlayerDirection = Direction.Right;
 		}
-		else if( mouseInfo.curY - mouseInfo.startY <= -60 ) {
+		else if( touchInfo.curY - touchInfo.startY <= -swipeDistance ) {
 			curPlayerDirection = Direction.Up;
 		}
-		else if( mouseInfo.curY - mouseInfo.startY >= 60 ) {
+		else if( touchInfo.curY - touchInfo.startY >= swipeDistance ) {
 			curPlayerDirection = Direction.Down;
 		}
 
@@ -903,14 +916,19 @@ function onmousemove(e) {
 			movePlayer( curPlayerDirection );
 			playerHoldToMoveTimer = 300;
 			// reset center
-			mouseInfo.startX = mouseInfo.curX;
-			mouseInfo.startY = mouseInfo.curY;
+			touchInfo.startX = touchInfo.curX;
+			touchInfo.startY = touchInfo.curY;
 		}
 	}
 }
 
-function onmouseup(e) {
-	mouseInfo.isDown = false;
+function ontouchend(e) {
+	e.preventDefault();
+
+	console.log("MOUSE UP");
+	console.log(touchInfo);
+
+	touchInfo.isDown = false;
 
 	if( curPlayerDirection == Direction.None ) {
 		// tap!

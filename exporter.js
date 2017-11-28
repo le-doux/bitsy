@@ -13,6 +13,8 @@ function loadResource(url) {
 }
 
 loadResource("exportTemplate.html");
+loadResource("exportStyleFixed.css");
+loadResource("exportStyleFull.css");
 loadResource("bitsy.js");
 loadResource("font.js");
 loadResource("dialog.js");
@@ -61,11 +63,17 @@ function replaceTemplateMarker(template, marker, text) {
 	return template.substr( 0, markerIndex ) + text + template.substr( markerIndex + marker.length );
 }
 
-this.exportGame = function(gameData, title, pageColor, filename) {
+this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, size) {
 	var html = resources["exportTemplate.html"].substr(); //copy template
 	console.log(html);
 	html = replaceTemplateMarker( html, "@@T", title );
 	html = replaceTemplateMarker( html, "@@B", pageColor );
+
+	if( isFixedSize )
+		html = replaceTemplateMarker( html, "@@C", resources["exportStyleFixed.css"] );
+	else
+		html = replaceTemplateMarker( html, "@@C", resources["exportStyleFull.css"] );
+
 	html = replaceTemplateMarker( html, "@@F", resources["font.js"] );
 	html = replaceTemplateMarker( html, "@@S", resources["script.js"] );
 	html = replaceTemplateMarker( html, "@@L", resources["dialog.js"] );

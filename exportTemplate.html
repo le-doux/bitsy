@@ -11,10 +11,15 @@
 </script>
 
 <style>
-	html { height: 592px; }
+/*	html { height: 592px; }
 	body { width:100%; height:100%; overflow:hidden; background:@@B; }
 	#game { background:black; margin: 0 auto; margin-top: 40px; display: block; }
-	#gameHolder { background:rgba(0,0,0,0); }
+
+	html { margin:0px; padding:0px; }
+	body { margin:0px; padding:0px; overflow:hidden; background:@@B; }
+	#game { background:black; width:100vw; margin:auto; max-width:100vh; display: block; }*/
+
+@@C
 </style>
 
 <!-- SCRIPTS -->
@@ -46,10 +51,8 @@ function startExportedGame() {
 
 <!-- DOCUMENT BODY -->
 <body onload='startExportedGame()'>
-	<div id="gameHolder">
-		<!-- GAME CANVAS -->
-		<canvas id='game'></canvas>
-	</div>
+	<!-- GAME CANVAS -->
+	<canvas id='game'></canvas>
 </body>
 
 
