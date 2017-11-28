@@ -5,16 +5,8 @@ CONFIRMED BUGS
 TODO: touch controls
 X figure out scaling (_test windows / android)
 X rename touch event handlers
-- test on android
-- release
-- publicize
 - need more feedback for swiping controls (partial swipe, bump, select character)
 X swipe movements are too large
--- updated style -- (also need a way to turn this off, looks good on mac but what about windows???)
-	html { margin:0px; padding:0px; }
-	body { margin:0px; padding:0px; overflow:hidden; background:#fff; }
-	#game { background:black; width:100vw; margin:auto; max-width:100vh; display: block; }
-------
 
 SPOTTED BUGS
 - start a new game, old dialog sticks around (no repro)

@@ -65,9 +65,9 @@ function replaceTemplateMarker(template, marker, text) {
 
 this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, size) {
 	var html = resources["exportTemplate.html"].substr(); //copy template
-	console.log(html);
+	// console.log(html);
+
 	html = replaceTemplateMarker( html, "@@T", title );
-	html = replaceTemplateMarker( html, "@@B", pageColor );
 
 	if( isFixedSize ) {
 		html = replaceTemplateMarker( html, "@@C", resources["exportStyleFixed.css"] );
@@ -77,12 +77,17 @@ this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, si
 		html = replaceTemplateMarker( html, "@@C", resources["exportStyleFull.css"] );
 	}
 
+	html = replaceTemplateMarker( html, "@@B", pageColor );
+
 	html = replaceTemplateMarker( html, "@@F", resources["font.js"] );
 	html = replaceTemplateMarker( html, "@@S", resources["script.js"] );
 	html = replaceTemplateMarker( html, "@@L", resources["dialog.js"] );
 	html = replaceTemplateMarker( html, "@@E", resources["bitsy.js"] );
+
 	html = replaceTemplateMarker( html, "@@D", gameData );
-	console.log(html);
+
+	// console.log(html);
+
 	downloadFile( filename, html );
 }
 

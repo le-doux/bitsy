@@ -1,3 +1,8 @@
+v4.3:
+- new swipe & tap mobile controls
+- mobile-friendly full page game window
+- adjustable game window size settings
+
 v4.2:
 - dialog text fields are expandable
 - the find drawing window is resizable
