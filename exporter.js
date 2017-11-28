@@ -69,10 +69,13 @@ this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, si
 	html = replaceTemplateMarker( html, "@@T", title );
 	html = replaceTemplateMarker( html, "@@B", pageColor );
 
-	if( isFixedSize )
+	if( isFixedSize ) {
 		html = replaceTemplateMarker( html, "@@C", resources["exportStyleFixed.css"] );
-	else
+		html = replaceTemplateMarker( html, "@@Z", size + "px" );
+	}
+	else {
 		html = replaceTemplateMarker( html, "@@C", resources["exportStyleFull.css"] );
+	}
 
 	html = replaceTemplateMarker( html, "@@F", resources["font.js"] );
 	html = replaceTemplateMarker( html, "@@S", resources["script.js"] );

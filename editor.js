@@ -2927,7 +2927,8 @@ function apply_wall_setting_all_rooms() {
 function exportGame() {
 	refreshGameData(); //just in case
 	var gameData = document.getElementById("game_data").value; //grab game data
-	exporter.exportGame( gameData, title, exportPageColor, "mygame.html", true, 0 ); //download as html file
+	var size = document.getElementById("exportSizeFixedInput").value;
+	exporter.exportGame( gameData, title, exportPageColor, "mygame.html", isFixedSize, size ); //download as html file
 }
 
 function hideAbout() {
@@ -5042,4 +5043,15 @@ function togglePreviewDialog(event) {
 	}
 	updatePlayModeButton();
 	updatePreviewDialogButton();
+}
+
+var isFixedSize = false;
+function chooseExportSizeFull() {
+	isFixedSize = false;
+	document.getElementById("exportSizeFixedInputSpan").style.display = "none";
+}
+
+function chooseExportSizeFixed() {
+	isFixedSize = true;
+	document.getElementById("exportSizeFixedInputSpan").style.display = "inline-block";
 }

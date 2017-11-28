@@ -187,7 +187,6 @@ function onready(startWithTitle) {
 	document.addEventListener('keydown', onkeydown);
 	document.addEventListener('keyup', onkeyup);
 
-	// canvas.addEventListener("mousedown", onTouch);
 	canvas.addEventListener('touchstart', ontouchstart);
 	canvas.addEventListener('touchmove', ontouchmove);
 	canvas.addEventListener('touchend', ontouchend);
@@ -216,119 +215,99 @@ function setInitialVariables() {
 	scriptInterpreter.SetOnVariableChangeHandler( onVariableChanged );
 }
 
-function fullscreen(el) {
-    if (el.requestFullscreen) {
-        return el.requestFullscreen();
-    } else if (el.msRequestFullscreen) {
-        return el.msRequestFullscreen();
-    } else if (el.mozRequestFullScreen) {
-        return el.mozRequestFullScreen();
-    } else if (el.webkitRequestFullscreen) {
-        return el.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-    }
-}
-
 // OLD VERSION: DEPRECATED
-function onTouch(e) {
-	console.log("MOUSEDOWN");
+// function onTouch(e) {
+// 	console.log("MOUSEDOWN");
 
-	if( featureTouchDpad ) {
-		console.log("FULLSCREEN");
-		document.getElementById("dpad").style.display = "block";
-		fullscreen( document.getElementById("gameHolder") );
-	}
+// 	//dialog mode
+// 	// if (isDialogMode) {
+// 	if(dialogBuffer.IsActive()) {
 
-	if( !featureOldTouch ) // Don't use old touch controls
-		return;
+// 		if (dialogBuffer.CanContinue()) {
+// 			var hasMoreDialog = dialogBuffer.Continue();
+// 			if(!hasMoreDialog) {
+// 				onExitDialog();
+// 			}
+// 		}
+// 		else {
+// 			dialogBuffer.Skip();
+// 		}
 
-	//dialog mode
-	// if (isDialogMode) {
-	if(dialogBuffer.IsActive()) {
+// 		return;
+// 	}
 
-		if (dialogBuffer.CanContinue()) {
-			var hasMoreDialog = dialogBuffer.Continue();
-			if(!hasMoreDialog) {
-				onExitDialog();
-			}
-		}
-		else {
-			dialogBuffer.Skip();
-		}
+// 	if (isEnding) {
+// 		reset_cur_game();
+// 		return;
+// 	}
 
-		return;
-	}
-
-	if (isEnding) {
-		reset_cur_game();
-		return;
-	}
-
-	//walking mode
-	var off = getOffset(e);
-	var x = Math.floor(off.x / (tilesize*scale));
-	var y = Math.floor(off.y / (tilesize*scale));
+// 	//walking mode
+// 	var off = getOffset(e);
+// 	var x = Math.floor(off.x / (tilesize*scale));
+// 	var y = Math.floor(off.y / (tilesize*scale));
 	
-	//abort if you touch the square you're already on
-	if (player().x == x && player().y == y) {
-		return;
-	}
+// 	//abort if you touch the square you're already on
+// 	if (player().x == x && player().y == y) {
+// 		return;
+// 	}
 
-	//did we touch a sprite?
-	var touchedSprite = null;
-	for (id in sprite) {
-		var spr = sprite[id];
-		if (spr.room === curRoom) {
-			if (spr.x == x && spr.y == y) {
-				touchedSprite = id;
-			}
-		}
-	}
+// 	//did we touch a sprite?
+// 	var touchedSprite = null;
+// 	for (id in sprite) {
+// 		var spr = sprite[id];
+// 		if (spr.room === curRoom) {
+// 			if (spr.x == x && spr.y == y) {
+// 				touchedSprite = id;
+// 			}
+// 		}
+// 	}
 
-	//respond to sprite touch
-	if (touchedSprite) {
-		var spr = sprite[touchedSprite];
-		// console.log(Math.abs(player().x - spr.x));
-		// console.log(Math.abs(player().y - spr.y));
-		if ( Math.abs(player().x - spr.x) == 0
-				&& Math.abs(player().y - spr.y) == 1 )
-		{
-			//touched a sprite next to you
-		}
-		else if ( Math.abs(player().y - spr.y) == 0
-				&& Math.abs(player().x - spr.x) == 1 )
-		{
-			//touched a sprite next to you
-		}
-		else
-		{
-			return; //oh no! touched a sprite that's out of range
-		}
+// 	//respond to sprite touch
+// 	if (touchedSprite) {
+// 		var spr = sprite[touchedSprite];
+// 		// console.log(Math.abs(player().x - spr.x));
+// 		// console.log(Math.abs(player().y - spr.y));
+// 		if ( Math.abs(player().x - spr.x) == 0
+// 				&& Math.abs(player().y - spr.y) == 1 )
+// 		{
+// 			//touched a sprite next to you
+// 		}
+// 		else if ( Math.abs(player().y - spr.y) == 0
+// 				&& Math.abs(player().x - spr.x) == 1 )
+// 		{
+// 			//touched a sprite next to you
+// 		}
+// 		else
+// 		{
+// 			return; //oh no! touched a sprite that's out of range
+// 		}
 
-		startSpriteDialog( touchedSprite /*spriteId*/ );
+// 		startSpriteDialog( touchedSprite /*spriteId*/ );
 
-		return;
-	}
+// 		return;
+// 	}
 
-	//did we touch an open square?
-	var row = room[curRoom].tilemap[y];
-	// console.log(row);
-	var til = row[x];
-	// console.log(til);
-	if ( room[curRoom].walls.indexOf(til) != -1 ) {
-		//touched a wall
-		return;
-	}
+// 	//did we touch an open square?
+// 	var row = room[curRoom].tilemap[y];
+// 	// console.log(row);
+// 	var til = row[x];
+// 	// console.log(til);
+// 	if ( room[curRoom].walls.indexOf(til) != -1 ) {
+// 		//touched a wall
+// 		return;
+// 	}
 
-	//find path to open square, if there is one
-	var map = collisionMap(curRoom);
-	var path = breadthFirstSearch( map, {x:player().x, y:player().y}, {x:x,y:y} );
-	path = path.slice(1); //remove player's start square
+// 	//find path to open square, if there is one
+// 	var map = collisionMap(curRoom);
+// 	var path = breadthFirstSearch( map, {x:player().x, y:player().y}, {x:x,y:y} );
+// 	path = path.slice(1); //remove player's start square
 
-	//console.log( pathToString(path) );
+// 	//console.log( pathToString(path) );
 
-	player().walkingPath = path;
-}
+// 	player().walkingPath = path;
+// }
 
+// TODO: this is likely broken
 function breadthFirstSearch(map, from, to) {
 	from.trail = [];
 	var visited = [];
@@ -2083,7 +2062,3 @@ var scriptModule = new Script();
 var scriptInterpreter = scriptModule.CreateInterpreter();
 var scriptUtils = scriptModule.CreateUtils(); // TODO: move to editor.js?
 // scriptInterpreter.SetDialogBuffer( dialogBuffer );
-
-/* FEATURE FLAGS */
-var featureOldTouch = false;
-var featureTouchDpad = false;

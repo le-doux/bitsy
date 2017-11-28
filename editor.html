@@ -846,9 +846,30 @@
 
 						<div id="downloadOptions" style="display:none;">
 							<div class="buttonGroup">
+								html page color: <br/>
 								<input title="pick background color for exported html page" type="color" value="#ffffff" id="pageColor" onchange="on_change_color_page();" autocomplete="off">
-								html page color
 							</div>
+
+							<form>
+								game window size: <br/>
+								<input type="radio" name="export size" value="full" onclick="chooseExportSizeFull();" id="exportSizeOptionFull" checked>
+								<label title="game window resizes to fill page (mobile friendly)" for="exportSizeOptionFull" class="left">
+									<i class="material-icons">crop_free</i>
+									full page
+								</label>
+
+								<input type="radio" name="export size" value="fixed" onclick="chooseExportSizeFixed();" id="exportSizeOptionFixed">
+								<label title="game window stays a fixed size" for="exportSizeOptionFixed" class="right">
+									<i class="material-icons">crop</i>
+									fixed size
+								</label>
+
+								<div style="margin-top:5px;">
+									<span class="controlBox" id="exportSizeFixedInputSpan" style="display:none;">
+										<input type="number" min="0" value="512" style="width:60px;" id="exportSizeFixedInput"> px
+									</span>
+								</div>
+							</form>
 						</div>
 					</div>
 
