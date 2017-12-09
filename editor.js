@@ -1,9 +1,7 @@
 /* 
-4.4 work:
-- bugfix: type error on top / bottom of screen
-
 CONFIRMED BUGS
 - iOS editor is broken again
+- bug with mobile (iOS safari) not loading itch games every time
 
 TODO: touch controls
 X figure out scaling (_test windows / android)

@@ -1,3 +1,7 @@
+v4.4:
+- wall settings for tiles apply to all rooms by default
+- bugfix: error on walking into edge of room
+
 v4.3:
 - new swipe & tap mobile controls
 - mobile-friendly full page game window
