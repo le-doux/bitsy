@@ -975,9 +975,19 @@ function isWallDown() {
 }
 
 function isWall(x,y) {
-	// console.log(x + " " + y);
-	var i = getRoom().walls.indexOf( getTile(x,y) );
-	return i > -1;
+	var tileId = getTile( x, y );
+
+	if( tileId === '0' )
+		return false; // Blank spaces aren't walls, ya doofus
+
+	if( tile[tileId].isWall === undefined || tile[tileId].isWall === null ) {
+		// No wall-state defined: check room-specific walls
+		var i = getRoom().walls.indexOf( getTile(x,y) );
+		return i > -1;
+	}
+
+	// Otherwise, use the tile's own wall-state
+	return tile[tileId].isWall;
 }
 
 function getItem(roomId,x,y) {
