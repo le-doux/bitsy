@@ -1314,15 +1314,24 @@ function reloadTile() {
 }
 
 function updateWallCheckboxOnCurrentTile() {
-	if (room[curRoom]) { //todo this per-room wall nonsense is confusing
-		if (room[curRoom].walls.indexOf(drawingId) != -1) {
-			document.getElementById("wallCheckbox").checked = true;
-			document.getElementById("wallCheckboxIcon").innerHTML = "border_outer";
+	var isCurTileWall = false;
+
+	if( tile[ drawingId ].isWall == undefined || tile[ drawingId ].isWall == null ) {
+		if (room[curRoom]) {
+			isCurTileWall = (room[curRoom].walls.indexOf(drawingId) != -1);
 		}
-		else {
-			document.getElementById("wallCheckbox").checked = false;
-			document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
-		}
+	}
+	else {
+		isCurTileWall = tile[ drawingId ].isWall;
+	}
+
+	if (isCurTileWall) {
+		document.getElementById("wallCheckbox").checked = true;
+		document.getElementById("wallCheckboxIcon").innerHTML = "border_outer";
+	}
+	else {
+		document.getElementById("wallCheckbox").checked = false;
+		document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
 	}
 }
 
@@ -2886,32 +2895,12 @@ function updateExitOptionsFromGameData() {
 
 function on_toggle_wall(e) {
 	if ( e.target.checked ){
-		//add to wall list
-		room[curRoom].walls.push( drawingId );
+		tile[ drawingId ].isWall = true;
 		document.getElementById("wallCheckboxIcon").innerHTML = "border_outer";
 	}
-	else if ( room[curRoom].walls.indexOf(drawingId) != -1 ){
-		//remove from wall list
-		room[curRoom].walls.splice( room[curRoom].walls.indexOf(drawingId), 1 );
-		document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
-	}
-	console.log(room[curRoom]);
-	refreshGameData();
-}
-
-function apply_wall_setting_all_rooms() {
-	if ( document.getElementById("wallCheckbox").checked ){
-		//add to wall list
-		for (id in room)
-			if (room[id].walls.indexOf(drawingId) == -1) room[id].walls.push( drawingId );
-	}
 	else {
-		//remove from wall list
-		for (id in room) {
-			if (room[id].walls.indexOf(drawingId) != -1) {
-				room[id].walls.splice( room[id].walls.indexOf(drawingId), 1 );
-			}
-		}
+		tile[ drawingId ].isWall = false;
+		document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
 	}
 	refreshGameData();
 }
