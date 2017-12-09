@@ -959,19 +959,19 @@ function getSpriteDown() {
 }
 
 function isWallLeft() {
-	return isWall( player().x - 1, player().y ) || (player().x - 1 < 0);
+	return (player().x - 1 < 0) || isWall( player().x - 1, player().y );
 }
 
 function isWallRight() {
-	return isWall( player().x + 1, player().y ) || (player().x + 1 >= 16);
+	return (player().x + 1 >= 16) || isWall( player().x + 1, player().y );
 }
 
 function isWallUp() {
-	return isWall( player().x, player().y - 1 ) || (player().y - 1 < 0);
+	return (player().y - 1 < 0) || isWall( player().x, player().y - 1 );
 }
 
 function isWallDown() {
-	return isWall( player().x, player().y + 1 ) || (player().y + 1 >= 16);
+	return (player().y + 1 >= 16) || isWall( player().x, player().y + 1 );
 }
 
 function isWall(x,y) {
@@ -1490,6 +1490,7 @@ function parseTile(lines, i) {
 
 	//other properties
 	var colorIndex = 1; //default palette color index is 1
+	var isWall = null; // null indicates it can vary from room to room (original version)
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		if (getType(lines[i]) === "COL") {
 			colorIndex = parseInt( getId(lines[i]) );
@@ -1498,6 +1499,15 @@ function parseTile(lines, i) {
 			/* NAME */
 			name = lines[i].split(/\s(.+)/)[1];
 			names.tile.set( name, id );
+		}
+		else if (getType(lines[i]) === "WAL") {
+			var wallArg = getArg( lines[i], 1 );
+			if( wallArg === "true" ) {
+				isWall = true;
+			}
+			else if( wallArg === "false" ) {
+				isWall = false; // TODO - think about design here
+			}
 		}
 		i++;
 	}

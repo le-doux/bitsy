@@ -1,6 +1,9 @@
 /* 
+4.4 work:
+- bugfix: type error on top / bottom of screen
+
 CONFIRMED BUGS
--
+- iOS editor is broken again
 
 TODO: touch controls
 X figure out scaling (_test windows / android)
@@ -17,14 +20,11 @@ SPOTTED BUGS
 - weird ghost tiles in exit map
 - overlapping entrance & exit things on regular map
 - ending undefined bug (how repro?)
+- but sometimes when pushing an arrow key just once, the avatar will keep moving in the direction until it runs into a wall/sprite
 
 NEW FEATURE IDEAS
 - plugin
 - import / export tiles
-- mobile ideas
-	- responsive window with min size, max size?
-	- swiping
-	- transparent iframe bg?
 - editor behaves odd in playtest mode -- disable more stuff (and make it more clear!)
 - need newlines in endings
 
