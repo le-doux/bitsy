@@ -1198,6 +1198,10 @@ function serializeWorld() {
 			/* NAME */
 			worldStr += "NAME " + tile[id].name + "\n";
 		}
+		if (tile[id].isWall != null && tile[id].isWall != undefined) {
+			/* WALL */
+			worldStr += "WAL " + tile[id].isWall + "\n";
+		}
 		worldStr += "\n";
 	}
 	/* SPRITES */
@@ -1489,7 +1493,7 @@ function parseTile(lines, i) {
 	}
 
 	//other properties
-	var colorIndex = 1; //default palette color index is 1
+	var colorIndex = 1; // default palette color index is 1
 	var isWall = null; // null indicates it can vary from room to room (original version)
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		if (getType(lines[i]) === "COL") {
@@ -1506,7 +1510,7 @@ function parseTile(lines, i) {
 				isWall = true;
 			}
 			else if( wallArg === "false" ) {
-				isWall = false; // TODO - think about design here
+				isWall = false;
 			}
 		}
 		i++;
@@ -1521,7 +1525,8 @@ function parseTile(lines, i) {
 			frameIndex : 0,
 			frameCount : imageStore.source[drwId].length
 		},
-		name : name
+		name : name,
+		isWall : isWall
 	};
 
 	return i;
