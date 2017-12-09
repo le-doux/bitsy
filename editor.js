@@ -1116,6 +1116,8 @@ function duplicateDrawing() {
 			}
 		}
 
+		var tmpIsWall = tile[ drawingId ].isWall;
+
 		drawingId = nextTileId();
 
 		console.log("DUPLICATE TILE");		
@@ -1123,6 +1125,8 @@ function duplicateDrawing() {
 		console.log(copiedImageData);
 
 		makeTile( drawingId, copiedImageData );
+
+		tile[ drawingId ].isWall = tmpIsWall;
 
 		drawPaintCanvas();
 		refreshGameData();
@@ -2894,6 +2898,16 @@ function updateExitOptionsFromGameData() {
 }
 
 function on_toggle_wall(e) {
+	if( tile[ drawingId ].isWall == undefined || tile[ drawingId ].isWall == null ) {
+		// clear out any existing wall settings for this tile in any rooms
+		// (this is back compat for old-style wall settings)
+		for( roomId in room ) {
+			var i = room[ roomId ].walls.indexOf( drawingId );
+			if( i > -1 )
+				room[ roomId ].walls.splice( i , 1 );
+		}
+	}
+
 	if ( e.target.checked ){
 		tile[ drawingId ].isWall = true;
 		document.getElementById("wallCheckboxIcon").innerHTML = "border_outer";
@@ -2902,6 +2916,7 @@ function on_toggle_wall(e) {
 		tile[ drawingId ].isWall = false;
 		document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
 	}
+
 	refreshGameData();
 }
 
