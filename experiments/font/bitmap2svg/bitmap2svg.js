@@ -29,7 +29,7 @@ function bitmapToSvg( bitmapArray, width, height, filename ) {
 /* FONT */
 function charToSvg( char ) {
 	var charData = font.getChar( char );
-	bitmapToSvg( charData, 6, 8, "font/char_" + char.charCodeAt(0) + ".svg" );
+	bitmapToSvg( charData, 6, 8, "font/U+" + char.charCodeAt(0).toString(16) + ".svg" );
 }
 
 function exportFont() {
@@ -39,7 +39,16 @@ function exportFont() {
 		charToSvg( char );
 	}
 }
-// exportFont();
+exportFont();
+
+/* ARROW */
+var arrowdata = [
+	1,1,1,1,1,
+	0,1,1,1,0,
+	0,0,1,0,0
+];
+var arrow_unicode = 256;
+bitmapToSvg( arrowdata, 5, 3, "font/U+" + arrow_unicode.toString(16) + ".svg" );
 
 /* CAT */
 var cat_data = 
@@ -53,14 +62,7 @@ var cat_data =
 	0,0,1,1,1,1,0,0,
 	0,0,1,0,0,1,0,0
 ];
-// bitmapToSvg( cat_data, 8, 8, "font/char_cat.svg" );
-
-/* ARROW */
-var arrowdata = [
-	1,1,1,1,1,
-	0,1,1,1,0,
-	0,0,1,0,0
-];
-// bitmapToSvg( arrowdata, 5, 3, "font/char_arrow.svg" );
+var cat_unicode = 257;
+bitmapToSvg( cat_data, 8, 8, "font/U+" + cat_unicode.toString(16) + ".svg" );
 
 console.log("svg done!");
