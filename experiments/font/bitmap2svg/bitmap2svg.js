@@ -1,3 +1,14 @@
+/*
+NOTES:
+improved vectorization algorithm:
+- find filled pixel
+- make square path from pixel
+- flood fill outward
+- merge each new pixel-square with the existing path
+- ?? if the path closes --> split into two paths, the inner one should be reversed
+	- doesPathClose() -> square merges with points in the path that are non-contiguous
+*/
+
 var fs = require('fs');
 var font = require('./font_module.js');
 
@@ -29,7 +40,7 @@ function bitmapToSvg( bitmapArray, width, height, filename ) {
 /* FONT */
 function charToSvg( char ) {
 	var charData = font.getChar( char );
-	bitmapToSvg( charData, 6, 8, "font/U+" + char.charCodeAt(0).toString(16) + ".svg" );
+	bitmapToSvg( charData, 6, 8, "../font/U+" + char.charCodeAt(0).toString(16) + ".svg" );
 }
 
 function exportFont() {
@@ -48,7 +59,7 @@ var arrowdata = [
 	0,0,1,0,0
 ];
 var arrow_unicode = 256;
-bitmapToSvg( arrowdata, 5, 3, "font/U+" + arrow_unicode.toString(16) + ".svg" );
+bitmapToSvg( arrowdata, 5, 3, "../font/U+" + arrow_unicode.toString(16) + ".svg" );
 
 /* CAT */
 var cat_data = 
@@ -63,6 +74,6 @@ var cat_data =
 	0,0,1,0,0,1,0,0
 ];
 var cat_unicode = 257;
-bitmapToSvg( cat_data, 8, 8, "font/U+" + cat_unicode.toString(16) + ".svg" );
+bitmapToSvg( cat_data, 8, 8, "../font/U+" + cat_unicode.toString(16) + ".svg" );
 
 console.log("svg done!");
