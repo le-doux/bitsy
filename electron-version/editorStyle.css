@@ -1,0 +1,465 @@
+body {
+	margin: 0 !important;
+	padding: 0 !important;
+	line-height: 170%;
+	font-family: "Nunito", Helvetica, Arial, sans-serif;
+	font-size: 16px;
+}
+canvas {
+	background: black;
+	margin-top: 4px;
+}
+#topbar {
+	width: 100%;
+	background: white;
+	padding: 10px;
+	padding-left: 20px;
+	padding-right: 20px;
+	box-sizing: border-box;
+	font-size: 20px;
+}
+#editorWindow {
+	width:100%;
+	height:750px;
+	overflow:scroll;
+	box-sizing: border-box;
+}
+#editorContent {
+	height:100%;
+	white-space: nowrap;
+	display: inline-block;
+	padding-left: 5px;
+	padding-right: 20px;
+}
+.panel {
+	display: inline-block;
+	vertical-align: top;
+	margin: 10px;
+	margin-right: 0px;
+	padding: 10px;
+	font-size: 16px;
+	border-radius: 4px;
+}
+.panel .bar {
+	padding: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-bottom: 2px;
+	margin: -10px;
+	margin-bottom: 10px;
+	font-size: 20px;
+	line-height: 150%;
+	border-radius: 4px 4px 0px 0px;
+}
+.panel .bar .material-icons {
+	line-height: 150%;
+	vertical-align: middle;
+	font-size: 24px;
+}
+.panelShadow {
+	display: inline-block;
+	vertical-align: top;
+	margin: 10px;
+	margin-right: 0px;
+	border-radius: 4px;
+}
+textarea {
+	font-family: monospace;
+}
+input {
+	font-family: monospace;
+}
+#unsupportedFeatures {
+	padding: 10px;
+}
+.helpMessage {
+	padding: 5px;
+	margin: 2px;
+	font-size: 13px;
+	line-height: 130%;
+}
+#aboutInner {
+	font-size: 13px;
+	line-height: 130%;
+}
+#exitCanvas {
+	width:256px;
+	height:256px;
+}
+#editSelectedExit {
+	padding: 10px;
+	margin: 2px;
+	width: 256px;
+	height: 350px;
+	font-size: 13px;
+}
+.minimize {
+	float:right;
+	color:blue;
+}
+.minimize:hover {
+	font-weight: bold;
+}
+#titleText {
+	width: 400px;
+	font-size: 16px;
+}
+#bitsyEditorName {
+	font-size: 14px;
+	float: right;
+}
+.toggleText {
+	color: blue;
+	text-decoration: underline;
+}
+.toggleText:hover {
+	font-weight: bold;
+}
+.options {
+	background: #f2f2f2;
+	padding: 7px;
+	margin-top: 2px;
+	margin-bottom: 2px;
+	color: #333;
+	font-size: 13px;
+	line-height: 150%;
+}
+.dialogTextArea {
+	resize: vertical;
+	font-size: 12px;
+	width: 32ch;
+	margin-top: 5px;
+}
+
+/* new UI groupers */
+.buttonGroup {
+	padding: 2px;
+	margin: 2px;
+	margin-left: 0px;
+	display: inline-block;
+}
+
+.controlBox {
+	padding: 5px;
+	margin-bottom: 5px;
+	border-radius: 2px;
+}
+
+.controlSpan {
+	padding: 3px;
+	margin-bottom: 5px;
+	margin-right: 5px;
+	margin-left: 0px;
+	border-radius: 2px;
+}
+
+/* random hacks */
+#instructionsOuter {
+	padding-top: 10px; /*why*/
+}
+#versionNotesOuter {
+	padding-top: 10px;
+}
+
+/*toolbar*/
+#toolsPanel {
+	padding-top: 5px;
+	font-size: 14px;
+}
+
+.panelBarTitle {
+	/*background:red;*/
+	overflow:auto;
+}
+
+#gifDownload .material-icons {
+	line-height: 100%;
+	vertical-align: middle;
+	font-size: 18px;
+}
+
+#gifRecordingText {
+	color:red;
+}
+#gifRecordingText .material-icons {
+	line-height: 100%;
+	vertical-align: middle;
+	font-size: 18px;
+}
+
+#gifEncodingText {
+	color: green;
+}
+#gifEncodingText .material-icons {
+	line-height: 100%;
+	vertical-align: middle;
+	font-size: 18px;
+}
+
+#paintExplorerViewport {
+	/*padding:5px;*/
+	margin-top:5px;
+	padding: 12px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	height:338px;
+	overflow:scroll;
+	display:block;
+	white-space:normal;
+	border: solid 1px #ccccff;
+	border-radius: 2px;
+	resize: both;
+	width:224px;
+}
+#paintExplorerContent {
+	/*width:224px;*/
+	margin:0px;
+}
+/*#paintExplorerContent label {
+	border: none;
+}*/
+#paintExplorerContent img {
+	width:64px;
+	height:64px;
+	margin:0px;
+	margin-right:2px;
+	margin-bottom:-6px; /* should be unnecesarry really */
+	display:inline-block;
+	image-rendering: pixelated;
+	border: solid 4px white;
+	/*border: none;*/
+}
+
+#paintExplorerAdd {
+	width:58px;
+	height:64px;
+	margin:0px;
+	margin-right:2px;
+	margin-bottom:-6px; /* should be unnecesarry really */
+	display:inline-block;
+	border: solid 4px white;
+	vertical-align: top;
+	/*background: red;*/
+}
+
+#paintExplorerAdd button { /* this style is a bit hacky but looks ok */
+	display:block;
+	margin:auto;
+	width: 40px;
+	height: 40px;
+	margin-top: 12px;
+	border: solid 1px #6767b2;
+}
+
+#animation img {
+	width:64px;
+	height:64px;
+	margin:0px;
+	border: solid 2px #6767b2;
+	display:inline-block;
+	image-rendering: pixelated;
+}
+
+.animationThumbnail {
+	display:inline-block;
+	padding: 4px;
+	margin:0px;
+	margin-left:-4px; /*why?*/
+}
+
+.animationThumbnail.preview {
+	margin-right:10px;
+}
+
+.animationThumbnail.selected {
+	background: #6767b2;
+	color: white;
+}
+
+.animationThumbnail.unselected {
+	background: #ccccff;
+	color: #6767b2;
+}
+
+.left {
+	border-radius: 2px 0px 0px 2px;
+}
+
+.right {
+	border-radius: 0px 2px 2px 0px;
+}
+
+#paintEditMain {
+	width:256px;
+	white-space:initial;
+	padding:none;
+	margin:none;
+	/*background: red;*/
+}
+
+/* ADVANCED DIALOG */
+.advDialogTextBlock {
+	width: 300px;
+	height: 60px;
+	resize: vertical;
+}
+
+.advDialogOptionDiv {
+	width: 300px;
+	/*height: 40px;*/
+	padding: 5px;
+	margin: 5px;
+	margin-left: 0px;
+	/*border: 1px solid #6767b2;*/
+	background: #ccccff;
+	border-radius: 2px;
+}
+
+.advDialogOptionDiv button {
+	height: 35px;
+	/*margin-top: -12px;*/
+	margin-left: 5px;
+	/*border: solid 1px black;*/
+	/*float: right;*/
+	display: inline-block;
+	vertical-align: top;
+}
+
+.advDialogOptionDiv button:hover {
+	background: #6767b2;
+	color: white;
+	opacity: 0.5;
+}
+
+.advDialogOptionDiv button .material-icons {
+	font-size: 12px;
+}
+
+.advDialogConditionDiv {
+	width: 300px;
+	/*height: 100px;*/
+	padding: 5px;
+	margin: 5px;
+	margin-left: 0px;
+	/*border: 1px solid #6767b2;*/
+	background: #ccccff;
+	border-radius: 2px;
+}
+
+.advDialogConditionDiv button {
+	height: 35px;
+	/*margin-top: -12px;*/
+	margin-left: 5px;
+	/*border: solid 1px black;*/
+	/*float: right;*/
+	display: inline-block;
+	vertical-align: top;
+}
+
+.advDialogConditionDiv button:hover {
+	background: #6767b2;
+	color: white;
+	opacity: 0.5;
+}
+
+.advDialogConditionDiv button .material-icons {
+	font-size: 12px;
+}
+
+/*.advDialogOptionDiv .light:hover {
+	background: #6767b2;
+}*/
+
+.advDialogTextOption {
+	width: 270px;
+	/*width: 290px;*/
+
+	/*width: 250px;*/
+	height: 30px;
+	resize: vertical;
+	/*margin-right: 0px;*/
+}
+
+#advDialogViewport {
+	padding: 12px;
+	/*width:340px;*/
+	min-width: 340px;
+	height:450px;
+	overflow:scroll;
+	display:block;
+	border: solid 1px #ccccff;
+	border-radius: 2px;
+	margin-bottom: 10px;
+	line-height: 1;
+}
+
+#advDialogViewport .controlBox {
+	margin-bottom: 5px;
+	border: solid 1px #6767b2;
+	padding: 10px;
+	line-height: 170%;
+}
+
+#dialogCodeText {
+	width: 340px;
+	height: 530px;
+	padding: 12px;
+	resize: none;
+	background: black;
+	color: white;
+}
+
+.advDialogTop {
+	margin-bottom: 10px;
+	height: 30px;
+}
+
+.advDialogIcon {
+	line-height: 150%;
+	vertical-align: middle;
+	font-size: 24px;
+	margin-right: 10px;
+}
+
+.inventoryViewport {
+	padding: 6px;
+	/*width:140px;*/
+	height:400px;
+	overflow:scroll;
+	display:block;
+	border: solid 1px #ccccff;
+	border-radius: 2px;
+	margin-top: 5px;
+	/*margin-bottom: 10px;*/
+}
+
+.inventoryVariableBox button {
+	height: 30px;
+	/*float: right;*/
+	margin-left: 5px;
+	/*background: #e8e8ff;*/
+}
+
+.inventoryVariableBox button:hover {
+	background: #6767b2;
+	color: white;
+	opacity: 0.5;
+}
+
+.inventoryVariableBox button .material-icons {
+	font-size: 12px;
+}
+
+.niceHr {
+	background:#6767b2;border:0px;height:1px;margin:4px;margin-left:0px;margin-right:0px;
+}
+
+/*.downArrowDialog .material-icons {
+	font-size: 16px;
+	line-height: 100%;
+}*/
+
+#dialogEditorNoContent {
+	width: 355px;
+	height: 580px;
+}

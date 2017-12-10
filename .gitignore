@@ -3,3 +3,4 @@ itch-version/*
 bitsy.sublime-project
 bitsy.sublime-workspace
 bitsy.zip
+electron-version/node_modules/*

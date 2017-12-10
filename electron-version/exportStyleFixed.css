@@ -1,0 +1,17 @@
+/*html { height: 592px; }*/
+
+body {
+	width:100%;
+	height:100%;
+	overflow:hidden;
+	background:@@B;
+}
+
+#game {
+	background:black;
+	margin: 0 auto;
+	margin-top: 40px;
+	display: block;
+	width:@@Z;
+	height:@@Z;
+}
