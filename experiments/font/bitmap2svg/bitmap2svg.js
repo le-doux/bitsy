@@ -7,6 +7,11 @@ improved vectorization algorithm:
 - merge each new pixel-square with the existing path
 - ?? if the path closes --> split into two paths, the inner one should be reversed
 	- doesPathClose() -> square merges with points in the path that are non-contiguous
+- ?? another way to close paths would be to do the flood fill then look for any adjacent edges
+
+TODO
+- flood fill
+- holes / merging
 */
 
 var fs = require('fs');
