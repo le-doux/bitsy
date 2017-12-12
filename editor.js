@@ -1,4 +1,8 @@
 /* 
+4.5
+- bitsy icon
+- better top bar behavior
+
 CONFIRMED BUGS
 - iOS editor is broken again
 - bug with mobile (iOS safari) not loading itch games every time

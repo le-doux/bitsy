@@ -1,7 +1,8 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>bitsy editor</title>
+		<title>Bitsy</title>
+		<link rel="icon" type="image/png" href="cat2.png" />
 
 		<!-- STYLES -->
 		<link rel="stylesheet" type="text/css" href="editorStyle.css">
@@ -26,11 +27,15 @@
 	</head>
  
 	<body onload="start()">
+
+		<div id="appRoot">
+
 		<div id="topbar">
 
 			<div id="topbarMain" style="width:100%;display:block;overflow:auto;">
 
-				<div class="buttonGroup">
+				<!-- TODO : FLEXBOX-ify -->
+<!-- 				<div class="buttonGroup">
 					<span title="Bitsy ~ make little worlds ~" style="font-size:24px">
 						<img src="cat.svg" height="24px" width="24px"/>
 						Bitsy
@@ -47,7 +52,37 @@
 				</div>
 				<div class="buttonGroup" style="font-size:12px;float:right;">
 					by <a href="https://www.twitter.com/adamledoux" target="_blank">@adamledoux</a>
+				</div> -->
+
+			<div id="topbarFlexContainer">
+
+				<div id="logoFlexItem">
+					<span title="Bitsy ~ make little worlds ~" style="font-size:24px">
+						<img src="cat.svg" height="24px" width="24px"/>
+						Bitsy
+					</span>	
 				</div>
+
+				<div id="titleFlexItem">
+					<input title="title text for your game" type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title" style="width:100%;">
+				</div>
+
+				<div id="toolsCheckFlexItem">
+					<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" />
+					<label title="show / hide toolbar" for="toolsCheck" style="font-size:18px;" id="toolsCheckLabel">
+						<i class="material-icons">settings</i>
+						tools
+						<i id="toolsCheckIcon" class="material-icons">expand_less</i>
+					</label>
+				</div>
+
+				<div id="topbarSpaceFlexItem">
+				</div>
+
+				<div id="bylineFlexItem">
+					by <a href="https://www.twitter.com/adamledoux" target="_blank">@adamledoux</a>
+				</div>
+			</div>
 
 			</div>
 
@@ -663,10 +698,6 @@
 						<br>
 						
 						<div id="paletteTools" style="display:none;">
-<!-- 							<div class="buttonGroup" id="paletteIdContainer">
-								palette <span id="paletteId">0</span>
-							</div> -->
-							
 							<span id="paletteNameUI" title="a name to refer to this drawing" class="controlSpan">
 								name
 								<input type="text" id="paletteName" onchange="on_palette_name_change();" style="width:80px;"></input>
@@ -956,6 +987,8 @@
 
 			</div> <!-- Editor Content -->
 		</div> <!-- Editor Window -->
+
+		</div>
 
 	</body>
 </html>
