@@ -2034,7 +2034,7 @@ function refreshGameData() {
 
 function toggleToolBar(e) {
 	if( e.target.checked ) {
-		document.getElementById("toolsPanel").style.display = "block";
+		document.getElementById("toolsPanel").style.display = "flex";
 		document.getElementById("toolsCheckIcon").innerHTML = "expand_more";
 	}
 	else {

@@ -97,3 +97,18 @@ input[type=radio] + label.right {
 	padding: 2px;
 	border: solid 2px #6767b2;
 }
+
+#toolsPanel label {
+	margin-bottom: 5px;
+}
+
+#toolsPanel button {
+	margin-bottom: 5px;
+	padding: 2px;
+}
+
+/*hack*/
+#toolsCheckFlexItem label {
+	/*border-radius: 4px;*/
+	/*font-size: 16px;*/
+}

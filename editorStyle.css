@@ -194,9 +194,11 @@ input {
 #toolsPanel {
 	padding-top: 5px;
 	font-size: 14px;
-	/*overflow: scroll;*/
-	/*height: 50px;*/
-	/*white-space: nowrap;*/
+	width:100%;
+	overflow:auto;
+	display:none;
+	flex-flow: row;
+	flex-wrap: wrap;
 }
 
 .panelBarTitle {
@@ -498,7 +500,10 @@ input {
 
 /* NEW FLEX STUFF */
 #topbarFlexContainer {
-	width:100%; display:flex; flex-flow: row;
+	width:100%;
+	display:flex;
+	flex-flow: row;
+	overflow: hidden;
 }
 
 #logoFlexItem {
@@ -518,5 +523,6 @@ input {
 }
 
 #bylineFlexItem {
-	flex: 1 0 auto; font-size:12px;
+	flex: 1 0 auto;
+	font-size:12px;
 }
