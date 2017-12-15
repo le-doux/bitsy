@@ -93,6 +93,8 @@
 		var centerY = height / 2;
 		var radius = 100;
 
+		var selectCircleRadius = 10;
+
 		function drawColorPickerWheel() {
 
 			wheelCanvas.width = width;
@@ -120,23 +122,24 @@
 				wheelContext.fill();
 			}
 
-		}
+			console.log(curColor.h);
+			var hueRadians = curColor.h * ( Math.PI * 2 );
+			var saturationDist = curColor.s * radius;
+			console.log(saturationDist);
+			var selectCircleX = centerX + ( Math.cos( hueRadians ) * saturationDist );
+			var selectCircleY = centerY + ( Math.sin( hueRadians ) * saturationDist );
 
-		function colorInWheel(x,y) {
-			var dist = Math.sqrt( Math.pow( x - centerX, 2 ) + Math.pow( y - centerY, 2 ) );
+			var rgbColor = HSVtoRGB( curColor.h, curColor.s, curColor.v );
+			var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
 
-			if( dist < radius ) {
-				var angle = Math.atan2( x - centerX, y - centerY );
-				var hue = (angle + (Math.PI * 1.5)) / (Math.PI * 2);
+			wheelContext.beginPath();
+			wheelContext.arc(selectCircleX, selectCircleY, selectCircleRadius, 0, 2 * Math.PI, false);
+			wheelContext.fillStyle = rgbColorStr;
+			wheelContext.fill();
+			wheelContext.lineWidth = 2;
+			wheelContext.strokeStyle = 'black';
+			wheelContext.stroke();
 
-				var saturation = dist / radius;
-
-				var rgbColor = HSVtoRGB( hue, saturation, curColor.value );
-				return rgbColor;
-			}
-			else {
-				return null;
-			}
 		}
 
 		function updateValue(e) {
@@ -164,6 +167,8 @@
 
 					colorPickerSlider.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
 				}
+
+				drawColorPickerWheel(); // TODO: perf is bad
 			}
 		}
 
