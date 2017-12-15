@@ -1,9 +1,224 @@
 <!DOCTYPE HTML>
 <html>
 
-<body>
+<head>
 
-	<input type="range" style="height:25px; background:linear-gradient(to right,red,yellow);"/>
+	<style>
+		#colorPickerWheel {
+			width: 200px;
+			height: 200px;
+			/*background: black;*/
+			/*border: 2px solid black;*/
+		}
+
+		#colorPickerSlider {
+			height:25px;
+			background:linear-gradient(to right,white,black);
+			width: 200px;
+			margin: 0px;
+		}
+	</style>
+
+	<script>
+		// source : http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
+		/* accepts parameters
+		 * h  Object = {h:x, s:y, v:z}
+		 * OR 
+		 * h, s, v
+		*/
+		function HSVtoRGB(h, s, v) {
+		    var r, g, b, i, f, p, q, t;
+		    if (arguments.length === 1) {
+		        s = h.s, v = h.v, h = h.h;
+		    }
+		    i = Math.floor(h * 6);
+		    f = h * 6 - i;
+		    p = v * (1 - s);
+		    q = v * (1 - f * s);
+		    t = v * (1 - (1 - f) * s);
+		    switch (i % 6) {
+		        case 0: r = v, g = t, b = p; break;
+		        case 1: r = q, g = v, b = p; break;
+		        case 2: r = p, g = v, b = t; break;
+		        case 3: r = p, g = q, b = v; break;
+		        case 4: r = t, g = p, b = v; break;
+		        case 5: r = v, g = p, b = q; break;
+		    }
+		    return {
+		        r: Math.round(r * 255),
+		        g: Math.round(g * 255),
+		        b: Math.round(b * 255)
+		    };
+		}
+
+		/* accepts parameters
+		 * r  Object = {r:x, g:y, b:z}
+		 * OR 
+		 * r, g, b
+		*/
+		function RGBtoHSV(r, g, b) {
+		    if (arguments.length === 1) {
+		        g = r.g, b = r.b, r = r.r;
+		    }
+		    var max = Math.max(r, g, b), min = Math.min(r, g, b),
+		        d = max - min,
+		        h,
+		        s = (max === 0 ? 0 : d / max),
+		        v = max / 255;
+
+		    switch (max) {
+		        case min: h = 0; break;
+		        case r: h = (g - b) + d * (g < b ? 6: 0); h /= 6 * d; break;
+		        case g: h = (b - r) + d * 2; h /= 6 * d; break;
+		        case b: h = (r - g) + d * 4; h /= 6 * d; break;
+		    }
+
+		    return {
+		        h: h,
+		        s: s,
+		        v: v
+		    };
+		}
+
+
+		var curColor = {
+			h : 0,
+			s : 0.5,
+			v : 1.0,
+		};
+
+		var width = 200;
+		var height = 200;
+		var centerX = width / 2;
+		var centerY = height / 2;
+		var radius = 100;
+
+		function drawColorPickerWheel() {
+
+			wheelCanvas.width = width;
+			wheelCanvas.height = height;
+
+			wheelContext.fillStyle = 'black';
+
+			for( var angle = 0; angle <= 360; angle += 1 ){
+				var startAngle = ( angle - 2 ) * ( Math.PI / 180 );
+				var endAngle = angle * ( Math.PI / 180 );
+
+				wheelContext.beginPath();
+				wheelContext.moveTo( centerX, centerY );
+				wheelContext.arc( centerX, centerY, radius, startAngle, endAngle, false /*counter clockwise*/ );
+				wheelContext.closePath();
+
+				var color1 = HSVtoRGB( angle / 360, 0, curColor.v );
+				var color2 = HSVtoRGB( angle / 360, 1, curColor.v );
+
+				var gradient = wheelContext.createRadialGradient( centerX, centerY, 0, centerX, centerY, radius );
+				gradient.addColorStop( 0, "rgb(" + color1.r + "," + color1.g + "," + color1.b + ")" );
+				gradient.addColorStop( 1, "rgb(" + color2.r + "," + color2.g + "," + color2.b + ")" );
+
+				wheelContext.fillStyle = gradient;
+				wheelContext.fill();
+			}
+
+		}
+
+		function colorInWheel(x,y) {
+			var dist = Math.sqrt( Math.pow( x - centerX, 2 ) + Math.pow( y - centerY, 2 ) );
+
+			if( dist < radius ) {
+				var angle = Math.atan2( x - centerX, y - centerY );
+				var hue = (angle + (Math.PI * 1.5)) / (Math.PI * 2);
+
+				var saturation = dist / radius;
+
+				var rgbColor = HSVtoRGB( hue, saturation, curColor.value );
+				return rgbColor;
+			}
+			else {
+				return null;
+			}
+		}
+
+		function updateValue(e) {
+			// console.log(e.target.value);
+			curColor.v = 1 - (e.target.value / 100);
+			drawColorPickerWheel();
+		}
+
+		var isMouseDown = false;
+		function pickColor(e) {
+			if(isMouseDown) {
+				console.log(e);
+				var x = e.clientX;
+				var y = e.clientY;
+
+				var dist = Math.sqrt( Math.pow( x - centerX, 2 ) + Math.pow( y - centerY, 2 ) );
+
+				if( dist < radius ) {
+					var pixelData = wheelContext.getImageData( x, y, 1, 1 ).data;
+					var rgbColor = { r:pixelData[0], g:pixelData[1], b:pixelData[2] };
+					curColor = RGBtoHSV( rgbColor.r, rgbColor.g, rgbColor.b );
+
+					var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
+					document.getElementById("curColorBox").style.background = rgbColorStr;
+
+					colorPickerSlider.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
+				}
+			}
+		}
+
+		function setColor(r,g,b) {
+			var rgbColor = { r:r, g:g, b:b };
+			curColor = RGBtoHSV( rgbColor.r, rgbColor.g, rgbColor.b );
+
+			var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
+			document.getElementById("curColorBox").style.background = rgbColorStr;
+
+			colorPickerSlider.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
+			colorPickerSlider.value = (1 - curColor.v) * 100;
+
+			drawColorPickerWheel();
+		}
+
+		function pickColorStart(e) {
+			isMouseDown = true;
+			pickColor(e);
+		}
+
+		function pickColorEnd(e) {
+			pickColor(e);
+			isMouseDown = false;
+		}
+
+		var wheelCanvas;
+		var wheelContext;
+		var slider;
+
+		function initColorWheel() {
+			wheelCanvas = document.getElementById("colorPickerWheel");
+			wheelContext = wheelCanvas.getContext("2d");
+			wheelCanvas.addEventListener("mousedown", pickColorStart);
+			wheelCanvas.addEventListener("mousemove", pickColor);
+			wheelCanvas.addEventListener("mouseup", pickColorEnd);
+
+			slider = document.getElementById("colorPickerSlider");
+			slider.addEventListener("input", updateValue);
+			slider.addEventListener("change", updateValue);
+
+			setColor(255,0,0);
+			// setColor(84,94,28);
+		}
+	</script>
+
+</head>
+
+<body onload="initColorWheel();">
+
+	<canvas id="colorPickerWheel"></canvas> <br>
+	<input type="range" id="colorPickerSlider" value="0" /> <br>
+	<input type="text" />
+
+	<div id="curColorBox" style="display:block; width:30px; height:30px; background:black;"></div>
 
 </body>
 
