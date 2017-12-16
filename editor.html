@@ -9,6 +9,7 @@
 		<link rel="stylesheet" type="text/css" href="editorButtons.css">
 		<link rel="stylesheet" type="text/css" href="editorColors.css">
 		<link rel="stylesheet" type="text/css" href="editorAnimations.css">
+		<link rel="stylesheet" type="text/css" href="colorPickerStyle.css">
 
 		<!-- UTIL SCRIPTS -->
 		<script src="color_util.js"></script>
@@ -20,6 +21,7 @@
 		<script src="bitsy.js"></script>
 
 		<!-- EDITOR SCRIPTS -->
+		<script src="color_picker.js"></script>
 		<script src="gif.js"></script>
 		<script src="exporter.js"></script>
 		<script src="editor.js"></script>
@@ -669,6 +671,15 @@
 					<div id="colorPickerHelp" class="helpMessage" style="display:none;">
 						Having trouble choosing hex colors? <br>
 						Try this online <a href="http://www.w3schools.com/colors/colors_picker.asp" target="_blank">color picker</a>.
+					</div>
+
+					<div id="colorPicker">
+						<canvas id="colorPickerWheel"></canvas>
+						<canvas id="colorPickerSelect"></canvas>
+						<div id="colorPickerSliderBg">
+							<input type="range" id="colorPickerSlider" value="0" />
+						</div>
+						<input id="colorPickerHexText" type="text" />
 					</div>
 
 					<div id="paletteToolsOuter" class="controlBox">

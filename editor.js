@@ -463,6 +463,9 @@ function start() {
 
 	updateInventoryUI();
 
+	// init color picker
+	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSlider', 'colorPickerSliderBg', 'colorPickerHexText');
+
 	//unsupported feature stuff
 	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
 	if (!browserFeatures.colorPicker) {
@@ -2213,6 +2216,8 @@ function updatePaletteBorders() {
 	document.getElementById("tileColor").style.border = "solid " + document.getElementById("tileColor").value + " 5px";
 	document.getElementById("spriteColor").style.border = "solid " + document.getElementById("spriteColor").value + " 5px";
 }
+
+var colorPicker = null; // new color picker
 
 function on_change_color_bg() {
 	//color testing
