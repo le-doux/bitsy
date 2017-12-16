@@ -662,7 +662,7 @@
 						</div>
 					</div>
 					
-					<input title="pick background color" type="color" value="#0052cc" id="backgroundColor" onchange="on_change_color_bg();" autocomplete="off"> background <br>
+<!-- 					<input title="pick background color" type="color" value="#0052cc" id="backgroundColor" onchange="on_change_color_bg();" autocomplete="off"> background <br>
 					
 					<input title="pick tile color" type="color" value="#809fff" id="tileColor" onchange="on_change_color_tile();" autocomplete="off"> tile <br>
 					
@@ -671,22 +671,39 @@
 					<div id="colorPickerHelp" class="helpMessage" style="display:none;">
 						Having trouble choosing hex colors? <br>
 						Try this online <a href="http://www.w3schools.com/colors/colors_picker.asp" target="_blank">color picker</a>.
-					</div>
+					</div> -->
 
-					<div id="colorPicker">
+					<form id="colorPaletteForm">
+						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionBackground" onclick="" checked>
+						<label for="colorPaletteOptionBackground" title="pick background color">
+							<i class="material-icons">grid_on</i> background color
+						</label>
+
+						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionTile" onclick="" checked>
+						<label for="colorPaletteOptionTile" title="pick tile color">
+							<i class="material-icons">terrain</i> tile color
+						</label>
+
+						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionSprite" onclick="" checked>
+						<label for="colorPaletteOptionSprite" title="pick sprite / avatar / item color">
+							<i class="material-icons">nature_people</i> sprite color
+						</label>
+					</form>
+
+					<div id="colorPicker" title="color picker">
 						<canvas id="colorPickerWheel"></canvas>
-						<canvas id="colorPickerSelect"></canvas>
-						<div id="colorPickerSliderBg">
+						<canvas id="colorPickerSelect" title="color picker wheel"></canvas>
+						<div id="colorPickerSliderBg" title="color picker darkness / lightness slider">
 							<input type="range" id="colorPickerSlider" value="0" />
 						</div>
-						<input id="colorPickerHexText" type="text" />
+						<input id="colorPickerHexText" title="color picker hex code" type="text" />
 					</div>
 
 					<div id="paletteToolsOuter" class="controlBox">
 
 						<input type="checkbox" id="paletteToolsCheck" onclick="togglePaletteTools(event);" />
 						<label title="show / hide additional palette tools" for="paletteToolsCheck">
-							palettes
+							palette select
 							<i id="paletteToolsCheckIcon" class="material-icons">expand_less</i>
 						</label>
 

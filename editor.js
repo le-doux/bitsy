@@ -2,10 +2,12 @@
 4.5
 - bitsy icon
 - better top bar behavior
+- new color picker
 
 CONFIRMED BUGS
 - iOS editor is broken again
 - bug with mobile (iOS safari) not loading itch games every time
+- animation bugs: https://twitter.com/skodone/status/942019687550017542
 
 TODO: touch controls
 X figure out scaling (_test windows / android)
@@ -304,9 +306,9 @@ function detectBrowserFeatures() {
 			// console.log(input.clientWidth);
 			console.log("WEIRD SAFARI COLOR PICKER IS BAD!");
 			browserFeatures.colorPicker = false;
-			document.getElementById("backgroundColor").type = "text";
-			document.getElementById("tileColor").type = "text";
-			document.getElementById("spriteColor").type = "text";
+			// document.getElementById("backgroundColor").type = "text";
+			// document.getElementById("tileColor").type = "text";
+			// document.getElementById("spriteColor").type = "text";
 			document.getElementById("pageColor").type = "text";
 		}
 		
@@ -2212,9 +2214,9 @@ function updateRoomPaletteSelect() {
 function updatePaletteBorders() {
 	console.log("UPDATE PALETTE BORDERS");
 	//feature to show selected colors in browsers that don't support a color picker
-	document.getElementById("backgroundColor").style.border = "solid " + document.getElementById("backgroundColor").value + " 5px";
-	document.getElementById("tileColor").style.border = "solid " + document.getElementById("tileColor").value + " 5px";
-	document.getElementById("spriteColor").style.border = "solid " + document.getElementById("spriteColor").value + " 5px";
+	// document.getElementById("backgroundColor").style.border = "solid " + document.getElementById("backgroundColor").value + " 5px";
+	// document.getElementById("tileColor").style.border = "solid " + document.getElementById("tileColor").value + " 5px";
+	// document.getElementById("spriteColor").style.border = "solid " + document.getElementById("spriteColor").value + " 5px";
 }
 
 var colorPicker = null; // new color picker
@@ -2223,7 +2225,7 @@ function on_change_color_bg() {
 	//color testing
 	// document.body.style.background = document.getElementById("backgroundColor").value;
 
-	var rgb = hexToRgb( document.getElementById("backgroundColor").value );
+	// var rgb = hexToRgb( document.getElementById("backgroundColor").value );
 	getPal(selectedColorPal())[0][0] = rgb.r;
 	getPal(selectedColorPal())[0][1] = rgb.g;
 	getPal(selectedColorPal())[0][2] = rgb.b;
@@ -2249,7 +2251,7 @@ function on_change_color_tile() {
 	// 	el.style.background = document.getElementById("tileColor").value;
 	// }
 
-	var rgb = hexToRgb( document.getElementById("tileColor").value );
+	// var rgb = hexToRgb( document.getElementById("tileColor").value );
 	getPal(selectedColorPal())[1][0] = rgb.r;
 	getPal(selectedColorPal())[1][1] = rgb.g;
 	getPal(selectedColorPal())[1][2] = rgb.b;
@@ -2270,7 +2272,7 @@ function on_change_color_sprite() {
 	//color testing
 	// document.getElementById("topbar").style.background = document.getElementById("spriteColor").value;
 
-	var rgb = hexToRgb( document.getElementById("spriteColor").value );
+	// var rgb = hexToRgb( document.getElementById("spriteColor").value );
 	getPal(selectedColorPal())[2][0] = rgb.r;
 	getPal(selectedColorPal())[2][1] = rgb.g;
 	getPal(selectedColorPal())[2][2] = rgb.b;
@@ -2307,9 +2309,9 @@ function updatePaletteOptionsFromGameData() {
 }
 
 function updatePaletteControlsFromGameData() {
-	document.getElementById("backgroundColor").value = rgbToHex(getPal(selectedColorPal())[0][0], getPal(selectedColorPal())[0][1], getPal(selectedColorPal())[0][2]);
-	document.getElementById("tileColor").value = rgbToHex(getPal(selectedColorPal())[1][0], getPal(selectedColorPal())[1][1], getPal(selectedColorPal())[1][2]);
-	document.getElementById("spriteColor").value = rgbToHex(getPal(selectedColorPal())[2][0], getPal(selectedColorPal())[2][1], getPal(selectedColorPal())[2][2]);
+	// document.getElementById("backgroundColor").value = rgbToHex(getPal(selectedColorPal())[0][0], getPal(selectedColorPal())[0][1], getPal(selectedColorPal())[0][2]);
+	// document.getElementById("tileColor").value = rgbToHex(getPal(selectedColorPal())[1][0], getPal(selectedColorPal())[1][1], getPal(selectedColorPal())[1][2]);
+	// document.getElementById("spriteColor").value = rgbToHex(getPal(selectedColorPal())[2][0], getPal(selectedColorPal())[2][1], getPal(selectedColorPal())[2][2]);
 }
 
 function prevPalette() {
