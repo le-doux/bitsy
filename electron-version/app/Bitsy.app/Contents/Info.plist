@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Bitsy</string>
 	<key>CFBundleIconFile</key>
-	<string>bitsy.icns</string>
+	<string>bitsy2.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.ledoux.bitsy</string>
 	<key>CFBundleInfoDictionaryVersion</key>
