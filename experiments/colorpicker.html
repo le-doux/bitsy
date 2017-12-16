@@ -184,7 +184,7 @@
 		function pickColor(e) {
 			if(isMouseDown) {
 				// console.log(e);
-				var bounds = e.target.getBoundingClientRect();
+				var bounds = wheelCanvas.getBoundingClientRect();
 				var x = e.clientX - bounds.left;
 				var y = e.clientY - bounds.top;
 
@@ -193,17 +193,17 @@
 
 				var dist = Math.sqrt( Math.pow( xRel, 2 ) + Math.pow( yRel, 2 ) );
 
-				if( dist > radius ) {
-					xRel = ( xRel / dist ) * radius;
-					yRel = ( yRel / dist ) * radius;
+				if( dist >= radius ) {
+					xRel = ( xRel / dist ) * (radius - 1);
+					yRel = ( yRel / dist ) * (radius - 1);
 
 					x = centerX + xRel;
 					y = centerY + yRel;
 
-					dist = radius;
+					dist = radius - 1; // the minus one is to avoid hitting unfilled pixels
 				}
 
-				if( dist <= radius ) {
+				if( dist < radius ) {
 					var pixelData = wheelContext.getImageData( x, y, 1, 1 ).data;
 					var rgbColor = { r:pixelData[0], g:pixelData[1], b:pixelData[2] };
 					curColor = RGBtoHSV( rgbColor.r, rgbColor.g, rgbColor.b );
@@ -254,9 +254,9 @@
 			selectContext = selectCanvas.getContext("2d");
 
 			selectCanvas.addEventListener("mousedown", pickColorStart);
-			selectCanvas.addEventListener("mousemove", pickColor);
-			selectCanvas.addEventListener("mouseup", pickColorEnd);
-			selectCanvas.addEventListener("mouseleave", pickColorEnd);
+			document.addEventListener("mousemove", pickColor);
+			document.addEventListener("mouseup", pickColorEnd);
+			// selectCanvas.addEventListener("mouseleave", pickColorEnd);
 
 			slider = document.getElementById("colorPickerSlider");
 			slider.addEventListener("input", updateValue);
