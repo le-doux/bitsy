@@ -7,15 +7,40 @@
 		#colorPickerWheel {
 			width: 200px;
 			height: 200px;
+			display: block;
 			/*background: black;*/
 			/*border: 2px solid black;*/
 		}
 
-		#colorPickerSlider {
-			height:25px;
-			background:linear-gradient(to right,white,black);
+		#colorPickerSelect {
 			width: 200px;
+			height: 200px;
+			/*background: black;*/
+			display: block;
+			margin-top: -200px;
+		}
+
+		#colorPickerSlider {
+			width: 140px;
 			margin: 0px;
+		}
+
+/*		#colorPickerSlider::-moz-range-track {
+			background: white;
+		}
+
+		#colorPickerSlider::-moz-range-thumb {
+			background: white;
+			border: none;
+		}*/
+
+		#colorPickerSliderBg {
+			background:linear-gradient(to right,yellow,black);
+			display: inline-block;
+			padding: 4px;
+			padding-bottom: 0px;
+			margin-left: 26px;
+			border-radius: 4px;
 		}
 	</style>
 
@@ -91,7 +116,7 @@
 		var height = 200;
 		var centerX = width / 2;
 		var centerY = height / 2;
-		var radius = 100;
+		var radius = 88;
 
 		var selectCircleRadius = 10;
 
@@ -122,53 +147,73 @@
 				wheelContext.fill();
 			}
 
-			console.log(curColor.h);
+		}
+
+		function drawColorPickerSelect() {
+			selectCanvas.width = width;
+			selectCanvas.height = height;
+
+			// console.log(curColor.h);
 			var hueRadians = curColor.h * ( Math.PI * 2 );
 			var saturationDist = curColor.s * radius;
-			console.log(saturationDist);
+			// console.log(saturationDist);
 			var selectCircleX = centerX + ( Math.cos( hueRadians ) * saturationDist );
 			var selectCircleY = centerY + ( Math.sin( hueRadians ) * saturationDist );
 
 			var rgbColor = HSVtoRGB( curColor.h, curColor.s, curColor.v );
 			var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
 
-			wheelContext.beginPath();
-			wheelContext.arc(selectCircleX, selectCircleY, selectCircleRadius, 0, 2 * Math.PI, false);
-			wheelContext.fillStyle = rgbColorStr;
-			wheelContext.fill();
-			wheelContext.lineWidth = 2;
-			wheelContext.strokeStyle = 'black';
-			wheelContext.stroke();
-
+			selectContext.beginPath();
+			selectContext.arc(selectCircleX, selectCircleY, selectCircleRadius, 0, 2 * Math.PI, false);
+			selectContext.fillStyle = rgbColorStr;
+			selectContext.fill();
+			selectContext.lineWidth = 2;
+			selectContext.strokeStyle = curColor.v > 0.5 ? 'black' : 'white';
+			selectContext.stroke();
 		}
+
 
 		function updateValue(e) {
 			// console.log(e.target.value);
 			curColor.v = 1 - (e.target.value / 100);
 			drawColorPickerWheel();
+			drawColorPickerSelect();
 		}
 
 		var isMouseDown = false;
 		function pickColor(e) {
 			if(isMouseDown) {
-				console.log(e);
-				var x = e.clientX;
-				var y = e.clientY;
+				// console.log(e);
+				var bounds = e.target.getBoundingClientRect();
+				var x = e.clientX - bounds.left;
+				var y = e.clientY - bounds.top;
 
-				var dist = Math.sqrt( Math.pow( x - centerX, 2 ) + Math.pow( y - centerY, 2 ) );
+				var xRel = x - centerX;
+				var yRel = y - centerY;
 
-				if( dist < radius ) {
+				var dist = Math.sqrt( Math.pow( xRel, 2 ) + Math.pow( yRel, 2 ) );
+
+				if( dist > radius ) {
+					xRel = ( xRel / dist ) * radius;
+					yRel = ( yRel / dist ) * radius;
+
+					x = centerX + xRel;
+					y = centerY + yRel;
+
+					dist = radius;
+				}
+
+				if( dist <= radius ) {
 					var pixelData = wheelContext.getImageData( x, y, 1, 1 ).data;
 					var rgbColor = { r:pixelData[0], g:pixelData[1], b:pixelData[2] };
 					curColor = RGBtoHSV( rgbColor.r, rgbColor.g, rgbColor.b );
 
 					var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
-					document.getElementById("curColorBox").style.background = rgbColorStr;
-
-					colorPickerSlider.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
+					sliderBg.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
 				}
 
-				drawColorPickerWheel(); // TODO: perf is bad
+				// drawColorPickerWheel(); // TODO: perf is bad
+				drawColorPickerSelect();
 			}
 		}
 
@@ -177,12 +222,11 @@
 			curColor = RGBtoHSV( rgbColor.r, rgbColor.g, rgbColor.b );
 
 			var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
-			document.getElementById("curColorBox").style.background = rgbColorStr;
-
-			colorPickerSlider.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
-			colorPickerSlider.value = (1 - curColor.v) * 100;
+			sliderBg.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
+			slider.value = (1 - curColor.v) * 100;
 
 			drawColorPickerWheel();
+			drawColorPickerSelect();
 		}
 
 		function pickColorStart(e) {
@@ -197,18 +241,28 @@
 
 		var wheelCanvas;
 		var wheelContext;
+		var selectCanvas;
+		var selectContext;
 		var slider;
+		var sliderBg;
 
 		function initColorWheel() {
 			wheelCanvas = document.getElementById("colorPickerWheel");
 			wheelContext = wheelCanvas.getContext("2d");
-			wheelCanvas.addEventListener("mousedown", pickColorStart);
-			wheelCanvas.addEventListener("mousemove", pickColor);
-			wheelCanvas.addEventListener("mouseup", pickColorEnd);
+
+			selectCanvas = document.getElementById("colorPickerSelect");
+			selectContext = selectCanvas.getContext("2d");
+
+			selectCanvas.addEventListener("mousedown", pickColorStart);
+			selectCanvas.addEventListener("mousemove", pickColor);
+			selectCanvas.addEventListener("mouseup", pickColorEnd);
+			selectCanvas.addEventListener("mouseleave", pickColorEnd);
 
 			slider = document.getElementById("colorPickerSlider");
 			slider.addEventListener("input", updateValue);
 			slider.addEventListener("change", updateValue);
+
+			sliderBg = document.getElementById("colorPickerSliderBg");
 
 			setColor(255,0,0);
 			// setColor(84,94,28);
@@ -219,11 +273,14 @@
 
 <body onload="initColorWheel();">
 
-	<canvas id="colorPickerWheel"></canvas> <br>
-	<input type="range" id="colorPickerSlider" value="0" /> <br>
-	<input type="text" />
+	<canvas id="colorPickerWheel"></canvas>
+	<canvas id="colorPickerSelect"></canvas>
+	<div id="colorPickerSliderBg">
+		<input type="range" id="colorPickerSlider" value="0" />
+	</div>
 
-	<div id="curColorBox" style="display:block; width:30px; height:30px; background:black;"></div>
+	<br>
+	<input type="text" />
 
 </body>
 
