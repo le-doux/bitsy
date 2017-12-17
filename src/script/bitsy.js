@@ -974,7 +974,10 @@ function isWallDown() {
 	return (player().y + 1 >= 16) || isWall( player().x, player().y + 1 );
 }
 
-function isWall(x,y) {
+function isWall(x,y,roomId) {
+	if(roomId == undefined || roomId == null)
+		roomId = curRoom;
+
 	var tileId = getTile( x, y );
 
 	if( tileId === '0' )
@@ -982,7 +985,7 @@ function isWall(x,y) {
 
 	if( tile[tileId].isWall === undefined || tile[tileId].isWall === null ) {
 		// No wall-state defined: check room-specific walls
-		var i = getRoom().walls.indexOf( getTile(x,y) );
+		var i = room[roomId].walls.indexOf( getTile(x,y) );
 		return i > -1;
 	}
 

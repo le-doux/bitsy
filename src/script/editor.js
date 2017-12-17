@@ -6,6 +6,7 @@
 - remember page export color
 
 CONFIRMED BUGS
+- wall visualization broken
 - iOS editor is broken again
 - bug with mobile (iOS safari) not loading itch games every time
 - animation bugs: https://twitter.com/skodone/status/942019687550017542
@@ -1809,11 +1810,10 @@ function drawEditMap() {
 	//draw walls
 	if (drawCollisionMap) {
 		ctx.fillStyle = getContrastingColor();
-		for (i in room[curRoom].tilemap) {
-			for (j in room[curRoom].tilemap[i]) {
-				var id = room[curRoom].tilemap[i][j];
-				if ( room[curRoom].walls.indexOf(id) != -1 ) {
-					ctx.fillRect(j*tilesize*scale,i*tilesize*scale,tilesize*scale,tilesize*scale);
+		for (y in room[curRoom].tilemap) {
+			for (x in room[curRoom].tilemap[y]) {
+				if( isWall(x,y,curRoom) ) {
+					ctx.fillRect(x*tilesize*scale,y*tilesize*scale,tilesize*scale,tilesize*scale);
 				}
 			}
 		}
