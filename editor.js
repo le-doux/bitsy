@@ -3,6 +3,7 @@
 - bitsy icon
 - better top bar behavior
 - new color picker
+- remember page export color
 
 CONFIRMED BUGS
 - iOS editor is broken again
@@ -529,6 +530,12 @@ function start() {
 
 	// save latest version used by editor (for compatibility)
 	localStorage.engine_version = JSON.stringify( version );
+
+	// load saved export settings
+	if( localStorage.export_settings ) {
+		export_settings = JSON.parse( localStorage.export_settings );
+		document.getElementById("pageColor").value = export_settings.page_color;
+	}
 }
 
 function setDefaultGameState() {
@@ -2879,7 +2886,7 @@ function exportGame() {
 	refreshGameData(); //just in case
 	var gameData = document.getElementById("game_data").value; //grab game data
 	var size = document.getElementById("exportSizeFixedInput").value;
-	exporter.exportGame( gameData, title, exportPageColor, "mygame.html", isFixedSize, size ); //download as html file
+	exporter.exportGame( gameData, title, export_settings.page_color, "mygame.html", isFixedSize, size ); //download as html file
 }
 
 function hideAbout() {
@@ -3513,15 +3520,19 @@ function on_paint_frame2() {
 	reloadCurDrawing();
 }
 
+var export_settings = {
+	page_color : "#ffffff"
+};
 
-var exportPageColor = "#fff";
 function on_change_color_page() {
 	var hex = document.getElementById("pageColor").value;
 	//console.log(hex);
 	var rgb = hexToRgb( hex );
 	// document.body.style.background = hex;
 	document.getElementById("roomPanel").style.background = hex;
-	exportPageColor = hex;
+	export_settings.page_color = hex;
+
+	localStorage.export_settings = JSON.stringify( export_settings );
 }
 
 /* ENDINGS */
