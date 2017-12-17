@@ -306,9 +306,6 @@ function detectBrowserFeatures() {
 			// console.log(input.clientWidth);
 			console.log("WEIRD SAFARI COLOR PICKER IS BAD!");
 			browserFeatures.colorPicker = false;
-			// document.getElementById("backgroundColor").type = "text";
-			// document.getElementById("tileColor").type = "text";
-			// document.getElementById("spriteColor").type = "text";
 			document.getElementById("pageColor").type = "text";
 		}
 		
@@ -334,8 +331,9 @@ function detectBrowserFeatures() {
 }
 
 function hasUnsupportedFeatures() {
-	return !browserFeatures.colorPicker || !browserFeatures.fileDownload;
+	return /*!browserFeatures.colorPicker ||*/ !browserFeatures.fileDownload;
 }
+// NOTE: No longer relying on color picker feature
 
 function showUnsupportedFeatureWarning() {
 	document.getElementById("unsupportedFeatures").style.display = "block";
@@ -467,13 +465,12 @@ function start() {
 
 	// init color picker
 	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSlider', 'colorPickerSliderBg', 'colorPickerHexText');
+	colorPicker.onColorChange = onColorPickerChange;
+	document.getElementById("colorPaletteOptionBackground").checked = true;
+	updateColorPickerUI();
 
 	//unsupported feature stuff
 	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
-	if (!browserFeatures.colorPicker) {
-		updatePaletteBorders();
-		document.getElementById("colorPickerHelp").style.display = "block";
-	}
 	if (!browserFeatures.fileDownload) {
 		document.getElementById("downloadHelp").style.display = "block";
 	}
@@ -2195,9 +2192,6 @@ function updatePaletteUI() {
 
 	updatePaletteOptionsFromGameData();
 	updatePaletteControlsFromGameData();
-	if (!browserFeatures.colorPicker) {
-		updatePaletteBorders();
-	}
 }
 
 function updateRoomPaletteSelect() {
@@ -2211,81 +2205,53 @@ function updateRoomPaletteSelect() {
 	}
 }
 
-function updatePaletteBorders() {
-	console.log("UPDATE PALETTE BORDERS");
-	//feature to show selected colors in browsers that don't support a color picker
-	// document.getElementById("backgroundColor").style.border = "solid " + document.getElementById("backgroundColor").value + " 5px";
-	// document.getElementById("tileColor").style.border = "solid " + document.getElementById("tileColor").value + " 5px";
-	// document.getElementById("spriteColor").style.border = "solid " + document.getElementById("spriteColor").value + " 5px";
-}
-
 var colorPicker = null; // new color picker
+var colorPickerIndex = 0;
+var colorPaletteLabels = ["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"];
 
-function on_change_color_bg() {
-	//color testing
-	// document.body.style.background = document.getElementById("backgroundColor").value;
-
-	// var rgb = hexToRgb( document.getElementById("backgroundColor").value );
-	getPal(selectedColorPal())[0][0] = rgb.r;
-	getPal(selectedColorPal())[0][1] = rgb.g;
-	getPal(selectedColorPal())[0][2] = rgb.b;
-	refreshGameData();
-	renderImages();
-	drawPaintCanvas();
-	drawEditMap();
-	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
-	if( isCurDrawingAnimated )
-		renderAnimationPreview( drawingId );
-
-	if (!browserFeatures.colorPicker) {
-		updatePaletteBorders();
-	}
+function changeColorPickerIndex(index) {
+	colorPickerIndex = index;
+	var color = getPal(selectedColorPal())[ index ];
+	console.log(color);
+	colorPicker.setColor( color[0], color[1], color[2] );
 }
 
-function on_change_color_tile() {
-	//color testing
-	// var elements = document.getElementsByClassName("bar");
-	// for (var i = 0; i < elements.length; i++) {
-	// 	var el = elements[i];
-	// 	console.log(el);
-	// 	el.style.background = document.getElementById("tileColor").value;
-	// }
+function updateColorPickerUI() {
+	var color0 = getPal(selectedColorPal())[ 0 ];
+	var color1 = getPal(selectedColorPal())[ 1 ];
+	var color2 = getPal(selectedColorPal())[ 2 ];
 
-	// var rgb = hexToRgb( document.getElementById("tileColor").value );
-	getPal(selectedColorPal())[1][0] = rgb.r;
-	getPal(selectedColorPal())[1][1] = rgb.g;
-	getPal(selectedColorPal())[1][2] = rgb.b;
-	refreshGameData();
-	renderImages();
-	drawPaintCanvas();
-	drawEditMap();
-	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
-	if( isCurDrawingAnimated )
-		renderAnimationPreview( drawingId );
+	updateColorPickerLabel(0, color0[0], color0[1], color0[2] );
+	updateColorPickerLabel(1, color1[0], color1[1], color1[2] );
+	updateColorPickerLabel(2, color2[0], color2[1], color2[2] );
 
-	if (!browserFeatures.colorPicker) {
-		updatePaletteBorders();
-	}
+	changeColorPickerIndex( colorPickerIndex );
 }
 
-function on_change_color_sprite() {
-	//color testing
-	// document.getElementById("topbar").style.background = document.getElementById("spriteColor").value;
+function updateColorPickerLabel(index, r, g, b) {
+	var rgbColor = {r:r, g:g, b:b};
 
-	// var rgb = hexToRgb( document.getElementById("spriteColor").value );
-	getPal(selectedColorPal())[2][0] = rgb.r;
-	getPal(selectedColorPal())[2][1] = rgb.g;
-	getPal(selectedColorPal())[2][2] = rgb.b;
-	refreshGameData();
-	renderImages();
-	drawPaintCanvas();
-	drawEditMap();
-	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
-	if( isCurDrawingAnimated )
-		renderAnimationPreview( drawingId );
+	var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
+	var hsvColor = RGBtoHSV( rgbColor );
+	document.getElementById( colorPaletteLabels[ index ] ).style.background = rgbColorStr;
+	document.getElementById( colorPaletteLabels[ index ] ).style.color = hsvColor.v < 0.5 ? "white" : "black";
+}
 
-	if (!browserFeatures.colorPicker) {
-		updatePaletteBorders();
+function onColorPickerChange( rgbColor, isMouseUp ) {
+	getPal(selectedColorPal())[ colorPickerIndex ][ 0 ] = rgbColor.r;
+	getPal(selectedColorPal())[ colorPickerIndex ][ 1 ] = rgbColor.g;
+	getPal(selectedColorPal())[ colorPickerIndex ][ 2 ] = rgbColor.b;
+
+	updateColorPickerLabel(colorPickerIndex, rgbColor.r, rgbColor.g, rgbColor.b );
+
+	if( isMouseUp ) {
+		refreshGameData();
+		renderImages();
+		drawPaintCanvas();
+		drawEditMap();
+		refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
+		if( isCurDrawingAnimated )
+			renderAnimationPreview( drawingId );
 	}
 }
 
@@ -2312,6 +2278,9 @@ function updatePaletteControlsFromGameData() {
 	// document.getElementById("backgroundColor").value = rgbToHex(getPal(selectedColorPal())[0][0], getPal(selectedColorPal())[0][1], getPal(selectedColorPal())[0][2]);
 	// document.getElementById("tileColor").value = rgbToHex(getPal(selectedColorPal())[1][0], getPal(selectedColorPal())[1][1], getPal(selectedColorPal())[1][2]);
 	// document.getElementById("spriteColor").value = rgbToHex(getPal(selectedColorPal())[2][0], getPal(selectedColorPal())[2][1], getPal(selectedColorPal())[2][2]);
+
+	if( colorPicker != null )
+		updateColorPickerUI();
 }
 
 function prevPalette() {

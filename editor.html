@@ -661,31 +661,20 @@
 							colors
 						</div>
 					</div>
-					
-<!-- 					<input title="pick background color" type="color" value="#0052cc" id="backgroundColor" onchange="on_change_color_bg();" autocomplete="off"> background <br>
-					
-					<input title="pick tile color" type="color" value="#809fff" id="tileColor" onchange="on_change_color_tile();" autocomplete="off"> tile <br>
-					
-					<input title="pick sprite / avatar color" type="color" value="#ffffff" id="spriteColor" onchange="on_change_color_sprite();" autocomplete="off"> sprite <br>
-					
-					<div id="colorPickerHelp" class="helpMessage" style="display:none;">
-						Having trouble choosing hex colors? <br>
-						Try this online <a href="http://www.w3schools.com/colors/colors_picker.asp" target="_blank">color picker</a>.
-					</div> -->
 
 					<form id="colorPaletteForm">
-						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionBackground" onclick="" checked>
-						<label for="colorPaletteOptionBackground" title="pick background color">
+						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionBackground" onclick="changeColorPickerIndex(0);" checked>
+						<label id="colorPaletteLabelBackground" for="colorPaletteOptionBackground" title="pick background color">
 							<i class="material-icons">grid_on</i> background color
 						</label>
 
-						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionTile" onclick="" checked>
-						<label for="colorPaletteOptionTile" title="pick tile color">
+						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionTile" onclick="changeColorPickerIndex(1);">
+						<label id="colorPaletteLabelTile" for="colorPaletteOptionTile" title="pick tile color">
 							<i class="material-icons">terrain</i> tile color
 						</label>
 
-						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionSprite" onclick="" checked>
-						<label for="colorPaletteOptionSprite" title="pick sprite / avatar / item color">
+						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionSprite" onclick="changeColorPickerIndex(2);">
+						<label id="colorPaletteLabelSprite" for="colorPaletteOptionSprite" title="pick sprite / avatar / item color">
 							<i class="material-icons">nature_people</i> sprite color
 						</label>
 					</form>

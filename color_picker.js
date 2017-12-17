@@ -13,6 +13,25 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 	var selectCircleRadius = 10;
 
+	var self = this;
+
+	this.setColor = function(r,g,b) {
+		var rgbColor = { r:r, g:g, b:b };
+		curColor = RGBtoHSV( rgbColor.r, rgbColor.g, rgbColor.b );
+
+		var hueHsvColor = { h:curColor.h, s:1.0, v:1.0 };
+		var hueRgbColor = HSVtoRGB( hueHsvColor );
+		var rgbColorStr = "rgb(" + hueRgbColor.r + "," + hueRgbColor.g + "," + hueRgbColor.b + ")";
+		sliderBg.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
+		slider.value = (1 - curColor.v) * 100;
+
+		drawColorPickerWheel();
+		drawColorPickerSelect();
+		updateHexCode();
+	}
+
+	this.onColorChange = null;
+
 	function drawColorPickerWheel() {
 
 		wheelCanvas.width = width;
@@ -69,6 +88,10 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 	function updateValue(e) {
 		// console.log(e.target.value);
 		curColor.v = 1 - (e.target.value / 100);
+
+		if( self.onColorChange != null )
+			self.onColorChange( HSVtoRGB( curColor ), true );
+
 		drawColorPickerWheel();
 		drawColorPickerSelect();
 		updateHexCode();
@@ -82,14 +105,22 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 	function changeHexCode(e) {
 		// console.log(e.target.value);
 		var rgbColor = hexToRgb( e.target.value );
-		if( rgbColor != null )
-			setColor( rgbColor.r, rgbColor.g, rgbColor.b );
-		else
+		if( rgbColor != null ) {
+			self.setColor( rgbColor.r, rgbColor.g, rgbColor.b );
+
+			if( self.onColorChange != null )
+				self.onColorChange( rgbColor, true );
+		}
+		else {
 			updateHexCode(); // change back to the current color if it's nonsense input
+		}
 	}
 
 	var isMouseDown = false;
-	function pickColor(e) {
+	function pickColor(e, isMouseUp) {
+		if( isMouseUp == null || isMouseUp == undefined )
+			isMouseUp = false;
+
 		if(isMouseDown) {
 			// console.log(e);
 			var bounds = wheelCanvas.getBoundingClientRect();
@@ -116,8 +147,13 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 				var rgbColor = { r:pixelData[0], g:pixelData[1], b:pixelData[2] };
 				curColor = RGBtoHSV( rgbColor.r, rgbColor.g, rgbColor.b );
 
-				var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
+				var hueHsvColor = { h:curColor.h, s:1.0, v:1.0 };
+				var hueRgbColor = HSVtoRGB( hueHsvColor );
+				var rgbColorStr = "rgb(" + hueRgbColor.r + "," + hueRgbColor.g + "," + hueRgbColor.b + ")";
 				sliderBg.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
+
+				if( self.onColorChange != null )
+					self.onColorChange( rgbColor, isMouseUp );
 			}
 
 			drawColorPickerSelect();
@@ -125,25 +161,13 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		}
 	}
 
-	function setColor(r,g,b) {
-		var rgbColor = { r:r, g:g, b:b };
-		curColor = RGBtoHSV( rgbColor.r, rgbColor.g, rgbColor.b );
-
-		var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
-		sliderBg.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
-		slider.value = (1 - curColor.v) * 100;
-
-		drawColorPickerWheel();
-		drawColorPickerSelect();
-	}
-
 	function pickColorStart(e) {
 		isMouseDown = true;
-		pickColor(e);
+		pickColor(e, false);
 	}
 
 	function pickColorEnd(e) {
-		pickColor(e);
+		pickColor(e, true);
 		isMouseDown = false;
 	}
 
@@ -175,7 +199,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		hexText = document.getElementById(hexTextId);
 		hexText.addEventListener( "change", changeHexCode );
 
-		setColor(255,0,0);
+		self.setColor(255,0,0);
 	}
 
 	initColorWheel();
