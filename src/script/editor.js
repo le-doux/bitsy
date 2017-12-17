@@ -361,6 +361,8 @@ var defaultPanelPrefs = {
 		{ id:"inventoryPanel",		visible:false,	position:11 }
 	]
 };
+// console.log(defaultPanelPrefs);
+
 function getPanelPrefs() {
 	// (TODO: weird that engine version and editor version are the same??)
 	var useDefaultPrefs = ( localStorage.engine_version == null ) ||
@@ -370,6 +372,7 @@ function getPanelPrefs() {
 	console.log("USE DEFAULT?? " + useDefaultPrefs);
 	var prefs = useDefaultPrefs ? defaultPanelPrefs : JSON.parse( localStorage.panel_prefs );
 	// add missing panel prefs (if any)
+	// console.log(defaultPanelPrefs);
 	for( var i = 0; i < defaultPanelPrefs.workspace.length; i++ ) {
 		var isMissing = true;
 		var panelPref = defaultPanelPrefs.workspace[i];

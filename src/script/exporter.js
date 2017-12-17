@@ -3,23 +3,23 @@ function Exporter() {
 
 /* resource loading */
 var resources = {};
-function loadResource(url) {
+function loadResource(folder, filename) {
 	var client = new XMLHttpRequest();
-	client.open('GET', './'+url);
+	client.open('GET', './' + folder + '/' + filename);
 	client.onreadystatechange = function() {
-	  resources[url] = client.responseText;
+	  resources[filename] = client.responseText;
 	}
 	client.send();
 }
 
-loadResource("exportTemplate.html");
-loadResource("exportStyleFixed.css");
-loadResource("exportStyleFull.css");
-loadResource("bitsy.js");
-loadResource("font.js");
-loadResource("dialog.js");
-loadResource("script.js");
-loadResource("color_util.js");
+loadResource("other", "exportTemplate.html");
+loadResource("style", "exportStyleFixed.css");
+loadResource("style", "exportStyleFull.css");
+loadResource("script", "bitsy.js");
+loadResource("script", "font.js");
+loadResource("script", "dialog.js");
+loadResource("script", "script.js");
+loadResource("script", "color_util.js");
 
 
 /* exporting */

@@ -4,3 +4,4 @@ bitsy.sublime-project
 bitsy.sublime-workspace
 bitsy.zip
 electron-version/node_modules/*
+experiments/electron-version/node_modules/*
