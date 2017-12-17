@@ -1,3 +1,9 @@
+v4.5:
+- new color picker tool
+- page export color saved between sessions
+- updated tools bar
+- bugfix: wall visualization was broken
+
 v4.4:
 - wall settings for tiles apply to all rooms by default
 - bugfix: error on walking into edge of room

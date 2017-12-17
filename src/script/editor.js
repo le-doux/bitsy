@@ -4,9 +4,9 @@
 - better top bar behavior
 - new color picker
 - remember page export color
+- bugfix: wall visualization broken
 
 CONFIRMED BUGS
-- wall visualization broken
 - iOS editor is broken again
 - bug with mobile (iOS safari) not loading itch games every time
 - animation bugs: https://twitter.com/skodone/status/942019687550017542
