@@ -1,0 +1,158 @@
+#colorPicker {
+	margin-bottom: 10px;
+}
+
+#colorPickerWheel {
+	width: 200px;
+	height: 200px;
+	display: block;
+	background: transparent;
+}
+
+#colorPickerSelect {
+	width: 200px;
+	height: 200px;
+	display: block;
+	margin-top: -200px;
+	cursor: pointer;
+	background: transparent;
+}
+
+#colorPickerHexText {
+	display: block;
+	width: 130px;
+	margin-left: 30px;
+	margin-top: 10px;
+}
+
+#colorPickerSlider {
+	margin: 0px;
+}
+
+#colorPickerSliderBg {
+	background:linear-gradient(to right,yellow,black);
+	display: inline-block;
+	padding: 4px;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-bottom: 0px;
+	margin-left: 30px;
+	margin-top: 5px;
+	border-radius: 4px;
+	width: 120px;
+}
+
+#colorPaletteForm input[type=radio] + label {
+	display: block;
+	margin-bottom: 4px;
+	background: #e8e8ff;
+	color: black;
+	border-radius: 4px;
+	border: solid 1px #ddd;
+}
+
+#colorPaletteForm input[type=radio]:checked + label {
+	border: solid 2px black;
+	background: #e8e8ff;
+	color: black;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	text-align: middle;
+}
+
+/* custom slider style -- source: https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/ */
+#colorPickerSlider {
+	-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+	width: 100%; /* Specific width is required for Firefox. */
+	background: transparent; /* Otherwise white in Chrome */
+}
+
+#colorPickerSlider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+}
+
+#colorPickerSlider:focus {
+	outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+}
+
+#colorPickerSlider::-ms-track {
+	width: 100%;
+	cursor: pointer;
+
+	/* Hides the slider so custom styles can be added */
+	background: transparent; 
+	border-color: transparent;
+	color: transparent;
+}
+
+/* custom slider thumb */
+#colorPickerSlider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	border: 1px solid #000000;
+	height: 12px;
+	width: 12px;
+	border-radius: 6px;
+	background: #ffffff;
+	cursor: pointer;
+	margin-top: -5px;
+}
+
+#colorPickerSlider::-moz-range-thumb {
+	border: 1px solid #000000;
+	height: 12px;
+	width: 12px;
+	border-radius: 6px;
+	background: #ffffff;
+	cursor: pointer;
+}
+
+#colorPickerSlider::-ms-thumb {
+	border: 1px solid #000000;
+	height: 12px;
+	width: 12px;
+	border-radius: 6px;
+	background: #ffffff;
+	cursor: pointer;
+}
+
+/* custom slider track */
+#colorPickerSlider::-webkit-slider-runnable-track {
+	width: 100%;
+	height: 2px;
+	cursor: pointer;
+	background: #fff;
+	margin-top: -14px;
+}
+
+#colorPickerSlider:focus::-webkit-slider-runnable-track {
+	background: #fff;
+}
+
+#colorPickerSlider::-moz-range-track {
+	width: 100%;
+	height: 2px;
+	cursor: pointer;
+	background: #fff;
+}
+
+#colorPickerSlider::-ms-track {
+	width: 100%;
+	height: 2px;
+	cursor: pointer;
+	background: transparent;
+	border-color: transparent;
+	border-width: 16px 0;
+	color: transparent;
+}
+#colorPickerSlider::-ms-fill-lower {
+	background: #fff;
+}
+#colorPickerSlider:focus::-ms-fill-lower {
+	background: #fff;
+}
+#colorPickerSlider::-ms-fill-upper {
+	background: #fff;
+}
+#colorPickerSlider:focus::-ms-fill-upper {
+	background: #fff;
+}
