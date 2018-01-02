@@ -786,19 +786,9 @@ function movePlayer(direction) {
 	var ext = getExit( player().room, player().x, player().y );
 	var end = getEnding( player().room, player().x, player().y );
 	var itmIndex = getItemIndex( player().room, player().x, player().y );
-	if (end) {
-		startNarrating( ending[end.id], true /*isEnding*/ );
-	}
-	else if (ext) {
-		player().room = ext.dest.room;
-		player().x = ext.dest.x;
-		player().y = ext.dest.y;
-		curRoom = ext.dest.room;
-	}
-	else if (spr) {
-		startSpriteDialog( spr /*spriteId*/ );
-	}
-	else if (itmIndex > -1) {
+
+	// do items first, because you can pick up an item AND go through a door
+	if (itmIndex > -1) {
 		// TODO pick up items (what about touch?)
 		// console.log("HIT ITM ");
 		// console.log( itmIndex );
@@ -816,6 +806,19 @@ function movePlayer(direction) {
 		startItemDialog( itm.id  /*itemId*/ );
 
 		// console.log( player().inventory );
+	}
+
+	if (end) {
+		startNarrating( ending[end.id], true /*isEnding*/ );
+	}
+	else if (ext) {
+		player().room = ext.dest.room;
+		player().x = ext.dest.x;
+		player().y = ext.dest.y;
+		curRoom = ext.dest.room;
+	}
+	else if (spr) {
+		startSpriteDialog( spr /*spriteId*/ );
 	}
 }
 
