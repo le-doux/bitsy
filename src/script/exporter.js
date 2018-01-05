@@ -102,10 +102,14 @@ function unescapeSpecialCharacters(str) {
 }
 
 this.importGame = function( html ) {
+	console.log("IMPORT!!!");
+
 	// IMPORT : old style
 	// find start of game data
 	var i = html.indexOf("var exportedGameData");
 	if(i > -1) {
+		console.log("OLD STYLE");
+
 		while ( html.charAt(i) != '"' ) {
 			i++; // move to first quote
 		}
@@ -128,10 +132,13 @@ this.importGame = function( html ) {
 	}
 
 	// IMPORT : new style
-	var scriptStart = '<script type="bitsyGameData" id="exportedGameData">\n';
-	var scriptEnd = '</script>\n'
+	var scriptStart = '<script type="bitsyGameData" id="exportedGameData">';
+	var scriptEnd = '</script>';
 	i = html.indexOf( scriptStart );
+	console.log(i);
 	if(i > -1) {
+		console.log("NEW STYLE");
+
 		i = i + scriptStart.length;
 		var gameStr = "";
 		var lineStr = "";
