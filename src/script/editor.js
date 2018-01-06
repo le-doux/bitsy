@@ -1,4 +1,7 @@
 /* 
+4.6
+- fix importing new-style html
+
 4.5
 - bitsy icon
 - better top bar behavior
