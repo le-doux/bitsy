@@ -249,9 +249,11 @@ input {
 	/*width:224px;*/
 	margin:0px;
 }
-/*#paintExplorerContent label {
-	border: none;
-}*/
+
+#paintExplorerContent div {
+	display: inline-block;
+}
+
 #paintExplorerContent img {
 	width:64px;
 	height:64px;

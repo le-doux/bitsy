@@ -2491,10 +2491,17 @@ function addPaintThumbnail(id) {
 	radio.id = "paintExplorerRadio_" + id;
 	radio.value = id;
 	radio.checked = id === drawingId;
+
 	paintExplorerForm.appendChild(radio);
+
 	var label = document.createElement("label");
 	label.htmlFor = "paintExplorerRadio_" + id;
 	label.id = "paintExplorerLabel_" + id;
+
+	var div = document.createElement("div");
+	// div.style.width = "100px";
+	// div.style.display = "inline-block";
+
 	var img = document.createElement("img");
 	img.id = "paintExplorerThumbnail_" + id;
 	if( paintMode === TileType.Tile )
@@ -2505,7 +2512,21 @@ function addPaintThumbnail(id) {
 		img.title = "player avatar";
 	else if( paintMode === TileType.Item )
 		img.title = item[id].name ? item[id].name : "item " + id;
-	label.appendChild(img);
+
+	div.appendChild(img);
+
+	// label.appendChild( document.createElement("br") );
+
+	var nameSpan = document.createElement("figcaption");
+	// nameSpan.style.display = "inline-block";
+	nameSpan.innerText = id;
+
+	div.appendChild(nameSpan);
+
+	// label.appendChild(img);
+
+	label.appendChild(div);
+
 	paintExplorerForm.appendChild(label);
 
 	radio.onclick = selectPaint;
