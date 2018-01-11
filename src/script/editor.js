@@ -845,9 +845,13 @@ function on_drawing_name_change() {
 					console.log(dialog[dlgId]);
 				}
 			}
+
+			document.getElementById("paintExplorerCaption_" + drawingId).innerText = newName;
 		}
 
 		updateInventoryItemUI();
+
+		// renderPaintThumbnail( drawingId ); // hacky way to update name
 	}
 
 	refreshGameData();
@@ -1330,7 +1334,7 @@ function reloadTile() {
 	// wall UI
 	updateWallCheckboxOnCurrentTile();
 
-	updateDrawingNameUI(false);
+	updateDrawingNameUI(true);
 
 	drawPaintCanvas();
 }
@@ -1441,7 +1445,7 @@ function reloadSprite() {
 	// dialog UI
 	reloadDialogUI()
 
-	updateDrawingNameUI(false);
+	updateDrawingNameUI(true);
 
 	// update paint canvas
 	drawPaintCanvas();
@@ -2381,7 +2385,7 @@ function on_paint_tile() {
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
-	updateDrawingNameUI(false);
+	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	refreshPaintExplorer();
 	document.getElementById("paintOptionTile").checked = true;
@@ -2408,7 +2412,7 @@ function on_paint_sprite() {
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
 	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
-	updateDrawingNameUI(false);
+	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	refreshPaintExplorer();
 	document.getElementById("paintOptionSprite").checked = true;
@@ -2442,8 +2446,18 @@ function on_paint_item() {
 	reloadAdvDialogUI();
 }
 
+function paintExplorerFilterChange( e ) {
+	console.log("paint explorer filter : " + e.target.value);
+	refreshPaintExplorer( true, e.target.value );
+}
+
 var drawingThumbnailCanvas, drawingThumbnailCtx;
-function refreshPaintExplorer( doKeepOldThumbnails = false ) {
+function refreshPaintExplorer( doKeepOldThumbnails, filterString ) {
+	if( doKeepOldThumbnails == null || doKeepOldThumbnails == undefined )
+		doKeepOldThumbnails = false;
+
+	var doFilter = filterString != null && filterString != undefined && filterString.length > 0;
+
 	var idList = [];
 	if( paintMode == TileType.Avatar ) {
 		idList = ["A"];
@@ -2478,6 +2492,11 @@ function refreshPaintExplorer( doKeepOldThumbnails = false ) {
 				addPaintThumbnail( id ); // create thumbnail element and render thumbnail
 			else
 				renderPaintThumbnail( id ); // just re-render the thumbnail
+
+			if( doFilter )
+				filterPaintThumbnail( id, filterString );
+			else
+				document.getElementById("paintExplorerLabel_" + id).style.display = "inline-block"; // make it visible otherwise
 		}
 	}
 }
@@ -2509,7 +2528,7 @@ function addPaintThumbnail(id) {
 	else if( paintMode === TileType.Sprite )
 		img.title = sprite[id].name ? sprite[id].name : "sprite " + id;
 	else if( paintMode === TileType.Avatar )
-		img.title = "player avatar";
+		img.title = "player";
 	else if( paintMode === TileType.Item )
 		img.title = item[id].name ? item[id].name : "item " + id;
 
@@ -2517,11 +2536,21 @@ function addPaintThumbnail(id) {
 
 	// label.appendChild( document.createElement("br") );
 
-	var nameSpan = document.createElement("figcaption");
-	// nameSpan.style.display = "inline-block";
-	nameSpan.innerText = id;
+	var nameCaption = document.createElement("figcaption");
+	nameCaption.id = "paintExplorerCaption_" + id;
 
-	div.appendChild(nameSpan);
+	nameCaption.innerText = img.title;
+
+	// if( paintMode === TileType.Tile )
+	// 	nameSpan.innerText = tile[id].name ? tile[id].name : "";
+	// else if( paintMode === TileType.Sprite )
+	// 	nameSpan.innerText = sprite[id].name ? sprite[id].name : "";
+	// else if( paintMode === TileType.Avatar )
+	// 	nameSpan.innerText = "";
+	// else if( paintMode === TileType.Item )
+	// 	nameSpan.innerText = item[id].name ? item[id].name : "";
+
+	div.appendChild(nameCaption);
 
 	// label.appendChild(img);
 
@@ -2532,6 +2561,16 @@ function addPaintThumbnail(id) {
 	radio.onclick = selectPaint;
 	
 	renderPaintThumbnail( id );
+}
+
+function filterPaintThumbnail(id,filterString) {
+	var label = document.getElementById("paintExplorerLabel_" + id);
+	var img = document.getElementById("paintExplorerThumbnail_" + id);
+	var thumbTitle = img.title;
+
+	var foundFilter = thumbTitle.indexOf( filterString ) > -1;
+
+	label.style.display = foundFilter ? "inline-block" : "none";
 }
 
 var thumbnailRenderEncoders = {};
@@ -2666,6 +2705,10 @@ function selectPaint() {
 	if( paintMode === TileType.Tile ) {
 		tileIndex = sortedTileIdList().indexOf( drawingId );
 		reloadTile();
+	}
+	else if( paintMode === TileType.Item ) {
+		itemIndex = sortedItemIdList().indexOf( drawingId );
+		reloadItem();
 	}
 	else {
 		spriteIndex = sortedSpriteIdList().indexOf( drawingId );

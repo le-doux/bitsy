@@ -98,6 +98,12 @@ input[type=radio] + label.right {
 	border: solid 2px #6767b2;
 }
 
+#paintExplorerContent input[type=radio]:checked + label {
+	color: #6767b2; /* keep text the same color */
+	font-weight: bold;
+	/*text-decoration: underline;*/
+}
+
 #toolsPanel label {
 	margin-bottom: 5px;
 }

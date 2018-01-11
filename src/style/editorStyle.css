@@ -266,6 +266,16 @@ input {
 	/*border: none;*/
 }
 
+#paintExplorerContent figcaption {
+	text-align: center;
+	padding-top: 5px;
+	min-height: 20px;
+	max-width: 68px;
+	/*background: red;*/
+	overflow: hidden;
+	white-space: nowrap;
+}
+
 #paintExplorerAdd {
 	width:58px;
 	height:64px;
