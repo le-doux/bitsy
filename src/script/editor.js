@@ -1120,6 +1120,7 @@ function newDrawing() {
 	}
 	addPaintThumbnail( drawingId );
 	changePaintExplorerSelection( drawingId );
+	refreshPaintExplorer( true /*doKeepOldThumbnails*/, document.getElementById("paintExplorerFilterInput").value /*filterString*/, true /*skipRenderStep*/ ); // this is a bit hacky feeling
 }
 
 function duplicateDrawing() {
@@ -2372,6 +2373,7 @@ function on_paint_avatar() {
 	document.getElementById("paintExplorerOptionAvatar").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:none;");
+	document.getElementById("paintExplorerFilterInput").value = "";
 
 	reloadAdvDialogUI();
 }
@@ -2392,6 +2394,7 @@ function on_paint_tile() {
 	document.getElementById("paintExplorerOptionTile").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
+	document.getElementById("paintExplorerFilterInput").value = "";
 
 	reloadAdvDialogUI();
 }
@@ -2419,6 +2422,7 @@ function on_paint_sprite() {
 	document.getElementById("paintExplorerOptionSprite").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
+	document.getElementById("paintExplorerFilterInput").value = "";
 
 	reloadAdvDialogUI();
 }
@@ -2442,6 +2446,7 @@ function on_paint_item() {
 	document.getElementById("paintExplorerOptionItem").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
+	document.getElementById("paintExplorerFilterInput").value = "";
 
 	reloadAdvDialogUI();
 }
@@ -2452,11 +2457,14 @@ function paintExplorerFilterChange( e ) {
 }
 
 var drawingThumbnailCanvas, drawingThumbnailCtx;
-function refreshPaintExplorer( doKeepOldThumbnails, filterString ) {
+function refreshPaintExplorer( doKeepOldThumbnails, filterString, skipRenderStep ) {
 	if( doKeepOldThumbnails == null || doKeepOldThumbnails == undefined )
 		doKeepOldThumbnails = false;
 
 	var doFilter = filterString != null && filterString != undefined && filterString.length > 0;
+
+	if( skipRenderStep == null || skipRenderStep == undefined )
+		skipRenderStep = false;
 
 	var idList = [];
 	if( paintMode == TileType.Avatar ) {
@@ -2488,10 +2496,12 @@ function refreshPaintExplorer( doKeepOldThumbnails, filterString ) {
 		var id = idList[i];
 		if(id != "A" || paintMode == TileType.Avatar)
 		{
-			if( !doKeepOldThumbnails )
-				addPaintThumbnail( id ); // create thumbnail element and render thumbnail
-			else
-				renderPaintThumbnail( id ); // just re-render the thumbnail
+			if(!skipRenderStep) {
+				if( !doKeepOldThumbnails )
+					addPaintThumbnail( id ); // create thumbnail element and render thumbnail
+				else
+					renderPaintThumbnail( id ); // just re-render the thumbnail
+			}
 
 			if( doFilter )
 				filterPaintThumbnail( id, filterString );
@@ -2528,7 +2538,7 @@ function addPaintThumbnail(id) {
 	else if( paintMode === TileType.Sprite )
 		img.title = sprite[id].name ? sprite[id].name : "sprite " + id;
 	else if( paintMode === TileType.Avatar )
-		img.title = "player";
+		img.title = "avatar";
 	else if( paintMode === TileType.Item )
 		img.title = item[id].name ? item[id].name : "item " + id;
 
