@@ -538,3 +538,24 @@ input {
 	flex: 1 0 auto;
 	font-size:12px;
 }
+
+#paintExplorerFilter {
+	margin-top: 5px;
+	padding: 5px;
+}
+
+#paintExplorerFilterIcon {
+	float:left;
+}
+#paintExplorerFilterIcon .material-icons {
+	font-size: 18px;
+}
+
+#paintExplorerFilterInput {
+	width: 220px;
+	display: block;
+}
+
+.thumbnailDefaultName {
+	color : #ccccff;
+}

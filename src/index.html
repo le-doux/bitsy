@@ -639,8 +639,6 @@
 						</label>
 					</form>
 
-					<input id="paintExplorerFilterInput" type="text" onkeyup="paintExplorerFilterChange(event);" onchange="paintExplorerFilterChange(event);">
-
 					<div id="paintExplorerViewport">
 						<div id="paintExplorerContent">
 
@@ -654,6 +652,13 @@
 								</div>
 							</form>
 						</div>
+					</div>
+
+					<div class="controlBox" id="paintExplorerFilter">
+						<span id="paintExplorerFilterIcon">
+							<i class="material-icons">search</i>
+						</span>
+						<input id="paintExplorerFilterInput" type="text" onkeyup="paintExplorerFilterChange(event);" onchange="paintExplorerFilterChange(event);" placeholder="filter drawings" title="filter drawings by name">
 					</div>
 				</div>
 

@@ -2544,25 +2544,17 @@ function addPaintThumbnail(id) {
 
 	div.appendChild(img);
 
-	// label.appendChild( document.createElement("br") );
-
 	var nameCaption = document.createElement("figcaption");
 	nameCaption.id = "paintExplorerCaption_" + id;
 
 	nameCaption.innerText = img.title;
-
-	// if( paintMode === TileType.Tile )
-	// 	nameSpan.innerText = tile[id].name ? tile[id].name : "";
-	// else if( paintMode === TileType.Sprite )
-	// 	nameSpan.innerText = sprite[id].name ? sprite[id].name : "";
-	// else if( paintMode === TileType.Avatar )
-	// 	nameSpan.innerText = "";
-	// else if( paintMode === TileType.Item )
-	// 	nameSpan.innerText = item[id].name ? item[id].name : "";
+	var obj = getCurPaintObject( id );
+	if( obj.name === undefined || obj.name === null ) {
+		console.log("default name!!!!");
+		nameCaption.classList.add( "thumbnailDefaultName" );
+	}
 
 	div.appendChild(nameCaption);
-
-	// label.appendChild(img);
 
 	label.appendChild(div);
 
@@ -2760,16 +2752,17 @@ function getCurDialogId() {
 	return dialogId;
 }
 
-function getCurPaintObject() {
-	console.log(drawingId);
+function getCurPaintObject(id) {
+	if(id === undefined || id === null) id = drawingId;
+	console.log(id);
 	if(paintMode == TileType.Sprite || paintMode == TileType.Avatar) {
-		return sprite[drawingId];
+		return sprite[id];
 	}
 	else if(paintMode == TileType.Item) {
-		return item[drawingId];
+		return item[id];
 	}
 	else if(paintMode == TileType.Tile) {
-		return tile[drawingId];
+		return tile[id];
 	}
 }
 
