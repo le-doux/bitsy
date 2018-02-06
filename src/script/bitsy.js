@@ -58,7 +58,7 @@ var spriteStartLocations = {};
 /* VERSION */
 var version = {
 	major: 4, // for file format / engine changes
-	minor: 5 // for editor changes and bugfixes
+	minor: 6 // for editor changes and bugfixes
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
@@ -1514,7 +1514,7 @@ function parseTile(lines, i) {
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		if (getType(lines[i]) === "COL") {
 			colorIndex = parseInt( getId(lines[i]) );
-		}	
+		}
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
 			name = lines[i].split(/\s(.+)/)[1];
@@ -1782,7 +1782,7 @@ function renderImageForAllPalettes(drawing) {
 				imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
 				frameCount++;
 			}
-		}		
+		}
 	}
 }
 

@@ -1,5 +1,6 @@
 /* 
 4.6
+- filter drawings by name!
 - fix importing new-style html
 
 4.5
@@ -798,6 +799,11 @@ function on_drawing_name_change() {
 
 	updateNamesFromCurData()
 
+	var newName = obj.name;
+	if(newName === null || newName === undefined) newName = drawingId;
+	if(oldName === null || oldName === undefined) oldName = drawingId;
+	document.getElementById("paintExplorerCaption_" + drawingId).innerText = newName; // TODO: append "item" etc.
+
 	// make sure items referenced in scripts update their names
 	if(paintMode === TileType.Item) {
 		console.log("SWAP ITEM NAMES");
@@ -823,10 +829,6 @@ function on_drawing_name_change() {
 			};
 		};
 
-		var newName = obj.name;
-		if(newName === null || newName === undefined) newName = drawingId;
-		if(oldName === null || oldName === undefined) oldName = drawingId;
-
 		console.log(oldName + " <-> " + newName);
 
 		if(newName != oldName) {
@@ -845,8 +847,6 @@ function on_drawing_name_change() {
 					console.log(dialog[dlgId]);
 				}
 			}
-
-			document.getElementById("paintExplorerCaption_" + drawingId).innerText = newName;
 		}
 
 		updateInventoryItemUI();

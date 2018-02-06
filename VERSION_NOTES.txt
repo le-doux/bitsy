@@ -1,3 +1,7 @@
+4.6:
+- filter drawings by name!
+- fix importing new-style html
+
 v4.5:
 - new color picker tool
 - page export color saved between sessions
