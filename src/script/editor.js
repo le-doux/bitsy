@@ -799,10 +799,19 @@ function on_drawing_name_change() {
 
 	updateNamesFromCurData()
 
-	var newName = obj.name;
-	if(newName === null || newName === undefined) newName = drawingId;
-	if(oldName === null || oldName === undefined) oldName = drawingId;
-	document.getElementById("paintExplorerCaption_" + drawingId).innerText = newName; // TODO: append "item" etc.
+	// update display name for thumbnail
+	var displayName = obj.name ? obj.name : getCurPaintModeStr() + " " + drawingId;
+	var caption = document.getElementById("paintExplorerCaption_" + drawingId);
+	caption.innerText = displayName;
+	if( obj.name ) {
+		if( caption.classList.contains("thumbnailDefaultName") )
+			caption.classList.remove("thumbnailDefaultName");
+	}
+	else {
+		if( !caption.classList.contains("thumbnailDefaultName") )
+			caption.classList.add("thumbnailDefaultName");
+	}
+
 
 	// make sure items referenced in scripts update their names
 	if(paintMode === TileType.Item) {
@@ -828,6 +837,10 @@ function on_drawing_name_change() {
 				}
 			};
 		};
+
+		var newName = obj.name;
+		if(newName === null || newName === undefined) newName = drawingId;
+		if(oldName === null || oldName === undefined) oldName = drawingId;
 
 		console.log(oldName + " <-> " + newName);
 
