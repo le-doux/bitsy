@@ -801,6 +801,7 @@ function on_drawing_name_change() {
 
 	// update display name for thumbnail
 	var displayName = obj.name ? obj.name : getCurPaintModeStr() + " " + drawingId;
+	document.getElementById("paintExplorerThumbnail_" + drawingId).title = displayName;
 	var caption = document.getElementById("paintExplorerCaption_" + drawingId);
 	caption.innerText = displayName;
 	if( obj.name ) {
@@ -1133,6 +1134,7 @@ function newDrawing() {
 	}
 	addPaintThumbnail( drawingId );
 	changePaintExplorerSelection( drawingId );
+	document.getElementById("paintExplorerFilterInput").value = "";
 	refreshPaintExplorer( true /*doKeepOldThumbnails*/, document.getElementById("paintExplorerFilterInput").value /*filterString*/, true /*skipRenderStep*/ ); // this is a bit hacky feeling
 }
 
