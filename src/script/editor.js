@@ -1461,7 +1461,7 @@ function reloadSprite() {
 	// dialog UI
 	reloadDialogUI()
 
-	updateDrawingNameUI(true);
+	updateDrawingNameUI( drawingId != "A" );
 
 	// update paint canvas
 	drawPaintCanvas();
@@ -2576,7 +2576,7 @@ function addPaintThumbnail(id) {
 	paintExplorerForm.appendChild(label);
 
 	radio.onclick = selectPaint;
-	
+
 	renderPaintThumbnail( id );
 }
 
