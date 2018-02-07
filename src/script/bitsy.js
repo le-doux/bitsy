@@ -1218,6 +1218,10 @@ function serializeWorld() {
 			/* WALL */
 			worldStr += "WAL " + tile[id].isWall + "\n";
 		}
+		if (tile[id].col != null && tile[id].col != undefined && tile[id].col != 1) {
+			/* COLOR OVERRIDE */
+			worldStr += "COL " + tile[id].col + "\n";
+		}
 		worldStr += "\n";
 	}
 	/* SPRITES */
@@ -1240,6 +1244,10 @@ function serializeWorld() {
 				worldStr += "ITM " + itemId + " " + sprite[id].inventory[itemId] + "\n";
 			}
 		}
+		if (sprite[id].col != null && sprite[id].col != undefined && sprite[id].col != 2) {
+			/* COLOR OVERRIDE */
+			worldStr += "COL " + sprite[id].col + "\n";
+		}
 		worldStr += "\n";
 	}
 	/* ITEMS */
@@ -1252,6 +1260,10 @@ function serializeWorld() {
 		}
 		if (item[id].dlg != null) {
 			worldStr += "DLG " + item[id].dlg + "\n";
+		}
+		if (item[id].col != null && item[id].col != undefined && item[id].col != 2) {
+			/* COLOR OVERRIDE */
+			worldStr += "COL " + item[id].col + "\n";
 		}
 		worldStr += "\n";
 	}
@@ -1759,13 +1771,23 @@ function renderImages() {
 function renderImageForAllPalettes(drawing) {
 	console.log("RENDER IMAGE");
 	for (pal in palette) {
-		console.log(pal);
+		// console.log(pal);
+
 		var col = drawing.col;
 		var colStr = "" + col;
-		console.log(drawing);
-		console.log(drawing.drw);
-		console.log(imageStore);
+
+		// slightly hacky initialization of image store for palettes with more than 3 colors ~~~ SECRET FEATURE DO NOT USE :P ~~~
+		if(imageStore.render[pal][colStr] === undefined || imageStore.render[pal][colStr] === null) {
+			console.log("UNDEFINED " + colStr);
+			imageStore.render[pal][colStr] = {};
+		}
+
+		// console.log(drawing);
+		// console.log(drawing.drw);
+		// console.log(imageStore);
+
 		var imgSrc = imageStore.source[ drawing.drw ];
+
 		if ( imgSrc.length <= 1 ) {
 			// non-animated drawing
 			var frameSrc = imgSrc[0];
@@ -1796,7 +1818,7 @@ function imageDataFromImageSource(imageSource, pal, col) {
 			for (var sy = 0; sy < scale; sy++) {
 				for (var sx = 0; sx < scale; sx++) {
 					var pxl = (((y * scale) + sy) * tilesize * scale * 4) + (((x*scale) + sx) * 4);
-					if (px === 1) {
+					if ( px === 1 && getPal(pal).length > col ) {
 						img.data[pxl + 0] = getPal(pal)[col][0]; //ugly
 						img.data[pxl + 1] = getPal(pal)[col][1];
 						img.data[pxl + 2] = getPal(pal)[col][2];
