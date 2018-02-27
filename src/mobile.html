@@ -1,0 +1,246 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<title>bitsy mobile alpha</title>
+</head>
+
+<!-- ENGINE SCRIPTS -->
+<script src="script/font.js"></script>
+<script src="script/script.js"></script>
+<script src="script/dialog.js"></script>
+<script src="script/bitsy.js"></script>
+
+<script>
+/*
+GOALS
+- mobile friendly UI
+- bitsy v0.1 functionality
+- better componentized code
+
+IDEAS
+- tools are one page each
+- tools are **self contained**
+- swipe to navigate tools?
+- horizontal vs vertical mode
+- zoom?
+- how do you handle exporting games?
+
+TODO
+X game canvas
+X game data
+- play / pause
+- resize to fit phone
+- host somewhere?
+*/
+
+function start() {
+	attachCanvas( document.getElementById("game") );
+
+	//load last auto-save
+	if (localStorage.game_data) {
+		document.getElementById("game_data").value = localStorage.game_data;
+	}
+	else {
+		// trying new way to get default game data
+		document.getElementById("game_data").value = document.getElementById("defaultGameData").text.slice(1);
+		localStorage.game_data = document.getElementById("game_data").value;
+	}
+
+	justDrawTheRoom();
+}
+
+function editGameData() {
+	justDrawTheRoom();
+	localStorage.game_data = document.getElementById("game_data").value;
+}
+
+function justDrawTheRoom() {
+	// re-import game data into the engine
+	clearGameData();
+	parseWorld(document.getElementById("game_data").value);
+	renderImages();
+
+	//clear screen
+	ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
+	ctx.fillRect(0,0,canvas.width,canvas.height);
+
+	//draw map
+	console.log(room);
+	drawRoom( room[curRoom] );
+}
+</script>
+
+<style>
+	html {
+		height: 100%;
+	}
+	body {
+		margin: 0 !important;
+		padding: 0 !important;
+		height: 100%;
+	}
+
+	canvas {
+		background: black;
+		/*width: 100%;*/
+		/*display: flex;*/
+/*		width:100vw;
+		max-width:100vh;
+		margin:auto;*/
+
+		/*height: 100%;*/
+		/*flex: 1;*/
+		/*height: 100%;*/
+		/*margin: auto;*/
+		/*width: 100%;*/
+		/*display: block;*/
+
+		/*height:500px;*/
+		/*max-height: 100%;*/
+		/*max-height: 80vw;*/
+
+		max-height: 100vw;
+		max-width: 100vh;
+		margin: auto;
+		display: block;
+	}
+
+	#rootBox {
+		background: red;
+		display: flex;
+		flex-flow: column;
+		height: 100%;
+		width: 100%;
+	}
+
+	@media screen and (orientation: landscape) {
+	  #rootBox {
+	    flex-direction: row;
+	  }
+	}
+
+	@media screen and (orientation: portrait) {
+	  #rootBox {
+	    flex-direction: column;
+	  }
+	}
+
+	#canvasBox {
+		background: green;
+		flex: 2;
+	}
+
+	#dataBox {
+		background: blue;
+		flex: 1;
+	}
+</style>
+
+<body onload="start();">
+	<div id="rootBox">
+		<div id="canvasBox">
+			<canvas id="game"></canvas>
+		</div>
+		<div id="dataBox">
+			<textarea id="game_data" onchange="editGameData();" style="width:300px;height:300px;"></textarea>
+		</div>
+	</div>
+
+<!-- 	<div style="width:100%;height:100%;display:block;background:black;">
+		<div style="width:100%;height:60%;display:block;background:red;">
+			<canvas id="game"></canvas>
+		</div>
+		<div style="width:100%;height:40%;display:block;background:green;">
+			<textarea id="game_data" onchange="editGameData();" style="height:100%;width:400px;margin:auto;"></textarea>
+		</div>
+	</div> -->
+</body>
+
+<script type="bitsyGameData" id="defaultGameData">
+Write your game's title here
+
+# BITSY VERSION 4.6
+
+! ROOM_FORMAT 1
+
+PAL 0
+0,82,204
+128,159,255
+255,255,255
+
+ROOM 0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,a,a,a,a,a,a,a,a,a,a,a,a,a,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
+0,a,a,a,a,a,a,a,a,a,a,a,a,a,a,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+PAL 0
+
+TIL a
+11111111
+10000001
+10000001
+10011001
+10011001
+10000001
+10000001
+11111111
+
+SPR A
+00011000
+00011000
+00011000
+00111100
+01111110
+10111101
+00100100
+00100100
+POS 0 4,4
+
+SPR a
+00000000
+00000000
+01010001
+01110001
+01110010
+01111100
+00111100
+00100100
+DLG SPR_0
+POS 0 8,12
+
+ITM 0
+00000000
+00000000
+00000000
+00111100
+01100100
+00100100
+00011000
+00000000
+NAME tea
+DLG ITM_0
+
+DLG SPR_0
+I'm a cat
+
+DLG ITM_0
+You found a nice warm cup of tea
+
+VAR a
+42
+</script>
+
+</html>
