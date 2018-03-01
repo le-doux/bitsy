@@ -27,7 +27,19 @@ var DialogRenderer = function() {
 
 	this.ClearTextbox = function() {
 		if(context == null) return;
-		textboxInfo.img = context.createImageData(textboxInfo.width*scale, textboxInfo.height*scale);
+
+		//create new image none exists
+		if(textboxInfo.img == null)
+			textboxInfo.img = context.createImageData(textboxInfo.width*scale, textboxInfo.height*scale);
+
+		// fill text box with black
+		for (var i=0;i<textboxInfo.img.data.length;i+=4)
+		{
+			textboxInfo.img.data[i+0]=0;
+			textboxInfo.img.data[i+1]=0;
+			textboxInfo.img.data[i+2]=0;
+			textboxInfo.img.data[i+3]=255;
+		}
 	};
 
 	var isCentered = false;

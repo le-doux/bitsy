@@ -29,9 +29,22 @@ IDEAS
 TODO
 X game canvas
 X game data
-- play / pause
-- resize to fit phone
+X play / pause
+X resize to fit phone
 - host somewhere?
+- title
+- paint panel
+- select tile / avatar / sprite
+
+Random thoughts
+- title on EVERY room?
+- how to distinguish between mobile / desktop tool versions?
+- can we collapse distinction between different drawing types? avatar / sprite / tile / item
+
+Components:
+- room tool
+- paint tool
+- drawing selector
 */
 
 function start() {
@@ -69,6 +82,57 @@ function justDrawTheRoom() {
 	console.log(room);
 	drawRoom( room[curRoom] );
 }
+
+function togglePlayMode(e) {
+	if (e.target.checked) {
+		on_play_mode();
+	}
+	else {
+		on_edit_mode();
+	}
+	updatePlayModeButton();
+}
+
+function on_play_mode() {
+	// isPlayMode = true;
+	// unlistenMapEditEvents();
+	load_game(document.getElementById("game_data").value /*, !isPreviewDialogMode*/ /* startWithTitle */);
+
+	// console.log("PLAY!! ~~ PREVIEW ? " + isPreviewDialogMode);
+	// if(!isPreviewDialogMode) {
+		// console.log("DISALBE PREVIEW!!!");
+		// document.getElementById("previewDialogCheck").disabled = true;
+	// }
+}
+
+function on_edit_mode() {
+	// isPlayMode = false;
+	stopGame();
+	// TODO I should really do more to separate the editor's game-data from the engine's game-data
+	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
+	// curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
+	// drawEditMap();
+	// listenMapEditEvents();
+
+	// updateInventoryUI();
+
+	// if(isPreviewDialogMode) {
+	// 	isPreviewDialogMode = false;
+	// 	updatePreviewDialogButton();
+
+	// 	for(var i = 0; i < advDialogUIComponents.length; i++) {
+	// 		advDialogUIComponents[i].GetEl().classList.remove("highlighted");
+	// 	}
+	// }
+	// document.getElementById("previewDialogCheck").disabled = false;
+
+	justDrawTheRoom();
+}
+
+function changeTool(e) {
+	Array.from( document.getElementsByClassName("tool") ).map( t => t.style.display = "none" );
+	document.getElementById(e.target.value).style.display = "block";
+}
 </script>
 
 <style>
@@ -83,31 +147,13 @@ function justDrawTheRoom() {
 
 	canvas {
 		background: black;
-		/*width: 100%;*/
-		/*display: flex;*/
-/*		width:100vw;
-		max-width:100vh;
-		margin:auto;*/
-
-		/*height: 100%;*/
-		/*flex: 1;*/
-		/*height: 100%;*/
-		/*margin: auto;*/
-		/*width: 100%;*/
-		/*display: block;*/
-
-		/*height:500px;*/
-		/*max-height: 100%;*/
-		/*max-height: 80vw;*/
-
-		max-height: 100vw;
-		max-width: 100vh;
-		margin: auto;
-		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 	}
 
-	#rootBox {
-		background: red;
+	.flexRoot {
+		/*background: red;*/
 		display: flex;
 		flex-flow: column;
 		height: 100%;
@@ -115,46 +161,68 @@ function justDrawTheRoom() {
 	}
 
 	@media screen and (orientation: landscape) {
-	  #rootBox {
+	  .flexRoot {
 	    flex-direction: row;
 	  }
 	}
 
 	@media screen and (orientation: portrait) {
-	  #rootBox {
+	  .flexRoot {
 	    flex-direction: column;
 	  }
 	}
 
-	#canvasBox {
-		background: green;
+	.flexMain {
+		/*background: green;*/
 		flex: 2;
 	}
 
-	#dataBox {
-		background: blue;
+	.flexAlt {
+		/*background: blue;*/
 		flex: 1;
+	}
+
+	#game_data {
+		width: calc(100% - 40px);
+		height: calc(100% - 40px);
+		margin: 20px;
+
+		/*display: none;*/
+		/*width: 100%;*/
+		/*height: 200px;*/
+	}
+
+	.tool {
+		width:100%;height:95%;margin:auto;
 	}
 </style>
 
 <body onload="start();">
-	<div id="rootBox">
-		<div id="canvasBox">
-			<canvas id="game"></canvas>
-		</div>
-		<div id="dataBox">
-			<textarea id="game_data" onchange="editGameData();" style="width:300px;height:300px;"></textarea>
+	<div style="width: 100%;height: 5%">
+		bitsy mobile alpha
+
+		<select onchange="changeTool(event);">
+			<option value="tool_room">room</option>
+			<option value="tool_data">data</option>
+		</select>
+	</div>
+	<div id="tool_room" class="tool">
+		<div class="flexRoot">
+			<div class="flexMain">
+				<canvas id="game"></canvas>
+			</div>
+			<div class="flexAlt">
+				<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" />
+				<label title="play / pause game" for="playModeCheck">
+					<!-- <i class="material-icons" id="playModeIcon">play_arrow</i> -->
+					<span id="playModeText"> play </span>
+				</label>
+			</div>
 		</div>
 	</div>
-
-<!-- 	<div style="width:100%;height:100%;display:block;background:black;">
-		<div style="width:100%;height:60%;display:block;background:red;">
-			<canvas id="game"></canvas>
-		</div>
-		<div style="width:100%;height:40%;display:block;background:green;">
-			<textarea id="game_data" onchange="editGameData();" style="height:100%;width:400px;margin:auto;"></textarea>
-		</div>
-	</div> -->
+	<div id="tool_data" class="tool">
+		<textarea id="game_data" onchange="editGameData();"></textarea>
+	</div>
 </body>
 
 <script type="bitsyGameData" id="defaultGameData">
