@@ -12,6 +12,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 	var radius = 88;
 
 	var selectCircleRadius = 10;
+	var selectCircleLineWidth = 2;
 
 	var self = this;
 
@@ -36,6 +37,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 		wheelCanvas.width = width;
 		wheelCanvas.height = height;
+
+		// wheelContext.fillStyle = "green";
+		// wheelContext.fillRect(0,0,width,height);
 
 		wheelContext.fillStyle = 'black';
 
@@ -65,6 +69,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		selectCanvas.width = width;
 		selectCanvas.height = height;
 
+		// selectContext.fillStyle = "blue";
+		// selectContext.fillRect(0,0,width,height);
+
 		// console.log(curColor.h);
 		var hueRadians = curColor.h * ( Math.PI * 2 );
 		var saturationDist = curColor.s * radius;
@@ -79,7 +86,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		selectContext.arc(selectCircleX, selectCircleY, selectCircleRadius, 0, 2 * Math.PI, false);
 		selectContext.fillStyle = rgbColorStr;
 		selectContext.fill();
-		selectContext.lineWidth = 2;
+		selectContext.lineWidth = selectCircleLineWidth;
 		selectContext.strokeStyle = curColor.v > 0.5 ? 'black' : 'white';
 		selectContext.stroke();
 	}
@@ -123,27 +130,63 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 		if(isMouseDown) {
 			// console.log(e);
-			var bounds = wheelCanvas.getBoundingClientRect();
-			var x = e.clientX - bounds.left;
-			var y = e.clientY - bounds.top;
+			var bounds = selectCanvas.getBoundingClientRect();
+			// console.log(bounds);
 
-			var xRel = x - centerX;
-			var yRel = y - centerY;
+			// console.log("-- pick color --")
+
+			var containerX = e.clientX - bounds.left;
+			var containerY = e.clientY - bounds.top;
+
+			var containerCenterX = bounds.width / 2;
+			var containerCenterY = bounds.height / 2;
+			var minContainerSize = Math.min( bounds.width, bounds.height );
+			var containerSizeRatio = width / minContainerSize; // could be either dimension (if it's a square)
+			var radiusRatio = radius / width;
+			var containerRadius = minContainerSize * radiusRatio;
+
+			// console.log("center",containerCenterX,containerCenterY);
+
+			var xRel = containerX - containerCenterX;
+			var yRel = containerY - containerCenterY;
+
+			// console.log("rel",xRel,yRel);
 
 			var dist = Math.sqrt( Math.pow( xRel, 2 ) + Math.pow( yRel, 2 ) );
 
-			if( dist >= radius ) {
-				xRel = ( xRel / dist ) * (radius - 1);
-				yRel = ( yRel / dist ) * (radius - 1);
+			// console.log("dist",dist);
+			// console.log("canvasRadius",containerRadius);
 
-				x = centerX + xRel;
-				y = centerY + yRel;
+			var canvasX = centerX;
+			var canvasY = centerY;
 
-				dist = radius - 1; // the minus one is to avoid hitting unfilled pixels
+			if( dist >= containerRadius ) {
+				var canvasXRel = ( xRel / dist ) * (radius - 1);
+				var canvasYRel = ( yRel / dist ) * (radius - 1);
+
+				canvasX = centerX + canvasXRel;
+				canvasY = centerY + canvasYRel;
+
+				dist = containerRadius - 1; // the minus one is to avoid hitting unfilled pixels
+			}
+			else {
+				// return;
+				// adjust X and Y coordinates to account for the "contain" algorithm used to center the color wheel (mobile)
+
+				if( bounds.width > bounds.height ) {
+					containerX -= (bounds.width - bounds.height) / 2;
+				}
+				else if( bounds.height > bounds.width ) {
+					containerY -= (bounds.height - bounds.width) / 2;
+				}
+
+				canvasX = containerX * containerSizeRatio;
+				canvasY = containerY * containerSizeRatio;
+				// console.log("ADJUSTED X Y",x, y);
 			}
 
-			if( dist < radius ) {
-				var pixelData = wheelContext.getImageData( x, y, 1, 1 ).data;
+			if( dist < containerRadius ) {
+				var pixelData = wheelContext.getImageData( canvasX, canvasY, 1, 1 ).data;
 				var rgbColor = { r:pixelData[0], g:pixelData[1], b:pixelData[2] };
 				curColor = RGBtoHSV( rgbColor.r, rgbColor.g, rgbColor.b );
 

@@ -1,3 +1,7 @@
+#colorPaletteForm input[type=radio] {
+	display: none;
+}
+
 #colorPicker {
 	margin-bottom: 10px;
 }

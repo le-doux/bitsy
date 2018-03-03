@@ -1105,7 +1105,7 @@ function parseWorld(file) {
 		curRoom = player().room;
 	}
 
-	console.log(names);
+	// console.log(names);
 }
 
 //TODO this is in progress and doesn't support all features
@@ -1741,7 +1741,7 @@ function parseDrawingCore(lines, i, drwId) {
 }
 
 function renderImages() {
-	console.log(" -- RENDER IMAGES -- ");
+	// console.log(" -- RENDER IMAGES -- ");
 
 	//init image store
 	for (pal in palette) {
@@ -1769,7 +1769,7 @@ function renderImages() {
 }
 
 function renderImageForAllPalettes(drawing) {
-	console.log("RENDER IMAGE");
+	// console.log("RENDER IMAGE");
 	for (pal in palette) {
 		// console.log(pal);
 
@@ -1778,7 +1778,7 @@ function renderImageForAllPalettes(drawing) {
 
 		// slightly hacky initialization of image store for palettes with more than 3 colors ~~~ SECRET FEATURE DO NOT USE :P ~~~
 		if(imageStore.render[pal][colStr] === undefined || imageStore.render[pal][colStr] === null) {
-			console.log("UNDEFINED " + colStr);
+			// console.log("UNDEFINED " + colStr);
 			imageStore.render[pal][colStr] = {};
 		}
 
@@ -1791,8 +1791,8 @@ function renderImageForAllPalettes(drawing) {
 		if ( imgSrc.length <= 1 ) {
 			// non-animated drawing
 			var frameSrc = imgSrc[0];
-			console.log(drawing);
-			console.log(imageStore);
+			// console.log(drawing);
+			// console.log(imageStore);
 			imageStore.render[pal][colStr][drawing.drw] = imageDataFromImageSource( frameSrc, pal, col );
 		}
 		else {

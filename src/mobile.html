@@ -5,11 +5,20 @@
 	<title>bitsy mobile alpha</title>
 </head>
 
+<!-- STYLES -->
+<link rel="stylesheet" type="text/css" href="style/colorPickerStyle.css">
+
+<!-- UTIL SCRIPTS -->
+<script src="script/color_util.js"></script>
+
 <!-- ENGINE SCRIPTS -->
 <script src="script/font.js"></script>
 <script src="script/script.js"></script>
 <script src="script/dialog.js"></script>
 <script src="script/bitsy.js"></script>
+
+<!-- EDITOR SCRIPTS -->
+<script src="script/color_picker.js"></script>
 
 <script>
 /*
@@ -55,12 +64,23 @@ function start() {
 		document.getElementById("game_data").value = localStorage.game_data;
 	}
 	else {
-		// trying new way to get default game data
-		document.getElementById("game_data").value = document.getElementById("defaultGameData").text.slice(1);
-		localStorage.game_data = document.getElementById("game_data").value;
+		setDefaultGameState();
 	}
 
-	justDrawTheRoom();
+	justDrawTheRoom(); // also parses and loads the data --- needs to be two separate things
+
+	console.log("title : " + title);
+
+	document.getElementById("titleText").value = title;
+
+	// init color picker
+	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSlider', 'colorPickerSliderBg', 'colorPickerHexText');
+	colorPicker.onColorChange = onColorPickerChange;
+	document.getElementById("colorPaletteOptionBackground").checked = true;
+	updateColorPickerUI();
+
+	document.getElementById("playModeCheck").checked = false;
+	document.getElementById("tool_select").options[0].selected = true;
 }
 
 function editGameData() {
@@ -90,7 +110,7 @@ function togglePlayMode(e) {
 	else {
 		on_edit_mode();
 	}
-	updatePlayModeButton();
+	// updatePlayModeButton();
 }
 
 function on_play_mode() {
@@ -133,6 +153,115 @@ function changeTool(e) {
 	Array.from( document.getElementsByClassName("tool") ).map( t => t.style.display = "none" );
 	document.getElementById(e.target.value).style.display = "block";
 }
+
+function on_change_title() {
+	title = document.getElementById("titleText").value;
+	refreshGameData();
+}
+
+function refreshGameData() {
+	// if (isPlayMode) return; //never store game data while in playmode (TODO: wouldn't be necessary if the game data was decoupled form editor data)
+
+	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
+	var gameData = serializeWorld();
+	//console.log("refresh!");
+	//console.log(gameData);
+	document.getElementById("game_data").value = gameData;
+	localStorage.setItem("game_data", gameData); //auto-save
+}
+
+function newGameDialog() {
+	// if ( confirm("Starting a new game will erase your old data. Consider exporting your work first! Are you sure you want to start over?") ) {
+		resetGameData();
+	// }
+}
+
+function resetGameData() {
+	setDefaultGameState();
+
+	// // todo wrap these variable resets in a function
+	// tileIndex = 0;
+	// spriteIndex = 0;
+
+	// refreshGameData();
+	// renderImages();
+	// drawPaintCanvas();
+	// drawEditMap();
+	// updatePaletteUI();
+	// // updatePaletteControlsFromGameData();
+	// updateExitOptionsFromGameData();
+	// updateRoomName();
+	// updateInventoryUI();
+
+	// on_paint_avatar();
+	// document.getElementById('paintOptionAvatar').checked = true;
+
+	justDrawTheRoom();
+	updateColorPickerUI();
+}
+
+function setDefaultGameState() {
+	// trying new way to get default game data
+	document.getElementById("game_data").value = document.getElementById("defaultGameData").text.slice(1);
+	localStorage.game_data = document.getElementById("game_data").value;
+}
+
+var colorPicker = null; // new color picker
+var colorPickerIndex = 0;
+var colorPaletteLabels = ["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"];
+
+function changeColorPickerIndex(index) {
+	colorPickerIndex = index;
+	var color = getPal(selectedColorPal())[ index ];
+	console.log(color);
+	colorPicker.setColor( color[0], color[1], color[2] );
+}
+
+function updateColorPickerLabel(index, r, g, b) {
+	var rgbColor = {r:r, g:g, b:b};
+
+	var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
+	var hsvColor = RGBtoHSV( rgbColor );
+	document.getElementById( colorPaletteLabels[ index ] ).style.background = rgbColorStr;
+	document.getElementById( colorPaletteLabels[ index ] ).style.color = hsvColor.v < 0.5 ? "white" : "black";
+}
+
+function onColorPickerChange( rgbColor, isMouseUp ) {
+	getPal(selectedColorPal())[ colorPickerIndex ][ 0 ] = rgbColor.r;
+	getPal(selectedColorPal())[ colorPickerIndex ][ 1 ] = rgbColor.g;
+	getPal(selectedColorPal())[ colorPickerIndex ][ 2 ] = rgbColor.b;
+
+	updateColorPickerLabel(colorPickerIndex, rgbColor.r, rgbColor.g, rgbColor.b );
+
+	if( isMouseUp ) {
+		// refreshGameData();
+		// renderImages();
+		// drawPaintCanvas();
+		// drawEditMap();
+		// refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
+		// if( isCurDrawingAnimated )
+		// 	renderAnimationPreview( drawingId );
+
+		refreshGameData();
+		justDrawTheRoom();
+	}
+}
+
+function updateColorPickerUI() {
+	var color0 = getPal(selectedColorPal())[ 0 ];
+	var color1 = getPal(selectedColorPal())[ 1 ];
+	var color2 = getPal(selectedColorPal())[ 2 ];
+
+	updateColorPickerLabel(0, color0[0], color0[1], color0[2] );
+	updateColorPickerLabel(1, color1[0], color1[1], color1[2] );
+	updateColorPickerLabel(2, color2[0], color2[1], color2[2] );
+
+	changeColorPickerIndex( colorPickerIndex );
+}
+
+function selectedColorPal() {
+	return "0"; // TODO HACK
+};
 </script>
 
 <style>
@@ -184,7 +313,7 @@ function changeTool(e) {
 
 	#game_data {
 		width: calc(100% - 40px);
-		height: calc(100% - 40px);
+		height: 60%;
 		margin: 20px;
 
 		/*display: none;*/
@@ -195,14 +324,55 @@ function changeTool(e) {
 	.tool {
 		width:100%;height:95%;margin:auto;
 	}
+
+	#colorPicker {
+		/*background: red;*/
+		width: 100%;
+		height: 100%;
+		/*position: relative;*/
+	}
+
+	#colorPickerWheelOuter {
+		width: 100%;
+		height: 80%;
+		position: relative;
+		background: black;
+	}
+
+	#colorPickerWheel, #colorPickerSelect {
+		/*background: black;*/
+		width: 100%;
+		height: 100%;
+		margin: 0px;
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		object-fit: contain;
+	}
+
+	#colorPickerHexText {
+		width: 70%;
+		/*margin: 0px;*/
+		margin: auto;
+		margin-top: 10px;
+	}
+
+	#colorPickerSliderBg {
+		width: calc(70% - 8px);
+		margin-left: 15%;
+		/*margin:auto;*/
+	}
 </style>
 
 <body onload="start();">
 	<div style="width: 100%;height: 5%">
-		bitsy mobile alpha
+		<b>bitsy mobile alpha</b> |
 
-		<select onchange="changeTool(event);">
+		tool :
+		<select id="tool_select" onchange="changeTool(event);">
 			<option value="tool_room">room</option>
+			<option value="tool_paint">paint</option>
+			<option value="tool_color">color</option>
 			<option value="tool_data">data</option>
 		</select>
 	</div>
@@ -217,10 +387,86 @@ function changeTool(e) {
 					<!-- <i class="material-icons" id="playModeIcon">play_arrow</i> -->
 					<span id="playModeText"> play </span>
 				</label>
+
+				<br/><br/>
+
+				title : 
+				<input title="title text for your game" type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
+
+				<br/><br/>
+
+				<form>
+					paint : 
+
+					<input type="radio" name="paint mode" value="avatar" onclick="//on_paint_avatar();" id="paintOptionAvatar" checked>
+					<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
+						<!-- <i class="material-icons">perm_identity</i> -->
+						avatar
+					</label>
+
+					<input type="radio" name="paint mode" value="tile" onclick="//on_paint_tile();" id="paintOptionTile">
+					<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
+						<!-- <i class="material-icons">terrain</i> -->
+						tile
+					</label>
+
+					<input type="radio" name="paint mode" value="sprite" onclick="//on_paint_sprite();" id="paintOptionSprite">
+					<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
+						<!-- <i class="material-icons">nature_people</i> -->
+						sprite
+					</label>
+				</form>
+
+				<select id="drawing_select">
+				</select>
 			</div>
 		</div>
 	</div>
-	<div id="tool_data" class="tool">
+	<div id="tool_paint" class="tool" style="display:none;">
+		paint
+	</div>
+	<div id="tool_color" class="tool" style="display:none;">
+		<div class="flexRoot">
+			<div class="flexMain">
+				<div id="colorPicker" title="color picker">
+					<div id="colorPickerWheelOuter">
+						<canvas id="colorPickerWheel"></canvas>
+						<canvas id="colorPickerSelect" title="color picker wheel"></canvas>
+					</div>
+					<div id="colorPickerSliderBg" title="color picker darkness / lightness slider">
+						<input type="range" id="colorPickerSlider" value="0" />
+					</div>
+					<input id="colorPickerHexText" title="color picker hex code" type="text" />
+				</div>
+			</div>
+			<div class="flexAlt">
+				<form id="colorPaletteForm">
+					<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionBackground" onclick="changeColorPickerIndex(0);" checked>
+					<label id="colorPaletteLabelBackground" for="colorPaletteOptionBackground" title="pick background color">
+						<!-- <i class="material-icons">grid_on</i> -->
+						background color
+					</label>
+
+					<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionTile" onclick="changeColorPickerIndex(1);">
+					<label id="colorPaletteLabelTile" for="colorPaletteOptionTile" title="pick tile color">
+						<!-- <i class="material-icons">terrain</i> -->
+						tile color
+					</label>
+
+					<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionSprite" onclick="changeColorPickerIndex(2);">
+					<label id="colorPaletteLabelSprite" for="colorPaletteOptionSprite" title="pick sprite / avatar / item color">
+						<!-- <i class="material-icons">nature_people</i> -->
+						sprite color
+					</label>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div id="tool_data" class="tool" style="display:none;">
+		<button title="reset everything and start new game" class="color0" onclick="newGameDialog();">
+			<!-- <i class="material-icons">restore_page</i> -->
+			reset game data
+		</button>
 		<textarea id="game_data" onchange="editGameData();"></textarea>
 	</div>
 </body>
