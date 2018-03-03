@@ -128,6 +128,8 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		if( isMouseUp == null || isMouseUp == undefined )
 			isMouseUp = false;
 
+		console.log(isMouseDown);
+
 		if(isMouseDown) {
 			// console.log(e);
 			var bounds = selectCanvas.getBoundingClientRect();
@@ -210,7 +212,24 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 	}
 
 	function pickColorEnd(e) {
+		// console.log("mouseup");
 		pickColor(e, true);
+		isMouseDown = false;
+	}
+
+	function pickColorTouchMove(e) {
+		// console.log(e.touches[0]);
+		pickColor(e.touches[0], true);
+	}
+
+	function pickColorTouchStart(e) {
+		// console.log(e.touches[0]);
+		pickColorStart(e.touches[0]);
+	}
+
+	function pickColorTouchEnd(e) {
+		// console.log(e.touches[0]);
+		// pickColorEnd(e.touches[0]);
 		isMouseDown = false;
 	}
 
@@ -232,6 +251,10 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		selectCanvas.addEventListener("mousedown", pickColorStart);
 		document.addEventListener("mousemove", pickColor);
 		document.addEventListener("mouseup", pickColorEnd);
+
+		selectCanvas.addEventListener('touchstart', pickColorTouchStart);
+		document.addEventListener('touchmove', pickColorTouchMove);
+		document.addEventListener('touchend', pickColorTouchEnd);
 
 		slider = document.getElementById(sliderId);
 		// slider.addEventListener("input", updateValue); // perf in safari isn't good enough for live update during slider

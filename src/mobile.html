@@ -274,6 +274,10 @@ function selectedColorPal() {
 		height: 100%;
 	}
 
+	body, input[type=text], button, select {
+		font-size: 36px;
+	}
+
 	canvas {
 		background: black;
 		width: 100%;
@@ -362,19 +366,27 @@ function selectedColorPal() {
 		margin-left: 15%;
 		/*margin:auto;*/
 	}
+
+	#colorPaletteForm input[type=radio]:checked + label {
+		border: solid 4px black;
+		padding-top: 20px;
+		padding-bottom: 20px;
+	}
 </style>
 
 <body onload="start();">
 	<div style="width: 100%;height: 5%">
-		<b>bitsy mobile alpha</b> |
+		<span style="float:left;">bitsy mobile alpha</span>
 
-		tool :
-		<select id="tool_select" onchange="changeTool(event);">
-			<option value="tool_room">room</option>
-			<option value="tool_paint">paint</option>
-			<option value="tool_color">color</option>
-			<option value="tool_data">data</option>
-		</select>
+		<span style="float:right;">
+			tool :
+			<select id="tool_select" onchange="changeTool(event);">
+				<option value="tool_room">room</option>
+				<option value="tool_paint">paint</option>
+				<option value="tool_color">color</option>
+				<option value="tool_data">data</option>
+			</select>
+		</span>
 	</div>
 	<div id="tool_room" class="tool">
 		<div class="flexRoot">
