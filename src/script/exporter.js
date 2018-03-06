@@ -5,7 +5,7 @@ function Exporter() {
 var resources = {};
 function loadResource(folder, filename) {
 	var client = new XMLHttpRequest();
-	client.open('GET', './' + folder + '/' + filename);
+	client.open('GET', '../shared/' + folder + '/' + filename);
 	client.onreadystatechange = function() {
 	  resources[filename] = client.responseText;
 	}
