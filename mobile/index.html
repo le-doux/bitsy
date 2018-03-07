@@ -40,10 +40,14 @@ X game canvas
 X game data
 X play / pause
 X resize to fit phone
-- host somewhere?
-- title
+X host somewhere
+X title
 - paint panel
 - select tile / avatar / sprite
+- fix layout issues
+- edit map
+- zoom
+- figure out localhost -> mobile dev cycle
 
 Random thoughts
 - title on EVERY room?
@@ -67,7 +71,8 @@ function start() {
 		setDefaultGameState();
 	}
 
-	justDrawTheRoom(); // also parses and loads the data --- needs to be two separate things
+	initGameState();
+	// initGameStateAndRender(); // also parses and loads the data --- needs to be two separate things
 
 	console.log("title : " + title);
 
@@ -81,19 +86,24 @@ function start() {
 
 	document.getElementById("playModeCheck").checked = false;
 	document.getElementById("tool_select").options[0].selected = true;
+
+	drawEditMap();
+	listenMapEditEvents();
 }
 
 function editGameData() {
-	justDrawTheRoom();
+	initGameStateAndRender();
 	localStorage.game_data = document.getElementById("game_data").value;
 }
 
-function justDrawTheRoom() {
+function initGameState() {
 	// re-import game data into the engine
 	clearGameData();
 	parseWorld(document.getElementById("game_data").value);
 	renderImages();
+}
 
+function drawEditMap() {
 	//clear screen
 	ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
 	ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -101,6 +111,22 @@ function justDrawTheRoom() {
 	//draw map
 	console.log(room);
 	drawRoom( room[curRoom] );
+
+	//draw grid
+	if (true /*drawMapGrid*/) {
+		ctx.fillStyle = "#fff"; /*getContrastingColor();*/
+		for (var x = 1; x < mapsize; x++) {
+			ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
+		}
+		for (var y = 1; y < mapsize; y++) {
+			ctx.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
+		}
+	}
+}
+
+function initGameStateAndRender() {
+	initGameState();
+	drawEditMap();
 }
 
 function togglePlayMode(e) {
@@ -115,7 +141,7 @@ function togglePlayMode(e) {
 
 function on_play_mode() {
 	// isPlayMode = true;
-	// unlistenMapEditEvents();
+	unlistenMapEditEvents();
 	load_game(document.getElementById("game_data").value /*, !isPreviewDialogMode*/ /* startWithTitle */);
 
 	// console.log("PLAY!! ~~ PREVIEW ? " + isPreviewDialogMode);
@@ -132,7 +158,7 @@ function on_edit_mode() {
 	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
 	// curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
 	// drawEditMap();
-	// listenMapEditEvents();
+	listenMapEditEvents();
 
 	// updateInventoryUI();
 
@@ -146,7 +172,7 @@ function on_edit_mode() {
 	// }
 	// document.getElementById("previewDialogCheck").disabled = false;
 
-	justDrawTheRoom();
+	initGameStateAndRender();
 }
 
 function changeTool(e) {
@@ -196,7 +222,7 @@ function resetGameData() {
 	// on_paint_avatar();
 	// document.getElementById('paintOptionAvatar').checked = true;
 
-	justDrawTheRoom();
+	initGameStateAndRender();
 	updateColorPickerUI();
 }
 
@@ -243,7 +269,7 @@ function onColorPickerChange( rgbColor, isMouseUp ) {
 		// 	renderAnimationPreview( drawingId );
 
 		refreshGameData();
-		justDrawTheRoom();
+		initGameStateAndRender();
 	}
 }
 
@@ -262,6 +288,264 @@ function updateColorPickerUI() {
 function selectedColorPal() {
 	return "0"; // TODO HACK
 };
+
+// hack copy
+var TileType = {
+	Tile : 0,
+	Sprite : 1,
+	Avatar : 2,
+	Item : 3
+};
+// TODO: combine into one object?? curDrawing (for room)
+var paintMode = TileType.Avatar;
+var drawingId = "A";
+
+function listenMapEditEvents() {
+	// canvas.addEventListener("mousedown", map_onMouseDown);
+	// canvas.addEventListener("mousemove", map_onMouseMove);
+	// canvas.addEventListener("mouseup", map_onMouseUp);
+	// canvas.addEventListener("mouseleave", map_onMouseUp);
+
+	canvas.addEventListener("touchstart", map_onTouchStart);
+	canvas.addEventListener("touchmove", map_onTouchMove);
+	canvas.addEventListener("touchend", map_onTouchEnd);
+
+	// mapEditAnimationLoop =
+	// 	setInterval( function() {
+	// 		animationCounter = animationTime + 1; // hack
+	// 		updateAnimation();
+	// 		drawEditMap();
+	// 	}, animationTime ); // update animation in map mode
+}
+
+function unlistenMapEditEvents() {
+	// canvas.removeEventListener("mousedown", map_onMouseDown);
+	// canvas.removeEventListener("mousemove", map_onMouseMove);
+	// canvas.removeEventListener("mouseup", map_onMouseUp);
+	// canvas.removeEventListener("mouseleave", map_onMouseUp);
+
+	canvas.removeEventListener("touchstart", map_onTouchStart);
+	canvas.removeEventListener("touchmove", map_onTouchMove);
+	canvas.removeEventListener("touchend", map_onTouchEnd);
+
+	// clearInterval( mapEditAnimationLoop );
+}
+
+function mobileOffsetCorrection(off,e) {
+	var bounds = e.target.getBoundingClientRect();
+
+	// var width = bounds.width * containerRatio;
+	// var height = bounds.height * containerRatio;
+
+	// correction for square canvas contained in rect
+	if( bounds.width > bounds.height ) {
+		off.x -= (bounds.width - bounds.height) / 2;
+	}
+	else if( bounds.height > bounds.width ) {
+		off.y -= (bounds.height - bounds.width) / 2;
+	}
+
+	console.log(off);
+
+	// convert container size to internal canvas size
+	var containerRatio = (tilesize*mapsize*scale) / Math.min( bounds.width, bounds.height );
+
+	console.log(containerRatio);
+
+	off.x *= containerRatio;
+	off.y *= containerRatio;
+
+	console.log(off);
+
+	return off;
+}
+
+var isDragAddingTiles = false;
+var isDragDeletingTiles = false;
+// var isDragMovingExit = false;
+// var isDragMovingEnding = false;
+function map_onMouseDown(e) {
+	var off = getOffset(e);
+
+	console.log(off);
+
+	off = mobileOffsetCorrection(off,e);
+
+	console.log(off);
+
+	var x = Math.floor( off.x / (tilesize*scale) );
+	var y = Math.floor( off.y / (tilesize*scale) );
+	// console.log(x + " " + y);
+
+	// var didSelectedExitChange = areExitsVisible ? setSelectedExit( getExit(curRoom,x,y) ) : false;
+	// var didSelectedEndingChange = areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;
+
+	// if (didSelectedExitChange || didSelectedEndingChange) {
+	// 	//don't do anything else
+	// 	if( selectedExit != null ) isDragMovingExit = true;
+	// 	if( selectedEndingTile != null ) isDragMovingEnding = true;
+	// }
+	// else if (isAddingExit) { //todo - mutually exclusive with adding an ending?
+	// 	//add exit
+	// 	if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
+	// 		addExitToCurRoom(x,y);
+	// 	}
+	// }
+	// else if (isAddingEnding) {
+	// 	//add ending
+	// 	if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
+	// 		addEndingToCurRoom(x,y);
+	// 	}
+	// }
+	// else
+	if (drawingId != null) {
+		//add tiles/sprites to map
+		console.log("DRAWING");
+		if (paintMode == TileType.Tile) {
+			if ( room[curRoom].tilemap[y][x] === "0" ) {
+				console.log("ADD");
+				//add
+				//row = row.substr(0, x) + drawingId + row.substr(x+1);
+				console.log( room[curRoom].tilemap );
+				room[curRoom].tilemap[y][x] = drawingId;
+				isDragAddingTiles = true;
+			}
+			else {
+				//delete (better way to do this?)
+				//row = row.substr(0, x) + "0" + row.substr(x+1);
+				room[curRoom].tilemap[y][x] = "0";
+				isDragDeletingTiles = true;
+			}
+			//room[curRoom].tilemap[y] = row;
+		}
+		else if( paintMode == TileType.Avatar || paintMode == TileType.Sprite ) {
+			var otherSprite = getSpriteAt(x,y);
+			var isThisSpriteAlreadyHere = sprite[drawingId].room === curRoom &&
+										sprite[drawingId].x === x &&
+										sprite[drawingId].y === y;
+
+			if (otherSprite) {
+				//remove other sprite from map
+				sprite[otherSprite].room = null;
+				sprite[otherSprite].x = -1;
+				sprite[otherSprite].y = -1;
+			}
+
+			if (!isThisSpriteAlreadyHere) {
+				//add sprite to map
+				sprite[drawingId].room = curRoom;
+				sprite[drawingId].x = x;
+				sprite[drawingId].y = y;
+				//row = row.substr(0, x) + "0" + row.substr(x+1); //is this necessary? no
+			}
+			else {
+				//remove sprite from map
+				sprite[drawingId].room = null;
+				sprite[drawingId].x = -1;
+				sprite[drawingId].y = -1;
+			}
+		}
+		// else if( paintMode == TileType.Item ) {
+		// 	// TODO : is this the final behavior I want?
+
+		// 	var otherItem = getItem(curRoom,x,y);
+		// 	var isThisItemAlreadyHere = otherItem != null && otherItem.id === drawingId;
+
+		// 	if(otherItem) {
+		// 		getRoom().items.splice( getRoom().items.indexOf(otherItem), 1 );
+		// 	}
+
+		// 	if(!isThisItemAlreadyHere) {
+		// 		getRoom().items.push( {id:drawingId, x:x, y:y} );
+		// 	}
+		// }
+		refreshGameData();
+		drawEditMap();
+	}
+}
+
+function editTilesOnDrag(e) {
+	var off = getOffset(e);
+
+	off = mobileOffsetCorrection(off,e);
+
+	var x = Math.floor(off.x / (tilesize*scale));
+	var y = Math.floor(off.y / (tilesize*scale));
+	// var row = room[curRoom].tilemap[y];
+	if (isDragAddingTiles) {
+		if ( room[curRoom].tilemap[y][x] != drawingId ) {
+			// row = row.substr(0, x) + drawingId + row.substr(x+1);
+			// room[curRoom].tilemap[y] = row;
+			room[curRoom].tilemap[y][x] = drawingId;
+			refreshGameData();
+			drawEditMap();
+		}
+	}
+	else if (isDragDeletingTiles) {
+		if ( room[curRoom].tilemap[y][x] != "0" ) {
+			// row = row.substr(0, x) + "0" + row.substr(x+1);
+			// room[curRoom].tilemap[y] = row;
+			room[curRoom].tilemap[y][x] = "0";
+			refreshGameData();
+			drawEditMap();
+		}
+	}
+}
+
+function map_onMouseMove(e) {
+	// if( selectedExit != null && isDragMovingExit )
+	// {
+	// 	// drag exit around
+	// 	var off = getOffset(e);
+	// 	var x = Math.floor(off.x / (tilesize*scale));
+	// 	var y = Math.floor(off.y / (tilesize*scale));
+	// 	if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
+	// 	{
+	// 		selectedExit.x = x;
+	// 		selectedExit.y = y;
+	// 		refreshGameData();
+	// 		drawEditMap();	
+	// 	}
+	// }
+	// else if( selectedEndingTile != null && isDragMovingEnding )
+	// {
+	// 	// drag ending around
+	// 	var off = getOffset(e);
+	// 	var x = Math.floor(off.x / (tilesize*scale));
+	// 	var y = Math.floor(off.y / (tilesize*scale));
+	// 	var y = Math.floor(off.y / (tilesize*scale));
+	// 	if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
+	// 	{
+	// 		selectedEndingTile.x = x;
+	// 		selectedEndingTile.y = y;
+	// 		refreshGameData();
+	// 		drawEditMap();	
+	// 	}
+	// }
+	// else
+		editTilesOnDrag(e);
+}
+
+function map_onMouseUp(e) {
+	editTilesOnDrag(e);
+	isDragAddingTiles = false;
+	isDragDeletingTiles = false;
+	// isDragMovingExit = false;
+	// isDragMovingEnding = false;
+}
+
+function map_onTouchStart(e) {
+	map_onMouseDown(e.touches[0]);
+}
+
+function map_onTouchMove(e) {
+	map_onMouseMove(e.touches[0]);
+}
+
+function map_onTouchEnd(e) {
+	map_onMouseUp(e.touches[0]);
+}
+
 </script>
 
 <style>
@@ -275,7 +559,7 @@ function selectedColorPal() {
 	}
 
 	body, input[type=text], button, select {
-		font-size: 36px;
+		font-size: 18px;
 	}
 
 	canvas {
@@ -308,11 +592,58 @@ function selectedColorPal() {
 	.flexMain {
 		/*background: green;*/
 		flex: 2;
+		padding: 20px;
 	}
 
 	.flexAlt {
 		/*background: blue;*/
 		flex: 1;
+		padding: 20px;
+	}
+
+	.responsiveRoot {
+		height: 100%;
+		width: 100%;
+	}
+
+	.responsiveMain {
+		background: blue;
+		/*display: inline-block;*/
+		/*margin: 0;*/
+		float:left;
+	}
+	.responsiveAlt {
+		background: red;
+		/*display: inline-block;*/
+		/*margin: 0;*/
+		float:right;
+	}
+	.innerGap {
+		margin: 5%;
+		width: 90%;
+		height: 90%;
+	}
+
+	@media screen and (orientation: landscape) {
+		.responsiveMain {
+			width: 60%;
+			height: 100%;
+		}
+		.responsiveAlt {
+			width: 40%;
+			height: 100%;
+		}
+	}
+
+	@media screen and (orientation: portrait) {
+		.responsiveMain {
+			width: 100%;
+			height: 60%;
+		}
+		.responsiveAlt {
+			width: 100%;
+			height: 40%;
+		}
 	}
 
 	#game_data {
@@ -375,7 +706,7 @@ function selectedColorPal() {
 </style>
 
 <body onload="start();">
-	<div style="width: 100%;height: 5%">
+	<div style="width: 100%;height: 5%; background:green;">
 		<span style="float:left;">bitsy mobile alpha</span>
 
 		<span style="float:right;">
@@ -389,48 +720,52 @@ function selectedColorPal() {
 		</span>
 	</div>
 	<div id="tool_room" class="tool">
-		<div class="flexRoot">
-			<div class="flexMain">
-				<canvas id="game"></canvas>
+		<div class="responsiveRoot">
+			<div class="responsiveMain">
+				<div class="innerGap">
+					<canvas id="game"></canvas>
+				</div>
 			</div>
-			<div class="flexAlt">
-				<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" />
-				<label title="play / pause game" for="playModeCheck">
-					<!-- <i class="material-icons" id="playModeIcon">play_arrow</i> -->
-					<span id="playModeText"> play </span>
-				</label>
-
-				<br/><br/>
-
-				title : 
-				<input title="title text for your game" type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
-
-				<br/><br/>
-
-				<form>
-					paint : 
-
-					<input type="radio" name="paint mode" value="avatar" onclick="//on_paint_avatar();" id="paintOptionAvatar" checked>
-					<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
-						<!-- <i class="material-icons">perm_identity</i> -->
-						avatar
+			<div class="responsiveAlt">
+				<div class="innerGap">
+					<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" />
+					<label title="play / pause game" for="playModeCheck">
+						<!-- <i class="material-icons" id="playModeIcon">play_arrow</i> -->
+						<span id="playModeText"> play </span>
 					</label>
 
-					<input type="radio" name="paint mode" value="tile" onclick="//on_paint_tile();" id="paintOptionTile">
-					<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
-						<!-- <i class="material-icons">terrain</i> -->
-						tile
-					</label>
+					<br/><br/>
 
-					<input type="radio" name="paint mode" value="sprite" onclick="//on_paint_sprite();" id="paintOptionSprite">
-					<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
-						<!-- <i class="material-icons">nature_people</i> -->
-						sprite
-					</label>
-				</form>
+					title : 
+					<input title="title text for your game" type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
 
-				<select id="drawing_select">
-				</select>
+					<br/><br/>
+
+					<form>
+						paint : 
+
+						<input type="radio" name="paint mode" value="avatar" onclick="//on_paint_avatar();" id="paintOptionAvatar" checked>
+						<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
+							<!-- <i class="material-icons">perm_identity</i> -->
+							avatar
+						</label>
+
+						<input type="radio" name="paint mode" value="tile" onclick="//on_paint_tile();" id="paintOptionTile">
+						<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
+							<!-- <i class="material-icons">terrain</i> -->
+							tile
+						</label>
+
+						<input type="radio" name="paint mode" value="sprite" onclick="//on_paint_sprite();" id="paintOptionSprite">
+						<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
+							<!-- <i class="material-icons">nature_people</i> -->
+							sprite
+						</label>
+					</form>
+
+					<select id="drawing_select">
+					</select>
+				</div>
 			</div>
 		</div>
 	</div>
