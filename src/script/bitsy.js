@@ -432,6 +432,12 @@ function stopGame() {
 	console.log("stop GAME!");
 
 	document.removeEventListener('keydown', onkeydown);
+	document.removeEventListener('keyup', onkeyup);
+
+	canvas.removeEventListener('touchstart', ontouchstart);
+	canvas.removeEventListener('touchmove', ontouchmove);
+	canvas.removeEventListener('touchend', ontouchend);
+
 	clearInterval(update_interval);
 }
 
