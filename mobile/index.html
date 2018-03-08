@@ -52,7 +52,7 @@ X figure out localhost -> mobile dev cycle
 - fix color slider
 
 BUGS
-- can't drag to delete tiles
+X can't drag to delete tiles
 X drag also moves player
 
 Random thoughts
@@ -556,15 +556,22 @@ function map_onMouseUp(e) {
 }
 
 function map_onTouchStart(e) {
-	map_onMouseDown(e.touches[0]);
+	// console.log(e.touches[0]);
+	var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+	// console.log(fakeEvent);
+	map_onMouseDown( fakeEvent );
 }
 
 function map_onTouchMove(e) {
-	map_onMouseMove(e.touches[0]);
+	var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+	map_onMouseMove( fakeEvent );
 }
 
 function map_onTouchEnd(e) {
-	map_onMouseUp(e.touches[0]);
+	// var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+	// map_onMouseUp( fakeEvent );
+	isDragAddingTiles = false;
+	isDragDeletingTiles = false;
 }
 
 // TODO: these need to be specialized for ROOM and PAINT tools
