@@ -50,6 +50,7 @@ X fix layout issues
 X figure out localhost -> mobile dev cycle
 - fix color picker
 - fix color slider
+X font size issue (currently fixed by making it big?)
 
 BUGS
 X can't drag to delete tiles
@@ -556,6 +557,7 @@ function map_onMouseUp(e) {
 }
 
 function map_onTouchStart(e) {
+	e.preventDefault();
 	// console.log(e.touches[0]);
 	var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 	// console.log(fakeEvent);
@@ -563,11 +565,13 @@ function map_onTouchStart(e) {
 }
 
 function map_onTouchMove(e) {
+	e.preventDefault();
 	var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 	map_onMouseMove( fakeEvent );
 }
 
 function map_onTouchEnd(e) {
+	e.preventDefault();
 	// var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 	// map_onMouseUp( fakeEvent );
 	isDragAddingTiles = false;
@@ -731,7 +735,7 @@ function onSelectDrawing(e) {
 	}
 
 	body, input[type=text], button, select {
-		font-size: 18px;
+		font-size: 36px;
 	}
 
 	canvas {
@@ -875,10 +879,15 @@ function onSelectDrawing(e) {
 		padding-top: 20px;
 		padding-bottom: 20px;
 	}
+
+	#titleText {
+		width: 600px;
+		max-width: 80%;
+	}
 </style>
 
 <body onload="start();">
-	<div style="width: 100%;height: 5%; background:green;">
+	<div style="width: 100%;height: 5%; background:green; overflow:hidden;">
 		<span style="float:left;">bitsy mobile alpha</span>
 
 		<span style="float:right;">
