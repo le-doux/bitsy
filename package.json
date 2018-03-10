@@ -1,0 +1,18 @@
+{
+  "name": "Bitsy",
+  "app_name": "Bitsy",
+  "version": "4.6",
+  "main": "editor/index.html",
+  "window": {
+    "title": "Bitsy",
+    "toolbar": false,
+    "fullscreen": true,
+    "width": 1280,
+    "height": 840,
+    "position": "center",
+    "min_width": 1280,
+    "min_height": 640
+  },
+  "chromium-args": "--in-process-gpu --disable-transparency",
+  "devDependencies": {}
+}
