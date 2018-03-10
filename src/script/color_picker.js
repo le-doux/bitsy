@@ -242,6 +242,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 	var hexText;
 
 	function initColorWheel() {
+		console.log(wheelId);
+		console.log(document);
+		console.log(document.getElementById(wheelId));
 		wheelCanvas = document.getElementById(wheelId);
 		wheelContext = wheelCanvas.getContext("2d");
 

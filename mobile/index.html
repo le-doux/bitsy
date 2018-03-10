@@ -94,9 +94,12 @@ function start() {
 	initGameState();
 	// initGameStateAndRender(); // also parses and loads the data --- needs to be two separate things
 
-	console.log("title : " + title);
+	// console.log("title : " + title);
 
 	document.getElementById("titleText").value = title;
+
+	initPaintCanvas();
+	drawPaintCanvas();
 
 	// init color picker
 	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSlider', 'colorPickerSliderBg', 'colorPickerHexText');
@@ -134,7 +137,7 @@ function drawEditMap() {
 
 	//draw grid
 	if (true /*drawMapGrid*/) {
-		ctx.fillStyle = "#fff"; /*getContrastingColor();*/
+		ctx.fillStyle = getContrastingColor();
 		for (var x = 1; x < mapsize; x++) {
 			ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
 		}
@@ -351,7 +354,7 @@ function unlistenMapEditEvents() {
 	// clearInterval( mapEditAnimationLoop );
 }
 
-function mobileOffsetCorrection(off,e) {
+function mobileOffsetCorrection(off,e,innerSize) {
 	var bounds = e.target.getBoundingClientRect();
 
 	// var width = bounds.width * containerRatio;
@@ -368,7 +371,7 @@ function mobileOffsetCorrection(off,e) {
 	console.log(off);
 
 	// convert container size to internal canvas size
-	var containerRatio = (tilesize*mapsize*scale) / Math.min( bounds.width, bounds.height );
+	var containerRatio = innerSize / Math.min( bounds.width, bounds.height );
 
 	console.log(containerRatio);
 
@@ -389,7 +392,7 @@ function map_onMouseDown(e) {
 
 	console.log(off);
 
-	off = mobileOffsetCorrection(off,e);
+	off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
 
 	console.log(off);
 
@@ -489,7 +492,7 @@ function editTilesOnDrag(e) {
 
 	var off = getOffset(e);
 
-	off = mobileOffsetCorrection(off,e);
+	off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
 
 	var x = Math.floor(off.x / (tilesize*scale));
 	var y = Math.floor(off.y / (tilesize*scale));
@@ -579,7 +582,7 @@ function map_onTouchEnd(e) {
 }
 
 // TODO: these need to be specialized for ROOM and PAINT tools
-function on_paint_avatar() {
+function on_room_paint_avatar() {
 	paintMode = TileType.Avatar;
 	drawingId = "A";
 	// reloadSprite();
@@ -604,7 +607,7 @@ function on_paint_avatar() {
 	var selectDrawing = document.getElementById("drawing_select");
 	selectDrawing.style.display = "none";
 }
-function on_paint_tile() {
+function on_room_paint_tile() {
 	paintMode = TileType.Tile;
 	tileIndex = 0;
 	drawingId = sortedTileIdList()[tileIndex];
@@ -627,7 +630,7 @@ function on_paint_tile() {
 
 
 	// update options
-	var selectDrawing = document.getElementById("drawing_select");
+	var selectDrawing = document.getElementById("room_drawing_select");
 	selectDrawing.style.display = "inline";
 	for(var i = selectDrawing.options.length - 1 ; i >= 0 ; i--) {
 		selectDrawing.remove(i);
@@ -641,7 +644,7 @@ function on_paint_tile() {
 		selectDrawing.add(option);
 	}
 }
-function on_paint_sprite() {
+function on_room_paint_sprite() {
 	paintMode = TileType.Sprite;
 	if (sortedSpriteIdList().length > 1)
 	{
@@ -671,12 +674,12 @@ function on_paint_sprite() {
 
 
 	// update options
-	var selectDrawing = document.getElementById("drawing_select");
+	var selectDrawing = document.getElementById("room_drawing_select");
 	selectDrawing.style.display = "inline";
 	for(var i = selectDrawing.options.length - 1 ; i >= 0 ; i--) {
 		selectDrawing.remove(i);
 	}
-	var idList = sortedTileIdList();
+	var idList = sortedSpriteIdList();
 	for(var i = 0; i < idList.length; i++) {
 		var id = idList[i];
 
@@ -688,6 +691,64 @@ function on_paint_sprite() {
 		option.value = id;
 		selectDrawing.add(option);
 	}
+}
+
+// TODO: these need to be specialized for ROOM and PAINT tools
+function on_paint_avatar() {
+	paint_paintMode = TileType.Avatar;
+	paint_drawingId = "A";
+
+	// update options
+	var selectDrawing = document.getElementById("drawing_select");
+	selectDrawing.style.display = "none";
+
+	drawPaintCanvas();
+}
+function on_paint_tile() {
+	paint_paintMode = TileType.Tile;
+	paint_drawingId = sortedTileIdList()[0];
+
+	// update options
+	var selectDrawing = document.getElementById("drawing_select");
+	selectDrawing.style.display = "inline";
+	for(var i = selectDrawing.options.length - 1 ; i >= 0 ; i--) {
+		selectDrawing.remove(i);
+	}
+	var idList = sortedTileIdList();
+	for(var i = 0; i < idList.length; i++) {
+		var id = idList[i];
+		var option = document.createElement("option");
+		option.text = id;
+		option.value = id;
+		selectDrawing.add(option);
+	}
+
+	drawPaintCanvas();
+}
+function on_paint_sprite() {
+	paint_paintMode = TileType.Sprite;
+	paint_drawingId = sortedSpriteIdList()[sortedSpriteIdList().length > 1 ? 1 : 0];
+
+	// update options
+	var selectDrawing = document.getElementById("drawing_select");
+	selectDrawing.style.display = "inline";
+	for(var i = selectDrawing.options.length - 1 ; i >= 0 ; i--) {
+		selectDrawing.remove(i);
+	}
+	var idList = sortedSpriteIdList();
+	for(var i = 0; i < idList.length; i++) {
+		var id = idList[i];
+
+		if(id === "A")
+			continue;
+
+		var option = document.createElement("option");
+		option.text = id;
+		option.value = id;
+		selectDrawing.add(option);
+	}
+
+	drawPaintCanvas();
 }
 
 // TODO: these need to go into CORE code
@@ -719,8 +780,184 @@ function sortedBase36IdList( objHolder ) {
 	return Object.keys( objHolder ).sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
 }
 
-function onSelectDrawing(e) {
+function room_onSelectDrawing(e) {
 	drawingId = e.target.value;
+}
+function paint_onSelectDrawing(e) {
+	paint_drawingId = e.target.value;
+	drawPaintCanvas();
+}
+
+/* PAINT STUFF */
+var paint_paintMode = TileType.Avatar;
+var paint_drawingId = "A";
+
+var paint_canvas;
+var paint_ctx;
+var paint_scale = 32;
+
+var drawPaintGrid = true;
+var curPaintBrush = 0;
+var isPainting = false;
+var isCurDrawingAnimated = false;
+var curDrawingFrameIndex = 0;
+
+function initPaintCanvas() {
+	//paint canvas & context
+	paint_canvas = document.getElementById("paint");
+	paint_canvas.width = tilesize * paint_scale;
+	paint_canvas.height = tilesize * paint_scale;
+	paint_ctx = paint_canvas.getContext("2d");
+	//paint events
+	// paint_canvas.addEventListener("mousedown", paint_onMouseDown);
+	// paint_canvas.addEventListener("mousemove", paint_onMouseMove);
+	// paint_canvas.addEventListener("mouseup", paint_onMouseUp);
+	// paint_canvas.addEventListener("mouseleave", paint_onMouseUp);
+	paint_canvas.addEventListener("touchstart", paint_onTouchStart);
+	paint_canvas.addEventListener("touchmove", paint_onTouchMove);
+	paint_canvas.addEventListener("touchend", paint_onTouchEnd);
+}
+
+function paint_onMouseDown(e) {
+	// if (isPlayMode) return; //can't paint during play mode
+
+	var off = getOffset(e);
+
+	off = mobileOffsetCorrection(off,e,(tilesize));
+
+	var x = Math.floor(off.x);
+	var y = Math.floor(off.y);
+
+	// non-responsive version
+	// var x = Math.floor(off.x / paint_scale);
+	// var y = Math.floor(off.y / paint_scale);
+
+	if (curDrawingData()[y][x] == 0) {
+		curPaintBrush = 1;
+	}
+	else {
+		curPaintBrush = 0;
+	}
+	curDrawingData()[y][x] = curPaintBrush;
+	drawPaintCanvas();
+	isPainting = true;
+}
+
+function paint_onMouseMove(e) {
+	if (isPainting) {	
+		var off = getOffset(e);
+
+		off = mobileOffsetCorrection(off,e,(tilesize));
+
+		var x = Math.floor(off.x);// / paint_scale);
+		var y = Math.floor(off.y);// / paint_scale);
+		curDrawingData()[y][x] = curPaintBrush;
+		drawPaintCanvas();
+	}
+}
+
+function paint_onMouseUp(e) {
+	if (isPainting) {
+		isPainting = false;
+		renderImages();
+		refreshGameData();
+		drawEditMap();
+		// renderPaintThumbnail( drawingId );
+		// if( isCurDrawingAnimated )
+		// 	renderAnimationPreview( drawingId );
+	}
+}
+
+function paint_onTouchStart(e) {
+	e.preventDefault();
+	var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+	paint_onMouseDown(fakeEvent);
+}
+
+function paint_onTouchMove(e) {
+	e.preventDefault();
+	var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+	paint_onMouseMove(fakeEvent);
+}
+
+function paint_onTouchEnd(e) {
+	e.preventDefault();
+	paint_onMouseUp();
+}
+
+function drawPaintCanvas() {
+	//background
+	paint_ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
+	paint_ctx.fillRect(0,0,canvas.width,canvas.height);
+
+	//pixel color
+	if (paintMode == TileType.Tile) {
+		paint_ctx.fillStyle = "rgb("+getPal(curPal())[1][0]+","+getPal(curPal())[1][1]+","+getPal(curPal())[1][2]+")";
+	}
+	else if (paintMode == TileType.Sprite || paintMode == TileType.Avatar || paintMode == TileType.Item) {
+		paint_ctx.fillStyle = "rgb("+getPal(curPal())[2][0]+","+getPal(curPal())[2][1]+","+getPal(curPal())[2][2]+")";
+	}
+
+	//draw pixels
+	for (var x = 0; x < 8; x++) {
+		for (var y = 0; y < 8; y++) {
+			// draw alternate frame
+			if (isCurDrawingAnimated && curDrawingAltFrameData()[y][x] === 1) {
+				paint_ctx.globalAlpha = 0.3;
+				paint_ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
+				paint_ctx.globalAlpha = 1;
+			}
+			// draw current frame
+			if (curDrawingData()[y][x] === 1) {
+				paint_ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
+			}
+		}
+	}
+
+	//draw grid
+	if (drawPaintGrid) {
+		paint_ctx.fillStyle = getContrastingColor();
+
+		for (var x = 1; x < tilesize; x++) {
+			paint_ctx.fillRect(x*paint_scale,0*paint_scale,1,tilesize*paint_scale);
+		}
+		for (var y = 1; y < tilesize; y++) {
+			paint_ctx.fillRect(0*paint_scale,y*paint_scale,tilesize*paint_scale,1);
+		}
+	}
+}
+
+function curDrawingData() {
+	var imgId = curDrawingImgId();
+	// console.log(imgId);
+	var frameIndex = (isCurDrawingAnimated ? curDrawingFrameIndex : 0);
+	// console.log(imageStore.source[ imgId ]);
+	return imageStore.source[ imgId ][ frameIndex ];
+}
+
+function curDrawingImgId() {
+	var imgId = "";
+	if( paint_paintMode == TileType.Tile )
+		imgId += "TIL_";
+	else if( paint_paintMode == TileType.Sprite || paint_paintMode == TileType.Avatar )
+		imgId += "SPR_";
+	else if( paint_paintMode == TileType.Item )
+		imgId += "ITM_";
+	imgId += paint_drawingId;
+	return imgId;
+}
+
+function getContrastingColor(palId) {
+	if (!palId) palId = curPal();
+	var hsl = rgbToHsl( getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2] );
+	// console.log(hsl);
+	var lightness = hsl[2];
+	if (lightness > 0.5) {
+		return "#000";
+	}
+	else {
+		return "#fff";
+	}
 }
 </script>
 
@@ -925,68 +1162,132 @@ function onSelectDrawing(e) {
 					<form>
 						paint : 
 
-						<input type="radio" name="paint mode" value="avatar" onclick="on_paint_avatar();" id="paintOptionAvatar" checked>
-						<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
+						<input type="radio" name="room paint mode" value="avatar" onclick="on_room_paint_avatar();" id="room_paintOptionAvatar" checked>
+						<label title="edit the avatar: the player's character" for="room_paintOptionAvatar" class="left">
 							<!-- <i class="material-icons">perm_identity</i> -->
 							avatar
 						</label>
 
-						<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();" id="paintOptionTile">
-						<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
+						<input type="radio" name="room paint mode" value="tile" onclick="on_room_paint_tile();" id="room_paintOptionTile">
+						<label title="edit tiles: pieces of scenery" for="room_paintOptionTile" class="middle">
 							<!-- <i class="material-icons">terrain</i> -->
 							tile
 						</label>
 
-						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite">
-						<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
+						<input type="radio" name="room paint mode" value="sprite" onclick="on_room_paint_sprite();" id="room_paintOptionSprite">
+						<label title="edit sprites: non-player characters and interactive objects" for="room_paintOptionSprite" class="middle">
 							<!-- <i class="material-icons">nature_people</i> -->
 							sprite
 						</label>
 					</form>
 
-					<select id="drawing_select" onchange="onSelectDrawing(event);">
+					<select id="room_drawing_select" onchange="room_onSelectDrawing(event);" style="display: none;">
 					</select>
 				</div>
 			</div>
 		</div>
 	</div>
+
 	<div id="tool_paint" class="tool" style="display:none;">
-		paint
-	</div>
-	<div id="tool_color" class="tool" style="display:none;">
-		<div class="flexRoot">
-			<div class="flexMain">
-				<div id="colorPicker" title="color picker">
-					<div id="colorPickerWheelOuter">
-						<canvas id="colorPickerWheel"></canvas>
-						<canvas id="colorPickerSelect" title="color picker wheel"></canvas>
-					</div>
-					<div id="colorPickerSliderBg" title="color picker darkness / lightness slider">
-						<input type="range" id="colorPickerSlider" value="0" />
-					</div>
-					<input id="colorPickerHexText" title="color picker hex code" type="text" />
+		<div class="responsiveRoot">
+
+			<div class="responsiveMain">
+				<div class="innerGap">
+					<canvas id="paint"></canvas>
 				</div>
 			</div>
-			<div class="flexAlt">
-				<form id="colorPaletteForm">
-					<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionBackground" onclick="changeColorPickerIndex(0);" checked>
-					<label id="colorPaletteLabelBackground" for="colorPaletteOptionBackground" title="pick background color">
-						<!-- <i class="material-icons">grid_on</i> -->
-						background color
-					</label>
 
-					<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionTile" onclick="changeColorPickerIndex(1);">
-					<label id="colorPaletteLabelTile" for="colorPaletteOptionTile" title="pick tile color">
-						<!-- <i class="material-icons">terrain</i> -->
-						tile color
-					</label>
+			<div class="responsiveAlt">
+				<div class="innerGap">
 
-					<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionSprite" onclick="changeColorPickerIndex(2);">
-					<label id="colorPaletteLabelSprite" for="colorPaletteOptionSprite" title="pick sprite / avatar / item color">
-						<!-- <i class="material-icons">nature_people</i> -->
-						sprite color
-					</label>
-				</form>
+					<div>
+						<form>
+							select drawing : 
+
+							<input type="radio" name="paint mode" value="avatar" onclick="on_paint_avatar();" id="paintOptionAvatar" checked />
+							<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
+								<!-- <i class="material-icons">perm_identity</i> -->
+								avatar
+							</label>
+
+							<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();" id="paintOptionTile" />
+							<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
+								<!-- <i class="material-icons">terrain</i> -->
+								tile
+							</label>
+
+							<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite" />
+							<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
+								<!-- <i class="material-icons">nature_people</i> -->
+								sprite
+							</label>
+
+							<select id="drawing_select" onchange="paint_onSelectDrawing(event);" style="display: none;" />
+						</form>
+					</div>
+
+					<!--- WHY???? weird empty input tag required not to break anything??? -->
+					<!-- <input /> -->
+
+					<div>
+					<div id="wall" style="/*display:none;*/">
+						<input type="checkbox" id="wallCheckbox" onchange="//on_toggle_wall(event);">
+						<label title="make tile an impassible wall" for="wallCheckbox">
+							<!-- <i id="wallCheckboxIcon" class="material-icons">border_clear</i> -->
+							wall
+						</label>
+					</div>
+					<div id="dialog" style="/*display:none;*/">
+						<span style="/*float:left;*/">
+							dialog
+						</span>
+						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea" onkeydown="//on_change_dialog();" onkeyup="//on_change_dialog();" onchange="//on_change_dialog();"></textarea>
+					</div>
+				</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div id="tool_color" class="tool" style="display:none;">
+		<div class="responsiveRoot">
+			<div class="responsiveMain">
+				<div class="innerGap">
+					<div id="colorPicker" title="color picker">
+						<div id="colorPickerWheelOuter">
+							<canvas id="colorPickerWheel"></canvas>
+							<canvas id="colorPickerSelect" title="color picker wheel"></canvas>
+						</div>
+						<div id="colorPickerSliderBg" title="color picker darkness / lightness slider">
+							<input type="range" id="colorPickerSlider" value="0" />
+						</div>
+						<input id="colorPickerHexText" title="color picker hex code" type="text" />
+					</div>
+				</div>
+			</div>
+			<div class="responsiveAlt">
+				<div class="innerGap">
+					<form id="colorPaletteForm">
+						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionBackground" onclick="changeColorPickerIndex(0);" checked />
+						<label id="colorPaletteLabelBackground" for="colorPaletteOptionBackground" title="pick background color">
+							<!-- <i class="material-icons">grid_on</i> -->
+							background color
+						</label>
+
+						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionTile" onclick="changeColorPickerIndex(1);" />
+						<label id="colorPaletteLabelTile" for="colorPaletteOptionTile" title="pick tile color">
+							<!-- <i class="material-icons">terrain</i> -->
+							tile color
+						</label>
+
+						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionSprite" onclick="changeColorPickerIndex(2);" />
+						<label id="colorPaletteLabelSprite" for="colorPaletteOptionSprite" title="pick sprite / avatar / item color">
+							<!-- <i class="material-icons">nature_people</i> -->
+							sprite color
+						</label>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
