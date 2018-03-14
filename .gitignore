@@ -7,3 +7,6 @@ electron-version/node_modules/*
 experiments/electron-version/node_modules/*
 src/node_modules/*
 npm-debug.log
+node_modules/*
+dist/*
+package-lock.json

@@ -1,18 +1,25 @@
 {
   "name": "Bitsy",
-  "app_name": "Bitsy",
-  "version": "4.6",
-  "main": "editor/index.html",
-  "window": {
-    "title": "Bitsy",
-    "toolbar": false,
-    "fullscreen": true,
-    "width": 1280,
-    "height": 840,
-    "position": "center",
-    "min_width": 1280,
-    "min_height": 640
+  "version": "4.6.0",
+  "main": "./electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "build --dir",
+    "dist": "build",
+    "dist-mac-win": "build -mw",
+    "dist-win": "build --win"
   },
-  "chromium-args": "--in-process-gpu --disable-transparency",
-  "devDependencies": {}
+  "build": {
+    "appId": "bitsy",
+    "mac": {
+      "icon": "./src/icons/bitsy.icns"
+    },
+    "win": {
+      "icon": "./src/icons/bitsy.ico"
+    }
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest"
+  }
 }
