@@ -808,11 +808,13 @@ function initPaintCanvas() {
 	paint_canvas.width = tilesize * paint_scale;
 	paint_canvas.height = tilesize * paint_scale;
 	paint_ctx = paint_canvas.getContext("2d");
+
 	//paint events
 	// paint_canvas.addEventListener("mousedown", paint_onMouseDown);
 	// paint_canvas.addEventListener("mousemove", paint_onMouseMove);
 	// paint_canvas.addEventListener("mouseup", paint_onMouseUp);
 	// paint_canvas.addEventListener("mouseleave", paint_onMouseUp);
+
 	paint_canvas.addEventListener("touchstart", paint_onTouchStart);
 	paint_canvas.addEventListener("touchmove", paint_onTouchMove);
 	paint_canvas.addEventListener("touchend", paint_onTouchEnd);
@@ -1181,8 +1183,7 @@ function getContrastingColor(palId) {
 						</label>
 					</form>
 
-					<select id="room_drawing_select" onchange="room_onSelectDrawing(event);" style="display: none;">
-					</select>
+					<select id="room_drawing_select" onchange="room_onSelectDrawing(event);" style="display: none;"></select>
 				</div>
 			</div>
 		</div>
@@ -1194,42 +1195,36 @@ function getContrastingColor(palId) {
 			<div class="responsiveMain">
 				<div class="innerGap">
 					<canvas id="paint"></canvas>
-				</div>
-			</div>
+				</div> <!-- innerGap -->
+			</div> <!-- responsiveMain -->
 
 			<div class="responsiveAlt">
 				<div class="innerGap">
 
-					<div>
-						<form>
-							select drawing : 
+					<form>
+						select drawing : 
 
-							<input type="radio" name="paint mode" value="avatar" onclick="on_paint_avatar();" id="paintOptionAvatar" checked />
-							<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
-								<!-- <i class="material-icons">perm_identity</i> -->
-								avatar
-							</label>
+						<input type="radio" name="paint mode" value="avatar" onclick="on_paint_avatar();" id="paintOptionAvatar" checked />
+						<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
+							<!-- <i class="material-icons">perm_identity</i> -->
+							avatar
+						</label>
 
-							<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();" id="paintOptionTile" />
-							<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
-								<!-- <i class="material-icons">terrain</i> -->
-								tile
-							</label>
+						<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();" id="paintOptionTile" />
+						<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
+							<!-- <i class="material-icons">terrain</i> -->
+							tile
+						</label>
 
-							<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite" />
-							<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
-								<!-- <i class="material-icons">nature_people</i> -->
-								sprite
-							</label>
+						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite" />
+						<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
+							<!-- <i class="material-icons">nature_people</i> -->
+							sprite
+						</label>
 
-							<select id="drawing_select" onchange="paint_onSelectDrawing(event);" style="display: none;" />
-						</form>
-					</div>
+						<select id="drawing_select" onchange="paint_onSelectDrawing(event);" style="display: none;"></select>
+					</form>
 
-					<!--- WHY???? weird empty input tag required not to break anything??? -->
-					<!-- <input /> -->
-
-					<div>
 					<div id="wall" style="/*display:none;*/">
 						<input type="checkbox" id="wallCheckbox" onchange="//on_toggle_wall(event);">
 						<label title="make tile an impassible wall" for="wallCheckbox">
@@ -1243,11 +1238,11 @@ function getContrastingColor(palId) {
 						</span>
 						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea" onkeydown="//on_change_dialog();" onkeyup="//on_change_dialog();" onchange="//on_change_dialog();"></textarea>
 					</div>
-				</div>
-				</div>
-			</div>
 
-		</div>
+				</div> <!-- innerGap -->
+			</div> <!-- responsiveMain -->
+
+		</div> <!-- responsiveRoot -->
 	</div>
 
 	<div id="tool_color" class="tool" style="display:none;">
