@@ -2793,7 +2793,8 @@ function getCurPaintModeStr() {
 	}
 }
 
-function nextAvailableDialogId(prefix = "") {
+function nextAvailableDialogId(prefix) {
+	if(prefix === undefined || prefix === null) prefix = "";
 	var i = 0;
 	var id = prefix + i.toString(36);
 	while( dialog[id] != null ) {

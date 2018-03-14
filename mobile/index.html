@@ -45,6 +45,10 @@ X title
 X select tile / avatar / sprite
 X edit map
 - paint panel
+	X dialog
+	X wall
+	- add
+	- delete
 X fix layout issues
 - zoom
 X figure out localhost -> mobile dev cycle
@@ -60,11 +64,15 @@ Random thoughts
 - title on EVERY room?
 - how to distinguish between mobile / desktop tool versions?
 - can we collapse distinction between different drawing types? avatar / sprite / tile / item
+- SFX?
+- tools as iframes?
 
 Components:
 - room tool
 - paint tool
+- color picker (done-ish)
 - drawing selector
+- data panel
 
 Shared code plan:
 - sort code in prototype by tool / category
@@ -703,6 +711,9 @@ function on_paint_avatar() {
 	selectDrawing.style.display = "none";
 
 	drawPaintCanvas();
+
+	document.getElementById("dialog").setAttribute("style","display:none;");
+	document.getElementById("wall").setAttribute("style","display:none;");
 }
 function on_paint_tile() {
 	paint_paintMode = TileType.Tile;
@@ -723,7 +734,11 @@ function on_paint_tile() {
 		selectDrawing.add(option);
 	}
 
+	reloadTile();
 	drawPaintCanvas();
+
+	document.getElementById("dialog").setAttribute("style","display:none;");
+	document.getElementById("wall").setAttribute("style","display:block;");
 }
 function on_paint_sprite() {
 	paint_paintMode = TileType.Sprite;
@@ -748,7 +763,12 @@ function on_paint_sprite() {
 		selectDrawing.add(option);
 	}
 
+	reloadSprite();
+
 	drawPaintCanvas();
+
+	document.getElementById("dialog").setAttribute("style","display:block;");
+	document.getElementById("wall").setAttribute("style","display:none;");
 }
 
 // TODO: these need to go into CORE code
@@ -786,6 +806,14 @@ function room_onSelectDrawing(e) {
 function paint_onSelectDrawing(e) {
 	paint_drawingId = e.target.value;
 	drawPaintCanvas();
+
+	// TODO : make these functions less hacky and terrible
+	if(paint_paintMode == TileType.Tile) {
+		reloadTile();
+	}
+	else if(paint_paintMode == TileType.Sprite) {
+		reloadSprite();
+	}
 }
 
 /* PAINT STUFF */
@@ -961,6 +989,224 @@ function getContrastingColor(palId) {
 		return "#fff";
 	}
 }
+
+function reloadTile() {
+	// animation UI
+	// if ( tile[drawingId] && tile[drawingId].animation.isAnimated ) {
+	// 	isCurDrawingAnimated = true;
+	// 	document.getElementById("animatedCheckbox").checked = true;
+
+	// 	if( curDrawingFrameIndex == 0)
+	// 	{
+	// 		document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
+	// 		document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
+	// 	}
+	// 	else if( curDrawingFrameIndex == 1 )
+	// 	{
+	// 		document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
+	// 		document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
+	// 	}
+
+	// 	document.getElementById("animation").setAttribute("style","display:block;");
+	// 	document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
+	// 	renderAnimationPreview( drawingId );
+	// }
+	// else {
+	// 	isCurDrawingAnimated = false;
+	// 	document.getElementById("animatedCheckbox").checked = false;
+	// 	document.getElementById("animation").setAttribute("style","display:none;");
+	// 	document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
+	// }
+
+	// wall UI
+	updateWallCheckboxOnCurrentTile();
+
+	// updateDrawingNameUI(true);
+
+	// drawPaintCanvas();
+}
+
+function updateWallCheckboxOnCurrentTile() {
+	var isCurTileWall = false;
+
+	if( tile[ paint_drawingId ].isWall == undefined || tile[ paint_drawingId ].isWall == null ) {
+		if (room[curRoom]) {
+			isCurTileWall = (room[curRoom].walls.indexOf(paint_drawingId) != -1);
+		}
+	}
+	else {
+		isCurTileWall = tile[ paint_drawingId ].isWall;
+	}
+
+	console.log("IS WALL " + isCurTileWall);
+
+	if (isCurTileWall) {
+		document.getElementById("wallCheckbox").checked = true;
+		// document.getElementById("wallCheckboxIcon").innerHTML = "border_outer";
+	}
+	else {
+		document.getElementById("wallCheckbox").checked = false;
+		// document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
+	}
+}
+
+function reloadSprite() {
+	// // animation UI
+	// if ( sprite[drawingId] && sprite[drawingId].animation.isAnimated ) {
+	// 	isCurDrawingAnimated = true;
+	// 	document.getElementById("animatedCheckbox").checked = true;
+
+	// 	if( curDrawingFrameIndex == 0)
+	// 	{
+	// 		document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
+	// 		document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
+	// 	}
+	// 	else if( curDrawingFrameIndex == 1 )
+	// 	{
+	// 		document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
+	// 		document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
+	// 	}
+
+	// 	document.getElementById("animation").setAttribute("style","display:block;");
+	// 	document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
+	// 	renderAnimationPreview( drawingId );
+	// }
+	// else {
+	// 	isCurDrawingAnimated = false;
+	// 	document.getElementById("animatedCheckbox").checked = false;
+	// 	document.getElementById("animation").setAttribute("style","display:none;");
+	// 	document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
+	// }
+
+	// dialog UI
+	reloadDialogUI()
+
+	// updateDrawingNameUI( drawingId != "A" );
+
+	// // update paint canvas
+	// drawPaintCanvas();
+
+}
+
+function reloadDialogUI() {
+	reloadDialogUICore();
+
+	// reloadAdvDialogUI();
+}
+
+function reloadDialogUICore() { // TODO: name is terrible
+	var dialogId = getCurDialogId();
+
+	if (dialogId in dialog) {
+		var dialogLines = dialog[dialogId].split("\n");
+		if(dialogLines[0] === '"""') {
+			// multi line
+			var dialogStr = "";
+			var i = 1;
+			while (i < dialogLines.length && dialogLines[i] != '"""') {
+				dialogStr += dialogLines[i] + (dialogLines[i+1] != '"""' ? '\n' : '');
+				i++;
+			}
+			document.getElementById("dialogText").value = dialogStr;
+		}
+		else {
+			// single line
+			document.getElementById("dialogText").value = dialog[dialogId];
+		}
+	}
+	else {
+		document.getElementById("dialogText").value = "";
+	}	
+}
+
+function getCurDialogId() {
+	var dialogId = null;
+	if(paint_paintMode == TileType.Sprite) {
+		dialogId = sprite[paint_drawingId].dlg;
+		if(dialogId == null && dialog[paint_drawingId] != null) {
+			dialogId = paint_drawingId;
+		}
+	}
+	else if(paint_paintMode == TileType.Item) {
+		dialogId = item[paint_drawingId].dlg;
+	}
+	console.log("DIALOG ID " + dialogId);
+	return dialogId;
+}
+
+function on_toggle_wall(e) {
+	// if( tile[ drawingId ].isWall == undefined || tile[ drawingId ].isWall == null ) {
+	// 	// clear out any existing wall settings for this tile in any rooms
+	// 	// (this is back compat for old-style wall settings)
+	// 	for( roomId in room ) {
+	// 		var i = room[ roomId ].walls.indexOf( drawingId );
+	// 		if( i > -1 )
+	// 			room[ roomId ].walls.splice( i , 1 );
+	// 	}
+	// }
+
+	if ( e.target.checked ){
+		tile[ paint_drawingId ].isWall = true;
+		// document.getElementById("wallCheckboxIcon").innerHTML = "border_outer";
+	}
+	else {
+		tile[ paint_drawingId ].isWall = false;
+		// document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
+	}
+
+	refreshGameData();
+}
+
+function on_change_dialog() {
+	var dialogId = getCurDialogId();
+
+	var dialogStr = document.getElementById("dialogText").value;
+	if(dialogStr.length <= 0){
+		if(dialogId) {
+			getCurPaintObject().dlg = null;
+			delete dialog[dialogId];
+		}
+	}
+	else {
+		if(!dialogId) {
+			var prefix = (paint_paintMode == TileType.Item) ? "ITM_" : "SPR_";
+			dialogId = nextAvailableDialogId( prefix );
+			getCurPaintObject().dlg = dialogId;
+		}
+		if( dialogStr.indexOf('\n') > -1 ) dialogStr = '"""\n' + dialogStr + '\n"""';
+		dialog[dialogId] = dialogStr;
+	}
+
+	// reloadAdvDialogUI();
+
+	refreshGameData();
+}
+
+function getCurPaintObject(id) {
+	if(id === undefined || id === null) id = paint_drawingId;
+	console.log(id);
+	if(paint_paintMode == TileType.Sprite || paint_paintMode == TileType.Avatar) {
+		return sprite[id];
+	}
+	else if(paint_paintMode == TileType.Item) {
+		return item[id];
+	}
+	else if(paint_paintMode == TileType.Tile) {
+		return tile[id];
+	}
+}
+
+function nextAvailableDialogId(prefix) {
+	if(prefix === undefined || prefix === null) prefix = "";
+	var i = 0;
+	var id = prefix + i.toString(36);
+	while( dialog[id] != null ) {
+		i++;
+		id = prefix + i.toString(36);
+	}
+	return id;
+}
+
 </script>
 
 <style>
@@ -1119,7 +1365,7 @@ function getContrastingColor(palId) {
 		padding-bottom: 20px;
 	}
 
-	#titleText {
+	#titleText, #dialogText {
 		width: 600px;
 		max-width: 80%;
 	}
@@ -1225,18 +1471,18 @@ function getContrastingColor(palId) {
 						<select id="drawing_select" onchange="paint_onSelectDrawing(event);" style="display: none;"></select>
 					</form>
 
-					<div id="wall" style="/*display:none;*/">
-						<input type="checkbox" id="wallCheckbox" onchange="//on_toggle_wall(event);">
+					<div id="wall" style="display:none;">
+						<input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall(event);">
 						<label title="make tile an impassible wall" for="wallCheckbox">
 							<!-- <i id="wallCheckboxIcon" class="material-icons">border_clear</i> -->
 							wall
 						</label>
 					</div>
-					<div id="dialog" style="/*display:none;*/">
+					<div id="dialog" style="display:none;">
 						<span style="/*float:left;*/">
 							dialog
 						</span>
-						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea" onkeydown="//on_change_dialog();" onkeyup="//on_change_dialog();" onchange="//on_change_dialog();"></textarea>
+						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"></textarea>
 					</div>
 
 				</div> <!-- innerGap -->
