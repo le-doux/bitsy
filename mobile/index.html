@@ -59,6 +59,9 @@ X font size issue (currently fixed by making it big?)
 BUGS
 X can't drag to delete tiles
 X drag also moves player
+- sprite / tile select doesn't update on add / delete
+- tile add / delete doesn't seem to work right?
+- add / delete shouldn't be visible on avatar
 
 Random thoughts
 - title on EVERY room?
@@ -714,6 +717,7 @@ function on_paint_avatar() {
 
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:none;");
+	document.getElementById("paintCommands").setAttribute("style","display:none;");
 }
 function on_paint_tile() {
 	paint_paintMode = TileType.Tile;
@@ -739,6 +743,7 @@ function on_paint_tile() {
 
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:block;");
+	document.getElementById("paintCommands").setAttribute("style","display:block;");
 }
 function on_paint_sprite() {
 	paint_paintMode = TileType.Sprite;
@@ -769,6 +774,7 @@ function on_paint_sprite() {
 
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
+	document.getElementById("paintCommands").setAttribute("style","display:block;");
 }
 
 // TODO: these need to go into CORE code
@@ -1207,6 +1213,228 @@ function nextAvailableDialogId(prefix) {
 	return id;
 }
 
+function newDrawing() {
+	if (paintMode == TileType.Tile) {
+		newTile();
+	}
+	else if( paintMode == TileType.Avatar || paintMode == TileType.Sprite ) {
+		newSprite();
+	}
+	// else if( paintMode == TileType.Item ) {
+	// 	newItem();
+	// }
+	// addPaintThumbnail( drawingId );
+	// changePaintExplorerSelection( drawingId );
+	// document.getElementById("paintExplorerFilterInput").value = "";
+	// refreshPaintExplorer( true /*doKeepOldThumbnails*/, document.getElementById("paintExplorerFilterInput").value /*filterString*/, true /*skipRenderStep*/ ); // this is a bit hacky feeling
+}
+
+function newTile(id) {
+	if (id)
+		paint_drawingId = id; //this optional parameter lets me override the default next id
+	else
+		paint_drawingId = nextTileId();
+
+	makeTile(paint_drawingId);
+	reloadTile(); //hack for ui consistency (hack x 2: order matters for animated tiles)
+
+	drawPaintCanvas();
+	refreshGameData();
+
+	tileIndex = Object.keys(tile).length - 1;
+}
+
+function newSprite(id) {
+	if (id)
+		paint_drawingId = id; //this optional parameter lets me override the default next id
+	else
+		paint_drawingId = nextSpriteId();
+
+	makeSprite(paint_drawingId);
+	reloadSprite(); //hack (order matters for animated tiles)
+
+	drawPaintCanvas();
+	refreshGameData();
+
+	spriteIndex = Object.keys(sprite).length - 1;
+}
+
+/* UNIQUE ID METHODS */ // TODO - lots of duplicated code around stuff (ex: all these things with IDs)
+function nextTileId() {
+	return nextObjectId( sortedTileIdList() );
+}
+
+function nextSpriteId() {
+	return nextObjectId( sortedSpriteIdList() );
+}
+
+// function nextItemId() {
+// 	return nextObjectId( sortedItemIdList() );
+// }
+
+// function nextRoomId() {
+// 	return nextObjectId( sortedRoomIdList() );
+// }
+
+// function nextEndingId() {
+// 	return nextObjectId( sortedEndingIdList() );
+// }
+
+// function nextPaletteId() {
+// 	return nextObjectId( sortedPaletteIdList() );
+// }
+
+function nextObjectId(idList) {
+	var lastId = idList[ idList.length - 1 ];
+	var idInt = parseInt( lastId, 36 );
+	idInt++;
+	return idInt.toString(36);
+}
+
+function makeTile(id,imageData) {
+	var drwId = "TIL_" + id;
+	tile[id] = {
+		drw : drwId,
+		col : 1,
+		animation : { //todo
+			isAnimated : (!imageData) ? false : (imageData.length>1),
+			frameIndex : 0,
+			frameCount : (!imageData) ? 2 : imageData.length
+		},
+		name : null
+	};
+	makeDrawing(drwId,imageData);
+}
+
+function makeSprite(id,imageData) {
+	var drwId = "SPR_" + id;
+	sprite[id] = { //todo create default sprite creation method
+		drw : drwId,
+		col : 2,
+		room : null,
+		x : -1,
+		y : -1,
+		animation : { //todo
+			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
+			frameIndex : 0,
+			frameCount : (!imageData) ? 2 : imageData.length
+		},
+		dlg : null,
+		name : null
+	};
+	makeDrawing(drwId,imageData);
+}
+
+// function makeItem(id,imageData) {
+// 	var drwId = "ITM_" + id;
+// 	item[id] = { //todo create default item creation method
+// 		drw : drwId,
+// 		col : 2,
+// 		animation : { //todo
+// 			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
+// 			frameIndex : 0,
+// 			frameCount : (!imageData) ? 2 : imageData.length
+// 		},
+// 		dlg : null,
+// 		name : null
+// 	};
+// 	makeDrawing(drwId,imageData);
+// }
+
+// function makeItem(id,imageData) { // NOTE : same as tile right now? make more like sprite?
+// 	console.log(id);
+// 	var drwId = "ITM_" + id;
+// 	console.log(drwId);
+// 	item[id] = {
+// 		drw : drwId,
+// 		col : 2, // TODO color not column (bad name)
+// 		animation : { //todo
+// 			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
+// 			frameIndex : 0,
+// 			frameCount : (!imageData) ? 2 : imageData.length
+// 		}
+// 	};
+// 	makeDrawing(drwId,imageData);
+// }
+
+function makeDrawing(id,imageData) {
+	if (!imageData) {
+		imageData = [[
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0]
+		]];
+	}
+	imageStore.source[id] = imageData;
+	renderImages(); //todo is this the right place for this?
+}
+
+function deleteDrawing() {
+	// if ( confirm("Are you sure you want to delete this drawing?") ) {
+		// deletePaintThumbnail( drawingId );
+		if (paintMode == TileType.Tile) {
+			if ( Object.keys( tile ).length <= 1 ) { /*alert("You can't delete your last tile!");*/ return; }
+			delete tile[ paint_drawingId ];
+			findAndReplaceTileInAllRooms( paint_drawingId, "0" );
+			refreshGameData();
+			renderImages();
+			drawEditMap();
+			// nextTile();
+			on_paint_tile();
+		}
+		else if( paintMode == TileType.Avatar || paintMode == TileType.Sprite ){
+			if ( Object.keys( sprite ).length <= 2 ) { /*alert("You can't delete your last sprite!");*/ return; }
+
+			// todo: share with items
+			var dlgId = sprite[ paint_drawingId ].dlg == null ? paint_drawingId : sprite[ paint_drawingId ].dlg;
+			if( dlgId && dialog[ dlgId ] )
+				delete dialog[ dlgId ];
+
+			delete sprite[ paint_drawingId ];
+
+			refreshGameData();
+			renderImages();
+			drawEditMap();
+			// nextSprite();
+			on_paint_sprite();
+		}
+		// else if( paintMode == TileType.Item ){
+		// 	if ( Object.keys( item ).length <= 1 ) { alert("You can't delete your last item!"); return; }
+
+		// 	var dlgId = item[ drawingId ].dlg;
+		// 	if( dlgId && dialog[ dlgId ] )
+		// 		delete dialog[ dlgId ];
+
+		// 	delete item[ drawingId ];
+
+		// 	removeAllItems( drawingId );
+		// 	refreshGameData();
+		// 	renderImages();
+		// 	drawEditMap();
+		// 	nextItem();
+		// 	updateInventoryItemUI();
+		// }
+		// changePaintExplorerSelection( drawingId );
+	// }
+}
+
+function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
+	for (roomId in room) {
+		for (y in room[roomId].tilemap) {
+			for (x in room[roomId].tilemap[y]) {
+				if (room[roomId].tilemap[y][x] === findTile) {
+					room[roomId].tilemap[y][x] = replaceTile;
+				}
+			}
+		}
+	}
+}
+
 </script>
 
 <style>
@@ -1467,9 +1695,23 @@ function nextAvailableDialogId(prefix) {
 							<!-- <i class="material-icons">nature_people</i> -->
 							sprite
 						</label>
-
-						<select id="drawing_select" onchange="paint_onSelectDrawing(event);" style="display: none;"></select>
 					</form>
+
+					<select id="drawing_select" onchange="paint_onSelectDrawing(event);" style="display: none;"></select>
+
+					<div id="paintCommands" class="buttonGroup" style="display:none;">
+						<button title="add drawing" class="color0" onclick="newDrawing();">
+							<!-- <i class="material-icons">add</i> -->
+							+ add
+						<!-- </button>
+						<button title="duplicate drawing" class="color0" onclick="duplicateDrawing();">
+							<i class="material-icons">content_copy</i>
+						</button> -->
+						<button title="delete drawing" class="color0" onclick="deleteDrawing();">
+							<!-- <i class="material-icons">remove_circle</i> -->
+							- delete
+						</button>
+					</div>
 
 					<div id="wall" style="display:none;">
 						<input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall(event);">
