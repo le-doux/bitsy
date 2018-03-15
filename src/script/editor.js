@@ -229,6 +229,7 @@ first bitsy tweet: https://twitter.com/adamledoux/status/787434344776241153
 /*
 NOTES
 - remember to run chrome like this to test "open /Applications/Google\ Chrome.app --args --allow-file-access-from-files"
+- useful for icon conversions: https://iconverticons.com/online/
 */
 
 /* MODES */

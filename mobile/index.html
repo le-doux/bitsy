@@ -44,24 +44,24 @@ X host somewhere
 X title
 X select tile / avatar / sprite
 X edit map
-- paint panel
+X paint panel
 	X dialog
 	X wall
-	- add
-	- delete
+	X add
+	X delete
 X fix layout issues
 - zoom
 X figure out localhost -> mobile dev cycle
-- fix color picker
+X fix color picker
 - fix color slider
 X font size issue (currently fixed by making it big?)
 
 BUGS
 X can't drag to delete tiles
 X drag also moves player
-- sprite / tile select doesn't update on add / delete
-- tile add / delete doesn't seem to work right?
-- add / delete shouldn't be visible on avatar
+X sprite / tile select doesn't update on add / delete
+X tile add / delete doesn't seem to work right?
+X add / delete shouldn't be visible on avatar
 
 Random thoughts
 - title on EVERY room?
@@ -1214,10 +1214,10 @@ function nextAvailableDialogId(prefix) {
 }
 
 function newDrawing() {
-	if (paintMode == TileType.Tile) {
+	if ( paint_paintMode == TileType.Tile ) {
 		newTile();
 	}
-	else if( paintMode == TileType.Avatar || paintMode == TileType.Sprite ) {
+	else if( paint_paintMode == TileType.Avatar || paint_paintMode == TileType.Sprite ) {
 		newSprite();
 	}
 	// else if( paintMode == TileType.Item ) {
