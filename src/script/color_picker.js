@@ -219,17 +219,20 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 	function pickColorTouchMove(e) {
 		// console.log(e.touches[0]);
+		// e.preventDefault();
 		pickColor(e.touches[0], true);
 	}
 
 	function pickColorTouchStart(e) {
 		// console.log(e.touches[0]);
+		e.preventDefault();
 		pickColorStart(e.touches[0]);
 	}
 
 	function pickColorTouchEnd(e) {
 		// console.log(e.touches[0]);
 		// pickColorEnd(e.touches[0]);
+		// e.preventDefault();
 		isMouseDown = false;
 	}
 
