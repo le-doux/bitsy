@@ -232,18 +232,6 @@ NOTES
 - useful for icon conversions: https://iconverticons.com/online/
 */
 
-/* MODES */
-var TileType = {
-	Tile : 0,
-	Sprite : 1,
-	Avatar : 2,
-	Item : 3
-};
-var EditMode = {
-	Edit : 0,
-	Play : 1
-};
-
 var editMode = EditMode.Edit;
 
 /* PAINT */
@@ -269,13 +257,6 @@ var roomIndex = 0;
 
 /* ENDINGS */
 var endingIndex = 0;
-
-/* PALETTES */
-var paletteIndex = 0;
-function selectedColorPal() {
-	return sortedPaletteIdList()[ paletteIndex ];
-};
-// var drawingPal = "0";
 
 /* BROWSER COMPATIBILITY */
 var browserFeatures = {
@@ -555,7 +536,7 @@ function setDefaultGameState() {
 	isCurDrawingAnimated = false;
 	//default values
 	title = "Write your game's title here";
-	paletteIndex = 0;
+	EditorState.paletteIndex = 0;
 	palette[ selectedColorPal() ] = {
 		name : null,
 		colors : 
@@ -1304,18 +1285,6 @@ function removeAllItems( id ) {
 	}
 }
 
-function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
-	for (roomId in room) {
-		for (y in room[roomId].tilemap) {
-			for (x in room[roomId].tilemap[y]) {
-				if (room[roomId].tilemap[y][x] === findTile) {
-					room[roomId].tilemap[y][x] = replaceTile;
-				}
-			}
-		}
-	}
-}
-
 function updateAnimationUI() {
 	//todo
 }
@@ -1506,66 +1475,6 @@ function reloadItem() {
 	// update paint canvas
 	drawPaintCanvas();
 
-}
-
-/* UNIQUE ID METHODS */ // TODO - lots of duplicated code around stuff (ex: all these things with IDs)
-function nextTileId() {
-	return nextObjectId( sortedTileIdList() );
-}
-
-function nextSpriteId() {
-	return nextObjectId( sortedSpriteIdList() );
-}
-
-function nextItemId() {
-	return nextObjectId( sortedItemIdList() );
-}
-
-function nextRoomId() {
-	return nextObjectId( sortedRoomIdList() );
-}
-
-function nextEndingId() {
-	return nextObjectId( sortedEndingIdList() );
-}
-
-function nextPaletteId() {
-	return nextObjectId( sortedPaletteIdList() );
-}
-
-function nextObjectId(idList) {
-	var lastId = idList[ idList.length - 1 ];
-	var idInt = parseInt( lastId, 36 );
-	idInt++;
-	return idInt.toString(36);
-}
-
-function sortedTileIdList() {
-	return sortedBase36IdList( tile );
-}
-
-function sortedSpriteIdList() {
-	return sortedBase36IdList( sprite );
-}
-
-function sortedItemIdList() {
-	return sortedBase36IdList( item );
-}
-
-function sortedRoomIdList() {
-	return sortedBase36IdList( room );
-}
-
-function sortedEndingIdList() {
-	return sortedBase36IdList( ending );
-}
-
-function sortedPaletteIdList() {
-	return sortedBase36IdList( palette );
-}
-
-function sortedBase36IdList( objHolder ) {
-	return Object.keys( objHolder ).sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
 }
 
 var isDragAddingTiles = false;
@@ -1947,89 +1856,6 @@ function curDrawingAltFrameData() {
 	return imageStore.source[ imgId ][ frameIndex ];
 }
 
-function makeTile(id,imageData) {
-	var drwId = "TIL_" + id;
-	tile[id] = {
-		drw : drwId,
-		col : 1,
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1),
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : imageData.length
-		},
-		name : null
-	};
-	makeDrawing(drwId,imageData);
-}
-
-function makeSprite(id,imageData) {
-	var drwId = "SPR_" + id;
-	sprite[id] = { //todo create default sprite creation method
-		drw : drwId,
-		col : 2,
-		room : null,
-		x : -1,
-		y : -1,
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : imageData.length
-		},
-		dlg : null,
-		name : null
-	};
-	makeDrawing(drwId,imageData);
-}
-
-function makeItem(id,imageData) {
-	var drwId = "ITM_" + id;
-	item[id] = { //todo create default item creation method
-		drw : drwId,
-		col : 2,
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : imageData.length
-		},
-		dlg : null,
-		name : null
-	};
-	makeDrawing(drwId,imageData);
-}
-
-function makeItem(id,imageData) { // NOTE : same as tile right now? make more like sprite?
-	console.log(id);
-	var drwId = "ITM_" + id;
-	console.log(drwId);
-	item[id] = {
-		drw : drwId,
-		col : 2, // TODO color not column (bad name)
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : imageData.length
-		}
-	};
-	makeDrawing(drwId,imageData);
-}
-
-function makeDrawing(id,imageData) {
-	if (!imageData) {
-		imageData = [[
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0]
-		]];
-	}
-	imageStore.source[id] = imageData;
-	renderImages(); //todo is this the right place for this?
-}
-
 function newGameDialog() {
 	if ( confirm("Starting a new game will erase your old data. Consider exporting your work first! Are you sure you want to start over?") ) {
 		resetGameData();
@@ -2319,8 +2145,8 @@ function updatePaletteControlsFromGameData() {
 
 function prevPalette() {
 	// update index
-	paletteIndex = (paletteIndex - 1);
-	if (paletteIndex < 0) paletteIndex = Object.keys(palette).length - 1;
+	EditorState.paletteIndex = (EditorState.paletteIndex - 1);
+	if (EditorState.paletteIndex < 0) EditorState.paletteIndex = Object.keys(palette).length - 1;
 
 	// change the UI
 	updatePaletteUI();
@@ -2328,8 +2154,8 @@ function prevPalette() {
 
 function nextPalette() {
 	// update index
-	paletteIndex = (paletteIndex + 1);
-	if (paletteIndex >= Object.keys(palette).length) paletteIndex = 0;
+	EditorState.paletteIndex = (EditorState.paletteIndex + 1);
+	if (EditorState.paletteIndex >= Object.keys(palette).length) EditorState.paletteIndex = 0;
 
 	// change the UI
 	updatePaletteUI();
@@ -2348,7 +2174,7 @@ function newPalette() {
 	refreshGameData();
 
 	// change the UI
-	paletteIndex = Object.keys(palette).length - 1;
+	EditorState.paletteIndex = Object.keys(palette).length - 1;
 	updatePaletteUI();
 }
 
@@ -2792,17 +2618,6 @@ function getCurPaintModeStr() {
 	else if(paintMode == TileType.Tile) {
 		return "tile";
 	}
-}
-
-function nextAvailableDialogId(prefix) {
-	if(prefix === undefined || prefix === null) prefix = "";
-	var i = 0;
-	var id = prefix + i.toString(36);
-	while( dialog[id] != null ) {
-		i++;
-		id = prefix + i.toString(36);
-	}
-	return id;
 }
 
 function on_change_dialog() {
@@ -3743,19 +3558,6 @@ function removeSelectedEnding() {
 	room[curRoom].endings.splice( room[curRoom].endings.indexOf( selectedEndingTile ), 1 );
 	refreshGameData();
 	setSelectedEnding(null);
-}
-
-function getContrastingColor(palId) {
-	if (!palId) palId = curPal();
-	var hsl = rgbToHsl( getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2] );
-	// console.log(hsl);
-	var lightness = hsl[2];
-	if (lightness > 0.5) {
-		return "#000";
-	}
-	else {
-		return "#fff";
-	}
 }
 
 function getComplimentingColor(palId) {

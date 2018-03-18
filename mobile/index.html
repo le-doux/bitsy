@@ -101,6 +101,8 @@ DEV NOTES:
 /*
 	CORE
 */
+
+// shared
 function start() {
 	attachCanvas( document.getElementById("game") );
 
@@ -135,6 +137,7 @@ function start() {
 	listenMapEditEvents();
 }
 
+// mobile
 function initGameState() {
 	// re-import game data into the engine
 	clearGameData();
@@ -142,27 +145,31 @@ function initGameState() {
 	renderImages();
 }
 
+// mobile
 function initGameStateAndRender() {
 	initGameState();
 	drawEditMap();
 }
 
+// shared
 function on_change_title() {
 	title = document.getElementById("titleText").value;
 	refreshGameData();
 }
 
+// mobile
 function changeTool(e) {
 	Array.from( document.getElementsByClassName("tool") ).map( function(t) { t.style.display = "none"; } );
 	document.getElementById(e.target.value).style.display = "block";
 }
 
+// shared - refactored
 function selectedColorPal() {
 	// TODO HACK
 	return "0";
 };
 
-// hack copy
+// shared - refactored
 var TileType = {
 	Tile : 0,
 	Sprite : 1,
@@ -170,6 +177,7 @@ var TileType = {
 	Item : 3
 };
 
+// mobile
 function mobileOffsetCorrection(off,e,innerSize) {
 	var bounds = e.target.getBoundingClientRect();
 
@@ -199,11 +207,12 @@ function mobileOffsetCorrection(off,e,innerSize) {
 	return off;
 }
 
-// TODO: these need to go into CORE code
+// shared - refactored
 function sortedTileIdList() {
 	return sortedBase36IdList( tile );
 }
 
+// shared - refactored
 function sortedSpriteIdList() {
 	return sortedBase36IdList( sprite );
 }
@@ -224,10 +233,12 @@ function sortedSpriteIdList() {
 // 	return sortedBase36IdList( palette );
 // }
 
+// shared - refactored
 function sortedBase36IdList( objHolder ) {
 	return Object.keys( objHolder ).sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
 }
 
+// shared - refactored
 function getContrastingColor(palId) {
 	if (!palId) palId = curPal();
 	var hsl = rgbToHsl( getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2] );
@@ -241,6 +252,7 @@ function getContrastingColor(palId) {
 	}
 }
 
+// shared - refactored
 function nextAvailableDialogId(prefix) {
 	if(prefix === undefined || prefix === null) prefix = "";
 	var i = 0;
@@ -252,11 +264,13 @@ function nextAvailableDialogId(prefix) {
 	return id;
 }
 
+// shared - refactored
 /* UNIQUE ID METHODS */ // TODO - lots of duplicated code around stuff (ex: all these things with IDs)
 function nextTileId() {
 	return nextObjectId( sortedTileIdList() );
 }
 
+// shared - refactored
 function nextSpriteId() {
 	return nextObjectId( sortedSpriteIdList() );
 }
@@ -277,6 +291,7 @@ function nextSpriteId() {
 // 	return nextObjectId( sortedPaletteIdList() );
 // }
 
+// shared - refactored
 function nextObjectId(idList) {
 	var lastId = idList[ idList.length - 1 ];
 	var idInt = parseInt( lastId, 36 );
@@ -284,6 +299,7 @@ function nextObjectId(idList) {
 	return idInt.toString(36);
 }
 
+// shared - refactored
 function makeTile(id,imageData) {
 	var drwId = "TIL_" + id;
 	tile[id] = {
@@ -299,6 +315,7 @@ function makeTile(id,imageData) {
 	makeDrawing(drwId,imageData);
 }
 
+// shared - refactored
 function makeSprite(id,imageData) {
 	var drwId = "SPR_" + id;
 	sprite[id] = { //todo create default sprite creation method
@@ -350,6 +367,7 @@ function makeSprite(id,imageData) {
 // 	makeDrawing(drwId,imageData);
 // }
 
+// shared - refactored
 function makeDrawing(id,imageData) {
 	if (!imageData) {
 		imageData = [[
@@ -367,6 +385,7 @@ function makeDrawing(id,imageData) {
 	renderImages(); //todo is this the right place for this?
 }
 
+// shared - refactored
 function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
 	for (roomId in room) {
 		for (y in room[roomId].tilemap) {
