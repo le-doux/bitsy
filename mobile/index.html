@@ -154,12 +154,6 @@ function initGameStateAndRender() {
 	drawEditMap();
 }
 
-// shared
-function on_change_title() {
-	title = document.getElementById("titleText").value;
-	refreshGameData();
-}
-
 // mobile
 function changeTool(e) {
 	Array.from( document.getElementsByClassName("tool") ).map( function(t) { t.style.display = "none"; } );
@@ -1526,7 +1520,7 @@ function setDefaultGameState() {
 					<br/><br/>
 
 					title : 
-					<input title="title text for your game" type="text" id="titleText" onchange="on_change_title();" value="Write your game's title here" placeholder="Title">
+					<input title="title text for your game" type="text" id="titleText" onchange="on_change_title(event);" value="Write your game's title here" placeholder="Title">
 
 					<br/><br/>
 

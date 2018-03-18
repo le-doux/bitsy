@@ -191,3 +191,10 @@ function makeDrawing(id,imageData) {
 	imageStore.source[id] = imageData;
 	renderImages(); //todo is this the right place for this?
 }
+
+/* EVENTS */
+function on_change_title(e) {
+	// title = document.getElementById("titleText").value;
+	title = e.target.value;
+	refreshGameData();
+}

@@ -2023,11 +2023,6 @@ function toggleCollisionMap(e) {
 	drawEditMap();
 }
 
-function on_change_title() {
-	title = document.getElementById("titleText").value;
-	refreshGameData();
-}
-
 /* PALETTE STUFF */
 function updatePaletteUI() {
 	// document.getElementById("paletteId").innerHTML = selectedColorPal();
