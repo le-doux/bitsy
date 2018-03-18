@@ -5,9 +5,10 @@
 /* GLOBAL editor state */
 // I'd like to remove as much as possible from this
 function makeEditorState() {
-	return {
+	var state = {
 		paletteIndex : 0
 	};
+	return state;
 };
 
 var defaultEditorState = makeEditorState();

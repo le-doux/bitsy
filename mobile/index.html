@@ -194,6 +194,7 @@ function mobileOffsetCorrection(off,e,innerSize) {
 /* 
 	ROOM
 */
+// shared
 function drawEditMap() {
 	//clear screen
 	ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
@@ -215,6 +216,7 @@ function drawEditMap() {
 	}
 }
 
+// shared
 function togglePlayMode(e) {
 	if (e.target.checked) {
 		on_play_mode();
@@ -225,6 +227,7 @@ function togglePlayMode(e) {
 	// updatePlayModeButton();
 }
 
+// shared
 function on_play_mode() {
 	// isPlayMode = true;
 	unlistenMapEditEvents();
@@ -237,6 +240,7 @@ function on_play_mode() {
 	// }
 }
 
+// shared
 function on_edit_mode() {
 	// isPlayMode = false;
 	stopGame();
@@ -261,10 +265,12 @@ function on_edit_mode() {
 	initGameStateAndRender();
 }
 
+// shared
 // TODO: combine into one object?? curDrawing (for room)
 var paintMode = TileType.Avatar;
 var drawingId = "A";
 
+// shared
 function listenMapEditEvents() {
 	// canvas.addEventListener("mousedown", map_onMouseDown);
 	// canvas.addEventListener("mousemove", map_onMouseMove);
@@ -283,6 +289,7 @@ function listenMapEditEvents() {
 	// 	}, animationTime ); // update animation in map mode
 }
 
+// shared
 function unlistenMapEditEvents() {
 	// canvas.removeEventListener("mousedown", map_onMouseDown);
 	// canvas.removeEventListener("mousemove", map_onMouseMove);
@@ -296,11 +303,14 @@ function unlistenMapEditEvents() {
 	// clearInterval( mapEditAnimationLoop );
 }
 
+// shared
+// TODO : how should I store this state?
 var isDragAddingTiles = false;
 var isDragDeletingTiles = false;
 // var isDragMovingExit = false;
 // var isDragMovingEnding = false;
 
+// shared
 function map_onMouseDown(e) {
 	var off = getOffset(e);
 
@@ -401,6 +411,7 @@ function map_onMouseDown(e) {
 	}
 }
 
+// shared
 function editTilesOnDrag(e) {
 	console.log("EDIT TILE - add? " + isDragAddingTiles + " delete? " + isDragDeletingTiles);
 
@@ -431,6 +442,7 @@ function editTilesOnDrag(e) {
 	}
 }
 
+// shared
 function map_onMouseMove(e) {
 	// if( selectedExit != null && isDragMovingExit )
 	// {
@@ -465,6 +477,7 @@ function map_onMouseMove(e) {
 		editTilesOnDrag(e);
 }
 
+// shared
 function map_onMouseUp(e) {
 	editTilesOnDrag(e);
 	isDragAddingTiles = false;
@@ -473,6 +486,7 @@ function map_onMouseUp(e) {
 	// isDragMovingEnding = false;
 }
 
+// mobile
 function map_onTouchStart(e) {
 	e.preventDefault();
 	// console.log(e.touches[0]);
@@ -481,12 +495,14 @@ function map_onTouchStart(e) {
 	map_onMouseDown( fakeEvent );
 }
 
+// mobile
 function map_onTouchMove(e) {
 	e.preventDefault();
 	var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 	map_onMouseMove( fakeEvent );
 }
 
+// mobile
 function map_onTouchEnd(e) {
 	e.preventDefault();
 	// var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
@@ -495,6 +511,7 @@ function map_onTouchEnd(e) {
 	isDragDeletingTiles = false;
 }
 
+// shared
 // TODO: these need to be specialized for ROOM and PAINT tools
 function on_room_paint_avatar() {
 	paintMode = TileType.Avatar;
@@ -609,6 +626,7 @@ function on_room_paint_sprite() {
 	}
 }
 
+// mobile
 function room_onSelectDrawing(e) {
 	drawingId = e.target.value;
 }
