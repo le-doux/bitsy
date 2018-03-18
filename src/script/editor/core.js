@@ -2,7 +2,8 @@
 	CORE 
 */
 
-// Global editor state - I'd like to remove as much as possible from this
+/* GLOBAL editor state */
+// I'd like to remove as much as possible from this
 function makeEditorState() {
 	return {
 		paletteIndex : 0
@@ -27,6 +28,12 @@ var EditMode = {
 	Play : 1
 };
 
+// TODO : use this to specialize code
+var PlatformType = {
+	Desktop : 0,
+	Mobile : 1
+};
+
 function defParam(param,value) {
 	return (param == undefined || param == null) ? value : param;
 };
@@ -37,7 +44,8 @@ function selectedColorPal(editor) {
 	return sortedPaletteIdList()[ editor.paletteIndex ];
 };
 
-/* UNIQUE ID METHODS */ // TODO - lots of duplicated code around stuff (ex: all these things with IDs)
+/* UNIQUE ID METHODS */
+// TODO - lots of duplicated code around stuff (ex: all these things with IDs)
 function nextTileId() {
 	return nextObjectId( sortedTileIdList() );
 }
