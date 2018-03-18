@@ -3,8 +3,15 @@
 */
 
 // Global editor state - I'd like to remove as much as possible from this
-var EditorState = {
-	paletteIndex : 0
+function makeEditorState() {
+	return {
+		paletteIndex : 0
+	};
+};
+
+var defaultEditorState = makeEditorState();
+function Ed() {
+	return defaultEditorState;
 };
 
 /* MODES */
@@ -20,9 +27,14 @@ var EditMode = {
 	Play : 1
 };
 
+function defParam(param,value) {
+	return (param == undefined || param == null) ? value : param;
+};
+
 /* PALETTES */
-function selectedColorPal() {
-	return sortedPaletteIdList()[ EditorState.paletteIndex ];
+function selectedColorPal(editor) {
+	editor = defParam( editor, Ed() );
+	return sortedPaletteIdList()[ editor.paletteIndex ];
 };
 
 /* UNIQUE ID METHODS */ // TODO - lots of duplicated code around stuff (ex: all these things with IDs)

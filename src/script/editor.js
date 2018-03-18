@@ -536,7 +536,7 @@ function setDefaultGameState() {
 	isCurDrawingAnimated = false;
 	//default values
 	title = "Write your game's title here";
-	EditorState.paletteIndex = 0;
+	Ed().paletteIndex = 0;
 	palette[ selectedColorPal() ] = {
 		name : null,
 		colors : 
@@ -2140,8 +2140,8 @@ function updatePaletteControlsFromGameData() {
 
 function prevPalette() {
 	// update index
-	EditorState.paletteIndex = (EditorState.paletteIndex - 1);
-	if (EditorState.paletteIndex < 0) EditorState.paletteIndex = Object.keys(palette).length - 1;
+	Ed().paletteIndex = (Ed().paletteIndex - 1);
+	if (Ed().paletteIndex < 0) Ed().paletteIndex = Object.keys(palette).length - 1;
 
 	// change the UI
 	updatePaletteUI();
@@ -2149,8 +2149,8 @@ function prevPalette() {
 
 function nextPalette() {
 	// update index
-	EditorState.paletteIndex = (EditorState.paletteIndex + 1);
-	if (EditorState.paletteIndex >= Object.keys(palette).length) EditorState.paletteIndex = 0;
+	Ed().paletteIndex = (Ed().paletteIndex + 1);
+	if (Ed().paletteIndex >= Object.keys(palette).length) Ed().paletteIndex = 0;
 
 	// change the UI
 	updatePaletteUI();
@@ -2169,7 +2169,7 @@ function newPalette() {
 	refreshGameData();
 
 	// change the UI
-	EditorState.paletteIndex = Object.keys(palette).length - 1;
+	Ed().paletteIndex = Object.keys(palette).length - 1;
 	updatePaletteUI();
 }
 
