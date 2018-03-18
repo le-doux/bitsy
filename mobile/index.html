@@ -89,6 +89,8 @@ Shared code plan:
 - componetization? (data-oriented or object-oriented? or?)
 - also: componentize parser code
 
+BUG: convert ’ -> ' in dialog
+
 DEV NOTES:
 - debug with safari
 	- host on localhost with: python -m SimpleHTTPServer
@@ -96,6 +98,9 @@ DEV NOTES:
 	- connect on iphone via: ip.address:8000/mobile
 */
 
+/*
+	CORE
+*/
 function start() {
 	attachCanvas( document.getElementById("game") );
 
@@ -130,11 +135,6 @@ function start() {
 	listenMapEditEvents();
 }
 
-function editGameData() {
-	initGameStateAndRender();
-	localStorage.game_data = document.getElementById("game_data").value;
-}
-
 function initGameState() {
 	// re-import game data into the engine
 	clearGameData();
@@ -142,6 +142,247 @@ function initGameState() {
 	renderImages();
 }
 
+function initGameStateAndRender() {
+	initGameState();
+	drawEditMap();
+}
+
+function on_change_title() {
+	title = document.getElementById("titleText").value;
+	refreshGameData();
+}
+
+function changeTool(e) {
+	Array.from( document.getElementsByClassName("tool") ).map( function(t) { t.style.display = "none"; } );
+	document.getElementById(e.target.value).style.display = "block";
+}
+
+function selectedColorPal() {
+	// TODO HACK
+	return "0";
+};
+
+// hack copy
+var TileType = {
+	Tile : 0,
+	Sprite : 1,
+	Avatar : 2,
+	Item : 3
+};
+
+function mobileOffsetCorrection(off,e,innerSize) {
+	var bounds = e.target.getBoundingClientRect();
+
+	// var width = bounds.width * containerRatio;
+	// var height = bounds.height * containerRatio;
+
+	// correction for square canvas contained in rect
+	if( bounds.width > bounds.height ) {
+		off.x -= (bounds.width - bounds.height) / 2;
+	}
+	else if( bounds.height > bounds.width ) {
+		off.y -= (bounds.height - bounds.width) / 2;
+	}
+
+	console.log(off);
+
+	// convert container size to internal canvas size
+	var containerRatio = innerSize / Math.min( bounds.width, bounds.height );
+
+	console.log(containerRatio);
+
+	off.x *= containerRatio;
+	off.y *= containerRatio;
+
+	console.log(off);
+
+	return off;
+}
+
+// TODO: these need to go into CORE code
+function sortedTileIdList() {
+	return sortedBase36IdList( tile );
+}
+
+function sortedSpriteIdList() {
+	return sortedBase36IdList( sprite );
+}
+
+// function sortedItemIdList() {
+// 	return sortedBase36IdList( item );
+// }
+
+// function sortedRoomIdList() {
+// 	return sortedBase36IdList( room );
+// }
+
+// function sortedEndingIdList() {
+// 	return sortedBase36IdList( ending );
+// }
+
+// function sortedPaletteIdList() {
+// 	return sortedBase36IdList( palette );
+// }
+
+function sortedBase36IdList( objHolder ) {
+	return Object.keys( objHolder ).sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
+}
+
+function getContrastingColor(palId) {
+	if (!palId) palId = curPal();
+	var hsl = rgbToHsl( getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2] );
+	// console.log(hsl);
+	var lightness = hsl[2];
+	if (lightness > 0.5) {
+		return "#000";
+	}
+	else {
+		return "#fff";
+	}
+}
+
+function nextAvailableDialogId(prefix) {
+	if(prefix === undefined || prefix === null) prefix = "";
+	var i = 0;
+	var id = prefix + i.toString(36);
+	while( dialog[id] != null ) {
+		i++;
+		id = prefix + i.toString(36);
+	}
+	return id;
+}
+
+/* UNIQUE ID METHODS */ // TODO - lots of duplicated code around stuff (ex: all these things with IDs)
+function nextTileId() {
+	return nextObjectId( sortedTileIdList() );
+}
+
+function nextSpriteId() {
+	return nextObjectId( sortedSpriteIdList() );
+}
+
+// function nextItemId() {
+// 	return nextObjectId( sortedItemIdList() );
+// }
+
+// function nextRoomId() {
+// 	return nextObjectId( sortedRoomIdList() );
+// }
+
+// function nextEndingId() {
+// 	return nextObjectId( sortedEndingIdList() );
+// }
+
+// function nextPaletteId() {
+// 	return nextObjectId( sortedPaletteIdList() );
+// }
+
+function nextObjectId(idList) {
+	var lastId = idList[ idList.length - 1 ];
+	var idInt = parseInt( lastId, 36 );
+	idInt++;
+	return idInt.toString(36);
+}
+
+function makeTile(id,imageData) {
+	var drwId = "TIL_" + id;
+	tile[id] = {
+		drw : drwId,
+		col : 1,
+		animation : { //todo
+			isAnimated : (!imageData) ? false : (imageData.length>1),
+			frameIndex : 0,
+			frameCount : (!imageData) ? 2 : imageData.length
+		},
+		name : null
+	};
+	makeDrawing(drwId,imageData);
+}
+
+function makeSprite(id,imageData) {
+	var drwId = "SPR_" + id;
+	sprite[id] = { //todo create default sprite creation method
+		drw : drwId,
+		col : 2,
+		room : null,
+		x : -1,
+		y : -1,
+		animation : { //todo
+			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
+			frameIndex : 0,
+			frameCount : (!imageData) ? 2 : imageData.length
+		},
+		dlg : null,
+		name : null
+	};
+	makeDrawing(drwId,imageData);
+}
+
+// function makeItem(id,imageData) {
+// 	var drwId = "ITM_" + id;
+// 	item[id] = { //todo create default item creation method
+// 		drw : drwId,
+// 		col : 2,
+// 		animation : { //todo
+// 			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
+// 			frameIndex : 0,
+// 			frameCount : (!imageData) ? 2 : imageData.length
+// 		},
+// 		dlg : null,
+// 		name : null
+// 	};
+// 	makeDrawing(drwId,imageData);
+// }
+
+// function makeItem(id,imageData) { // NOTE : same as tile right now? make more like sprite?
+// 	console.log(id);
+// 	var drwId = "ITM_" + id;
+// 	console.log(drwId);
+// 	item[id] = {
+// 		drw : drwId,
+// 		col : 2, // TODO color not column (bad name)
+// 		animation : { //todo
+// 			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
+// 			frameIndex : 0,
+// 			frameCount : (!imageData) ? 2 : imageData.length
+// 		}
+// 	};
+// 	makeDrawing(drwId,imageData);
+// }
+
+function makeDrawing(id,imageData) {
+	if (!imageData) {
+		imageData = [[
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0]
+		]];
+	}
+	imageStore.source[id] = imageData;
+	renderImages(); //todo is this the right place for this?
+}
+
+function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
+	for (roomId in room) {
+		for (y in room[roomId].tilemap) {
+			for (x in room[roomId].tilemap[y]) {
+				if (room[roomId].tilemap[y][x] === findTile) {
+					room[roomId].tilemap[y][x] = replaceTile;
+				}
+			}
+		}
+	}
+}
+
+
+/* 
+	ROOM
+*/
 function drawEditMap() {
 	//clear screen
 	ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
@@ -161,11 +402,6 @@ function drawEditMap() {
 			ctx.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
 		}
 	}
-}
-
-function initGameStateAndRender() {
-	initGameState();
-	drawEditMap();
 }
 
 function togglePlayMode(e) {
@@ -214,127 +450,6 @@ function on_edit_mode() {
 	initGameStateAndRender();
 }
 
-function changeTool(e) {
-	Array.from( document.getElementsByClassName("tool") ).map( function(t) { t.style.display = "none"; } );
-	document.getElementById(e.target.value).style.display = "block";
-}
-
-function on_change_title() {
-	title = document.getElementById("titleText").value;
-	refreshGameData();
-}
-
-function refreshGameData() {
-	// if (isPlayMode) return; //never store game data while in playmode (TODO: wouldn't be necessary if the game data was decoupled form editor data)
-
-	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
-	var gameData = serializeWorld();
-	//console.log("refresh!");
-	//console.log(gameData);
-	document.getElementById("game_data").value = gameData;
-	localStorage.setItem("game_data", gameData); //auto-save
-}
-
-function newGameDialog() {
-	// if ( confirm("Starting a new game will erase your old data. Consider exporting your work first! Are you sure you want to start over?") ) {
-		resetGameData();
-	// }
-}
-
-function resetGameData() {
-	setDefaultGameState();
-
-	// // todo wrap these variable resets in a function
-	// tileIndex = 0;
-	// spriteIndex = 0;
-
-	// refreshGameData();
-	// renderImages();
-	// drawPaintCanvas();
-	// drawEditMap();
-	// updatePaletteUI();
-	// // updatePaletteControlsFromGameData();
-	// updateExitOptionsFromGameData();
-	// updateRoomName();
-	// updateInventoryUI();
-
-	// on_paint_avatar();
-	// document.getElementById('paintOptionAvatar').checked = true;
-
-	initGameStateAndRender();
-	updateColorPickerUI();
-}
-
-function setDefaultGameState() {
-	// trying new way to get default game data
-	document.getElementById("game_data").value = document.getElementById("defaultGameData").text.slice(1);
-	localStorage.game_data = document.getElementById("game_data").value;
-}
-
-var colorPicker = null; // new color picker
-var colorPickerIndex = 0;
-var colorPaletteLabels = ["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"];
-
-function changeColorPickerIndex(index) {
-	colorPickerIndex = index;
-	var color = getPal(selectedColorPal())[ index ];
-	console.log(color);
-	colorPicker.setColor( color[0], color[1], color[2] );
-}
-
-function updateColorPickerLabel(index, r, g, b) {
-	var rgbColor = {r:r, g:g, b:b};
-
-	var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
-	var hsvColor = RGBtoHSV( rgbColor );
-	document.getElementById( colorPaletteLabels[ index ] ).style.background = rgbColorStr;
-	document.getElementById( colorPaletteLabels[ index ] ).style.color = hsvColor.v < 0.5 ? "white" : "black";
-}
-
-function onColorPickerChange( rgbColor, isMouseUp ) {
-	getPal(selectedColorPal())[ colorPickerIndex ][ 0 ] = rgbColor.r;
-	getPal(selectedColorPal())[ colorPickerIndex ][ 1 ] = rgbColor.g;
-	getPal(selectedColorPal())[ colorPickerIndex ][ 2 ] = rgbColor.b;
-
-	updateColorPickerLabel(colorPickerIndex, rgbColor.r, rgbColor.g, rgbColor.b );
-
-	if( isMouseUp ) {
-		// refreshGameData();
-		// renderImages();
-		// drawPaintCanvas();
-		// drawEditMap();
-		// refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
-		// if( isCurDrawingAnimated )
-		// 	renderAnimationPreview( drawingId );
-
-		refreshGameData();
-		initGameStateAndRender();
-	}
-}
-
-function updateColorPickerUI() {
-	var color0 = getPal(selectedColorPal())[ 0 ];
-	var color1 = getPal(selectedColorPal())[ 1 ];
-	var color2 = getPal(selectedColorPal())[ 2 ];
-
-	updateColorPickerLabel(0, color0[0], color0[1], color0[2] );
-	updateColorPickerLabel(1, color1[0], color1[1], color1[2] );
-	updateColorPickerLabel(2, color2[0], color2[1], color2[2] );
-
-	changeColorPickerIndex( colorPickerIndex );
-}
-
-function selectedColorPal() {
-	return "0"; // TODO HACK
-};
-
-// hack copy
-var TileType = {
-	Tile : 0,
-	Sprite : 1,
-	Avatar : 2,
-	Item : 3
-};
 // TODO: combine into one object?? curDrawing (for room)
 var paintMode = TileType.Avatar;
 var drawingId = "A";
@@ -370,39 +485,11 @@ function unlistenMapEditEvents() {
 	// clearInterval( mapEditAnimationLoop );
 }
 
-function mobileOffsetCorrection(off,e,innerSize) {
-	var bounds = e.target.getBoundingClientRect();
-
-	// var width = bounds.width * containerRatio;
-	// var height = bounds.height * containerRatio;
-
-	// correction for square canvas contained in rect
-	if( bounds.width > bounds.height ) {
-		off.x -= (bounds.width - bounds.height) / 2;
-	}
-	else if( bounds.height > bounds.width ) {
-		off.y -= (bounds.height - bounds.width) / 2;
-	}
-
-	console.log(off);
-
-	// convert container size to internal canvas size
-	var containerRatio = innerSize / Math.min( bounds.width, bounds.height );
-
-	console.log(containerRatio);
-
-	off.x *= containerRatio;
-	off.y *= containerRatio;
-
-	console.log(off);
-
-	return off;
-}
-
 var isDragAddingTiles = false;
 var isDragDeletingTiles = false;
 // var isDragMovingExit = false;
 // var isDragMovingEnding = false;
+
 function map_onMouseDown(e) {
 	var off = getOffset(e);
 
@@ -623,6 +710,7 @@ function on_room_paint_avatar() {
 	var selectDrawing = document.getElementById("drawing_select");
 	selectDrawing.style.display = "none";
 }
+
 function on_room_paint_tile() {
 	paintMode = TileType.Tile;
 	tileIndex = 0;
@@ -660,6 +748,7 @@ function on_room_paint_tile() {
 		selectDrawing.add(option);
 	}
 }
+
 function on_room_paint_sprite() {
 	paintMode = TileType.Sprite;
 	if (sortedSpriteIdList().length > 1)
@@ -709,7 +798,14 @@ function on_room_paint_sprite() {
 	}
 }
 
-// TODO: these need to be specialized for ROOM and PAINT tools
+function room_onSelectDrawing(e) {
+	drawingId = e.target.value;
+}
+
+
+/* 
+	PAINT 
+*/
 function on_paint_avatar() {
 	paint_paintMode = TileType.Avatar;
 	paint_drawingId = "A";
@@ -724,6 +820,7 @@ function on_paint_avatar() {
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintCommands").setAttribute("style","display:none;");
 }
+
 function on_paint_tile() {
 	paint_paintMode = TileType.Tile;
 	paint_drawingId = sortedTileIdList()[0];
@@ -750,6 +847,7 @@ function on_paint_tile() {
 	document.getElementById("wall").setAttribute("style","display:block;");
 	document.getElementById("paintCommands").setAttribute("style","display:block;");
 }
+
 function on_paint_sprite() {
 	paint_paintMode = TileType.Sprite;
 	paint_drawingId = sortedSpriteIdList()[sortedSpriteIdList().length > 1 ? 1 : 0];
@@ -782,38 +880,6 @@ function on_paint_sprite() {
 	document.getElementById("paintCommands").setAttribute("style","display:block;");
 }
 
-// TODO: these need to go into CORE code
-function sortedTileIdList() {
-	return sortedBase36IdList( tile );
-}
-
-function sortedSpriteIdList() {
-	return sortedBase36IdList( sprite );
-}
-
-// function sortedItemIdList() {
-// 	return sortedBase36IdList( item );
-// }
-
-// function sortedRoomIdList() {
-// 	return sortedBase36IdList( room );
-// }
-
-// function sortedEndingIdList() {
-// 	return sortedBase36IdList( ending );
-// }
-
-// function sortedPaletteIdList() {
-// 	return sortedBase36IdList( palette );
-// }
-
-function sortedBase36IdList( objHolder ) {
-	return Object.keys( objHolder ).sort( function(a,b) { return parseInt(a,36) - parseInt(b,36); } );
-}
-
-function room_onSelectDrawing(e) {
-	drawingId = e.target.value;
-}
 function paint_onSelectDrawing(e) {
 	paint_drawingId = e.target.value;
 	drawPaintCanvas();
@@ -827,7 +893,6 @@ function paint_onSelectDrawing(e) {
 	}
 }
 
-/* PAINT STUFF */
 var paint_paintMode = TileType.Avatar;
 var paint_drawingId = "A";
 
@@ -986,19 +1051,6 @@ function curDrawingImgId() {
 		imgId += "ITM_";
 	imgId += paint_drawingId;
 	return imgId;
-}
-
-function getContrastingColor(palId) {
-	if (!palId) palId = curPal();
-	var hsl = rgbToHsl( getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2] );
-	// console.log(hsl);
-	var lightness = hsl[2];
-	if (lightness > 0.5) {
-		return "#000";
-	}
-	else {
-		return "#fff";
-	}
 }
 
 function reloadTile() {
@@ -1207,17 +1259,6 @@ function getCurPaintObject(id) {
 	}
 }
 
-function nextAvailableDialogId(prefix) {
-	if(prefix === undefined || prefix === null) prefix = "";
-	var i = 0;
-	var id = prefix + i.toString(36);
-	while( dialog[id] != null ) {
-		i++;
-		id = prefix + i.toString(36);
-	}
-	return id;
-}
-
 function newDrawing() {
 	if ( paint_paintMode == TileType.Tile ) {
 		newTile();
@@ -1262,121 +1303,6 @@ function newSprite(id) {
 	refreshGameData();
 
 	spriteIndex = Object.keys(sprite).length - 1;
-}
-
-/* UNIQUE ID METHODS */ // TODO - lots of duplicated code around stuff (ex: all these things with IDs)
-function nextTileId() {
-	return nextObjectId( sortedTileIdList() );
-}
-
-function nextSpriteId() {
-	return nextObjectId( sortedSpriteIdList() );
-}
-
-// function nextItemId() {
-// 	return nextObjectId( sortedItemIdList() );
-// }
-
-// function nextRoomId() {
-// 	return nextObjectId( sortedRoomIdList() );
-// }
-
-// function nextEndingId() {
-// 	return nextObjectId( sortedEndingIdList() );
-// }
-
-// function nextPaletteId() {
-// 	return nextObjectId( sortedPaletteIdList() );
-// }
-
-function nextObjectId(idList) {
-	var lastId = idList[ idList.length - 1 ];
-	var idInt = parseInt( lastId, 36 );
-	idInt++;
-	return idInt.toString(36);
-}
-
-function makeTile(id,imageData) {
-	var drwId = "TIL_" + id;
-	tile[id] = {
-		drw : drwId,
-		col : 1,
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1),
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : imageData.length
-		},
-		name : null
-	};
-	makeDrawing(drwId,imageData);
-}
-
-function makeSprite(id,imageData) {
-	var drwId = "SPR_" + id;
-	sprite[id] = { //todo create default sprite creation method
-		drw : drwId,
-		col : 2,
-		room : null,
-		x : -1,
-		y : -1,
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : imageData.length
-		},
-		dlg : null,
-		name : null
-	};
-	makeDrawing(drwId,imageData);
-}
-
-// function makeItem(id,imageData) {
-// 	var drwId = "ITM_" + id;
-// 	item[id] = { //todo create default item creation method
-// 		drw : drwId,
-// 		col : 2,
-// 		animation : { //todo
-// 			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
-// 			frameIndex : 0,
-// 			frameCount : (!imageData) ? 2 : imageData.length
-// 		},
-// 		dlg : null,
-// 		name : null
-// 	};
-// 	makeDrawing(drwId,imageData);
-// }
-
-// function makeItem(id,imageData) { // NOTE : same as tile right now? make more like sprite?
-// 	console.log(id);
-// 	var drwId = "ITM_" + id;
-// 	console.log(drwId);
-// 	item[id] = {
-// 		drw : drwId,
-// 		col : 2, // TODO color not column (bad name)
-// 		animation : { //todo
-// 			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
-// 			frameIndex : 0,
-// 			frameCount : (!imageData) ? 2 : imageData.length
-// 		}
-// 	};
-// 	makeDrawing(drwId,imageData);
-// }
-
-function makeDrawing(id,imageData) {
-	if (!imageData) {
-		imageData = [[
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0]
-		]];
-	}
-	imageStore.source[id] = imageData;
-	renderImages(); //todo is this the right place for this?
 }
 
 function deleteDrawing() {
@@ -1428,17 +1354,119 @@ function deleteDrawing() {
 	// }
 }
 
-function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
-	for (roomId in room) {
-		for (y in room[roomId].tilemap) {
-			for (x in room[roomId].tilemap[y]) {
-				if (room[roomId].tilemap[y][x] === findTile) {
-					room[roomId].tilemap[y][x] = replaceTile;
-				}
-			}
-		}
+
+/* 
+	COLOR 
+*/
+var colorPicker = null; // new color picker
+var colorPickerIndex = 0;
+var colorPaletteLabels = ["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"];
+
+function changeColorPickerIndex(index) {
+	colorPickerIndex = index;
+	var color = getPal(selectedColorPal())[ index ];
+	console.log(color);
+	colorPicker.setColor( color[0], color[1], color[2] );
+}
+
+function updateColorPickerLabel(index, r, g, b) {
+	var rgbColor = {r:r, g:g, b:b};
+
+	var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
+	var hsvColor = RGBtoHSV( rgbColor );
+	document.getElementById( colorPaletteLabels[ index ] ).style.background = rgbColorStr;
+	document.getElementById( colorPaletteLabels[ index ] ).style.color = hsvColor.v < 0.5 ? "white" : "black";
+}
+
+function onColorPickerChange( rgbColor, isMouseUp ) {
+	getPal(selectedColorPal())[ colorPickerIndex ][ 0 ] = rgbColor.r;
+	getPal(selectedColorPal())[ colorPickerIndex ][ 1 ] = rgbColor.g;
+	getPal(selectedColorPal())[ colorPickerIndex ][ 2 ] = rgbColor.b;
+
+	updateColorPickerLabel(colorPickerIndex, rgbColor.r, rgbColor.g, rgbColor.b );
+
+	if( isMouseUp ) {
+		// refreshGameData();
+		// renderImages();
+		// drawPaintCanvas();
+		// drawEditMap();
+		// refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
+		// if( isCurDrawingAnimated )
+		// 	renderAnimationPreview( drawingId );
+
+		refreshGameData();
+		initGameStateAndRender();
 	}
 }
+
+function updateColorPickerUI() {
+	var color0 = getPal(selectedColorPal())[ 0 ];
+	var color1 = getPal(selectedColorPal())[ 1 ];
+	var color2 = getPal(selectedColorPal())[ 2 ];
+
+	updateColorPickerLabel(0, color0[0], color0[1], color0[2] );
+	updateColorPickerLabel(1, color1[0], color1[1], color1[2] );
+	updateColorPickerLabel(2, color2[0], color2[1], color2[2] );
+
+	changeColorPickerIndex( colorPickerIndex );
+}
+
+
+/* 
+	DATA 
+*/
+function editGameData() {
+	initGameStateAndRender();
+	localStorage.game_data = document.getElementById("game_data").value;
+}
+
+function refreshGameData() {
+	// if (isPlayMode) return; //never store game data while in playmode (TODO: wouldn't be necessary if the game data was decoupled form editor data)
+
+	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
+	var gameData = serializeWorld();
+	//console.log("refresh!");
+	//console.log(gameData);
+	document.getElementById("game_data").value = gameData;
+	localStorage.setItem("game_data", gameData); //auto-save
+}
+
+function newGameDialog() {
+	// if ( confirm("Starting a new game will erase your old data. Consider exporting your work first! Are you sure you want to start over?") ) {
+		resetGameData();
+	// }
+}
+
+function resetGameData() {
+	setDefaultGameState();
+
+	// // todo wrap these variable resets in a function
+	// tileIndex = 0;
+	// spriteIndex = 0;
+
+	// refreshGameData();
+	// renderImages();
+	// drawPaintCanvas();
+	// drawEditMap();
+	// updatePaletteUI();
+	// // updatePaletteControlsFromGameData();
+	// updateExitOptionsFromGameData();
+	// updateRoomName();
+	// updateInventoryUI();
+
+	// on_paint_avatar();
+	// document.getElementById('paintOptionAvatar').checked = true;
+
+	initGameStateAndRender();
+	updateColorPickerUI();
+}
+
+function setDefaultGameState() {
+	// trying new way to get default game data
+	document.getElementById("game_data").value = document.getElementById("defaultGameData").text.slice(1);
+	localStorage.game_data = document.getElementById("game_data").value;
+}
+
 
 </script>
 
