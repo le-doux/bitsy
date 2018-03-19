@@ -2,20 +2,6 @@
 	CORE 
 */
 
-/* GLOBAL editor state */
-// I'd like to remove as much as possible from this
-function makeEditorState() {
-	var state = {
-		paletteIndex : 0
-	};
-	return state;
-};
-
-var defaultEditorState = makeEditorState();
-function Ed() {
-	return defaultEditorState;
-};
-
 /* MODES */
 var TileType = {
 	Tile : 0,
@@ -33,6 +19,18 @@ var EditMode = {
 var PlatformType = {
 	Desktop : 0,
 	Mobile : 1
+};
+
+/* GLOBAL editor state */
+// I'd like to remove as much as possible from this
+function EditorState() {
+	this.paletteIndex = 0;
+	this.platform = PlatformType.Desktop; // default to desktop
+}
+
+var defaultEditorState = new EditorState();
+function Ed() {
+	return defaultEditorState;
 };
 
 function defParam(param,value) {
@@ -218,4 +216,34 @@ function on_change_title(e) {
 	// title = document.getElementById("titleText").value;
 	title = e.target.value;
 	refreshGameData();
+}
+
+/* MOBILE */
+function mobileOffsetCorrection(off,e,innerSize) {
+	var bounds = e.target.getBoundingClientRect();
+
+	// var width = bounds.width * containerRatio;
+	// var height = bounds.height * containerRatio;
+
+	// correction for square canvas contained in rect
+	if( bounds.width > bounds.height ) {
+		off.x -= (bounds.width - bounds.height) / 2;
+	}
+	else if( bounds.height > bounds.width ) {
+		off.y -= (bounds.height - bounds.width) / 2;
+	}
+
+	console.log(off);
+
+	// convert container size to internal canvas size
+	var containerRatio = innerSize / Math.min( bounds.width, bounds.height );
+
+	console.log(containerRatio);
+
+	off.x *= containerRatio;
+	off.y *= containerRatio;
+
+	console.log(off);
+
+	return off;
 }

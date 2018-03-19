@@ -232,15 +232,20 @@ NOTES
 - useful for icon conversions: https://iconverticons.com/online/
 */
 
-var editMode = EditMode.Edit;
+var editMode = EditMode.Edit; // TODO : move to core.js?
+
+/* TOOL CONTROLLERS */
+var roomTool;
 
 /* PAINT */
 var paint_canvas;
 var paint_ctx;
 var paint_scale = 32;
 
-var paintMode = TileType.Avatar;
-var drawingId = "A";
+// var paintMode = TileType.Avatar;
+// var drawingId = "A";
+var drawing = new DrawingId(TileType.Avatar,"A");
+
 var drawPaintGrid = true;
 var curPaintBrush = 0;
 var isPainting = false;
@@ -381,8 +386,12 @@ function start() {
 
 	//game canvas & context (also the map editor)
 	attachCanvas( document.getElementById("game") );
+
 	//map edit events
-	listenMapEditEvents();
+	// listenMapEditEvents();
+	roomTool = new RoomTool(canvas);
+	roomTool.listenEditEvents()
+	roomTool.drawing = drawing; // will this work?
 
 	//paint canvas & context
 	paint_canvas = document.getElementById("paint");
@@ -1483,6 +1492,7 @@ var isDragMovingExit = false;
 var isDragMovingEnding = false;
 function map_onMouseDown(e) {
 	var off = getOffset(e);
+	off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
 	var x = Math.floor( off.x / (tilesize*scale) );
 	var y = Math.floor( off.y / (tilesize*scale) );
 	// console.log(x + " " + y);
@@ -1575,6 +1585,7 @@ function map_onMouseDown(e) {
 
 function editTilesOnDrag(e) {
 	var off = getOffset(e);
+	off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
 	var x = Math.floor(off.x / (tilesize*scale));
 	var y = Math.floor(off.y / (tilesize*scale));
 	// var row = room[curRoom].tilemap[y];
@@ -1965,7 +1976,9 @@ function on_edit_mode() {
 	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
 	curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
 	drawEditMap();
-	listenMapEditEvents();
+
+	// listenMapEditEvents();
+	roomTool.listenEditEvents();
 
 	updateInventoryUI();
 
@@ -1982,7 +1995,10 @@ function on_edit_mode() {
 
 function on_play_mode() {
 	isPlayMode = true;
-	unlistenMapEditEvents();
+
+	// unlistenMapEditEvents();
+	roomTool.unlistenEditEvents();
+
 	load_game(document.getElementById("game_data").value, !isPreviewDialogMode /* startWithTitle */);
 
 	console.log("PLAY!! ~~ PREVIEW ? " + isPreviewDialogMode);

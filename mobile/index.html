@@ -19,6 +19,8 @@
 
 <!-- NEW EDITOR SCRIPTS (WIP) -->
 <script src="../src/script/editor/core.js"></script>
+<script src="../src/script/editor/paint.js"></script>
+<script src="../src/script/editor/room.js"></script>
 
 <!-- EDITOR SCRIPTS -->
 <script src="../src/script/color_picker.js"></script>
@@ -159,37 +161,6 @@ function changeTool(e) {
 	Array.from( document.getElementsByClassName("tool") ).map( function(t) { t.style.display = "none"; } );
 	document.getElementById(e.target.value).style.display = "block";
 }
-
-// mobile
-function mobileOffsetCorrection(off,e,innerSize) {
-	var bounds = e.target.getBoundingClientRect();
-
-	// var width = bounds.width * containerRatio;
-	// var height = bounds.height * containerRatio;
-
-	// correction for square canvas contained in rect
-	if( bounds.width > bounds.height ) {
-		off.x -= (bounds.width - bounds.height) / 2;
-	}
-	else if( bounds.height > bounds.width ) {
-		off.y -= (bounds.height - bounds.width) / 2;
-	}
-
-	console.log(off);
-
-	// convert container size to internal canvas size
-	var containerRatio = innerSize / Math.min( bounds.width, bounds.height );
-
-	console.log(containerRatio);
-
-	off.x *= containerRatio;
-	off.y *= containerRatio;
-
-	console.log(off);
-
-	return off;
-}
-
 
 /* 
 	ROOM
