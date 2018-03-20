@@ -256,7 +256,6 @@ var spriteIndex = 0;
 var itemIndex = 0;
 
 /* ROOM */
-var drawMapGrid = true;
 var roomIndex = 0;
 
 /* ENDINGS */
@@ -454,7 +453,7 @@ function start() {
 	//draw everything
 	on_paint_avatar();
 	drawPaintCanvas();
-	drawEditMap();
+	roomTool.drawEditMap();
 	updateRoomPaletteSelect(); //dumb to have to specify this here --- wrap up room UI method?
 	updateRoomName(); // init the room UI
 	reloadEnding();
@@ -855,7 +854,7 @@ function nextRoom() {
 	var ids = sortedRoomIdList();
 	roomIndex = (roomIndex + 1) % ids.length;
 	curRoom = ids[roomIndex];
-	drawEditMap();
+	roomTool.drawEditMap();
 	drawPaintCanvas();
 	updateRoomPaletteSelect();
 	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
@@ -871,7 +870,7 @@ function prevRoom() {
 	roomIndex--;
 	if (roomIndex < 0) roomIndex = (ids.length-1);
 	curRoom = ids[roomIndex];
-	drawEditMap();
+	roomTool.drawEditMap();
 	drawPaintCanvas();
 	updateRoomPaletteSelect();
 	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
@@ -917,7 +916,7 @@ function duplicateRoom() {
 
 	curRoom = newRoomId;
 	//console.log(curRoom);
-	drawEditMap();
+	roomTool.drawEditMap();
 	drawPaintCanvas();
 	updateRoomPaletteSelect();
 
@@ -979,7 +978,7 @@ function newRoom() {
 
 	curRoom = roomId;
 	//console.log(curRoom);
-	drawEditMap();
+	roomTool.drawEditMap();
 	drawPaintCanvas();
 	updateRoomPaletteSelect();
 
@@ -1018,7 +1017,7 @@ function deleteRoom() {
 
 		refreshGameData();
 		nextRoom();
-		drawEditMap();
+		roomTool.drawEditMap();
 		drawPaintCanvas();
 		updateRoomPaletteSelect();
 		updateExitOptionsFromGameData();
@@ -1212,7 +1211,7 @@ function deleteDrawing() {
 			findAndReplaceTileInAllRooms( drawing.id, "0" );
 			refreshGameData();
 			renderImages();
-			drawEditMap();
+			roomTool.drawEditMap();
 			nextTile();
 		}
 		else if( drawing.type == TileType.Avatar || drawing.type == TileType.Sprite ){
@@ -1227,7 +1226,7 @@ function deleteDrawing() {
 
 			refreshGameData();
 			renderImages();
-			drawEditMap();
+			roomTool.drawEditMap();
 			nextSprite();
 		}
 		else if( drawing.type == TileType.Item ){
@@ -1242,7 +1241,7 @@ function deleteDrawing() {
 			removeAllItems( drawing.id );
 			refreshGameData();
 			renderImages();
-			drawEditMap();
+			roomTool.drawEditMap();
 			nextItem();
 			updateInventoryItemUI();
 		}
@@ -1492,7 +1491,7 @@ function paint_onMouseUp(e) {
 		isPainting = false;
 		renderImages();
 		refreshGameData();
-		drawEditMap();
+		roomTool.drawEditMap();
 		renderPaintThumbnail( drawing.id );
 		if( isCurDrawingAnimated )
 			renderAnimationPreview( drawing.id );
@@ -1541,114 +1540,6 @@ function drawPaintCanvas() {
 	}
 }
 
-function drawEditMap() {
-	//clear screen
-	ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
-	ctx.fillRect(0,0,canvas.width,canvas.height);
-
-	//draw map
-	drawRoom( room[curRoom] );
-
-	//draw grid
-	if (drawMapGrid) {
-		ctx.fillStyle = getContrastingColor();
-		for (var x = 1; x < mapsize; x++) {
-			ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
-		}
-		for (var y = 1; y < mapsize; y++) {
-			ctx.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
-		}
-	}
-
-	//draw walls
-	if (drawCollisionMap) {
-		ctx.fillStyle = getContrastingColor();
-		for (y in room[curRoom].tilemap) {
-			for (x in room[curRoom].tilemap[y]) {
-				if( isWall(x,y,curRoom) ) {
-					ctx.fillRect(x*tilesize*scale,y*tilesize*scale,tilesize*scale,tilesize*scale);
-				}
-			}
-		}
-	}
-
-	//draw exits (and entrances)
-	if (areExitsVisible) {
-		for( r in room ) {
-			if( r === curRoom ) {
-				for (i in room[curRoom].exits) {
-					var e = room[curRoom].exits[i];
-					if( !room[e.dest.room] )
-						continue;
-
-					if (e == selectedExit) {
-						ctx.fillStyle = "#ff0";
-						ctx.globalAlpha = 0.9;
-					}
-					else {
-						ctx.fillStyle = getContrastingColor();
-						ctx.globalAlpha = 0.5;
-					}
-					ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
-					ctx.strokeStyle = getComplimentingColor();
-					ctx.globalAlpha = 1.0;
-					ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-
-					ctx.font = '14px sans-serif';
-					var roomStr = "To " + ( (room[e.dest.room].name != null) ? room[e.dest.room].name : ("room " + e.dest.room) );
-					ctx.fillText( roomStr, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
-
-					//todo (tilesize*scale) should be a function
-				}
-			}
-			else {
-				for (i in room[r].exits) {
-					var e = room[r].exits[i];
-					if( !room[e.dest.room] )
-						continue;
-
-					if (e.dest.room === curRoom){
-						ctx.fillStyle = getContrastingColor();
-						ctx.globalAlpha = 0.3;
-						ctx.fillRect(e.dest.x * tilesize * scale, e.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
-						ctx.strokeStyle = getComplimentingColor();
-						ctx.globalAlpha = 0.6;
-						ctx.strokeRect( (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-	
-						ctx.font = '14px sans-serif';
-						var roomStr = "From " + ( (room[r].name != null) ? room[r].name : ("room " + r) );
-						ctx.fillText( roomStr, (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 5 );
-					}
-				}
-			}
-		}
-		ctx.globalAlpha = 1;
-	}
-
-	//draw endings
-	if (areEndingsVisible) {
-		for (i in room[curRoom].endings) {
-			var e = room[curRoom].endings[i];
-			if (e == selectedEndingTile) {
-				ctx.fillStyle = "#ff0";
-				ctx.globalAlpha = 0.9;
-			}
-			else {
-				ctx.fillStyle = getContrastingColor();
-				ctx.globalAlpha = 0.5;
-			}
-			ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
-			ctx.strokeStyle = getComplimentingColor();
-			ctx.globalAlpha = 1.0;
-			ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-
-			ctx.font = '14px sans-serif';
-			ctx.fillText( "To ending " + e.id, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
-		}
-		ctx.globalAlpha = 1;
-	}
-}
-
 function curDrawingImgId() {
 	var imgId = "";
 	if( drawing.type == TileType.Tile )
@@ -1692,7 +1583,7 @@ function resetGameData() {
 	refreshGameData();
 	renderImages();
 	drawPaintCanvas();
-	drawEditMap();
+	roomTool.drawEditMap();
 	updatePaletteUI();
 	// updatePaletteControlsFromGameData();
 	updateExitOptionsFromGameData();
@@ -1784,7 +1675,7 @@ function on_edit_mode() {
 	// TODO I should really do more to separate the editor's game-data from the engine's game-data
 	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
 	curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
-	drawEditMap();
+	roomTool.drawEditMap();
 
 	roomTool.listenEditEvents();
 
@@ -1834,16 +1725,15 @@ function togglePaintGrid(e) {
 }
 
 function toggleMapGrid(e) {
-	drawMapGrid = e.target.checked;
-	document.getElementById("roomGridIcon").innerHTML = drawMapGrid ? "visibility" : "visibility_off";
-	drawEditMap();
+	roomTool.drawMapGrid = e.target.checked;
+	document.getElementById("roomGridIcon").innerHTML = roomTool.drawMapGrid ? "visibility" : "visibility_off";
+	roomTool.drawEditMap();
 }
 
-var drawCollisionMap = false; //todo - move variable to more centeral spot?
 function toggleCollisionMap(e) {
-	drawCollisionMap = e.target.checked;
-	document.getElementById("roomWallsIcon").innerHTML = drawCollisionMap ? "visibility" : "visibility_off";
-	drawEditMap();
+	roomTool.drawCollisionMap = e.target.checked;
+	document.getElementById("roomWallsIcon").innerHTML = roomTool.drawCollisionMap ? "visibility" : "visibility_off";
+	roomTool.drawEditMap();
 }
 
 /* PALETTE STUFF */
@@ -1926,7 +1816,7 @@ function onColorPickerChange( rgbColor, isMouseUp ) {
 		refreshGameData();
 		renderImages();
 		drawPaintCanvas();
-		drawEditMap();
+		roomTool.drawEditMap();
 		refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 		if( isCurDrawingAnimated )
 			renderAnimationPreview( drawing.id );
@@ -2000,7 +1890,7 @@ function roomPaletteChange(event) {
 	var palId = event.target.value;
 	room[curRoom].pal = palId;
 	refreshGameData();
-	drawEditMap();
+	roomTool.drawEditMap();
 	drawPaintCanvas();
 	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 }
@@ -2531,7 +2421,7 @@ function on_game_data_change_core() {
 
 	renderImages();
 
-	drawEditMap();
+	roomTool.drawEditMap();
 
 	drawing.type = curPaintMode;
 	if ( drawing.type == TileType.Tile ) {
@@ -2641,7 +2531,6 @@ function toggleVersionNotes(e) {
 
 /* EXITS */
 var isAddingExit = false;
-var areExitsVisible = true;
 var selectedExit = null;
 var exit_canvas;
 var exit_ctx;
@@ -2655,16 +2544,16 @@ function resetExitVars() {
 function showExits() {
 	console.log("show exits");
 	resetExitVars();
-	areExitsVisible = true;
-	drawEditMap();
+	roomTool.areExitsVisible = true;
+	roomTool.drawEditMap();
 	drawExitDestinationRoom();
 }
 
 function hideExits() {
 	console.log("hide exits");
 	resetExitVars();
-	areExitsVisible = false;
-	drawEditMap();
+	roomTool.areExitsVisible = false;
+	roomTool.drawEditMap();
 	drawExitDestinationRoom();
 }
 
@@ -2724,7 +2613,7 @@ function setSelectedExit(e) {
 		drawExitDestinationRoom();
 	}
 
-	drawEditMap();
+	roomTool.drawEditMap();
 
 	return didChange;
 }
@@ -3261,7 +3150,6 @@ function on_change_color_page() {
 /* ENDINGS */
 var isAddingEnding = false;
 var selectedEndingTile = null;
-var areEndingsVisible = false;
 
 function hasEndings() {
 	return Object.keys(ending).length > 0;
@@ -3343,13 +3231,13 @@ function addEndingToCurRoom(x,y) {
 
 function showEndings() {
 	// resetExitVars(); -- what's this for?
-	areEndingsVisible = true;
-	drawEditMap();
+	roomTool.areEndingsVisible = true;
+	roomTool.drawEditMap();
 }
 
 function hideEndings() {
-	areEndingsVisible = false;
-	drawEditMap();
+	roomTool.areEndingsVisible = false;
+	roomTool.drawEditMap();
 }
 
 function setSelectedEnding(e) { //todo
@@ -3367,7 +3255,7 @@ function setSelectedEnding(e) { //todo
 		document.getElementById("removeEndingButton").style.display = "block";
 	}
 
-	drawEditMap();
+	roomTool.drawEditMap();
 
 	return didChange;
 }

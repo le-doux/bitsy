@@ -18,10 +18,17 @@ function RoomTool(canvas) {
 
 	this.drawing = new DrawingId( TileType.Avatar, "A" );
 
+	// edit flags
 	var isDragAddingTiles = false;
 	var isDragDeletingTiles = false;
 	var isDragMovingExit = false;
 	var isDragMovingEnding = false;
+
+	// render flags
+	this.drawMapGrid = true;
+	this.drawCollisionMap = false;
+	this.areExitsVisible = false;
+	this.areEndingsVisible = false;
 
 	function onMouseDown(e) {
 		var off = getOffset(e);
@@ -31,8 +38,8 @@ function RoomTool(canvas) {
 		// console.log(x + " " + y);
 
 		if( Ed().platform == PlatformType.Desktop ) {
-			var didSelectedExitChange = areExitsVisible ? setSelectedExit( getExit(curRoom,x,y) ) : false;
-			var didSelectedEndingChange = areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;	
+			var didSelectedExitChange = self.areExitsVisible ? setSelectedExit( getExit(curRoom,x,y) ) : false;
+			var didSelectedEndingChange = self.areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;	
 		}
 
 		if ( Ed().platform == PlatformType.Desktop && (didSelectedExitChange || didSelectedEndingChange) ) {
@@ -114,7 +121,7 @@ function RoomTool(canvas) {
 				}
 			}
 			refreshGameData();
-			drawEditMap();
+			self.drawEditMap();
 		}
 	}
 
@@ -130,7 +137,7 @@ function RoomTool(canvas) {
 				selectedExit.x = x;
 				selectedExit.y = y;
 				refreshGameData();
-				drawEditMap();	
+				self.drawEditMap();
 			}
 		}
 		else if( Ed().platform == PlatformType.Desktop && selectedEndingTile != null && isDragMovingEnding )
@@ -145,7 +152,7 @@ function RoomTool(canvas) {
 				selectedEndingTile.x = x;
 				selectedEndingTile.y = y;
 				refreshGameData();
-				drawEditMap();	
+				self.drawEditMap();
 			}
 		}
 		else
@@ -172,7 +179,7 @@ function RoomTool(canvas) {
 				// room[curRoom].tilemap[y] = row;
 				room[curRoom].tilemap[y][x] = self.drawing.id;
 				refreshGameData();
-				drawEditMap();
+				self.drawEditMap();
 			}
 		}
 		else if (isDragDeletingTiles) {
@@ -181,7 +188,7 @@ function RoomTool(canvas) {
 				// room[curRoom].tilemap[y] = row;
 				room[curRoom].tilemap[y][x] = "0";
 				refreshGameData();
-				drawEditMap();
+				self.drawEditMap();
 			}
 		}
 	}
@@ -221,7 +228,7 @@ function RoomTool(canvas) {
 				setInterval( function() {
 					animationCounter = animationTime + 1; // hack
 					updateAnimation();
-					drawEditMap();
+					self.drawEditMap();
 				}, animationTime ); // update animation in map mode
 		}
 
@@ -245,6 +252,114 @@ function RoomTool(canvas) {
 			canvas.removeEventListener("touchstart", onTouchStart);
 			canvas.removeEventListener("touchmove", onTouchMove);
 			canvas.removeEventListener("touchend", onTouchEnd);
+		}
+	}
+
+	this.drawEditMap = function() {
+		//clear screen
+		ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
+		ctx.fillRect(0,0,canvas.width,canvas.height);
+
+		//draw map
+		drawRoom( room[curRoom] );
+
+		//draw grid
+		if (self.drawMapGrid) {
+			ctx.fillStyle = getContrastingColor();
+			for (var x = 1; x < mapsize; x++) {
+				ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
+			}
+			for (var y = 1; y < mapsize; y++) {
+				ctx.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
+			}
+		}
+
+		//draw walls
+		if (self.drawCollisionMap) {
+			ctx.fillStyle = getContrastingColor();
+			for (y in room[curRoom].tilemap) {
+				for (x in room[curRoom].tilemap[y]) {
+					if( isWall(x,y,curRoom) ) {
+						ctx.fillRect(x*tilesize*scale,y*tilesize*scale,tilesize*scale,tilesize*scale);
+					}
+				}
+			}
+		}
+
+		//draw exits (and entrances)
+		if (self.areExitsVisible) {
+			for( r in room ) {
+				if( r === curRoom ) {
+					for (i in room[curRoom].exits) {
+						var e = room[curRoom].exits[i];
+						if( !room[e.dest.room] )
+							continue;
+
+						if (e == selectedExit) {
+							ctx.fillStyle = "#ff0";
+							ctx.globalAlpha = 0.9;
+						}
+						else {
+							ctx.fillStyle = getContrastingColor();
+							ctx.globalAlpha = 0.5;
+						}
+						ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
+						ctx.strokeStyle = getComplimentingColor();
+						ctx.globalAlpha = 1.0;
+						ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+
+						ctx.font = '14px sans-serif';
+						var roomStr = "To " + ( (room[e.dest.room].name != null) ? room[e.dest.room].name : ("room " + e.dest.room) );
+						ctx.fillText( roomStr, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
+
+						//todo (tilesize*scale) should be a function
+					}
+				}
+				else {
+					for (i in room[r].exits) {
+						var e = room[r].exits[i];
+						if( !room[e.dest.room] )
+							continue;
+
+						if (e.dest.room === curRoom){
+							ctx.fillStyle = getContrastingColor();
+							ctx.globalAlpha = 0.3;
+							ctx.fillRect(e.dest.x * tilesize * scale, e.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
+							ctx.strokeStyle = getComplimentingColor();
+							ctx.globalAlpha = 0.6;
+							ctx.strokeRect( (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+		
+							ctx.font = '14px sans-serif';
+							var roomStr = "From " + ( (room[r].name != null) ? room[r].name : ("room " + r) );
+							ctx.fillText( roomStr, (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 5 );
+						}
+					}
+				}
+			}
+			ctx.globalAlpha = 1;
+		}
+
+		//draw endings
+		if (self.areEndingsVisible) {
+			for (i in room[curRoom].endings) {
+				var e = room[curRoom].endings[i];
+				if (e == selectedEndingTile) {
+					ctx.fillStyle = "#ff0";
+					ctx.globalAlpha = 0.9;
+				}
+				else {
+					ctx.fillStyle = getContrastingColor();
+					ctx.globalAlpha = 0.5;
+				}
+				ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
+				ctx.strokeStyle = getComplimentingColor();
+				ctx.globalAlpha = 1.0;
+				ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+
+				ctx.font = '14px sans-serif';
+				ctx.fillText( "To ending " + e.id, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
+			}
+			ctx.globalAlpha = 1;
 		}
 	}
 }
