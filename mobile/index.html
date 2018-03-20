@@ -142,7 +142,7 @@ function start() {
 	document.getElementById("playModeCheck").checked = false;
 	document.getElementById("tool_select").options[0].selected = true;
 
-	drawEditMap();
+	roomTool.drawEditMap();
 
 	roomTool.listenEditEvents();
 }
@@ -158,7 +158,7 @@ function initGameState() {
 // mobile
 function initGameStateAndRender() {
 	initGameState();
-	drawEditMap();
+	roomTool.drawEditMap();
 }
 
 // mobile
@@ -171,28 +171,6 @@ function changeTool(e) {
 	ROOM
 */
 var roomTool;
-
-// shared
-function drawEditMap() {
-	//clear screen
-	ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
-	ctx.fillRect(0,0,canvas.width,canvas.height);
-
-	//draw map
-	console.log(room);
-	drawRoom( room[curRoom] );
-
-	//draw grid
-	if (true /*drawMapGrid*/) {
-		ctx.fillStyle = getContrastingColor();
-		for (var x = 1; x < mapsize; x++) {
-			ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
-		}
-		for (var y = 1; y < mapsize; y++) {
-			ctx.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
-		}
-	}
-}
 
 // shared
 function togglePlayMode(e) {
@@ -225,7 +203,7 @@ function on_edit_mode() {
 	// TODO I should really do more to separate the editor's game-data from the engine's game-data
 	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
 	// curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
-	// drawEditMap();
+	// roomTool.drawEditMap();
 	// listenMapEditEvents();
 	roomTool.listenEditEvents();
 
@@ -529,7 +507,7 @@ function paint_onMouseUp(e) {
 		isPainting = false;
 		renderImages();
 		refreshGameData();
-		drawEditMap();
+		roomTool.drawEditMap();
 		// renderPaintThumbnail( roomTool.drawing.id );
 		// if( isCurDrawingAnimated )
 		// 	renderAnimationPreview( roomTool.drawing.id );
@@ -876,7 +854,7 @@ function deleteDrawing() {
 			findAndReplaceTileInAllRooms( paint_drwId, "0" );
 			refreshGameData();
 			renderImages();
-			drawEditMap();
+			roomTool.drawEditMap();
 			// nextTile();
 			on_paint_tile();
 		}
@@ -892,7 +870,7 @@ function deleteDrawing() {
 
 			refreshGameData();
 			renderImages();
-			drawEditMap();
+			roomTool.drawEditMap();
 			// nextSprite();
 			on_paint_sprite();
 		}
@@ -908,7 +886,7 @@ function deleteDrawing() {
 		// 	removeAllItems( roomTool.drawing.id );
 		// 	refreshGameData();
 		// 	renderImages();
-		// 	drawEditMap();
+		// 	roomTool.drawEditMap();
 		// 	nextItem();
 		// 	updateInventoryItemUI();
 		// }
@@ -951,7 +929,7 @@ function onColorPickerChange( rgbColor, isMouseUp ) {
 		// refreshGameData();
 		// renderImages();
 		// drawPaintCanvas();
-		// drawEditMap();
+		// roomTool.drawEditMap();
 		// refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 		// if( isCurDrawingAnimated )
 		// 	renderAnimationPreview( roomTool.drawing.id );
@@ -1009,7 +987,7 @@ function resetGameData() {
 	// refreshGameData();
 	// renderImages();
 	// drawPaintCanvas();
-	// drawEditMap();
+	// roomTool.drawEditMap();
 	// updatePaletteUI();
 	// // updatePaletteControlsFromGameData();
 	// updateExitOptionsFromGameData();
