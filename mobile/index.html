@@ -109,6 +109,8 @@ DEV NOTES:
 
 // shared
 function start() {
+	Ed().platform = PlatformType.Mobile;
+
 	attachCanvas( document.getElementById("game") );
 
 	roomTool = new RoomTool(canvas);

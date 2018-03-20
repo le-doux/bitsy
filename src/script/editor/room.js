@@ -30,21 +30,23 @@ function RoomTool(canvas) {
 		var y = Math.floor( off.y / (tilesize*scale) );
 		// console.log(x + " " + y);
 
-		var didSelectedExitChange = areExitsVisible ? setSelectedExit( getExit(curRoom,x,y) ) : false;
-		var didSelectedEndingChange = areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;
+		if( Ed().platform == PlatformType.Desktop ) {
+			var didSelectedExitChange = areExitsVisible ? setSelectedExit( getExit(curRoom,x,y) ) : false;
+			var didSelectedEndingChange = areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;	
+		}
 
-		if (didSelectedExitChange || didSelectedEndingChange) {
+		if ( Ed().platform == PlatformType.Desktop && (didSelectedExitChange || didSelectedEndingChange) ) {
 			//don't do anything else
 			if( selectedExit != null ) isDragMovingExit = true;
 			if( selectedEndingTile != null ) isDragMovingEnding = true;
 		}
-		else if (isAddingExit) { //todo - mutually exclusive with adding an ending?
+		else if ( Ed().platform == PlatformType.Desktop && isAddingExit) { //todo - mutually exclusive with adding an ending?
 			//add exit
 			if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
 				addExitToCurRoom(x,y);
 			}
 		}
-		else if (isAddingEnding) {
+		else if ( Ed().platform == PlatformType.Desktop && isAddingEnding ) {
 			//add ending
 			if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
 				addEndingToCurRoom(x,y);
@@ -97,7 +99,7 @@ function RoomTool(canvas) {
 					sprite[self.drawing.id].y = -1;
 				}
 			}
-			else if( self.drawing.type == TileType.Item ) {
+			else if( Ed().platform == PlatformType.Desktop && self.drawing.type == TileType.Item ) {
 				// TODO : is this the final behavior I want?
 
 				var otherItem = getItem(curRoom,x,y);
@@ -117,7 +119,7 @@ function RoomTool(canvas) {
 	}
 
 	function onMouseMove(e) {
-		if( selectedExit != null && isDragMovingExit )
+		if( Ed().platform == PlatformType.Desktop && selectedExit != null && isDragMovingExit )
 		{
 			// drag exit around
 			var off = getOffset(e);
@@ -131,7 +133,7 @@ function RoomTool(canvas) {
 				drawEditMap();	
 			}
 		}
-		else if( selectedEndingTile != null && isDragMovingEnding )
+		else if( Ed().platform == PlatformType.Desktop && selectedEndingTile != null && isDragMovingEnding )
 		{
 			// drag ending around
 			var off = getOffset(e);
