@@ -386,11 +386,10 @@ function start() {
 	//game canvas & context (also the map editor)
 	attachCanvas( document.getElementById("game") );
 
-	//map edit events
-	// listenMapEditEvents();
+	//init room tool
 	roomTool = new RoomTool(canvas);
 	roomTool.listenEditEvents()
-	roomTool.drawing = drawing; // will this work?
+	roomTool.drawing = drawing;
 
 	//paint canvas & context
 	paint_canvas = document.getElementById("paint");
@@ -666,30 +665,6 @@ function setDefaultGameState() {
 	console.log("E");
 	refreshGameData();
 	document.getElementById("titleText").value = title;
-}
-
-var mapEditAnimationLoop;
-
-function listenMapEditEvents() {
-	canvas.addEventListener("mousedown", map_onMouseDown);
-	canvas.addEventListener("mousemove", map_onMouseMove);
-	canvas.addEventListener("mouseup", map_onMouseUp);
-	canvas.addEventListener("mouseleave", map_onMouseUp);
-
-	mapEditAnimationLoop =
-		setInterval( function() {
-			animationCounter = animationTime + 1; // hack
-			updateAnimation();
-			drawEditMap();
-		}, animationTime ); // update animation in map mode
-}
-
-function unlistenMapEditEvents() {
-	canvas.removeEventListener("mousedown", map_onMouseDown);
-	canvas.removeEventListener("mousemove", map_onMouseMove);
-	canvas.removeEventListener("mouseup", map_onMouseUp);
-	canvas.removeEventListener("mouseleave", map_onMouseUp);
-	clearInterval( mapEditAnimationLoop );
 }
 
 function newTile(id) {
@@ -1485,171 +1460,6 @@ function reloadItem() {
 
 }
 
-var isDragAddingTiles = false;
-var isDragDeletingTiles = false;
-var isDragMovingExit = false;
-var isDragMovingEnding = false;
-function map_onMouseDown(e) {
-	var off = getOffset(e);
-	off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
-	var x = Math.floor( off.x / (tilesize*scale) );
-	var y = Math.floor( off.y / (tilesize*scale) );
-	// console.log(x + " " + y);
-
-	var didSelectedExitChange = areExitsVisible ? setSelectedExit( getExit(curRoom,x,y) ) : false;
-	var didSelectedEndingChange = areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;
-
-	if (didSelectedExitChange || didSelectedEndingChange) {
-		//don't do anything else
-		if( selectedExit != null ) isDragMovingExit = true;
-		if( selectedEndingTile != null ) isDragMovingEnding = true;
-	}
-	else if (isAddingExit) { //todo - mutually exclusive with adding an ending?
-		//add exit
-		if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
-			addExitToCurRoom(x,y);
-		}
-	}
-	else if (isAddingEnding) {
-		//add ending
-		if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
-			addEndingToCurRoom(x,y);
-		}
-	}
-	else if (drawing.id != null) {
-		//add tiles/sprites to map
-		console.log("DRAWING");
-		if (drawing.type == TileType.Tile) {
-			if ( room[curRoom].tilemap[y][x] === "0" ) {
-				console.log("ADD");
-				//add
-				//row = row.substr(0, x) + drawing.id + row.substr(x+1);
-				console.log( room[curRoom].tilemap );
-				room[curRoom].tilemap[y][x] = drawing.id;
-				isDragAddingTiles = true;
-			}
-			else {
-				//delete (better way to do this?)
-				//row = row.substr(0, x) + "0" + row.substr(x+1);
-				room[curRoom].tilemap[y][x] = "0";
-				isDragDeletingTiles = true;
-			}
-			//room[curRoom].tilemap[y] = row;
-		}
-		else if( drawing.type == TileType.Avatar || drawing.type == TileType.Sprite ) {
-			var otherSprite = getSpriteAt(x,y);
-			var isThisSpriteAlreadyHere = sprite[drawing.id].room === curRoom &&
-										sprite[drawing.id].x === x &&
-										sprite[drawing.id].y === y;
-
-			if (otherSprite) {
-				//remove other sprite from map
-				sprite[otherSprite].room = null;
-				sprite[otherSprite].x = -1;
-				sprite[otherSprite].y = -1;
-			}
-
-			if (!isThisSpriteAlreadyHere) {
-				//add sprite to map
-				sprite[drawing.id].room = curRoom;
-				sprite[drawing.id].x = x;
-				sprite[drawing.id].y = y;
-				//row = row.substr(0, x) + "0" + row.substr(x+1); //is this necessary? no
-			}
-			else {
-				//remove sprite from map
-				sprite[drawing.id].room = null;
-				sprite[drawing.id].x = -1;
-				sprite[drawing.id].y = -1;
-			}
-		}
-		else if( drawing.type == TileType.Item ) {
-			// TODO : is this the final behavior I want?
-
-			var otherItem = getItem(curRoom,x,y);
-			var isThisItemAlreadyHere = otherItem != null && otherItem.id === drawing.id;
-
-			if(otherItem) {
-				getRoom().items.splice( getRoom().items.indexOf(otherItem), 1 );
-			}
-
-			if(!isThisItemAlreadyHere) {
-				getRoom().items.push( {id:drawing.id, x:x, y:y} );
-			}
-		}
-		refreshGameData();
-		drawEditMap();
-	}
-}
-
-function editTilesOnDrag(e) {
-	var off = getOffset(e);
-	off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
-	var x = Math.floor(off.x / (tilesize*scale));
-	var y = Math.floor(off.y / (tilesize*scale));
-	// var row = room[curRoom].tilemap[y];
-	if (isDragAddingTiles) {
-		if ( room[curRoom].tilemap[y][x] != drawing.id ) {
-			// row = row.substr(0, x) + drawing.id + row.substr(x+1);
-			// room[curRoom].tilemap[y] = row;
-			room[curRoom].tilemap[y][x] = drawing.id;
-			refreshGameData();
-			drawEditMap();
-		}
-	}
-	else if (isDragDeletingTiles) {
-		if ( room[curRoom].tilemap[y][x] != "0" ) {
-			// row = row.substr(0, x) + "0" + row.substr(x+1);
-			// room[curRoom].tilemap[y] = row;
-			room[curRoom].tilemap[y][x] = "0";
-			refreshGameData();
-			drawEditMap();
-		}
-	}
-}
-
-function map_onMouseMove(e) {
-	if( selectedExit != null && isDragMovingExit )
-	{
-		// drag exit around
-		var off = getOffset(e);
-		var x = Math.floor(off.x / (tilesize*scale));
-		var y = Math.floor(off.y / (tilesize*scale));
-		if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
-		{
-			selectedExit.x = x;
-			selectedExit.y = y;
-			refreshGameData();
-			drawEditMap();	
-		}
-	}
-	else if( selectedEndingTile != null && isDragMovingEnding )
-	{
-		// drag ending around
-		var off = getOffset(e);
-		var x = Math.floor(off.x / (tilesize*scale));
-		var y = Math.floor(off.y / (tilesize*scale));
-		var y = Math.floor(off.y / (tilesize*scale));
-		if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
-		{
-			selectedEndingTile.x = x;
-			selectedEndingTile.y = y;
-			refreshGameData();
-			drawEditMap();	
-		}
-	}
-	else
-		editTilesOnDrag(e);
-}
-
-function map_onMouseUp(e) {
-	editTilesOnDrag(e);
-	isDragAddingTiles = false;
-	isDragDeletingTiles = false;
-	isDragMovingExit = false;
-	isDragMovingEnding = false;
-}
-
 function paint_onMouseDown(e) {
 	if (isPlayMode) return; //can't paint during play mode
 
@@ -1976,7 +1786,6 @@ function on_edit_mode() {
 	curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
 	drawEditMap();
 
-	// listenMapEditEvents();
 	roomTool.listenEditEvents();
 
 	updateInventoryUI();
@@ -1995,7 +1804,6 @@ function on_edit_mode() {
 function on_play_mode() {
 	isPlayMode = true;
 
-	// unlistenMapEditEvents();
 	roomTool.unlistenEditEvents();
 
 	load_game(document.getElementById("game_data").value, !isPreviewDialogMode /* startWithTitle */);
