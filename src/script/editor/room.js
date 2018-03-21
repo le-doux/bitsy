@@ -363,3 +363,21 @@ function RoomTool(canvas) {
 		}
 	}
 }
+
+/* METHODS */
+function togglePlayMode(e) {
+	if (e.target.checked) {
+		on_play_mode();
+	}
+	else {
+		on_edit_mode();
+	}
+	if( Ed().platform == PlatformType.Desktop ) // hack for mobile
+		updatePlayModeButton();
+}
+/* TODO 
+- make a PlayModeController objec?
+- share:
+	- on_play_mode
+	- on_edit_mode
+*/

@@ -1659,16 +1659,6 @@ function toggleDownloadOptions(e) {
 	}
 }
 
-function togglePlayMode(e) {
-	if (e.target.checked) {
-		on_play_mode();
-	}
-	else {
-		on_edit_mode();
-	}
-	updatePlayModeButton();
-}
-
 function on_edit_mode() {
 	isPlayMode = false;
 	stopGame();

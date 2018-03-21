@@ -173,53 +173,18 @@ function changeTool(e) {
 var roomTool;
 
 // shared
-function togglePlayMode(e) {
-	if (e.target.checked) {
-		on_play_mode();
-	}
-	else {
-		on_edit_mode();
-	}
-	// updatePlayModeButton();
-}
-
-// shared
 function on_play_mode() {
-	// isPlayMode = true;
 	roomTool.unlistenEditEvents();
-	load_game(document.getElementById("game_data").value /*, !isPreviewDialogMode*/ /* startWithTitle */);
-
-	// console.log("PLAY!! ~~ PREVIEW ? " + isPreviewDialogMode);
-	// if(!isPreviewDialogMode) {
-		// console.log("DISALBE PREVIEW!!!");
-		// document.getElementById("previewDialogCheck").disabled = true;
-	// }
+	load_game(document.getElementById("game_data").value);
 }
 
 // shared
 function on_edit_mode() {
-	// isPlayMode = false;
 	stopGame();
-	// TODO I should really do more to separate the editor's game-data from the engine's game-data
-	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
-	// curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
-	// roomTool.drawEditMap();
-	// listenMapEditEvents();
+	parseWorld(document.getElementById("game_data").value);
 	roomTool.listenEditEvents();
-
-	// updateInventoryUI();
-
-	// if(isPreviewDialogMode) {
-	// 	isPreviewDialogMode = false;
-	// 	updatePreviewDialogButton();
-
-	// 	for(var i = 0; i < advDialogUIComponents.length; i++) {
-	// 		advDialogUIComponents[i].GetEl().classList.remove("highlighted");
-	// 	}
-	// }
-	// document.getElementById("previewDialogCheck").disabled = false;
-
-	initGameStateAndRender();
+	roomTool.drawEditMap();
+	// initGameStateAndRender();
 }
 
 // shared
@@ -227,23 +192,6 @@ function on_edit_mode() {
 function on_room_paint_avatar() {
 	roomTool.drawing.type = TileType.Avatar;
 	roomTool.drawing.id = "A";
-	// reloadSprite();
-	// document.getElementById("dialog").setAttribute("style","display:none;");
-	// document.getElementById("wall").setAttribute("style","display:none;");
-	// document.getElementById("paintNav").setAttribute("style","display:none;");
-	// document.getElementById("paintCommands").setAttribute("style","display:none;");
-	// document.getElementById("animationOuter").setAttribute("style","display:block;");
-	// updateDrawingNameUI(false);
-	// //document.getElementById("animation").setAttribute("style","display:none;");
-	// refreshPaintExplorer();
-	// document.getElementById("paintOptionAvatar").checked = true;
-	// document.getElementById("paintExplorerOptionAvatar").checked = true;
-	// document.getElementById("showInventoryButton").setAttribute("style","display:none;");
-	// document.getElementById("paintExplorerAdd").setAttribute("style","display:none;");
-	// document.getElementById("paintExplorerFilterInput").value = "";
-
-	// reloadAdvDialogUI();
-
 
 	// update options
 	var selectDrawing = document.getElementById("drawing_select");
@@ -254,23 +202,6 @@ function on_room_paint_tile() {
 	roomTool.drawing.type = TileType.Tile;
 	tileIndex = 0;
 	roomTool.drawing.id = sortedTileIdList()[tileIndex];
-	// reloadTile();
-	// document.getElementById("dialog").setAttribute("style","display:none;");
-	// document.getElementById("wall").setAttribute("style","display:block;");
-	// document.getElementById("paintNav").setAttribute("style","display:inline-block;");
-	// document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
-	// document.getElementById("animationOuter").setAttribute("style","display:block;");
-	// updateDrawingNameUI(true);
-	// //document.getElementById("animation").setAttribute("style","display:block;");
-	// refreshPaintExplorer();
-	// document.getElementById("paintOptionTile").checked = true;
-	// document.getElementById("paintExplorerOptionTile").checked = true;
-	// document.getElementById("showInventoryButton").setAttribute("style","display:none;");
-	// document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
-	// document.getElementById("paintExplorerFilterInput").value = "";
-
-	// reloadAdvDialogUI();
-
 
 	// update options
 	var selectDrawing = document.getElementById("room_drawing_select");
@@ -298,24 +229,6 @@ function on_room_paint_sprite() {
 		spriteIndex = 0; //fall back to avatar if no other sprites exist
 	}
 	roomTool.drawing.id = sortedSpriteIdList()[spriteIndex];
-	// curDrawingFrameIndex = 0;
-	// reloadSprite();
-	// document.getElementById("dialog").setAttribute("style","display:block;");
-	// document.getElementById("wall").setAttribute("style","display:none;");
-	// document.getElementById("paintNav").setAttribute("style","display:inline-block;");
-	// document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
-	// document.getElementById("animationOuter").setAttribute("style","display:block;");
-	// updateDrawingNameUI(true);
-	// //document.getElementById("animation").setAttribute("style","display:block;");
-	// refreshPaintExplorer();
-	// document.getElementById("paintOptionSprite").checked = true;
-	// document.getElementById("paintExplorerOptionSprite").checked = true;
-	// document.getElementById("showInventoryButton").setAttribute("style","display:none;");
-	// document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
-	// document.getElementById("paintExplorerFilterInput").value = "";
-
-	// reloadAdvDialogUI();
-
 
 	// update options
 	var selectDrawing = document.getElementById("room_drawing_select");
