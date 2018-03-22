@@ -247,3 +247,12 @@ function mobileOffsetCorrection(off,e,innerSize) {
 
 	return off;
 }
+
+function tileTypeToIdPrefix(type) {
+	if( type == TileType.Tile )
+		return "TIL_";
+	else if( type == TileType.Sprite || type == TileType.Avatar )
+		return "SPR_";
+	else if( type == TileType.Item )
+		return "ITM_";
+}
