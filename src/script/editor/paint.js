@@ -8,11 +8,11 @@ function DrawingId(type,id) { // TODO: is this the right name?
 	this.type = type;
 	this.id = id;
 
-	function getFrameData(frameIndex) {
-		return imageStore.source[ toString() ][ frameIndex ];
+	this.getFrameData = function(frameIndex) {
+		return imageStore.source[ self.toString() ][ frameIndex ];
 	}
 
-	function toString() {
+	this.toString = function() {
 		return tileTypeToIdPrefix(self.type) + self.id;
 	}
 }
@@ -71,7 +71,7 @@ function PaintTool(canvas, roomTool) {
 			curPaintBrush = 0;
 		}
 		curDrawingData()[y][x] = curPaintBrush;
-		self.drawPaintCanvas();
+		self.updateCanvas();
 		isPainting = true;
 	}
 
@@ -84,7 +84,7 @@ function PaintTool(canvas, roomTool) {
 			var x = Math.floor(off.x);// / paint_scale);
 			var y = Math.floor(off.y);// / paint_scale);
 			curDrawingData()[y][x] = curPaintBrush;
-			self.drawPaintCanvas();
+			self.updateCanvas();
 		}
 	}
 
@@ -120,7 +120,7 @@ function PaintTool(canvas, roomTool) {
 		onMouseUp();
 	}
 
-	this.drawPaintCanvas() {
+	this.updateCanvas = function() {
 		//background
 		ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
 		ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -150,7 +150,7 @@ function PaintTool(canvas, roomTool) {
 		}
 
 		//draw grid
-		if (drawPaintGrid) {
+		if (self.drawPaintGrid) {
 			ctx.fillStyle = getContrastingColor();
 
 			for (var x = 1; x < tilesize; x++) {
@@ -173,6 +173,22 @@ function PaintTool(canvas, roomTool) {
 		return self.drawing.getFrameData(frameIndex);
 	}
 
-	// TODO : branch into reloadSprite, reloadTile, etc
-	function reloadDrawing() {}
+	// methods for updating the UI
+	this.onReloadTile = null;
+	this.onReloadSprite = null;
+	this.onReloadItem = null;
+	this.reloadDrawing = function() {
+		if ( self.drawing.type === TileType.Tile) {
+			if(self.onReloadTile)
+				self.onReloadTile();
+		}
+		else if( self.drawing.type === TileType.Avatar || self.drawing.type === TileType.Sprite ) {
+			if(self.onReloadSprite)
+				self.onReloadSprite();
+		}
+		else if( self.drawing.type === TileType.Item ) {
+			if(self.onReloadItem)
+				self.onReloadItem();
+		}
+	}
 }

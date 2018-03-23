@@ -236,20 +236,10 @@ var editMode = EditMode.Edit; // TODO : move to core.js?
 
 /* TOOL CONTROLLERS */
 var roomTool;
-
-/* PAINT */
-var paint_canvas;
-var paint_ctx;
-var paint_scale = 32;
+var paintTool;
 
 /* CUR DRAWING */
 var drawing = new DrawingId(TileType.Avatar,"A");
-
-var drawPaintGrid = true;
-var curPaintBrush = 0;
-var isPainting = false;
-var isCurDrawingAnimated = false;
-var curDrawingFrameIndex = 0;
 
 var tileIndex = 0;
 var spriteIndex = 0;
@@ -385,21 +375,16 @@ function start() {
 	//game canvas & context (also the map editor)
 	attachCanvas( document.getElementById("game") );
 
-	//init room tool
+	//init tool controllers
 	roomTool = new RoomTool(canvas);
 	roomTool.listenEditEvents()
 	roomTool.drawing = drawing;
 
-	//paint canvas & context
-	paint_canvas = document.getElementById("paint");
-	paint_canvas.width = tilesize * paint_scale;
-	paint_canvas.height = tilesize * paint_scale;
-	paint_ctx = paint_canvas.getContext("2d");
-	//paint events
-	paint_canvas.addEventListener("mousedown", paint_onMouseDown);
-	paint_canvas.addEventListener("mousemove", paint_onMouseMove);
-	paint_canvas.addEventListener("mouseup", paint_onMouseUp);
-	paint_canvas.addEventListener("mouseleave", paint_onMouseUp);
+	paintTool = new PaintTool(document.getElementById("paint"),roomTool);
+	paintTool.drawing = drawing;
+	paintTool.onReloadTile = function(){ reloadTile() };
+	paintTool.onReloadSprite = function(){ reloadSprite() };
+	paintTool.onReloadItem = function(){ reloadItem() };
 
 	//exit destination canvas & context
 	exit_canvas = document.getElementById("exitCanvas");
@@ -452,7 +437,7 @@ function start() {
 
 	//draw everything
 	on_paint_avatar();
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	roomTool.drawEditMap();
 	updateRoomPaletteSelect(); //dumb to have to specify this here --- wrap up room UI method?
 	updateRoomName(); // init the room UI
@@ -538,8 +523,8 @@ function setDefaultGameState() {
 	//clear values
 	clearGameData();
 	//hack
-	curDrawingFrameIndex = 0;
-	isCurDrawingAnimated = false;
+	paintTool.curDrawingFrameIndex = 0;
+	paintTool.isCurDrawingAnimated = false;
 	//default values
 	title = "Write your game's title here";
 	Ed().paletteIndex = 0;
@@ -673,9 +658,9 @@ function newTile(id) {
 		drawing.id = nextTileId();
 
 	makeTile(drawing.id);
-	reloadTile(); //hack for ui consistency (hack x 2: order matters for animated tiles)
+	paintTool.reloadDrawing(); //hack for ui consistency (hack x 2: order matters for animated tiles)
 
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	refreshGameData();
 
 	tileIndex = Object.keys(tile).length - 1;
@@ -685,8 +670,8 @@ function nextTile() {
 	var ids = sortedTileIdList();
 	tileIndex = (tileIndex + 1) % ids.length;
 	drawing.id = ids[tileIndex];
-	curDrawingFrameIndex = 0;
-	reloadTile();
+	paintTool.curDrawingFrameIndex = 0;
+	paintTool.reloadDrawing();
 }
 
 function prevTile() {
@@ -694,8 +679,8 @@ function prevTile() {
 	tileIndex = (tileIndex - 1) % ids.length;
 	if (tileIndex < 0) tileIndex = (ids.length-1);
 	drawing.id = ids[tileIndex];
-	curDrawingFrameIndex = 0;
-	reloadTile();
+	paintTool.curDrawingFrameIndex = 0;
+	paintTool.reloadDrawing();
 }
 
 function newSprite(id) {
@@ -705,9 +690,9 @@ function newSprite(id) {
 		drawing.id = nextSpriteId();
 
 	makeSprite(drawing.id);
-	reloadSprite(); //hack (order matters for animated tiles)
+	paintTool.reloadDrawing(); //hack (order matters for animated tiles)
 
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	refreshGameData();
 
 	spriteIndex = Object.keys(sprite).length - 1;
@@ -720,9 +705,9 @@ function newItem(id) {
 		drawing.id = nextItemId();
 
 	makeItem(drawing.id);
-	reloadItem(); //hack (order matters for animated tiles)
+	paintTool.reloadDrawing(); //hack (order matters for animated tiles)
 
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	updateInventoryItemUI();
 	refreshGameData();
 
@@ -855,7 +840,7 @@ function nextRoom() {
 	roomIndex = (roomIndex + 1) % ids.length;
 	curRoom = ids[roomIndex];
 	roomTool.drawEditMap();
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
 	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 
@@ -871,7 +856,7 @@ function prevRoom() {
 	if (roomIndex < 0) roomIndex = (ids.length-1);
 	curRoom = ids[roomIndex];
 	roomTool.drawEditMap();
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
 	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 
@@ -917,7 +902,7 @@ function duplicateRoom() {
 	curRoom = newRoomId;
 	//console.log(curRoom);
 	roomTool.drawEditMap();
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
 
 	updateRoomName();
@@ -979,7 +964,7 @@ function newRoom() {
 	curRoom = roomId;
 	//console.log(curRoom);
 	roomTool.drawEditMap();
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
 
 	updateRoomName();
@@ -1018,7 +1003,7 @@ function deleteRoom() {
 		refreshGameData();
 		nextRoom();
 		roomTool.drawEditMap();
-		drawPaintCanvas();
+		paintTool.updateCanvas();
 		updateRoomPaletteSelect();
 		updateExitOptionsFromGameData();
 		//recreate exit options
@@ -1029,8 +1014,8 @@ function nextItem() {
 	var ids = sortedItemIdList();
 	itemIndex = (itemIndex + 1) % ids.length;
 	drawing.id = ids[itemIndex];
-	curDrawingFrameIndex = 0;
-	reloadItem();
+	paintTool.curDrawingFrameIndex = 0;
+	paintTool.reloadDrawing();
 }
 
 function prevItem() {
@@ -1038,8 +1023,8 @@ function prevItem() {
 	itemIndex = (itemIndex - 1) % ids.length;
 	if (itemIndex < 0) itemIndex = (ids.length-1); // loop
 	drawing.id = ids[itemIndex];
-	curDrawingFrameIndex = 0;
-	reloadItem();
+	paintTool.curDrawingFrameIndex = 0;
+	paintTool.reloadDrawing();
 }
 
 function nextSprite() {
@@ -1047,8 +1032,8 @@ function nextSprite() {
 	spriteIndex = (spriteIndex + 1) % ids.length;
 	if (spriteIndex === 0) spriteIndex = 1; //skip avatar
 	drawing.id = ids[spriteIndex];
-	curDrawingFrameIndex = 0;
-	reloadSprite();
+	paintTool.curDrawingFrameIndex = 0;
+	paintTool.reloadDrawing();
 }
 
 function prevSprite() {
@@ -1056,8 +1041,8 @@ function prevSprite() {
 	spriteIndex = (spriteIndex - 1) % ids.length;
 	if (spriteIndex <= 0) spriteIndex = (ids.length-1); //loop and skip avatar
 	drawing.id = ids[spriteIndex];
-	curDrawingFrameIndex = 0;
-	reloadSprite();
+	paintTool.curDrawingFrameIndex = 0;
+	paintTool.reloadDrawing();
 }
 
 function next() {
@@ -1130,12 +1115,12 @@ function duplicateDrawing() {
 
 		tile[ drawing.id ].isWall = tmpIsWall;
 
-		drawPaintCanvas();
+		paintTool.updateCanvas();
 		refreshGameData();
 
 		tileIndex = Object.keys(tile).length - 1;
 
-		reloadTile(); //hack for ui consistency
+		paintTool.reloadDrawing(); //hack for ui consistency
 	}
 	else if(drawing.type == TileType.Avatar || drawing.type == TileType.Sprite) {
 
@@ -1160,12 +1145,12 @@ function duplicateDrawing() {
 
 		makeSprite( drawing.id, copiedImageData );
 
-		drawPaintCanvas();
+		paintTool.updateCanvas();
 		refreshGameData();
 
 		spriteIndex = Object.keys(sprite).length - 1;
 
-		reloadSprite(); //hack
+		paintTool.reloadDrawing(); //hack
 	}
 	else if(drawing.type == TileType.Item) {
 
@@ -1190,12 +1175,12 @@ function duplicateDrawing() {
 
 		makeItem( drawing.id, copiedImageData );
 
-		drawPaintCanvas();
+		paintTool.updateCanvas();
 		refreshGameData();
 
 		itemIndex = Object.keys(item).length - 1;
 
-		reloadItem(); //hack
+		paintTool.reloadDrawing(); //hack
 		updateInventoryItemUI();
 	}
 	addPaintThumbnail( drawing.id );
@@ -1274,15 +1259,15 @@ function updateAnimationUI() {
 function reloadTile() {
 	// animation UI
 	if ( tile[drawing.id] && tile[drawing.id].animation.isAnimated ) {
-		isCurDrawingAnimated = true;
+		paintTool.isCurDrawingAnimated = true;
 		document.getElementById("animatedCheckbox").checked = true;
 
-		if( curDrawingFrameIndex == 0)
+		if( paintTool.curDrawingFrameIndex == 0)
 		{
 			document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
 			document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
 		}
-		else if( curDrawingFrameIndex == 1 )
+		else if( paintTool.curDrawingFrameIndex == 1 )
 		{
 			document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
 			document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
@@ -1293,7 +1278,7 @@ function reloadTile() {
 		renderAnimationPreview( drawing.id );
 	}
 	else {
-		isCurDrawingAnimated = false;
+		paintTool.isCurDrawingAnimated = false;
 		document.getElementById("animatedCheckbox").checked = false;
 		document.getElementById("animation").setAttribute("style","display:none;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
@@ -1304,7 +1289,7 @@ function reloadTile() {
 
 	updateDrawingNameUI(true);
 
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 }
 
 function updateWallCheckboxOnCurrentTile() {
@@ -1385,15 +1370,15 @@ function reloadAdvDialogUI() {
 function reloadSprite() {
 	// animation UI
 	if ( sprite[drawing.id] && sprite[drawing.id].animation.isAnimated ) {
-		isCurDrawingAnimated = true;
+		paintTool.isCurDrawingAnimated = true;
 		document.getElementById("animatedCheckbox").checked = true;
 
-		if( curDrawingFrameIndex == 0)
+		if( paintTool.curDrawingFrameIndex == 0)
 		{
 			document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
 			document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
 		}
-		else if( curDrawingFrameIndex == 1 )
+		else if( paintTool.curDrawingFrameIndex == 1 )
 		{
 			document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
 			document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
@@ -1404,7 +1389,7 @@ function reloadSprite() {
 		renderAnimationPreview( drawing.id );
 	}
 	else {
-		isCurDrawingAnimated = false;
+		paintTool.isCurDrawingAnimated = false;
 		document.getElementById("animatedCheckbox").checked = false;
 		document.getElementById("animation").setAttribute("style","display:none;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
@@ -1416,7 +1401,7 @@ function reloadSprite() {
 	updateDrawingNameUI( drawing.id != "A" );
 
 	// update paint canvas
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 
 }
 
@@ -1424,15 +1409,15 @@ function reloadSprite() {
 function reloadItem() {
 	// animation UI
 	if ( item[drawing.id] && item[drawing.id].animation.isAnimated ) {
-		isCurDrawingAnimated = true;
+		paintTool.isCurDrawingAnimated = true;
 		document.getElementById("animatedCheckbox").checked = true;
 
-		if( curDrawingFrameIndex == 0)
+		if( paintTool.curDrawingFrameIndex == 0)
 		{
 			document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
 			document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
 		}
-		else if( curDrawingFrameIndex == 1 )
+		else if( paintTool.curDrawingFrameIndex == 1 )
 		{
 			document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
 			document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
@@ -1443,7 +1428,7 @@ function reloadItem() {
 		renderAnimationPreview( drawing.id );
 	}
 	else {
-		isCurDrawingAnimated = false;
+		paintTool.isCurDrawingAnimated = false;
 		document.getElementById("animatedCheckbox").checked = false;
 		document.getElementById("animation").setAttribute("style","display:none;");
 		document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
@@ -1455,116 +1440,8 @@ function reloadItem() {
 	updateDrawingNameUI(true);
 
 	// update paint canvas
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 
-}
-
-function paint_onMouseDown(e) {
-	if (isPlayMode) return; //can't paint during play mode
-
-	var off = getOffset(e);
-	var x = Math.floor(off.x / paint_scale);
-	var y = Math.floor(off.y / paint_scale);
-	if (curDrawingData()[y][x] == 0) {
-		curPaintBrush = 1;
-	}
-	else {
-		curPaintBrush = 0;
-	}
-	curDrawingData()[y][x] = curPaintBrush;
-	drawPaintCanvas();
-	isPainting = true;
-}
-
-function paint_onMouseMove(e) {
-	if (isPainting) {	
-		var off = getOffset(e);
-		var x = Math.floor(off.x / paint_scale);
-		var y = Math.floor(off.y / paint_scale);
-		curDrawingData()[y][x] = curPaintBrush;
-		drawPaintCanvas();
-	}
-}
-
-function paint_onMouseUp(e) {
-	if (isPainting) {
-		isPainting = false;
-		renderImages();
-		refreshGameData();
-		roomTool.drawEditMap();
-		renderPaintThumbnail( drawing.id );
-		if( isCurDrawingAnimated )
-			renderAnimationPreview( drawing.id );
-	}
-}
-
-function drawPaintCanvas() {
-	//background
-	paint_ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
-	paint_ctx.fillRect(0,0,canvas.width,canvas.height);
-
-	//pixel color
-	if (drawing.type == TileType.Tile) {
-		paint_ctx.fillStyle = "rgb("+getPal(curPal())[1][0]+","+getPal(curPal())[1][1]+","+getPal(curPal())[1][2]+")";
-	}
-	else if (drawing.type == TileType.Sprite || drawing.type == TileType.Avatar || drawing.type == TileType.Item) {
-		paint_ctx.fillStyle = "rgb("+getPal(curPal())[2][0]+","+getPal(curPal())[2][1]+","+getPal(curPal())[2][2]+")";
-	}
-
-	//draw pixels
-	for (var x = 0; x < 8; x++) {
-		for (var y = 0; y < 8; y++) {
-			// draw alternate frame
-			if (isCurDrawingAnimated && curDrawingAltFrameData()[y][x] === 1) {
-				paint_ctx.globalAlpha = 0.3;
-				paint_ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
-				paint_ctx.globalAlpha = 1;
-			}
-			// draw current frame
-			if (curDrawingData()[y][x] === 1) {
-				paint_ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
-			}
-		}
-	}
-
-	//draw grid
-	if (drawPaintGrid) {
-		paint_ctx.fillStyle = getContrastingColor();
-
-		for (var x = 1; x < tilesize; x++) {
-			paint_ctx.fillRect(x*paint_scale,0*paint_scale,1,tilesize*paint_scale);
-		}
-		for (var y = 1; y < tilesize; y++) {
-			paint_ctx.fillRect(0*paint_scale,y*paint_scale,tilesize*paint_scale,1);
-		}
-	}
-}
-
-function curDrawingImgId() {
-	var imgId = "";
-	if( drawing.type == TileType.Tile )
-		imgId += "TIL_";
-	else if( drawing.type == TileType.Sprite || drawing.type == TileType.Avatar )
-		imgId += "SPR_";
-	else if( drawing.type == TileType.Item )
-		imgId += "ITM_";
-	imgId += drawing.id;
-	return imgId;
-}
-
-function curDrawingData() {
-	var imgId = curDrawingImgId();
-	// console.log(imgId);
-	var frameIndex = (isCurDrawingAnimated ? curDrawingFrameIndex : 0);
-	// console.log(imageStore.source[ imgId ]);
-	return imageStore.source[ imgId ][ frameIndex ];
-}
-
-// todo: assumes 2 frames
-function curDrawingAltFrameData() {
-	var imgId = curDrawingImgId();
-	var frameIndex = (curDrawingFrameIndex === 0 ? 1 : 0);
-	return imageStore.source[ imgId ][ frameIndex ];
 }
 
 function newGameDialog() {
@@ -1582,7 +1459,7 @@ function resetGameData() {
 
 	refreshGameData();
 	renderImages();
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	roomTool.drawEditMap();
 	updatePaletteUI();
 	// updatePaletteControlsFromGameData();
@@ -1709,9 +1586,9 @@ function updatePreviewDialogButton() {
 }
 
 function togglePaintGrid(e) {
-	drawPaintGrid = e.target.checked;
-	document.getElementById("paintGridIcon").innerHTML = drawPaintGrid ? "visibility" : "visibility_off";
-	drawPaintCanvas();
+	paintTool.drawPaintGrid = e.target.checked;
+	document.getElementById("paintGridIcon").innerHTML = paintTool.drawPaintGrid ? "visibility" : "visibility_off";
+	paintTool.updateCanvas();
 }
 
 function toggleMapGrid(e) {
@@ -1805,10 +1682,10 @@ function onColorPickerChange( rgbColor, isMouseUp ) {
 	if( isMouseUp ) {
 		refreshGameData();
 		renderImages();
-		drawPaintCanvas();
+		paintTool.updateCanvas();
 		roomTool.drawEditMap();
 		refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
-		if( isCurDrawingAnimated )
+		if( paintTool.isCurDrawingAnimated )
 			renderAnimationPreview( drawing.id );
 	}
 }
@@ -1881,7 +1758,7 @@ function roomPaletteChange(event) {
 	room[curRoom].pal = palId;
 	refreshGameData();
 	roomTool.drawEditMap();
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 }
 
@@ -1900,7 +1777,7 @@ function updateDrawingNameUI(visible) {
 function on_paint_avatar() {
 	drawing.type = TileType.Avatar;
 	drawing.id = "A";
-	reloadSprite();
+	paintTool.reloadDrawing();
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintNav").setAttribute("style","display:none;");
@@ -1921,7 +1798,7 @@ function on_paint_tile() {
 	drawing.type = TileType.Tile;
 	tileIndex = 0;
 	drawing.id = sortedTileIdList()[tileIndex];
-	reloadTile();
+	paintTool.reloadDrawing();
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:block;");
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
@@ -1948,8 +1825,8 @@ function on_paint_sprite() {
 		spriteIndex = 0; //fall back to avatar if no other sprites exist
 	}
 	drawing.id = sortedSpriteIdList()[spriteIndex];
-	curDrawingFrameIndex = 0;
-	reloadSprite();
+	paintTool.curDrawingFrameIndex = 0;
+	paintTool.reloadDrawing();
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
@@ -1972,8 +1849,8 @@ function on_paint_item() {
 	itemIndex = 0;
 	drawing.id = sortedItemIdList()[itemIndex];
 	console.log(drawing.id);
-	curDrawingFrameIndex = 0;
-	reloadItem();
+	paintTool.curDrawingFrameIndex = 0;
+	paintTool.reloadDrawing();
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
@@ -2246,15 +2123,15 @@ function selectPaint() {
 	drawing.id = this.value;
 	if( drawing.type === TileType.Tile ) {
 		tileIndex = sortedTileIdList().indexOf( drawing.id );
-		reloadTile();
+		paintTool.reloadDrawing();
 	}
 	else if( drawing.type === TileType.Item ) {
 		itemIndex = sortedItemIdList().indexOf( drawing.id );
-		reloadItem();
+		paintTool.reloadDrawing();
 	}
 	else {
 		spriteIndex = sortedSpriteIdList().indexOf( drawing.id );
-		reloadSprite();
+		paintTool.reloadDrawing();
 	}
 }
 
@@ -2416,15 +2293,15 @@ function on_game_data_change_core() {
 	drawing.type = curPaintMode;
 	if ( drawing.type == TileType.Tile ) {
 		drawing.id = sortedTileIdList()[0];
-		reloadTile();
+		paintTool.reloadDrawing();
 	}
 	else if( drawing.type === TileType.Item ) {
 		drawing.id = sortedItemIdList()[0];
-		reloadItem();
+		paintTool.reloadDrawing();
 	}
 	else {
 		drawing.id = sortedSpriteIdList()[0];
-		reloadSprite();
+		paintTool.reloadDrawing();
 	}
 
 
@@ -2941,8 +2818,8 @@ function on_toggle_animated() {
 
 function addSpriteAnimation() {
 	//set editor mode
-	isCurDrawingAnimated = true;
-	curDrawingFrameIndex = 0;
+	paintTool.isCurDrawingAnimated = true;
+	paintTool.curDrawingFrameIndex = 0;
 
 	//mark sprite as animated
 	sprite[drawing.id].animation.isAnimated = true;
@@ -2959,12 +2836,12 @@ function addSpriteAnimation() {
 	//refresh data model
 	renderImages();
 	refreshGameData();
-	reloadSprite();
+	paintTool.reloadDrawing();
 }
 
 function removeSpriteAnimation() {
 	//set editor mode
-	isCurDrawingAnimated = false;
+	paintTool.isCurDrawingAnimated = false;
 
 	//mark sprite as non-animated
 	sprite[drawing.id].animation.isAnimated = false;
@@ -2979,13 +2856,13 @@ function removeSpriteAnimation() {
 	//refresh data model
 	renderImages();
 	refreshGameData();
-	reloadSprite();
+	paintTool.reloadDrawing();
 }
 
 function addTileAnimation() {
 	//set editor mode
-	isCurDrawingAnimated = true;
-	curDrawingFrameIndex = 0;
+	paintTool.isCurDrawingAnimated = true;
+	paintTool.curDrawingFrameIndex = 0;
 
 	//mark tile as animated
 	tile[drawing.id].animation.isAnimated = true;
@@ -3002,12 +2879,12 @@ function addTileAnimation() {
 	//refresh data model
 	renderImages();
 	refreshGameData();
-	reloadTile();
+	paintTool.reloadDrawing();
 }
 
 function removeTileAnimation() {
 	//set editor mode
-	isCurDrawingAnimated = false;
+	paintTool.isCurDrawingAnimated = false;
 
 	//mark tile as non-animated
 	tile[drawing.id].animation.isAnimated = false;
@@ -3022,14 +2899,14 @@ function removeTileAnimation() {
 	//refresh data model
 	renderImages();
 	refreshGameData();
-	reloadTile();
+	paintTool.reloadDrawing();
 }
 
 // TODO : so much duplication it makes me sad :(
 function addItemAnimation() {
 	//set editor mode
-	isCurDrawingAnimated = true;
-	curDrawingFrameIndex = 0;
+	paintTool.isCurDrawingAnimated = true;
+	paintTool.curDrawingFrameIndex = 0;
 
 	//mark item as animated
 	item[drawing.id].animation.isAnimated = true;
@@ -3046,12 +2923,12 @@ function addItemAnimation() {
 	//refresh data model
 	renderImages();
 	refreshGameData();
-	reloadItem();
+	paintTool.reloadDrawing();
 }
 
 function removeItemAnimation() {
 	//set editor mode
-	isCurDrawingAnimated = false;
+	paintTool.isCurDrawingAnimated = false;
 
 	//mark item as non-animated
 	item[drawing.id].animation.isAnimated = false;
@@ -3066,7 +2943,7 @@ function removeItemAnimation() {
 	//refresh data model
 	renderImages();
 	refreshGameData();
-	reloadItem();
+	paintTool.reloadDrawing();
 }
 
 function addNewFrameToDrawing(drwId) {
@@ -3100,26 +2977,14 @@ function restoreDrawingAnimation(imageStoreId,cachedAnimation) {
 	}
 }
 
-function reloadCurDrawing() {
-	if ( drawing.type === TileType.Tile) {
-		reloadTile();
-	}
-	else if( drawing.type === TileType.Avatar || drawing.type === TileType.Sprite ) {
-		reloadSprite();
-	}
-	else if( drawing.type === TileType.Item ) {
-		reloadItem();
-	}
-}
-
 function on_paint_frame1() {
-	curDrawingFrameIndex = 0;
-	reloadCurDrawing();
+	paintTool.curDrawingFrameIndex = 0;
+	paintTool.reloadDrawing();
 }
 
 function on_paint_frame2() {
-	curDrawingFrameIndex = 1;
-	reloadCurDrawing();
+	paintTool.curDrawingFrameIndex = 1;
+	paintTool.reloadDrawing();
 }
 
 var export_settings = {
