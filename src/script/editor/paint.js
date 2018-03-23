@@ -126,10 +126,10 @@ function PaintTool(canvas, roomTool) {
 		ctx.fillRect(0,0,canvas.width,canvas.height);
 
 		//pixel color
-		if (drawing.type == TileType.Tile) {
+		if (self.drawing.type == TileType.Tile) {
 			ctx.fillStyle = "rgb("+getPal(curPal())[1][0]+","+getPal(curPal())[1][1]+","+getPal(curPal())[1][2]+")";
 		}
-		else if (drawing.type == TileType.Sprite || drawing.type == TileType.Avatar || drawing.type == TileType.Item) {
+		else if (self.drawing.type == TileType.Sprite || self.drawing.type == TileType.Avatar || self.drawing.type == TileType.Item) {
 			ctx.fillStyle = "rgb("+getPal(curPal())[2][0]+","+getPal(curPal())[2][1]+","+getPal(curPal())[2][2]+")";
 		}
 

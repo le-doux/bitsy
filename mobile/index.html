@@ -114,6 +114,9 @@ function start() {
 	attachCanvas( document.getElementById("game") );
 
 	roomTool = new RoomTool(canvas);
+	paintTool = new PaintTool(document.getElementById("paint"),roomTool);
+	paintTool.onReloadTile = function(){ reloadTile() };
+	paintTool.onReloadSprite = function(){ reloadSprite() };
 
 	//load last auto-save
 	if (localStorage.game_data) {
@@ -130,8 +133,7 @@ function start() {
 
 	document.getElementById("titleText").value = title;
 
-	initPaintCanvas();
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 
 	// init color picker
 	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSlider', 'colorPickerSliderBg', 'colorPickerHexText');
@@ -259,15 +261,17 @@ function room_onSelectDrawing(e) {
 /* 
 	PAINT 
 */
+var paintTool;
+
 function on_paint_avatar() {
-	paint_pntMode = TileType.Avatar;
-	paint_drwId = "A";
+	paintTool.drawing.type = TileType.Avatar;
+	paintTool.drawing.id = "A";
 
 	// update options
 	var selectDrawing = document.getElementById("drawing_select");
 	selectDrawing.style.display = "none";
 
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:none;");
@@ -275,8 +279,8 @@ function on_paint_avatar() {
 }
 
 function on_paint_tile() {
-	paint_pntMode = TileType.Tile;
-	paint_drwId = sortedTileIdList()[0];
+	paintTool.drawing.type = TileType.Tile;
+	paintTool.drawing.id = sortedTileIdList()[0];
 
 	// update options
 	var selectDrawing = document.getElementById("drawing_select");
@@ -294,7 +298,7 @@ function on_paint_tile() {
 	}
 
 	reloadTile();
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:block;");
@@ -302,8 +306,8 @@ function on_paint_tile() {
 }
 
 function on_paint_sprite() {
-	paint_pntMode = TileType.Sprite;
-	paint_drwId = sortedSpriteIdList()[sortedSpriteIdList().length > 1 ? 1 : 0];
+	paintTool.drawing.type = TileType.Sprite;
+	paintTool.drawing.id = sortedSpriteIdList()[sortedSpriteIdList().length > 1 ? 1 : 0];
 
 	// update options
 	var selectDrawing = document.getElementById("drawing_select");
@@ -326,7 +330,7 @@ function on_paint_sprite() {
 
 	reloadSprite();
 
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
@@ -334,243 +338,34 @@ function on_paint_sprite() {
 }
 
 function paint_onSelectDrawing(e) {
-	paint_drwId = e.target.value;
-	drawPaintCanvas();
+	paintTool.drawing.id = e.target.value;
+	paintTool.updateCanvas();
 
 	// TODO : make these functions less hacky and terrible
-	if(paint_pntMode == TileType.Tile) {
+	if(paintTool.drawing.type == TileType.Tile) {
 		reloadTile();
 	}
-	else if(paint_pntMode == TileType.Sprite) {
+	else if(paintTool.drawing.type == TileType.Sprite) {
 		reloadSprite();
 	}
 }
 
-// shared - refactored
-var paint_pntMode = TileType.Avatar;
-var paint_drwId = "A";
-
-// shared - refactored
-var paint_canvas;
-var paint_ctx;
-var paint_scale = 32;
-
-// shared - refactored
-var drawPaintGrid = true;
-var curPaintBrush = 0;
-var isPainting = false;
-var isCurDrawingAnimated = false;
-var curDrawingFrameIndex = 0;
-
-// shared - refactored
-function initPaintCanvas() {
-	//paint canvas & context
-	paint_canvas = document.getElementById("paint");
-	paint_canvas.width = tilesize * paint_scale;
-	paint_canvas.height = tilesize * paint_scale;
-	paint_ctx = paint_canvas.getContext("2d");
-
-	//paint events
-	// paint_canvas.addEventListener("mousedown", paint_onMouseDown);
-	// paint_canvas.addEventListener("mousemove", paint_onMouseMove);
-	// paint_canvas.addEventListener("mouseup", paint_onMouseUp);
-	// paint_canvas.addEventListener("mouseleave", paint_onMouseUp);
-
-	paint_canvas.addEventListener("touchstart", paint_onTouchStart);
-	paint_canvas.addEventListener("touchmove", paint_onTouchMove);
-	paint_canvas.addEventListener("touchend", paint_onTouchEnd);
-}
-
-// shared - refactored
-function paint_onMouseDown(e) {
-	// if (isPlayMode) return; //can't paint during play mode
-
-	var off = getOffset(e);
-
-	off = mobileOffsetCorrection(off,e,(tilesize));
-
-	var x = Math.floor(off.x);
-	var y = Math.floor(off.y);
-
-	// non-responsive version
-	// var x = Math.floor(off.x / paint_scale);
-	// var y = Math.floor(off.y / paint_scale);
-
-	if (curDrawingData()[y][x] == 0) {
-		curPaintBrush = 1;
-	}
-	else {
-		curPaintBrush = 0;
-	}
-	curDrawingData()[y][x] = curPaintBrush;
-	drawPaintCanvas();
-	isPainting = true;
-}
-
-// shared - refactored
-function paint_onMouseMove(e) {
-	if (isPainting) {	
-		var off = getOffset(e);
-
-		off = mobileOffsetCorrection(off,e,(tilesize));
-
-		var x = Math.floor(off.x);// / paint_scale);
-		var y = Math.floor(off.y);// / paint_scale);
-		curDrawingData()[y][x] = curPaintBrush;
-		drawPaintCanvas();
-	}
-}
-
-// shared - refactored
-function paint_onMouseUp(e) {
-	if (isPainting) {
-		isPainting = false;
-		renderImages();
-		refreshGameData();
-		roomTool.drawEditMap();
-		// renderPaintThumbnail( roomTool.drawing.id );
-		// if( isCurDrawingAnimated )
-		// 	renderAnimationPreview( roomTool.drawing.id );
-	}
-}
-
-// shared - refactored
-function paint_onTouchStart(e) {
-	e.preventDefault();
-	var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
-	paint_onMouseDown(fakeEvent);
-}
-
-// shared - refactored
-function paint_onTouchMove(e) {
-	e.preventDefault();
-	var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
-	paint_onMouseMove(fakeEvent);
-}
-
-// shared - refactored
-function paint_onTouchEnd(e) {
-	e.preventDefault();
-	paint_onMouseUp();
-}
-
-// shared - refactored
-function drawPaintCanvas() {
-	//background
-	paint_ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
-	paint_ctx.fillRect(0,0,canvas.width,canvas.height);
-
-	//pixel color
-	if (roomTool.drawing.type == TileType.Tile) {
-		paint_ctx.fillStyle = "rgb("+getPal(curPal())[1][0]+","+getPal(curPal())[1][1]+","+getPal(curPal())[1][2]+")";
-	}
-	else if (roomTool.drawing.type == TileType.Sprite || roomTool.drawing.type == TileType.Avatar || roomTool.drawing.type == TileType.Item) {
-		paint_ctx.fillStyle = "rgb("+getPal(curPal())[2][0]+","+getPal(curPal())[2][1]+","+getPal(curPal())[2][2]+")";
-	}
-
-	//draw pixels
-	for (var x = 0; x < 8; x++) {
-		for (var y = 0; y < 8; y++) {
-			// draw alternate frame
-			if (isCurDrawingAnimated && curDrawingAltFrameData()[y][x] === 1) {
-				paint_ctx.globalAlpha = 0.3;
-				paint_ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
-				paint_ctx.globalAlpha = 1;
-			}
-			// draw current frame
-			if (curDrawingData()[y][x] === 1) {
-				paint_ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
-			}
-		}
-	}
-
-	//draw grid
-	if (drawPaintGrid) {
-		paint_ctx.fillStyle = getContrastingColor();
-
-		for (var x = 1; x < tilesize; x++) {
-			paint_ctx.fillRect(x*paint_scale,0*paint_scale,1,tilesize*paint_scale);
-		}
-		for (var y = 1; y < tilesize; y++) {
-			paint_ctx.fillRect(0*paint_scale,y*paint_scale,tilesize*paint_scale,1);
-		}
-	}
-}
-
-// shared - refactored
-function curDrawingData() {
-	var imgId = curDrawingImgId();
-	// console.log(imgId);
-	var frameIndex = (isCurDrawingAnimated ? curDrawingFrameIndex : 0);
-	// console.log(imageStore.source[ imgId ]);
-	return imageStore.source[ imgId ][ frameIndex ];
-}
-
-// shared - refactored
-function curDrawingImgId() {
-	var imgId = "";
-	if( paint_pntMode == TileType.Tile )
-		imgId += "TIL_";
-	else if( paint_pntMode == TileType.Sprite || paint_pntMode == TileType.Avatar )
-		imgId += "SPR_";
-	else if( paint_pntMode == TileType.Item )
-		imgId += "ITM_";
-	imgId += paint_drwId;
-	return imgId;
-}
-
-// shared - refactored
-function curDrawingAltFrameData() {
-}
-
 // shared
 function reloadTile() {
-	// animation UI
-	// if ( tile[roomTool.drawing.id] && tile[roomTool.drawing.id].animation.isAnimated ) {
-	// 	isCurDrawingAnimated = true;
-	// 	document.getElementById("animatedCheckbox").checked = true;
-
-	// 	if( curDrawingFrameIndex == 0)
-	// 	{
-	// 		document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
-	// 		document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
-	// 	}
-	// 	else if( curDrawingFrameIndex == 1 )
-	// 	{
-	// 		document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
-	// 		document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
-	// 	}
-
-	// 	document.getElementById("animation").setAttribute("style","display:block;");
-	// 	document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
-	// 	renderAnimationPreview( roomTool.drawing.id );
-	// }
-	// else {
-	// 	isCurDrawingAnimated = false;
-	// 	document.getElementById("animatedCheckbox").checked = false;
-	// 	document.getElementById("animation").setAttribute("style","display:none;");
-	// 	document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
-	// }
-
-	// wall UI
 	updateWallCheckboxOnCurrentTile();
-
-	// updateDrawingNameUI(true);
-
-	// drawPaintCanvas();
 }
 
 // shared
 function updateWallCheckboxOnCurrentTile() {
 	var isCurTileWall = false;
 
-	if( tile[ paint_drwId ].isWall == undefined || tile[ paint_drwId ].isWall == null ) {
+	if( tile[ paintTool.drawing.id ].isWall == undefined || tile[ paintTool.drawing.id ].isWall == null ) {
 		if (room[curRoom]) {
-			isCurTileWall = (room[curRoom].walls.indexOf(paint_drwId) != -1);
+			isCurTileWall = (room[curRoom].walls.indexOf(paintTool.drawing.id) != -1);
 		}
 	}
 	else {
-		isCurTileWall = tile[ paint_drwId ].isWall;
+		isCurTileWall = tile[ paintTool.drawing.id ].isWall;
 	}
 
 	console.log("IS WALL " + isCurTileWall);
@@ -587,41 +382,7 @@ function updateWallCheckboxOnCurrentTile() {
 
 // shared
 function reloadSprite() {
-	// // animation UI
-	// if ( sprite[roomTool.drawing.id] && sprite[roomTool.drawing.id].animation.isAnimated ) {
-	// 	isCurDrawingAnimated = true;
-	// 	document.getElementById("animatedCheckbox").checked = true;
-
-	// 	if( curDrawingFrameIndex == 0)
-	// 	{
-	// 		document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
-	// 		document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
-	// 	}
-	// 	else if( curDrawingFrameIndex == 1 )
-	// 	{
-	// 		document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
-	// 		document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
-	// 	}
-
-	// 	document.getElementById("animation").setAttribute("style","display:block;");
-	// 	document.getElementById("animatedCheckboxIcon").innerHTML = "expand_more";
-	// 	renderAnimationPreview( roomTool.drawing.id );
-	// }
-	// else {
-	// 	isCurDrawingAnimated = false;
-	// 	document.getElementById("animatedCheckbox").checked = false;
-	// 	document.getElementById("animation").setAttribute("style","display:none;");
-	// 	document.getElementById("animatedCheckboxIcon").innerHTML = "expand_less";
-	// }
-
-	// dialog UI
 	reloadDialogUI()
-
-	// updateDrawingNameUI( roomTool.drawing.id != "A" );
-
-	// // update paint canvas
-	// drawPaintCanvas();
-
 }
 
 // shared
@@ -660,14 +421,14 @@ function reloadDialogUICore() { // TODO: name is terrible
 // shared
 function getCurDialogId() {
 	var dialogId = null;
-	if(paint_pntMode == TileType.Sprite) {
-		dialogId = sprite[paint_drwId].dlg;
-		if(dialogId == null && dialog[paint_drwId] != null) {
-			dialogId = paint_drwId;
+	if(paintTool.drawing.type == TileType.Sprite) {
+		dialogId = sprite[paintTool.drawing.id].dlg;
+		if(dialogId == null && dialog[paintTool.drawing.id] != null) {
+			dialogId = paintTool.drawing.id;
 		}
 	}
-	else if(paint_pntMode == TileType.Item) {
-		dialogId = item[paint_drwId].dlg;
+	else if(paintTool.drawing.type == TileType.Item) {
+		dialogId = item[paintTool.drawing.id].dlg;
 	}
 	console.log("DIALOG ID " + dialogId);
 	return dialogId;
@@ -686,11 +447,11 @@ function on_toggle_wall(e) {
 	// }
 
 	if ( e.target.checked ){
-		tile[ paint_drwId ].isWall = true;
+		tile[ paintTool.drawing.id ].isWall = true;
 		// document.getElementById("wallCheckboxIcon").innerHTML = "border_outer";
 	}
 	else {
-		tile[ paint_drwId ].isWall = false;
+		tile[ paintTool.drawing.id ].isWall = false;
 		// document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
 	}
 
@@ -710,7 +471,7 @@ function on_change_dialog() {
 	}
 	else {
 		if(!dialogId) {
-			var prefix = (paint_pntMode == TileType.Item) ? "ITM_" : "SPR_";
+			var prefix = (paintTool.drawing.type == TileType.Item) ? "ITM_" : "SPR_";
 			dialogId = nextAvailableDialogId( prefix );
 			getCurPaintObject().dlg = dialogId;
 		}
@@ -725,25 +486,25 @@ function on_change_dialog() {
 
 // shared
 function getCurPaintObject(id) {
-	if(id === undefined || id === null) id = paint_drwId;
+	if(id === undefined || id === null) id = paintTool.drawing.id;
 	console.log(id);
-	if(paint_pntMode == TileType.Sprite || paint_pntMode == TileType.Avatar) {
+	if(paintTool.drawing.type == TileType.Sprite || paintTool.drawing.type == TileType.Avatar) {
 		return sprite[id];
 	}
-	else if(paint_pntMode == TileType.Item) {
+	else if(paintTool.drawing.type == TileType.Item) {
 		return item[id];
 	}
-	else if(paint_pntMode == TileType.Tile) {
+	else if(paintTool.drawing.type == TileType.Tile) {
 		return tile[id];
 	}
 }
 
 // shared
 function newDrawing() {
-	if ( paint_pntMode == TileType.Tile ) {
+	if ( paintTool.drawing.type == TileType.Tile ) {
 		newTile();
 	}
-	else if( paint_pntMode == TileType.Avatar || paint_pntMode == TileType.Sprite ) {
+	else if( paintTool.drawing.type == TileType.Avatar || paintTool.drawing.type == TileType.Sprite ) {
 		newSprite();
 	}
 	// else if( roomTool.drawing.type == TileType.Item ) {
@@ -758,14 +519,14 @@ function newDrawing() {
 // shared
 function newTile(id) {
 	if (id)
-		paint_drwId = id; //this optional parameter lets me override the default next id
+		paintTool.drawing.id = id; //this optional parameter lets me override the default next id
 	else
-		paint_drwId = nextTileId();
+		paintTool.drawing.id = nextTileId();
 
-	makeTile(paint_drwId);
+	makeTile(paintTool.drawing.id);
 	reloadTile(); //hack for ui consistency (hack x 2: order matters for animated tiles)
 
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	refreshGameData();
 
 	tileIndex = Object.keys(tile).length - 1;
@@ -774,14 +535,14 @@ function newTile(id) {
 // shared
 function newSprite(id) {
 	if (id)
-		paint_drwId = id; //this optional parameter lets me override the default next id
+		paintTool.drawing.id = id; //this optional parameter lets me override the default next id
 	else
-		paint_drwId = nextSpriteId();
+		paintTool.drawing.id = nextSpriteId();
 
-	makeSprite(paint_drwId);
+	makeSprite(paintTool.drawing.id);
 	reloadSprite(); //hack (order matters for animated tiles)
 
-	drawPaintCanvas();
+	paintTool.updateCanvas();
 	refreshGameData();
 
 	spriteIndex = Object.keys(sprite).length - 1;
@@ -793,8 +554,8 @@ function deleteDrawing() {
 		// deletePaintThumbnail( roomTool.drawing.id );
 		if (roomTool.drawing.type == TileType.Tile) {
 			if ( Object.keys( tile ).length <= 1 ) { /*alert("You can't delete your last tile!");*/ return; }
-			delete tile[ paint_drwId ];
-			findAndReplaceTileInAllRooms( paint_drwId, "0" );
+			delete tile[ paintTool.drawing.id ];
+			findAndReplaceTileInAllRooms( paintTool.drawing.id, "0" );
 			refreshGameData();
 			renderImages();
 			roomTool.drawEditMap();
@@ -805,11 +566,11 @@ function deleteDrawing() {
 			if ( Object.keys( sprite ).length <= 2 ) { /*alert("You can't delete your last sprite!");*/ return; }
 
 			// todo: share with items
-			var dlgId = sprite[ paint_drwId ].dlg == null ? paint_drwId : sprite[ paint_drwId ].dlg;
+			var dlgId = sprite[ paintTool.drawing.id ].dlg == null ? paintTool.drawing.id : sprite[ paintTool.drawing.id ].dlg;
 			if( dlgId && dialog[ dlgId ] )
 				delete dialog[ dlgId ];
 
-			delete sprite[ paint_drwId ];
+			delete sprite[ paintTool.drawing.id ];
 
 			refreshGameData();
 			renderImages();
@@ -871,7 +632,7 @@ function onColorPickerChange( rgbColor, isMouseUp ) {
 	if( isMouseUp ) {
 		// refreshGameData();
 		// renderImages();
-		// drawPaintCanvas();
+		// paintTool.updateCanvas();
 		// roomTool.drawEditMap();
 		// refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
 		// if( isCurDrawingAnimated )
@@ -929,7 +690,7 @@ function resetGameData() {
 
 	// refreshGameData();
 	// renderImages();
-	// drawPaintCanvas();
+	// paintTool.updateCanvas();
 	// roomTool.drawEditMap();
 	// updatePaletteUI();
 	// // updatePaletteControlsFromGameData();
