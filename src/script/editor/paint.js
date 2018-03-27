@@ -15,6 +15,21 @@ function DrawingId(type,id) { // TODO: is this the right name?
 	this.toString = function() {
 		return tileTypeToIdPrefix(self.type) + self.id;
 	}
+
+	this.getDialogId = function() {
+		var dialogId = null;
+		if(self.type == TileType.Sprite) {
+			dialogId = sprite[self.id].dlg;
+			if(dialogId == null && dialog[self.id] != null) {
+				dialogId = self.id;
+			}
+		}
+		else if(self.type == TileType.Item) {
+			dialogId = item[self.id].dlg;
+		}
+		console.log("DIALOG ID " + dialogId);
+		return dialogId;
+	}
 }
 
 // TODO

@@ -350,12 +350,12 @@ function paint_onSelectDrawing(e) {
 	}
 }
 
-// shared
+// specialized
 function reloadTile() {
 	updateWallCheckboxOnCurrentTile();
 }
 
-// shared
+// specialized
 function updateWallCheckboxOnCurrentTile() {
 	var isCurTileWall = false;
 
@@ -380,58 +380,9 @@ function updateWallCheckboxOnCurrentTile() {
 	}
 }
 
-// shared
+// specialized
 function reloadSprite() {
 	reloadDialogUI()
-}
-
-// shared
-function reloadDialogUI() {
-	reloadDialogUICore();
-
-	// reloadAdvDialogUI();
-}
-
-// shared
-function reloadDialogUICore() { // TODO: name is terrible
-	var dialogId = getCurDialogId();
-
-	if (dialogId in dialog) {
-		var dialogLines = dialog[dialogId].split("\n");
-		if(dialogLines[0] === '"""') {
-			// multi line
-			var dialogStr = "";
-			var i = 1;
-			while (i < dialogLines.length && dialogLines[i] != '"""') {
-				dialogStr += dialogLines[i] + (dialogLines[i+1] != '"""' ? '\n' : '');
-				i++;
-			}
-			document.getElementById("dialogText").value = dialogStr;
-		}
-		else {
-			// single line
-			document.getElementById("dialogText").value = dialog[dialogId];
-		}
-	}
-	else {
-		document.getElementById("dialogText").value = "";
-	}	
-}
-
-// shared
-function getCurDialogId() {
-	var dialogId = null;
-	if(paintTool.drawing.type == TileType.Sprite) {
-		dialogId = sprite[paintTool.drawing.id].dlg;
-		if(dialogId == null && dialog[paintTool.drawing.id] != null) {
-			dialogId = paintTool.drawing.id;
-		}
-	}
-	else if(paintTool.drawing.type == TileType.Item) {
-		dialogId = item[paintTool.drawing.id].dlg;
-	}
-	console.log("DIALOG ID " + dialogId);
-	return dialogId;
 }
 
 // shared

@@ -1314,37 +1314,6 @@ function updateWallCheckboxOnCurrentTile() {
 	}
 }
 
-function reloadDialogUI() {
-	reloadDialogUICore();
-
-	reloadAdvDialogUI();
-}
-
-function reloadDialogUICore() { // TODO: name is terrible
-	var dialogId = getCurDialogId();
-
-	if (dialogId in dialog) {
-		var dialogLines = dialog[dialogId].split("\n");
-		if(dialogLines[0] === '"""') {
-			// multi line
-			var dialogStr = "";
-			var i = 1;
-			while (i < dialogLines.length && dialogLines[i] != '"""') {
-				dialogStr += dialogLines[i] + (dialogLines[i+1] != '"""' ? '\n' : '');
-				i++;
-			}
-			document.getElementById("dialogText").value = dialogStr;
-		}
-		else {
-			// single line
-			document.getElementById("dialogText").value = dialog[dialogId];
-		}
-	}
-	else {
-		document.getElementById("dialogText").value = "";
-	}	
-}
-
 // TODO : better name?
 function reloadAdvDialogUI() {
 	// var dialogId = getCurDialogId(); // necessary?
@@ -2152,21 +2121,6 @@ function deletePaintThumbnail(id) {
 	var paintExplorerForm = document.getElementById("paintExplorerFormInner");
 	paintExplorerForm.removeChild( document.getElementById( "paintExplorerRadio_" + id ) );
 	paintExplorerForm.removeChild( document.getElementById( "paintExplorerLabel_" + id ) );
-}
-
-function getCurDialogId() {
-	var dialogId = null;
-	if(drawing.type == TileType.Sprite) {
-		dialogId = sprite[drawing.id].dlg;
-		if(dialogId == null && dialog[drawing.id] != null) {
-			dialogId = drawing.id;
-		}
-	}
-	else if(drawing.type == TileType.Item) {
-		dialogId = item[drawing.id].dlg;
-	}
-	console.log("DIALOG ID " + dialogId);
-	return dialogId;
 }
 
 function getCurPaintObject(id) {

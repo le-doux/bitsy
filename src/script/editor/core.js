@@ -256,3 +256,46 @@ function tileTypeToIdPrefix(type) {
 	else if( type == TileType.Item )
 		return "ITM_";
 }
+
+/* DIALOG UI 
+- needs a better home
+	- into paint object?
+	- needs its own controller?
+*/
+function reloadDialogUI() {
+	reloadDialogUICore();
+
+	if( Ed().platform == PlatformType.Desktop )
+		reloadAdvDialogUI();
+}
+
+// TODO : default paint and room tools tied to editor state object??? (or is that bad?)
+function reloadDialogUICore() { // TODO: name is terrible
+	var dialogId = getCurDialogId(); // hacky
+
+	if (dialogId in dialog) {
+		var dialogLines = dialog[dialogId].split("\n");
+		if(dialogLines[0] === '"""') {
+			// multi line
+			var dialogStr = "";
+			var i = 1;
+			while (i < dialogLines.length && dialogLines[i] != '"""') {
+				dialogStr += dialogLines[i] + (dialogLines[i+1] != '"""' ? '\n' : '');
+				i++;
+			}
+			document.getElementById("dialogText").value = dialogStr;
+		}
+		else {
+			// single line
+			document.getElementById("dialogText").value = dialog[dialogId];
+		}
+	}
+	else {
+		document.getElementById("dialogText").value = "";
+	}	
+}
+
+// hacky - assumes global paintTool object
+function getCurDialogId() {
+	return paintTool.drawing.getDialogId();
+}
