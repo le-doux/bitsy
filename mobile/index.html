@@ -385,28 +385,9 @@ function reloadSprite() {
 	reloadDialogUI()
 }
 
-// shared
+// specialized - sort of
 function on_toggle_wall(e) {
-	// if( tile[ roomTool.drawing.id ].isWall == undefined || tile[ roomTool.drawing.id ].isWall == null ) {
-	// 	// clear out any existing wall settings for this tile in any rooms
-	// 	// (this is back compat for old-style wall settings)
-	// 	for( roomId in room ) {
-	// 		var i = room[ roomId ].walls.indexOf( roomTool.drawing.id );
-	// 		if( i > -1 )
-	// 			room[ roomId ].walls.splice( i , 1 );
-	// 	}
-	// }
-
-	if ( e.target.checked ){
-		tile[ paintTool.drawing.id ].isWall = true;
-		// document.getElementById("wallCheckboxIcon").innerHTML = "border_outer";
-	}
-	else {
-		tile[ paintTool.drawing.id ].isWall = false;
-		// document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
-	}
-
-	refreshGameData();
+	paintTool.toggleWall( e.target.checked );
 }
 
 // shared

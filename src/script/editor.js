@@ -2294,26 +2294,11 @@ function updateExitOptionsFromGameData() {
 }
 
 function on_toggle_wall(e) {
-	if( tile[ drawing.id ].isWall == undefined || tile[ drawing.id ].isWall == null ) {
-		// clear out any existing wall settings for this tile in any rooms
-		// (this is back compat for old-style wall settings)
-		for( roomId in room ) {
-			var i = room[ roomId ].walls.indexOf( drawing.id );
-			if( i > -1 )
-				room[ roomId ].walls.splice( i , 1 );
-		}
-	}
+	paintTool.toggleWall( e.target.checked );
+}
 
-	if ( e.target.checked ){
-		tile[ drawing.id ].isWall = true;
-		document.getElementById("wallCheckboxIcon").innerHTML = "border_outer";
-	}
-	else {
-		tile[ drawing.id ].isWall = false;
-		document.getElementById("wallCheckboxIcon").innerHTML = "border_clear";
-	}
-
-	refreshGameData();
+function toggleWallUI(checked) {
+	document.getElementById("wallCheckboxIcon").innerHTML = checked ? "border_outer" : "border_clear";
 }
 
 function exportGame() {

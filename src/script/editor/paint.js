@@ -206,4 +206,27 @@ function PaintTool(canvas, roomTool) {
 				self.onReloadItem();
 		}
 	}
+
+	this.toggleWall = function(checked) {
+		if( self.drawing.type != TileType.Tile )
+			return;
+
+		if( tile[ self.drawing.id ].isWall == undefined || tile[ self.drawing.id ].isWall == null ) {
+			// clear out any existing wall settings for this tile in any rooms
+			// (this is back compat for old-style wall settings)
+			for( roomId in room ) {
+				var i = room[ roomId ].walls.indexOf( self.drawing.id );
+				if( i > -1 )
+					room[ roomId ].walls.splice( i , 1 );
+			}
+		}
+
+		tile[ self.drawing.id ].isWall = checked;
+
+		refreshGameData();
+
+		if(toggleWallUI != null && toggleWallUI != undefined) // a bit hacky
+			toggleWallUI(checked);
+	}
 }
+
