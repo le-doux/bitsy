@@ -1129,53 +1129,6 @@ function duplicateDrawing() {
 	changePaintExplorerSelection( drawing.id );
 }
 
-function deleteDrawing() {
-	if ( confirm("Are you sure you want to delete this drawing?") ) {
-		deletePaintThumbnail( drawing.id );
-		if (drawing.type == TileType.Tile) {
-			if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
-			delete tile[ drawing.id ];
-			findAndReplaceTileInAllRooms( drawing.id, "0" );
-			refreshGameData();
-			renderImages();
-			roomTool.drawEditMap();
-			nextTile();
-		}
-		else if( drawing.type == TileType.Avatar || drawing.type == TileType.Sprite ){
-			if ( Object.keys( sprite ).length <= 2 ) { alert("You can't delete your last sprite!"); return; }
-
-			// todo: share with items
-			var dlgId = sprite[ drawing.id ].dlg == null ? drawing.id : sprite[ drawing.id ].dlg;
-			if( dlgId && dialog[ dlgId ] )
-				delete dialog[ dlgId ];
-
-			delete sprite[ drawing.id ];
-
-			refreshGameData();
-			renderImages();
-			roomTool.drawEditMap();
-			nextSprite();
-		}
-		else if( drawing.type == TileType.Item ){
-			if ( Object.keys( item ).length <= 1 ) { alert("You can't delete your last item!"); return; }
-
-			var dlgId = item[ drawing.id ].dlg;
-			if( dlgId && dialog[ dlgId ] )
-				delete dialog[ dlgId ];
-
-			delete item[ drawing.id ];
-
-			removeAllItems( drawing.id );
-			refreshGameData();
-			renderImages();
-			roomTool.drawEditMap();
-			nextItem();
-			updateInventoryItemUI();
-		}
-		changePaintExplorerSelection( drawing.id );
-	}
-}
-
 function removeAllItems( id ) {
 	function getFirstItemIndex(roomId, itemId) {
 		for(var i = 0; i < room[roomId].items.length; i++) {
@@ -1380,6 +1333,10 @@ function resetGameData() {
 
 	on_paint_avatar();
 	document.getElementById('paintOptionAvatar').checked = true;
+}
+
+function deleteDrawing() {
+	paintTool.deleteDrawing();
 }
 
 function refreshGameData() {

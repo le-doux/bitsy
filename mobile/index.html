@@ -305,6 +305,11 @@ function on_paint_tile() {
 	document.getElementById("paintCommands").setAttribute("style","display:block;");
 }
 
+// hack
+function nextTile() {
+	on_paint_tile();
+}
+
 function on_paint_sprite() {
 	paintTool.drawing.type = TileType.Sprite;
 	paintTool.drawing.id = sortedSpriteIdList()[sortedSpriteIdList().length > 1 ? 1 : 0];
@@ -335,6 +340,11 @@ function on_paint_sprite() {
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintCommands").setAttribute("style","display:block;");
+}
+
+// hack
+function nextSprite() {
+	on_paint_sprite();
 }
 
 function paint_onSelectDrawing(e) {
@@ -397,52 +407,7 @@ function newDrawing() {
 
 // shared
 function deleteDrawing() {
-	// if ( confirm("Are you sure you want to delete this drawing?") ) {
-		// deletePaintThumbnail( roomTool.drawing.id );
-		if (roomTool.drawing.type == TileType.Tile) {
-			if ( Object.keys( tile ).length <= 1 ) { /*alert("You can't delete your last tile!");*/ return; }
-			delete tile[ paintTool.drawing.id ];
-			findAndReplaceTileInAllRooms( paintTool.drawing.id, "0" );
-			refreshGameData();
-			renderImages();
-			roomTool.drawEditMap();
-			// nextTile();
-			on_paint_tile();
-		}
-		else if( roomTool.drawing.type == TileType.Avatar || roomTool.drawing.type == TileType.Sprite ){
-			if ( Object.keys( sprite ).length <= 2 ) { /*alert("You can't delete your last sprite!");*/ return; }
-
-			// todo: share with items
-			var dlgId = sprite[ paintTool.drawing.id ].dlg == null ? paintTool.drawing.id : sprite[ paintTool.drawing.id ].dlg;
-			if( dlgId && dialog[ dlgId ] )
-				delete dialog[ dlgId ];
-
-			delete sprite[ paintTool.drawing.id ];
-
-			refreshGameData();
-			renderImages();
-			roomTool.drawEditMap();
-			// nextSprite();
-			on_paint_sprite();
-		}
-		// else if( roomTool.drawing.type == TileType.Item ){
-		// 	if ( Object.keys( item ).length <= 1 ) { alert("You can't delete your last item!"); return; }
-
-		// 	var dlgId = item[ roomTool.drawing.id ].dlg;
-		// 	if( dlgId && dialog[ dlgId ] )
-		// 		delete dialog[ dlgId ];
-
-		// 	delete item[ roomTool.drawing.id ];
-
-		// 	removeAllItems( roomTool.drawing.id );
-		// 	refreshGameData();
-		// 	renderImages();
-		// 	roomTool.drawEditMap();
-		// 	nextItem();
-		// 	updateInventoryItemUI();
-		// }
-		// changePaintExplorerSelection( roomTool.drawing.id );
-	// }
+	paintTool.deleteDrawing();
 }
 
 

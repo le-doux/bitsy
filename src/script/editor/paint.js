@@ -319,5 +319,59 @@ function PaintTool(canvas, roomTool) {
 
 		itemIndex = Object.keys(item).length - 1;
 	}
+
+	// TODO - may need to extract this for different tools beyond the paint tool (put it in core.js?)
+	this.deleteDrawing = function() {
+		var shouldDelete = true;
+		if ( Ed().platform == PlatformType.Desktop )
+			shouldDelete = confirm("Are you sure you want to delete this drawing?");
+
+		if ( shouldDelete ) {
+			if ( Ed().platform == PlatformType.Desktop )
+				deletePaintThumbnail( self.drawing.id );
+
+			if (self.drawing.type == TileType.Tile) {
+				if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
+				delete tile[ self.drawing.id ];
+				findAndReplaceTileInAllRooms( self.drawing.id, "0" );
+				refreshGameData();
+				renderImages();
+				roomTool.drawEditMap();
+				nextTile();
+			}
+			else if( self.drawing.type == TileType.Avatar || self.drawing.type == TileType.Sprite ){
+				if ( Object.keys( sprite ).length <= 2 ) { alert("You can't delete your last sprite!"); return; }
+
+				// todo: share with items
+				var dlgId = sprite[ self.drawing.id ].dlg == null ? self.drawing.id : sprite[ self.drawing.id ].dlg;
+				if( dlgId && dialog[ dlgId ] )
+					delete dialog[ dlgId ];
+
+				delete sprite[ self.drawing.id ];
+
+				refreshGameData();
+				renderImages();
+				roomTool.drawEditMap();
+				nextSprite();
+			}
+			else if( self.drawing.type == TileType.Item ){
+				if ( Object.keys( item ).length <= 1 ) { alert("You can't delete your last item!"); return; }
+
+				var dlgId = item[ self.drawing.id ].dlg;
+				if( dlgId && dialog[ dlgId ] )
+					delete dialog[ dlgId ];
+
+				delete item[ self.drawing.id ];
+
+				removeAllItems( self.drawing.id );
+				refreshGameData();
+				renderImages();
+				roomTool.drawEditMap();
+				nextItem();
+				updateInventoryItemUI();
+			}
+			changePaintExplorerSelection( self.drawing.id );
+		}
+	}
 }
 
