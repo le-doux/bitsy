@@ -43,6 +43,13 @@ function DrawingId(type,id) { // TODO: is this the right name?
 		}
 		return null;
 	}
+
+	this.isWallTile = function() {
+		if(self.type != TileType.Tile)
+			return false;
+
+		// TODO
+	}
 }
 
 // TODO

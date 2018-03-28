@@ -299,3 +299,30 @@ function reloadDialogUICore() { // TODO: name is terrible
 function getCurDialogId() {
 	return paintTool.drawing.getDialogId();
 }
+
+// hacky - assumes global paintTool object
+function on_change_dialog() {
+	var dialogId = getCurDialogId();
+
+	var dialogStr = document.getElementById("dialogText").value;
+	if(dialogStr.length <= 0){
+		if(dialogId) {
+			paintTool.getCurObject().dlg = null;
+			delete dialog[dialogId];
+		}
+	}
+	else {
+		if(!dialogId) {
+			var prefix = (paintTool.drawing.type == TileType.Item) ? "ITM_" : "SPR_";
+			dialogId = nextAvailableDialogId( prefix );
+			paintTool.getCurObject().dlg = dialogId;
+		}
+		if( dialogStr.indexOf('\n') > -1 ) dialogStr = '"""\n' + dialogStr + '\n"""';
+		dialog[dialogId] = dialogStr;
+	}
+
+	if( Ed().platform == PlatformType.Desktop )
+		reloadAdvDialogUI();
+
+	refreshGameData();
+}

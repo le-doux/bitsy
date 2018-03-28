@@ -2137,31 +2137,6 @@ function getCurPaintModeStr() {
 	}
 }
 
-function on_change_dialog() {
-	var dialogId = getCurDialogId();
-
-	var dialogStr = document.getElementById("dialogText").value;
-	if(dialogStr.length <= 0){
-		if(dialogId) {
-			paintTool.getCurObject().dlg = null;
-			delete dialog[dialogId];
-		}
-	}
-	else {
-		if(!dialogId) {
-			var prefix = (drawing.type == TileType.Item) ? "ITM_" : "SPR_";
-			dialogId = nextAvailableDialogId( prefix );
-			paintTool.getCurObject().dlg = dialogId;
-		}
-		if( dialogStr.indexOf('\n') > -1 ) dialogStr = '"""\n' + dialogStr + '\n"""';
-		dialog[dialogId] = dialogStr;
-	}
-
-	reloadAdvDialogUI();
-
-	refreshGameData();
-}
-
 function on_change_adv_dialog() {
 	document.getElementById("dialogText").value = document.getElementById("dialogCodeText").value;
 	on_change_dialog();
