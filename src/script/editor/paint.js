@@ -252,5 +252,72 @@ function PaintTool(canvas, roomTool) {
 	this.getCurObject = function() {
 		return self.drawing.getEngineObject();
 	}
+
+	this.newDrawing = function() {
+		if ( self.drawing.type == TileType.Tile ) {
+			newTile();
+		}
+		else if( self.drawing.type == TileType.Avatar || self.drawing.type == TileType.Sprite ) {
+			newSprite();
+		}
+		else if( self.drawing.type == TileType.Item ) {
+			newItem();
+		}
+
+		// update paint explorer - only on desktop (TODO: should be separate object with events)
+		if( Ed().platform == PlatformType.Desktop ) {
+			addPaintThumbnail( self.drawing.id );
+			changePaintExplorerSelection( self.drawing.id );
+			document.getElementById("paintExplorerFilterInput").value = "";
+			refreshPaintExplorer( true /*doKeepOldThumbnails*/, document.getElementById("paintExplorerFilterInput").value /*filterString*/, true /*skipRenderStep*/ ); // this is a bit hacky feeling
+		}
+	}
+
+	// TODO -- sould these newDrawing methods be internal to PaintTool?
+	function newTile(id) {
+		if (id)
+			self.drawing.id = id; //this optional parameter lets me override the default next id
+		else
+			self.drawing.id = nextTileId();
+
+		makeTile(self.drawing.id);
+		self.reloadDrawing(); //hack for ui consistency (hack x 2: order matters for animated tiles)
+
+		self.updateCanvas();
+		refreshGameData();
+
+		tileIndex = Object.keys(tile).length - 1;
+	}
+
+	function newSprite(id) {
+		if (id)
+			self.drawing.id = id; //this optional parameter lets me override the default next id
+		else
+			self.drawing.id = nextSpriteId();
+
+		makeSprite(self.drawing.id);
+		self.reloadDrawing(); //hack (order matters for animated tiles)
+
+		self.updateCanvas();
+		refreshGameData();
+
+		spriteIndex = Object.keys(sprite).length - 1;
+	}
+
+	function newItem(id) {
+		if (id)
+			self.drawing.id = id; //this optional parameter lets me override the default next id
+		else
+			self.drawing.id = nextItemId();
+
+		makeItem(self.drawing.id);
+		self.reloadDrawing(); //hack (order matters for animated tiles)
+
+		self.updateCanvas();
+		updateInventoryItemUI();
+		refreshGameData();
+
+		itemIndex = Object.keys(item).length - 1;
+	}
 }
 

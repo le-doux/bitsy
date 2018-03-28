@@ -355,7 +355,7 @@ function reloadTile() {
 	updateWallCheckboxOnCurrentTile();
 }
 
-// specialized
+// specialized - sort of
 function updateWallCheckboxOnCurrentTile() {
 	var isCurTileWall = false;
 
@@ -390,53 +390,9 @@ function on_toggle_wall(e) {
 	paintTool.toggleWall( e.target.checked );
 }
 
-// shared
+// specialized - sort of
 function newDrawing() {
-	if ( paintTool.drawing.type == TileType.Tile ) {
-		newTile();
-	}
-	else if( paintTool.drawing.type == TileType.Avatar || paintTool.drawing.type == TileType.Sprite ) {
-		newSprite();
-	}
-	// else if( roomTool.drawing.type == TileType.Item ) {
-	// 	newItem();
-	// }
-	// addPaintThumbnail( roomTool.drawing.id );
-	// changePaintExplorerSelection( roomTool.drawing.id );
-	// document.getElementById("paintExplorerFilterInput").value = "";
-	// refreshPaintExplorer( true /*doKeepOldThumbnails*/, document.getElementById("paintExplorerFilterInput").value /*filterString*/, true /*skipRenderStep*/ ); // this is a bit hacky feeling
-}
-
-// shared
-function newTile(id) {
-	if (id)
-		paintTool.drawing.id = id; //this optional parameter lets me override the default next id
-	else
-		paintTool.drawing.id = nextTileId();
-
-	makeTile(paintTool.drawing.id);
-	reloadTile(); //hack for ui consistency (hack x 2: order matters for animated tiles)
-
-	paintTool.updateCanvas();
-	refreshGameData();
-
-	tileIndex = Object.keys(tile).length - 1;
-}
-
-// shared
-function newSprite(id) {
-	if (id)
-		paintTool.drawing.id = id; //this optional parameter lets me override the default next id
-	else
-		paintTool.drawing.id = nextSpriteId();
-
-	makeSprite(paintTool.drawing.id);
-	reloadSprite(); //hack (order matters for animated tiles)
-
-	paintTool.updateCanvas();
-	refreshGameData();
-
-	spriteIndex = Object.keys(sprite).length - 1;
+	paintTool.newDrawing();
 }
 
 // shared

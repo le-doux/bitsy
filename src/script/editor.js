@@ -651,19 +651,8 @@ function setDefaultGameState() {
 	document.getElementById("titleText").value = title;
 }
 
-function newTile(id) {
-	if (id)
-		drawing.id = id; //this optional parameter lets me override the default next id
-	else
-		drawing.id = nextTileId();
-
-	makeTile(drawing.id);
-	paintTool.reloadDrawing(); //hack for ui consistency (hack x 2: order matters for animated tiles)
-
-	paintTool.updateCanvas();
-	refreshGameData();
-
-	tileIndex = Object.keys(tile).length - 1;
+function newDrawing() {
+	paintTool.newDrawing();
 }
 
 function nextTile() {
@@ -681,37 +670,6 @@ function prevTile() {
 	drawing.id = ids[tileIndex];
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
-}
-
-function newSprite(id) {
-	if (id)
-		drawing.id = id; //this optional parameter lets me override the default next id
-	else
-		drawing.id = nextSpriteId();
-
-	makeSprite(drawing.id);
-	paintTool.reloadDrawing(); //hack (order matters for animated tiles)
-
-	paintTool.updateCanvas();
-	refreshGameData();
-
-	spriteIndex = Object.keys(sprite).length - 1;
-}
-
-function newItem(id) {
-	if (id)
-		drawing.id = id; //this optional parameter lets me override the default next id
-	else
-		drawing.id = nextItemId();
-
-	makeItem(drawing.id);
-	paintTool.reloadDrawing(); //hack (order matters for animated tiles)
-
-	paintTool.updateCanvas();
-	updateInventoryItemUI();
-	refreshGameData();
-
-	itemIndex = Object.keys(item).length - 1;
 }
 
 function updateRoomName() {
@@ -1069,22 +1027,6 @@ function prev() {
 		prevItem();
 	}
 	changePaintExplorerSelection( drawing.id );
-}
-
-function newDrawing() {
-	if (drawing.type == TileType.Tile) {
-		newTile();
-	}
-	else if( drawing.type == TileType.Avatar || drawing.type == TileType.Sprite ) {
-		newSprite();
-	}
-	else if( drawing.type == TileType.Item ) {
-		newItem();
-	}
-	addPaintThumbnail( drawing.id );
-	changePaintExplorerSelection( drawing.id );
-	document.getElementById("paintExplorerFilterInput").value = "";
-	refreshPaintExplorer( true /*doKeepOldThumbnails*/, document.getElementById("paintExplorerFilterInput").value /*filterString*/, true /*skipRenderStep*/ ); // this is a bit hacky feeling
 }
 
 function duplicateDrawing() {
