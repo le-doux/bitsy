@@ -397,7 +397,7 @@ function on_change_dialog() {
 	var dialogStr = document.getElementById("dialogText").value;
 	if(dialogStr.length <= 0){
 		if(dialogId) {
-			getCurPaintObject().dlg = null;
+			paintTool.getCurObject().dlg = null;
 			delete dialog[dialogId];
 		}
 	}
@@ -405,7 +405,7 @@ function on_change_dialog() {
 		if(!dialogId) {
 			var prefix = (paintTool.drawing.type == TileType.Item) ? "ITM_" : "SPR_";
 			dialogId = nextAvailableDialogId( prefix );
-			getCurPaintObject().dlg = dialogId;
+			paintTool.getCurObject().dlg = dialogId;
 		}
 		if( dialogStr.indexOf('\n') > -1 ) dialogStr = '"""\n' + dialogStr + '\n"""';
 		dialog[dialogId] = dialogStr;
@@ -414,21 +414,6 @@ function on_change_dialog() {
 	// reloadAdvDialogUI();
 
 	refreshGameData();
-}
-
-// shared
-function getCurPaintObject(id) {
-	if(id === undefined || id === null) id = paintTool.drawing.id;
-	console.log(id);
-	if(paintTool.drawing.type == TileType.Sprite || paintTool.drawing.type == TileType.Avatar) {
-		return sprite[id];
-	}
-	else if(paintTool.drawing.type == TileType.Item) {
-		return item[id];
-	}
-	else if(paintTool.drawing.type == TileType.Tile) {
-		return tile[id];
-	}
 }
 
 // shared

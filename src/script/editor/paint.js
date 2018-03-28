@@ -30,6 +30,19 @@ function DrawingId(type,id) { // TODO: is this the right name?
 		console.log("DIALOG ID " + dialogId);
 		return dialogId;
 	}
+
+	this.getEngineObject = function() {
+		if(self.type == TileType.Sprite || self.type == TileType.Avatar) {
+			return sprite[self.id];
+		}
+		else if(self.type == TileType.Item) {
+			return item[self.id];
+		}
+		else if(self.type == TileType.Tile) {
+			return tile[self.id];
+		}
+		return null;
+	}
 }
 
 // TODO
@@ -227,6 +240,10 @@ function PaintTool(canvas, roomTool) {
 
 		if(toggleWallUI != null && toggleWallUI != undefined) // a bit hacky
 			toggleWallUI(checked);
+	}
+
+	this.getCurObject = function() {
+		return self.drawing.getEngineObject();
 	}
 }
 

@@ -739,7 +739,7 @@ function on_room_name_change() {
 
 function on_drawing_name_change() {
 	var str = document.getElementById("drawingName").value;
-	var obj = getCurPaintObject();
+	var obj = paintTool.getCurObject();
 	var oldName = obj.name;
 	if(str.length > 0)
 		obj.name = str;
@@ -1733,7 +1733,7 @@ function roomPaletteChange(event) {
 
 function updateDrawingNameUI(visible) {
 	document.getElementById("drawingNameUI").setAttribute("style", visible ? "display:initial;" : "display:none;");
-	var obj = getCurPaintObject();
+	var obj = paintTool.getCurObject();
 	console.log("update drawing name ui");
 	console.log(obj);
 	if( obj.name != null )
@@ -1934,7 +1934,9 @@ function addPaintThumbnail(id) {
 	nameCaption.id = "paintExplorerCaption_" + id;
 
 	nameCaption.innerText = img.title;
-	var obj = getCurPaintObject( id );
+	var curPaintMode = paintTool.drawing.type;
+	var drawingId = new DrawingId( curPaintMode, id );
+	var obj = drawingId.getEngineObject();
 	if( obj.name === undefined || obj.name === null ) {
 		console.log("default name!!!!");
 		nameCaption.classList.add( "thumbnailDefaultName" );
@@ -2123,20 +2125,6 @@ function deletePaintThumbnail(id) {
 	paintExplorerForm.removeChild( document.getElementById( "paintExplorerLabel_" + id ) );
 }
 
-function getCurPaintObject(id) {
-	if(id === undefined || id === null) id = drawing.id;
-	console.log(id);
-	if(drawing.type == TileType.Sprite || drawing.type == TileType.Avatar) {
-		return sprite[id];
-	}
-	else if(drawing.type == TileType.Item) {
-		return item[id];
-	}
-	else if(drawing.type == TileType.Tile) {
-		return tile[id];
-	}
-}
-
 function getCurPaintModeStr() {
 	if(drawing.type == TileType.Sprite || drawing.type == TileType.Avatar) {
 		return "sprite";
@@ -2155,7 +2143,7 @@ function on_change_dialog() {
 	var dialogStr = document.getElementById("dialogText").value;
 	if(dialogStr.length <= 0){
 		if(dialogId) {
-			getCurPaintObject().dlg = null;
+			paintTool.getCurObject().dlg = null;
 			delete dialog[dialogId];
 		}
 	}
@@ -2163,7 +2151,7 @@ function on_change_dialog() {
 		if(!dialogId) {
 			var prefix = (drawing.type == TileType.Item) ? "ITM_" : "SPR_";
 			dialogId = nextAvailableDialogId( prefix );
-			getCurPaintObject().dlg = dialogId;
+			paintTool.getCurObject().dlg = dialogId;
 		}
 		if( dialogStr.indexOf('\n') > -1 ) dialogStr = '"""\n' + dialogStr + '\n"""';
 		dialog[dialogId] = dialogStr;
@@ -4005,7 +3993,7 @@ function serializeAdvDialog() {
 	var dialogStr = scriptRoot.Serialize();
 	if( dialogStr.length <= 0 )
 	{
-		getCurPaintObject().dlg = null;
+		paintTool.getCurObject().dlg = null;
 		delete dialog[dialogId];
 	}
 	else
@@ -4018,7 +4006,7 @@ function serializeAdvDialog() {
 		if(!dialogId) {
 			var prefix = (drawing.type == TileType.Item) ? "ITM_" : "SPR_";
 			dialogId = nextAvailableDialogId( prefix );
-			getCurPaintObject().dlg = dialogId;
+			paintTool.getCurObject().dlg = dialogId;
 		}
 
 		dialog[dialogId] = dialogStr; //TODO: do I need to do more here?
