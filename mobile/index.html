@@ -137,9 +137,10 @@ function start() {
 
 	// init color picker
 	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSlider', 'colorPickerSliderBg', 'colorPickerHexText');
-	colorPicker.onColorChange = onColorPickerChange;
 	document.getElementById("colorPaletteOptionBackground").checked = true;
-	updateColorPickerUI();
+	paletteTool = new PaletteTool(colorPicker,["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"]);
+	paletteTool.onPaletteChange = onPaletteChange;
+	paletteTool.updateColorPickerUI();
 
 	document.getElementById("playModeCheck").checked = false;
 	document.getElementById("tool_select").options[0].selected = true;
@@ -415,58 +416,16 @@ function deleteDrawing() {
 	COLOR 
 */
 var colorPicker = null; // new color picker
-var colorPickerIndex = 0;
-var colorPaletteLabels = ["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"];
+var paletteTool = null;
 
 function changeColorPickerIndex(index) {
-	colorPickerIndex = index;
-	var color = getPal(selectedColorPal())[ index ];
-	console.log(color);
-	colorPicker.setColor( color[0], color[1], color[2] );
+	paletteTool.changeColorPickerIndex(index);
 }
 
-function updateColorPickerLabel(index, r, g, b) {
-	var rgbColor = {r:r, g:g, b:b};
-
-	var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
-	var hsvColor = RGBtoHSV( rgbColor );
-	document.getElementById( colorPaletteLabels[ index ] ).style.background = rgbColorStr;
-	document.getElementById( colorPaletteLabels[ index ] ).style.color = hsvColor.v < 0.5 ? "white" : "black";
+function onPaletteChange() {
+	refreshGameData();
+	initGameStateAndRender();
 }
-
-function onColorPickerChange( rgbColor, isMouseUp ) {
-	getPal(selectedColorPal())[ colorPickerIndex ][ 0 ] = rgbColor.r;
-	getPal(selectedColorPal())[ colorPickerIndex ][ 1 ] = rgbColor.g;
-	getPal(selectedColorPal())[ colorPickerIndex ][ 2 ] = rgbColor.b;
-
-	updateColorPickerLabel(colorPickerIndex, rgbColor.r, rgbColor.g, rgbColor.b );
-
-	if( isMouseUp ) {
-		// refreshGameData();
-		// renderImages();
-		// paintTool.updateCanvas();
-		// roomTool.drawEditMap();
-		// refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
-		// if( isCurDrawingAnimated )
-		// 	renderAnimationPreview( roomTool.drawing.id );
-
-		refreshGameData();
-		initGameStateAndRender();
-	}
-}
-
-function updateColorPickerUI() {
-	var color0 = getPal(selectedColorPal())[ 0 ];
-	var color1 = getPal(selectedColorPal())[ 1 ];
-	var color2 = getPal(selectedColorPal())[ 2 ];
-
-	updateColorPickerLabel(0, color0[0], color0[1], color0[2] );
-	updateColorPickerLabel(1, color1[0], color1[1], color1[2] );
-	updateColorPickerLabel(2, color2[0], color2[1], color2[2] );
-
-	changeColorPickerIndex( colorPickerIndex );
-}
-
 
 /* 
 	DATA 
@@ -476,6 +435,7 @@ function editGameData() {
 	localStorage.game_data = document.getElementById("game_data").value;
 }
 
+// shared
 function refreshGameData() {
 	// if (isPlayMode) return; //never store game data while in playmode (TODO: wouldn't be necessary if the game data was decoupled form editor data)
 
@@ -487,12 +447,14 @@ function refreshGameData() {
 	localStorage.setItem("game_data", gameData); //auto-save
 }
 
+// shared
 function newGameDialog() {
 	// if ( confirm("Starting a new game will erase your old data. Consider exporting your work first! Are you sure you want to start over?") ) {
 		resetGameData();
 	// }
 }
 
+// shared
 function resetGameData() {
 	setDefaultGameState();
 
@@ -514,9 +476,11 @@ function resetGameData() {
 	// document.getElementById('paintOptionAvatar').checked = true;
 
 	initGameStateAndRender();
-	updateColorPickerUI();
+	// updateColorPickerUI();
+	paletteTool.updateColorPickerUI();
 }
 
+// shared
 function setDefaultGameState() {
 	// trying new way to get default game data
 	document.getElementById("game_data").value = document.getElementById("defaultGameData").text.slice(1);

@@ -447,9 +447,10 @@ function start() {
 
 	// init color picker
 	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSlider', 'colorPickerSliderBg', 'colorPickerHexText');
-	colorPicker.onColorChange = onColorPickerChange;
 	document.getElementById("colorPaletteOptionBackground").checked = true;
-	updateColorPickerUI();
+	paletteTool = new PaletteTool(colorPicker,["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"]);
+	paletteTool.onPaletteChange = onPaletteChange;
+	paletteTool.updateColorPickerUI();
 
 	//unsupported feature stuff
 	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
@@ -1509,53 +1510,20 @@ function updateRoomPaletteSelect() {
 }
 
 var colorPicker = null; // new color picker
-var colorPickerIndex = 0;
-var colorPaletteLabels = ["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"];
+var paletteTool = null;
 
 function changeColorPickerIndex(index) {
-	colorPickerIndex = index;
-	var color = getPal(selectedColorPal())[ index ];
-	console.log(color);
-	colorPicker.setColor( color[0], color[1], color[2] );
+	paletteTool.changeColorPickerIndex(index);
 }
 
-function updateColorPickerUI() {
-	var color0 = getPal(selectedColorPal())[ 0 ];
-	var color1 = getPal(selectedColorPal())[ 1 ];
-	var color2 = getPal(selectedColorPal())[ 2 ];
-
-	updateColorPickerLabel(0, color0[0], color0[1], color0[2] );
-	updateColorPickerLabel(1, color1[0], color1[1], color1[2] );
-	updateColorPickerLabel(2, color2[0], color2[1], color2[2] );
-
-	changeColorPickerIndex( colorPickerIndex );
-}
-
-function updateColorPickerLabel(index, r, g, b) {
-	var rgbColor = {r:r, g:g, b:b};
-
-	var rgbColorStr = "rgb(" + rgbColor.r + "," + rgbColor.g + "," + rgbColor.b + ")";
-	var hsvColor = RGBtoHSV( rgbColor );
-	document.getElementById( colorPaletteLabels[ index ] ).style.background = rgbColorStr;
-	document.getElementById( colorPaletteLabels[ index ] ).style.color = hsvColor.v < 0.5 ? "white" : "black";
-}
-
-function onColorPickerChange( rgbColor, isMouseUp ) {
-	getPal(selectedColorPal())[ colorPickerIndex ][ 0 ] = rgbColor.r;
-	getPal(selectedColorPal())[ colorPickerIndex ][ 1 ] = rgbColor.g;
-	getPal(selectedColorPal())[ colorPickerIndex ][ 2 ] = rgbColor.b;
-
-	updateColorPickerLabel(colorPickerIndex, rgbColor.r, rgbColor.g, rgbColor.b );
-
-	if( isMouseUp ) {
-		refreshGameData();
-		renderImages();
-		paintTool.updateCanvas();
-		roomTool.drawEditMap();
-		refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
-		if( paintTool.isCurDrawingAnimated )
-			renderAnimationPreview( drawing.id );
-	}
+function onPaletteChange() {
+	refreshGameData();
+	renderImages();
+	paintTool.updateCanvas();
+	roomTool.drawEditMap();
+	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
+	if( paintTool.isCurDrawingAnimated )
+		renderAnimationPreview( drawing.id );
 }
 
 function updatePaletteOptionsFromGameData() {
@@ -1583,7 +1551,7 @@ function updatePaletteControlsFromGameData() {
 	// document.getElementById("spriteColor").value = rgbToHex(getPal(selectedColorPal())[2][0], getPal(selectedColorPal())[2][1], getPal(selectedColorPal())[2][2]);
 
 	if( colorPicker != null )
-		updateColorPickerUI();
+		paletteTool.updateColorPickerUI();
 }
 
 function prevPalette() {
