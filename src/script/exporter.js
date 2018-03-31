@@ -1,25 +1,15 @@
 function Exporter() {
 
+var resources = new ResourceLoader();
 
-/* resource loading */
-var resources = {};
-function loadResource(folder, filename) {
-	var client = new XMLHttpRequest();
-	client.open('GET', '../src/' + folder + '/' + filename);
-	client.onreadystatechange = function() {
-	  resources[filename] = client.responseText;
-	}
-	client.send();
-}
-
-loadResource("other", "exportTemplate.html");
-loadResource("style", "exportStyleFixed.css");
-loadResource("style", "exportStyleFull.css");
-loadResource("script", "bitsy.js");
-loadResource("script", "font.js");
-loadResource("script", "dialog.js");
-loadResource("script", "script.js");
-loadResource("script", "color_util.js");
+resources.load("other", "exportTemplate.html");
+resources.load("style", "exportStyleFixed.css");
+resources.load("style", "exportStyleFull.css");
+resources.load("script", "bitsy.js");
+resources.load("script", "font.js");
+resources.load("script", "dialog.js");
+resources.load("script", "script.js");
+resources.load("script", "color_util.js");
 
 
 /* exporting */
@@ -65,26 +55,26 @@ function replaceTemplateMarker(template, marker, text) {
 }
 
 this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, size) {
-	var html = resources["exportTemplate.html"].substr(); //copy template
+	var html = resources.get("exportTemplate.html").substr(); //copy template
 	// console.log(html);
 
 	html = replaceTemplateMarker( html, "@@T", title );
 
 	if( isFixedSize ) {
-		html = replaceTemplateMarker( html, "@@C", resources["exportStyleFixed.css"] );
+		html = replaceTemplateMarker( html, "@@C", resources.get("exportStyleFixed.css") );
 		html = replaceTemplateMarker( html, "@@Z", size + "px" );
 	}
 	else {
-		html = replaceTemplateMarker( html, "@@C", resources["exportStyleFull.css"] );
+		html = replaceTemplateMarker( html, "@@C", resources.get("exportStyleFull.css") );
 	}
 
 	html = replaceTemplateMarker( html, "@@B", pageColor );
 
-	html = replaceTemplateMarker( html, "@@U", resources["color_util.js"] );
-	html = replaceTemplateMarker( html, "@@F", resources["font.js"] );
-	html = replaceTemplateMarker( html, "@@S", resources["script.js"] );
-	html = replaceTemplateMarker( html, "@@L", resources["dialog.js"] );
-	html = replaceTemplateMarker( html, "@@E", resources["bitsy.js"] );
+	html = replaceTemplateMarker( html, "@@U", resources.get("color_util.js") );
+	html = replaceTemplateMarker( html, "@@F", resources.get("font.js") );
+	html = replaceTemplateMarker( html, "@@S", resources.get("script.js") );
+	html = replaceTemplateMarker( html, "@@L", resources.get("dialog.js") );
+	html = replaceTemplateMarker( html, "@@E", resources.get("bitsy.js") );
 
 	html = replaceTemplateMarker( html, "@@D", gameData );
 

@@ -384,3 +384,32 @@ function PaletteTool(colorPicker,labelIds) {
 		changeColorPickerIndex( colorPickerIndex );
 	}
 }
+
+/* RESOURCE LOADER */
+function ResourceLoader() {
+	var resources = {};
+
+	this.load = function(folder, filename) {
+		var client = new XMLHttpRequest();
+		client.open('GET', '../src/' + folder + '/' + filename);
+		client.onreadystatechange = function() {
+			resources[filename] = client.responseText;
+		}
+		client.send();
+	}
+
+	this.get = function(filename) {
+		return resources[filename];
+	}
+}
+
+function createDefaultFunction() {
+	var resources = new ResourceLoader();
+	resources.load("other", "defaultGameData.bitsy");
+
+	return function() {
+		document.getElementById("game_data").value = resources.get("defaultGameData.bitsy");
+		localStorage.game_data = document.getElementById("game_data").value;
+	}
+}
+var setDefaultGameState = createDefaultFunction();
