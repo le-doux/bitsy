@@ -403,13 +403,14 @@ function ResourceLoader() {
 	}
 }
 
-function createDefaultFunction() {
+function createDefaultGameStateFunction() {
 	var resources = new ResourceLoader();
 	resources.load("other", "defaultGameData.bitsy");
 
 	return function() {
-		document.getElementById("game_data").value = resources.get("defaultGameData.bitsy");
-		localStorage.game_data = document.getElementById("game_data").value;
+		document.getElementById("game_data").value = resources.get("defaultGameData.bitsy"); // reset game data
+		localStorage.game_data = document.getElementById("game_data").value; // save game
+		parseWorld(document.getElementById("game_data").value); // load game
 	}
 }
-var setDefaultGameState = createDefaultFunction();
+var setDefaultGameState = createDefaultGameStateFunction();
