@@ -414,3 +414,11 @@ function createDefaultGameStateFunction() {
 	}
 }
 var setDefaultGameState = createDefaultGameStateFunction();
+
+function newGameDialog() {
+	if ( Ed().platform == PlatformType.Mobile ||
+			confirm("Starting a new game will erase your old data. Consider exporting your work first! Are you sure you want to start over?") )
+	{
+		resetGameData();
+	}
+}
