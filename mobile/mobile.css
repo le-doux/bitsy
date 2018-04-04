@@ -1,0 +1,192 @@
+html {
+	height: 100%;
+}
+body {
+	margin: 0 !important;
+	padding: 0 !important;
+	height: 100%;
+}
+
+body, input[type=text], button, select {
+	font-size: 36px;
+}
+
+canvas {
+	background: black;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+.flexRoot {
+	/*background: red;*/
+	display: flex;
+	flex-flow: column;
+	height: 100%;
+	width: 100%;
+}
+
+@media screen and (orientation: landscape) {
+  .flexRoot {
+    flex-direction: row;
+  }
+}
+
+@media screen and (orientation: portrait) {
+  .flexRoot {
+    flex-direction: column;
+  }
+}
+
+.flexMain {
+	background: yellow;
+	/*flex-grow: 2;*/
+	/*flex-shrink: 1;*/
+	/*flex-basis: 40%;*/
+	/*height: 512px;*/
+	/*width: 512px;*/
+	padding: 20px;
+}
+
+.flexAlt {
+	background: purple;
+	/*flex-grow: 1;*/
+	/*flex-shrink: 2;*/
+	/*flex-basis: 30%;*/
+	padding: 20px;
+}
+
+.responsiveRoot {
+	height: 100%;
+	width: 100%;
+}
+
+.responsiveMain {
+	background: blue;
+	/*display: inline-block;*/
+	/*margin: 0;*/
+	float:left;
+}
+.responsiveAlt {
+	background: red;
+	/*display: inline-block;*/
+	/*margin: 0;*/
+	float:right;
+}
+
+.innerGap {
+	margin: 2%;
+	width: 96%;
+	height: 96%;
+}
+
+@media screen and (orientation: landscape) {
+	.responsiveMain {
+		width: 50%;
+		height: 100%;
+	}
+	.responsiveAlt {
+		width: 50%;
+		height: 100%;
+	}
+}
+
+@media screen and (orientation: portrait) {
+	.responsiveMain {
+		width: 100%;
+		height: 70%;
+	}
+	.responsiveAlt {
+		width: 100%;
+		height: 30%;
+	}
+}
+
+#game_data {
+	width: calc(100% - 40px);
+	height: 60%;
+	margin: 20px;
+
+	/*display: none;*/
+	/*width: 100%;*/
+	/*height: 200px;*/
+}
+
+.tool {
+	width:100%;height:100%;margin:auto;
+}
+
+#colorPicker {
+	/*background: red;*/
+	width: 100%;
+	height: 100%;
+	/*position: relative;*/
+}
+
+#colorPickerWheelOuter {
+	width: 100%;
+	height: 80%;
+	position: relative;
+	background: black;
+}
+
+#colorPickerWheel, #colorPickerSelect {
+	/*background: black;*/
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	object-fit: contain;
+}
+
+#colorPickerHexText {
+	width: 70%;
+	/*margin: 0px;*/
+	margin: auto;
+	margin-top: 10px;
+}
+
+#colorPickerSliderBg {
+	width: calc(70% - 8px);
+	margin-left: 12%;
+	/*margin:auto;*/
+}
+
+#colorPaletteForm input[type=radio]:checked + label {
+	border: solid 4px black;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+#titleText, #dialogText {
+	width: 600px;
+	max-width: 80%;
+}
+
+/* custom slider thumb */
+#colorPickerSlider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	border: 4px solid #000000;
+	height: 36px;
+	width: 36px;
+	border-radius: 18px;
+	background: #ffffff;
+	cursor: pointer;
+	margin-top: -12px;
+}
+
+/* custom slider track */
+#colorPickerSlider::-webkit-slider-runnable-track {
+	width: 100%;
+	height: 8px;
+	cursor: pointer;
+	background: #fff;
+	margin-top: -28px;
+}
+
+#colorPickerSliderBg {
+	padding: 30px;
+	border-radius: 8px;
+}
