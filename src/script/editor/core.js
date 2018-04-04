@@ -422,3 +422,39 @@ function newGameDialog() {
 		resetGameData();
 	}
 }
+
+function resetGameData() {
+	setDefaultGameState();
+
+	// todo wrap these variable resets in a function
+	tileIndex = 0;
+	spriteIndex = 0;
+
+	refreshGameData();
+	renderImages();
+	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
+	roomTool.drawEditMap();
+
+	if ( Ed().platform == PlatformType.Desktop ) {
+		updatePaletteUI();
+		// updatePaletteControlsFromGameData();
+		updateExitOptionsFromGameData();
+		updateRoomName();
+		updateInventoryUI();
+
+		on_paint_avatar();
+		document.getElementById('paintOptionAvatar').checked = true;
+	}
+}
+
+function refreshGameData() {
+	if( Ed().platform == PlatformType.Desktop )
+		if (isPlayMode) return; //never store game data while in playmode (TODO: wouldn't be necessary if the game data was decoupled form editor data)
+
+	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
+	var gameData = serializeWorld();
+	//console.log("refresh!");
+	//console.log(gameData);
+	document.getElementById("game_data").value = gameData;
+	localStorage.setItem("game_data", gameData); //auto-save
+}
