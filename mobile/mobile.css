@@ -7,7 +7,7 @@ body {
 	height: 100%;
 }
 
-body, input[type=text], button, select {
+body, input[type=text], select {
 	font-size: 36px;
 }
 
@@ -191,6 +191,9 @@ canvas {
 	border-radius: 8px;
 }
 
+/*
+	NEW
+*/
 #tool_side_bar {
 	background: green;
 	position: absolute;
@@ -198,4 +201,17 @@ canvas {
 	left: 0;
 	height: 100%;
 	margin: 0;
+}
+
+button {
+	font-size: 50px;
+	padding: 5px;
+	background: black;
+	color: white;
+	margin: 5px;
+}
+
+#tool_side_bar button {
+	font-size: 80px;
+	margin: 20px;
 }
