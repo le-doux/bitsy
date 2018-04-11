@@ -30,6 +30,7 @@
 <link rel="stylesheet" type="text/css" href="mobile.css" />
 
 <body onload="start();">
+
 	<div style="display: flex; flex-flow: column; height: 100%; width: 100%;">
 
 	<!-- <div style="width: 100%;height: 5%; background:green; overflow:hidden;"> -->
@@ -37,7 +38,7 @@
 
 		<span style="float:left;">bitsy mobile alpha</span>
 
-		<span style="float:right;">
+<!-- 		<span style="float:right;">
 			tool :
 			<select id="tool_select" onchange="changeTool(event);">
 				<option value="tool_room">room</option>
@@ -45,7 +46,11 @@
 				<option value="tool_color">color</option>
 				<option value="tool_data">data</option>
 			</select>
-		</span>
+		</span> -->
+
+		<button style="float:right" onclick="toggleToolSideBar();">
+			tools
+		</button>
 
 	</div>
 
@@ -228,6 +233,14 @@
 
 	</div>
 
+	</div>
+
+
+	<div id="tool_side_bar" style="display:none;">
+		<button onclick="changeToolById('tool_room');">room</button> <br/>
+		<button onclick="changeToolById('tool_paint');">paint</button> <br/>
+		<button onclick="changeToolById('tool_color');">color</button> <br/>
+		<button onclick="changeToolById('tool_data');">data</button> <br/>
 	</div>
 </body>
 

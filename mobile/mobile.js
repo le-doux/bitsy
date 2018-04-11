@@ -12,6 +12,24 @@ IDEAS
 - zoom?
 - how do you handle exporting games?
 
+TODO next
+- bigger buttons (especially play)
+- better tool select
+	- bottom toolbar?
+	- side panel?
+	- swipe shortcut?
+- visual drawing picker
+- bitsy style
+- better handle of scrolling
+? zoom
+? text edit pop out windows
+?? undo/redo
+
+TODO future
+- all tools are iframes
+- all tools UI generated in code
+- better code refactor
+
 TODO
 X game canvas
 X game data
@@ -33,7 +51,7 @@ X fix color picker
 - fix color slider [maybe I did??]
 X font size issue (currently fixed by making it big?)
 - try flex panel again
-- try making a game!!
+X try making a game!!
 - what is the correct way to handle font sizing??
 
 BUGS
@@ -115,7 +133,7 @@ function start() {
 	paletteTool.updateColorPickerUI();
 
 	document.getElementById("playModeCheck").checked = false;
-	document.getElementById("tool_select").options[0].selected = true;
+	// document.getElementById("tool_select").options[0].selected = true;
 
 	roomTool.drawEditMap();
 
@@ -138,8 +156,12 @@ function initGameStateAndRender() {
 
 // mobile
 function changeTool(e) {
+	changeToolById(e.target.value);
+}
+
+function changeToolById(toolId) {
 	Array.from( document.getElementsByClassName("tool") ).map( function(t) { t.style.display = "none"; } );
-	document.getElementById(e.target.value).style.display = "block";
+	document.getElementById(toolId).style.display = "block";
 }
 
 /* 
@@ -406,4 +428,12 @@ function onPaletteChange() {
 function editGameData() {
 	initGameStateAndRender();
 	localStorage.game_data = document.getElementById("game_data").value;
+}
+
+/*
+	NEW
+*/
+function toggleToolSideBar() {
+	var sideBar = document.getElementById("tool_side_bar");
+	sideBar.style.display = sideBar.style.display === "none" ? "block" : "none";
 }

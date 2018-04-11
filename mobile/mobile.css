@@ -190,3 +190,12 @@ canvas {
 	padding: 30px;
 	border-radius: 8px;
 }
+
+#tool_side_bar {
+	background: green;
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	margin: 0;
+}
