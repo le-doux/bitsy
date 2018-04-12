@@ -138,6 +138,9 @@ function start() {
 	roomTool.drawEditMap();
 
 	roomTool.listenEditEvents();
+
+	roomExplorer = new PaintExplorer("roomExplorer", onRoomExplorerSelect);
+	roomExplorer.Refresh( TileType.Avatar );
 }
 
 // mobile
@@ -191,8 +194,11 @@ function on_room_paint_avatar() {
 	roomTool.drawing.id = "A";
 
 	// update options
-	var selectDrawing = document.getElementById("drawing_select");
-	selectDrawing.style.display = "none";
+	// var selectDrawing = document.getElementById("drawing_select");
+	// selectDrawing.style.display = "none";
+
+	roomExplorer.Refresh(roomTool.drawing.type);
+	roomExplorer.ChangeSelection(roomTool.drawing.id);
 }
 
 function on_room_paint_tile() {
@@ -201,19 +207,23 @@ function on_room_paint_tile() {
 	roomTool.drawing.id = sortedTileIdList()[tileIndex];
 
 	// update options
-	var selectDrawing = document.getElementById("room_drawing_select");
-	selectDrawing.style.display = "inline";
-	for(var i = selectDrawing.options.length - 1 ; i >= 0 ; i--) {
-		selectDrawing.remove(i);
-	}
-	var idList = sortedTileIdList();
-	for(var i = 0; i < idList.length; i++) {
-		var id = idList[i];
-		var option = document.createElement("option");
-		option.text = id;
-		option.value = id;
-		selectDrawing.add(option);
-	}
+	// var selectDrawing = document.getElementById("room_drawing_select");
+	// selectDrawing.style.display = "inline";
+	// for(var i = selectDrawing.options.length - 1 ; i >= 0 ; i--) {
+	// 	selectDrawing.remove(i);
+	// }
+	// var idList = sortedTileIdList();
+	// for(var i = 0; i < idList.length; i++) {
+	// 	var id = idList[i];
+	// 	var option = document.createElement("option");
+	// 	option.text = id;
+	// 	option.value = id;
+	// 	selectDrawing.add(option);
+	// }
+
+
+	roomExplorer.Refresh(roomTool.drawing.type);
+	roomExplorer.ChangeSelection(roomTool.drawing.id);
 }
 
 function on_room_paint_sprite() {
@@ -228,23 +238,26 @@ function on_room_paint_sprite() {
 	roomTool.drawing.id = sortedSpriteIdList()[spriteIndex];
 
 	// update options
-	var selectDrawing = document.getElementById("room_drawing_select");
-	selectDrawing.style.display = "inline";
-	for(var i = selectDrawing.options.length - 1 ; i >= 0 ; i--) {
-		selectDrawing.remove(i);
-	}
-	var idList = sortedSpriteIdList();
-	for(var i = 0; i < idList.length; i++) {
-		var id = idList[i];
+	// var selectDrawing = document.getElementById("room_drawing_select");
+	// selectDrawing.style.display = "inline";
+	// for(var i = selectDrawing.options.length - 1 ; i >= 0 ; i--) {
+	// 	selectDrawing.remove(i);
+	// }
+	// var idList = sortedSpriteIdList();
+	// for(var i = 0; i < idList.length; i++) {
+	// 	var id = idList[i];
 
-		if(id === "A")
-			continue;
+	// 	if(id === "A")
+	// 		continue;
 
-		var option = document.createElement("option");
-		option.text = id;
-		option.value = id;
-		selectDrawing.add(option);
-	}
+	// 	var option = document.createElement("option");
+	// 	option.text = id;
+	// 	option.value = id;
+	// 	selectDrawing.add(option);
+	// }
+
+	roomExplorer.Refresh(roomTool.drawing.type);
+	roomExplorer.ChangeSelection(roomTool.drawing.id);
 }
 
 // mobile
@@ -436,4 +449,9 @@ function editGameData() {
 function toggleToolSideBar() {
 	var sideBar = document.getElementById("tool_side_bar");
 	sideBar.style.display = sideBar.style.display === "none" ? "block" : "none";
+}
+
+var roomExplorer;
+function onRoomExplorerSelect() {
+	console.log(this.value);
 }

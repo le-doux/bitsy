@@ -11,6 +11,8 @@
 <!-- UTIL SCRIPTS -->
 <script src="../src/script/color_util.js"></script>
 
+<script src="../src/script/gif.js"></script>
+
 <!-- ENGINE SCRIPTS -->
 <script src="../src/script/font.js"></script>
 <script src="../src/script/script.js"></script>
@@ -21,6 +23,7 @@
 <script src="../src/script/editor/core.js"></script>
 <script src="../src/script/editor/paint.js"></script>
 <script src="../src/script/editor/room.js"></script>
+<script src="../src/script/editor/explorer.js"></script>
 
 <!-- EDITOR SCRIPTS -->
 <script src="../src/script/color_picker.js"></script>
@@ -105,6 +108,11 @@
 					</form>
 
 					<select id="room_drawing_select" onchange="room_onSelectDrawing(event);" style="display: none;"></select>
+
+					<form id="roomExplorerForm">
+						<span id="roomExplorerFormInner">
+						</span>
+					</form>
 				</div>
 			</div>
 			<!-- </div> -->

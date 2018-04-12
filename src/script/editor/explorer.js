@@ -4,8 +4,8 @@
 
 /*
 TODO
-- make object
-- move code out of editor.js
+X make object
+X move code out of editor.js
 - what are shared functions? need to share with animation preview thumbnail
 - make it support multiple instances
 - how to handle selected drawing?? (type + id)
@@ -19,7 +19,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 	var drawingThumbnailCanvas, drawingThumbnailCtx;
 	drawingThumbnailCanvas = document.createElement("canvas");
-	drawingThumbnailCanvas.width = 8 * scale;
+	drawingThumbnailCanvas.width = 8 * scale; // TODO: scale constants need to be contained somewhere
 	drawingThumbnailCanvas.height = 8 * scale;
 	drawingThumbnailCtx = drawingThumbnailCanvas.getContext("2d");
 
@@ -27,7 +27,15 @@ function PaintExplorer(idPrefix,selectCallback) {
 	TODO: make variables for all the IDs that use idPrefix that we can store
 	*/
 
-	function refreshPaintExplorer( doKeepOldThumbnails, filterString, skipRenderStep ) {
+	var drawingCategory = null; // TODO: support multiple drawing categories in a list (possibly)
+	var selectedDrawingId = null;
+
+	function refresh( type, doKeepOldThumbnails, filterString, skipRenderStep ) {
+		drawingCategory = type;
+
+		if( drawingCategory == null )
+			return;
+
 		if( doKeepOldThumbnails == null || doKeepOldThumbnails == undefined )
 			doKeepOldThumbnails = false;
 
@@ -37,16 +45,16 @@ function PaintExplorer(idPrefix,selectCallback) {
 			skipRenderStep = false;
 
 		var idList = [];
-		if( drawing.type == TileType.Avatar ) {
+		if( drawingCategory == TileType.Avatar ) {
 			idList = ["A"];
 		}
-		else if( drawing.type == TileType.Sprite ) {
+		else if( drawingCategory == TileType.Sprite ) {
 			idList = sortedSpriteIdList();
 		}
-		else if ( drawing.type == TileType.Tile ) {
+		else if ( drawingCategory == TileType.Tile ) {
 			idList = sortedTileIdList();
 		}
-		else if ( drawing.type == TileType.Item ) {
+		else if ( drawingCategory == TileType.Item ) {
 			idList = sortedItemIdList();
 		}
 
@@ -64,24 +72,30 @@ function PaintExplorer(idPrefix,selectCallback) {
 		
 		for(var i = 0; i < idList.length; i++) {
 			var id = idList[i];
-			if(id != "A" || drawing.type == TileType.Avatar)
+			if(id != "A" || drawingCategory == TileType.Avatar)
 			{
 				if(!skipRenderStep) {
 					if( !doKeepOldThumbnails )
-						addPaintThumbnail( id ); // create thumbnail element and render thumbnail
+						addThumbnail( id ); // create thumbnail element and render thumbnail
 					else
-						renderPaintThumbnail( id ); // just re-render the thumbnail
+						renderThumbnail( id ); // just re-render the thumbnail
 				}
 
 				if( doFilter )
-					filterPaintThumbnail( id, filterString );
+					filterThumbnail( id, filterString );
 				else
 					document.getElementById(idPrefix + "Label_" + id).style.display = "inline-block"; // make it visible otherwise
 			}
 		}
 	}
+	this.Refresh = function( type, doKeepOldThumbnails, filterString, skipRenderStep ) {
+		refresh( type, doKeepOldThumbnails, filterString, skipRenderStep );
+	};
 
-	function addPaintThumbnail(id) {
+	function addThumbnail(id) {
+		if( drawingCategory == null ) // TODO: used combined id + type instead?
+			return;
+
 		var paintExplorerForm = document.getElementById(idPrefix + "FormInner");
 
 		var radio = document.createElement("input");
@@ -89,7 +103,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 		radio.name = idPrefix + "Radio";
 		radio.id = idPrefix + "Radio_" + id;
 		radio.value = id;
-		radio.checked = id === drawing.id;
+		radio.checked = id === selectedDrawingId;
 
 		paintExplorerForm.appendChild(radio);
 
@@ -103,13 +117,13 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 		var img = document.createElement("img");
 		img.id = idPrefix + "Thumbnail_" + id;
-		if( drawing.type === TileType.Tile )
+		if( drawingCategory === TileType.Tile )
 			img.title = tile[id].name ? tile[id].name : "tile " + id;
-		else if( drawing.type === TileType.Sprite )
+		else if( drawingCategory === TileType.Sprite )
 			img.title = sprite[id].name ? sprite[id].name : "sprite " + id;
-		else if( drawing.type === TileType.Avatar )
+		else if( drawingCategory === TileType.Avatar )
 			img.title = "avatar";
-		else if( drawing.type === TileType.Item )
+		else if( drawingCategory === TileType.Item )
 			img.title = item[id].name ? item[id].name : "item " + id;
 
 		div.appendChild(img);
@@ -118,7 +132,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 		nameCaption.id = idPrefix + "Caption_" + id;
 
 		nameCaption.innerText = img.title;
-		var curPaintMode = paintTool.drawing.type;
+		var curPaintMode = drawingCategory;
 		var drawingId = new DrawingId( curPaintMode, id );
 		var obj = drawingId.getEngineObject();
 		if( obj.name === undefined || obj.name === null ) {
@@ -134,10 +148,13 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 		radio.onclick = selectCallback;
 
-		renderPaintThumbnail( id );
+		renderThumbnail( id );
 	}
+	this.AddThumbnail = function(id) {
+		addThumbnail(id);
+	};
 
-	function filterPaintThumbnail(id,filterString) {
+	function filterThumbnail(id,filterString) {
 		var label = document.getElementById(idPrefix + "Label_" + id);
 		var img = document.getElementById(idPrefix + "Thumbnail_" + id);
 		var thumbTitle = img.title;
@@ -149,7 +166,10 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 	// TODO : pull out core of this to make it re-usable
 	var thumbnailRenderEncoders = {};
-	function renderPaintThumbnail(id) {
+	function renderThumbnail(id) {
+		if( drawingCategory == null ) // TODO: used combined id + type instead?
+			return;
+
 		var hexPalette = []; // TODO this is a bit repetitive to do all the time, huh?
 		for (pal in palette) {
 			for (i in getPal(pal)){
@@ -162,21 +182,21 @@ function PaintExplorer(idPrefix,selectCallback) {
 		var img = document.getElementById(idPrefix + "Thumbnail_" + id);
 
 		var drawingFrameData = [];
-		if( drawing.type == TileType.Tile ) {
+		if( drawingCategory == TileType.Tile ) {
 			// console.log(tile[id]);
 			drawTile( getTileImage( tile[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
 			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 			drawTile( getTileImage( tile[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
 			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 		}
-		else if( drawing.type == TileType.Sprite || drawing.type == TileType.Avatar ){
+		else if( drawingCategory == TileType.Sprite || drawingCategory == TileType.Avatar ){
 			// console.log(sprite[id]);
 			drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
 			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 			drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
 			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 		}
-		else if( drawing.type == TileType.Item ) {
+		else if( drawingCategory == TileType.Item ) {
 			drawItem( getItemImage( item[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
 			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 			drawItem( getItemImage( item[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
@@ -202,8 +222,12 @@ function PaintExplorer(idPrefix,selectCallback) {
 		// start encoding new GIF
 		encoder.encode( gifData, createThumbnailRenderCallback(img) );
 	}
+	this.RenderThumbnail = function(id) {
+		renderThumbnail(id);
+	};
 
-	function changePaintExplorerSelection(id) {
+	function changeSelection(id) {
+		selectedDrawingId = id; // store that value
 		var paintExplorerForm = document.getElementById(idPrefix + "FormInner");
 		for( var i = 0; i < paintExplorerForm.childNodes.length; i++ ) {
 			var child = paintExplorerForm.childNodes[i];
@@ -215,12 +239,18 @@ function PaintExplorer(idPrefix,selectCallback) {
 			}
 		}
 	}
+	this.ChangeSelection = function(id) {
+		changeSelection(id);
+	};
 
-	function deletePaintThumbnail(id) {
+	function deleteThumbnail(id) {
 		var paintExplorerForm = document.getElementById(idPrefix + "FormInner");
 		paintExplorerForm.removeChild( document.getElementById( idPrefix + "Radio_" + id ) );
 		paintExplorerForm.removeChild( document.getElementById( idPrefix + "Label_" + id ) );
 	}
+	this.DeleteThumbnail = function(id) {
+		deleteThumbnail(id);
+	};
 
 }
 
