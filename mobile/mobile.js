@@ -14,9 +14,9 @@ IDEAS
 
 TODO next
 - bigger buttons (especially play)
-- better tool select
+x better tool select
 	- bottom toolbar?
-	- side panel?
+	x side panel?
 	- swipe shortcut?
 - visual drawing picker
 - bitsy style
