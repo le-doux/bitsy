@@ -119,6 +119,8 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 		var img = document.createElement("img");
 		img.id = idPrefix + "Thumbnail_" + id;
+
+		// TODO : make image title not show up while loading image? or style the size?
 		if( drawingCategory === TileType.Tile )
 			img.title = tile[id].name ? tile[id].name : "tile " + id;
 		else if( drawingCategory === TileType.Sprite )
@@ -127,6 +129,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 			img.title = "avatar";
 		else if( drawingCategory === TileType.Item )
 			img.title = item[id].name ? item[id].name : "item " + id;
+
 		img.classList.add("explorerThumbnail"); // NEW
 
 		div.appendChild(img);

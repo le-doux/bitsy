@@ -13,12 +13,13 @@ IDEAS
 - how do you handle exporting games?
 
 TODO next
-- bigger buttons (especially play)
+X bigger buttons (especially play)
 x better tool select
 	- bottom toolbar?
 	x side panel?
 	- swipe shortcut?
-- visual drawing picker
+X visual drawing picker
+- more testing
 - bitsy style
 - better handle of scrolling
 ? zoom

@@ -257,4 +257,5 @@ input[type=checkbox]:checked + label {
 .explorerContent {
 	height: 150px;
 	overflow: scroll;
+	white-space: nowrap;
 }

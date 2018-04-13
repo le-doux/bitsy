@@ -1,4 +1,8 @@
 /* 
+TODO:
+make branch off of: https://github.com/le-doux/bitsy/commit/e2ab6cb15ac328ad9cd596edcfc6c89e2caed2b4
+https://stackoverflow.com/questions/7167645/how-do-i-create-a-new-git-branch-from-an-old-commit
+
 4.6
 - filter drawings by name!
 - fix importing new-style html
