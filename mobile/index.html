@@ -107,8 +107,6 @@
 						</label>
 					</form>
 
-					<select id="room_drawing_select" onchange="room_onSelectDrawing(event);" style="display: none;"></select>
-
 					<form id="roomExplorerForm">
 						<span id="roomExplorerFormInner">
 						</span>
@@ -154,7 +152,10 @@
 						</label>
 					</form>
 
-					<select id="drawing_select" onchange="paint_onSelectDrawing(event);" style="display: none;"></select>
+					<form id="paintExplorerForm">
+						<span id="paintExplorerFormInner">
+						</span>
+					</form>
 
 					<div id="paintCommands" class="buttonGroup" style="display:none;">
 						<button title="add drawing" class="color0" onclick="newDrawing();">
