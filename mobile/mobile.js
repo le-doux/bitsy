@@ -140,10 +140,14 @@ function start() {
 	roomTool.listenEditEvents();
 
 	roomExplorer = new PaintExplorer("roomExplorer", onRoomExplorerSelect);
+	roomExplorer.displayCaptions = false;
 	roomExplorer.Refresh( TileType.Avatar );
+	roomExplorer.ChangeSelection("A");
 
 	paintExplorer = new PaintExplorer("paintExplorer", onPaintExplorerSelect);
+	paintExplorer.displayCaptions = false;
 	paintExplorer.Refresh( TileType.Avatar );
+	paintExplorer.ChangeSelection("A");
 }
 
 // mobile

@@ -215,3 +215,46 @@ button {
 	font-size: 80px;
 	margin: 20px;
 }
+
+input[type=radio] {
+	display: none;
+}
+
+input[type=radio] + label {
+	font-size: 50px;
+	padding: 5px;
+	background: black;
+	color: white;
+	margin: 5px;
+}
+
+input[type=radio]:checked + label {
+	background: white;
+	color: black;
+}
+
+input[type=checkbox] {
+	display: none;
+}
+
+input[type=checkbox] + label {
+	font-size: 50px;
+	padding: 5px;
+	background: black;
+	color: white;
+	margin: 5px;
+}
+
+input[type=checkbox]:checked + label {
+	background: white;
+	color: black;
+}
+
+.explorerThumbnail {
+	width: 100px;
+}
+
+.explorerContent {
+	height: 150px;
+	overflow: scroll;
+}

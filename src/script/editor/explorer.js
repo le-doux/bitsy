@@ -30,6 +30,8 @@ function PaintExplorer(idPrefix,selectCallback) {
 	var drawingCategory = null; // TODO: support multiple drawing categories in a list (possibly)
 	var selectedDrawingId = null;
 
+	this.displayCaptions = true;
+
 	function refresh( type, doKeepOldThumbnails, filterString, skipRenderStep ) {
 		drawingCategory = type;
 
@@ -125,22 +127,25 @@ function PaintExplorer(idPrefix,selectCallback) {
 			img.title = "avatar";
 		else if( drawingCategory === TileType.Item )
 			img.title = item[id].name ? item[id].name : "item " + id;
+		img.classList.add("explorerThumbnail"); // NEW
 
 		div.appendChild(img);
 
-		var nameCaption = document.createElement("figcaption");
-		nameCaption.id = idPrefix + "Caption_" + id;
+		if(this.displayCaptions) {
+			var nameCaption = document.createElement("figcaption");
+			nameCaption.id = idPrefix + "Caption_" + id;
 
-		nameCaption.innerText = img.title;
-		var curPaintMode = drawingCategory;
-		var drawingId = new DrawingId( curPaintMode, id );
-		var obj = drawingId.getEngineObject();
-		if( obj.name === undefined || obj.name === null ) {
-			console.log("default name!!!!");
-			nameCaption.classList.add( "thumbnailDefaultName" );
+			nameCaption.innerText = img.title;
+			var curPaintMode = drawingCategory;
+			var drawingId = new DrawingId( curPaintMode, id );
+			var obj = drawingId.getEngineObject();
+			if( obj.name === undefined || obj.name === null ) {
+				console.log("default name!!!!");
+				nameCaption.classList.add( "thumbnailDefaultName" );
+			}
+
+			div.appendChild(nameCaption);
 		}
-
-		div.appendChild(nameCaption);
 
 		label.appendChild(div);
 
