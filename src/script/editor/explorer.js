@@ -287,3 +287,73 @@ function PaintExplorer(idPrefix,selectCallback) {
 function createThumbnailRenderCallback(img) {
 	return function(uri) { img.src = uri; img.style.background = "none"; };
 }
+
+function ThumbnailRenderer() {
+	var drawingThumbnailCanvas, drawingThumbnailCtx;
+	drawingThumbnailCanvas = document.createElement("canvas");
+	drawingThumbnailCanvas.width = 8 * scale; // TODO: scale constants need to be contained somewhere
+	drawingThumbnailCanvas.height = 8 * scale;
+	drawingThumbnailCtx = drawingThumbnailCanvas.getContext("2d");
+
+	var thumbnailRenderEncoders = {};
+
+	function render(imgId,drawingId,frameIndex) {
+		var isAnimated = (frameIndex === undefined || frameIndex === null) ? true : false;
+
+		var hexPalette = []; // TODO this is a bit repetitive to do all the time, huh?
+		for (pal in palette) {
+			for (i in getPal(pal)){
+				var hexStr = rgbToHex( getPal(pal)[i][0], getPal(pal)[i][1], getPal(pal)[i][2] ).slice(1);
+				hexPalette.push( hexStr );
+			}
+		}
+
+		// console.log(id);
+		var img = document.getElementById(imgId);
+
+		var drawingFrameData = [];
+		if( drawingCategory == TileType.Tile ) {
+			// console.log(tile[id]);
+			drawTile( getTileImage( tile[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
+			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+			drawTile( getTileImage( tile[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
+			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+		}
+		else if( drawingCategory == TileType.Sprite || drawingCategory == TileType.Avatar ){
+			// console.log(sprite[id]);
+			drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
+			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+			drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
+			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+		}
+		else if( drawingCategory == TileType.Item ) {
+			drawItem( getItemImage( item[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
+			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+			drawItem( getItemImage( item[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
+			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+		}
+
+		// create encoder
+		var gifData = {
+			frames: drawingFrameData,
+			width: 8*scale,
+			height: 8*scale,
+			palette: hexPalette,
+			loops: 0,
+			delay: animationTime / 10 // TODO why divide by 10???
+		};
+		var encoder = new gif();
+
+		// cancel old encoder (if in progress already)
+		if( thumbnailRenderEncoders[imgId] != null )
+			thumbnailRenderEncoders[imgId].cancel();
+		thumbnailRenderEncoders[imgId] = encoder;
+
+		// start encoding new GIF
+		encoder.encode( gifData, createThumbnailRenderCallback(img) );
+	}
+
+	function createThumbnailRenderCallback(img) {
+		return function(uri) { img.src = uri; img.style.background = "none"; };
+	}
+}

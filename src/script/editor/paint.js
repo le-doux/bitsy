@@ -44,6 +44,19 @@ function DrawingId(type,id) { // TODO: is this the right name?
 		return null;
 	}
 
+	this.getImage = function(palId,frameIndex) {
+		if(self.type == TileType.Sprite || self.type == TileType.Avatar) {
+			return getSpriteImage(self.id,palId,frameIndex);
+		}
+		else if(self.type == TileType.Item) {
+			return getItemImage(self.id,palId,frameIndex);
+		}
+		else if(self.type == TileType.Tile) {
+			return getTileImage(self.id,palId,frameIndex);
+		}
+		return null;
+	}
+
 	this.isWallTile = function() {
 		if(self.type != TileType.Tile)
 			return false;

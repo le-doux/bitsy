@@ -1933,7 +1933,7 @@ function getTileImage(t,palId,frameIndex) {
 
 	var drwId = t.drw;
 
-	if (!palId) palId = curPal();
+	if (!palId) palId = curPal(); // TODO : will this break on iOS?
 
 	if ( t.animation.isAnimated ) {
 		if (frameIndex != null) { // use optional provided frame index
