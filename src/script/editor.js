@@ -455,6 +455,11 @@ function start() {
 	paletteTool.onPaletteChange = onPaletteChange;
 	paletteTool.updateColorPickerUI();
 
+	// init paint explorer
+	paintExplorer = new PaintExplorer("paintExplorer",selectPaint);
+	paintExplorer.Refresh(TileType.Avatar);
+	paintExplorer.ChangeSelection("A");
+
 	//unsupported feature stuff
 	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
 	if (!browserFeatures.fileDownload) {
@@ -580,18 +585,7 @@ function on_drawing_name_change() {
 
 	// update display name for thumbnail
 	var displayName = obj.name ? obj.name : getCurPaintModeStr() + " " + drawing.id;
-	document.getElementById("paintExplorerThumbnail_" + drawing.id).title = displayName;
-	var caption = document.getElementById("paintExplorerCaption_" + drawing.id);
-	caption.innerText = displayName;
-	if( obj.name ) {
-		if( caption.classList.contains("thumbnailDefaultName") )
-			caption.classList.remove("thumbnailDefaultName");
-	}
-	else {
-		if( !caption.classList.contains("thumbnailDefaultName") )
-			caption.classList.add("thumbnailDefaultName");
-	}
-
+	paintExplorer.ChangeThumbnailCaption(drawing.id, displayName);
 
 	// make sure items referenced in scripts update their names
 	if(drawing.type === TileType.Item) {
@@ -672,7 +666,7 @@ function nextRoom() {
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
-	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
+	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 
 	if (drawing.type === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -688,7 +682,7 @@ function prevRoom() {
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
-	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
+	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 
 	if (drawing.type === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -885,7 +879,7 @@ function next() {
 	else if( drawing.type == TileType.Item ) {
 		nextItem();
 	}
-	changePaintExplorerSelection( drawing.id );
+	paintExplorer.ChangeSelection( drawing.id );
 }
 
 function prev() {
@@ -898,7 +892,7 @@ function prev() {
 	else if( drawing.type == TileType.Item ) {
 		prevItem();
 	}
-	changePaintExplorerSelection( drawing.id );
+	paintExplorer.ChangeSelection( drawing.id );
 }
 
 function duplicateDrawing() {
@@ -997,8 +991,8 @@ function duplicateDrawing() {
 		paintTool.reloadDrawing(); //hack
 		updateInventoryItemUI();
 	}
-	addPaintThumbnail( drawing.id );
-	changePaintExplorerSelection( drawing.id );
+	paintExplorer.AddThumbnail( drawing.id );
+	paintExplorer.ChangeSelection( drawing.id );
 }
 
 function removeAllItems( id ) {
@@ -1344,6 +1338,7 @@ function updateRoomPaletteSelect() {
 
 var colorPicker = null; // new color picker
 var paletteTool = null;
+var paintExplorer = null;
 
 function changeColorPickerIndex(index) {
 	paletteTool.changeColorPickerIndex(index);
@@ -1354,7 +1349,7 @@ function onPaletteChange() {
 	renderImages();
 	paintTool.updateCanvas();
 	roomTool.drawEditMap();
-	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
+	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 	if( paintTool.isCurDrawingAnimated )
 		renderAnimationPreview( drawing.id );
 }
@@ -1428,7 +1423,7 @@ function roomPaletteChange(event) {
 	refreshGameData();
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
-	refreshPaintExplorer( true /*doKeepOldThumbnails*/ );
+	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 }
 
 function updateDrawingNameUI(visible) {
@@ -1454,7 +1449,7 @@ function on_paint_avatar() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(false);
 	//document.getElementById("animation").setAttribute("style","display:none;");
-	refreshPaintExplorer();
+	if(paintExplorer != null) paintExplorer.Refresh( paintTool.drawing.type );
 	document.getElementById("paintOptionAvatar").checked = true;
 	document.getElementById("paintExplorerOptionAvatar").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
@@ -1475,7 +1470,7 @@ function on_paint_tile() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
-	refreshPaintExplorer();
+	paintExplorer.Refresh( paintTool.drawing.type );
 	document.getElementById("paintOptionTile").checked = true;
 	document.getElementById("paintExplorerOptionTile").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
@@ -1503,7 +1498,7 @@ function on_paint_sprite() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
-	refreshPaintExplorer();
+	paintExplorer.Refresh( paintTool.drawing.type );
 	document.getElementById("paintOptionSprite").checked = true;
 	document.getElementById("paintExplorerOptionSprite").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
@@ -1527,7 +1522,7 @@ function on_paint_item() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
-	refreshPaintExplorer();
+	paintExplorer.Refresh( paintTool.drawing.type );
 	document.getElementById("paintOptionItem").checked = true;
 	document.getElementById("paintExplorerOptionItem").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:inline-block;");
@@ -1539,183 +1534,7 @@ function on_paint_item() {
 
 function paintExplorerFilterChange( e ) {
 	console.log("paint explorer filter : " + e.target.value);
-	refreshPaintExplorer( true, e.target.value );
-}
-
-var drawingThumbnailCanvas, drawingThumbnailCtx;
-function refreshPaintExplorer( doKeepOldThumbnails, filterString, skipRenderStep ) {
-	if( doKeepOldThumbnails == null || doKeepOldThumbnails == undefined )
-		doKeepOldThumbnails = false;
-
-	var doFilter = filterString != null && filterString != undefined && filterString.length > 0;
-
-	if( skipRenderStep == null || skipRenderStep == undefined )
-		skipRenderStep = false;
-
-	var idList = [];
-	if( drawing.type == TileType.Avatar ) {
-		idList = ["A"];
-	}
-	else if( drawing.type == TileType.Sprite ) {
-		idList = sortedSpriteIdList();
-	}
-	else if ( drawing.type == TileType.Tile ) {
-		idList = sortedTileIdList();
-	}
-	else if ( drawing.type == TileType.Item ) {
-		idList = sortedItemIdList();
-	}
-
-	var hexPalette = [];
-	for (id in palette) {
-		for (i in getPal(id)){
-			var hexStr = rgbToHex( getPal(id)[i][0], getPal(id)[i][1], getPal(id)[i][2] ).slice(1);
-			hexPalette.push( hexStr );
-		}
-	}
-
-	var paintExplorerForm = document.getElementById("paintExplorerFormInner");
-	if( !doKeepOldThumbnails )
-		paintExplorerForm.innerHTML = "";
-	
-	for(var i = 0; i < idList.length; i++) {
-		var id = idList[i];
-		if(id != "A" || drawing.type == TileType.Avatar)
-		{
-			if(!skipRenderStep) {
-				if( !doKeepOldThumbnails )
-					addPaintThumbnail( id ); // create thumbnail element and render thumbnail
-				else
-					renderPaintThumbnail( id ); // just re-render the thumbnail
-			}
-
-			if( doFilter )
-				filterPaintThumbnail( id, filterString );
-			else
-				document.getElementById("paintExplorerLabel_" + id).style.display = "inline-block"; // make it visible otherwise
-		}
-	}
-}
-
-function addPaintThumbnail(id) {
-	var paintExplorerForm = document.getElementById("paintExplorerFormInner");
-
-	var radio = document.createElement("input");
-	radio.type = "radio";
-	radio.name = "paintExplorerRadio";
-	radio.id = "paintExplorerRadio_" + id;
-	radio.value = id;
-	radio.checked = id === drawing.id;
-
-	paintExplorerForm.appendChild(radio);
-
-	var label = document.createElement("label");
-	label.htmlFor = "paintExplorerRadio_" + id;
-	label.id = "paintExplorerLabel_" + id;
-
-	var div = document.createElement("div");
-	// div.style.width = "100px";
-	// div.style.display = "inline-block";
-
-	var img = document.createElement("img");
-	img.id = "paintExplorerThumbnail_" + id;
-	if( drawing.type === TileType.Tile )
-		img.title = tile[id].name ? tile[id].name : "tile " + id;
-	else if( drawing.type === TileType.Sprite )
-		img.title = sprite[id].name ? sprite[id].name : "sprite " + id;
-	else if( drawing.type === TileType.Avatar )
-		img.title = "avatar";
-	else if( drawing.type === TileType.Item )
-		img.title = item[id].name ? item[id].name : "item " + id;
-
-	div.appendChild(img);
-
-	var nameCaption = document.createElement("figcaption");
-	nameCaption.id = "paintExplorerCaption_" + id;
-
-	nameCaption.innerText = img.title;
-	var curPaintMode = paintTool.drawing.type;
-	var drawingId = new DrawingId( curPaintMode, id );
-	var obj = drawingId.getEngineObject();
-	if( obj.name === undefined || obj.name === null ) {
-		console.log("default name!!!!");
-		nameCaption.classList.add( "thumbnailDefaultName" );
-	}
-
-	div.appendChild(nameCaption);
-
-	label.appendChild(div);
-
-	paintExplorerForm.appendChild(label);
-
-	radio.onclick = selectPaint;
-
-	renderPaintThumbnail( id );
-}
-
-function filterPaintThumbnail(id,filterString) {
-	var label = document.getElementById("paintExplorerLabel_" + id);
-	var img = document.getElementById("paintExplorerThumbnail_" + id);
-	var thumbTitle = img.title;
-
-	var foundFilter = thumbTitle.indexOf( filterString ) > -1;
-
-	label.style.display = foundFilter ? "inline-block" : "none";
-}
-
-var thumbnailRenderEncoders = {};
-function renderPaintThumbnail(id) {
-	var hexPalette = []; // TODO this is a bit repetitive to do all the time, huh?
-	for (pal in palette) {
-		for (i in getPal(pal)){
-			var hexStr = rgbToHex( getPal(pal)[i][0], getPal(pal)[i][1], getPal(pal)[i][2] ).slice(1);
-			hexPalette.push( hexStr );
-		}
-	}
-
-	// console.log(id);
-	var img = document.getElementById("paintExplorerThumbnail_" + id);
-
-	var drawingFrameData = [];
-	if( drawing.type == TileType.Tile ) {
-		// console.log(tile[id]);
-		drawTile( getTileImage( tile[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-		drawTile( getTileImage( tile[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-	}
-	else if( drawing.type == TileType.Sprite || drawing.type == TileType.Avatar ){
-		// console.log(sprite[id]);
-		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-	}
-	else if( drawing.type == TileType.Item ) {
-		drawItem( getItemImage( item[id], getRoomPal(curRoom), 0 ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-		drawItem( getItemImage( item[id], getRoomPal(curRoom), 1 ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-	}
-
-	// create encoder
-	var gifData = {
-		frames: drawingFrameData,
-		width: 8*scale,
-		height: 8*scale,
-		palette: hexPalette,
-		loops: 0,
-		delay: animationTime / 10 // TODO why divide by 10???
-	};
-	var encoder = new gif();
-
-	// cancel old encoder (if in progress already)
-	if( thumbnailRenderEncoders[id] != null )
-		thumbnailRenderEncoders[id].cancel();
-	thumbnailRenderEncoders[id] = encoder;
-
-	// start encoding new GIF
-	encoder.encode( gifData, createThumbnailRenderCallback(img) );
+	paintExplorer.Refresh( paintTool.drawing.type, true, e.target.value );
 }
 
 var animationPreviewEncoders = {};
@@ -1782,10 +1601,6 @@ function renderAnimationPreview(id) {
 	renderAnimationThumbnail( id, 1, 1, "animationThumbnailFrame2" );
 }
 
-function createThumbnailRenderCallback(img) {
-	return function(uri) { img.src = uri; img.style.background = "none"; };
-}
-
 function selectPaint() {
 	if(drawing.id === this.value && document.getElementById("paintPanel").style.display === "none") {
 		togglePanelCore("paintPanel", true /*visible*/); // animate?
@@ -1804,25 +1619,6 @@ function selectPaint() {
 		spriteIndex = sortedSpriteIdList().indexOf( drawing.id );
 		paintTool.reloadDrawing();
 	}
-}
-
-function changePaintExplorerSelection(id) {
-	var paintExplorerForm = document.getElementById("paintExplorerFormInner");
-	for( var i = 0; i < paintExplorerForm.childNodes.length; i++ ) {
-		var child = paintExplorerForm.childNodes[i];
-		if( child.type && child.type === "radio" ) {
-			if( child.id === "paintExplorerRadio_" + id )
-				child.checked = true;
-			else
-				child.checked = false;
-		}
-	}
-}
-
-function deletePaintThumbnail(id) {
-	var paintExplorerForm = document.getElementById("paintExplorerFormInner");
-	paintExplorerForm.removeChild( document.getElementById( "paintExplorerRadio_" + id ) );
-	paintExplorerForm.removeChild( document.getElementById( "paintExplorerLabel_" + id ) );
 }
 
 function getCurPaintModeStr() {

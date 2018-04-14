@@ -30,7 +30,10 @@ function PaintExplorer(idPrefix,selectCallback) {
 	var drawingCategory = null; // TODO: support multiple drawing categories in a list (possibly)
 	var selectedDrawingId = null;
 
-	this.displayCaptions = true;
+	var displayCaptions = true;
+	this.SetDisplayCaptions = function(display) {
+		displayCaptions = display;
+	}
 
 	function refresh( type, doKeepOldThumbnails, filterString, skipRenderStep ) {
 		drawingCategory = type;
@@ -134,7 +137,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 		div.appendChild(img);
 
-		if(this.displayCaptions) {
+		if(displayCaptions) {
 			var nameCaption = document.createElement("figcaption");
 			nameCaption.id = idPrefix + "Caption_" + id;
 
@@ -260,6 +263,24 @@ function PaintExplorer(idPrefix,selectCallback) {
 		deleteThumbnail(id);
 	};
 
+
+	function changeThumbnailCaption(id,captionText) {
+		document.getElementById(idPrefix + "Thumbnail_" + id).title = captionText;
+		var caption = document.getElementById(idPrefix + "Caption_" + id);
+		caption.innerText = captionText;
+		var obj = (new DrawingId(drawingCategory,id)).getEngineObject();
+		if( obj.name ) {
+			if( caption.classList.contains("thumbnailDefaultName") )
+				caption.classList.remove("thumbnailDefaultName");
+		}
+		else {
+			if( !caption.classList.contains("thumbnailDefaultName") )
+				caption.classList.add("thumbnailDefaultName");
+		}
+	}
+	this.ChangeThumbnailCaption = function(id,captionText) {
+		changeThumbnailCaption(id,captionText);
+	}
 }
 
 // TODO : what to do with free floating functions??
