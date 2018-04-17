@@ -357,7 +357,9 @@ function PaintTool(canvas, roomTool) {
 			shouldDelete = confirm("Are you sure you want to delete this drawing?");
 
 		if ( shouldDelete ) {
+			console.log("PAINT TOOLLLL");
 			if ( Ed().platform == PlatformType.Desktop && self.explorer != null ) {
+				console.log("PAINT TOOL DELETE THUMB");
 				self.explorer.DeleteThumbnail( self.drawing.id );
 			}
 
@@ -401,7 +403,7 @@ function PaintTool(canvas, roomTool) {
 				nextItem();
 				updateInventoryItemUI();
 			}
-			if(self.explorer != null) {
+			if(Ed().platform == PlatformType.Desktop && self.explorer != null) {
 				self.explorer.ChangeSelection( self.drawing.id );
 			}
 		}

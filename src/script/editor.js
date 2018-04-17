@@ -459,6 +459,7 @@ function start() {
 	paintExplorer = new PaintExplorer("paintExplorer",selectPaint);
 	paintExplorer.Refresh(TileType.Avatar);
 	paintExplorer.ChangeSelection("A");
+	paintTool.explorer = paintExplorer;
 
 	//unsupported feature stuff
 	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
@@ -1449,7 +1450,10 @@ function on_paint_avatar() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(false);
 	//document.getElementById("animation").setAttribute("style","display:none;");
-	if(paintExplorer != null) paintExplorer.Refresh( paintTool.drawing.type );
+	if(paintExplorer != null) { 
+		paintExplorer.Refresh( paintTool.drawing.type );
+		paintExplorer.ChangeSelection( paintTool.drawing.id );
+	}
 	document.getElementById("paintOptionAvatar").checked = true;
 	document.getElementById("paintExplorerOptionAvatar").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
@@ -1471,6 +1475,7 @@ function on_paint_tile() {
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	paintExplorer.Refresh( paintTool.drawing.type );
+	paintExplorer.ChangeSelection( paintTool.drawing.id );
 	document.getElementById("paintOptionTile").checked = true;
 	document.getElementById("paintExplorerOptionTile").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
@@ -1499,6 +1504,7 @@ function on_paint_sprite() {
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	paintExplorer.Refresh( paintTool.drawing.type );
+	paintExplorer.ChangeSelection( paintTool.drawing.id );
 	document.getElementById("paintOptionSprite").checked = true;
 	document.getElementById("paintExplorerOptionSprite").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
@@ -1523,6 +1529,7 @@ function on_paint_item() {
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	paintExplorer.Refresh( paintTool.drawing.type );
+	paintExplorer.ChangeSelection( paintTool.drawing.id );
 	document.getElementById("paintOptionItem").checked = true;
 	document.getElementById("paintExplorerOptionItem").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:inline-block;");

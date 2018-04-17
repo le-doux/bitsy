@@ -17,12 +17,6 @@ X move code out of editor.js
 
 function PaintExplorer(idPrefix,selectCallback) {
 
-	// var drawingThumbnailCanvas, drawingThumbnailCtx;
-	// drawingThumbnailCanvas = document.createElement("canvas");
-	// drawingThumbnailCanvas.width = 8 * scale; // TODO: scale constants need to be contained somewhere
-	// drawingThumbnailCanvas.height = 8 * scale;
-	// drawingThumbnailCtx = drawingThumbnailCanvas.getContext("2d");
-
 	var renderer = new ThumbnailRenderer();
 
 	/*
@@ -191,6 +185,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 	};
 
 	function changeSelection(id) {
+		console.log("CHANGE SELECTION " + id);
 		selectedDrawingId = id; // store that value
 		var paintExplorerForm = document.getElementById(idPrefix + "FormInner");
 		for( var i = 0; i < paintExplorerForm.childNodes.length; i++ ) {
@@ -215,7 +210,6 @@ function PaintExplorer(idPrefix,selectCallback) {
 	this.DeleteThumbnail = function(id) {
 		deleteThumbnail(id);
 	};
-
 
 	function changeThumbnailCaption(id,captionText) {
 		document.getElementById(idPrefix + "Thumbnail_" + id).title = captionText;
