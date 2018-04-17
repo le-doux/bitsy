@@ -44,17 +44,30 @@ function DrawingId(type,id) { // TODO: is this the right name?
 		return null;
 	}
 
+	// TODO : these methods should really be moved DOWN an abstraction level into a core DRAWING object in bitsy.js
 	this.getImage = function(palId,frameIndex) {
 		if(self.type == TileType.Sprite || self.type == TileType.Avatar) {
-			return getSpriteImage(self.id,palId,frameIndex);
+			return getSpriteImage(sprite[self.id],palId,frameIndex);
 		}
 		else if(self.type == TileType.Item) {
-			return getItemImage(self.id,palId,frameIndex);
+			return getItemImage(item[self.id],palId,frameIndex);
 		}
 		else if(self.type == TileType.Tile) {
-			return getTileImage(self.id,palId,frameIndex);
+			return getTileImage(tile[self.id],palId,frameIndex);
 		}
 		return null;
+	}
+
+	this.draw = function(context,x,y,palId,frameIndex) {
+		if(self.type == TileType.Sprite || self.type == TileType.Avatar) {
+			return drawSprite(self.getImage(palId,frameIndex),x,y,context);
+		}
+		else if(self.type == TileType.Item) {
+			return drawItem(self.getImage(palId,frameIndex),x,y,context);
+		}
+		else if(self.type == TileType.Tile) {
+			return drawTile(self.getImage(palId,frameIndex),x,y,context);
+		}
 	}
 
 	this.isWallTile = function() {

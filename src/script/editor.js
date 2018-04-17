@@ -1537,68 +1537,17 @@ function paintExplorerFilterChange( e ) {
 	paintExplorer.Refresh( paintTool.drawing.type, true, e.target.value );
 }
 
-var animationPreviewEncoders = {};
-function renderAnimationThumbnail(id,frameA,frameB,imgId) {
-	var hexPalette = []; // TODO this is a bit repetitive to do all the time, huh?
-	for (pal in palette) {
-		for (i in getPal(pal)){
-			var hexStr = rgbToHex( getPal(pal)[i][0], getPal(pal)[i][1], getPal(pal)[i][2] ).slice(1);
-			hexPalette.push( hexStr );
-		}
-	}
-
-	console.log(imgId);
-	var img = document.getElementById(imgId);
-	console.log(img);
-
-	var drawingFrameData = [];
-	if( drawing.type == TileType.Tile ) {
-		// console.log(tile[id]);
-		// console.log("RENDER ANIM " + frameA + " " + frameB);
-		drawTile( getTileImage( tile[id], getRoomPal(curRoom), frameA ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-		drawTile( getTileImage( tile[id], getRoomPal(curRoom), frameB ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-	}
-	else if( drawing.type == TileType.Avatar || drawing.type == TileType.Sprite ) {
-		// console.log(sprite[id]);
-		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), frameA ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-		drawSprite( getSpriteImage( sprite[id], getRoomPal(curRoom), frameB ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-	}
-	else if( drawing.type == TileType.Item ) {
-		drawItem( getItemImage( item[id], getRoomPal(curRoom), frameA ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-		drawItem( getItemImage( item[id], getRoomPal(curRoom), frameB ), 0, 0, drawingThumbnailCtx );
-		drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
-	}
-
-	// create encoder
-	var gifData = {
-		frames: drawingFrameData,
-		width: 8*scale,
-		height: 8*scale,
-		palette: hexPalette,
-		loops: 0,
-		delay: animationTime / 10 // TODO why divide by 10???
-	};
-	var encoder = new gif();
-
-	// cancel old encoder (if in progress already)
-	if( animationPreviewEncoders[imgId] != null )
-		animationPreviewEncoders[imgId].cancel();
-	animationPreviewEncoders[imgId] = encoder;
-
-	// start encoding new GIF
-	encoder.encode( gifData, createThumbnailRenderCallback(img) );
+var animationThumbnailRenderer = new ThumbnailRenderer();
+function renderAnimationThumbnail(imgId,id,frameIndex) {
+	var drawingId = new DrawingId(drawing.type,id); // HACK!!! - need consistency on how type + id should be coupled
+	animationThumbnailRenderer.Render(imgId,drawingId,frameIndex);
 }
 
 function renderAnimationPreview(id) {
 	// console.log("RENDRE ANIM PREVIW");
-	renderAnimationThumbnail( id, 0, 1, "animationThumbnailPreview" );
-	renderAnimationThumbnail( id, 0, 0, "animationThumbnailFrame1" );
-	renderAnimationThumbnail( id, 1, 1, "animationThumbnailFrame2" );
+	renderAnimationThumbnail( "animationThumbnailPreview", id );
+	renderAnimationThumbnail( "animationThumbnailFrame1", id, 0 );
+	renderAnimationThumbnail( "animationThumbnailFrame2", id, 1 );
 }
 
 function selectPaint() {
