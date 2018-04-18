@@ -202,6 +202,19 @@ function PaintExplorer(idPrefix,selectCallback) {
 		changeSelection(id);
 	};
 
+	function refreshAndChangeSelection(drawingId) {
+		console.log(drawingCategory);
+		console.log(drawingId.type);
+		if(drawingCategory != drawingId.type) {
+			console.log("refresh!!");
+			refresh(drawingId.type);
+		}
+		changeSelection(drawingId.id);
+	}
+	this.RefreshAndChangeSelection = function(drawingId) {
+		refreshAndChangeSelection(drawingId);
+	};
+
 	function deleteThumbnail(id) {
 		var paintExplorerForm = document.getElementById(idPrefix + "FormInner");
 		paintExplorerForm.removeChild( document.getElementById( idPrefix + "Radio_" + id ) );

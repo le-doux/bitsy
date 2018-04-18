@@ -27,7 +27,6 @@ function DrawingId(type,id) { // TODO: is this the right name?
 		else if(self.type == TileType.Item) {
 			dialogId = item[self.id].dlg;
 		}
-		console.log("DIALOG ID " + dialogId);
 		return dialogId;
 	}
 
@@ -116,6 +115,9 @@ function PaintTool(canvas, roomTool) {
 		if( Ed().platform == PlatformType.Desktop ) // hack
 			if (isPlayMode) return; //can't paint during play mode
 
+		console.log("PAINT TOOL!!!");
+		console.log(e);
+
 		var off = getOffset(e);
 
 		off = mobileOffsetCorrection(off,e,(tilesize));
@@ -152,6 +154,7 @@ function PaintTool(canvas, roomTool) {
 	}
 
 	function onMouseUp(e) {
+		console.log("?????");
 		if (isPainting) {
 			isPainting = false;
 			renderImages();
@@ -255,6 +258,13 @@ function PaintTool(canvas, roomTool) {
 			if(self.onReloadItem)
 				self.onReloadItem();
 		}
+	}
+
+	this.selectDrawing = function(drawingId) {
+		self.drawing.id = drawingId.id; // have to do this hack because I'm relying on aliasing (not good!)
+		self.drawing.type = drawingId.type;
+		self.reloadDrawing();
+		self.updateCanvas();
 	}
 
 	this.toggleWall = function(checked) {

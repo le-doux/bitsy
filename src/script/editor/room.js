@@ -37,6 +37,12 @@ function RoomTool(canvas) {
 		var y = Math.floor( off.y / (tilesize*scale) );
 		// console.log(x + " " + y);
 
+		console.log(e);
+		if( self.editDrawingAtCoordinateCallback != null && e.altKey ) {
+			self.editDrawingAtCoordinateCallback(x,y); // "eye dropper"
+			return;
+		}
+
 		if( Ed().platform == PlatformType.Desktop ) {
 			var didSelectedExitChange = self.areExitsVisible ? setSelectedExit( getExit(curRoom,x,y) ) : false;
 			var didSelectedEndingChange = self.areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;	
@@ -214,6 +220,8 @@ function RoomTool(canvas) {
 		isDragAddingTiles = false;
 		isDragDeletingTiles = false;
 	}
+
+	this.editDrawingAtCoordinateCallback = null;
 
 	var mapEditAnimationLoop;
 

@@ -1,4 +1,11 @@
 /* 
+TEST desktop editor:
+- feature: drag tools past edge of window
+- bug: gif text recording doesn't work
+- feature: visual room select
+- feature: copy sprites w/ room
+- bug: duplicate drawing -> weird thumbnail formatting
+
 TODO:
 make branch off of: https://github.com/le-doux/bitsy/commit/e2ab6cb15ac328ad9cd596edcfc6c89e2caed2b4
 https://stackoverflow.com/questions/7167645/how-do-i-create-a-new-git-branch-from-an-old-commit
@@ -383,6 +390,7 @@ function start() {
 	roomTool = new RoomTool(canvas);
 	roomTool.listenEditEvents()
 	roomTool.drawing = drawing;
+	roomTool.editDrawingAtCoordinateCallback = editDrawingAtCoordinate;
 
 	paintTool = new PaintTool(document.getElementById("paint"),roomTool);
 	paintTool.drawing = drawing;
@@ -1443,6 +1451,15 @@ function on_paint_avatar() {
 	drawing.type = TileType.Avatar;
 	drawing.id = "A";
 	paintTool.reloadDrawing();
+	if(paintExplorer != null) { 
+		paintExplorer.Refresh( paintTool.drawing.type );
+		paintExplorer.ChangeSelection( paintTool.drawing.id );
+	}
+
+	on_paint_avatar_ui_update();
+}
+
+function on_paint_avatar_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintNav").setAttribute("style","display:none;");
@@ -1450,10 +1467,6 @@ function on_paint_avatar() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(false);
 	//document.getElementById("animation").setAttribute("style","display:none;");
-	if(paintExplorer != null) { 
-		paintExplorer.Refresh( paintTool.drawing.type );
-		paintExplorer.ChangeSelection( paintTool.drawing.id );
-	}
 	document.getElementById("paintOptionAvatar").checked = true;
 	document.getElementById("paintExplorerOptionAvatar").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
@@ -1462,11 +1475,19 @@ function on_paint_avatar() {
 
 	reloadAdvDialogUI();
 }
+
 function on_paint_tile() {
 	drawing.type = TileType.Tile;
 	tileIndex = 0;
 	drawing.id = sortedTileIdList()[tileIndex];
 	paintTool.reloadDrawing();
+	paintExplorer.Refresh( paintTool.drawing.type );
+	paintExplorer.ChangeSelection( paintTool.drawing.id );
+
+	on_paint_tile_ui_update();
+}
+
+function on_paint_tile_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:block;");
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
@@ -1474,8 +1495,6 @@ function on_paint_tile() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
-	paintExplorer.Refresh( paintTool.drawing.type );
-	paintExplorer.ChangeSelection( paintTool.drawing.id );
 	document.getElementById("paintOptionTile").checked = true;
 	document.getElementById("paintExplorerOptionTile").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
@@ -1484,6 +1503,7 @@ function on_paint_tile() {
 
 	reloadAdvDialogUI();
 }
+
 function on_paint_sprite() {
 	drawing.type = TileType.Sprite;
 	if (sortedSpriteIdList().length > 1)
@@ -1496,6 +1516,13 @@ function on_paint_sprite() {
 	drawing.id = sortedSpriteIdList()[spriteIndex];
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
+	paintExplorer.Refresh( paintTool.drawing.type );
+	paintExplorer.ChangeSelection( paintTool.drawing.id );
+
+	on_paint_sprite_ui_update();
+}
+
+function on_paint_sprite_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
@@ -1503,8 +1530,6 @@ function on_paint_sprite() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
-	paintExplorer.Refresh( paintTool.drawing.type );
-	paintExplorer.ChangeSelection( paintTool.drawing.id );
 	document.getElementById("paintOptionSprite").checked = true;
 	document.getElementById("paintExplorerOptionSprite").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
@@ -1513,6 +1538,7 @@ function on_paint_sprite() {
 
 	reloadAdvDialogUI();
 }
+
 function on_paint_item() {
 	console.log("PAINT ITEM");
 	drawing.type = TileType.Item;
@@ -1521,6 +1547,13 @@ function on_paint_item() {
 	console.log(drawing.id);
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
+	paintExplorer.Refresh( paintTool.drawing.type );
+	paintExplorer.ChangeSelection( paintTool.drawing.id );
+
+	on_paint_item_ui_update();
+}
+
+function on_paint_item_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
 	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
@@ -1528,8 +1561,6 @@ function on_paint_item() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
-	paintExplorer.Refresh( paintTool.drawing.type );
-	paintExplorer.ChangeSelection( paintTool.drawing.id );
 	document.getElementById("paintOptionItem").checked = true;
 	document.getElementById("paintExplorerOptionItem").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:inline-block;");
@@ -1542,6 +1573,50 @@ function on_paint_item() {
 function paintExplorerFilterChange( e ) {
 	console.log("paint explorer filter : " + e.target.value);
 	paintExplorer.Refresh( paintTool.drawing.type, true, e.target.value );
+}
+
+// ok to split up per-app functionality this way?
+function editDrawingAtCoordinate(x,y) {
+	// if(self.paintTool === null || self.paintExplorer === null)
+	// 	return;
+
+	// console.log("!!!");
+
+	console.log("ALT " + x + " " + y);
+
+	var spriteId = getSpriteAt(x,y); // todo: need more consistency with these methods
+	console.log(spriteId);
+	if(spriteId) {
+		if(spriteId === "A")
+			on_paint_avatar_ui_update();
+		else
+			on_paint_sprite_ui_update();
+
+		var drawing = new DrawingId( spriteId === "A" ? TileType.Avatar : TileType.Sprite, spriteId );
+		paintTool.selectDrawing( drawing );
+		paintExplorer.RefreshAndChangeSelection( drawing );
+		return;
+	}
+
+	var item = getItem(curRoom,x,y);
+	console.log(item);
+	if(item) {
+		on_paint_item_ui_update();
+		var drawing = new DrawingId( TileType.Item, item.id );
+		paintTool.selectDrawing( drawing );
+		paintExplorer.RefreshAndChangeSelection( drawing );
+		return;
+	}
+
+	var tileId = getTile(x,y);
+	console.log(tileId);
+	if(tileId != 0) {
+		on_paint_tile_ui_update(); // really wasteful probably
+		var drawing = new DrawingId( TileType.Tile, tileId );
+		paintTool.selectDrawing( drawing );
+		paintExplorer.RefreshAndChangeSelection( drawing );
+		return;
+	}
 }
 
 var animationThumbnailRenderer = new ThumbnailRenderer();
