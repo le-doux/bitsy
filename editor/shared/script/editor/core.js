@@ -389,9 +389,11 @@ function PaletteTool(colorPicker,labelIds) {
 function ResourceLoader() {
 	var resources = {};
 
+	var pathRoot = Ed().platform == PlatformType.Desktop ? "shared" : "../editor/shared";
+
 	this.load = function(folder, filename) {
 		var client = new XMLHttpRequest();
-		client.open('GET', '../src/' + folder + '/' + filename);
+		client.open('GET', pathRoot + '/' + folder + '/' + filename);
 		client.onreadystatechange = function() {
 			resources[filename] = client.responseText;
 		}
