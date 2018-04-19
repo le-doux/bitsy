@@ -1,3 +1,6 @@
+4.7:
+- alt-click a tile or sprite in the room tool to edit it in the paint tool
+
 4.6:
 - filter drawings by name!
 - fix importing new-style html
