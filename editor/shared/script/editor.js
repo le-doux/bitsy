@@ -10,20 +10,6 @@ TODO:
 make branch off of: https://github.com/le-doux/bitsy/commit/e2ab6cb15ac328ad9cd596edcfc6c89e2caed2b4
 https://stackoverflow.com/questions/7167645/how-do-i-create-a-new-git-branch-from-an-old-commit
 
-4.7
-- alt-click a tile or sprite in the room tool to edit it in the paint tool
-
-4.6
-- filter drawings by name!
-- fix importing new-style html
-
-4.5
-- bitsy icon
-- better top bar behavior
-- new color picker
-- remember page export color
-- bugfix: wall visualization broken
-
 CONFIRMED BUGS
 - iOS editor is broken again
 - bug with mobile (iOS safari) not loading itch games every time
@@ -275,8 +261,6 @@ var browserFeatures = {
 /* SCREEN CAPTURE */
 var gifencoder = new gif();
 var gifFrameData = [];
-var gifCaptureCanvas;
-var gifCaptureCtx;
 
 var isPlayMode = false;
 
@@ -2131,6 +2115,7 @@ function startRecordingGif() {
 	gifFrameData = [];
 
 	document.getElementById("gifStartButton").style.display="none";
+	document.getElementById("gifSnapshotButton").style.display="none";
 	document.getElementById("gifStopButton").style.display="inline";
 	document.getElementById("gifRecordingText").style.display="inline";
 	document.getElementById("gifPreview").style.display="none";
@@ -2141,23 +2126,34 @@ function startRecordingGif() {
 	}, 100 );
 }
 
-var gifCaptureConsistentFrameIndex = 0; // free floating var like this is weird
-function addFrameToGif() {
-	drawRoom( room[curRoom], gifCaptureCtx, gifCaptureConsistentFrameIndex );
+// TODO - widescreen GIF capture on alt-click
+var gifCaptureCanvas; // initialized in start() -- should be in own module?
+var gifCaptureCtx;
+function takeSnapshotGif(e) {
+	console.log(e);
 
+	gifFrameData = [];
+
+	drawRoom( room[curRoom], gifCaptureCtx, 0 );
 	gifFrameData.push( gifCaptureCtx.getImageData(0,0,512,512).data );
 
-	gifCaptureConsistentFrameIndex++;
-	if(gifCaptureConsistentFrameIndex > 1)
-		gifCaptureConsistentFrameIndex = 0;
+	drawRoom( room[curRoom], gifCaptureCtx, 1 );
+	gifFrameData.push( gifCaptureCtx.getImageData(0,0,512,512).data );
+
+	stopRecordingGif( animationTime / 10 );
 }
 
-function stopRecordingGif() {
+function stopRecordingGif(frameDelay) {
+	if(frameDelay === undefined || frameDelay === null)
+		frameDelay = 10;
+
 	if(gifRecordingInterval != null) {
 		clearInterval( gifRecordingInterval );
 		gifRecordingInterval = null;
 	}
 
+	document.getElementById("gifStartButton").style.display="none";
+	document.getElementById("gifSnapshotButton").style.display="none";
 	document.getElementById("gifStopButton").style.display="none";
 	document.getElementById("gifRecordingText").style.display="none";
 	document.getElementById("gifEncodingText").style.display="inline";
@@ -2177,25 +2173,24 @@ function stopRecordingGif() {
 				hexPalette.push( hexStr );
 			}
 		}
-		//console.log(hexPalette);
-		//console.log(gifFrameData);
+
 		var gif = {
 			frames: gifFrameData,
 			width: 512,
 			height: 512,
 			palette: hexPalette,
 			loops: 0,
-			delay: 10 //30
+			delay: frameDelay
 		};
+
 		gifencoder.encode( gif, 
 			function(uri, blob) {
 				document.getElementById("gifEncodingText").style.display="none";
 				document.getElementById("gifStartButton").style.display="inline";
-				//console.log("encoding finished!");
-				//console.log(uri);
 				document.getElementById("gifPreview").src = uri;
 				document.getElementById("gifPreview").style.display="block";
 				document.getElementById("gifPlaceholder").style.display="none";
+				document.getElementById("gifSnapshotButton").style.display="inline";
 
 				if( browserFeatures.blobURL ) {
 					document.getElementById("gifDownload").href = makeURL.createObjectURL( blob );
