@@ -530,13 +530,14 @@ function update() {
 	var curTime = Date.now();
 	deltaTime = curTime - prevTime;
 
-	//clear screen
-	ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
-	ctx.fillRect(0,0,canvas.width,canvas.height);
-	
 	if (!isNarrating && !isEnding) {
 		updateAnimation();
 		drawRoom( room[curRoom] ); // draw world if game has begun
+	}
+	else {
+		//make sure to still clear screen
+		ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
+		ctx.fillRect(0,0,canvas.width,canvas.height);
 	}
 
 	// if (isDialogMode) { // dialog mode
@@ -1896,7 +1897,15 @@ function drawItem(img,x,y,context) {
 	drawTile(img,x,y,context); //TODO these methods are dumb and repetitive
 }
 
-function drawRoom(room,context) {
+function drawRoom(room,context,frameIndex) { // context & frameIndex are optional
+	if (!context) { //optional pass in context; otherwise, use default (ok this is REAL hacky isn't it)
+		context = ctx;
+	}
+
+	//clear screen
+	context.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
+	context.fillRect(0,0,canvas.width,canvas.height);
+
 	//draw tiles
 	for (i in room.tilemap) {
 		for (j in room.tilemap[i]) {
@@ -1909,21 +1918,23 @@ function drawRoom(room,context) {
 				}
 				else {
 					// console.log(id);
-					drawTile( getTileImage(tile[id],getRoomPal(room.id)), j, i, context );
+					drawTile( getTileImage(tile[id],getRoomPal(room.id),frameIndex), j, i, context );
 				}
 			}
 		}
 	}
+
 	//draw items
 	for (var i = 0; i < room.items.length; i++) {
 		var itm = room.items[i];
-		drawItem( getItemImage(item[itm.id],getRoomPal(room.id)), itm.x, itm.y, context );
+		drawItem( getItemImage(item[itm.id],getRoomPal(room.id),frameIndex), itm.x, itm.y, context );
 	}
+
 	//draw sprites
 	for (id in sprite) {
 		var spr = sprite[id];
 		if (spr.room === room.id) {
-			drawSprite( getSpriteImage(spr,getRoomPal(room.id)), spr.x, spr.y, context );
+			drawSprite( getSpriteImage(spr,getRoomPal(room.id),frameIndex), spr.x, spr.y, context );
 		}
 	}
 }

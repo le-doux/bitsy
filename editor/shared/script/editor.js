@@ -274,8 +274,10 @@ var browserFeatures = {
 
 /* SCREEN CAPTURE */
 var gifencoder = new gif();
-var isRecordingGif = false;
 var gifFrameData = [];
+var gifCaptureCanvas;
+var gifCaptureCtx;
+
 var isPlayMode = false;
 
 /* EXPORT HTML */
@@ -478,22 +480,11 @@ function start() {
 		document.getElementById("downloadHelp").style.display = "block";
 	}
 
-	//respond to player movement event by recording gif frames
-	onPlayerMoved = function() {
-		if (isRecordingGif) 
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-	};
-	onDialogUpdate = function() {
-		// console.log("dialog update!");
-		if (isRecordingGif) {
-			// copy frame 5x to slow it down (hacky)
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-			gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-		}
-	};
+	// gif recording init (should this go in its own file?)
+	gifCaptureCanvas = document.getElementById("exitCanvas");
+	gifCaptureCanvas.width = width * scale;
+	gifCaptureCanvas.height = width * scale;
+	gifCaptureCtx = gifCaptureCanvas.getContext("2d");
 
 	onInventoryChanged = function(id) {
 		updateInventoryUI();
@@ -2134,20 +2125,43 @@ function updatePanelPrefs() {
 	console.log(localStorage.panel_prefs);
 }
 
+
+var gifRecordingInterval = null;
 function startRecordingGif() {
 	gifFrameData = [];
-	if (isPlayMode)
-		gifFrameData.push( ctx.getImageData(0,0,512,512).data );
-	isRecordingGif = true;
+
 	document.getElementById("gifStartButton").style.display="none";
 	document.getElementById("gifStopButton").style.display="inline";
 	document.getElementById("gifRecordingText").style.display="inline";
+	document.getElementById("gifPreview").style.display="none";
+	document.getElementById("gifPlaceholder").style.display="block";
+
+	gifRecordingInterval = setInterval( function() {
+		gifFrameData.push( ctx.getImageData(0,0,512,512).data );
+	}, 100 );
+}
+
+var gifCaptureConsistentFrameIndex = 0; // free floating var like this is weird
+function addFrameToGif() {
+	drawRoom( room[curRoom], gifCaptureCtx, gifCaptureConsistentFrameIndex );
+
+	gifFrameData.push( gifCaptureCtx.getImageData(0,0,512,512).data );
+
+	gifCaptureConsistentFrameIndex++;
+	if(gifCaptureConsistentFrameIndex > 1)
+		gifCaptureConsistentFrameIndex = 0;
 }
 
 function stopRecordingGif() {
+	if(gifRecordingInterval != null) {
+		clearInterval( gifRecordingInterval );
+		gifRecordingInterval = null;
+	}
+
 	document.getElementById("gifStopButton").style.display="none";
 	document.getElementById("gifRecordingText").style.display="none";
 	document.getElementById("gifEncodingText").style.display="inline";
+	document.getElementById("gifEncodingProgress").innerText = "0";
 
 	if(gifFrameData.length <= 0) {
 		document.getElementById("gifEncodingText").style.display="none";
@@ -2171,24 +2185,30 @@ function stopRecordingGif() {
 			height: 512,
 			palette: hexPalette,
 			loops: 0,
-			delay: 30
+			delay: 10 //30
 		};
-		gifencoder.encode( gif, function(uri, blob) {
-			document.getElementById("gifEncodingText").style.display="none";
-			document.getElementById("gifStartButton").style.display="inline";
-			//console.log("encoding finished!");
-			//console.log(uri);
-			document.getElementById("gifPreview").src = uri;
+		gifencoder.encode( gif, 
+			function(uri, blob) {
+				document.getElementById("gifEncodingText").style.display="none";
+				document.getElementById("gifStartButton").style.display="inline";
+				//console.log("encoding finished!");
+				//console.log(uri);
+				document.getElementById("gifPreview").src = uri;
+				document.getElementById("gifPreview").style.display="block";
+				document.getElementById("gifPlaceholder").style.display="none";
 
-			if( browserFeatures.blobURL ) {
-				document.getElementById("gifDownload").href = makeURL.createObjectURL( blob );
+				if( browserFeatures.blobURL ) {
+					document.getElementById("gifDownload").href = makeURL.createObjectURL( blob );
+				}
+				else {
+					var downloadData = uri.replace("data:;", "data:attachment/file;"); // for safari
+					document.getElementById("gifDownload").href = downloadData;
+				}
+			},
+			function(curFrame, maxFrame) {
+				document.getElementById("gifEncodingProgress").innerText = Math.floor( (curFrame / maxFrame) * 100 );
 			}
-			else {
-				var downloadData = uri.replace("data:;", "data:attachment/file;"); // for safari
-				document.getElementById("gifDownload").href = downloadData;
-			}
-		});
-		isRecordingGif = false;
+		);
 	}, 10);
 }
 

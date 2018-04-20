@@ -29,7 +29,7 @@ GIF DATA FORMAT:
 }
 */
 
-this.encode = function(gifData, callback) {
+this.encode = function(gifData, callback, progressCallback) {
 	//color init stuff
 	var colorTableSize = colorTableSizeThatFitsPalette( gifData.palette );
 	var colorTable = padPalette( gifData.palette, colorTableSize );
@@ -63,6 +63,13 @@ this.encode = function(gifData, callback) {
 				clearInterval( loop );
 			}
 			else if (i < gifData.frames.length) {
+				// console.log("ENCODE GIF!!!!");
+				// console.log(i + " / " + gifData.frames.length);
+
+				if(progressCallback != undefined && progressCallback != null) {
+					progressCallback(i, gifData.frames.length);
+				}
+
 				//record one frame
 				gifArr = animationGraphicsControlExtension( gifArr, gifData.delay );
 				gifArr = imageDescriptor( gifArr, 0, 0, gifData.width, gifData.height );
