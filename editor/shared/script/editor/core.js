@@ -177,9 +177,9 @@ function makeSprite(id,imageData) {
 }
 
 function makeItem(id,imageData) { // NOTE : same as tile right now? make more like sprite?
-	console.log(id);
+	// console.log(id);
 	var drwId = "ITM_" + id;
-	console.log(drwId);
+	// console.log(drwId);
 	item[id] = {
 		drw : drwId,
 		col : 2, // TODO color not column (bad name)
@@ -233,17 +233,17 @@ function mobileOffsetCorrection(off,e,innerSize) {
 		off.y -= (bounds.height - bounds.width) / 2;
 	}
 
-	console.log(off);
+	// console.log(off);
 
 	// convert container size to internal canvas size
 	var containerRatio = innerSize / Math.min( bounds.width, bounds.height );
 
-	console.log(containerRatio);
+	// console.log(containerRatio);
 
 	off.x *= containerRatio;
 	off.y *= containerRatio;
 
-	console.log(off);
+	// console.log(off);
 
 	return off;
 }
@@ -342,7 +342,7 @@ function PaletteTool(colorPicker,labelIds) {
 	this.changeColorPickerIndex = function(index) {
 		colorPickerIndex = index;
 		var color = getPal(selectedColorPal())[ index ];
-		console.log(color);
+		// console.log(color);
 		colorPicker.setColor( color[0], color[1], color[2] );
 	}
 
@@ -412,6 +412,7 @@ function createDefaultGameStateFunction() {
 	return function() {
 		document.getElementById("game_data").value = resources.get("defaultGameData.bitsy"); // reset game data
 		localStorage.game_data = document.getElementById("game_data").value; // save game
+		clearGameData();
 		parseWorld(document.getElementById("game_data").value); // load game
 	}
 }
@@ -434,8 +435,6 @@ function resetGameData() {
 
 	refreshGameData();
 	renderImages();
-	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
-	roomTool.drawEditMap();
 
 	if ( Ed().platform == PlatformType.Desktop ) {
 		updatePaletteUI();
@@ -447,6 +446,9 @@ function resetGameData() {
 		on_paint_avatar();
 		document.getElementById('paintOptionAvatar').checked = true;
 	}
+
+	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
+	roomTool.drawEditMap();
 }
 
 function refreshGameData() {

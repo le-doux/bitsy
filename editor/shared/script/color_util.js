@@ -21,6 +21,27 @@ function rgbToHex(r, g, b) {
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
+function hslToHex(h,s,l) {
+    var rgbArr = hslToRgb(h,s,l);
+    return rgbToHex( Math.floor(rgbArr[0]), Math.floor(rgbArr[1]), Math.floor(rgbArr[2]) );
+}
+
+function hexToHsl(hex) {
+    var rgb = hexToRgb(hex);
+    return rgbToHsl(rgb.r, rgb.g, rgb.b);
+}
+
+// really just a vector distance
+function colorDistance(a1,b1,c1,a2,b2,c2) {
+    return Math.sqrt( Math.pow(a1 - a2, 2) + Math.pow(b1 - b2, 2) + Math.pow(c1 - c2, 2) );
+}
+
+function hexColorDistance(hex1,hex2) {
+    var color1 = hexToRgb(hex1);
+    var color2 = hexToRgb(hex2);
+    return rgbColorDistance(color1.r, color1.g, color1.b, color2.r, color2.g, color2.b);
+}
+
 
 // source : http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
 /* accepts parameters

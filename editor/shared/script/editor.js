@@ -2189,6 +2189,7 @@ function stopRecordingGif() {
 	finishRecordingGif(gif);
 }
 
+// TODO - palette for rainbow text
 function finishRecordingGif(gif) {
 	if(gifRecordingInterval != null) {
 		clearInterval( gifRecordingInterval );
@@ -2210,12 +2211,27 @@ function finishRecordingGif(gif) {
 
 	setTimeout( function() {
 		var hexPalette = [];
+		// add black & white
+		hexPalette.push( rgbToHex(0,0,0).slice(1) ); // need to slice off leading # (should that safeguard go in gif.js?)
+		hexPalette.push( rgbToHex(255,255,255).slice(1) );
+		// add all user defined palette colors
 		for (id in palette) {
 			for (i in getPal(id)){
 				var hexStr = rgbToHex( getPal(id)[i][0], getPal(id)[i][1], getPal(id)[i][2] ).slice(1);
 				hexPalette.push( hexStr );
 			}
 		}
+		// add rainbow colors (for rainbow text effect)
+		hexPalette.push( hslToHex(0.0,1,0.5).slice(1) );
+		hexPalette.push( hslToHex(0.1,1,0.5).slice(1) );
+		hexPalette.push( hslToHex(0.2,1,0.5).slice(1) );
+		hexPalette.push( hslToHex(0.3,1,0.5).slice(1) );
+		hexPalette.push( hslToHex(0.4,1,0.5).slice(1) );
+		hexPalette.push( hslToHex(0.5,1,0.5).slice(1) );
+		hexPalette.push( hslToHex(0.6,1,0.5).slice(1) );
+		hexPalette.push( hslToHex(0.7,1,0.5).slice(1) );
+		hexPalette.push( hslToHex(0.8,1,0.5).slice(1) );
+		hexPalette.push( hslToHex(0.9,1,0.5).slice(1) );
 
 		gif.palette = hexPalette; // hacky
 

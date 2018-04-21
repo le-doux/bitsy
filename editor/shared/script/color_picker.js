@@ -128,7 +128,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		if( isMouseUp == null || isMouseUp == undefined )
 			isMouseUp = false;
 
-		console.log(isMouseDown);
+		// console.log(isMouseDown);
 
 		if(isMouseDown) {
 			// console.log(e);
@@ -245,9 +245,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 	var hexText;
 
 	function initColorWheel() {
-		console.log(wheelId);
-		console.log(document);
-		console.log(document.getElementById(wheelId));
+		// console.log(wheelId);
+		// console.log(document);
+		// console.log(document.getElementById(wheelId));
 		wheelCanvas = document.getElementById(wheelId);
 		wheelContext = wheelCanvas.getContext("2d");
 

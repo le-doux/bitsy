@@ -226,16 +226,42 @@ function imageDescriptor(gifArr, left, top, width, height) {
 function pixelsToIndices(pixels, colors) {
 	var indices = [];
 
+	// hex map for exact matching
 	var colorMap = {};
-	for (i in colors) {
+	for (var i in colors) {
 		var hex = parseInt("0x"+colors[i]);
 		colorMap[ hex ] = parseInt(i);
 	}
 
+	// hsl colors for fuzzy matching
+	var hslColors = [];
+	for (var i in colors) {
+		hslColors.push(hexToHsl(colors[i]));
+	}
+
 	for (var i = 0; i < pixels.length; i += 4) {
+		// first try exact match
 		var hex = (pixels[i+0] << 16) | (pixels[i+1] << 8) | (pixels[i+2] << 0);
 		var index = colorMap[ hex ];
-		if (index == undefined) index = indices[indices.length-1]; //hack for unsupported colors (should change to bg index)
+
+		// if (index == undefined) index = indices[indices.length-1]; //old hack for unsupported colors
+
+		// if there's no exact match, use fuzzy matching (this might be slow?)
+		if (index == undefined) {
+			var color = rgbToHsl(pixels[i+0],pixels[i+1],pixels[i+2]);
+			index = 0;
+			for(var j in hslColors) {
+				var color1 = hslColors[index];
+				var color2 = hslColors[j];
+
+				var dist1 = colorDistance(color[0],color[1],color[2], color1[0],color1[1],color1[2]);
+				var dist2 = colorDistance(color[0],color[1],color[2], color2[0],color2[1],color2[2]);
+				if(dist2 < dist1) {
+					index = parseInt(j);
+				}
+			}
+		}
+
 		indices.push(index);
 	}
 
