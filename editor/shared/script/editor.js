@@ -465,7 +465,7 @@ function start() {
 	}
 
 	// gif recording init (should this go in its own file?)
-	gifCaptureCanvas = document.getElementById("exitCanvas");
+	gifCaptureCanvas = document.createElement("canvas");
 	gifCaptureCanvas.width = width * scale;
 	gifCaptureCanvas.height = width * scale;
 	gifCaptureCtx = gifCaptureCanvas.getContext("2d");
