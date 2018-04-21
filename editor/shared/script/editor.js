@@ -2126,27 +2126,70 @@ function startRecordingGif() {
 	}, 100 );
 }
 
-// TODO - widescreen GIF capture on alt-click
 var gifCaptureCanvas; // initialized in start() -- should be in own module?
 var gifCaptureCtx;
-function takeSnapshotGif(e) {
-	console.log(e);
+var gifCaptureWidescreenSize = {
+	width : 726, // height * 1.26
+	height : 576
+};
 
-	gifFrameData = [];
+function takeSnapshotGif(e) {
+	var gif = {
+		frames: [],
+		width: 512,
+		height: 512,
+		loops: 0,
+		delay: animationTime / 10
+	};
+
+	gifCaptureCanvas.width = 512; // stop hardcoding 512?
+	gifCaptureCanvas.height = 512;
 
 	drawRoom( room[curRoom], gifCaptureCtx, 0 );
-	gifFrameData.push( gifCaptureCtx.getImageData(0,0,512,512).data );
+	var frame0 = gifCaptureCtx.getImageData(0,0,512,512);
 
 	drawRoom( room[curRoom], gifCaptureCtx, 1 );
-	gifFrameData.push( gifCaptureCtx.getImageData(0,0,512,512).data );
+	var frame1 = gifCaptureCtx.getImageData(0,0,512,512);
 
-	stopRecordingGif( animationTime / 10 );
+	if(e.altKey) {
+		/* widescreen */
+		gif.width = gifCaptureWidescreenSize.width;
+		gif.height = gifCaptureWidescreenSize.height;
+		gifCaptureCanvas.width = gifCaptureWidescreenSize.width;
+		gifCaptureCanvas.height = gifCaptureWidescreenSize.height;
+
+		var widescreenX = (gifCaptureWidescreenSize.width / 2) - (512 / 2);
+		var widescreenY = (gifCaptureWidescreenSize.height / 2) - (512 / 2);
+
+		gifCaptureCtx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
+		gifCaptureCtx.fillRect(0,0,gifCaptureWidescreenSize.width,gifCaptureWidescreenSize.height);
+
+		gifCaptureCtx.putImageData(frame0,widescreenX,widescreenY);
+		frame0 = gifCaptureCtx.getImageData(0,0,gifCaptureWidescreenSize.width,gifCaptureWidescreenSize.height);
+
+		gifCaptureCtx.putImageData(frame1,widescreenX,widescreenY);
+		frame1 = gifCaptureCtx.getImageData(0,0,gifCaptureWidescreenSize.width,gifCaptureWidescreenSize.height);
+	}
+
+	gif.frames.push( frame0.data );
+	gif.frames.push( frame1.data );
+
+	finishRecordingGif(gif);
 }
 
-function stopRecordingGif(frameDelay) {
-	if(frameDelay === undefined || frameDelay === null)
-		frameDelay = 10;
+function stopRecordingGif() {
+	var gif = {
+		frames: gifFrameData,
+		width: 512,
+		height: 512,
+		loops: 0,
+		delay: 10
+	};
 
+	finishRecordingGif(gif);
+}
+
+function finishRecordingGif(gif) {
 	if(gifRecordingInterval != null) {
 		clearInterval( gifRecordingInterval );
 		gifRecordingInterval = null;
@@ -2159,7 +2202,7 @@ function stopRecordingGif(frameDelay) {
 	document.getElementById("gifEncodingText").style.display="inline";
 	document.getElementById("gifEncodingProgress").innerText = "0";
 
-	if(gifFrameData.length <= 0) {
+	if(gif.frames.length <= 0) {
 		document.getElementById("gifEncodingText").style.display="none";
 		document.getElementById("gifStartButton").style.display="inline";
 		return; // nothing recorded, nothing to encode
@@ -2174,14 +2217,7 @@ function stopRecordingGif(frameDelay) {
 			}
 		}
 
-		var gif = {
-			frames: gifFrameData,
-			width: 512,
-			height: 512,
-			palette: hexPalette,
-			loops: 0,
-			delay: frameDelay
-		};
+		gif.palette = hexPalette; // hacky
 
 		gifencoder.encode( gif, 
 			function(uri, blob) {
