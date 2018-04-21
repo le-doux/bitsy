@@ -2,6 +2,7 @@
 - fix broken gif recording
 - add gif snapshot! (take screenshot of current room)
 -- alt-click for widescreen snapshot
+- fix bug with reset game
 
 4.7:
 - alt-click a tile or sprite in the room tool to edit it in the paint tool
