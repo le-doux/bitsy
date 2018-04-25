@@ -391,11 +391,12 @@ function ResourceLoader() {
 
 	var pathRoot = Ed().platform == PlatformType.Desktop ? "shared" : "../editor/shared";
 
-	this.load = function(folder, filename) {
+	this.load = function(folder, filename, onready) {
 		var client = new XMLHttpRequest();
 		client.open('GET', pathRoot + '/' + folder + '/' + filename);
 		client.onreadystatechange = function() {
 			resources[filename] = client.responseText;
+			if(onready) onready();
 		}
 		client.send();
 	}

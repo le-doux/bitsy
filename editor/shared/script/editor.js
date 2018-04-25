@@ -513,6 +513,9 @@ function start() {
 		export_settings = JSON.parse( localStorage.export_settings );
 		document.getElementById("pageColor").value = export_settings.page_color;
 	}
+
+	// TEST
+	localization.Localize();
 }
 
 function newDrawing() {
@@ -3935,3 +3938,6 @@ function chooseExportSizeFixed() {
 	isFixedSize = true;
 	document.getElementById("exportSizeFixedInputSpan").style.display = "inline-block";
 }
+
+// LOCALIZATION
+var localization = new Localization();
