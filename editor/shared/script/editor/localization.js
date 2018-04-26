@@ -2,7 +2,7 @@
 TODO
 X where to store localization id? id, class, innerText?
 - test google sheets
-- wrap all UI strings in index.html
+X wrap all UI strings in index.html
 - create UI for switching languages
 - save setting for switching languages
 - debug UI for translators
