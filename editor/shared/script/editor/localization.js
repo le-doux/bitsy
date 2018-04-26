@@ -72,4 +72,21 @@ this.Localize = function() {
 	}
 }
 
+this.PrintEnglishStrings = function() {
+	var englishStrings = {};
+	var elements = document.getElementsByClassName(localizationClass);
+	for(var i = 0; i < elements.length; i++) {
+		var el = elements[i];
+		var localizationId = getLocalizationId(el);
+		englishStrings[localizationId] = el.innerText;
+	}
+
+	var englishStringTsv = "id\ten\n";
+	for(var stringId in englishStrings) {
+		englishStringTsv += stringId + "\t" + englishStrings[stringId] + "\n";
+	}
+
+	console.log(englishStringTsv);
+}
+
 } // Localization()
