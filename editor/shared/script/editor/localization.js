@@ -1,12 +1,22 @@
 /*
 TODO
 X where to store localization id? id, class, innerText?
-- test google sheets
+X test google sheets (use tabs, not semicolons)
 X wrap all UI strings in index.html
 - create UI for switching languages
-- save setting for switching languages
+- save setting for default languages
 - debug UI for translators
 - get translation volunteers
+- how to handle multi-paragraph text
+	- about
+	- instructions
+	- download help
+	- current solution: 
+		- use word wrap for line breaks
+		- broken up into many chunks because of
+			- links (possible alt solution: [])
+			- lists (possible alt solution? |,;>*@)
+- how to handle dynamic text
 */
 
 function Localization() {
@@ -72,7 +82,7 @@ this.Localize = function() {
 	}
 }
 
-this.PrintEnglishStrings = function() {
+this.ExportEnglishStrings = function() {
 	var englishStrings = {};
 	var elements = document.getElementsByClassName(localizationClass);
 	for(var i = 0; i < elements.length; i++) {
@@ -86,7 +96,8 @@ this.PrintEnglishStrings = function() {
 		englishStringTsv += stringId + "\t" + englishStrings[stringId] + "\n";
 	}
 
-	console.log(englishStringTsv);
+	// console.log(englishStringTsv);
+	ExporterUtils.DownloadFile("englishStrings.tsv",englishStringTsv);
 }
 
 } // Localization()

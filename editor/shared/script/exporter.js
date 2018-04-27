@@ -13,36 +13,6 @@ resources.load("script", "color_util.js");
 
 
 /* exporting */
-function downloadFile(filename, text) {
-
-	if( browserFeatures.blobURL ) {
-		// new blob version
-		var a = document.createElement('a');
-		var blob = new Blob( [text] );
-		a.download = filename;
-		a.href = makeURL.createObjectURL(blob);
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-	}
-	else {
-		// old version
-		var element = document.createElement('a');
-
-		element.setAttribute('href', 'data:attachment/file;charset=utf-8,' + encodeURIComponent(text));
-
-		element.setAttribute('download', filename);
-		element.setAttribute('target', '_blank');
-
-		element.style.display = 'none';
-		document.body.appendChild(element);
-
-		element.click();
-
-		document.body.removeChild(element);
-	}
-}
-
 function escapeSpecialCharacters(str) {
 	str = str.replace(/\\/g, '\\\\');
 	str = str.replace(/"/g, '\\"');
@@ -80,7 +50,7 @@ this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, si
 
 	// console.log(html);
 
-	downloadFile( filename, html );
+	ExporterUtils.DownloadFile( filename, html );
 }
 
 
@@ -158,3 +128,35 @@ this.importGame = function( html ) {
 }
 
 } // Exporter()
+
+var ExporterUtils = {
+	DownloadFile : function(filename, text) {
+
+		if( browserFeatures.blobURL ) {
+			// new blob version
+			var a = document.createElement('a');
+			var blob = new Blob( [text] );
+			a.download = filename;
+			a.href = makeURL.createObjectURL(blob);
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+		}
+		else {
+			// old version
+			var element = document.createElement('a');
+
+			element.setAttribute('href', 'data:attachment/file;charset=utf-8,' + encodeURIComponent(text));
+
+			element.setAttribute('download', filename);
+			element.setAttribute('target', '_blank');
+
+			element.style.display = 'none';
+			document.body.appendChild(element);
+
+			element.click();
+
+			document.body.removeChild(element);
+		}
+	}
+}

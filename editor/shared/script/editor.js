@@ -515,7 +515,7 @@ function start() {
 	}
 
 	// TEST
-	localization.PrintEnglishStrings();
+	// localization.ExportEnglishStrings();
 	localization.Localize();
 }
 

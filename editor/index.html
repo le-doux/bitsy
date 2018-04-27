@@ -63,7 +63,7 @@
 						<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" />
 						<label title="show / hide toolbar" for="toolsCheck" id="toolsCheckLabel">
 							<i class="material-icons">settings</i>
-							<span class="localize tools_select_title">tools</span>
+							<span class="localize tools_label">tools</span>
 							<i id="toolsCheckIcon" class="material-icons">expand_less</i>
 						</label>
 					</div>
@@ -72,9 +72,9 @@
 					</div>
 
 					<div id="bylineFlexItem">
-						<span class="localize byline_by">by</span>
+						<span class="localize author_by">by</span>
 						<a href="https://www.twitter.com/adamledoux" target="_blank">
-							<span class="localize adam_twitter">@adamledoux</span>
+							<span class="localize author_twitter">@adamledoux</span>
 						</a>
 					</div>
 
@@ -158,31 +158,28 @@
 
 				<button title="reset everything and start new game" class="color0" onclick="newGameDialog();" style="margin-left:20px;">
 					<i class="material-icons">restore_page</i>
-					<span class="localize reset_new_game">new game</span>
+					<span class="localize reset_game">new game</span>
 				</button>
 			</div>
 		</div>
 
-		<!-- TODO LOCALIZE -->
 		<div id="unsupportedFeatures" style="display:none;">
-			uh oh ~ your browser doesn't support all of bitsy's features, so some things might not work right. maybe try
+			<span class="localize unsupported_features">uh oh ~ your browser doesn't support all of bitsy's features, so some things might not work right. maybe try another browser, such as:</span>
 			<a href="https://www.google.com/chrome/browser" target="_blank">
-				chrome
-			</a>
-			or
+				<span class="localize browser_chrome">chrome</span>
+			</a>,
 			<a href="https://www.mozilla.org/firefox" target="_blank">
-				firefox
+				<span class="localize browser_firefox">firefox</span>
 			</a>
-			?
 			<button onclick="hideUnsupportedFeatureWarning();">
-				I'll be ok, hide this message
+				<span class="localize unsupported_features_dismiss">I'll be ok, hide this message</span>
 			</button>
 		</div>
 
 		<div id="editorWindow" onmousewheel="blockScrollBackpage(event);">
 			<div id="editorContent">
 
-				<div id="aboutPanel" class="panel color0">
+				<div id="aboutPanel" class="panel color0" style="width:350px;white-space:normal;">
 					<div class="bar color0">
 						<button title="minimize about window" class="light" style="float:right;" onclick="hidePanel('aboutPanel');">
 							<i class="material-icons">close</i>
@@ -193,20 +190,39 @@
 							 v4.8
 						</div>
 					</div>
-					<!-- TODO LOCALIZE : use word wrap? -->
 					<div id="aboutInner">
-						hi! bitsy is a little editor for little games or worlds. <br>
-						the goal is to make it easy to make games where you <br>
-						can walk around and talk to people and be somewhere. <br><br>
+						<p>
+							<span class="localize about_intro1">hi! bitsy is a little editor for little games or worlds. the goal is to make it easy to make games where you can walk around and talk to people and be somewhere.</span>
+						</p>
 
-						not sure where to start? try this helpful <a target="_blank" href="http://www.clairemorleyart.com/a-bitsy-tutorial">bitsy tutorial!</a><br><br>
+						<p>
+							<span class="localize about_intro2">not sure where to start? try this helpful </span>
+							<a target="_blank" href="http://www.clairemorleyart.com/a-bitsy-tutorial">
+								<span class="localize about_intro3_link_tutorial">bitsy tutorial!</span>
+							</a>
+						</p>
 
-						if you need inspiration, you can <a target="_blank" href="https://itch.io/c/90743/bitsy-games">play other bitsy games</a> 
-						<br>on <a target="_blank" href="https://itch.io">itch.io</a>, which is a great place to share games!<br><br>
+						<p>
+							<span class="localize about_intro4">if you need inspiration, you can </span>
+							<a target="_blank" href="https://itch.io/c/90743/bitsy-games">
+								<span class="localize about_intro5_link_games">play other bitsy games.</span>
+							</a>
+							<span class="localize about_intro6">you can find many on </span>
+							<a target="_blank" href="https://itch.io">
+								<span class="localize about_intro7_link_itchio">itch.io</span>
+							</a>
+							<span class="localize about_intro8">, which is a great place to share games!</span>
+						</p>
 
-
-						have fun making things with bitsy! <br>
-						- <a target="_blank" href="https://www.twitter.com/adamledoux">adam</a> <br><br>
+						<p>
+							<span class="localize about_intro9">have fun making things with bitsy!</span>
+						</p>
+						<p>
+							<span class="localize about_intro10">- </span>
+							<a target="_blank" href="https://www.twitter.com/adamledoux">
+								<span class="localize about_intro11_link_twitter">adam</span>
+							</a>
+						</p>
 
 						<!-- <span class="toggleText" onclick="toggleInstructions();">instructions</span> <br> -->
 
@@ -218,36 +234,48 @@
 							</label>
 
 							<div id="instructions" style="display:none;">
-								<br>
-								you can draw things in the <b>paint</b> panel, then place <br>
-								them in your world in the <b>room</b> panel. you can write <br>
-								dialog for your characters (aka sprites) too. you can <br>
-								also animate your drawings if you want to! <br>
-								<br>
-								some words:<br>
-								* room - a place in your game world<br>
-								* avatar - the player's character<br>
-								* tile - a piece of the scenery<br>
-								* sprite - interactive characters or things<br>
-								<br>
-								to try your game, switch the room to play mode: <br>
-								* walk around with the arrow keys <br>
-								* talk to sprites by walking up to them <br>
-								<br>
-								you can make multiple rooms, but make sure you add <br>
-								some <b>exits</b> to connect them to each other! <br>
-								<br>
-								use "share game" to download the game as an html file. <br>
-								you can email the file to a friend, or host it online! <br>
-								<br>
-								if you want to talk about bitsy, report a bug, or share <br>
-								a game you made, i'm on twitter <a href="https://www.twitter.com/adamledoux" target="_blank">@adamledoux</a><br>
-								or you can post in the <a href="https://ledoux.itch.io/bitsy/community" target="_blank">community forum</a><br>
-								<br>
-								special thanks to: <br>
-								* mary-margaret <br>
-								* seattle game meetup folks <br>
-								* everyone in the bitsy community!
+								<p>
+									you can draw things in the paint panel, then place them in your world in the room panel. you can write dialog for your characters (aka sprites) too. you can also animate your drawings if you want to!
+								</p>
+
+								<p>
+									some words:
+									<ul>
+										<li>room - a place in your game world</li>
+										<li>avatar - the player's character</li>
+										<li>tile - a piece of the scenery</li>
+										<li>sprite - interactive characters or things</li>
+									</ul>
+								</p>
+
+								<p>
+									to try your game, switch the room to play mode:
+									<ul>
+										<li>walk around with the arrow keys</li>
+										<li>talk to sprites by walking up to them</li>
+									</ul>
+								</p>
+
+								<p>
+									you can make multiple rooms, but make sure you add some <b>exits</b> to connect them to each other!
+								</p>
+
+								<p>
+									use "share game" to download the game as an html file. you can email the file to a friend, or host it online!
+								</p>
+
+								<p>
+									if you want to talk about bitsy, report a bug, or share a game you made, i'm on twitter <a href="https://www.twitter.com/adamledoux" target="_blank">@adamledoux</a> or you can post in the <a href="https://ledoux.itch.io/bitsy/community" target="_blank">community forum</a>
+								</p>
+
+								<p>
+									special thanks to:
+									<ul>
+										<li>mary-margaret</li>
+										<li>seattle game meetup folks</li>
+										<li>everyone in the bitsy community!</li>
+									</ul>
+								</p>
 							</div>
 						</div>
 
@@ -506,7 +534,7 @@
 							<i class="material-icons">location_searching</i>
 							<span class="localize ending_place">place ending</span>
 						</button>
-						<span id="addingEndingHelpText" class="localize ending_place_help" style="display:none;"> click space in room to add ending </span>
+						<span id="addingEndingHelpText" class="localize ending_place_help" style="display:none;">click space in room to add ending</span>
 					<!-- todo needs a cancel button -->
 						<button title="remove selected ending from room" class="color0" id="removeEndingButton" onclick="removeSelectedEnding();" style="display:none;">
 							<i class="material-icons">location_disabled</i>
@@ -807,7 +835,7 @@
 							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
 							<label title="preview dialog" for="previewDialogCheck" style="float:left;">
 								<i class="material-icons" id="previewDialogIcon">play_arrow</i>
-								<span id="previewDialogText" class="localize dialog_start_preview"> preview </span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
+								<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
 							</label>
 
 							<button id="dialogShowCode" onclick="showDialogCode();" style="float:right;" title="show the code for this dialog">
@@ -1064,7 +1092,7 @@
 					<br>
 					<button title="reset everything and start new game" class="color0" onclick="newGameDialog();">
 						<i class="material-icons">restore_page</i>
-						<span class="localize data_reset">reset game data</span>
+						<span class="localize reset_data">reset game data</span>
 					</button>
 				</div>
 
