@@ -21,25 +21,31 @@ X wrap all UI strings in index.html
 
 function Localization() {
 
+var self = this;
+
 var resources = new ResourceLoader();
 
 var localizationStrings = null;
 
-resources.load("other", "testLocalization.csv", function() { // why does this happen multiple times?
+resources.load("other", "localization.tsv", function() { // why does this happen multiple times?
 	localizationStrings = {};
 
-	var csv = resources.get("testLocalization.csv");
-	console.log(csv);
+	var csv = resources.get("localization.tsv");
+	csv = csv.replace(/\r/g,""); // weird sanitization bug required
+	// console.log(csv);
 	var lines = csv.split("\n");
 
-	var columnHeaders = lines[0].split(";");
-	console.log(columnHeaders);
+	var columnHeaders = lines[0].split("\t");
+	// console.log(columnHeaders);
 	for(var i = 1; i < columnHeaders.length; i++) {
+		// console.log(columnHeaders[i]);
 		localizationStrings[columnHeaders[i]] = {};
 	}
 
 	for(var i = 1; i < lines.length; i++) {
-		var lineSplit = lines[i].split(";");
+		// console.log(lines[i]);
+		var lineSplit = lines[i].split("\t");
+		// console.log(lineSplit);
 		var lineId = lineSplit[0];
 		for(var j = 1; j < lineSplit.length; j++) {
 			var languageId = columnHeaders[j];
@@ -47,7 +53,8 @@ resources.load("other", "testLocalization.csv", function() { // why does this ha
 		}
 	}
 
-	console.log(localizationStrings);
+	// console.log(localizationStrings);
+	localize();
 });
 
 var localizationClass = "localize";
@@ -56,7 +63,7 @@ var localizationClass = "localize";
 var language = (navigator.languages ? navigator.languages[0] : navigator.language).split("-")[0];
 // console.log(language);
 
-// language = "es";
+language = "es";
 
 function getLocalizationId(element) { // the localization id is the class AFTER the localizationClass
 	for(var i = 0; i < element.classList.length; i++) {
@@ -67,9 +74,11 @@ function getLocalizationId(element) { // the localization id is the class AFTER 
 	return null; // oops
 }
 
-this.Localize = function() {
+function localize() {
 	if(localizationStrings == null)
 		return;
+
+	// console.log("LANG " + language);
 
 	var elements = document.getElementsByClassName(localizationClass);
 	for(var i = 0; i < elements.length; i++) {
@@ -80,6 +89,9 @@ this.Localize = function() {
 			el.innerText = locString;
 		}
 	}
+}
+this.Localize = function() {
+	localize();
 }
 
 this.ExportEnglishStrings = function() {

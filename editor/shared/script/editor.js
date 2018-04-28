@@ -516,7 +516,7 @@ function start() {
 
 	// TEST
 	// localization.ExportEnglishStrings();
-	localization.Localize();
+	// localization.Localize();
 }
 
 function newDrawing() {
