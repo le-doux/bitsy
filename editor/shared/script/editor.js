@@ -338,7 +338,8 @@ var defaultPanelPrefs = {
 		{ id:"endingsPanel", 		visible:false, 	position:8  },
 		{ id:"paintExplorerPanel",	visible:false,	position:9  },
 		{ id:"dialogPanel",			visible:false,	position:10 },
-		{ id:"inventoryPanel",		visible:false,	position:11 }
+		{ id:"inventoryPanel",		visible:false,	position:11 },
+		{ id:"settingsPanel",		visible:false,	position:11 }
 	]
 };
 // console.log(defaultPanelPrefs);
@@ -366,6 +367,7 @@ function getPanelPrefs() {
 			prefs.workspace.push( panelPref );
 		}
 	}
+	console.log(prefs);
 	return prefs;
 }
 
@@ -514,9 +516,8 @@ function start() {
 		document.getElementById("pageColor").value = export_settings.page_color;
 	}
 
-	// TEST
-	// localization.ExportEnglishStrings();
-	// localization.Localize();
+	// localization
+	localization = new Localization( initLanguageOptions );
 }
 
 function newDrawing() {
@@ -2652,9 +2653,13 @@ function grabCard(e) {
 
 	if (grabbedPanel.card != null) return;
 
-	console.log("grab!");
+	grabbedPanel.card = e.target;
+	while(!grabbedPanel.card.classList.contains("panel") && !(grabbedPanel.card == null)) {
+		grabbedPanel.card = grabbedPanel.card.parentElement;
+	}
 
-	grabbedPanel.card = e.target.parentElement.parentElement;
+	if(grabbedPanel.card == null) return; // couldn't find a panel above the handle - abort!
+
 	grabbedPanel.size = getElementSize( grabbedPanel.card );
 	var pos = getElementPosition( grabbedPanel.card );
 	
@@ -2662,6 +2667,10 @@ function grabCard(e) {
 	grabbedPanel.shadow.className = "panelShadow";
 	grabbedPanel.shadow.style.width = grabbedPanel.size.x + "px";
 	grabbedPanel.shadow.style.height = grabbedPanel.size.y + "px";
+
+	console.log( document.getElementById("editorContent") );
+	console.log( grabbedPanel.shadow );
+	console.log( grabbedPanel.card );
 
 	document.getElementById("editorContent").insertBefore( grabbedPanel.shadow, grabbedPanel.card );
 	grabbedPanel.cursorOffset.x = e.clientX - pos.x;
@@ -3941,4 +3950,23 @@ function chooseExportSizeFixed() {
 }
 
 // LOCALIZATION
-var localization = new Localization();
+var localization;
+function on_change_language(e) {
+	localization.ChangeLanguage(e.target.value);
+}
+
+function initLanguageOptions() {
+	localization.Localize();
+
+	var languageSelect = document.getElementById("languageSelect");
+	languageSelect.innerHTML = "";
+
+	var languageList = localization.GetLanguageList();
+	for (var i = 0; i < languageList.length; i++) {
+		var option = document.createElement("option");
+		option.innerText = languageList[i].name;
+		option.value = languageList[i].id;
+		option.selected = languageList[i].id === localization.GetLanguage();
+		languageSelect.add(option);
+	}
+}

@@ -1,116 +1,119 @@
-id	en	es
-bitsy_title	Bitsy	bitsy_title
-tools_label	tools	tools_label
-author_by	by	author_by
-author_twitter	@adamledoux	author_twitter
-about_tool_name	about	about_tool_name
-room_tool_name	room	room_tool_name
-exits_tool_name	exits	exits_tool_name
-endings_tool_name	endings	endings_tool_name
-paint_tool_name	paint	paint_tool_name
-explorer_tool_name	find drawing	explorer_tool_name
-palette_tool_name	colors	palette_tool_name
-dialog_tool_name	dialog	dialog_tool_name
-inventory_tool_name	inventory	inventory_tool_name
-download_tool_name	download	download_tool_name
-gif_tool_name	record gif	gif_tool_name
-data_tool_name	game data	data_tool_name
-reset_game	new game	reset_game
-unsupported_features	uh oh ~ your browser doesn't support all of bitsy's features, so some things might not work right. maybe try another browser, such as:	unsupported_features
-browser_chrome	chrome	browser_chrome
-browser_firefox	firefox	browser_firefox
-unsupported_features_dismiss	I'll be ok, hide this message	unsupported_features_dismiss
-ending_label	ending	ending_label
-ending_place	place ending	ending_place
-ending_place_help	click space in room to add ending	ending_place_help
-ending_remove	remove selected ending	ending_remove
-reset_data	reset game data	reset_data
-download_html	download game as html file:	download_html
-download_game	download game	download_game
-import_html	import game from html file:	import_html
-options_label	options	options_label
-option_page_color	html page color:	option_page_color
-option_window_size	game window size:	option_window_size
-option_full_size	full page	option_full_size
-option_fixed_size	fixed size	option_fixed_size
-about_tool_title	about bitsy	about_tool_title
-about1	hi! bitsy is a little editor for little games or worlds. the goal is to make it easy to make games where you can walk around and talk to people and be somewhere.	about1
-about2	not sure where to start? try this helpful	about2
-about3_link_tutorial	bitsy tutorial!	about3_link_tutorial
-about4	if you need inspiration, you can	about4
-about5_link_games	play other bitsy games.	about5_link_games
-about6	you can find many on	about6
-about7_link_itchio	itch.io	about7_link_itchio
-about8	, which is a great place to share games!	about8
-about9	have fun making things with bitsy!	about9
-about10	-	about10
-about11_link_twitter	adam	about11_link_twitter
-instructions_title	instructions	instructions_title
-instructions1	you can draw things in the paint panel, then place them in your world in the room panel. you can write dialog for your characters (aka sprites) too. you can also animate your drawings if you want to!	instructions1
-instructions2	some words:	instructions2
-instructions3	room - a place in your game world	instructions3
-instructions4	avatar - the player's character	instructions4
-instructions5	tile - a piece of the scenery	instructions5
-instructions6	sprite - interactive characters or things	instructions6
-instructions7	to try your game, switch the room to play mode:	instructions7
-instructions8	walk around with the arrow keys	instructions8
-instructions9	talk to sprites by walking up to them	instructions9
-instructions10	you can make multiple rooms, but make sure you add some exits to connect them to each other!	instructions10
-instructions11	use "share game" to download the game as an html file. you can email the file to a friend, or host it online!	instructions11
-instructions12	if you want to talk about bitsy, report a bug, or share a game you made, i'm on twitter	instructions12
-instructions13_link_twitter	@adamledoux	instructions13_link_twitter
-instructions14	or you can post in the	instructions14
-instructions15_link_forum	community forum	instructions15_link_forum
-instructions16	special thanks to:	instructions16
-instructions17	mary-margaret	instructions17
-instructions18	seattle game meetup folks	instructions18
-instructions19	everyone in the bitsy community!	instructions19
-version_notes_title	what's new in	version_notes_title
-palette_background	background color	palette_background
-palette_tile	tile color	palette_tile
-palette_sprite	sprite color	palette_sprite
-palette_tool_advanced	palette select	palette_tool_advanced
-name_label	name	name_label
-exit_new	place new exit	exit_new
-exit_selected	selected exit	exit_selected
-exit_selected_none	no exit selected	exit_selected_none
-exit_destination	this exit goes to	exit_destination
-exit_delete	delete selected exit	exit_delete
-gif_start	start recording	gif_start
-gif_stop	stop recording	gif_stop
-gif_recording	recording...	gif_recording
-gif_encoding	encoding...	gif_encoding
-gif_snapshot	snapshot	gif_snapshot
-gif_download	download gif	gif_download
-avatar_label	avatar	avatar_label
-tile_label	tile	tile_label
-sprite_label	sprite	sprite_label
-item_label	item	item_label
-grid_toggle_visible	grid	grid_toggle_visible
-wall_toggle	wall	wall_toggle
-animation_title	animation	animation_title
-animation_preview	preview	animation_preview
-animation_frame1	frame 1	animation_frame1
-animation_frame2	frame 2	animation_frame2
-play_game	play	play_game
-room_tool_advanced	room tools	room_tool_advanced
-walls_toggle_visible	walls	walls_toggle_visible
-room_add_exits	add exits	room_add_exits
-room_add_endings	add endings	room_add_endings
-items_label	items	items_label
-variables_label	variables	variables_label
-dialog_start_preview	preview	dialog_start_preview
-dialog_show_code	show code	dialog_show_code
-dialog_hide_code	hide code	dialog_hide_code
-dialog_block_new	new section	dialog_block_new
-dialog_effect_new	text effects	dialog_effect_new
-dialog_block_basic	dialog	dialog_block_basic
-dialog_block_list	list	dialog_block_list
-dialog_block_conditional	conditional	dialog_block_conditional
-dialog_effect_color1	color 1	dialog_effect_color1
-dialog_effect_color2	color 2	dialog_effect_color2
-dialog_effect_color3	color 3	dialog_effect_color3
-dialog_effect_wavy	wavy	dialog_effect_wavy
-dialog_effect_shaky	shaky	dialog_effect_shaky
-dialog_effect_rainbow	rainbow	dialog_effect_rainbow
-dialog_no_selection	Select a sprite or item to edit its dialog.	dialog_no_selection
+id	en	es	fr
+language_name	English	Español	Français
+bitsy_title	Bitsy		
+tools_label	tools		
+author_by	by		
+author_twitter	@adamledoux		
+about_tool_name	about		
+room_tool_name	room		
+exits_tool_name	exits		
+endings_tool_name	endings		
+paint_tool_name	paint		
+explorer_tool_name	find drawing		
+palette_tool_name	colors		
+dialog_tool_name	dialog		
+inventory_tool_name	inventory		
+download_tool_name	download		
+gif_tool_name	record gif		
+data_tool_name	game data		
+settings_tool_name	settings		
+reset_game	new game		
+unsupported_features	uh oh ~ your browser doesn't support all of bitsy's features, so some things might not work right. maybe try another browser, such as:		
+browser_chrome	chrome		
+browser_firefox	firefox		
+unsupported_features_dismiss	I'll be ok, hide this message		
+ending_label	ending		
+ending_place	place ending		
+ending_place_help	click space in room to add ending		
+ending_remove	remove selected ending		
+reset_data	reset game data		
+download_html	download game as html file:		
+download_game	download game		
+import_html	import game from html file:		
+options_label	options		
+option_page_color	html page color:		
+option_window_size	game window size:		
+option_full_size	full page		
+option_fixed_size	fixed size		
+about_tool_title	about bitsy		
+about1	hi! bitsy is a little editor for little games or worlds. the goal is to make it easy to make games where you can walk around and talk to people and be somewhere.		
+about2	not sure where to start? try this helpful		
+about3_link_tutorial	bitsy tutorial!		
+about4	if you need inspiration, you can		
+about5_link_games	play other bitsy games.		
+about6	you can find many on		
+about7_link_itchio	itch.io		
+about8	, which is a great place to share games!		
+about9	have fun making things with bitsy!		
+about10	-		
+about11_link_twitter	adam		
+instructions_title	instructions		
+instructions1	you can draw things in the paint panel, then place them in your world in the room panel. you can write dialog for your characters (aka sprites) too. you can also animate your drawings if you want to!		
+instructions2	some words:		
+instructions3	room - a place in your game world		
+instructions4	avatar - the player's character		
+instructions5	tile - a piece of the scenery		
+instructions6	sprite - interactive characters or things		
+instructions7	to try your game, switch the room to play mode:		
+instructions8	walk around with the arrow keys		
+instructions9	talk to sprites by walking up to them		
+instructions10	you can make multiple rooms, but make sure you add some exits to connect them to each other!		
+instructions11	use "share game" to download the game as an html file. you can email the file to a friend, or host it online!		
+instructions12	if you want to talk about bitsy, report a bug, or share a game you made, i'm on twitter		
+instructions13_link_twitter	@adamledoux		
+instructions14	or you can post in the		
+instructions15_link_forum	community forum		
+instructions16	special thanks to:		
+instructions17	mary-margaret		
+instructions18	seattle game meetup folks		
+instructions19	everyone in the bitsy community!		
+version_notes_title	what's new in		
+palette_background	background color		
+palette_tile	tile color		
+palette_sprite	sprite color		
+palette_tool_advanced	palette select		
+name_label	name		
+exit_new	place new exit		
+exit_selected	selected exit		
+exit_selected_none	no exit selected		
+exit_destination	this exit goes to		
+exit_delete	delete selected exit		
+language_label	language		
+gif_start	start recording		
+gif_stop	stop recording		
+gif_recording	recording...		
+gif_encoding	encoding...		
+gif_snapshot	snapshot		
+gif_download	download gif		
+avatar_label	avatar		
+tile_label	tile		
+sprite_label	sprite		
+item_label	item		
+grid_toggle_visible	grid		
+wall_toggle	wall		
+animation_title	animation		
+animation_preview	preview		
+animation_frame1	frame 1		
+animation_frame2	frame 2		
+play_game	play		
+room_tool_advanced	room tools		
+walls_toggle_visible	walls		
+room_add_exits	add exits		
+room_add_endings	add endings		
+items_label	items		
+variables_label	variables		
+dialog_start_preview	preview		
+dialog_show_code	show code		
+dialog_hide_code	hide code		
+dialog_block_new	new section		
+dialog_effect_new	text effects		
+dialog_block_basic	dialog		
+dialog_block_list	list		
+dialog_block_conditional	conditional		
+dialog_effect_color1	color 1		
+dialog_effect_color2	color 2		
+dialog_effect_color3	color 3		
+dialog_effect_wavy	wavy		
+dialog_effect_shaky	shaky		
+dialog_effect_rainbow	rainbow		
+dialog_no_selection	Select a sprite or item to edit its dialog.		

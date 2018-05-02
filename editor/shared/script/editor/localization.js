@@ -3,23 +3,17 @@ TODO
 X where to store localization id? id, class, innerText?
 X test google sheets (use tabs, not semicolons)
 X wrap all UI strings in index.html
-- create UI for switching languages
-- save setting for default languages
+X create UI for switching languages
+X save setting for default languages
+X dynamically populate language selector
 - debug UI for translators
 - get translation volunteers
-- how to handle multi-paragraph text
-	- about
-	- instructions
-	- download help
-	- current solution: 
-		- use word wrap for line breaks
-		- broken up into many chunks because of
-			- links (possible alt solution: [])
-			- lists (possible alt solution? |,;>*@)
+X how to handle multi-paragraph text (for now: lots of strings)
 - how to handle dynamic text
+- how to handle alt text
 */
 
-function Localization() {
+function Localization(initCallback) {
 
 var self = this;
 
@@ -54,16 +48,16 @@ resources.load("other", "localization.tsv", function() { // why does this happen
 	}
 
 	// console.log(localizationStrings);
-	localize();
+	// localize( getEditorLanguage() );
+
+	if(initCallback != undefined && initCallback != null)
+		initCallback();
 });
 
 var localizationClass = "localize";
 
-// console.log("DEFAULT language");
-var language = (navigator.languages ? navigator.languages[0] : navigator.language).split("-")[0];
-// console.log(language);
-
-language = "es";
+// var language = (navigator.languages ? navigator.languages[0] : navigator.language).split("-")[0];
+// language = "es";
 
 function getLocalizationId(element) { // the localization id is the class AFTER the localizationClass
 	for(var i = 0; i < element.classList.length; i++) {
@@ -74,11 +68,11 @@ function getLocalizationId(element) { // the localization id is the class AFTER 
 	return null; // oops
 }
 
-function localize() {
+function localize(language) {
 	if(localizationStrings == null)
 		return;
 
-	// console.log("LANG " + language);
+	console.log("LANG " + language);
 
 	var elements = document.getElementsByClassName(localizationClass);
 	for(var i = 0; i < elements.length; i++) {
@@ -91,7 +85,7 @@ function localize() {
 	}
 }
 this.Localize = function() {
-	localize();
+	localize( getEditorLanguage() );
 }
 
 this.ExportEnglishStrings = function() {
@@ -110,6 +104,45 @@ this.ExportEnglishStrings = function() {
 
 	// console.log(englishStringTsv);
 	ExporterUtils.DownloadFile("englishStrings.tsv",englishStringTsv);
+}
+
+function getEditorLanguage() {
+	if(localStorage.editor_language == null) {
+		var browserLanguage = (navigator.languages ? navigator.languages[0] : navigator.language).split("-")[0];
+		localStorage.editor_language = browserLanguage;
+	}
+	return localStorage.editor_language;
+}
+this.GetLanguage = function() {
+	return getEditorLanguage();
+}
+
+function saveEditorLanguage(language) {
+	localStorage.editor_language = language;
+}
+
+function getLanguageList() {
+	var langList = [];
+
+	if(localizationStrings == null)
+		return langList;
+
+	for(var langId in localizationStrings) {
+		langList.push( {
+			id : langId,
+			name : localizationStrings[langId]["language_name"]
+		});
+	}
+
+	return langList;
+}
+this.GetLanguageList = function() {
+	return getLanguageList();
+}
+
+this.ChangeLanguage = function(language) {
+	saveEditorLanguage(language);
+	localize( getEditorLanguage() );
 }
 
 } // Localization()

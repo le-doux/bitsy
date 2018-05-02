@@ -156,6 +156,12 @@
 					<span class="localize data_tool_name">game data</span>
 				</label>
 
+				<input type="checkbox" value="settingsPanel" onclick="togglePanelAnimated(event);" id="settingsCheck"/>
+				<label title="show / hide settings window" for="settingsCheck">
+					<i class="material-icons">settings</i>
+					<span class="localize settings_tool_name">settings</span>
+				</label>
+
 				<button title="reset everything and start new game" class="color0" onclick="newGameDialog();" style="margin-left:20px;">
 					<i class="material-icons">restore_page</i>
 					<span class="localize reset_game">new game</span>
@@ -1119,6 +1125,25 @@
 						<i class="material-icons">restore_page</i>
 						<span class="localize reset_data">reset game data</span>
 					</button>
+				</div>
+
+				<div id="settingsPanel" class="panel color0" style="display:none;">
+					<div class="bar color0">
+
+						<button title="minimize settings window" class="light" style="float:right;" onclick="hidePanel('settingsPanel');">
+							<i class="material-icons">close</i>
+						</button>
+
+						<div title="settings window" class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">settings</i>
+							<span class="localize settings_tool_name">settings</span>
+						</div>
+					</div>
+					<div id="settingsInner">
+						<span class="localize language_label">language</span>
+						<select id="languageSelect" onchange="on_change_language(event);">
+						</select>
+					</div>
 				</div>
 
 			</div> <!-- Editor Content -->
