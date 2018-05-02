@@ -88,24 +88,6 @@ this.Localize = function() {
 	localize( getEditorLanguage() );
 }
 
-this.ExportEnglishStrings = function() {
-	var englishStrings = {};
-	var elements = document.getElementsByClassName(localizationClass);
-	for(var i = 0; i < elements.length; i++) {
-		var el = elements[i];
-		var localizationId = getLocalizationId(el);
-		englishStrings[localizationId] = el.innerText;
-	}
-
-	var englishStringTsv = "id\ten\n";
-	for(var stringId in englishStrings) {
-		englishStringTsv += stringId + "\t" + englishStrings[stringId] + "\n";
-	}
-
-	// console.log(englishStringTsv);
-	ExporterUtils.DownloadFile("englishStrings.tsv",englishStringTsv);
-}
-
 function getEditorLanguage() {
 	if(localStorage.editor_language == null) {
 		var browserLanguage = (navigator.languages ? navigator.languages[0] : navigator.language).split("-")[0];
@@ -143,6 +125,51 @@ this.GetLanguageList = function() {
 this.ChangeLanguage = function(language) {
 	saveEditorLanguage(language);
 	localize( getEditorLanguage() );
+}
+
+function getString(id) {
+	return localizationStrings[getEditorLanguage()][id];
+}
+this.GetString(id) {
+	return getString(id);
+}
+
+var unlocalizedDynamicStrings = {};
+function getStringOrFallback(id, englishFallback) {
+	var locString = getString(id);
+	if(locString == null) {
+		locString = englishFallback;
+		unlocalizedDynamicStrings[id] = englishFallback; // record use of unlocalized strings
+	}
+	return locString;
+}
+this.GetStringOrFallback(id, englishFallback) {
+	return getStringOrFallback(id,englishFallback);
+}
+
+function exportEnglishStringsDictionary(englishStrings) {
+	var englishStringTsv = "id\ten\n";
+	for(var stringId in englishStrings) {
+		englishStringTsv += stringId + "\t" + englishStrings[stringId] + "\n";
+	}
+
+	// console.log(englishStringTsv);
+	ExporterUtils.DownloadFile("englishStrings.tsv",englishStringTsv);
+}
+
+this.ExportEnglishStrings = function() {
+	var englishStrings = {};
+	var elements = document.getElementsByClassName(localizationClass);
+	for(var i = 0; i < elements.length; i++) {
+		var el = elements[i];
+		var localizationId = getLocalizationId(el);
+		englishStrings[localizationId] = el.innerText;
+	}
+	exportEnglishStringsDictionary(englishStrings);
+}
+
+this.ExportDynamicEnglishStrings = function() {
+	exportEnglishStringsDictionary(unlocalizedDynamicStrings);
 }
 
 } // Localization()
