@@ -10,8 +10,8 @@ X dynamically populate language selector
 - get translation volunteers
 X how to handle multi-paragraph text (for now: lots of strings)
 X how to handle dynamic text
-- find instances of dynamic text
-- how to handle alt text
+X find instances of dynamic text
+- how to handle alt text & pladeholder text (other special cases)
 */
 
 function Localization(initCallback) {

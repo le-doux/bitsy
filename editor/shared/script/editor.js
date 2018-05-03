@@ -349,7 +349,7 @@ function getPanelPrefs() {
 	var useDefaultPrefs = ( localStorage.engine_version == null ) ||
 							( localStorage.panel_prefs == null ) ||
 							( JSON.parse(localStorage.engine_version).major < 4 ) ||
-							( JSON.parse(localStorage.engine_version).minor < 0 );
+							( JSON.parse(localStorage.engine_version).minor < 9 );
 	console.log("USE DEFAULT?? " + useDefaultPrefs);
 	var prefs = useDefaultPrefs ? defaultPanelPrefs : JSON.parse( localStorage.panel_prefs );
 	// add missing panel prefs (if any)

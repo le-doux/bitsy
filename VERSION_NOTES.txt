@@ -1,3 +1,6 @@
+4.9:
+- new settings panel!
+
 4.8:
 - fix broken gif recording
 - add gif snapshot! (take screenshot of current room)
