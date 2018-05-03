@@ -121,13 +121,13 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 		// TODO : make image title not show up while loading image? or style the size?
 		if( drawingCategory === TileType.Tile )
-			img.title = tile[id].name ? tile[id].name : "tile " + id;
+			img.title = tile[id].name ? tile[id].name : localization.GetStringOrFallback("tile_label", "tile") + " " + id;
 		else if( drawingCategory === TileType.Sprite )
-			img.title = sprite[id].name ? sprite[id].name : "sprite " + id;
+			img.title = sprite[id].name ? sprite[id].name : localization.GetStringOrFallback("sprite_label", "sprite") + " " + id;
 		else if( drawingCategory === TileType.Avatar )
-			img.title = "avatar";
+			img.title = localization.GetStringOrFallback("avatar_label", "avatar");
 		else if( drawingCategory === TileType.Item )
-			img.title = item[id].name ? item[id].name : "item " + id;
+			img.title = item[id].name ? item[id].name : localization.GetStringOrFallback("item_label", "item") + " " + id;
 
 		img.classList.add("explorerThumbnail"); // NEW
 

@@ -374,6 +374,9 @@ function getPanelPrefs() {
 function start() {
 	detectBrowserFeatures();
 
+	// localization
+	localization = new Localization( initLanguageOptions );
+
 	//game canvas & context (also the map editor)
 	attachCanvas( document.getElementById("game") );
 
@@ -515,9 +518,6 @@ function start() {
 		export_settings = JSON.parse( localStorage.export_settings );
 		document.getElementById("pageColor").value = export_settings.page_color;
 	}
-
-	// localization
-	localization = new Localization( initLanguageOptions );
 }
 
 function newDrawing() {
@@ -1637,13 +1637,13 @@ function selectPaint() {
 
 function getCurPaintModeStr() {
 	if(drawing.type == TileType.Sprite || drawing.type == TileType.Avatar) {
-		return "sprite";
+		return localization.GetStringOrFallback("sprite_label", "sprite");
 	}
 	else if(drawing.type == TileType.Item) {
-		return "item";
+		return localization.GetStringOrFallback("item_label", "item");
 	}
 	else if(drawing.type == TileType.Tile) {
-		return "tile";
+		return localization.GetStringOrFallback("tile_label", "tile");
 	}
 }
 
@@ -2886,7 +2886,7 @@ var DialogBlockUI = function(nodes, num) {
 	leftSpan.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
-	typeEl.innerText = "dialog";
+	typeEl.innerText = localization.GetStringOrFallback("dialog_block_basic", "dialog");
 	typeEl.title = "this dialog is said once on each interaction";
 	leftSpan.appendChild( typeEl );
 
@@ -2988,7 +2988,7 @@ var IfBlockUI = function(node, num) {
 	leftSpan.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
-	typeEl.innerText = "conditional";
+	typeEl.innerText = localization.GetStringOrFallback("dialog_block_conditional", "conditional");
 	typeEl.title = "which dialog option is said is determined by conditions you define"
 	leftSpan.appendChild( typeEl );
 
@@ -3023,6 +3023,12 @@ var IfBlockUI = function(node, num) {
 	}
 
 	var conditionTypes = ["item","variable","default","custom"];
+	var conditionTypeNames = [
+		localization.GetStringOrFallback("item_label", "item"),
+		localization.GetStringOrFallback("variable_label", "variable"),
+		localization.GetStringOrFallback("condition_type_default", "default"),
+		localization.GetStringOrFallback("condition_type_custom", "custom")
+	];
 	// var conditionTypesVerbose = ["the player's inventory of the item", "the value of the variable", "no other condition is met (default)", "a custom condition is met"]
 	// var comparisonNames = ["equals","greater than","less than","greater than or equal to","less than or equal to"];
 	var comparisonTypes = ["==", ">", "<", ">=", "<="];
@@ -3157,7 +3163,7 @@ var IfBlockUI = function(node, num) {
 	addConditionEl.title = "add a new dialog option to this conditional dialog section"
 	addConditionEl.appendChild( createIconElement("add") );
 	var addConditionText = document.createElement("span");
-	addConditionText.innerText = "add option";
+	addConditionText.innerText = localization.GetStringOrFallback("dialog_conditional_add", "add option");
 	addConditionEl.appendChild( addConditionText );
 
 	function addCondition(condition, result, index) {
@@ -3190,7 +3196,7 @@ var IfBlockUI = function(node, num) {
 
 
 		var condSpan = document.createElement("span");
-		condSpan.innerText = "when ";
+		condSpan.innerText = localization.GetStringOrFallback("dialog_conditional_when", "when ");
 		condSpan.title = "define the condition for which this dialog option is said";
 		condInnerDiv.appendChild(condSpan);
 		var condTypeSelect = document.createElement("select");
@@ -3199,7 +3205,7 @@ var IfBlockUI = function(node, num) {
 		for(var i = 0; i < conditionTypes.length; i++) {
 			var condTypeOption = document.createElement("option");
 			condTypeOption.value = conditionTypes[i];
-			condTypeOption.innerText = conditionTypes[i];
+			condTypeOption.innerText = conditionTypeNames[i];
 			condTypeSelect.appendChild(condTypeOption);
 		}
 		// condInnerDiv.appendChild( document.createElement("br") );
@@ -3209,7 +3215,7 @@ var IfBlockUI = function(node, num) {
 		for(id in item) {
 			var condItemOption = document.createElement("option");
 			condItemOption.value = id;
-			condItemOption.innerText = (item[id].name != null ? item[id].name : "item " + id); //"item " + id;
+			condItemOption.innerText = (item[id].name != null ? item[id].name : localization.GetStringOrFallback("item_label", "item") + " " + id);
 			condItemSelect.appendChild(condItemOption);
 		}
 		var condVariableSelect = document.createElement("select");
@@ -3230,7 +3236,7 @@ var IfBlockUI = function(node, num) {
 		for(var i = 0; i < comparisonTypes.length; i++) {
 			var condCompareOption = document.createElement("option");
 			condCompareOption.value = comparisonTypes[i];
-			condCompareOption.innerText = comparisonTypes[i]; //comparisonNames[i];
+			condCompareOption.innerText = comparisonTypes[i];
 			condCompareSelect.appendChild(condCompareOption);
 		}
 		var condValueInput = document.createElement("input");
@@ -3356,7 +3362,7 @@ var SeqBlockUI = function(node, num) {
 	leftSpan.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
-	typeEl.innerText = "list"; //sequenceNode.type;
+	typeEl.innerText = localization.GetStringOrFallback("dialog_block_list", "list");
 	typeEl.title = "one line of dialog in the list is said on each interaction, in the order you choose";
 	leftSpan.appendChild( typeEl );
 	
@@ -3381,7 +3387,7 @@ var SeqBlockUI = function(node, num) {
 	// div.appendChild( document.createElement("br") );
 
 	var orderEl = document.createElement("span");
-	orderEl.innerText = "order: ";
+	orderEl.innerText = localization.GetStringOrFallback("dialog_list_order", "order: ");
 	orderEl.title = "select the order in which lines are said";
 	div.appendChild( orderEl );
 
@@ -3395,7 +3401,11 @@ var SeqBlockUI = function(node, num) {
 	});
 	div.appendChild(selectEl);
 	var sequenceTypes = ["sequence","cycle","shuffle"];
-	var sequenceDesc = ["sequence (say each line once)", "cycle (say each line, then repeat)", "shuffle (say lines in random order)"];
+	var sequenceDesc = [
+		localization.GetStringOrFallback("list_type_description_sequence", "sequence (say each line once)"),
+		localization.GetStringOrFallback("list_type_description_cycle", "cycle (say each line, then repeat)"),
+		localization.GetStringOrFallback("list_type_description_shuffle", "shuffle (say lines in random order)")
+	];
 	for(var i = 0; i < sequenceTypes.length; i++) {
 		var optionEl = document.createElement("option");
 		optionEl.value = sequenceTypes[i];
@@ -3412,7 +3422,7 @@ var SeqBlockUI = function(node, num) {
 	// addOptionEl.innerText = "add";
 	addOptionEl.appendChild( createIconElement("add") );
 	var addOptionText = document.createElement("span");
-	addOptionText.innerText = "add line";
+	addOptionText.innerText = localization.GetStringOrFallback("dialog_list_add", "add line");
 	addOptionEl.title = "add a new line of dialog to the list";
 	addOptionEl.appendChild( addOptionText );
 
@@ -3877,7 +3887,7 @@ function updateInventoryVariableUI(){
 		addVarEl.title = "add new variable";
 		addVarEl.appendChild( createIconElement("add") );
 		var addVarText = document.createElement("span");
-		addVarText.innerText = "add variable";
+		addVarText.innerText = localization.GetStringOrFallback("variable_add", "add variable");
 		addVarEl.appendChild( addVarText );
 		addVarEl.addEventListener('click', function() {
 			viewport.removeChild(addVarEl);

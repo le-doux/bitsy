@@ -9,7 +9,8 @@ X dynamically populate language selector
 - debug UI for translators
 - get translation volunteers
 X how to handle multi-paragraph text (for now: lots of strings)
-- how to handle dynamic text
+X how to handle dynamic text
+- find instances of dynamic text
 - how to handle alt text
 */
 
@@ -130,12 +131,16 @@ this.ChangeLanguage = function(language) {
 function getString(id) {
 	return localizationStrings[getEditorLanguage()][id];
 }
-this.GetString(id) {
+this.GetString = function(id) {
 	return getString(id);
 }
 
 var unlocalizedDynamicStrings = {};
 function getStringOrFallback(id, englishFallback) {
+	// we haven't loaded yet - always return fallback (but don't record it)
+	if(localizationStrings == null)
+		return englishFallback;
+
 	var locString = getString(id);
 	if(locString == null) {
 		locString = englishFallback;
@@ -143,7 +148,7 @@ function getStringOrFallback(id, englishFallback) {
 	}
 	return locString;
 }
-this.GetStringOrFallback(id, englishFallback) {
+this.GetStringOrFallback = function(id, englishFallback) {
 	return getStringOrFallback(id,englishFallback);
 }
 
@@ -164,6 +169,18 @@ this.ExportEnglishStrings = function() {
 		var el = elements[i];
 		var localizationId = getLocalizationId(el);
 		englishStrings[localizationId] = el.innerText;
+	}
+	exportEnglishStringsDictionary(englishStrings);
+}
+
+this.ExportMissingEnglishStrings = function() {
+	var englishStrings = {};
+	var elements = document.getElementsByClassName(localizationClass);
+	for(var i = 0; i < elements.length; i++) {
+		var el = elements[i];
+		var localizationId = getLocalizationId(el);
+		if(!localizationStrings["en"][localizationId])
+			englishStrings[localizationId] = el.innerText;
 	}
 	exportEnglishStringsDictionary(englishStrings);
 }
