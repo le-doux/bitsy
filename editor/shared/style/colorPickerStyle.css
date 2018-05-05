@@ -8,14 +8,14 @@
 
 #colorPickerWheel {
 	width: 200px;
-	height: 200px;
+	/*height: 200px;*/
 	display: block;
 	background: transparent;
 }
 
 #colorPickerSelect {
 	width: 200px;
-	height: 200px;
+	/*height: 200px;*/
 	display: block;
 	margin-top: -200px;
 	cursor: pointer;

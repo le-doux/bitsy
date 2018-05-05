@@ -1,0 +1,152 @@
+#editorContent {
+	white-space: normal;
+}
+
+.panel {
+	margin: 20px;
+	padding: 10px; /* need to create a panelInner so this can change*/
+	width: calc(100% - 60px);
+	/*height: 100vh;*/
+}
+
+#aboutPanel {
+	margin: 20px;
+	padding: 10px;
+	width: calc(100% - 60px);
+}
+
+.notMobile {
+	display: none;
+}
+
+#game {
+	width: 100%;
+}
+
+#paint {
+	width: 100%;
+}
+
+/* color picker */
+#colorPickerWheel {
+	width: 100%;
+}
+#colorPickerSelect {
+	width: 100%;
+	margin-top: calc(-1 * 100%);
+}
+#colorPickerHexText {
+	width: calc(100% - 60px);
+	font-size: 42px;
+}
+#colorPickerSliderBg {
+	width: calc(100% - 60px);
+}
+/* custom slider thumb */
+#colorPickerSlider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	border: 4px solid #000000;
+	height: 36px;
+	width: 36px;
+	border-radius: 18px;
+	background: #ffffff;
+	cursor: pointer;
+	margin-top: -12px;
+}
+
+/* custom slider track */
+#colorPickerSlider::-webkit-slider-runnable-track {
+	width: 100%;
+	height: 8px;
+	cursor: pointer;
+	background: #fff;
+	margin-top: -28px;
+}
+
+/* FONT SIZES */
+body {
+	font-size: 42px;
+}
+#topbar {
+	font-size: 42px;
+}
+.panel {
+	font-size: 42px;
+}
+.panel .bar {
+	font-size: 42px;
+}
+.panel .bar .material-icons {
+	font-size: 42px;
+}
+.helpMessage {
+	font-size: 42px;
+}
+#aboutInner {
+	font-size: 42px;
+}
+#editSelectedExit {
+	font-size: 42px;
+}
+#titleText {
+	font-size: 42px;
+}
+#bitsyEditorName {
+	font-size: 42px;
+}
+.options {
+	font-size: 42px;
+}
+.dialogTextArea {
+	font-size: 42px;
+}
+#toolsPanel {
+	font-size: 42px;
+}
+#gifDownload .material-icons {
+	font-size: 42px;
+}
+#gifEncodingText .material-icons {
+	font-size: 42px;
+}
+.advDialogOptionDiv button .material-icons {
+	font-size: 42px;
+}
+.advDialogConditionDiv button .material-icons {
+	font-size: 42px;
+}
+.advDialogIcon {
+	font-size: 42px;
+}
+.inventoryVariableBox button .material-icons {
+	font-size: 42px;
+}
+#bylineFlexItem {
+	font-size: 42px;
+}
+#paintExplorerFilterIcon .material-icons {
+	font-size: 42px;
+}
+button {
+	font-size: 42px;
+}
+button .material-icons {
+	font-size: 42px;
+}
+.panel .bar button.light .material-icons {
+	font-size: 42px;
+}
+input[type=checkbox] + label {
+	font-size: 42px;
+}
+input[type=checkbox] + label .material-icons {
+	font-size: 42px;
+}
+input[type=radio] + label {
+	font-size: 42px;
+}
+input[type=radio] + label .material-icons {
+	font-size: 42px;
+}
+
+

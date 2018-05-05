@@ -372,7 +372,20 @@ function getPanelPrefs() {
 }
 
 function start() {
-	detectBrowserFeatures();
+	// Ed().platform = PlatformType.Mobile;
+
+	// test
+	if(Ed().platform === PlatformType.Mobile) {
+		var head = document.getElementsByTagName("head")[0];
+		var link = document.createElement("link");
+		link.rel = "stylesheet";
+		link.type = "text/css";
+		link.href = "shared/style/mobileEditorStyle.css";
+		head.appendChild(link);
+	}
+
+	if(Ed().platform === PlatformType.Desktop)
+		detectBrowserFeatures();
 
 	// localization
 	localization = new Localization( initLanguageOptions );
@@ -2647,6 +2660,9 @@ var grabbedPanel = {
 };
 
 function grabCard(e) {
+	if(Ed().platform === PlatformType.Mobile)
+		return; // This doesn't work on mobile
+
 	e.preventDefault();
 
 	console.log(grabbedPanel.card);

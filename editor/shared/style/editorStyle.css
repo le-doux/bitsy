@@ -559,3 +559,7 @@ input {
 .thumbnailDefaultName {
 	color : #ccccff;
 }
+
+#aboutPanel {
+	width:350px;white-space:normal;
+}

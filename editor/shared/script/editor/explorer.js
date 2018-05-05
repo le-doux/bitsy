@@ -119,6 +119,8 @@ function PaintExplorer(idPrefix,selectCallback) {
 		var img = document.createElement("img");
 		img.id = idPrefix + "Thumbnail_" + id;
 
+		// TODO : this localization global variable breaks mobile
+
 		// TODO : make image title not show up while loading image? or style the size?
 		if( drawingCategory === TileType.Tile )
 			img.title = tile[id].name ? tile[id].name : localization.GetStringOrFallback("tile_label", "tile") + " " + id;
