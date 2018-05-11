@@ -539,6 +539,10 @@ input {
 	font-size:12px;
 }
 
+#bitsyLogoTitle {
+	font-size: 24px;
+}
+
 #paintExplorerFilter {
 	margin-top: 5px;
 	padding: 5px;

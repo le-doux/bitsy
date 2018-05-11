@@ -6,8 +6,8 @@ X wrap all UI strings in index.html
 X create UI for switching languages
 X save setting for default languages
 X dynamically populate language selector
-- debug UI for translators
-- get translation volunteers
+X debug UI for translators (solution: send them a version of the editor)
+X get translation volunteers
 X how to handle multi-paragraph text (for now: lots of strings)
 X how to handle dynamic text
 X find instances of dynamic text
@@ -24,9 +24,12 @@ var resources = new ResourceLoader();
 var localizationStrings = null;
 
 resources.load("other", "localization.tsv", function() { // why does this happen multiple times?
+	var csv = resources.get("localization.tsv");
+	if(csv.length <= 0) // hack to avoid weird double loading (there's got to be a *real* way)
+		return;
+
 	localizationStrings = {};
 
-	var csv = resources.get("localization.tsv");
 	csv = csv.replace(/\r/g,""); // weird sanitization bug required
 	// console.log(csv);
 	var lines = csv.split("\n");

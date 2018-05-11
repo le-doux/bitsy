@@ -372,7 +372,7 @@ function getPanelPrefs() {
 }
 
 function start() {
-	// Ed().platform = PlatformType.Mobile;
+	Ed().platform = PlatformType.Mobile;
 
 	// test
 	if(Ed().platform === PlatformType.Mobile) {
@@ -475,11 +475,16 @@ function start() {
 	paintExplorer.Refresh(TileType.Avatar);
 	paintExplorer.ChangeSelection("A");
 	paintTool.explorer = paintExplorer;
+	paintExplorer.SetDisplayCaptions( Ed().platform === PlatformType.Desktop );
 
 	//unsupported feature stuff
-	if (hasUnsupportedFeatures()) showUnsupportedFeatureWarning();
-	if (!browserFeatures.fileDownload) {
-		document.getElementById("downloadHelp").style.display = "block";
+	if(Ed().platform === PlatformType.Desktop) {
+		if (hasUnsupportedFeatures()) {
+			showUnsupportedFeatureWarning();
+		}
+		if (!browserFeatures.fileDownload) {
+			document.getElementById("downloadHelp").style.display = "block";
+		}
 	}
 
 	// gif recording init (should this go in its own file?)

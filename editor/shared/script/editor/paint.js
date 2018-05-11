@@ -112,7 +112,7 @@ function PaintTool(canvas, roomTool) {
 
 	// TODO : 
 	function onMouseDown(e) {
-		if( Ed().platform == PlatformType.Desktop ) // hack
+		// if( Ed().platform == PlatformType.Desktop ) // hack
 			if (isPlayMode) return; //can't paint during play mode
 
 		console.log("PAINT TOOL!!!");
@@ -161,13 +161,13 @@ function PaintTool(canvas, roomTool) {
 			refreshGameData();
 			roomTool.drawEditMap(); // TODO : events instead of direct coupling
 
-			if( Ed().platform == PlatformType.Desktop ) {
+			// if( Ed().platform == PlatformType.Desktop ) {
 				if(self.explorer != null) {
 					self.explorer.RenderThumbnail( self.drawing.id )
 				}
 				if( self.isCurDrawingAnimated )
 					renderAnimationPreview( roomTool.drawing.id );
-			}
+			// }
 		}
 	}
 
@@ -305,12 +305,12 @@ function PaintTool(canvas, roomTool) {
 		}
 
 		// update paint explorer - only on desktop (TODO: should be separate object with events)
-		if( Ed().platform == PlatformType.Desktop && self.explorer != null ) {
+		// if( Ed().platform == PlatformType.Desktop && self.explorer != null ) {
 			self.explorer.AddThumbnail( self.drawing.id );
 			self.explorer.ChangeSelection( self.drawing.id );
 			document.getElementById("paintExplorerFilterInput").value = ""; // super hacky
 			self.explorer.Refresh( self.drawing.type, true /*doKeepOldThumbnails*/, document.getElementById("paintExplorerFilterInput").value /*filterString*/, true /*skipRenderStep*/ ); // this is a bit hacky feeling
-		}
+		// }
 	}
 
 	// TODO -- sould these newDrawing methods be internal to PaintTool?
@@ -368,10 +368,10 @@ function PaintTool(canvas, roomTool) {
 
 		if ( shouldDelete ) {
 			console.log("PAINT TOOLLLL");
-			if ( Ed().platform == PlatformType.Desktop && self.explorer != null ) {
+			// if ( Ed().platform == PlatformType.Desktop && self.explorer != null ) {
 				console.log("PAINT TOOL DELETE THUMB");
 				self.explorer.DeleteThumbnail( self.drawing.id );
-			}
+			// }
 
 			if (self.drawing.type == TileType.Tile) {
 				if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
@@ -413,9 +413,9 @@ function PaintTool(canvas, roomTool) {
 				nextItem();
 				updateInventoryItemUI();
 			}
-			if(Ed().platform == PlatformType.Desktop && self.explorer != null) {
+			// if(Ed().platform == PlatformType.Desktop && self.explorer != null) {
 				self.explorer.ChangeSelection( self.drawing.id );
-			}
+			// }
 		}
 	}
 }

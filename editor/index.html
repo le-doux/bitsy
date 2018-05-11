@@ -49,8 +49,8 @@
 				<div id="topbarFlexContainer">
 
 					<div id="logoFlexItem">
-						<span title="Bitsy ~ make little worlds ~" style="font-size:24px">
-							<img src="shared/image/cat.svg" height="24px" width="24px"/>
+						<span title="Bitsy ~ make little worlds ~" id="bitsyLogoTitle">
+							<img src="shared/image/cat.svg" height="24px" width="24px" id="bitsyLogo"/>
 							<span class="localize bitsy_title">Bitsy</span>
 						</span>	
 					</div>
@@ -71,7 +71,7 @@
 					<div id="topbarSpaceFlexItem">
 					</div>
 
-					<div id="bylineFlexItem">
+					<div id="bylineFlexItem" class="notMobile">
 						<span class="localize author_by">by</span>
 						<a href="https://www.twitter.com/adamledoux" target="_blank">
 							<span class="localize author_twitter">@adamledoux</span>
@@ -640,14 +640,14 @@
 								<i class="material-icons">remove_circle</i>
 							</button>
 						</div>
-						<div class="buttonGroup">
+						<div class="buttonGroup notMobile">
 							<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" checked/>
 							<label title="show / hide grid" for="paintGridCheck">
 								<i class="material-icons" id="paintGridIcon">visibility</i> 
 								<span class="localize grid_toggle_visible">grid</span>
 							</label>
 						</div>
-						<div style="margin-bottom: 5px;">
+						<div style="margin-bottom: 5px;" class="notMobile">
 							
 							<span id="drawingNameUI" title="a name to refer to this drawing" class="controlSpan">
 								<span class="localize name_label">name</span>
@@ -673,7 +673,7 @@
 						<span style="float:left;">
 							<span class="localize dialog_tool_name">dialog</span>
 						</span>
-						<button title="open in advanced dialog editor" style="float:right;" onclick="showPanel('dialogPanel');">
+						<button title="open in advanced dialog editor" style="float:right;" onclick="showPanel('dialogPanel');" class="notMobile">
 							<i class="material-icons">open_in_new</i>
 						</button>
 						<br>
@@ -768,7 +768,7 @@
 						</div>
 					</div>
 
-					<div class="controlBox" id="paintExplorerFilter">
+					<div class="controlBox notMobile" id="paintExplorerFilter">
 						<span id="paintExplorerFilterIcon">
 							<i class="material-icons">search</i>
 						</span>

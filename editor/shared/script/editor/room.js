@@ -231,13 +231,6 @@ function RoomTool(canvas) {
 			canvas.addEventListener("mousemove", onMouseMove);
 			canvas.addEventListener("mouseup", onMouseUp);
 			canvas.addEventListener("mouseleave", onMouseUp);
-
-			mapEditAnimationLoop =
-				setInterval( function() {
-					animationCounter = animationTime + 1; // hack
-					updateAnimation();
-					self.drawEditMap();
-				}, animationTime ); // update animation in map mode
 		}
 
 		if( Ed().platform == PlatformType.Mobile ) {
@@ -245,6 +238,13 @@ function RoomTool(canvas) {
 			canvas.addEventListener("touchmove", onTouchMove);
 			canvas.addEventListener("touchend", onTouchEnd);
 		}
+
+		mapEditAnimationLoop =
+			setInterval( function() {
+				animationCounter = animationTime + 1; // hack
+				updateAnimation();
+				self.drawEditMap();
+			}, animationTime ); // update animation in map mode
 	}
 
 	this.unlistenEditEvents = function() {
@@ -253,7 +253,6 @@ function RoomTool(canvas) {
 			canvas.removeEventListener("mousemove", onMouseMove);
 			canvas.removeEventListener("mouseup", onMouseUp);
 			canvas.removeEventListener("mouseleave", onMouseUp);
-			clearInterval( mapEditAnimationLoop );
 		}
 
 		if( Ed().platform == PlatformType.Mobile ) {
@@ -261,6 +260,8 @@ function RoomTool(canvas) {
 			canvas.removeEventListener("touchmove", onTouchMove);
 			canvas.removeEventListener("touchend", onTouchEnd);
 		}
+
+		clearInterval( mapEditAnimationLoop );
 	}
 
 	this.drawEditMap = function() {

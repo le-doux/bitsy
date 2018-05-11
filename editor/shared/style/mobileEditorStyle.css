@@ -1,12 +1,15 @@
 #editorContent {
 	white-space: normal;
+	width: 100%;
+/*	margin: 0;
+	overflow-x: hidden !important;
+	overflow-y: scroll !important;*/
 }
 
 .panel {
 	margin: 20px;
-	padding: 10px; /* need to create a panelInner so this can change*/
+	padding: 10px;
 	width: calc(100% - 60px);
-	/*height: 100vh;*/
 }
 
 #aboutPanel {
@@ -25,6 +28,53 @@
 
 #paint {
 	width: 100%;
+}
+#paintEditMain {
+	width: 100%;
+}
+
+#bitsyLogoTitle {
+	font-size: 42px;
+}
+
+#bitsyLogo {
+	width: 48px;
+	height: 48px;
+}
+
+#paintExplorerViewport {
+	width: calc(100% - 30px);
+	height: 600px;
+	border: solid 4px #ccccff;
+}
+
+/*.explorerThumbnail {
+	width: 200px;
+}
+*/
+#paintExplorerContent img {
+	width: 200px;
+	height: 200px;
+}
+
+#paintExplorerAdd {
+	width:200px;
+	height:200px;
+}
+#paintExplorerAdd button { /* this style is a bit hacky but looks ok */
+	width: 150px;
+	height: 150px;
+	margin-top: 25px;
+}
+
+#animation img {
+	width:200px;
+	height:200px;
+	border: solid 4px #6767b2;
+}
+
+.animationThumbnail {
+	padding: 10px;
 }
 
 /* color picker */
