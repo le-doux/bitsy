@@ -16,13 +16,53 @@ var DialogRenderer = function() {
 		top : 12,
 		left : 12,
 		bottom : 12, //for drawing it from the bottom
+
+		// new stuff
+		font_scale : 0.5, // we draw font at half-size compared to everything else
+		font_width : 6,
+		font_height : 8,
+		padding_vert : 2,
+		padding_horz : 4,
+		arrow_height : 5,
+		charsPerRow : 32
 	};
-	
+
+	// new font dimension code
+	function textScale() {
+		return scale * textboxInfo.font_scale;
+	}
+
+	function relativeFontWidth() {
+		return Math.ceil( textboxInfo.font_width * textboxInfo.font_scale );
+	}
+
+	function relativeFontHeight() {
+		return Math.ceil( textboxInfo.font_height * textboxInfo.font_scale );
+	}
+
+	function recalcTextboxInfo() {
+		textboxInfo.height = (textboxInfo.padding_vert * 3) + (relativeFontHeight() * 2) + textboxInfo.arrow_height;
+		textboxInfo.charsPerRow = Math.floor( (textboxInfo.width - (textboxInfo.padding_horz * 2)) / relativeFontWidth() );
+
+		console.log( "CHARS PER ROW " + textboxInfo.charsPerRow );
+
+		textboxInfo.img = context.createImageData(textboxInfo.width*scale, textboxInfo.height*scale);
+	}
+
+	function setFontDimensions(width, height) {
+		textboxInfo.font_width = width;
+		textboxInfo.font_height = height;
+		recalcTextboxInfo();
+	}
+
 	var font = new Font();
 
 	var context = null;
 	this.AttachContext = function(c) {
 		context = c;
+
+		setFontDimensions(6,9); // debug
+		// setFontDimensions(8,13);
 	};
 
 	this.ClearTextbox = function() {
@@ -96,11 +136,15 @@ var DialogRenderer = function() {
 		char.SetPosition(row,col);
 		char.ApplyEffects(effectTime);
 		var charData = font.getChar( char.char );
-		var top = (4 * scale) + (row * 2 * scale) + (row * 8 * text_scale) + Math.floor( char.offset.y );
-		var left = (4 * scale) + (col * 6 * text_scale) + Math.floor( char.offset.x );
-		for (var y = 0; y < 8; y++) {
-			for (var x = 0; x < 6; x++) {
-				var i = (y * 6) + x;
+		var top = (4 * scale) + (row * 2 * scale) + (row * textboxInfo.font_height * text_scale) + Math.floor( char.offset.y );
+		var left = (4 * scale) + (col * textboxInfo.font_width * text_scale) + Math.floor( char.offset.x );
+
+		var debug_r = Math.random() * 255;
+
+		for (var y = 0; y < textboxInfo.font_height; y++) {
+			for (var x = 0; x < textboxInfo.font_width; x++) {
+
+				var i = (y * textboxInfo.font_width) + x;
 				if ( charData[i] == 1 ) {
 
 					//scaling nonsense
@@ -113,9 +157,22 @@ var DialogRenderer = function() {
 							textboxInfo.img.data[pxl+3] = char.color.a;
 						}
 					}
-
-					
 				}
+				// else {
+				// 	// DEBUG
+
+				// 	//scaling nonsense
+				// 	for (var sy = 0; sy < text_scale; sy++) {
+				// 		for (var sx = 0; sx < text_scale; sx++) {
+				// 			var pxl = 4 * ( ((top+(y*text_scale)+sy) * (textboxInfo.width*scale)) + (left+(x*text_scale)+sx) );
+				// 			textboxInfo.img.data[pxl+0] = debug_r;
+				// 			textboxInfo.img.data[pxl+1] = 0;
+				// 			textboxInfo.img.data[pxl+2] = 0;
+				// 			textboxInfo.img.data[pxl+3] = 255;
+				// 		}
+				// 	}
+				// }
+
 			}
 		}
 		
@@ -124,7 +181,7 @@ var DialogRenderer = function() {
 	};
 
 	var effectTime = 0; // TODO this variable should live somewhere better
-	this.Draw = function(buffer,dt) { // TODO move out of the buffer?? (into say a dialog box renderer)
+	this.Draw = function(buffer,dt) {
 		effectTime += dt;
 
 		this.ClearTextbox();
@@ -149,6 +206,10 @@ var DialogRenderer = function() {
 	this.Reset = function() {
 		effectTime = 0;
 		// TODO - anything else?
+	}
+
+	this.CharsPerRow = function() {
+		return textboxInfo.charsPerRow;
 	}
 }
 
@@ -426,6 +487,8 @@ var DialogBuffer = function() {
 
 	var didFlipPageThisFrame = false;
 	this.DidFlipPageThisFrame = function(){ return didFlipPageThisFrame; };
+
+	this.SetCharsPerRow = function(num){ charsPerRow = num; }; // hacky
 };
 
 /* NEW TEXT EFFECTS */

@@ -172,19 +172,19 @@ function PaintTool(canvas, roomTool) {
 	}
 
 	function onTouchStart(e) {
-		e.preventDefault();
+		// e.preventDefault();
 		var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		onMouseDown(fakeEvent);
 	}
 
 	function onTouchMove(e) {
-		e.preventDefault();
+		// e.preventDefault();
 		var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		onMouseMove(fakeEvent);
 	}
 
 	function onTouchEnd(e) {
-		e.preventDefault();
+		// e.preventDefault();
 		onMouseUp();
 	}
 

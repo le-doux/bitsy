@@ -856,7 +856,7 @@ var touchInfo = {
 };
 
 function ontouchstart(e) {
-	e.preventDefault();
+	// e.preventDefault();
 
 	if( e.changedTouches.length > 0 ) {
 		touchInfo.isDown = true;
@@ -875,7 +875,7 @@ function ontouchstart(e) {
 
 var swipeDistance = 30;
 function ontouchmove(e) {
-	e.preventDefault();
+	// e.preventDefault();
 
 	console.log("MOUSE MOVE");
 	console.log(touchInfo);
@@ -912,7 +912,7 @@ function ontouchmove(e) {
 }
 
 function ontouchend(e) {
-	e.preventDefault();
+	// e.preventDefault();
 
 	console.log("MOUSE UP");
 	console.log(touchInfo);
@@ -2089,6 +2089,7 @@ function startDialog(dialogStr,scriptId) {
 	dialogRenderer.Reset();
 	dialogRenderer.SetCentered( isNarrating /*centered*/ );
 	dialogBuffer.Reset();
+	dialogBuffer.SetCharsPerRow( dialogRenderer.CharsPerRow() ); // hack!!
 	scriptInterpreter.SetDialogBuffer( dialogBuffer );
 
 	var onScriptEnd = function() {

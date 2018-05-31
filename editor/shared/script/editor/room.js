@@ -200,7 +200,7 @@ function RoomTool(canvas) {
 	}
 
 	function onTouchStart(e) {
-		e.preventDefault();
+		// e.preventDefault();
 		// console.log(e.touches[0]);
 		var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		// console.log(fakeEvent);
@@ -208,13 +208,13 @@ function RoomTool(canvas) {
 	}
 
 	function onTouchMove(e) {
-		e.preventDefault();
+		// e.preventDefault();
 		var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		onMouseMove( fakeEvent );
 	}
 
 	function onTouchEnd(e) {
-		e.preventDefault();
+		// e.preventDefault();
 		// var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		// map_onMouseUp( fakeEvent );
 		isDragAddingTiles = false;

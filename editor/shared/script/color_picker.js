@@ -225,7 +225,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 	function pickColorTouchStart(e) {
 		// console.log(e.touches[0]);
-		e.preventDefault();
+		// e.preventDefault();
 		pickColorStart(e.touches[0]);
 	}
 

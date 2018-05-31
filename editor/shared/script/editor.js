@@ -1,4 +1,9 @@
 /* 
+font stuff:
+http://www.cl.cam.ac.uk/~mgk25/ucs-fonts.html
+- use BDF 5x7
+
+
 TEST desktop editor:
 - feature: drag tools past edge of window
 - bug: gif text recording doesn't work
@@ -372,7 +377,7 @@ function getPanelPrefs() {
 }
 
 function start() {
-	Ed().platform = PlatformType.Mobile;
+	// Ed().platform = PlatformType.Mobile;
 
 	// test
 	if(Ed().platform === PlatformType.Mobile) {
@@ -2668,7 +2673,7 @@ function grabCard(e) {
 	if(Ed().platform === PlatformType.Mobile)
 		return; // This doesn't work on mobile
 
-	e.preventDefault();
+	// e.preventDefault();
 
 	console.log(grabbedPanel.card);
 
@@ -2774,11 +2779,11 @@ function blockScrollBackpage(e) {
 	var el = document.getElementById("editorWindow");
 	var maxX = el.scrollWidth - el.offsetWidth;
 
-	if ( el.scrollLeft + e.deltaX < 0 || el.scrollLeft + e.deltaX > maxX )
-	{
-		e.preventDefault();
-		el.scrollLeft = Math.max(0, Math.min(maxX, el.scrollLeft + event.deltaX));
-	}
+	// if ( el.scrollLeft + e.deltaX < 0 || el.scrollLeft + e.deltaX > maxX )
+	// {
+	// 	e.preventDefault();
+	// 	el.scrollLeft = Math.max(0, Math.min(maxX, el.scrollLeft + event.deltaX));
+	// }
 }
 
 
@@ -2836,13 +2841,13 @@ function onTextSelectionLeave(event) {
 
 function preventTextDeselect(event) {
 	if(dialogSel.target != null) {
-		event.preventDefault();
+		// event.preventDefault();
 	}
 }
 
 function preventTextDeselectAndClick(event) {
 	if(dialogSel.target != null) {
-		event.preventDefault();
+		// event.preventDefault();
 		event.target.click();
 	}
 }
