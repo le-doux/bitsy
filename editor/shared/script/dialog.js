@@ -452,16 +452,45 @@ var DialogBuffer = function() {
 		return width;
 	}
 
-	var pixelsPerRow = 192;
+	var pixelsPerRow = 192; // hard-coded fun times!!!
+
 	this.AddDrawing = function(drawingId, onFinishHandler) {
 		// console.log("DRAWING ID " + drawingId);
 
 		var curPageIndex = buffer.length - 1;
 		var curRowIndex = buffer[curPageIndex].length - 1;
 		var curRowArr = buffer[curPageIndex][curRowIndex];
+
 		var drawingChar = new DialogDrawingChar(drawingId, activeTextEffects)
 		drawingChar.SetPrintHandler( onFinishHandler );
-		curRowArr.push( drawingChar );
+
+		var rowLength = GetCharArrayWidth(curRowArr);
+
+		// TODO : clean up copy-pasted code here :/
+		if (rowLength + drawingChar.width  <= pixelsPerRow || rowLength <= 0)
+		{
+			//stay on same row
+			curRowArr.push( drawingChar );
+		}
+		else if (curRowIndex == 0)
+		{
+			//start next row
+			buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
+			buffer[ curPageIndex ].push( [] );
+			curRowIndex++;
+			curRowArr = buffer[ curPageIndex ][ curRowIndex ];
+			curRowArr.push( drawingChar );
+		}
+		else {
+			//start next page
+			buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
+			buffer.push( [] );
+			curPageIndex++;
+			buffer[ curPageIndex ].push( [] );
+			curRowIndex = 0;
+			curRowArr = buffer[ curPageIndex ][ curRowIndex ];
+			curRowArr.push( drawingChar );
+		}
 
 		isActive = true; // this feels like a bad way to do this???
 	}
