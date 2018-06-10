@@ -87,6 +87,9 @@ function localize(language) {
 		if (locString) {
 			el.innerText = locString;
 		}
+		else {
+			el.innerText = localizationStrings["en"][localizationId]; // fall back to english
+		}
 	}
 }
 this.Localize = function() {
@@ -98,6 +101,12 @@ function getEditorLanguage() {
 		var browserLanguage = (navigator.languages ? navigator.languages[0] : navigator.language).split("-")[0];
 		localStorage.editor_language = browserLanguage;
 	}
+
+	// fallback to english
+	if(localizationStrings[localStorage.editor_language] == null) {
+		localStorage.editor_language = "en";
+	}
+
 	return localStorage.editor_language;
 }
 this.GetLanguage = function() {

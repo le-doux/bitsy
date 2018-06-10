@@ -9,23 +9,27 @@ this.CreateBuffer = function() {
 };
 
 var DialogRenderer = function() {
-	var textboxInfo = {
+	var textboxInfo = { // TODO these all can change so it's weird to start at the defaults -- could cause problems
 		img : null,
 		width : 104,
 		height : 8+4+2+5, //8 for text, 4 for top-bottom padding, 2 for line padding, 5 for arrow
 		top : 12,
 		left : 12,
 		bottom : 12, //for drawing it from the bottom
-
-		// new stuff
 		font_scale : 0.5, // we draw font at half-size compared to everything else
-		font_width : 6,
-		font_height : 8,
+		font_width : 6, // default, but this will change
+		font_height : 8, // also default
 		padding_vert : 2,
 		padding_horz : 4,
 		arrow_height : 5,
-		charsPerRow : 32
+		// charsPerRow : 32
 	};
+	var font = null;
+
+	this.SetFont = function(f) {
+		font = f;
+		setFontDimensions( font.getWidth(), font.getHeight() );
+	}
 
 	// new font dimension code
 	function textScale() {
@@ -42,9 +46,9 @@ var DialogRenderer = function() {
 
 	function recalcTextboxInfo() {
 		textboxInfo.height = (textboxInfo.padding_vert * 3) + (relativeFontHeight() * 2) + textboxInfo.arrow_height;
-		textboxInfo.charsPerRow = Math.floor( (textboxInfo.width - (textboxInfo.padding_horz * 2)) / relativeFontWidth() );
+		// textboxInfo.charsPerRow = Math.floor( (textboxInfo.width - (textboxInfo.padding_horz * 2)) / relativeFontWidth() );
 
-		console.log( "CHARS PER ROW " + textboxInfo.charsPerRow );
+		// console.log( "CHARS PER ROW " + textboxInfo.charsPerRow );
 
 		textboxInfo.img = context.createImageData(textboxInfo.width*scale, textboxInfo.height*scale);
 	}
@@ -55,14 +59,11 @@ var DialogRenderer = function() {
 		recalcTextboxInfo();
 	}
 
-	var font = new Font();
+	// var font = new Font("testFont");
 
 	var context = null;
 	this.AttachContext = function(c) {
 		context = c;
-
-		setFontDimensions(6,9); // debug
-		// setFontDimensions(8,13);
 	};
 
 	this.ClearTextbox = function() {
@@ -131,20 +132,29 @@ var DialogRenderer = function() {
 	};
 
 	var text_scale = 2; //using a different scaling factor for text feels like cheating... but it looks better
-	this.DrawChar = function(char, row, col) {
+	this.DrawChar = function(char, row, col, leftPos) {
 		char.offset = {x:0, y:0};
-		char.SetPosition(row,col);
+
+		// console.log("DRAW CHAR");
+		// console.log(col);
+
+		char.SetPosition(row,col); // TODO : replace
 		char.ApplyEffects(effectTime);
-		var charData = font.getChar( char.char );
+
+		// var charData = font.getChar( char.char );
+		var charData = char.bitmap;
+
 		var top = (4 * scale) + (row * 2 * scale) + (row * textboxInfo.font_height * text_scale) + Math.floor( char.offset.y );
-		var left = (4 * scale) + (col * textboxInfo.font_width * text_scale) + Math.floor( char.offset.x );
+		// var left = (4 * scale) + (col * textboxInfo.font_width * text_scale) + Math.floor( char.offset.x );
+
+		var left = (4 * scale) + (leftPos * text_scale) + Math.floor( char.offset.x );
 
 		var debug_r = Math.random() * 255;
 
-		for (var y = 0; y < textboxInfo.font_height; y++) {
-			for (var x = 0; x < textboxInfo.font_width; x++) {
+		for (var y = 0; y < char.height; y++) {
+			for (var x = 0; x < char.width; x++) {
 
-				var i = (y * textboxInfo.font_width) + x;
+				var i = (y * char.width) + x;
 				if ( charData[i] == 1 ) {
 
 					//scaling nonsense
@@ -208,9 +218,9 @@ var DialogRenderer = function() {
 		// TODO - anything else?
 	}
 
-	this.CharsPerRow = function() {
-		return textboxInfo.charsPerRow;
-	}
+	// this.CharsPerRow = function() {
+	// 	return textboxInfo.charsPerRow;
+	// }
 }
 
 
@@ -223,7 +233,12 @@ var DialogBuffer = function() {
 	var nextCharMaxTime = 50; // in milliseconds
 	var isDialogReadyToContinue = false;
 	var activeTextEffects = [];
-	
+	var font = null;
+
+	this.SetFont = function(f) {
+		font = f;
+	}
+
 	this.CurPage = function() { return buffer[ pageIndex ]; };
 	this.CurRow = function() { return this.CurPage()[ rowIndex ]; };
 	this.CurChar = function() { return this.CurRow()[ charIndex ]; };
@@ -237,10 +252,17 @@ var DialogBuffer = function() {
 			var row = this.CurPage()[i];
 			var charCount = (i == rowIndex) ? charIndex+1 : row.length;
 			// console.log(charCount);
+
+			var leftPos = 0;
+
 			for(var j = 0; j < charCount; j++) {
 				var char = row[j];
-				if(char)
-					handler( char, i /*rowIndex*/, j /*colIndex*/ );
+				if(char) {
+					// handler( char, i /*rowIndex*/, j /*colIndex*/ );
+					handler(char, i /*rowIndex*/, j /*colIndex*/, leftPos)
+
+					leftPos += char.width;
+				}
 			}
 		}
 	}
@@ -350,22 +372,27 @@ var DialogBuffer = function() {
 
 	this.CanContinue = function() { return isDialogReadyToContinue; };
 
-	function DialogChar(char,effectList) {
-		this.char = char;
+	function DialogChar(effectList) {
 		this.effectList = effectList.slice(); // clone effect list (since it can change between chars)
 
 		this.color = { r:255, g:255, b:255, a:255 };
 		this.offset = { x:0, y:0 }; // in pixels (screen pixels?)
-		this.row = 0;
+
 		this.col = 0;
+		this.row = 0;
+
 		this.SetPosition = function(row,col) {
+			// console.log("SET POS");
+			// console.log(this);
 			this.row = row;
 			this.col = col;
-		};
+		}
 
 		this.ApplyEffects = function(time) {
+			// console.log("APPLY EFFECTS! " + time);
 			for(var i = 0; i < this.effectList.length; i++) {
 				var effectName = this.effectList[i];
+				// console.log("FX " + effectName);
 				TextEffects[ effectName ].DoEffect( this, time );
 			}
 		}
@@ -381,18 +408,67 @@ var DialogBuffer = function() {
 				printHandler = null; // only call handler once (hacky)
 			}
 		}
-	};
+
+		this.bitmap = [];
+		this.width = 0;
+		this.height = 0;
+	}
+
+	function DialogFontChar(font, char, effectList) {
+		Object.assign(this, new DialogChar(effectList));
+
+		this.bitmap = font.getChar(char);
+		this.width = font.getWidth();
+		this.height = font.getHeight();
+	}
+
+	function DialogDrawingChar(drawingId, effectList) {
+		Object.assign(this, new DialogChar(effectList));
+
+		var imageData = imageStore.source[drawingId][0];
+		var imageDataFlat = [];
+		for (var i = 0; i < imageData.length; i++) {
+			// console.log(imageData[i]);
+			imageDataFlat = imageDataFlat.concat(imageData[i]);
+		}
+
+		this.bitmap = imageDataFlat;
+		this.width = 8;
+		this.height = 8;
+	}
 
 	function AddWordToCharArray(charArray,word,effectList) {
 		for(var i = 0; i < word.length; i++) {
-			charArray.push( new DialogChar( word[i], effectList ) );
+			charArray.push( new DialogFontChar( font, word[i], effectList ) );
 		}
 		return charArray;
 	}
 
-	var charsPerRow = 32;
+	function GetCharArrayWidth(charArray) {
+		var width = 0;
+		for(var i = 0; i < charArray.length; i++) {
+			width += charArray[i].width;
+		}
+		return width;
+	}
+
+	var pixelsPerRow = 192;
+	this.AddDrawing = function(drawingId, onFinishHandler) {
+		// console.log("DRAWING ID " + drawingId);
+
+		var curPageIndex = buffer.length - 1;
+		var curRowIndex = buffer[curPageIndex].length - 1;
+		var curRowArr = buffer[curPageIndex][curRowIndex];
+		var drawingChar = new DialogDrawingChar(drawingId, activeTextEffects)
+		drawingChar.SetPrintHandler( onFinishHandler );
+		curRowArr.push( drawingChar );
+
+		isActive = true; // this feels like a bad way to do this???
+	}
+
+	// TODO : convert this into something that takes DialogChar arrays
 	this.AddText = function(textStr,onFinishHandler) {
-		console.log("ADD TEXT " + textStr);
+		// console.log("ADD TEXT " + textStr);
 
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
@@ -408,7 +484,11 @@ var DialogBuffer = function() {
 		for (var i = 0; i < words.length; i++) {
 			var word = words[i];
 			var wordLength = word.length + ((i == 0) ? 0 : 1);
-			if (curRowArr.length + wordLength <= charsPerRow || curRowArr.length <= 0) {
+
+			wordLength = wordLength * font.getWidth(); // hack?
+			var rowLength = GetCharArrayWidth(curRowArr);
+
+			if (rowLength + wordLength <= pixelsPerRow || rowLength <= 0) {
 				//stay on same row
 				var wordWithPrecedingSpace = ((i == 0) ? "" : " ") + word;
 				curRowArr = AddWordToCharArray( curRowArr, wordWithPrecedingSpace, activeTextEffects );
@@ -488,7 +568,7 @@ var DialogBuffer = function() {
 	var didFlipPageThisFrame = false;
 	this.DidFlipPageThisFrame = function(){ return didFlipPageThisFrame; };
 
-	this.SetCharsPerRow = function(num){ charsPerRow = num; }; // hacky
+	// this.SetCharsPerRow = function(num){ charsPerRow = num; }; // hacky
 };
 
 /* NEW TEXT EFFECTS */
@@ -496,6 +576,11 @@ var TextEffects = new Map();
 
 var RainbowEffect = function() { // TODO - should it be an object or just a method?
 	this.DoEffect = function(char,time) {
+		// console.log("RAINBOW!!!");
+		// console.log(char);
+		// console.log(char.color);
+		// console.log(char.col);
+
 		var h = Math.abs( Math.sin( (time / 600) - (char.col / 8) ) );
 		var rgb = hslToRgb( h, 1, 0.5 );
 		char.color.r = rgb[0];
@@ -510,7 +595,7 @@ var ColorEffect = function(index) {
 	this.DoEffect = function(char) {
 		var pal = getPal( curPal() );
 		var color = pal[ parseInt( index ) ];
-		console.log(color);
+		// console.log(color);
 		char.color.r = color[0];
 		char.color.g = color[1];
 		char.color.b = color[2];

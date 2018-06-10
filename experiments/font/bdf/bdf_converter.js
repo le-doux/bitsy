@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-fs.readFile("8x13.bdf", "utf8", function(err, data) {
+fs.readFile("6x9.bdf", "utf8", function(err, data) {
 	// console.log(data);
 
 	var lines = data.split("\n");
@@ -10,7 +10,10 @@ fs.readFile("8x13.bdf", "utf8", function(err, data) {
 	var bitList = [];
 	var fontData = {};
 
-	var width = 8;
+	var name = "ucs_fixed_6x9"
+	var width = 6;
+	var height = 9;
+	var offset = (Math.ceil(width/4)*4) - width;
 
 	for (var i = 0; i < lines.length; i++) {
 		var line = lines[i];
@@ -29,7 +32,7 @@ fs.readFile("8x13.bdf", "utf8", function(err, data) {
 			var hexInt = parseInt("0x" + line);
 			
 			for (var j = (width-1); j >= 0; j--) {
-				var bit = (hexInt >> j + 0) & 1; // +4 was +2
+				var bit = (hexInt >> j + offset) & 1; // +4 was +2
 				bitList.push( bit );
 			}
 		}
@@ -40,8 +43,26 @@ fs.readFile("8x13.bdf", "utf8", function(err, data) {
 		}
 	}
 
+	var strFontData = "";
+	strFontData += "FONT " + name + "\n";
+	strFontData += "SIZE " + width + " " + height + "\n";
+
+	for (var code in fontData)
+	{
+		strFontData += "CHAR " + code + "\n";
+		for (var y = 0; y < height; y++)
+		{
+			for (var x = 0; x < width; x++)
+			{
+				var i = (y * width) + x;
+				strFontData += "" + fontData[code][i];
+			}
+			strFontData += "\n";
+		}
+	}
+
 	// console.log(JSON.stringify(fontData));
 
-	fs.writeFile("bdfFontData.js", JSON.stringify(fontData));
+	fs.writeFile(name + "_font.txt", strFontData);
 
 });

@@ -160,15 +160,21 @@ function attachCanvas(c) {
 var curGameData = null;
 function load_game(game_data, startWithTitle) {
 	curGameData = game_data; //remember the current game (used to reset the game)
+
+	// move this around probably
+	var font = new Font("bitsy_ascii"); // hack
+	dialogBuffer.SetFont(font);
+	dialogRenderer.SetFont(font);
+
 	dialogBuffer.Reset();
 	scriptInterpreter.ResetEnvironment(); // ensures variables are reset -- is this the best way?
-	// console.log(dialog);
+
 	parseWorld(game_data);
-	// console.log(dialog);
+
 	setInitialVariables();
 	renderImages();
+
 	onready(startWithTitle);
-	// console.log(dialog);
 }
 
 function reset_cur_game() {
@@ -2025,6 +2031,8 @@ var isDialogMode = false;
 var isNarrating = false;
 var isEnding = false;
 var dialogModule = new Dialog();
+
+// var font = new Font("bitsy_ascii"); // hack
 var dialogRenderer = dialogModule.CreateRenderer();
 var dialogBuffer = dialogModule.CreateBuffer();
 
@@ -2089,7 +2097,6 @@ function startDialog(dialogStr,scriptId) {
 	dialogRenderer.Reset();
 	dialogRenderer.SetCentered( isNarrating /*centered*/ );
 	dialogBuffer.Reset();
-	dialogBuffer.SetCharsPerRow( dialogRenderer.CharsPerRow() ); // hack!!
 	scriptInterpreter.SetDialogBuffer( dialogBuffer );
 
 	var onScriptEnd = function() {

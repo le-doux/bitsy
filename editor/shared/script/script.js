@@ -133,8 +133,8 @@ var Utils = function() {
 
 
 /* BUILT-IN FUNCTIONS */ // TODO: better way to encapsulate these?
-function sayFunc(environment,parameters,onReturn) {
-	// console.log("SAY FUNC");
+function printFunc(environment,parameters,onReturn) {
+	// console.log("PRINT FUNC");
 	// console.log(parameters);
 	if( parameters[0] != undefined && parameters[0] != null ) {
 		// console.log(parameters[0]);
@@ -148,14 +148,43 @@ function sayFunc(environment,parameters,onReturn) {
 		}; // called when dialog is finished printing
 		environment.GetDialogBuffer().AddText( textStr, onFinishHandler );
 	}
-	else
+	else {
 		onReturn(null);
+	}
 }
 
 function linebreakFunc(environment,parameters,onReturn) {
 	// console.log("LINEBREAK FUNC");
 	environment.GetDialogBuffer().AddLinebreak();
 	onReturn(null);
+}
+
+function printDrawingFunc(environment,parameters,onReturn) {
+	var drawingId = parameters[0];
+	environment.GetDialogBuffer().AddDrawing( drawingId, function() {
+		onReturn(null);
+	});
+}
+
+function printSpriteFunc(environment,parameters,onReturn) {
+	var spriteId = parameters[0];
+	if(names.sprite.has(spriteId)) spriteId = names.sprite.get(spriteId); // id is actually a name
+	var drawingId = sprite[spriteId].drw;
+	printDrawingFunc(environment, [drawingId], onReturn);
+}
+
+function printTileFunc(environment,parameters,onReturn) {
+	var tileId = parameters[0];
+	if(names.tile.has(tileId)) tileId = names.tile.get(tileId); // id is actually a name
+	var drawingId = tile[tileId].drw;
+	printDrawingFunc(environment, [drawingId], onReturn);
+}
+
+function printItemFunc(environment,parameters,onReturn) {
+	var itemId = parameters[0];
+	if(names.item.has(itemId)) itemId = names.item.get(itemId); // id is actually a name
+	var drawingId = item[itemId].drw;
+	printDrawingFunc(environment, [drawingId], onReturn);
 }
 
 function itemFunc(environment,parameters,onReturn) {
@@ -296,7 +325,7 @@ var Environment = function() {
 	this.GetDialogBuffer = function() { return dialogBuffer; };
 
 	var functionMap = new Map();
-	functionMap.set("say", sayFunc);
+	functionMap.set("print", printFunc);
 	functionMap.set("br", linebreakFunc);
 	functionMap.set("item", itemFunc);
 	functionMap.set("rbw", rainbowFunc);
@@ -305,6 +334,9 @@ var Environment = function() {
 	functionMap.set("clr3", color3Func);
 	functionMap.set("wvy", wavyFunc);
 	functionMap.set("shk", shakyFunc);
+	functionMap.set("print_sprite", printSpriteFunc);
+	functionMap.set("print_tile", printTileFunc);
+	functionMap.set("print_item", printItemFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn) {
@@ -530,9 +562,9 @@ var FuncNode = function(name,arguments) {
 
 	this.Serialize = function(depth) {
 		var isDialogBlock = this.parent.mode && this.parent.mode === BlockMode.Dialog;
-		if(isDialogBlock && this.name === "say") {
-			// TODO this could cause problems with "real" say functions
-			return this.arguments[0].value; // first argument should be the text of the {say} func
+		if(isDialogBlock && this.name === "print") {
+			// TODO this could cause problems with "real" print functions
+			return this.arguments[0].value; // first argument should be the text of the {print} func
 		}
 		else if(isDialogBlock && this.name === "br") {
 			return "\n";
@@ -946,7 +978,7 @@ var Parser = function(env) {
 				// console.log("text!!");
 				// console.log([text]);
 
-				state.curNode.AddChild( new FuncNode( "say", [new LiteralNode(text)] ) );
+				state.curNode.AddChild( new FuncNode( "print", [new LiteralNode(text)] ) );
 				text = "";
 
 				hasDialog = true;

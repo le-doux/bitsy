@@ -376,6 +376,19 @@ function getPanelPrefs() {
 	return prefs;
 }
 
+var urlFlags = {};
+function readUrlFlags() {
+	console.log("@@@@@ FLAGGS")
+	var urlSplit = window.location.href.split("?");
+	if (urlSplit.length > 1) {
+		for(var i = 1; i < urlSplit.length; i++) {
+			var flagSplit = urlSplit[i].split("=");
+			urlFlags[ flagSplit[0] ] = flagSplit[1];
+		}
+	}
+	console.log(urlFlags);
+}
+
 function start() {
 	// Ed().platform = PlatformType.Mobile;
 
@@ -392,7 +405,12 @@ function start() {
 	if(Ed().platform === PlatformType.Desktop)
 		detectBrowserFeatures();
 
+	readUrlFlags();
+
 	// localization
+	if (urlFlags["lang"] != null) {
+		localStorage.editor_language = urlFlags["lang"]; // need to verify this is real language?
+	}
 	localization = new Localization( initLanguageOptions );
 
 	//game canvas & context (also the map editor)
@@ -527,6 +545,14 @@ function start() {
 	};
 
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
+
+	// LOAD bitmmap fonts
+	fontLoadSettings.useExternal = true;
+	fontLoadSettings.resources = new ResourceLoader();
+	fontLoadSettings.resources.load("bitsy_fonts", "bitsy_ascii.txt");
+	fontLoadSettings.resources.load("bitsy_fonts", "ucs_fixed_6x9.txt");
+	fontLoadSettings.resources.load("bitsy_fonts", "ucs_fixed_8x13.txt");
+	// TODO More
 
 	//color testing
 	// on_change_color_bg();
