@@ -1,12 +1,14 @@
 /* 
-font stuff:
-http://www.cl.cam.ac.uk/~mgk25/ucs-fonts.html
-- use BDF 5x7
-
+v5.0
+- localization
+- fonts
+- download file uses real game title
+- print_sprite, print_tile, print_item
+- print vs say
+- download game data
 
 TEST desktop editor:
 - feature: drag tools past edge of window
-- bug: gif text recording doesn't work
 - feature: visual room select
 - feature: copy sprites w/ room
 - bug: duplicate drawing -> weird thumbnail formatting
@@ -1717,6 +1719,7 @@ function on_game_data_change_core() {
 	var curPaintMode = drawing.type; //save current paint mode (hacky)
 
 	//fallback if there are no tiles, sprites, map
+	// TODO : switch to using stored default file data (requires separated parser / game data code)
 	if (Object.keys(sprite).length == 0) {
 		drawing.type = TileType.Avatar;
 		drawing.id = "A";
@@ -1785,9 +1788,36 @@ function on_game_data_change_core() {
 
 	updateInventoryUI();
 
+	updateFontSelectUI();
+
 	updateExitOptionsFromGameData();
 
 	document.getElementById("titleText").value = title;
+}
+
+function updateFontSelectUI() {
+	var fontSelect = document.getElementById("fontSelect");
+	// console.log("FONT SELECT");
+	// console.log(fontSelect);
+	for (var i in fontSelect.options) {
+		var fontOption = fontSelect.options[i];
+		console.log(fontOption);
+		console.log(fontOption.value + " === " + fontName);
+		fontOption.selected = fontOption.value === fontName;
+	}
+	updateFontDescriptionUI();
+}
+
+function updateFontDescriptionUI() {
+	for (var i in fontSelect.options) {
+		var fontOption = fontSelect.options[i];
+		var fontDescriptionId = fontOption.value + "_description";
+		console.log(fontDescriptionId);
+		var fontDescription = document.getElementById(fontDescriptionId);
+		if (fontDescription != null) {
+			fontDescription.style.display = fontOption.selected ? "block" : "none";
+		}
+	}
 }
 
 function updateExitOptionsFromGameData() {
@@ -1823,11 +1853,30 @@ function toggleWallUI(checked) {
 	document.getElementById("wallCheckboxIcon").innerHTML = checked ? "border_outer" : "border_clear";
 }
 
+function filenameFromGameTitle() {
+	var filename = title.replace(/[^a-zA-Z]/g, "_"); // replace non alphabet characters
+	filename = filename.toLowerCase();
+	filename = filename.substring(0,32); // keep it from getting too long
+	return filename;
+}
+
 function exportGame() {
 	refreshGameData(); //just in case
 	var gameData = document.getElementById("game_data").value; //grab game data
 	var size = document.getElementById("exportSizeFixedInput").value;
-	exporter.exportGame( gameData, title, export_settings.page_color, "mygame.html", isFixedSize, size ); //download as html file
+	exporter.exportGame( gameData, title, export_settings.page_color, filenameFromGameTitle() + ".html", isFixedSize, size ); //download as html file
+}
+
+function exportGameData() {
+	refreshGameData(); //just in case
+	var gameData = document.getElementById("game_data").value; //grab game data
+	ExporterUtils.DownloadFile( filenameFromGameTitle() + ".bitsy", gameData );
+}
+
+function exportFont() {
+	var fontData = fontLoadSettings.resources.get(fontName + ".txt"); // TODO switch to new file extension
+	console.log(fontData);
+	ExporterUtils.DownloadFile( fontName + ".bitsyfont", fontData );
 }
 
 function hideAbout() {
@@ -2315,6 +2364,8 @@ function finishRecordingGif(gif) {
 
 /* LOAD FROM FILE */
 function importGameFromFile(e) {
+	resetGameData();
+
 	// load file chosen by user
 	var files = e.target.files;
 	var file = files[0];
@@ -4015,6 +4066,12 @@ function chooseExportSizeFixed() {
 var localization;
 function on_change_language(e) {
 	localization.ChangeLanguage(e.target.value);
+}
+
+function on_change_font(e) {
+	fontName = e.target.value;
+	refreshGameData();
+	updateFontDescriptionUI();
 }
 
 function initLanguageOptions() {

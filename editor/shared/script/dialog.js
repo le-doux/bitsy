@@ -9,7 +9,9 @@ this.CreateBuffer = function() {
 };
 
 var DialogRenderer = function() {
-	var textboxInfo = { // TODO these all can change so it's weird to start at the defaults -- could cause problems
+
+	// TODO : refactor this eventually? remove everything from struct.. avoid the defaults?
+	var textboxInfo = {
 		img : null,
 		width : 104,
 		height : 8+4+2+5, //8 for text, 4 for top-bottom padding, 2 for line padding, 5 for arrow
@@ -17,49 +19,29 @@ var DialogRenderer = function() {
 		left : 12,
 		bottom : 12, //for drawing it from the bottom
 		font_scale : 0.5, // we draw font at half-size compared to everything else
-		font_width : 6, // default, but this will change
-		font_height : 8, // also default
 		padding_vert : 2,
 		padding_horz : 4,
 		arrow_height : 5,
-		// charsPerRow : 32
 	};
-	var font = null;
 
+	var font = null;
 	this.SetFont = function(f) {
 		font = f;
-		setFontDimensions( font.getWidth(), font.getHeight() );
+		textboxInfo.height = (textboxInfo.padding_vert * 3) + (relativeFontHeight() * 2) + textboxInfo.arrow_height;
+		textboxInfo.img = context.createImageData(textboxInfo.width*scale, textboxInfo.height*scale);
 	}
 
-	// new font dimension code
 	function textScale() {
 		return scale * textboxInfo.font_scale;
 	}
 
 	function relativeFontWidth() {
-		return Math.ceil( textboxInfo.font_width * textboxInfo.font_scale );
+		return Math.ceil( font.getWidth() * textboxInfo.font_scale );
 	}
 
 	function relativeFontHeight() {
-		return Math.ceil( textboxInfo.font_height * textboxInfo.font_scale );
+		return Math.ceil( font.getHeight() * textboxInfo.font_scale );
 	}
-
-	function recalcTextboxInfo() {
-		textboxInfo.height = (textboxInfo.padding_vert * 3) + (relativeFontHeight() * 2) + textboxInfo.arrow_height;
-		// textboxInfo.charsPerRow = Math.floor( (textboxInfo.width - (textboxInfo.padding_horz * 2)) / relativeFontWidth() );
-
-		// console.log( "CHARS PER ROW " + textboxInfo.charsPerRow );
-
-		textboxInfo.img = context.createImageData(textboxInfo.width*scale, textboxInfo.height*scale);
-	}
-
-	function setFontDimensions(width, height) {
-		textboxInfo.font_width = width;
-		textboxInfo.font_height = height;
-		recalcTextboxInfo();
-	}
-
-	// var font = new Font("testFont");
 
 	var context = null;
 	this.AttachContext = function(c) {
@@ -135,18 +117,12 @@ var DialogRenderer = function() {
 	this.DrawChar = function(char, row, col, leftPos) {
 		char.offset = {x:0, y:0};
 
-		// console.log("DRAW CHAR");
-		// console.log(col);
-
-		char.SetPosition(row,col); // TODO : replace
+		char.SetPosition(row,col);
 		char.ApplyEffects(effectTime);
 
-		// var charData = font.getChar( char.char );
 		var charData = char.bitmap;
 
-		var top = (4 * scale) + (row * 2 * scale) + (row * textboxInfo.font_height * text_scale) + Math.floor( char.offset.y );
-		// var left = (4 * scale) + (col * textboxInfo.font_width * text_scale) + Math.floor( char.offset.x );
-
+		var top = (4 * scale) + (row * 2 * scale) + (row * font.getHeight() * text_scale) + Math.floor( char.offset.y );
 		var left = (4 * scale) + (leftPos * text_scale) + Math.floor( char.offset.x );
 
 		var debug_r = Math.random() * 255;

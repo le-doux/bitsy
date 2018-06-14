@@ -15,6 +15,7 @@ var palette = {
 var ending = {};
 var variable = {}; // these are starting variable values -- they don't update (or I don't think they will)
 var playerId = "A";
+var fontName = "bitsy_ascii";
 
 var names = {
 	room : new Map(),
@@ -161,15 +162,15 @@ var curGameData = null;
 function load_game(game_data, startWithTitle) {
 	curGameData = game_data; //remember the current game (used to reset the game)
 
-	// move this around probably
-	var font = new Font("bitsy_ascii"); // hack
-	dialogBuffer.SetFont(font);
-	dialogRenderer.SetFont(font);
-
 	dialogBuffer.Reset();
 	scriptInterpreter.ResetEnvironment(); // ensures variables are reset -- is this the best way?
 
 	parseWorld(game_data);
+
+	// move this around probably
+	var font = new Font( fontName ); // hack
+	dialogBuffer.SetFont(font);
+	dialogRenderer.SetFont(font);
 
 	setInitialVariables();
 	renderImages();
@@ -1106,6 +1107,9 @@ function parseWorld(file) {
 		else if (getType(curLine) === "VAR") {
 			i = parseVariable(lines, i);
 		}
+		else if (getType(curLine) === "SET_FONT") {
+			i = parseFontName(lines, i);
+		}
 		else if (getType(curLine) === "!") {
 			i = parseFlag(lines, i);
 		}
@@ -1134,6 +1138,9 @@ function serializeWorld() {
 	for (f in flags) {
 		worldStr += "! " + f + " " + flags[f] + "\n";
 	}
+	worldStr += "\n"
+	/* FONT */
+	worldStr += "SET_FONT " + fontName + "\n";
 	worldStr += "\n"
 	/* PALETTE */
 	for (id in palette) {
@@ -1880,6 +1887,12 @@ function parseVariable(lines, i) {
 	return i;
 }
 
+function parseFontName(lines, i) {
+	fontName = getArg(lines[i], 1);
+	i++;
+	return i;
+}
+
 function parseFlag(lines, i) {
 	var id = getId(lines[i]);
 	var valStr = lines[i].split(" ")[2];
@@ -2032,7 +2045,6 @@ var isNarrating = false;
 var isEnding = false;
 var dialogModule = new Dialog();
 
-// var font = new Font("bitsy_ascii"); // hack
 var dialogRenderer = dialogModule.CreateRenderer();
 var dialogBuffer = dialogModule.CreateBuffer();
 
@@ -2086,6 +2098,9 @@ function startSpriteDialog(spriteId) {
 }
 
 function startDialog(dialogStr,scriptId) {
+	console.log("START DIALOG ");
+	console.log(dialogStr);
+
 	if(dialogStr.length <= 0) {
 		console.log("ON EXIT DIALOG -- startDialog 1");
 		onExitDialog();

@@ -46,6 +46,12 @@ this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, si
 	html = replaceTemplateMarker( html, "@@L", resources.get("dialog.js") );
 	html = replaceTemplateMarker( html, "@@E", resources.get("bitsy.js") );
 
+	// fonts
+	// (TODO : relies too much on global settings - move into parameter)
+	// TODO : ... these one letter markers are starting to get a little cryptic
+	html = replaceTemplateMarker( html, "@@N", fontName );
+	html = replaceTemplateMarker( html, "@@M", fontLoadSettings.resources.get(fontName + ".txt") );
+
 	html = replaceTemplateMarker( html, "@@D", gameData );
 
 	// console.log(html);
@@ -92,7 +98,7 @@ this.importGame = function( html ) {
 	}
 
 	// IMPORT : new style
-	var scriptStart = '<script type="bitsyGameData" id="exportedGameData">';
+	var scriptStart = '<script type="bitsyGameData" id="exportedGameData">\n';
 	var scriptEnd = '</script>';
 	i = html.indexOf( scriptStart );
 	console.log(i);

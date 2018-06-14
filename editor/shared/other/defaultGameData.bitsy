@@ -1,8 +1,10 @@
 Write your game's title here
 
-# BITSY VERSION 4.6
+# BITSY VERSION 4.9
 
 ! ROOM_FORMAT 1
+
+SET_FONT bitsy_ascii
 
 PAL 0
 0,82,204

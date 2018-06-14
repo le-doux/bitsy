@@ -87,7 +87,7 @@ function localize(language) {
 		if (locString) {
 			el.innerText = locString;
 		}
-		else {
+		else if (localizationStrings["en"][localizationId] != null) {
 			el.innerText = localizationStrings["en"][localizationId]; // fall back to english
 		}
 	}

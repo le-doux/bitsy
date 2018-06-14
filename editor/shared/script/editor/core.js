@@ -443,6 +443,7 @@ function resetGameData() {
 		updateExitOptionsFromGameData();
 		updateRoomName();
 		updateInventoryUI();
+		updateFontSelectUI(); // hmm is this really the place for this?
 
 		on_paint_avatar();
 		document.getElementById('paintOptionAvatar').checked = true;
