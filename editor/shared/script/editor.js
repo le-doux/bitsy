@@ -8,6 +8,7 @@ v5.0
 - print vs say
 - download game data
 - bug: reset doesn't reset game title
+- second frame starts looking the same as the first frame in animation
 
 TEST desktop editor:
 - feature: drag tools past edge of window
@@ -2592,16 +2593,15 @@ function removeItemAnimation() {
 }
 
 function addNewFrameToDrawing(drwId) {
-	var newFrame = [
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0]
-	];
+	// copy first frame data into new frame
+	var firstFrame = imageStore.source[ drwId ][0];
+	var newFrame = [];
+	for (var y = 0; y < tilesize; y++) {
+		newFrame.push([]);
+		for (var x = 0; x < tilesize; x++) {
+			newFrame[y].push( firstFrame[y][x] );
+		}
+	}
 	imageStore.source[ drwId ].push( newFrame );
 }
 
