@@ -1165,10 +1165,18 @@
 								<option value="bitsy_ascii">Bitsy ASCII</option>
 								<option value="ucs_fixed_6x9">UCS Fixed 6x9</option>
 								<option value="ucs_fixed_8x13">UCS Fixed 8x13</option>
+								<option value="custom">Custom Font - none</option>
 							</select>
-							<div id="bitsy_ascii_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Original Bitsy font - limited to ASCII characters. Only supports English character set.</div>
-							<div id="ucs_fixed_6x9_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Small font with wider unicode support than Bitsy ASCII. Supports most European scripts.</div>
-							<div id="ucs_fixed_8x13_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Larger font with wider unicode support than UCS Fixed 6x9. Supports all European scripts and some other character sets.</div>
+							<!-- TODO localize -->
+							<div id="bitsy_ascii_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Original Bitsy font - limited to ASCII characters. Only supports English character set.
+							</div>
+							<div id="ucs_fixed_6x9_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Small font with wider unicode support than Bitsy ASCII. Supports most European scripts.
+							</div>
+							<div id="ucs_fixed_8x13_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Larger font with wider unicode support than UCS Fixed 6x9. Supports all European scripts and some other character sets.
+							</div>
+							<div id="custom_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Upload your own custom font!
+								<input title="import font from bitsyfont file on your computer" type="file" onchange="importFontFromFile(event);"/>
+							</div>
 							<button title="download font file" class="color0" onclick="exportFont();">
 								<i class="material-icons">file_download</i>
 								<span class="localize download_font">download font</span>

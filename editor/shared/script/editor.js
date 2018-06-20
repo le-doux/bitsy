@@ -549,12 +549,13 @@ function start() {
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
 	// LOAD bitmmap fonts
-	fontLoadSettings.useExternal = true;
-	fontLoadSettings.resources = new ResourceLoader();
-	fontLoadSettings.resources.load("bitsy_fonts", "bitsy_ascii.txt");
-	fontLoadSettings.resources.load("bitsy_fonts", "ucs_fixed_6x9.txt");
-	fontLoadSettings.resources.load("bitsy_fonts", "ucs_fixed_8x13.txt");
-	// TODO More
+	fontManager.LoadResources(["bitsy_ascii.txt", "ucs_fixed_6x9.txt", "ucs_fixed_8x13.txt"]);
+	if (localStorage.custom_font != null) {
+		var fontStorage = JSON.parse(localStorage.custom_font);
+		fontManager.AddResource(fontStorage.name + ".txt", fontStorage.fontdata);
+	}
+	// TODO add asian font(s)
+	// TODO change font extension
 
 	//color testing
 	// on_change_color_bg();
@@ -1796,15 +1797,24 @@ function on_game_data_change_core() {
 }
 
 function updateFontSelectUI() {
+	var fontStorage = null;
+	if (localStorage.custom_font != null) {
+		fontStorage = JSON.parse(localStorage.custom_font);
+	}
+
 	var fontSelect = document.getElementById("fontSelect");
-	// console.log("FONT SELECT");
-	// console.log(fontSelect);
+
 	for (var i in fontSelect.options) {
 		var fontOption = fontSelect.options[i];
-		console.log(fontOption);
-		console.log(fontOption.value + " === " + fontName);
-		fontOption.selected = fontOption.value === fontName;
+		var fontOptionName = (fontOption.value === "custom" && fontStorage != null) ? fontStorage.name : fontOption.value;
+		fontOption.selected = fontOptionName === fontName;
+
+		if (fontOption.value === "custom" && fontStorage != null) {
+			var textSplit = fontOption.text.split("-");
+			fontOption.text = textSplit[0] + "- " + fontStorage.name;
+		}
 	}
+
 	updateFontDescriptionUI();
 }
 
@@ -1874,8 +1884,7 @@ function exportGameData() {
 }
 
 function exportFont() {
-	var fontData = fontLoadSettings.resources.get(fontName + ".txt"); // TODO switch to new file extension
-	console.log(fontData);
+	var fontData = fontManager.GetData(fontName);
 	ExporterUtils.DownloadFile( fontName + ".bitsyfont", fontData );
 }
 
@@ -2379,6 +2388,36 @@ function importGameFromFile(e) {
 		// change game data & reload everything
 		document.getElementById("game_data").value = gameDataStr;
 		on_game_data_change();
+	}
+}
+
+function importFontFromFile(e) {
+	// load file chosen by user
+	var files = e.target.files;
+	var file = files[0];
+	var reader = new FileReader();
+	reader.readAsText( file );
+
+	reader.onloadend = function() {
+		var fileText = reader.result;
+		console.log(fileText);
+
+		var customFontName = (fontManager.Create(fileText)).getName();
+
+		fontManager.AddResource(customFontName + ".txt", fileText);
+		fontName = customFontName; // bitsy engine setting
+
+		var fontStorage = {
+			name : customFontName,
+			fontdata : fileText
+		};
+		localStorage.custom_font = JSON.stringify(fontStorage);
+
+		refreshGameData();
+		updateFontSelectUI();
+
+		// TODO
+		// fontLoadSettings.resources.set("custom.txt", fileText); // hacky!!!
 	}
 }
 
@@ -4069,7 +4108,19 @@ function on_change_language(e) {
 }
 
 function on_change_font(e) {
-	fontName = e.target.value;
+	if (e.target.value != "custom") {
+		fontName = e.target.value;
+	}
+	else {
+		if (localStorage.custom_font != null) {
+			var fontStorage = JSON.parse(localStorage.custom_font);
+			fontName = fontStorage.name;
+		}
+		else {
+			// fallback
+			fontName = "bitsy_ascii";
+		}
+	}
 	refreshGameData();
 	updateFontDescriptionUI();
 }

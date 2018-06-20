@@ -404,6 +404,11 @@ function ResourceLoader() {
 	this.get = function(filename) {
 		return resources[filename];
 	}
+
+	// for manually adding stuff to the resources that doesn't ACTUALLY have to be loaded from an external file
+	this.set = function(filename,data) {
+		resources[filename] = data;
+	}
 }
 
 function createDefaultGameStateFunction() {

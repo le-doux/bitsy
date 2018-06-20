@@ -50,7 +50,7 @@ this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, si
 	// (TODO : relies too much on global settings - move into parameter)
 	// TODO : ... these one letter markers are starting to get a little cryptic
 	html = replaceTemplateMarker( html, "@@N", fontName );
-	html = replaceTemplateMarker( html, "@@M", fontLoadSettings.resources.get(fontName + ".txt") );
+	html = replaceTemplateMarker( html, "@@M", fontManager.GetData(fontName) );
 
 	html = replaceTemplateMarker( html, "@@D", gameData );
 

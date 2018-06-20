@@ -168,7 +168,7 @@ function load_game(game_data, startWithTitle) {
 	parseWorld(game_data);
 
 	// move this around probably
-	var font = new Font( fontName ); // hack
+	var font = fontManager.Get( fontName ); // hack
 	dialogBuffer.SetFont(font);
 	dialogRenderer.SetFont(font);
 
@@ -2044,9 +2044,9 @@ var isDialogMode = false;
 var isNarrating = false;
 var isEnding = false;
 var dialogModule = new Dialog();
-
 var dialogRenderer = dialogModule.CreateRenderer();
 var dialogBuffer = dialogModule.CreateBuffer();
+var fontManager = new FontManager();
 
 function onExitDialog() {
 	// var breakShit = null;
