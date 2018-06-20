@@ -456,6 +456,8 @@ function resetGameData() {
 
 	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
 	roomTool.drawEditMap();
+
+	document.getElementById("titleText").value = title;
 }
 
 function refreshGameData() {

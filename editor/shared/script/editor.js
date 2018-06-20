@@ -1,11 +1,13 @@
 /* 
 v5.0
+- new settings panel
 - localization
 - fonts
 - download file uses real game title
 - print_sprite, print_tile, print_item
 - print vs say
 - download game data
+- bug: reset doesn't reset game title
 
 TEST desktop editor:
 - feature: drag tools past edge of window
