@@ -7,14 +7,7 @@ TODO:
 - warn people about missing characters in fonts?
 - consider moving export options into settings panel??
 - X pick bitsy font file extension (".bitsyfont??")
-
-TODO custom font:
-- store custom font in browser memory
-- get name somehow?
-- display in UI (list)
-- make custom font accessible to game
-	- X in editor
-	- on export
+- X custom fonts
 */
 function FontManager() {
 
@@ -59,8 +52,8 @@ this.Get = function(fontName) {
 
 function Font(fontData) {
 	var name = "unknown";
-	var width = 0;
-	var height = 0;
+	var width = 6; // default size so if you have NO font or an invalid font it displays boxes
+	var height = 8;
 	var fontdata = {};
 
 	this.getName = function() {
@@ -89,13 +82,24 @@ function Font(fontData) {
 		}
 		else {
 			var invalidCharData = [];
-			for (var i = 0; i < width*height; i++)
-				invalidCharData.push(1);
+			for (var y = 0; y < height; y++) {
+				for (var x = 0; x < width; x++) {
+					if (x < width-1 && y < height-1) {
+						invalidCharData.push(1);
+					}
+					else {
+						invalidCharData.push(0);
+					}
+				}
+			}
 			return invalidCharData;
 		}
 	}
 
 	function parseFont(fontData) {
+		if (fontData == null)
+			return;
+
 		var lines = fontData.split("\n");
 
 		var isReadingChar = false;
