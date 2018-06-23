@@ -126,7 +126,11 @@ var key = {
 	a : 65,
 	s : 83,
 	d : 68,
-	r : 82
+	r : 82,
+	shift : 16,
+	ctrl : 17,
+	alt : 18,
+	cmd : 224
 };
 
 var prevTime = 0;
@@ -191,12 +195,16 @@ function onready(startWithTitle) {
 
 	clearInterval(loading_interval);
 
-	document.addEventListener('keydown', onkeydown);
-	document.addEventListener('keyup', onkeyup);
+	input = new InputManager();
 
-	canvas.addEventListener('touchstart', ontouchstart);
-	canvas.addEventListener('touchmove', ontouchmove);
-	canvas.addEventListener('touchend', ontouchend);
+	document.addEventListener('keydown', input.onkeydown);
+	document.addEventListener('keyup', input.onkeyup);
+
+	canvas.addEventListener('touchstart', input.ontouchstart);
+	canvas.addEventListener('touchmove', input.ontouchmove);
+	canvas.addEventListener('touchend', input.ontouchend);
+
+	canvas.addEventListener('onfocusout', input.onfocusout);
 
 	update_interval = setInterval(update,-1);
 
@@ -438,12 +446,12 @@ function getOffset(evt) {
 function stopGame() {
 	console.log("stop GAME!");
 
-	document.removeEventListener('keydown', onkeydown);
-	document.removeEventListener('keyup', onkeyup);
+	document.removeEventListener('keydown', input.onkeydown);
+	document.removeEventListener('keyup', input.onkeyup);
 
-	canvas.removeEventListener('touchstart', ontouchstart);
-	canvas.removeEventListener('touchmove', ontouchmove);
-	canvas.removeEventListener('touchend', ontouchend);
+	canvas.removeEventListener('touchstart', input.ontouchstart);
+	canvas.removeEventListener('touchmove', input.ontouchmove);
+	canvas.removeEventListener('touchend', input.ontouchend);
 
 	clearInterval(update_interval);
 }
@@ -537,6 +545,8 @@ function update() {
 	var curTime = Date.now();
 	deltaTime = curTime - prevTime;
 
+	updateInput();
+
 	if (!isNarrating && !isEnding) {
 		updateAnimation();
 		drawRoom( room[curRoom] ); // draw world if game has begun
@@ -588,6 +598,57 @@ function update() {
 	/* hacky replacement */
 	if (onDialogUpdate != null)
 		dialogRenderer.SetPageFinishHandler( onDialogUpdate );
+
+	input.resetKeyPressed();
+	input.resetTapReleased();
+}
+
+function updateInput() {
+	if( dialogBuffer.IsActive() ) {
+		if (input.anyKeyPressed() || input.isTapReleased()) {
+			/* CONTINUE DIALOG */
+			if (dialogBuffer.CanContinue()) {
+				var hasMoreDialog = dialogBuffer.Continue();
+				if(!hasMoreDialog) {
+					onExitDialog();
+				}
+			}
+			else {
+				dialogBuffer.Skip();
+			}
+		}
+	}
+	else if ( isEnding ) {
+		if (input.anyKeyPressed() || input.isTapReleased()) {
+			/* RESTART GAME */
+			reset_cur_game();
+		}
+	}
+	else {
+		/* WALK */
+		var prevPlayerDirection = curPlayerDirection;
+
+		if ( input.isKeyDown( key.left ) || input.isKeyDown( key.a ) || input.swipeLeft() ) {
+			curPlayerDirection = Direction.Left;
+		}
+		else if ( input.isKeyDown( key.right ) || input.isKeyDown( key.d ) || input.swipeRight() ) {
+			curPlayerDirection = Direction.Right;
+		}
+		else if ( input.isKeyDown( key.up ) || input.isKeyDown( key.w ) || input.swipeUp() ) {
+			curPlayerDirection = Direction.Up;
+		}
+		else if ( input.isKeyDown( key.down ) || input.isKeyDown( key.s ) || input.swipeDown() ) {
+			curPlayerDirection = Direction.Down;
+		}
+		else {
+			curPlayerDirection = Direction.None;
+		}
+
+		if (curPlayerDirection != Direction.None && curPlayerDirection != prevPlayerDirection) {
+			movePlayer( curPlayerDirection );
+			playerHoldToMoveTimer = 500;
+		}
+	}
 }
 
 var animationCounter = 0;
@@ -711,57 +772,36 @@ var Direction = {
 var curPlayerDirection = Direction.None;
 var playerHoldToMoveTimer = 0;
 
-var keyDownList = [];
+var InputManager = function() {
+	var self = this;
 
-function onkeydown(e) {
-	if(e.keyCode == key.left || e.keyCode == key.right || e.keyCode == key.up || e.keyCode == key.down || !isPlayerEmbeddedInEditor)
-		e.preventDefault();
+	var pressed;
+	var newKeyPress;
+	var touchInfo;
 
-	if( keyDownList.indexOf( e.keyCode ) != -1 ) {
-		// key already down --- do nothing
-		return;
+	function resetAll() {
+		pressed = {};
+		newKeyPress = false;
+
+		touchInfo = {
+			isDown : false,
+			startX : 0,
+			startY : 0,
+			curX : 0,
+			curY : 0,
+			swipeDistance : 30,
+			swipeDirection : Direction.None,
+			tapReleased : false
+		};
+	}
+	resetAll();
+
+	function stopWindowScrolling(e) {
+		if(e.keyCode == key.left || e.keyCode == key.right || e.keyCode == key.up || e.keyCode == key.down || !isPlayerEmbeddedInEditor)
+			e.preventDefault();
 	}
 
-	curPlayerDirection = Direction.None;
-
-	if( dialogBuffer.IsActive() ) {
-		/* CONTINUE DIALOG */
-		if (dialogBuffer.CanContinue()) {
-			var hasMoreDialog = dialogBuffer.Continue();
-			if(!hasMoreDialog) {
-				console.log("EXIT DIALOG --- onkeydown")
-				onExitDialog();
-			}
-		}
-		else {
-			dialogBuffer.Skip();
-		}
-	}
-	else if ( isEnding ) {
-		/* RESTART GAME */
-		reset_cur_game();
-	}
-	else {
-		/* WALK */
-		if ( e.keyCode == key.left || e.keyCode == key.a ) {
-			curPlayerDirection = Direction.Left;
-		}
-		else if ( e.keyCode == key.right || e.keyCode == key.d ) {
-			curPlayerDirection = Direction.Right;
-		}
-		else if ( e.keyCode == key.up || e.keyCode == key.w ) {
-			curPlayerDirection = Direction.Up;
-		}
-		else if ( e.keyCode == key.down || e.keyCode == key.s ) {
-			curPlayerDirection = Direction.Down;
-		}
-		movePlayer( curPlayerDirection );
-
-		if( curPlayerDirection != Direction.None )
-		{
-			playerHoldToMoveTimer = 500;
-		}
-
+	function tryRestartGame(e) {
 		/* RESTART GAME */
 		if ( e.keyCode === key.r && ( e.getModifierState("Control") || e.getModifierState("Meta") ) ) {
 			if ( confirm("Restart the game?") ) {
@@ -770,12 +810,138 @@ function onkeydown(e) {
 		}
 	}
 
-	if( keyDownList.indexOf( e.keyCode ) == -1 )
-		keyDownList.push( e.keyCode );
+	function eventIsModifier(event) {
+		return (event.keyCode == key.shift || event.keyCode == key.ctrl || event.keyCode == key.alt || event.keyCode == key.cmd);
+	}
 
-	console.log("KEY DOWN " + keyDownList.length );
-	console.log(keyDownList);
+	function isModifierKeyDown() {
+		return ( self.isKeyDown(key.shift) || self.isKeyDown(key.ctrl) || self.isKeyDown(key.alt) || self.isKeyDown(key.cmd) );
+	}
+
+	this.onkeydown = function(event) {
+		// console.log("KEYDOWN -- " + event.keyCode);
+
+		stopWindowScrolling(event);
+
+		tryRestartGame(event);
+
+		// Special keys being held down can interfere with keyup events and lock movement
+		// so just don't collect input when they're held
+		{
+			if (isModifierKeyDown()) {
+				return;
+			}
+
+			if (eventIsModifier(event)) {
+				resetAll();
+			}
+		}
+
+		if (!self.isKeyDown(event.keyCode)) {
+			newKeyPress = true;
+		}
+
+		pressed[event.keyCode] = true;
+	}
+
+	this.onkeyup = function(event) {
+		// console.log("KEYUP -- " + event.keyCode);
+		pressed[event.keyCode] = false;
+	}
+
+	this.ontouchstart = function(event) {
+		if( event.changedTouches.length > 0 ) {
+			touchInfo.isDown = true;
+
+			touchInfo.startX = touchInfo.curX = event.changedTouches[0].clientX;
+			touchInfo.startY = touchInfo.curY = event.changedTouches[0].clientY;
+
+			touchInfo.swipeDirection = Direction.None;
+		}
+	}
+
+	this.ontouchmove = function(event) {
+		if( touchInfo.isDown && event.changedTouches.length > 0 ) {
+			touchInfo.curX = event.changedTouches[0].clientX;
+			touchInfo.curY = event.changedTouches[0].clientY;
+
+			var prevDirection = touchInfo.swipeDirection;
+
+			if( touchInfo.curX - touchInfo.startX <= -touchInfo.swipeDistance ) {
+				touchInfo.swipeDirection = Direction.Left;
+			}
+			else if( touchInfo.curX - touchInfo.startX >= touchInfo.swipeDistance ) {
+				touchInfo.swipeDirection = Direction.Right;
+			}
+			else if( touchInfo.curY - touchInfo.startY <= -touchInfo.swipeDistance ) {
+				touchInfo.swipeDirection = Direction.Up;
+			}
+			else if( touchInfo.curY - touchInfo.startY >= touchInfo.swipeDistance ) {
+				touchInfo.swipeDirection = Direction.Down;
+			}
+
+			if( touchInfo.swipeDirection != prevDirection ) {
+				// reset center so changing directions is easier
+				touchInfo.startX = touchInfo.curX;
+				touchInfo.startY = touchInfo.curY;
+			}
+		}
+	}
+
+	this.ontouchend = function(event) {
+		touchInfo.isDown = false;
+
+		if( touchInfo.swipeDirection == Direction.None ) {
+			// tap!
+			touchInfo.tapReleased = true;
+		}
+
+		touchInfo.swipeDirection = Direction.None;
+	}
+
+	this.isKeyDown = function(keyCode) {
+		return pressed[keyCode] != null && pressed[keyCode] == true;
+	}
+
+	this.anyKeyPressed = function() {
+		return newKeyPress;
+	}
+
+	this.resetKeyPressed = function() {
+		newKeyPress = false;
+	}
+
+	this.swipeLeft = function() {
+		return touchInfo.swipeDirection == Direction.Left;
+	}
+
+	this.swipeRight = function() {
+		return touchInfo.swipeDirection == Direction.Right;
+	}
+
+	this.swipeUp = function() {
+		return touchInfo.swipeDirection == Direction.Up;
+	}
+
+	this.swipeDown = function() {
+		return touchInfo.swipeDirection == Direction.Down;
+	}
+
+	this.isTapReleased = function() {
+		return touchInfo.tapReleased;
+	}
+
+	this.resetTapReleased = function() {
+		touchInfo.tapReleased = false;
+	}
+
+	this.onfocusout = function() {
+		// TODO
+		console.log("~~~ LOST FOCUS ~~");
+		resetAll();
+	}
 }
+var input = null;
 
 function movePlayer(direction) {
 	var spr = null;
@@ -834,120 +1000,6 @@ function movePlayer(direction) {
 	else if (spr) {
 		startSpriteDialog( spr /*spriteId*/ );
 	}
-}
-
-function onkeyup(e) {
-
-	if(e.keyCode == key.left || e.keyCode == key.right || e.keyCode == key.up || e.keyCode == key.down || !isPlayerEmbeddedInEditor)
-		e.preventDefault();
-
-	if( keyDownList.indexOf( e.keyCode ) != -1 )
-		keyDownList.splice( keyDownList.indexOf( e.keyCode ), 1 );
-
-	// todo is this robust enough?
-	if( keyDownList.length <= 0 )
-		curPlayerDirection = Direction.None;
-
-	console.log(e.keyCode);
-	console.log("KEY UP " + keyDownList.length );
-	console.log(keyDownList);
-	console.log("_____");
-}
-
-var touchInfo = {
-	isDown : false,
-	startX : 0,
-	startY : 0,
-	curX : 0,
-	curY : 0
-};
-
-function ontouchstart(e) {
-	// e.preventDefault();
-
-	if( e.changedTouches.length > 0 ) {
-		touchInfo.isDown = true;
-
-		console.log(e);
-
-		touchInfo.startX = touchInfo.curX = e.changedTouches[0].clientX;
-		touchInfo.startY = touchInfo.curY = e.changedTouches[0].clientY;
-
-		console.log("MOUSE DOWN");
-		console.log(touchInfo);
-
-		curPlayerDirection = Direction.None;
-	}
-}
-
-var swipeDistance = 30;
-function ontouchmove(e) {
-	// e.preventDefault();
-
-	console.log("MOUSE MOVE");
-	console.log(touchInfo);
-
-	if( !dialogBuffer.IsActive() && touchInfo.isDown && e.changedTouches.length > 0 ) {
-		touchInfo.curX = e.changedTouches[0].clientX;
-		touchInfo.curY = e.changedTouches[0].clientY;
-
-		var prevDirection = curPlayerDirection;
-
-		console.log( touchInfo.curX - touchInfo.startX );
-
-		if( touchInfo.curX - touchInfo.startX <= -swipeDistance ) {
-			curPlayerDirection = Direction.Left;
-		}
-		else if( touchInfo.curX - touchInfo.startX >= swipeDistance ) {
-			curPlayerDirection = Direction.Right;
-		}
-		else if( touchInfo.curY - touchInfo.startY <= -swipeDistance ) {
-			curPlayerDirection = Direction.Up;
-		}
-		else if( touchInfo.curY - touchInfo.startY >= swipeDistance ) {
-			curPlayerDirection = Direction.Down;
-		}
-
-		if( curPlayerDirection != prevDirection ) {
-			movePlayer( curPlayerDirection );
-			playerHoldToMoveTimer = 300;
-			// reset center
-			touchInfo.startX = touchInfo.curX;
-			touchInfo.startY = touchInfo.curY;
-		}
-	}
-}
-
-function ontouchend(e) {
-	// e.preventDefault();
-
-	console.log("MOUSE UP");
-	console.log(touchInfo);
-
-	touchInfo.isDown = false;
-
-	if( curPlayerDirection == Direction.None ) {
-		// tap!
-		if( dialogBuffer.IsActive() ) {
-			/* CONTINUE DIALOG */
-			if (dialogBuffer.CanContinue()) {
-				var hasMoreDialog = dialogBuffer.Continue();
-				if(!hasMoreDialog) {
-					console.log("EXIT DIALOG --- onkeydown")
-					onExitDialog();
-				}
-			}
-			else {
-				dialogBuffer.Skip();
-			}
-		}
-		else if ( isEnding ) {
-			/* RESTART GAME */
-			reset_cur_game();
-		}
-	}
-
-	curPlayerDirection = Direction.None;
 }
 
 function getItemIndex( roomId, x, y ) {

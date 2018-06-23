@@ -8,6 +8,10 @@ TODO:
 - consider moving export options into settings panel??
 - X pick bitsy font file extension (".bitsyfont??")
 - X custom fonts
+
+MISC:
+- fix key-hold-down problem
+	- idea: create keypress manager object? http://nokarma.org/2011/02/27/javascript-game-development-keyboard-input/index.html
 */
 function FontManager() {
 
