@@ -204,7 +204,7 @@ function onready(startWithTitle) {
 	canvas.addEventListener('touchmove', input.ontouchmove);
 	canvas.addEventListener('touchend', input.ontouchend);
 
-	canvas.addEventListener('onfocusout', input.onfocusout);
+	window.onblur = input.onblur;
 
 	update_interval = setInterval(update,-1);
 
@@ -452,6 +452,8 @@ function stopGame() {
 	canvas.removeEventListener('touchstart', input.ontouchstart);
 	canvas.removeEventListener('touchmove', input.ontouchmove);
 	canvas.removeEventListener('touchend', input.ontouchend);
+
+	window.onblur = null;
 
 	clearInterval(update_interval);
 }
@@ -777,13 +779,13 @@ var InputManager = function() {
 
 	var pressed;
 	var newKeyPress;
-	var touchInfo;
+	var touchState;
 
 	function resetAll() {
 		pressed = {};
 		newKeyPress = false;
 
-		touchInfo = {
+		touchState = {
 			isDown : false,
 			startX : 0,
 			startY : 0,
@@ -851,52 +853,52 @@ var InputManager = function() {
 
 	this.ontouchstart = function(event) {
 		if( event.changedTouches.length > 0 ) {
-			touchInfo.isDown = true;
+			touchState.isDown = true;
 
-			touchInfo.startX = touchInfo.curX = event.changedTouches[0].clientX;
-			touchInfo.startY = touchInfo.curY = event.changedTouches[0].clientY;
+			touchState.startX = touchState.curX = event.changedTouches[0].clientX;
+			touchState.startY = touchState.curY = event.changedTouches[0].clientY;
 
-			touchInfo.swipeDirection = Direction.None;
+			touchState.swipeDirection = Direction.None;
 		}
 	}
 
 	this.ontouchmove = function(event) {
-		if( touchInfo.isDown && event.changedTouches.length > 0 ) {
-			touchInfo.curX = event.changedTouches[0].clientX;
-			touchInfo.curY = event.changedTouches[0].clientY;
+		if( touchState.isDown && event.changedTouches.length > 0 ) {
+			touchState.curX = event.changedTouches[0].clientX;
+			touchState.curY = event.changedTouches[0].clientY;
 
-			var prevDirection = touchInfo.swipeDirection;
+			var prevDirection = touchState.swipeDirection;
 
-			if( touchInfo.curX - touchInfo.startX <= -touchInfo.swipeDistance ) {
-				touchInfo.swipeDirection = Direction.Left;
+			if( touchState.curX - touchState.startX <= -touchState.swipeDistance ) {
+				touchState.swipeDirection = Direction.Left;
 			}
-			else if( touchInfo.curX - touchInfo.startX >= touchInfo.swipeDistance ) {
-				touchInfo.swipeDirection = Direction.Right;
+			else if( touchState.curX - touchState.startX >= touchState.swipeDistance ) {
+				touchState.swipeDirection = Direction.Right;
 			}
-			else if( touchInfo.curY - touchInfo.startY <= -touchInfo.swipeDistance ) {
-				touchInfo.swipeDirection = Direction.Up;
+			else if( touchState.curY - touchState.startY <= -touchState.swipeDistance ) {
+				touchState.swipeDirection = Direction.Up;
 			}
-			else if( touchInfo.curY - touchInfo.startY >= touchInfo.swipeDistance ) {
-				touchInfo.swipeDirection = Direction.Down;
+			else if( touchState.curY - touchState.startY >= touchState.swipeDistance ) {
+				touchState.swipeDirection = Direction.Down;
 			}
 
-			if( touchInfo.swipeDirection != prevDirection ) {
+			if( touchState.swipeDirection != prevDirection ) {
 				// reset center so changing directions is easier
-				touchInfo.startX = touchInfo.curX;
-				touchInfo.startY = touchInfo.curY;
+				touchState.startX = touchState.curX;
+				touchState.startY = touchState.curY;
 			}
 		}
 	}
 
 	this.ontouchend = function(event) {
-		touchInfo.isDown = false;
+		touchState.isDown = false;
 
-		if( touchInfo.swipeDirection == Direction.None ) {
+		if( touchState.swipeDirection == Direction.None ) {
 			// tap!
-			touchInfo.tapReleased = true;
+			touchState.tapReleased = true;
 		}
 
-		touchInfo.swipeDirection = Direction.None;
+		touchState.swipeDirection = Direction.None;
 	}
 
 	this.isKeyDown = function(keyCode) {
@@ -912,32 +914,31 @@ var InputManager = function() {
 	}
 
 	this.swipeLeft = function() {
-		return touchInfo.swipeDirection == Direction.Left;
+		return touchState.swipeDirection == Direction.Left;
 	}
 
 	this.swipeRight = function() {
-		return touchInfo.swipeDirection == Direction.Right;
+		return touchState.swipeDirection == Direction.Right;
 	}
 
 	this.swipeUp = function() {
-		return touchInfo.swipeDirection == Direction.Up;
+		return touchState.swipeDirection == Direction.Up;
 	}
 
 	this.swipeDown = function() {
-		return touchInfo.swipeDirection == Direction.Down;
+		return touchState.swipeDirection == Direction.Down;
 	}
 
 	this.isTapReleased = function() {
-		return touchInfo.tapReleased;
+		return touchState.tapReleased;
 	}
 
 	this.resetTapReleased = function() {
-		touchInfo.tapReleased = false;
+		touchState.tapReleased = false;
 	}
 
-	this.onfocusout = function() {
-		// TODO
-		console.log("~~~ LOST FOCUS ~~");
+	this.onblur = function() {
+		// console.log("~~~ BLUR ~~");
 		resetAll();
 	}
 }

@@ -9,6 +9,7 @@ v5.0
 - download game data
 - bug: reset doesn't reset game title
 - second frame starts looking the same as the first frame in animation
+- fix bug where player gets stuck moving in one direction
 
 TEST desktop editor:
 - feature: drag tools past edge of window
