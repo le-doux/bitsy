@@ -10,6 +10,7 @@ v5.0
 - bug: reset doesn't reset game title
 - second frame starts looking the same as the first frame in animation
 - fix bug where player gets stuck moving in one direction
+- touch controls work on whole page, not just game window
 
 TEST desktop editor:
 - feature: drag tools past edge of window

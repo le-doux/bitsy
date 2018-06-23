@@ -200,9 +200,16 @@ function onready(startWithTitle) {
 	document.addEventListener('keydown', input.onkeydown);
 	document.addEventListener('keyup', input.onkeyup);
 
-	canvas.addEventListener('touchstart', input.ontouchstart);
-	canvas.addEventListener('touchmove', input.ontouchmove);
-	canvas.addEventListener('touchend', input.ontouchend);
+	if (isPlayerEmbeddedInEditor) {
+		canvas.addEventListener('touchstart', input.ontouchstart);
+		canvas.addEventListener('touchmove', input.ontouchmove);
+		canvas.addEventListener('touchend', input.ontouchend);
+	}
+	else {
+		document.addEventListener('touchstart', input.ontouchstart);
+		document.addEventListener('touchmove', input.ontouchmove);
+		document.addEventListener('touchend', input.ontouchend);
+	}
 
 	window.onblur = input.onblur;
 
@@ -449,9 +456,16 @@ function stopGame() {
 	document.removeEventListener('keydown', input.onkeydown);
 	document.removeEventListener('keyup', input.onkeyup);
 
-	canvas.removeEventListener('touchstart', input.ontouchstart);
-	canvas.removeEventListener('touchmove', input.ontouchmove);
-	canvas.removeEventListener('touchend', input.ontouchend);
+	if (isPlayerEmbeddedInEditor) {
+		canvas.removeEventListener('touchstart', input.ontouchstart);
+		canvas.removeEventListener('touchmove', input.ontouchmove);
+		canvas.removeEventListener('touchend', input.ontouchend);
+	}
+	else {
+		document.removeEventListener('touchstart', input.ontouchstart);
+		document.removeEventListener('touchmove', input.ontouchmove);
+		document.removeEventListener('touchend', input.ontouchend);
+	}
 
 	window.onblur = null;
 
