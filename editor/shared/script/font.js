@@ -3,15 +3,14 @@ TODO:
 - fix SAY funcs on import old files
 - X download font data
 - asian fonts
+	- what size?
+	- which options?
+	- need to combine half-width & full-width fonts for full coverage
 - translate new text
 - warn people about missing characters in fonts?
 - consider moving export options into settings panel??
 - X pick bitsy font file extension (".bitsyfont??")
 - X custom fonts
-
-MISC:
-- fix key-hold-down problem
-	- idea: create keypress manager object? http://nokarma.org/2011/02/27/javascript-game-development-keyboard-input/index.html
 */
 function FontManager() {
 
@@ -85,7 +84,7 @@ function Font(fontData) {
 			return fontdata[codepoint];
 		}
 		else {
-			var invalidCharData = [];
+			var invalidCharData = []; // TODO : generate on intialization?
 			for (var y = 0; y < height; y++) {
 				for (var x = 0; x < width; x++) {
 					if (x < width-1 && y < height-1) {
