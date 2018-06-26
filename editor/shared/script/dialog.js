@@ -403,10 +403,16 @@ var DialogBuffer = function() {
 			this.width = font[0].getWidth();
 			this.height = font[0].getHeight();
 		}
-		else {
+		else if (font[1].hasChar(char)) {
 			this.bitmap = font[1].getChar(char);
 			this.width = font[1].getWidth();
 			this.height = font[1].getHeight();
+		}
+		else {
+			// invalid char from first font
+			this.bitmap = font[0].getChar(char);
+			this.width = font[0].getWidth();
+			this.height = font[0].getHeight();
 		}
 	}
 
@@ -436,6 +442,23 @@ var DialogBuffer = function() {
 		var width = 0;
 		for(var i = 0; i < charArray.length; i++) {
 			width += charArray[i].width;
+		}
+		return width;
+	}
+
+	function GetStringWidth(str) {
+		var width = 0;
+		for (var i = 0; i < str.length; i++) {
+			// hack
+			if (font[0].hasChar(str[i])) {
+				width += font[0].getWidth();
+			}
+			else if (font[1].hasChar(str[i])) {
+				width += font[1].getWidth();
+			}
+			else {
+				width += font[0].getWidth();
+			}
 		}
 		return width;
 	}
@@ -500,14 +523,17 @@ var DialogBuffer = function() {
 
 		for (var i = 0; i < words.length; i++) {
 			var word = words[i];
-			var wordLength = word.length + ((i == 0) ? 0 : 1);
 
-			wordLength = wordLength * font[0].getWidth(); // hack?
+			// var wordLength = word.length + ((i == 0) ? 0 : 1);
+			// wordLength = wordLength * font[0].getWidth(); // hack?
+
+			var wordWithPrecedingSpace = ((i == 0) ? "" : " ") + word;
+			var wordLength = GetStringWidth( wordWithPrecedingSpace );
+
 			var rowLength = GetCharArrayWidth(curRowArr);
 
 			if (rowLength + wordLength <= pixelsPerRow || rowLength <= 0) {
 				//stay on same row
-				var wordWithPrecedingSpace = ((i == 0) ? "" : " ") + word;
 				curRowArr = AddWordToCharArray( curRowArr, wordWithPrecedingSpace, activeTextEffects );
 			}
 			else if (curRowIndex == 0) {

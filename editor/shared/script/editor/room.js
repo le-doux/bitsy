@@ -241,9 +241,15 @@ function RoomTool(canvas) {
 
 		mapEditAnimationLoop =
 			setInterval( function() {
-				animationCounter = animationTime + 1; // hack
-				updateAnimation();
-				self.drawEditMap();
+				if (!isPlayMode) {
+					animationCounter = animationTime + 1; // hack
+					updateAnimation();
+					self.drawEditMap();
+				}
+				else {
+					console.log("BLINKY BUG :(");
+					self.unlistenEditEvents(); // hacky attempt to prevent blinky bug (not sure what the real cause is)
+				}
 			}, animationTime ); // update animation in map mode
 	}
 

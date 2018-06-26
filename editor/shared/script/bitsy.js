@@ -180,8 +180,9 @@ function load_game(game_data, startWithTitle) {
 
 	// test
 	fontList = [];
-	fontList.push( fontManager.Get( "ucs_fixed_18x18ja" ) );
-	fontList.push( fontManager.Get( "ucs_fixed_9x18" ) );
+	// fontList.push( fontManager.Get( "ucs_fixed_18x18ja" ) );
+	// fontList.push( fontManager.Get( "ucs_fixed_9x18" ) );
+	fontList.push( fontManager.Get( fontName ) );
 	dialogBuffer.SetFont(fontList);
 	dialogRenderer.SetFont(fontList);
 

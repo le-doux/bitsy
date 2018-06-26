@@ -5,14 +5,22 @@ TODO:
 - asian fonts
 	- what size?
 	- which options?
-	- need to combine half-width & full-width fonts for full coverage
-	- there is something wrong with the 18 size fonts - they are missing data
+	- need to combine half-width & full-width fonts for full coverage (success - experimentally)
+		- how do I handle multiple font sets in the file format? (or do I just abandon half-width characters)
+	- X there is something wrong with the 18 size fonts - they are missing data
+		- do I need to re-import all other fonts too?
 - translate new text
 - warn people about missing characters in fonts?
 - consider moving export options into settings panel??
 - X pick bitsy font file extension (".bitsyfont??")
 - X custom fonts
-- fix blinky bug in editor
+- X fix blinky bug in editor (it's as if clearInterval isn't called for the room renderer)
+- text direction?
+- update version number
+- update default game data
+
+test text
+你好！ 你好 吗 안녕 하세요, 당신은 어떠 세요 こんにち は世界ﾀ ﾁﾂﾃ ﾄ界ﾅﾆﾇ ﾈﾉ界ﾊﾍ カｶ界 안ㅠ hello
 */
 function FontManager() {
 
@@ -60,6 +68,7 @@ function Font(fontData) {
 	var width = 6; // default size so if you have NO font or an invalid font it displays boxes
 	var height = 8;
 	var fontdata = {};
+	var invalidCharData = [];
 
 	this.getName = function() {
 		return name;
@@ -82,7 +91,6 @@ function Font(fontData) {
 		return fontdata[codepoint] != null;
 	}
 
-	var charSize = 6 * 8;
 	this.getChar = function(char) {
 
 		var codepoint = char.charCodeAt(0);
@@ -91,17 +99,6 @@ function Font(fontData) {
 			return fontdata[codepoint];
 		}
 		else {
-			var invalidCharData = []; // TODO : generate on intialization?
-			for (var y = 0; y < height; y++) {
-				for (var x = 0; x < width; x++) {
-					if (x < width-1 && y < height-1) {
-						invalidCharData.push(1);
-					}
-					else {
-						invalidCharData.push(0);
-					}
-				}
-			}
 			return invalidCharData;
 		}
 	}
@@ -145,6 +142,19 @@ function Font(fontData) {
 				curCharLineCount++;
 				if (curCharLineCount >= height) {
 					isReadingChar = false;
+				}
+			}
+		}
+
+		// init invalid character box
+		invalidCharData = [];
+		for (var y = 0; y < height; y++) {
+			for (var x = 0; x < width; x++) {
+				if (x < width-1 && y < height-1) {
+					invalidCharData.push(1);
+				}
+				else {
+					invalidCharData.push(0);
 				}
 			}
 		}
