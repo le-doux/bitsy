@@ -162,6 +162,8 @@ function attachCanvas(c) {
 	dialogRenderer.AttachContext(ctx);
 }
 
+var fontList = [];
+
 var curGameData = null;
 function load_game(game_data, startWithTitle) {
 	curGameData = game_data; //remember the current game (used to reset the game)
@@ -172,9 +174,16 @@ function load_game(game_data, startWithTitle) {
 	parseWorld(game_data);
 
 	// move this around probably
-	var font = fontManager.Get( fontName ); // hack
-	dialogBuffer.SetFont(font);
-	dialogRenderer.SetFont(font);
+	// var font = fontManager.Get( fontName ); // hack
+	// dialogBuffer.SetFont(font);
+	// dialogRenderer.SetFont(font);
+
+	// test
+	fontList = [];
+	fontList.push( fontManager.Get( "ucs_fixed_18x18ja" ) );
+	fontList.push( fontManager.Get( "ucs_fixed_9x18" ) );
+	dialogBuffer.SetFont(fontList);
+	dialogRenderer.SetFont(fontList);
 
 	setInitialVariables();
 	renderImages();

@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-fs.readFile("6x9.bdf", "utf8", function(err, data) {
+fs.readFile("9x18.bdf", "utf8", function(err, data) {
 	// console.log(data);
 
 	var lines = data.split("\n");
@@ -10,10 +10,10 @@ fs.readFile("6x9.bdf", "utf8", function(err, data) {
 	var bitList = [];
 	var fontData = {};
 
-	var name = "ucs_fixed_6x9"
-	var width = 6;
-	var height = 9;
-	var offset = (Math.ceil(width/4)*4) - width;
+	var name = "ucs_fixed_9x18"
+	var width = 9;
+	var height = 18;
+	// var offset = (Math.ceil(width/4)*4) - width; // old formula here is broken
 
 	for (var i = 0; i < lines.length; i++) {
 		var line = lines[i];
@@ -29,6 +29,7 @@ fs.readFile("6x9.bdf", "utf8", function(err, data) {
 		}
 
 		if (isReadingBitmap) {
+			var offset = (line.length * 4) - width; // more accurate to calculate offset based on the char count per line
 			var hexInt = parseInt("0x" + line);
 			
 			for (var j = (width-1); j >= 0; j--) {
@@ -63,6 +64,6 @@ fs.readFile("6x9.bdf", "utf8", function(err, data) {
 
 	// console.log(JSON.stringify(fontData));
 
-	fs.writeFile(name + "_font.txt", strFontData);
+	fs.writeFile(name + ".txt", strFontData);
 
 });

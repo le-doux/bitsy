@@ -6,11 +6,13 @@ TODO:
 	- what size?
 	- which options?
 	- need to combine half-width & full-width fonts for full coverage
+	- there is something wrong with the 18 size fonts - they are missing data
 - translate new text
 - warn people about missing characters in fonts?
 - consider moving export options into settings panel??
 - X pick bitsy font file extension (".bitsyfont??")
 - X custom fonts
+- fix blinky bug in editor
 */
 function FontManager() {
 
@@ -73,6 +75,11 @@ function Font(fontData) {
 
 	this.getHeight = function() {
 		return height;
+	}
+
+	this.hasChar = function(char) {
+		var codepoint = char.charCodeAt(0);
+		return fontdata[codepoint] != null;
 	}
 
 	var charSize = 6 * 8;
