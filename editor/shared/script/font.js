@@ -18,6 +18,8 @@ TODO:
 - text direction?
 - update version number
 - update default game data
+- another pass on font names & descriptions
+- change ".txt" to ".bitsyfont" everywhere
 
 test text
 你好！ 你好 吗 안녕 하세요, 당신은 어떠 세요 こんにち は世界ﾀ ﾁﾂﾃ ﾄ界ﾅﾆﾇ ﾈﾉ界ﾊﾍ カｶ界 안ㅠ hello

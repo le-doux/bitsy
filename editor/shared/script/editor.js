@@ -11,6 +11,7 @@ v5.0
 - second frame starts looking the same as the first frame in animation
 - fix bug where player gets stuck moving in one direction
 - touch controls work on whole page, not just game window
+- fix blinky bug (I hope)
 
 TEST desktop editor:
 - feature: drag tools past edge of window

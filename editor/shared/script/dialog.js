@@ -36,11 +36,11 @@ var DialogRenderer = function() {
 	}
 
 	function relativeFontWidth() {
-		return Math.ceil( font[0].getWidth() * textboxInfo.font_scale );
+		return Math.ceil( font.getWidth() * textboxInfo.font_scale );
 	}
 
 	function relativeFontHeight() {
-		return Math.ceil( font[0].getHeight() * textboxInfo.font_scale );
+		return Math.ceil( font.getHeight() * textboxInfo.font_scale );
 	}
 
 	var context = null;
@@ -122,7 +122,7 @@ var DialogRenderer = function() {
 
 		var charData = char.bitmap;
 
-		var top = (4 * scale) + (row * 2 * scale) + (row * font[0].getHeight() * text_scale) + Math.floor( char.offset.y );
+		var top = (4 * scale) + (row * 2 * scale) + (row * font.getHeight() * text_scale) + Math.floor( char.offset.y );
 		var left = (4 * scale) + (leftPos * text_scale) + Math.floor( char.offset.x );
 
 		var debug_r = Math.random() * 255;
@@ -393,27 +393,9 @@ var DialogBuffer = function() {
 	function DialogFontChar(font, char, effectList) {
 		Object.assign(this, new DialogChar(effectList));
 
-		// this.bitmap = font.getChar(char);
-		// this.width = font.getWidth();
-		// this.height = font.getHeight();
-
-		// hack test
-		if (font[0].hasChar(char)) {
-			this.bitmap = font[0].getChar(char);
-			this.width = font[0].getWidth();
-			this.height = font[0].getHeight();
-		}
-		else if (font[1].hasChar(char)) {
-			this.bitmap = font[1].getChar(char);
-			this.width = font[1].getWidth();
-			this.height = font[1].getHeight();
-		}
-		else {
-			// invalid char from first font
-			this.bitmap = font[0].getChar(char);
-			this.width = font[0].getWidth();
-			this.height = font[0].getHeight();
-		}
+		this.bitmap = font.getChar(char);
+		this.width = font.getWidth();
+		this.height = font.getHeight();
 	}
 
 	function DialogDrawingChar(drawingId, effectList) {
@@ -449,16 +431,7 @@ var DialogBuffer = function() {
 	function GetStringWidth(str) {
 		var width = 0;
 		for (var i = 0; i < str.length; i++) {
-			// hack
-			if (font[0].hasChar(str[i])) {
-				width += font[0].getWidth();
-			}
-			else if (font[1].hasChar(str[i])) {
-				width += font[1].getWidth();
-			}
-			else {
-				width += font[0].getWidth();
-			}
+			width += font.getWidth();
 		}
 		return width;
 	}
@@ -523,9 +496,6 @@ var DialogBuffer = function() {
 
 		for (var i = 0; i < words.length; i++) {
 			var word = words[i];
-
-			// var wordLength = word.length + ((i == 0) ? 0 : 1);
-			// wordLength = wordLength * font[0].getWidth(); // hack?
 
 			var wordWithPrecedingSpace = ((i == 0) ? "" : " ") + word;
 			var wordLength = GetStringWidth( wordWithPrecedingSpace );

@@ -173,18 +173,9 @@ function load_game(game_data, startWithTitle) {
 
 	parseWorld(game_data);
 
-	// move this around probably
-	// var font = fontManager.Get( fontName ); // hack
-	// dialogBuffer.SetFont(font);
-	// dialogRenderer.SetFont(font);
-
-	// test
-	fontList = [];
-	// fontList.push( fontManager.Get( "ucs_fixed_18x18ja" ) );
-	// fontList.push( fontManager.Get( "ucs_fixed_9x18" ) );
-	fontList.push( fontManager.Get( fontName ) );
-	dialogBuffer.SetFont(fontList);
-	dialogRenderer.SetFont(fontList);
+	var font = fontManager.Get( fontName );
+	dialogBuffer.SetFont(font);
+	dialogRenderer.SetFont(font);
 
 	setInitialVariables();
 	renderImages();
@@ -1150,10 +1141,17 @@ function parseWorld(file) {
 
 		// console.log(lines[i]);
 
+		var versionNumber = 0;
+
 		if (i == 0) {
 			i = parseTitle(lines, i);
 		}
 		else if (curLine.length <= 0 || curLine.charAt(0) === "#") {
+			// collect version number
+			if (curLine.indexOf("# BITSY VERSION ") != -1) {
+				versionNumber = parseFloat(curLine.replace("# BITSY VERSION ", "")); // TODO : how do I do stuff with this?
+			}
+
 			//skip blank lines & comments
 			i++;
 		}
