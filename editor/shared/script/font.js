@@ -18,8 +18,9 @@ TODO:
 - text direction?
 - update version number
 - update default game data
-- another pass on font names & descriptions
-- change ".txt" to ".bitsyfont" everywhere
+X another pass on font names & descriptions
+	X unicode vs ucs
+X change ".txt" to ".bitsyfont" everywhere
 
 test text
 你好！ 你好 吗 안녕 하세요, 당신은 어떠 세요 こんにち は世界ﾀ ﾁﾂﾃ ﾄ界ﾅﾆﾇ ﾈﾉ界ﾊﾍ カｶ界 안ㅠ hello
@@ -33,7 +34,7 @@ this.LoadResources = function(filenames) {
 	// NOTE : only used by the editor -- should I move this out somehow so it isn't sitting in the exported games?
 	externalResources = new ResourceLoader(); // WARNING : this class doesn't exist in exported game
 	for (var i = 0; i < filenames.length; i++) {
-		externalResources.load("bitsy_fonts", filenames[i]);
+		externalResources.load("bitsyfont", filenames[i]);
 	}
 }
 

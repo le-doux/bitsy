@@ -555,7 +555,13 @@ function start() {
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
 	// LOAD bitmmap fonts
-	fontManager.LoadResources(["ascii_small.bitsyfont", "ucs_euro_small.bitsyfont", "ucs_euro_large.bitsyfont", "ucs_asian.bitsyfont"]);
+	fontManager.LoadResources([
+		"ascii_small.bitsyfont",
+		"unicode_european_small.bitsyfont",
+		"unicode_european_large.bitsyfont",
+		"unicode_asian.bitsyfont"
+	]);
+
 	if (localStorage.custom_font != null) {
 		var fontStorage = JSON.parse(localStorage.custom_font);
 		fontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
