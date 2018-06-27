@@ -555,13 +555,11 @@ function start() {
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
 	// LOAD bitmmap fonts
-	fontManager.LoadResources(["bitsy_ascii.txt", "ucs_fixed_6x9.txt", "ucs_fixed_8x13.txt", "ucs_fixed_18x18ja.txt", "ucs_fixed_9x18.txt"]);
+	fontManager.LoadResources(["ascii_small.bitsyfont", "ucs_euro_small.bitsyfont", "ucs_euro_large.bitsyfont", "ucs_asian.bitsyfont"]);
 	if (localStorage.custom_font != null) {
 		var fontStorage = JSON.parse(localStorage.custom_font);
-		fontManager.AddResource(fontStorage.name + ".txt", fontStorage.fontdata);
+		fontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
 	}
-	// TODO add asian font(s)
-	// TODO change font extension
 
 	//color testing
 	// on_change_color_bg();

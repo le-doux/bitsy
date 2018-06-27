@@ -26,7 +26,7 @@ test text
 */
 function FontManager() {
 
-var fontExtension = ".txt";
+var fontExtension = ".bitsyfont";
 
 var externalResources = null;
 this.LoadResources = function(filenames) {

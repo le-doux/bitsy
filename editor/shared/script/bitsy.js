@@ -15,7 +15,7 @@ var palette = {
 var ending = {};
 var variable = {}; // these are starting variable values -- they don't update (or I don't think they will)
 var playerId = "A";
-var fontName = "bitsy_ascii";
+var fontName = "ascii_small";
 
 var names = {
 	room : new Map(),
@@ -161,8 +161,6 @@ function attachCanvas(c) {
 	ctx = canvas.getContext("2d");
 	dialogRenderer.AttachContext(ctx);
 }
-
-var fontList = [];
 
 var curGameData = null;
 function load_game(game_data, startWithTitle) {

@@ -1162,20 +1162,22 @@
 						<div class="controlBox">
 							<span class="localize font_label">font</span>:
 							<select id="fontSelect" onchange="on_change_font(event);">
-								<option value="bitsy_ascii">Bitsy ASCII</option>
-								<option value="ucs_fixed_6x9">UCS Fixed 6x9</option>
-								<option value="ucs_fixed_8x13">UCS Fixed 8x13</option>
-								<option value="ucs_fixed_18x18ja">UCS Fixed 18x18 Japanese</option>
+								<option value="ascii_small">ASCII Small</option>
+								<option value="ucs_euro_small">UCS European Small</option>
+								<option value="ucs_euro_large">UCS European Large</option>
+								<option value="ucs_asian">UCS Asian</option>
 								<option value="custom">Custom Font - none</option>
 							</select>
 							<!-- TODO localize -->
-							<div id="bitsy_ascii_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Original Bitsy font - limited to ASCII characters. Only supports English character set.
+							<div id="ascii_small_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Small font limited to ASCII, which includes English characters and some symbols.
 							</div>
-							<div id="ucs_fixed_6x9_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Small font with wider unicode support than Bitsy ASCII. Supports most European scripts.
+							<div id="ucs_euro_small_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Small font with some unicode support. Includes characters for most European languages.
 							</div>
-							<div id="ucs_fixed_8x13_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Larger font with wider unicode support than UCS Fixed 6x9. Supports all European scripts and some other character sets.
+							<div id="ucs_euro_large_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Large font with more unicode support. Includes characters for all European languages.
 							</div>
-							<div id="custom_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Upload your own custom font!
+							<div id="ucs_asian_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Large font which includes characters for Asian languages such as Chinese, Japanese, and Korean.
+							</div>
+							<div id="custom_description" style="font-size: 14px; width: 300px; white-space: pre-wrap;">Upload your own custom font in the ".bitsyfont" format!
 								<input title="import font from bitsyfont file on your computer" type="file" onchange="importFontFromFile(event);"/>
 							</div>
 							<button title="download font file" class="color0" onclick="exportFont();">
