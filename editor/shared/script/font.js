@@ -2,13 +2,7 @@
 TODO:
 - fix SAY funcs on import old files
 - X download font data
-- asian fonts
-	- what size?
-	- which options?
-	- need to combine half-width & full-width fonts for full coverage (success - experimentally)
-		- how do I handle multiple font sets in the file format? (or do I just abandon half-width characters)
-	- X there is something wrong with the 18 size fonts - they are missing data
-		- do I need to re-import all other fonts too?
+- X asian fonts
 - translate new text
 - warn people about missing characters in fonts?
 - consider moving export options into settings panel??

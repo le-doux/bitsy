@@ -4114,6 +4114,16 @@ function chooseExportSizeFixed() {
 var localization;
 function on_change_language(e) {
 	localization.ChangeLanguage(e.target.value);
+
+	// update font too
+	// TODO : switch to asian characters when we get asian language translations of editor
+	if (e.target.value === "en") {
+		fontName = "ascii_small";
+	}
+	else {
+		fontName = "unicode_european_small";
+	}
+	updateFontSelectUI();
 }
 
 function on_change_font(e) {
