@@ -435,6 +435,9 @@ function newGameDialog() {
 function resetGameData() {
 	setDefaultGameState();
 
+	// TODO : localize default_title
+	title = localization.GetStringOrFallback("default_title", "Write your game's title here");
+
 	// todo wrap these variable resets in a function
 	tileIndex = 0;
 	spriteIndex = 0;

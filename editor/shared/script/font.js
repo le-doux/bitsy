@@ -4,6 +4,8 @@ TODO:
 - X download font data
 - X asian fonts
 - translate new text
+	- X add "Write your game's title here"
+	- make sure localization for all font & settings stuff is there
 - warn people about missing characters in fonts?
 - consider moving export options into settings panel??
 - X pick bitsy font file extension (".bitsyfont??")

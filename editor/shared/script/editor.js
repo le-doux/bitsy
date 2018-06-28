@@ -4114,10 +4114,20 @@ function chooseExportSizeFixed() {
 var localization;
 function on_change_language(e) {
 	localization.ChangeLanguage(e.target.value);
+	pickDefaultFontForLanguage(e.target.value);
 
-	// update font too
+	// update title in new language IF the user hasn't made any changes to the default title
+	if (localization.LocalizationContains("default_title", title)) {
+		// TODO : localize default_title
+		title = localization.GetStringOrFallback("default_title", "Write your game's title here");
+		refreshGameData();
+		document.getElementById("titleText").value = title;
+	}
+}
+
+function pickDefaultFontForLanguage(lang) {
 	// TODO : switch to asian characters when we get asian language translations of editor
-	if (e.target.value === "en") {
+	if (lang === "en") {
 		fontName = "ascii_small";
 	}
 	else {

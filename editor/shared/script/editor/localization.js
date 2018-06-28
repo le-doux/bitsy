@@ -165,6 +165,17 @@ this.GetStringOrFallback = function(id, englishFallback) {
 	return getStringOrFallback(id,englishFallback);
 }
 
+function localizationContains(id, text) { // TODO : rename to be more descriptive?
+	for (lang in localizationStrings) {
+		if (localizationStrings[lang][id] === text) {
+			return true;
+		}
+	}
+
+	return false;
+}
+this.LocalizationContains = localizationContains;
+
 function exportEnglishStringsDictionary(englishStrings) {
 	var englishStringTsv = "id\ten\n";
 	for(var stringId in englishStrings) {
