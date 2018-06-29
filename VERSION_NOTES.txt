@@ -1,5 +1,16 @@
-4.9:
+5.0:
+- editor translated into French, Portuguese, Spanish, Italian, Swedish, German
+- new fonts to display European and Asian characters
 - new settings panel!
+- functions to add drawings to dialog: {print_sprite}, {print_tile}, {print_item}
+- {print} function replaces deprecated {say} function
+- downloaded game uses game title for file name
+- when creating animations, the second frame starts as a copy of the first
+- touch controls work on whole exported page, not just the game window
+- you can download game data as separate ".bitsy" file
+- bugfix: reset didn't reset game title
+- bugfix: player got stuck moving in one direction
+- bugfix: sometimes game window blinked in editor during play
 
 4.8:
 - fix broken gif recording

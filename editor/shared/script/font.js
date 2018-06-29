@@ -1,27 +1,3 @@
-/*
-TODO:
-- X fix SAY funcs on import old files
-- X download font data
-- X asian fonts
-- X translate new text
-	- X add "Write your game's title here"
-	- X make sure localization for all font & settings stuff is there
-- X warn people about missing characters in fonts?
-	- X localize warning!!
-- X consider moving export options into settings panel??
-- X pick bitsy font file extension (".bitsyfont??")
-- X custom fonts
-- X fix blinky bug in editor (it's as if clearInterval isn't called for the room renderer)
-- text direction?
-- update version number
-- update default game data
-X another pass on font names & descriptions
-	X unicode vs ucs
-X change ".txt" to ".bitsyfont" everywhere
-
-test text
-你好！ 你好 吗 안녕 하세요, 당신은 어떠 세요 こんにち は世界ﾀ ﾁﾂﾃ ﾄ界ﾅﾆﾇ ﾈﾉ界ﾊﾍ カｶ界 안ㅠ hello
-*/
 function FontManager() {
 
 var fontExtension = ".bitsyfont";

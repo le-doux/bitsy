@@ -1,18 +1,4 @@
-/* 
-v5.0
-- new settings panel
-- localization
-- fonts
-- download file uses real game title
-- print_sprite, print_tile, print_item
-- print vs say
-- download game data
-- bug: reset doesn't reset game title
-- second frame starts looking the same as the first frame in animation
-- fix bug where player gets stuck moving in one direction
-- touch controls work on whole page, not just game window
-- fix blinky bug (I hope)
-
+/*
 TEST desktop editor:
 - feature: drag tools past edge of window
 - feature: visual room select
@@ -361,8 +347,8 @@ function getPanelPrefs() {
 	// (TODO: weird that engine version and editor version are the same??)
 	var useDefaultPrefs = ( localStorage.engine_version == null ) ||
 							( localStorage.panel_prefs == null ) ||
-							( JSON.parse(localStorage.engine_version).major < 4 ) ||
-							( JSON.parse(localStorage.engine_version).minor < 9 );
+							( JSON.parse(localStorage.engine_version).major < 5 ) ||
+							( JSON.parse(localStorage.engine_version).minor < 0 );
 	console.log("USE DEFAULT?? " + useDefaultPrefs);
 	var prefs = useDefaultPrefs ? defaultPanelPrefs : JSON.parse( localStorage.panel_prefs );
 	// add missing panel prefs (if any)

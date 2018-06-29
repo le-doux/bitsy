@@ -210,7 +210,7 @@
 						<div title="about window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">favorite</i>
 							<span class="localize about_tool_title">about bitsy</span>
-							 v4.9
+							 v5.0
 						</div>
 					</div>
 					<div id="aboutInner">
@@ -332,80 +332,26 @@
 							<input type="checkbox" id="versionNotesCheck" onclick="toggleVersionNotes(event);"/>
 							<label title="show / hide version notes" for="versionNotesCheck">
 								<span class="localize version_notes_title">what's new in</span>
-								 v4.9
+								 v5.0
 								<i id="versionNotesCheckIcon" class="material-icons">expand_less</i>
 							</label>
 
 							<div id="versionNotes" style="display:none;">
 								<br>
-								4.9:<br>
+								5.0:<br>
+								- editor translated into French, Portuguese, Spanish, Italian, Swedish, German<br>
+								- new fonts to display European and Asian characters<br>
 								- new settings panel!<br>
-								<br>
-								4.8:<br>
-								- fix broken gif recording<br>
-								- add gif snapshot! (take screenshot of current room)<br>
-								-- alt-click for widescreen snapshot<br>
-								- fix bug with reset game<br>
-								<br>
-								4.7:<br>
-								- alt-click tiles in a room to edit them in the paint tool!<br>
-								<br>
-								4.6:<br>
-								- filter drawings by name!<br>
-								- fix importing new-style html<br>
-								<br>
-								v4.5:<br>
-								- new color picker tool<br>
-								- page export color saved between sessions<br>
-								- updated tools bar<br>
-								- bugfix: wall visualization was broken<br>
-								<br>
-								v4.4:<br>
-								- wall settings for tiles apply to all rooms by default<br>
-								- bugfix: error on walking into edge of room<br>
-								<br>
-								v4.3:<br>
-								- new swipe & tap mobile controls<br>
-								- mobile-friendly full page game window<br>
-								- adjustable game window size settings<br>
-								<br>
-								v4.2:<br>
-								- dialog text fields are expandable<br>
-								- the find drawing window is resizable<br>
-								- add drawings in the find drawing window<br>
-								~~~~<br>
-								- bugs fixed:<br>
-								-- when you deleted a room, exits weren't deleted<br>
-								-- when you deleted a room, exit options didn't update<br>
-								-- find drawing window didn't update correctly when <br>drawing deleted<br>
-								-- dialog wasn't delete when sprite was<br>
-								-- tiles were being named "undefined"<br>
-								-- find drawing window didn't refresh on new game<br>
-								<br>
-								v4.1:<br>
-								- bugfix: sometimes new dialog would overwrite old dialog<br>
-								<br>
-								v4.0:<br>
-								- advanced dialog options, including:<br>
-								-> dialog that changes each time it's said<br>
-								-> dialog that changes based on items player has<br>
-								~~~~~<br>
-								- special effects for dialog, including:<br>
-								-> shaky text<br>
-								-> wavy text<br>
-								-> rainbow text<br>
-								~~~~~<br>
-								- items<br>
-								- inventory<br>
-								~~~~~<br>
-								- you can name objects, including:<br>
-								-> items<br>
-								-> rooms<br>
-								-> palettes<br>
-								~~~~~<br>
-								- dialog scripting language with variables<br>
-								- bugfix: newline characters work in dialog<br>
-								- additional bugfixes<br>
+								- functions to add drawings to dialog: {print_sprite}, {print_tile}, {print_item}<br>
+								- {print} function replaces deprecated {say} function<br>
+								- downloaded game uses game title for file name<br>
+								- when creating animations, the second frame starts as a copy of the first<br>
+								- touch controls work on whole exported page, not just the game window<br>
+								- you can download game data as separate ".bitsy" file<br>
+								- bugfix: reset didn't reset game title<br>
+								- bugfix: player got stuck moving in one direction<br>
+								- bugfix: sometimes game window blinked in editor during play<br>
+								<!-- TODO : add volunteer names -->
 							</div>
 						</div>
 					</div>
