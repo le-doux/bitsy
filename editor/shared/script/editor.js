@@ -1725,9 +1725,59 @@ function on_game_data_change() {
 	refreshGameData();
 }
 
+function convertGameDataToCurVersion(importVersion) {
+	if (importVersion < 5.0) {
+		console.log("version under 5!!!!");
+
+		var PrintFunctionVisitor = function() {
+			var didChange = false;
+			this.DidChange = function() { return didChange; };
+
+			this.Visit = function(node) {
+				if ( node.type != "function" )
+					return;
+
+				console.log("VISIT " + node.name);
+
+				if ( node.name === "say" ) {
+					node.name = "print";
+					didChange = true;
+				}
+			};
+		};
+
+		for(dlgId in dialog) {
+			console.log("DLG " + dlgId);
+			var dialogScript = scriptInterpreter.Parse( dialog[dlgId] );
+			var visitor = new PrintFunctionVisitor();
+			dialogScript.VisitAll( visitor );
+			if( visitor.DidChange() ) {
+				console.log("CHANGE!");
+				console.log(dialog[dlgId]);
+				var newDialog = dialogScript.Serialize();
+				if(newDialog.indexOf("\n") > -1)
+					newDialog = '"""\n' + newDialog + '\n"""';
+				dialog[dlgId] = newDialog;
+				console.log(dialog[dlgId]);
+			}
+		}
+
+		{
+			var titleScript = scriptInterpreter.Parse( title );
+			var visitor = new PrintFunctionVisitor();
+			titleScript.VisitAll( visitor );
+			if( visitor.DidChange() ) {
+				title = titleScript.Serialize();
+			}
+		}
+	}
+}
+
 function on_game_data_change_core() {
 	clearGameData();
-	parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
+	var version = parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
+
+	convertGameDataToCurVersion(version);
 
 	var curPaintMode = drawing.type; //save current paint mode (hacky)
 

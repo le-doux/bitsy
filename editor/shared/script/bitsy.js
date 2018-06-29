@@ -1132,14 +1132,14 @@ function isSpriteOffstage(id) {
 function parseWorld(file) {
 	resetFlags();
 
+	var versionNumber = 0;
+
 	var lines = file.split("\n");
 	var i = 0;
 	while (i < lines.length) {
 		var curLine = lines[i];
 
 		// console.log(lines[i]);
-
-		var versionNumber = 0;
 
 		if (i == 0) {
 			i = parseTitle(lines, i);
@@ -1196,6 +1196,8 @@ function parseWorld(file) {
 	}
 
 	// console.log(names);
+
+	return versionNumber;
 }
 
 //TODO this is in progress and doesn't support all features

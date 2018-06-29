@@ -133,6 +133,11 @@ var Utils = function() {
 
 
 /* BUILT-IN FUNCTIONS */ // TODO: better way to encapsulate these?
+function deprecatedFunc(environment,parameters,onReturn) {
+	console.log("BITSY SCRIPT WARNING: Tried to use deprecated function");
+	onReturn(null);
+}
+
 function printFunc(environment,parameters,onReturn) {
 	// console.log("PRINT FUNC");
 	// console.log(parameters);
@@ -326,6 +331,7 @@ var Environment = function() {
 
 	var functionMap = new Map();
 	functionMap.set("print", printFunc);
+	functionMap.set("say", deprecatedFunc);
 	functionMap.set("br", linebreakFunc);
 	functionMap.set("item", itemFunc);
 	functionMap.set("rbw", rainbowFunc);
