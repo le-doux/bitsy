@@ -102,15 +102,16 @@ input[type=radio]:checked + label {
 	background: none;
 }
 
-#unsupportedFeatures {
+.warning {
 	background: #f7df74;
 	border-bottom: solid #776203 2px;
 	color: #776203;
 }
-#unsupportedFeatures button {
+.warning button {
 	color: white;
 	background: #776203;
 }
+
 .helpMessage {
 	background: #e8e8ff;
 	color: #6767b2;

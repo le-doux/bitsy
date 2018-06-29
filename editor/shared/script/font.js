@@ -3,11 +3,12 @@ TODO:
 - fix SAY funcs on import old files
 - X download font data
 - X asian fonts
-- translate new text
+- X translate new text
 	- X add "Write your game's title here"
 	- X make sure localization for all font & settings stuff is there
-- warn people about missing characters in fonts?
-- consider moving export options into settings panel??
+- X warn people about missing characters in fonts?
+	- localize warning!!
+- X consider moving export options into settings panel??
 - X pick bitsy font file extension (".bitsyfont??")
 - X custom fonts
 - X fix blinky bug in editor (it's as if clearInterval isn't called for the room renderer)

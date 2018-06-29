@@ -567,6 +567,8 @@ function start() {
 		fontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
 	}
 
+	resetMissingCharacterWarning();
+
 	//color testing
 	// on_change_color_bg();
 	// on_change_color_tile();
@@ -4120,9 +4122,9 @@ function on_change_language(e) {
 	if (localization.LocalizationContains("default_title", title)) {
 		// TODO : localize default_title
 		title = localization.GetStringOrFallback("default_title", "Write your game's title here");
-		refreshGameData();
 		document.getElementById("titleText").value = title;
 	}
+	refreshGameData();
 }
 
 function pickDefaultFontForLanguage(lang) {
@@ -4134,6 +4136,7 @@ function pickDefaultFontForLanguage(lang) {
 		fontName = "unicode_european_small";
 	}
 	updateFontSelectUI();
+	resetMissingCharacterWarning();
 }
 
 function on_change_font(e) {
@@ -4152,6 +4155,7 @@ function on_change_font(e) {
 	}
 	refreshGameData();
 	updateFontDescriptionUI();
+	resetMissingCharacterWarning();
 }
 
 function initLanguageOptions() {
@@ -4168,4 +4172,44 @@ function initLanguageOptions() {
 		option.selected = languageList[i].id === localization.GetLanguage();
 		languageSelect.add(option);
 	}
+}
+
+/* WARNINGS */
+// TODO : turn this into a real system someday instead of hard-coded nonsense
+var missingCharacterWarningState = {
+	showedWarning : false,
+	curFont : null
+}
+
+function resetMissingCharacterWarning() {
+	// missingCharacterWarningState.showedWarning = false; // should I really do this every time?
+	missingCharacterWarningState.curFont = fontManager.Get( fontName );
+}
+
+function tryWarnAboutMissingCharacters(text) {
+	if (missingCharacterWarningState.showedWarning) {
+		return;
+	}
+
+	var hasMissingCharacter = false;
+
+	for (var i = 0; i < text.length; i++) {
+		var character = text[i];
+		if (!missingCharacterWarningState.curFont.hasChar(character)) {
+			hasMissingCharacter = true;
+		}
+	}
+
+	if (hasMissingCharacter) {
+		showFontMissingCharacterWarning();
+	}
+}
+
+function showFontMissingCharacterWarning() {
+	document.getElementById("fontMissingCharacter").style.display = "block";
+	missingCharacterWarningState.showedWarning = true;
+}
+
+function hideFontMissingCharacterWarning() {
+	document.getElementById("fontMissingCharacter").style.display = "none";
 }

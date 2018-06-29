@@ -98,9 +98,11 @@ textarea {
 input {
 	font-family: monospace;
 }
-#unsupportedFeatures {
+
+.warning {
 	padding: 10px;
 }
+
 .helpMessage {
 	padding: 5px;
 	margin: 2px;

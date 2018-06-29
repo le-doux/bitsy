@@ -170,7 +170,7 @@
 			</div>
 		</div>
 
-		<div id="unsupportedFeatures" style="display:none;">
+		<div id="unsupportedFeatures" class="warning" style="display:none;">
 			<span class="localize unsupported_features">uh oh ~ your browser doesn't support all of bitsy's features, so some things might not work right. maybe try another browser, such as:</span>
 			<a href="https://www.google.com/chrome/browser" target="_blank">
 				<span class="localize browser_chrome">chrome</span>
@@ -181,6 +181,22 @@
 			<button onclick="hideUnsupportedFeatureWarning();">
 				<span class="localize unsupported_features_dismiss">I'll be ok, hide this message</span>
 			</button>
+		</div>
+
+		<div id="fontMissingCharacter" class="warning" style="display:none;">
+			<div>
+				<span class="localize font_missing_character">The current font is missing some of the characters used in your dialog. Not all text in your game will display correctly. Consider picking a different font in the settings.</span>
+			</div>
+			<div>
+				<button onclick="showPanel('settingsPanel');">
+					<i class="material-icons">open_in_new</i>
+					<span class="localize open_settings">open settings</span>
+				</button>
+				<button onclick="hideFontMissingCharacterWarning();">
+					<i class="material-icons">close</i>
+					<span class="localize close_label">close</span>
+				</button>
+			</div>
 		</div>
 
 		<div id="editorWindow" onmousewheel="blockScrollBackpage(event);">
@@ -678,7 +694,7 @@
 							<i class="material-icons">open_in_new</i>
 						</button>
 						<br>
-						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog();"></textarea> <!-- rows="2" cols="32" -->
+						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog_finished();"></textarea> <!-- rows="2" cols="32" -->
 					</div>
 
 					<div id="animationOuter" class="controlBox">

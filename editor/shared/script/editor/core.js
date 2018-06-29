@@ -216,6 +216,7 @@ function on_change_title(e) {
 	// title = document.getElementById("titleText").value;
 	title = e.target.value;
 	refreshGameData();
+	tryWarnAboutMissingCharacters(title);
 }
 
 /* MOBILE */
@@ -298,6 +299,11 @@ function reloadDialogUICore() { // TODO: name is terrible
 // hacky - assumes global paintTool object
 function getCurDialogId() {
 	return paintTool.drawing.getDialogId();
+}
+
+function on_change_dialog_finished() {
+	on_change_dialog();
+	tryWarnAboutMissingCharacters( document.getElementById("dialogText").value );
 }
 
 // hacky - assumes global paintTool object
@@ -437,6 +443,8 @@ function resetGameData() {
 
 	// TODO : localize default_title
 	title = localization.GetStringOrFallback("default_title", "Write your game's title here");
+
+	pickDefaultFontForLanguage(localization.GetLanguage());
 
 	// todo wrap these variable resets in a function
 	tileIndex = 0;
