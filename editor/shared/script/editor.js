@@ -1,4 +1,11 @@
 /*
+FINAL 5.0 TODOs:
+- Add all volunteer names in about
+- Update localization file
+- Test on windows
+- Upload
+- get opinions on print_tile vs printTile
+
 TEST desktop editor:
 - feature: drag tools past edge of window
 - feature: visual room select
