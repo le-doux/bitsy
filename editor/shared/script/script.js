@@ -340,9 +340,9 @@ var Environment = function() {
 	functionMap.set("clr3", color3Func);
 	functionMap.set("wvy", wavyFunc);
 	functionMap.set("shk", shakyFunc);
-	functionMap.set("print_sprite", printSpriteFunc);
-	functionMap.set("print_tile", printTileFunc);
-	functionMap.set("print_item", printItemFunc);
+	functionMap.set("printSprite", printSpriteFunc);
+	functionMap.set("printTile", printTileFunc);
+	functionMap.set("printItem", printItemFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn) {

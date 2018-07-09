@@ -5,6 +5,7 @@ FINAL 5.0 TODOs:
 - Test on windows
 - Upload
 - get opinions on print_tile vs printTile
+	- printTile wins
 
 TEST desktop editor:
 - feature: drag tools past edge of window
