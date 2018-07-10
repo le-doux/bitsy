@@ -155,7 +155,7 @@ function getStringOrFallback(id, englishFallback) {
 		return englishFallback;
 
 	var locString = getString(id);
-	if(locString == null) {
+	if(locString == null || locString.length <= 0) {
 		locString = englishFallback;
 		unlocalizedDynamicStrings[id] = englishFallback; // record use of unlocalized strings
 	}
@@ -167,7 +167,8 @@ this.GetStringOrFallback = function(id, englishFallback) {
 
 function localizationContains(id, text) { // TODO : rename to be more descriptive?
 	for (lang in localizationStrings) {
-		if (localizationStrings[lang][id] === text) {
+		var locString = localizationStrings[lang][id];
+		if (locString != null && locString.length > 0 && locString === text) {
 			return true;
 		}
 	}
