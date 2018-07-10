@@ -548,20 +548,24 @@ function start() {
 
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
-	// LOAD bitmmap fonts
-	fontManager.LoadResources([
-		"ascii_small.bitsyfont",
-		"unicode_european_small.bitsyfont",
-		"unicode_european_large.bitsyfont",
-		"unicode_asian.bitsyfont"
-	]);
+	fontManager.InitResourceLoader();
 
+	// load custom font first, since it is synchronous
 	if (localStorage.custom_font != null) {
 		var fontStorage = JSON.parse(localStorage.custom_font);
 		fontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
 	}
 
-	resetMissingCharacterWarning();
+	// load built-in bitmap fonts from servery (async)
+	fontManager.LoadResources([
+		"ascii_small.bitsyfont",
+		"unicode_european_small.bitsyfont",
+		"unicode_european_large.bitsyfont",
+		"unicode_asian.bitsyfont"
+	], function() {
+		console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
+		resetMissingCharacterWarning();
+	});
 
 	//color testing
 	// on_change_color_bg();
@@ -4236,6 +4240,8 @@ function tryWarnAboutMissingCharacters(text) {
 	}
 
 	var hasMissingCharacter = false;
+
+	console.log(missingCharacterWarningState.curFont.getData());
 
 	for (var i = 0; i < text.length; i++) {
 		var character = text[i];

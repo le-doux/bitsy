@@ -1,18 +1,37 @@
 function FontManager() {
 
+var self = this;
 var fontExtension = ".bitsyfont";
 
+// feels very hacky to initialize this seperately and late
 var externalResources = null;
-this.LoadResources = function(filenames) {
-	// NOTE : only used by the editor -- should I move this out somehow so it isn't sitting in the exported games?
-	externalResources = new ResourceLoader(); // WARNING : this class doesn't exist in exported game
+this.InitResourceLoader = function() {
+	externalResources = new ResourceLoader();// NOTE : this class doesn't exist in exported game
+}
+
+this.LoadResources = function(filenames, onLoadAll) {
+	if (externalResources == null)
+		return;
+
+	// TODO : is this being called too many times?
+	var onLoad = function() {
+		var count = externalResources.getResourceLoadedCount();
+
+		if (count >= filenames.length && onLoadAll != null) {
+			onLoadAll();
+		}
+	}
+
 	for (var i = 0; i < filenames.length; i++) {
-		externalResources.load("bitsyfont", filenames[i]);
+		externalResources.load("bitsyfont", filenames[i], onLoad);
 	}
 }
 
 // "manually" add resource
 this.AddResource = function(filename, fontdata) {
+	if (externalResources == null)
+		return;
+
 	externalResources.set(filename, fontdata);
 }
 
@@ -29,14 +48,13 @@ this.Create = Create;
 this.Get = function(fontName) {
 	var fontData = "";
 	if (externalResources != null) {
-		// TODO : need access to GetData method.. (self, =>, other?)
-		fontData = GetData(fontName); // in editor
+		fontData = self.GetData(fontName); // in editor
 	}
 	else {
 		fontData = document.getElementById(fontName).text.slice(1); // exported
 	}
 
-	return Create(fontData); // also need access to create
+	return self.Create(fontData); // also need access to create
 }
 
 function Font(fontData) {

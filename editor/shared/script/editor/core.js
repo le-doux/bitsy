@@ -415,6 +415,15 @@ function ResourceLoader() {
 	this.set = function(filename,data) {
 		resources[filename] = data;
 	}
+
+	this.getResourceLoadedCount = function() {
+		// feels hacky
+		var count = 0;
+		for (var r in resources) {
+			count++;
+		}
+		return count;
+	}
 }
 
 function createDefaultGameStateFunction() {
