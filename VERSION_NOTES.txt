@@ -2,7 +2,7 @@
 - editor translated into French, Portuguese, Spanish, Italian, Swedish, German
 - new fonts to display European and Asian characters
 - new settings panel!
-- functions to add drawings to dialog: {print_sprite}, {print_tile}, {print_item}
+- functions to add drawings to dialog: {printSprite}, {printTile}, {printItem}
 - {print} function replaces deprecated {say} function
 - downloaded game uses game title for file name
 - when creating animations, the second frame starts as a copy of the first
