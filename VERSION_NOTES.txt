@@ -1,5 +1,12 @@
 5.0:
 - editor translated into French, Portuguese, Spanish, Italian, Swedish, German
+***** huge thanks to the translators *****
+Peter Februar & Dorian Beaugendre (French)
+Bruno Silva (Portuguese)
+Marina Díez (Spanish & Italian)
+Em (Swedish)
+Kai Werder & Matthias Löwe (German)
+******************************************
 - new fonts to display European and Asian characters
 - new settings panel!
 - functions to add drawings to dialog: {printSprite}, {printTile}, {printItem}
