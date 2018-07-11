@@ -564,6 +564,7 @@ function updateLoadingScreen() {
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 
 	loadingAnimation();
+	drawSprite( getSpriteImage(sprite["a"],"0",0), 8, 8, ctx );
 }
 
 function update() {
@@ -1147,9 +1148,9 @@ function parseWorld(file) {
 			i = parseTitle(lines, i);
 		}
 		else if (curLine.length <= 0 || curLine.charAt(0) === "#") {
-			// collect version number
+			// collect version number (from a comment.. hacky I know)
 			if (curLine.indexOf("# BITSY VERSION ") != -1) {
-				versionNumber = parseFloat(curLine.replace("# BITSY VERSION ", "")); // TODO : how do I do stuff with this?
+				versionNumber = parseFloat(curLine.replace("# BITSY VERSION ", ""));
 			}
 
 			//skip blank lines & comments
