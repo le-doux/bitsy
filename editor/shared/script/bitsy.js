@@ -178,6 +178,8 @@ function load_game(game_data, startWithTitle) {
 	setInitialVariables();
 	renderImages();
 
+	// setInterval(updateLoadingScreen, 300); // hack test
+
 	onready(startWithTitle);
 }
 
@@ -556,6 +558,14 @@ function loadingAnimation() {
 	if (loading_anim_frame >= 5) loading_anim_frame = 0;
 }
 
+function updateLoadingScreen() {
+	// TODO : in progress
+	ctx.fillStyle = "rgb(0,0,0)";
+	ctx.fillRect(0,0,canvas.width,canvas.height);
+
+	loadingAnimation();
+}
+
 function update() {
 	var curTime = Date.now();
 	deltaTime = curTime - prevTime;
@@ -579,14 +589,6 @@ function update() {
 	}
 	else if (!isEnding) {
 		moveSprites();
-
-		if (player().walkingPath.length > 0) {
-			var dest = player().walkingPath[ player().walkingPath.length - 1 ];
-			ctx.fillStyle = "#fff";
-			ctx.globalAlpha = 0.5;
-			ctx.fillRect( dest.x * tilesize*scale, dest.y * tilesize*scale, tilesize*scale, tilesize*scale );
-			ctx.globalAlpha = 1;
-		}
 	}
 
 	// keep moving avatar if player holds down button
