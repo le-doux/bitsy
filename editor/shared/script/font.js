@@ -1,16 +1,32 @@
-function FontManager() {
+/*
+TODO:
+- untangle local & external resource use in font manager (still more to do here)
+*/
+
+function FontManager(useExternalResources) {
+
+if (useExternalResources === undefined || useExternalResources === null) {
+	useExternalResources = false;
+}
 
 var self = this;
-var fontExtension = ".bitsyfont";
 
-// feels very hacky to initialize this seperately and late
+var fontExtension = ".bitsyfont";
+this.GetExtension = function() {
+	return fontExtension;
+}
+
+// place to store font data that is part of the local game data
+var localResources = {};
+
+// place to store font data fetched from a server (only used in editor)
 var externalResources = null;
-this.InitResourceLoader = function() {
+if (useExternalResources) {
 	externalResources = new ResourceLoader();// NOTE : this class doesn't exist in exported game
 }
 
 this.LoadResources = function(filenames, onLoadAll) {
-	if (externalResources == null)
+	if (!useExternalResources)
 		return;
 
 	// TODO : is this being called too many times?
@@ -27,28 +43,32 @@ this.LoadResources = function(filenames, onLoadAll) {
 	}
 }
 
-// "manually" add resource
+// manually add resource
 this.AddResource = function(filename, fontdata) {
-	if (externalResources == null)
-		return;
-
-	externalResources.set(filename, fontdata);
+	if (useExternalResources) {
+		externalResources.set(filename, fontdata);
+	}
+	else {
+		localResources[filename] = fontdata;
+	}
 }
 
-// store font data that is part of the local game data
-var localResources = {};
-this.AddLocalResource = function(fontName, fontData) {
-	localResources[fontName] = fontData;
-}
-
-this.GetLocalResource = function(fontName) {
-	console.log("GET LOCAL RESOURCE " + fontName);
-	console.log(localResources[fontName]);
-	return localResources[fontName];
+this.ContainsResource = function(filename) {
+	if (useExternalResources) {
+		return externalResources.contains(filename);
+	}
+	else {
+		return localResources[filename] != null;
+	}
 }
 
 function GetData(fontName) {
-	return externalResources.get(fontName + fontExtension);
+	if (useExternalResources) {
+		return externalResources.get(fontName + fontExtension);
+	}
+	else {
+		return localResources[fontName + fontExtension];
+	}
 }
 this.GetData = GetData;
 
@@ -58,19 +78,8 @@ function Create(fontData) {
 this.Create = Create;
 
 this.Get = function(fontName) {
-	var fontData = "";
-	if (externalResources != null) {
-		fontData = self.GetData(fontName); // in editor
-	}
-	else {
-		// OLD VERSION : from separate font file
-		// fontData = document.getElementById(fontName).text.slice(1); // exported
-
-		// NEW VERSION : stored in game data
-		fontData = localResources[fontName];
-	}
-
-	return self.Create(fontData); // also need access to create
+	var fontData = self.GetData(fontName);
+	return self.Create(fontData);
 }
 
 function Font(fontData) {

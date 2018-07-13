@@ -105,6 +105,8 @@ function clearGameData() {
 		sprite : new Map(),
 		item : new Map()
 	};
+
+	fontName = "ascii_small"; // TODO : reset font manager too?
 }
 
 var width = 128;
@@ -1129,8 +1131,10 @@ function serializeWorld() {
 	}
 	worldStr += "\n"
 	/* FONT */
-	worldStr += "SET_FONT " + fontName + "\n";
-	worldStr += "\n"
+	if (fontName != "ascii_small") {
+		worldStr += "SET_FONT " + fontName + "\n";
+		worldStr += "\n"
+	}
 	/* PALETTE */
 	for (id in palette) {
 		worldStr += "PAL " + id + "\n";
@@ -1296,7 +1300,9 @@ function serializeWorld() {
 	}
 	/* FONT */
 	// TODO : support multiple fonts
-	worldStr += fontManager.GetLocalResource(fontName);
+	if (fontName != "ascii_small") {
+		worldStr += fontManager.GetData(fontName);
+	}
 
 	return worldStr;
 }
@@ -1895,16 +1901,13 @@ function parseFontData(lines, i) {
 	var localFontData = lines[i];
 	i++;
 
-	console.log("PARSE FONT DATA " + localFontName);
-
 	while (i < lines.length && lines[i] != "") {
 		localFontData += "\n" + lines[i];
 		i++;
 	}
 
-	console.log(localFontData);
-
-	fontManager.AddLocalResource( localFontName, localFontData );
+	var localFontFilename = localFontName + fontManager.GetExtension();
+	fontManager.AddResource( localFontFilename, localFontData );
 
 	return i;
 }

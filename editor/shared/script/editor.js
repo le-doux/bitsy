@@ -345,6 +345,9 @@ var isPlayMode = false;
 var makeURL = null;
 var exporter = new Exporter();
 
+/* FONT MANAGER */
+var editorFontManager = new FontManager( true /*useExternalResources*/ );
+
 function detectBrowserFeatures() {
 	console.log("BROWSER FEATURES");
 	//test feature support
@@ -618,16 +621,14 @@ function start() {
 
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
-	fontManager.InitResourceLoader();
-
 	// load custom font first, since it is synchronous
 	if (localStorage.custom_font != null) {
 		var fontStorage = JSON.parse(localStorage.custom_font);
-		fontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
+		editorFontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
 	}
 
 	// load built-in bitmap fonts from servery (async)
-	fontManager.LoadResources([
+	editorFontManager.LoadResources([
 		"ascii_small.bitsyfont",
 		"unicode_european_small.bitsyfont",
 		"unicode_european_large.bitsyfont",
@@ -1914,6 +1915,15 @@ function on_game_data_change_core() {
 		paintTool.reloadDrawing();
 	}
 
+	// if user pasted in a custom font into game data - update the stored custom font
+	if (!editorFontManager.ContainsResource(fontName + editorFontManager.GetExtension())) {
+		var fontStorage = {
+			name : fontName,
+			fontdata : fontManager.GetData(fontName)
+		};
+		localStorage.custom_font = JSON.stringify(fontStorage);
+		editorFontManager.AddResource(fontName + editorFontManager.GetExtension(), fontManager.GetData(fontName));
+	}
 
 	updatePaletteUI();
 
@@ -2014,7 +2024,7 @@ function exportGameData() {
 }
 
 function exportFont() {
-	var fontData = fontManager.GetData(fontName);
+	var fontData = editorFontManager.GetData(fontName);
 	ExporterUtils.DownloadFile( fontName + ".bitsyfont", fontData );
 }
 
@@ -2532,10 +2542,10 @@ function importFontFromFile(e) {
 		var fileText = reader.result;
 		console.log(fileText);
 
-		var customFontName = (fontManager.Create(fileText)).getName();
+		var customFontName = (editorFontManager.Create(fileText)).getName();
 
-		fontManager.AddResource(customFontName + ".txt", fileText);
-		fontName = customFontName; // bitsy engine setting
+		editorFontManager.AddResource(customFontName + editorFontManager.GetExtension(), fileText);
+		switchFont(customFontName); // bitsy engine setting
 
 		var fontStorage = {
 			name : customFontName,
@@ -4248,10 +4258,10 @@ function on_change_language(e) {
 function pickDefaultFontForLanguage(lang) {
 	// TODO : switch to asian characters when we get asian language translations of editor
 	if (lang === "en") {
-		fontName = "ascii_small";
+		switchFont("ascii_small");
 	}
 	else {
-		fontName = "unicode_european_small";
+		switchFont("unicode_european_small");
 	}
 	updateFontSelectUI();
 	resetMissingCharacterWarning();
@@ -4259,21 +4269,29 @@ function pickDefaultFontForLanguage(lang) {
 
 function on_change_font(e) {
 	if (e.target.value != "custom") {
-		fontName = e.target.value;
+		switchFont(e.target.value);
 	}
 	else {
 		if (localStorage.custom_font != null) {
 			var fontStorage = JSON.parse(localStorage.custom_font);
-			fontName = fontStorage.name;
+			switchFont(fontStorage.name);
 		}
 		else {
 			// fallback
-			fontName = "bitsy_ascii";
+			switchFont("ascii_small");
 		}
 	}
-	refreshGameData();
 	updateFontDescriptionUI();
 	resetMissingCharacterWarning();
+}
+
+function switchFont(newFontName) {
+	fontName = newFontName;
+
+	// hacky - move the font data from the editor to the engine
+	fontManager.AddResource(fontName + fontManager.GetExtension(), editorFontManager.GetData(fontName));
+
+	refreshGameData()
 }
 
 function initLanguageOptions() {
@@ -4301,7 +4319,7 @@ var missingCharacterWarningState = {
 
 function resetMissingCharacterWarning() {
 	// missingCharacterWarningState.showedWarning = false; // should I really do this every time?
-	missingCharacterWarningState.curFont = fontManager.Get( fontName );
+	missingCharacterWarningState.curFont = editorFontManager.Get( fontName );
 }
 
 function tryWarnAboutMissingCharacters(text) {

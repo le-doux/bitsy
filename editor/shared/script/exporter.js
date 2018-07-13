@@ -46,11 +46,9 @@ this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, si
 	html = replaceTemplateMarker( html, "@@L", resources.get("dialog.js") );
 	html = replaceTemplateMarker( html, "@@E", resources.get("bitsy.js") );
 
-	// fonts
-	// (TODO : relies too much on global settings - move into parameter)
-	// TODO : ... these one letter markers are starting to get a little cryptic
-	html = replaceTemplateMarker( html, "@@N", fontName );
-	html = replaceTemplateMarker( html, "@@M", fontManager.GetData(fontName) );
+	// export the default font in its own script tag (TODO : remove if unused)
+	html = replaceTemplateMarker( html, "@@N", "ascii_small" );
+	html = replaceTemplateMarker( html, "@@M", editorFontManager.GetData("ascii_small") );
 
 	html = replaceTemplateMarker( html, "@@D", gameData );
 

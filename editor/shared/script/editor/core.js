@@ -416,6 +416,10 @@ function ResourceLoader() {
 		resources[filename] = data;
 	}
 
+	this.contains = function(filename) {
+		return resources[filename] != null;
+	}
+
 	this.getResourceLoadedCount = function() {
 		// feels hacky
 		var count = 0;
