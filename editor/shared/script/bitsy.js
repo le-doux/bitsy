@@ -1094,6 +1094,9 @@ function parseWorld(file) {
 		else if (getType(curLine) === "SET_FONT") {
 			i = parseFontName(lines, i);
 		}
+		else if (getType(curLine) === "FONT") {
+			i = parseFontData(lines, i);
+		}
 		else if (getType(curLine) === "!") {
 			i = parseFlag(lines, i);
 		}
@@ -1291,6 +1294,10 @@ function serializeWorld() {
 		worldStr += variable[id] + "\n";
 		worldStr += "\n";
 	}
+	/* FONT */
+	// TODO : support multiple fonts
+	worldStr += fontManager.GetLocalResource(fontName);
+
 	return worldStr;
 }
 
@@ -1876,6 +1883,29 @@ function parseVariable(lines, i) {
 function parseFontName(lines, i) {
 	fontName = getArg(lines[i], 1);
 	i++;
+	return i;
+}
+
+function parseFontData(lines, i) {
+	// NOTE : we're not doing the actual parsing here --
+	// just grabbing the block of text that represents the font
+	// and giving it to the font manager to use later
+
+	var localFontName = getId(lines[i]);
+	var localFontData = lines[i];
+	i++;
+
+	console.log("PARSE FONT DATA " + localFontName);
+
+	while (i < lines.length && lines[i] != "") {
+		localFontData += "\n" + lines[i];
+		i++;
+	}
+
+	console.log(localFontData);
+
+	fontManager.AddLocalResource( localFontName, localFontData );
+
 	return i;
 }
 

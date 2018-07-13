@@ -35,6 +35,18 @@ this.AddResource = function(filename, fontdata) {
 	externalResources.set(filename, fontdata);
 }
 
+// store font data that is part of the local game data
+var localResources = {};
+this.AddLocalResource = function(fontName, fontData) {
+	localResources[fontName] = fontData;
+}
+
+this.GetLocalResource = function(fontName) {
+	console.log("GET LOCAL RESOURCE " + fontName);
+	console.log(localResources[fontName]);
+	return localResources[fontName];
+}
+
 function GetData(fontName) {
 	return externalResources.get(fontName + fontExtension);
 }
@@ -51,7 +63,11 @@ this.Get = function(fontName) {
 		fontData = self.GetData(fontName); // in editor
 	}
 	else {
-		fontData = document.getElementById(fontName).text.slice(1); // exported
+		// OLD VERSION : from separate font file
+		// fontData = document.getElementById(fontName).text.slice(1); // exported
+
+		// NEW VERSION : stored in game data
+		fontData = localResources[fontName];
 	}
 
 	return self.Create(fontData); // also need access to create
