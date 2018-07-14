@@ -173,6 +173,11 @@ function load_game(game_data, startWithTitle) {
 
 	parseWorld(game_data);
 
+	if (!isPlayerEmbeddedInEditor) {
+		// hack to ensure default font is available
+		fontManager.AddResource("ascii_small" + fontManager.GetExtension(), document.getElementById("ascii_small").text.slice(1));
+	}
+
 	var font = fontManager.Get( fontName );
 	dialogBuffer.SetFont(font);
 	dialogRenderer.SetFont(font);

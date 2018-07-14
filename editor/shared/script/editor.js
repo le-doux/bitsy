@@ -635,6 +635,7 @@ function start() {
 		"unicode_asian.bitsyfont"
 	], function() {
 		console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
+		switchFont(fontName); // hack - make sure the engine font manager is setup too
 		resetMissingCharacterWarning();
 	});
 
