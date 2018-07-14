@@ -15,7 +15,9 @@ var palette = {
 var ending = {};
 var variable = {}; // these are starting variable values -- they don't update (or I don't think they will)
 var playerId = "A";
-var fontName = "ascii_small";
+
+var defaultFontName = "ascii_small";
+var fontName = defaultFontName;
 
 var names = {
 	room : new Map(),
@@ -106,7 +108,7 @@ function clearGameData() {
 		item : new Map()
 	};
 
-	fontName = "ascii_small"; // TODO : reset font manager too?
+	fontName = defaultFontName; // TODO : reset font manager too?
 }
 
 var width = 128;
@@ -175,7 +177,7 @@ function load_game(game_data, startWithTitle) {
 
 	if (!isPlayerEmbeddedInEditor) {
 		// hack to ensure default font is available
-		fontManager.AddResource("ascii_small" + fontManager.GetExtension(), document.getElementById("ascii_small").text.slice(1));
+		fontManager.AddResource(defaultFontName + fontManager.GetExtension(), document.getElementById(defaultFontName).text.slice(1));
 	}
 
 	var font = fontManager.Get( fontName );
@@ -1098,7 +1100,7 @@ function parseWorld(file) {
 		else if (getType(curLine) === "VAR") {
 			i = parseVariable(lines, i);
 		}
-		else if (getType(curLine) === "SET_FONT") {
+		else if (getType(curLine) === "DEFAULT_FONT") {
 			i = parseFontName(lines, i);
 		}
 		else if (getType(curLine) === "FONT") {
@@ -1136,8 +1138,8 @@ function serializeWorld() {
 	}
 	worldStr += "\n"
 	/* FONT */
-	if (fontName != "ascii_small") {
-		worldStr += "SET_FONT " + fontName + "\n";
+	if (fontName != defaultFontName) {
+		worldStr += "DEFAULT_FONT " + fontName + "\n";
 		worldStr += "\n"
 	}
 	/* PALETTE */
@@ -1305,7 +1307,7 @@ function serializeWorld() {
 	}
 	/* FONT */
 	// TODO : support multiple fonts
-	if (fontName != "ascii_small") {
+	if (fontName != defaultFontName) {
 		worldStr += fontManager.GetData(fontName);
 	}
 
