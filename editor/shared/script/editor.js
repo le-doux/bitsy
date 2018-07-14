@@ -347,6 +347,7 @@ var exporter = new Exporter();
 
 /* FONT MANAGER */
 var editorFontManager = new FontManager( true /*useExternalResources*/ );
+var areAllFontsLoaded = false;
 
 function detectBrowserFeatures() {
 	console.log("BROWSER FEATURES");
@@ -637,6 +638,7 @@ function start() {
 		console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
 		switchFont(fontName); // hack - make sure the engine font manager is setup too
 		resetMissingCharacterWarning();
+		areAllFontsLoaded = true; // hack
 	});
 
 	//color testing
@@ -1917,7 +1919,7 @@ function on_game_data_change_core() {
 	}
 
 	// if user pasted in a custom font into game data - update the stored custom font
-	if (!editorFontManager.ContainsResource(fontName + editorFontManager.GetExtension())) {
+	if (areAllFontsLoaded && !editorFontManager.ContainsResource(fontName + editorFontManager.GetExtension())) {
 		var fontStorage = {
 			name : fontName,
 			fontdata : fontManager.GetData(fontName)
