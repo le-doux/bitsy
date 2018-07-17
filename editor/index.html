@@ -1066,6 +1066,11 @@
 						<i class="material-icons">file_download</i>
 						<span class="localize download_data">download data</span>
 					</button>
+					<input type="checkbox" id="fontDataCheck" onclick="toggleFontDataVisibility(event);" />
+					<label title="show / hide font data (WARNING: can be very slow for large fonts)" for="fontDataCheck">
+						<i class="material-icons" id="fontDataIcon">visibility_off</i> 
+						<span class="localize font_data_toggle_visible">font data</span>
+					</label>
 				</div>
 
 				<div id="settingsPanel" class="panel color0" style="display:none;">

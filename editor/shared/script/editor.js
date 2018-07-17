@@ -1,6 +1,7 @@
 /*
 5.2
 - hide font data (for perf)
+- toggle font data visibility
 
 POST 5.0 TODOs:
 X fix move on end dialog bug
@@ -8,11 +9,14 @@ icelandic
 estonian
 arabic
 esperanto
-bug where big fonts slow down re-writing the game data (toggle to show the font data?)
+X bug where big fonts slow down re-writing the game data (toggle to show the font data?)
 	- cause: writing a ton of data into the game data text box
 		fixes: hide/show font in game data, make "async" re-write of textbox (will that work?)
-asian font : NS_ERROR_DOM_QUOTA_REACHED: Persistent storage maximum size reached
+X asian font : NS_ERROR_DOM_QUOTA_REACHED: Persistent storage maximum size reached
 	- ideas: don't save fonts in the game data until download ... just store the names (note: could cause some bugs)
+
+POST 5.0 longer term:
+- fix perf of game data box (async writing?)
 
 Loading sprites
 Qs: black or blue background?
@@ -1440,6 +1444,13 @@ function toggleCollisionMap(e) {
 	roomTool.drawCollisionMap = e.target.checked;
 	document.getElementById("roomWallsIcon").innerHTML = roomTool.drawCollisionMap ? "visibility" : "visibility_off";
 	roomTool.drawEditMap();
+}
+
+var showFontDataInGameData = false;
+function toggleFontDataVisibility(e) {
+	showFontDataInGameData = e.target.checked;
+	document.getElementById("fontDataIcon").innerHTML = e.target.checked ? "visibility" : "visibility_off";
+	refreshGameData(); // maybe a bit expensive
 }
 
 /* PALETTE STUFF */

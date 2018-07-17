@@ -489,12 +489,13 @@ function refreshGameData() {
 		if (isPlayMode) return; //never store game data while in playmode (TODO: wouldn't be necessary if the game data was decoupled form editor data)
 
 	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
-	var gameData = serializeWorld();
+
+	// var gameData = serializeWorld();
 
 	// document.getElementById("game_data").value = gameData; // TODO : this is where the slow down is
 
 	var gameDataNoFonts = serializeWorld(true);
-	document.getElementById("game_data").value = gameDataNoFonts;
+	document.getElementById("game_data").value = showFontDataInGameData ? serializeWorld() : gameDataNoFonts;
 
 	// localStorage.setItem("game_data", gameData); //auto-save
 
