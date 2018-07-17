@@ -491,10 +491,12 @@ function refreshGameData() {
 	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
 	var gameData = serializeWorld();
 
-	document.getElementById("game_data").value = gameData; // TODO : this is where the slow down is
+	// document.getElementById("game_data").value = gameData; // TODO : this is where the slow down is
 
-	// var gameDataNoFonts = serializeWorld(true);
-	// document.getElementById("game_data").value = gameDataNoFonts;
+	var gameDataNoFonts = serializeWorld(true);
+	document.getElementById("game_data").value = gameDataNoFonts;
 
-	localStorage.setItem("game_data", gameData); //auto-save
+	// localStorage.setItem("game_data", gameData); //auto-save
+
+	localStorage.setItem("game_data", gameDataNoFonts);
 }

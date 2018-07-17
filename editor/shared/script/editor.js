@@ -1,4 +1,7 @@
 /*
+5.2
+- hide font data (for perf)
+
 POST 5.0 TODOs:
 X fix move on end dialog bug
 icelandic
@@ -1388,12 +1391,19 @@ function on_edit_mode() {
 	document.getElementById("previewDialogCheck").disabled = false;
 }
 
+// hacky - part of hiding font data from the game data
+function getFullGameData() {
+	// return document.getElementById("game_data").value + fontManager.GetData(fontName);
+	return serializeWorld();
+}
+
 function on_play_mode() {
 	isPlayMode = true;
 
 	roomTool.unlistenEditEvents();
 
-	load_game(document.getElementById("game_data").value, !isPreviewDialogMode /* startWithTitle */);
+	// load_game(document.getElementById("game_data").value, !isPreviewDialogMode /* startWithTitle */);
+	load_game(getFullGameData(), !isPreviewDialogMode /* startWithTitle */);
 
 	console.log("PLAY!! ~~ PREVIEW ? " + isPreviewDialogMode);
 	if(!isPreviewDialogMode) {
@@ -2020,14 +2030,16 @@ function filenameFromGameTitle() {
 
 function exportGame() {
 	refreshGameData(); //just in case
-	var gameData = document.getElementById("game_data").value; //grab game data
+	// var gameData = document.getElementById("game_data").value; //grab game data
+	var gameData = getFullGameData();
 	var size = document.getElementById("exportSizeFixedInput").value;
 	exporter.exportGame( gameData, title, export_settings.page_color, filenameFromGameTitle() + ".html", isFixedSize, size ); //download as html file
 }
 
 function exportGameData() {
 	refreshGameData(); //just in case
-	var gameData = document.getElementById("game_data").value; //grab game data
+	// var gameData = document.getElementById("game_data").value; //grab game data
+	var gameData = getFullGameData();
 	ExporterUtils.DownloadFile( filenameFromGameTitle() + ".bitsy", gameData );
 }
 
