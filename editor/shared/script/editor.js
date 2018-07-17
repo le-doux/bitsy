@@ -1,10 +1,15 @@
 /*
-FINAL 5.0 TODOs:
-X Add all volunteer names in about
-X Update localization file
-- Test on windows
-- Upload
-X get opinions on print_tile vs printTile
+POST 5.0 TODOs:
+X fix move on end dialog bug
+icelandic
+estonian
+arabic
+esperanto
+bug where big fonts slow down re-writing the game data (toggle to show the font data?)
+	- cause: writing a ton of data into the game data text box
+		fixes: hide/show font in game data, make "async" re-write of textbox (will that work?)
+asian font : NS_ERROR_DOM_QUOTA_REACHED: Persistent storage maximum size reached
+	- ideas: don't save fonts in the game data until download ... just store the names (note: could cause some bugs)
 
 Loading sprites
 Qs: black or blue background?

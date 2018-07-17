@@ -551,6 +551,8 @@ function updateInput() {
 			else {
 				dialogBuffer.Skip();
 			}
+			// ignore currently held keys UNTIL they are released
+			input.ignoreHeldKeys();
 		}
 	}
 	else if ( isEnding ) {
@@ -711,11 +713,13 @@ var InputManager = function() {
 	var self = this;
 
 	var pressed;
+	var ignored;
 	var newKeyPress;
 	var touchState;
 
 	function resetAll() {
 		pressed = {};
+		ignored = {};
 		newKeyPress = false;
 
 		touchState = {
@@ -753,6 +757,12 @@ var InputManager = function() {
 		return ( self.isKeyDown(key.shift) || self.isKeyDown(key.ctrl) || self.isKeyDown(key.alt) || self.isKeyDown(key.cmd) );
 	}
 
+	this.ignoreHeldKeys = function() {
+		for (var key in pressed) {
+			ignored[key] = true;
+		}
+	}
+
 	this.onkeydown = function(event) {
 		// console.log("KEYDOWN -- " + event.keyCode);
 
@@ -772,16 +782,22 @@ var InputManager = function() {
 			}
 		}
 
+		if (ignored[event.keyCode]) {
+			return;
+		}
+
 		if (!self.isKeyDown(event.keyCode)) {
 			newKeyPress = true;
 		}
 
 		pressed[event.keyCode] = true;
+		ignored[event.keyCode] = false;
 	}
 
 	this.onkeyup = function(event) {
 		// console.log("KEYUP -- " + event.keyCode);
 		pressed[event.keyCode] = false;
+		ignored[event.keyCode] = false;
 	}
 
 	this.ontouchstart = function(event) {
@@ -835,7 +851,7 @@ var InputManager = function() {
 	}
 
 	this.isKeyDown = function(keyCode) {
-		return pressed[keyCode] != null && pressed[keyCode] == true;
+		return pressed[keyCode] != null && pressed[keyCode] == true && (ignored[keyCode] == null || ignored[keyCode] == false);
 	}
 
 	this.anyKeyPressed = function() {
@@ -1124,7 +1140,10 @@ function parseWorld(file) {
 }
 
 //TODO this is in progress and doesn't support all features
-function serializeWorld() {
+function serializeWorld(skipFonts) {
+	if (skipFonts === undefined || skipFonts === null)
+		skipFonts = false;
+
 	var worldStr = "";
 	/* TITLE */
 	worldStr += title + "\n";
@@ -1307,7 +1326,7 @@ function serializeWorld() {
 	}
 	/* FONT */
 	// TODO : support multiple fonts
-	if (fontName != defaultFontName) {
+	if (fontName != defaultFontName && !skipFonts) {
 		worldStr += fontManager.GetData(fontName);
 	}
 

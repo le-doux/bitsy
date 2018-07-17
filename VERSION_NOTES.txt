@@ -1,3 +1,6 @@
+5.1:
+- bugfix: avatar moved after leaving dialog
+
 5.0:
 - editor translated into French, Portuguese, Spanish, Italian, Swedish, German
 ***** huge thanks to the translators *****
