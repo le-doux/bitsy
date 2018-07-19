@@ -545,14 +545,15 @@ function updateInput() {
 			if (dialogBuffer.CanContinue()) {
 				var hasMoreDialog = dialogBuffer.Continue();
 				if(!hasMoreDialog) {
+					// ignore currently held keys UNTIL they are released (stops player from insta-moving)
+					input.ignoreHeldKeys();
+
 					onExitDialog();
 				}
 			}
 			else {
 				dialogBuffer.Skip();
 			}
-			// ignore currently held keys UNTIL they are released
-			input.ignoreHeldKeys();
 		}
 	}
 	else if ( isEnding ) {
@@ -759,7 +760,10 @@ var InputManager = function() {
 
 	this.ignoreHeldKeys = function() {
 		for (var key in pressed) {
-			ignored[key] = true;
+			if (pressed[key]) { // only ignore keys that are actually held
+				ignored[key] = true;
+				// console.log("IGNORE -- " + key);
+			}
 		}
 	}
 

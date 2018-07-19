@@ -2,6 +2,7 @@
 - perf improvement: hide font data in game data by default
 --- added toggle button to show/hide font data
 - bugfix: avatar moved after leaving dialog
+- bugfix: too many keys being ignored after leaving dialog
 
 5.0:
 - editor translated into French, Portuguese, Spanish, Italian, Swedish, German
