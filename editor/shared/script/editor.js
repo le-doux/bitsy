@@ -17,9 +17,14 @@ X asian font : NS_ERROR_DOM_QUOTA_REACHED: Persistent storage maximum size reach
 
 POST 5.0 longer term:
 - fix perf of game data box (async writing?)
+	- also: perf of sprite selector
+	- also: loading screen
+		- also also: controls screen
 
 Loading sprites
-Qs: black or blue background?
+- black or blue background?
+- how to store loading images? DRW?
+-- DRW isn't preserved or rendered
 ---
 SPR a
 00000000
