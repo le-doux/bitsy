@@ -1,8 +1,4 @@
 /*
-5.2
-- hide font data (for perf)
-- toggle font data visibility
-
 POST 5.0 TODOs:
 X fix move on end dialog bug
 icelandic
@@ -16,10 +12,21 @@ X asian font : NS_ERROR_DOM_QUOTA_REACHED: Persistent storage maximum size reach
 	- ideas: don't save fonts in the game data until download ... just store the names (note: could cause some bugs)
 
 POST 5.0 longer term:
+- desktop apps
+- homepage (bitsy.org)
+- arabic pixel font
+- scripting documentation
 - fix perf of game data box (async writing?)
-	- also: perf of sprite selector
-	- also: loading screen
-		- also also: controls screen
+- perf of sprite selector
+- loading screen
+- controls screen
+- async loading
+- parsing module
+- game data object w/ event subscription
+- rendering module w/ image lookup methods
+- EXITS + rooms + script update
+- choice dialog
+- music editor
 
 Loading sprites
 - black or blue background?
