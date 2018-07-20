@@ -4004,20 +4004,37 @@ function createAdvDialogEditor(scriptTree) {
 	addText();
 }
 
+function toggleDialogCode(e) {
+	console.log("DIALOG CODE");
+	console.log(e.target.checked);
+	if (e.target.checked) {
+		showDialogCode();
+	}
+	else {
+		hideDialogCode();
+	}
+}
+
 function showDialogCode() {
 	document.getElementById("dialogCode").style.display = "block";
 	document.getElementById("dialogEditor").style.display = "none";
-	document.getElementById("dialogShowCode").style.display = "none";
-	document.getElementById("dialogHideCode").style.display = "block";
+	// document.getElementById("dialogShowCode").style.display = "none";
+	// document.getElementById("dialogHideCode").style.display = "block";
 	document.getElementById("dialogTools").style.display = "none";
+
+	document.getElementById("dialogToggleCodeShowText").style.display = "none";
+	document.getElementById("dialogToggleCodeHideText").style.display = "inline";
 }
 
 function hideDialogCode() {
 	document.getElementById("dialogCode").style.display = "none";
 	document.getElementById("dialogEditor").style.display = "block";
-	document.getElementById("dialogShowCode").style.display = "block";
-	document.getElementById("dialogHideCode").style.display = "none";
+	// document.getElementById("dialogShowCode").style.display = "block";
+	// document.getElementById("dialogHideCode").style.display = "none";
 	document.getElementById("dialogTools").style.display = "block";
+
+	document.getElementById("dialogToggleCodeShowText").style.display = "inline";
+	document.getElementById("dialogToggleCodeHideText").style.display = "none";
 }
 
 function showDialogToolsSection() {
@@ -4350,6 +4367,22 @@ function initLanguageOptions() {
 		option.value = languageList[i].id;
 		option.selected = languageList[i].id === localization.GetLanguage();
 		languageSelect.add(option);
+	}
+}
+
+/* DOCS */
+function toggleDialogDocs(e) {
+	console.log("SHOW DOCS");
+	console.log(e.target.checked);
+	if (e.target.checked) {
+		document.getElementById("dialogDocs").style.display = "block";
+		document.getElementById("dialogToggleDocsShowText").style.display = "none";
+		document.getElementById("dialogToggleDocsHideText").style.display = "inline";
+	}
+	else {
+		document.getElementById("dialogDocs").style.display = "none";
+		document.getElementById("dialogToggleDocsShowText").style.display = "inline";
+		document.getElementById("dialogToggleDocsHideText").style.display = "none";
 	}
 }
 

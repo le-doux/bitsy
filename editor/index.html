@@ -841,29 +841,30 @@
 
 					<div id="dialogEditorHasContent">
 						<div style="float:left;">
-							<div id="dialogTop" style="height: 30px;">
-								<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
-								<label title="preview dialog" for="previewDialogCheck" style="float:left;">
-									<i class="material-icons" id="previewDialogIcon">play_arrow</i>
-									<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
-								</label>
+							<div id="dialogTop" style="height: 30px; margin-bottom: 5px;">
+								<span style="float:left">
+									<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
+									<label title="preview dialog" for="previewDialogCheck">
+										<i class="material-icons" id="previewDialogIcon">play_arrow</i>
+										<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
+									</label>
+								</span>
 
-								<!-- <span style="float:right">
-									<button title="show documentation for dialog scripting">
+								<span style="float:right">
+									<input type="checkbox" id="dialogShowDocsCheck" onclick="toggleDialogDocs(event);"/>
+									<label title="show / hide the code for this dialog" for="dialogShowDocsCheck">
 										<i class="material-icons">info</i>
-										<span class="localize dialog_show_docs">show docs</span>
-									</button>
-								</span> -->
+										<span id="dialogToggleDocsShowText" class="localize dialog_show_docs">show docs</span> 
+										<span id="dialogToggleDocsHideText" class="localize dialog_hide_docs" style="display:none;">hide docs</span>
+									</label>
 
-								<button id="dialogShowCode" onclick="showDialogCode();" title="show the code for this dialog" style="float:right;">
-									<i class="material-icons">code</i>
-									<span class="localize dialog_show_code">show code</span>
-								</button>
-
-								<button id="dialogHideCode" onclick="hideDialogCode();" style="display:none; float:right;" title="hide the code for this dialog, and show the dialog editing interface">
-									<i class="material-icons">code</i>
-									<span class="localize dialog_hide_code">hide code</span>
-								</button>
+									<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);" />
+									<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
+										<i class="material-icons">code</i> 
+										<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
+										<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
+									</label>
+								</span>
 							</div>
 
 							<div id="dialogTools" class="controlBox">
@@ -916,18 +917,25 @@
 									</button>
 								</div>
 							</div>
+
 							<div id="dialogCode" style="display:none;">
 								<textarea id="dialogCodeText" onkeydown="on_change_adv_dialog();" onkeyup="on_change_adv_dialog();" onchange="on_change_adv_dialog();"></textarea>
 							</div>
+
 							<div id="dialogEditor">
 								<div id="advDialogViewport">
 								</div>
 							</div>
 						</div>
 
-						<!-- <div id="dialogEditorDocs" style="float:right; width:300px; height:500px; background:red;">
-							DOCUMENTATION HERE!
-						</div> -->
+						<div id="dialogDocs" style="float:right; padding-left: 5px; display:none;">
+							<div class="controlBox">
+								<i class="material-icons" style="font-size:20px;vertical-align: middle;line-height: 100%;">info</i>
+								<span class="localize documentation_label">documentation</span>
+							</div>
+							<iframe src="docs/index.html" style="width:300px;height:450px;">
+							</iframe>
+						</div>
 					</div>
 
 					<div id="dialogEditorNoContent" class="controlBox" style="display:none;">
