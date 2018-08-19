@@ -1,4 +1,7 @@
 /*
+BUG ON WINDOWS
+..newly opened version of bitsy everything is broken because default game data can't be loaded :(
+
 POST 5.0 TODOs:
 X fix move on end dialog bug
 icelandic
