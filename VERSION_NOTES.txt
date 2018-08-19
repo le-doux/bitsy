@@ -1,3 +1,6 @@
+5.2:
+- {say} function re-enabled
+
 5.1:
 - perf improvement: hide font data in game data by default
 --- added toggle button to show/hide font data

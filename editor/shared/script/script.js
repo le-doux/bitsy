@@ -331,7 +331,7 @@ var Environment = function() {
 
 	var functionMap = new Map();
 	functionMap.set("print", printFunc);
-	functionMap.set("say", deprecatedFunc);
+	functionMap.set("say", printFunc);
 	functionMap.set("br", linebreakFunc);
 	functionMap.set("item", itemFunc);
 	functionMap.set("rbw", rainbowFunc);
