@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "electron": "latest",
-    "electron-builder": "latest"
+    "electron-builder": "latest",
+    "nw-builder": "^3.5.4"
   }
 }
