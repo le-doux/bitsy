@@ -1070,6 +1070,9 @@ function isSpriteOffstage(id) {
 }
 
 function parseWorld(file) {
+	console.log("~~~ PARSE WORLD ~~~");
+	console.log(file);
+
 	resetFlags();
 
 	var versionNumber = 0;
@@ -1790,7 +1793,7 @@ function parseDrawingCore(lines, i, drwId) {
 }
 
 function renderImages() {
-	// console.log(" -- RENDER IMAGES -- ");
+	console.log(" -- RENDER IMAGES -- ");
 
 	//init image store
 	for (pal in palette) {
@@ -1815,6 +1818,8 @@ function renderImages() {
 		var itm = item[i];
 		renderImageForAllPalettes( itm );
 	}
+
+	console.log(imageStore);
 }
 
 function renderImageForAllPalettes(drawing) {

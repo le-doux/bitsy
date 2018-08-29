@@ -8,6 +8,7 @@ icelandic
 estonian
 arabic
 esperanto
+[one other? hungarian?]
 X bug where big fonts slow down re-writing the game data (toggle to show the font data?)
 	- cause: writing a ton of data into the game data text box
 		fixes: hide/show font in game data, make "async" re-write of textbox (will that work?)
@@ -554,7 +555,6 @@ function start() {
 		on_game_data_change_core();
 	}
 	else {
-		//console.log("~~~~ no old save data! ~~~~");
 		setDefaultGameState();
 	}
 

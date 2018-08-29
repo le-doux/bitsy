@@ -430,18 +430,17 @@ function ResourceLoader() {
 	}
 }
 
-function createDefaultGameStateFunction() {
-	var resources = new ResourceLoader();
-	resources.load("other", "defaultGameData.bitsy");
-
-	return function() {
-		document.getElementById("game_data").value = resources.get("defaultGameData.bitsy"); // reset game data
-		localStorage.game_data = document.getElementById("game_data").value; // save game
-		clearGameData();
-		parseWorld(document.getElementById("game_data").value); // load game
-	}
+function setDefaultGameState() {
+	console.log("GET DEFAULT DATA");
+	var defaultData = document.getElementById("defaultGameData").text;
+	console.log("DEFAULT DATA \n" + defaultData);
+	document.getElementById("game_data").value = defaultData;
+	localStorage.game_data = document.getElementById("game_data").value; // save game
+	clearGameData();
+	parseWorld(document.getElementById("game_data").value); // load game
+	renderImages();
+	// TODO -- more setup???
 }
-var setDefaultGameState = createDefaultGameStateFunction();
 
 function newGameDialog() {
 	if ( Ed().platform == PlatformType.Mobile ||
