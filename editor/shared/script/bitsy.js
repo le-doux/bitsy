@@ -805,6 +805,8 @@ var InputManager = function() {
 	}
 
 	this.ontouchstart = function(event) {
+		e.preventDefault();
+
 		if( event.changedTouches.length > 0 ) {
 			touchState.isDown = true;
 
@@ -816,6 +818,8 @@ var InputManager = function() {
 	}
 
 	this.ontouchmove = function(event) {
+		e.preventDefault();
+
 		if( touchState.isDown && event.changedTouches.length > 0 ) {
 			touchState.curX = event.changedTouches[0].clientX;
 			touchState.curY = event.changedTouches[0].clientY;
@@ -844,6 +848,8 @@ var InputManager = function() {
 	}
 
 	this.ontouchend = function(event) {
+		e.preventDefault();
+
 		touchState.isDown = false;
 
 		if( touchState.swipeDirection == Direction.None ) {
