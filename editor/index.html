@@ -211,7 +211,7 @@
 						<div title="about window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">favorite</i>
 							<span class="localize about_tool_title">about bitsy</span>
-							 v5.1
+							 v5.2
 						</div>
 					</div>
 					<div id="aboutInner">
@@ -333,11 +333,16 @@
 							<input type="checkbox" id="versionNotesCheck" onclick="toggleVersionNotes(event);"/>
 							<label title="show / hide version notes" for="versionNotesCheck">
 								<span class="localize version_notes_title">what's new in</span>
-								 v5.1
+								 v5.2
 								<i id="versionNotesCheckIcon" class="material-icons">expand_less</i>
 							</label>
 
 							<div id="versionNotes" style="display:none;">
+								<br>
+								5.2:<br>
+								- {say} function re-enabled<br>
+								- fix weird scrolling in mobile<br>
+								- default game loads correctly<br>
 								<br>
 								5.1:<br>
 								- perf improvement: hide font data in game data by default<br>
@@ -1193,7 +1198,7 @@
 <script type="bitsyGameData" id="defaultGameData">
 Write your game's title here
 
-# BITSY VERSION 5.1
+# BITSY VERSION 5.2
 
 ! ROOM_FORMAT 1
 

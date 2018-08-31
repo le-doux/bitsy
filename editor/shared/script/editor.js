@@ -1,4 +1,7 @@
 /*
+TODO
+- fix bug where window wobbles around in touch mode [TEST AT HOME]
+
 POST 5.0 TODOs:
 X fix move on end dialog bug
 icelandic

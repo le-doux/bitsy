@@ -61,7 +61,7 @@ var spriteStartLocations = {};
 /* VERSION */
 var version = {
 	major: 5, // for file format / engine changes
-	minor: 1 // for editor changes and bugfixes
+	minor: 2 // for editor changes and bugfixes
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
@@ -805,7 +805,7 @@ var InputManager = function() {
 	}
 
 	this.ontouchstart = function(event) {
-		e.preventDefault();
+		event.preventDefault();
 
 		if( event.changedTouches.length > 0 ) {
 			touchState.isDown = true;
@@ -818,7 +818,7 @@ var InputManager = function() {
 	}
 
 	this.ontouchmove = function(event) {
-		e.preventDefault();
+		event.preventDefault();
 
 		if( touchState.isDown && event.changedTouches.length > 0 ) {
 			touchState.curX = event.changedTouches[0].clientX;
@@ -848,7 +848,7 @@ var InputManager = function() {
 	}
 
 	this.ontouchend = function(event) {
-		e.preventDefault();
+		event.preventDefault();
 
 		touchState.isDown = false;
 

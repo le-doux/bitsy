@@ -1,6 +1,7 @@
 5.2:
 - {say} function re-enabled
-- fix default game data load issue
+- fix weird scrolling in mobile
+- default game loads correctly
 
 5.1:
 - perf improvement: hide font data in game data by default
