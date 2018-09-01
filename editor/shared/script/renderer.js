@@ -15,6 +15,8 @@ TODO
 	- need to keep editor renderer up-to-date when you change something WITHOUT re-rendering everything
 	- will this get rid of the need for a loading screen?
 	- renderer can CONTAIN an "imageStore" variable (instead of the game state)
+	- the longer it goes.. the more expensive rendering seems to get
+		- keep a memory limit? up to a certain number of sprites in memory? (IF THEY ARE NOT ON SCREEN DELETE THEM)
 */
 
 function Renderer(tilesize, scale, context) {
