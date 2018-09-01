@@ -6,16 +6,22 @@ TODO
 	- scale
 	- palette data
 	- sprite, tile, item data
+- pass in loading update room?
+- tile picker is BROKEN!!!!
+- it's too flashy & slow right now :(
+- what if INSTEAD of doing everything at once.. I just rendered on an AS-NEEDED basis
+	- one image at a time
+	- need cacheing strategy
+	- need to keep editor renderer up-to-date when you change something WITHOUT re-rendering everything
+	- will this get rid of the need for a loading screen?
+	- renderer can CONTAIN an "imageStore" variable (instead of the game state)
 */
 
 function Renderer(tilesize, scale, context) {
 
-this.Render = function(gameState) {
-	renderImages(gameState);
-}
-
 // TODO : turn this into something with a callback
-function renderImages(gameState) {
+// 			should this return someting instead of writing into the gameState?
+function renderImages(gameState, onComplete) {
 	console.log(" -- RENDER IMAGES -- ");
 
 	//init image store
@@ -51,15 +57,58 @@ function renderImages(gameState) {
 
 	/* RENDER DRAWINGS */
 
-	for (var i = 0; i < renderList.length; i++) {
-		var drawing = renderList[i];
-		renderImageForAllPalettes( drawing, gameState.ImageStore, gameState.Palettes );
+	// for (var i = 0; i < renderList.length; i++) {
+	// 	var drawing = renderList[i];
+	// 	renderImageForAllPalettes( drawing, gameState.ImageStore, gameState.Palettes );
+	// }
+
+	var renderInterval = null;
+	var renderIndex = 0;
+
+	var renderTimer = new Timer();
+
+	var renderStepCount = 0;
+	var renderStepFunc;
+
+	renderStepFunc = function() {
+		var renderStepTimer = new Timer();
+
+		// console.log(">>>>> RENDER STEP " + renderStepCount);
+		while (renderIndex < renderList.length && renderStepTimer.Milliseconds() < 5) {
+			// console.log(">>>>> RENDER " + (renderIndex+1) + " / " + renderList.length);
+
+			// will one image per frame slow things down? (NEED A TIMER TO TEST)
+			var drawing = renderList[renderIndex];
+			renderImageForAllPalettes( drawing, gameState.ImageStore, gameState.Palettes );
+			renderIndex++;
+
+			if (renderIndex >= renderList.length) {
+				// console.log(">>>>>>>>>>>>> RENDER TIME " + renderTimer.Milliseconds());
+				// console.log(">>>>>>>>>>>>> RENDER STEPS " + renderStepCount);
+
+				if (renderInterval != null)
+					clearInterval(renderInterval);
+
+				onComplete();
+			}
+		}
+
+		renderStepCount++;
+
+		if (renderInterval == null) {
+			renderInterval = setInterval(renderStepFunc, 30);
+		}
 	}
 
-	console.log(imageStore);
+	renderStepFunc();
+
+	// console.log(imageStore);
 }
+this.RenderImages = renderImages; // public interface
 
 function renderImageForAllPalettes(drawing, imageStore, palettes) {
+	var timer = new Timer();
+
 	// console.log("RENDER IMAGE");
 	for (pal in palettes) {
 		// console.log(pal);
@@ -97,6 +146,8 @@ function renderImageForAllPalettes(drawing, imageStore, palettes) {
 			}
 		}
 	}
+
+	console.log("IMAGE RENDER TIME " + timer.Milliseconds());
 }
 
 function imageDataFromImageSource(imageSource, pal, col) {
@@ -130,3 +181,16 @@ function imageDataFromImageSource(imageSource, pal, col) {
 
 
 } // Renderer()
+
+
+function Timer() {
+	var start = Date.now();
+
+	this.Seconds = function() {
+		return Math.floor( (Date.now() - start) / 1000 );
+	}
+
+	this.Milliseconds = function() {
+		return Date.now() - start;
+	}
+}

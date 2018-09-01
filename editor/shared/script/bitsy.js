@@ -185,15 +185,17 @@ function load_game(game_data, startWithTitle) {
 	dialogRenderer.SetFont(font);
 
 	setInitialVariables();
-	renderImages();
+	renderImages(function() {
+		onready(startWithTitle);
+	});
 
 	// setInterval(updateLoadingScreen, 300); // hack test
 
-	onready(startWithTitle);
+	// onready(startWithTitle);
 }
 
 // hack test new render version
-function renderImages() {
+function renderImages(onComplete) {
 	var testGameState = new GameState();
 	testGameState.Tiles = tile;
 	testGameState.Sprites = sprite;
@@ -201,8 +203,15 @@ function renderImages() {
 	testGameState.Palettes = palette;
 	testGameState.ImageStore = imageStore;
 	var testRenderer = new Renderer(tilesize, scale, ctx);
-	testRenderer.Render(testGameState);
-	imageStore = testGameState.ImageStore;
+	testRenderer.RenderImages(testGameState, function() {
+		console.log("HACK renderImages complete");
+		console.log(onComplete);
+
+		imageStore = testGameState.ImageStore;
+		if (onComplete) {
+			onComplete();
+		}
+	});
 }
 
 function reset_cur_game() {
@@ -1089,8 +1098,8 @@ function isSpriteOffstage(id) {
 }
 
 function parseWorld(file) {
-	console.log("~~~ PARSE WORLD ~~~");
-	console.log(file);
+	// console.log("~~~ PARSE WORLD ~~~");
+	// console.log(file);
 
 	resetFlags();
 

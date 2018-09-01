@@ -430,15 +430,17 @@ function ResourceLoader() {
 	}
 }
 
-function setDefaultGameState() {
+function setDefaultGameState(onComplete) {
 	console.log("GET DEFAULT DATA");
+	console.log(onComplete);
+
 	var defaultData = document.getElementById("defaultGameData").text;
-	console.log("DEFAULT DATA \n" + defaultData);
+	// console.log("DEFAULT DATA \n" + defaultData);
 	document.getElementById("game_data").value = defaultData;
 	localStorage.game_data = document.getElementById("game_data").value; // save game
 	clearGameData();
 	parseWorld(document.getElementById("game_data").value); // load game
-	renderImages();
+	renderImages(onComplete);
 	// TODO -- more setup???
 }
 
@@ -450,37 +452,46 @@ function newGameDialog() {
 	}
 }
 
-function resetGameData() {
-	setDefaultGameState();
+function resetGameData(onComplete) {
+	setDefaultGameState(function() {
+		console.log("reset complete");
+		console.log(onComplete);
 
-	// TODO : localize default_title
-	title = localization.GetStringOrFallback("default_title", "Write your game's title here");
+		// TODO : localize default_title
+		title = localization.GetStringOrFallback("default_title", "Write your game's title here");
 
-	pickDefaultFontForLanguage(localization.GetLanguage());
+		pickDefaultFontForLanguage(localization.GetLanguage());
 
-	// todo wrap these variable resets in a function
-	tileIndex = 0;
-	spriteIndex = 0;
+		// todo wrap these variable resets in a function
+		tileIndex = 0;
+		spriteIndex = 0;
 
-	refreshGameData();
-	renderImages();
+		refreshGameData();
 
-	if ( Ed().platform == PlatformType.Desktop ) {
-		updatePaletteUI();
-		// updatePaletteControlsFromGameData();
-		updateExitOptionsFromGameData();
-		updateRoomName();
-		updateInventoryUI();
-		updateFontSelectUI(); // hmm is this really the place for this?
+		// TODO : is this second renderImages REALLY necessary?????
+		renderImages(function() {
+			if ( Ed().platform == PlatformType.Desktop ) {
+				updatePaletteUI();
+				// updatePaletteControlsFromGameData();
+				updateExitOptionsFromGameData();
+				updateRoomName();
+				updateInventoryUI();
+				updateFontSelectUI(); // hmm is this really the place for this?
 
-		on_paint_avatar();
-		document.getElementById('paintOptionAvatar').checked = true;
-	}
+				on_paint_avatar();
+				document.getElementById('paintOptionAvatar').checked = true;
+			}
 
-	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
-	roomTool.drawEditMap();
+			paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
+			roomTool.drawEditMap();
 
-	document.getElementById("titleText").value = title;
+			document.getElementById("titleText").value = title;
+
+			if (onComplete) {
+				onComplete();
+			}
+		});
+	});
 }
 
 function refreshGameData() {
