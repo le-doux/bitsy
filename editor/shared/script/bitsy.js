@@ -1,6 +1,6 @@
-var xhr;
+var xhr; // TODO : remove
 var canvas;
-var context;
+var context; // TODO : remove if safe?
 var ctx;
 
 var title = "";
@@ -190,6 +190,19 @@ function load_game(game_data, startWithTitle) {
 	// setInterval(updateLoadingScreen, 300); // hack test
 
 	onready(startWithTitle);
+}
+
+// hack test new render version
+function renderImages() {
+	var testGameState = new GameState();
+	testGameState.Tiles = tile;
+	testGameState.Sprites = sprite;
+	testGameState.Items = item;
+	testGameState.Palettes = palette;
+	testGameState.ImageStore = imageStore;
+	var testRenderer = new Renderer(tilesize, scale, ctx);
+	testRenderer.Render(testGameState);
+	imageStore = testGameState.ImageStore;
 }
 
 function reset_cur_game() {
@@ -1796,105 +1809,6 @@ function parseDrawingCore(lines, i, drwId) {
 
 	//console.log(imageStore.source[drwId]);
 	return i;
-}
-
-function renderImages() {
-	console.log(" -- RENDER IMAGES -- ");
-
-	//init image store
-	for (pal in palette) {
-		imageStore.render[pal] = {
-			"1" : {}, //images with primary color index 1 (usually tiles)
-			"2" : {}  //images with primary color index 2 (usually sprites)
-		};
-	}
-
-	//render images required by sprites
-	for (s in sprite) {
-		var spr = sprite[s];
-		renderImageForAllPalettes( spr );
-	}
-	//render images required by tiles
-	for (t in tile) {
-		var til = tile[t];
-		renderImageForAllPalettes( til );
-	}
-	//render images required by tiles
-	for (i in item) {
-		var itm = item[i];
-		renderImageForAllPalettes( itm );
-	}
-
-	console.log(imageStore);
-}
-
-function renderImageForAllPalettes(drawing) {
-	// console.log("RENDER IMAGE");
-	for (pal in palette) {
-		// console.log(pal);
-
-		var col = drawing.col;
-		var colStr = "" + col;
-
-		// slightly hacky initialization of image store for palettes with more than 3 colors ~~~ SECRET FEATURE DO NOT USE :P ~~~
-		if(imageStore.render[pal][colStr] === undefined || imageStore.render[pal][colStr] === null) {
-			// console.log("UNDEFINED " + colStr);
-			imageStore.render[pal][colStr] = {};
-		}
-
-		// console.log(drawing);
-		// console.log(drawing.drw);
-		// console.log(imageStore);
-
-		var imgSrc = imageStore.source[ drawing.drw ];
-
-		if ( imgSrc.length <= 1 ) {
-			// non-animated drawing
-			var frameSrc = imgSrc[0];
-			// console.log(drawing);
-			// console.log(imageStore);
-			imageStore.render[pal][colStr][drawing.drw] = imageDataFromImageSource( frameSrc, pal, col );
-		}
-		else {
-			// animated drawing
-			var frameCount = 0;
-			for (f in imgSrc) {
-				var frameSrc = imgSrc[f];
-				var frameId = drawing.drw + "_" + frameCount;
-				imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
-				frameCount++;
-			}
-		}
-	}
-}
-
-function imageDataFromImageSource(imageSource, pal, col) {
-	//console.log(imageSource);
-
-	var img = ctx.createImageData(tilesize*scale,tilesize*scale);
-	for (var y = 0; y < tilesize; y++) {
-		for (var x = 0; x < tilesize; x++) {
-			var px = imageSource[y][x];
-			for (var sy = 0; sy < scale; sy++) {
-				for (var sx = 0; sx < scale; sx++) {
-					var pxl = (((y * scale) + sy) * tilesize * scale * 4) + (((x*scale) + sx) * 4);
-					if ( px === 1 && getPal(pal).length > col ) {
-						img.data[pxl + 0] = getPal(pal)[col][0]; //ugly
-						img.data[pxl + 1] = getPal(pal)[col][1];
-						img.data[pxl + 2] = getPal(pal)[col][2];
-						img.data[pxl + 3] = 255;
-					}
-					else { //ch === 0
-						img.data[pxl + 0] = getPal(pal)[0][0];
-						img.data[pxl + 1] = getPal(pal)[0][1];
-						img.data[pxl + 2] = getPal(pal)[0][2];
-						img.data[pxl + 3] = 255;
-					}
-				}
-			}
-		}
-	}
-	return img;
 }
 
 function parseDialog(lines, i) {

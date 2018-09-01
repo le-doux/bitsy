@@ -1,6 +1,8 @@
 /*
-TODO
-- fix bug where window wobbles around in touch mode [TEST AT HOME]
+PERF NOTES:
+- little duck load time: 20 seconds
+	- parse time: 0
+	- render time: 20 [it's all RENDERING!!!]
 
 POST 5.0 TODOs:
 X fix move on end dialog bug
