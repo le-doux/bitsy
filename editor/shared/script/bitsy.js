@@ -50,12 +50,6 @@ function updateNamesFromCurData() {
 	}
 }
 
-//stores all image data for tiles, sprites, drawings
-var imageStore = {
-	source: {},
-	render: {}
-};
-
 var spriteStartLocations = {};
 
 /* VERSION */
@@ -152,6 +146,8 @@ var onVariableChanged = null;
 
 var isPlayerEmbeddedInEditor = false;
 
+var renderer = new Renderer(tilesize, scale);
+
 function getGameNameFromURL() {
 	var game = window.location.hash.substring(1);
 	// console.log("game name --- " + game);
@@ -164,6 +160,7 @@ function attachCanvas(c) {
 	canvas.height = width * scale;
 	ctx = canvas.getContext("2d");
 	dialogRenderer.AttachContext(ctx);
+	renderer.AttachContext(ctx);
 }
 
 var curGameData = null;
@@ -185,33 +182,18 @@ function load_game(game_data, startWithTitle) {
 	dialogRenderer.SetFont(font);
 
 	setInitialVariables();
-	renderImages(function() {
-		onready(startWithTitle);
-	});
 
 	// setInterval(updateLoadingScreen, 300); // hack test
 
-	// onready(startWithTitle);
+	onready(startWithTitle);
 }
 
 // hack test new render version
 function renderImages(onComplete) {
-	var testGameState = new GameState();
-	testGameState.Tiles = tile;
-	testGameState.Sprites = sprite;
-	testGameState.Items = item;
-	testGameState.Palettes = palette;
-	testGameState.ImageStore = imageStore;
-	var testRenderer = new Renderer(tilesize, scale, ctx);
-	testRenderer.RenderImages(testGameState, function() {
-		console.log("HACK renderImages complete");
-		console.log(onComplete);
-
-		imageStore = testGameState.ImageStore;
-		if (onComplete) {
-			onComplete();
-		}
-	});
+	// TODO -- remove
+	console.log("DEPRECATED RENDER IMAGES!!!!");
+	if (onComplete)
+		onComplete();
 }
 
 function reset_cur_game() {
@@ -1169,6 +1151,8 @@ function parseWorld(file) {
 		curRoom = player().room;
 	}
 
+	renderer.SetPalettes(palette);
+
 	// console.log(names);
 
 	return versionNumber;
@@ -1369,16 +1353,17 @@ function serializeWorld(skipFonts) {
 }
 
 function serializeDrawing(drwId) {
+	var imageSource = renderer.GetImageSource(drwId);
 	var drwStr = "";
-	for (f in imageStore.source[drwId]) {
-		for (y in imageStore.source[drwId][f]) {
+	for (f in imageSource) {
+		for (y in imageSource[f]) {
 			var rowStr = "";
-			for (x in imageStore.source[drwId][f][y]) {
-				rowStr += imageStore.source[drwId][f][y][x];
+			for (x in imageSource[f][y]) {
+				rowStr += imageSource[f][y][x];
 			}
 			drwStr += rowStr + "\n";
 		}
-		if (f < (imageStore.source[drwId].length-1)) drwStr += ">\n";
+		if (f < (imageSource.length-1)) drwStr += ">\n";
 	}
 	return drwStr;
 }
@@ -1629,9 +1614,9 @@ function parseTile(lines, i) {
 		drw : drwId, //drawing id
 		col : colorIndex,
 		animation : {
-			isAnimated : (imageStore.source[drwId].length > 1),
+			isAnimated : (renderer.GetFrameCount(drwId) > 1),
 			frameIndex : 0,
-			frameCount : imageStore.source[drwId].length
+			frameCount : renderer.GetFrameCount(drwId)
 		},
 		name : name,
 		isWall : isWall
@@ -1704,9 +1689,9 @@ function parseSprite(lines, i) {
 		y : -1,
 		walkingPath : [], //tile by tile movement path (isn't saved)
 		animation : {
-			isAnimated : (imageStore.source[drwId].length > 1),
+			isAnimated : (renderer.GetFrameCount(drwId) > 1),
 			frameIndex : 0,
-			frameCount : imageStore.source[drwId].length
+			frameCount : renderer.GetFrameCount(drwId)
 		},
 		inventory : startingInventory,
 		name : name
@@ -1770,9 +1755,9 @@ function parseItem(lines, i) {
 		// x : -1,
 		// y : -1,
 		animation : {
-			isAnimated : (imageStore.source[drwId].length > 1),
+			isAnimated : (renderer.GetFrameCount(drwId) > 1),
 			frameIndex : 0,
-			frameCount : imageStore.source[drwId].length
+			frameCount : renderer.GetFrameCount(drwId)
 		},
 		name : name
 	};
@@ -1790,8 +1775,8 @@ function parseDrawing(lines, i) {
 }
 
 function parseDrawingCore(lines, i, drwId) {
-	imageStore.source[drwId] = []; //init list of frames
-	imageStore.source[drwId].push( [] ); //init first frame
+	var frameList = []; //init list of frames
+	frameList.push( [] ); //init first frame
 	var frameIndex = 0;
 	var y = 0;
 	while ( y < tilesize ) {
@@ -1800,14 +1785,14 @@ function parseDrawingCore(lines, i, drwId) {
 		for (x = 0; x < tilesize; x++) {
 			row.push( parseInt( l.charAt(x) ) );
 		}
-		imageStore.source[drwId][frameIndex].push( row );
+		frameList[frameIndex].push( row );
 		y++;
 
 		if (y === tilesize) {
 			i = i + y;
 			if ( lines[i] != undefined && lines[i].charAt(0) === ">" ) {
 				// start next frame!
-				imageStore.source[drwId].push( [] );
+				frameList.push( [] );
 				frameIndex++;
 				//start the count over again for the next frame
 				i++;
@@ -1816,7 +1801,8 @@ function parseDrawingCore(lines, i, drwId) {
 		}
 	}
 
-	//console.log(imageStore.source[drwId]);
+	renderer.SetImageSource(drwId, frameList);
+
 	return i;
 }
 
@@ -1941,64 +1927,17 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	}
 }
 
+// TODO : remove these get*Image methods
 function getTileImage(t,palId,frameIndex) {
-	if( frameIndex === undefined ) frameIndex = null; // no default parameter support on iOS
-
-	var drwId = t.drw;
-
-	if (!palId) palId = curPal(); // TODO : will this break on iOS?
-
-	if ( t.animation.isAnimated ) {
-		if (frameIndex != null) { // use optional provided frame index
-			// console.log("GET TILE " + frameIndex);
-			drwId += "_" + frameIndex;
-		}
-		else { // or the one bundled with the tile
-			drwId += "_" + t.animation.frameIndex;
-		}
-	}
-	return imageStore.render[ palId ][ t.col ][ drwId ];
+	return renderer.GetImage(t,palId,frameIndex);
 }
 
 function getSpriteImage(s,palId,frameIndex) {
-	if( frameIndex === undefined ) frameIndex = null; // no default parameter support on iOS
-
-	var drwId = s.drw;
-
-	if (!palId) palId = curPal();
-
-	if ( s.animation.isAnimated ) {
-		if (frameIndex != null) {
-			drwId += "_" + frameIndex;
-		}
-		else {
-			drwId += "_" + s.animation.frameIndex;
-		}
-	}
-
-	return imageStore.render[ palId ][ s.col ][ drwId ];
+	return renderer.GetImage(s,palId,frameIndex);
 }
 
-function getItemImage(itm,palId,frameIndex) { //aren't these all the same????
-	if( frameIndex === undefined ) frameIndex = null; // no default parameter support on iOS
-
-	var drwId = itm.drw;
-	// console.log(drwId);
-
-	if (!palId) palId = curPal();
-
-	if ( itm.animation.isAnimated ) {
-		if (frameIndex != null) {
-			drwId += "_" + frameIndex;
-		}
-		else {
-			drwId += "_" + itm.animation.frameIndex;
-		}
-	}
-
-	// console.log(imageStore.render[ palId ][ itm.col ]);
-	// console.log(imageStore.render[ palId ][ itm.col ][ drwId ]);
-	return imageStore.render[ palId ][ itm.col ][ drwId ];
+function getItemImage(itm,palId,frameIndex) {
+	return renderer.GetImage(itm,palId,frameIndex);
 }
 
 function curPal() {

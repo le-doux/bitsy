@@ -19,168 +19,156 @@ TODO
 		- keep a memory limit? up to a certain number of sprites in memory? (IF THEY ARE NOT ON SCREEN DELETE THEM)
 */
 
-function Renderer(tilesize, scale, context) {
+function Renderer(tilesize, scale) {
 
-// TODO : turn this into something with a callback
-// 			should this return someting instead of writing into the gameState?
-function renderImages(gameState, onComplete) {
-	console.log(" -- RENDER IMAGES -- ");
+console.log("!!!!! NEW RENDERER");
 
-	//init image store
-	for (pal in gameState.Palettes) {
-		gameState.ImageStore.render[pal] = {
+var imageStore = {
+	source: {},
+	render: {}
+};
+
+var palettes = null; // TODO : need null checks?
+var context = null;
+
+function setPalettes(paletteObj) {
+	palettes = paletteObj;
+
+	// TODO : should this really clear out the render cache?
+	for (pal in palettes) {
+		imageStore.render[pal] = {
 			"1" : {}, //images with primary color index 1 (usually tiles)
 			"2" : {}  //images with primary color index 2 (usually sprites)
-		};
-	}
-
-	var renderList = [];
-
-	/* BUILD RENDER LIST */
-
-	//render images required by sprites
-	for (s in gameState.Sprites) {
-		var spr = gameState.Sprites[s];
-		renderList.push(spr);
-		// renderImageForAllPalettes( spr, gameState.ImageStore, gameState.Palettes );
-	}
-	//render images required by tiles
-	for (t in gameState.Tiles) {
-		var til = gameState.Tiles[t];
-		renderList.push(til);
-		// renderImageForAllPalettes( til, gameState.ImageStore, gameState.Palettes );
-	}
-	//render images required by tiles
-	for (i in gameState.Items) {
-		var itm = gameState.Items[i];
-		renderList.push(itm);
-		// renderImageForAllPalettes( itm, gameState.ImageStore, gameState.Palettes );
-	}
-
-	/* RENDER DRAWINGS */
-
-	// for (var i = 0; i < renderList.length; i++) {
-	// 	var drawing = renderList[i];
-	// 	renderImageForAllPalettes( drawing, gameState.ImageStore, gameState.Palettes );
-	// }
-
-	var renderInterval = null;
-	var renderIndex = 0;
-
-	var renderTimer = new Timer();
-
-	var renderStepCount = 0;
-	var renderStepFunc;
-
-	renderStepFunc = function() {
-		var renderStepTimer = new Timer();
-
-		// console.log(">>>>> RENDER STEP " + renderStepCount);
-		while (renderIndex < renderList.length && renderStepTimer.Milliseconds() < 5) {
-			// console.log(">>>>> RENDER " + (renderIndex+1) + " / " + renderList.length);
-
-			// will one image per frame slow things down? (NEED A TIMER TO TEST)
-			var drawing = renderList[renderIndex];
-			renderImageForAllPalettes( drawing, gameState.ImageStore, gameState.Palettes );
-			renderIndex++;
-
-			if (renderIndex >= renderList.length) {
-				// console.log(">>>>>>>>>>>>> RENDER TIME " + renderTimer.Milliseconds());
-				// console.log(">>>>>>>>>>>>> RENDER STEPS " + renderStepCount);
-
-				if (renderInterval != null)
-					clearInterval(renderInterval);
-
-				onComplete();
-			}
-		}
-
-		renderStepCount++;
-
-		if (renderInterval == null) {
-			renderInterval = setInterval(renderStepFunc, 30);
 		}
 	}
-
-	renderStepFunc();
-
-	// console.log(imageStore);
 }
-this.RenderImages = renderImages; // public interface
 
-function renderImageForAllPalettes(drawing, imageStore, palettes) {
-	var timer = new Timer();
+function getPaletteColor(paletteId, colorIndex) {
+	var palette = palettes[paletteId];
 
-	// console.log("RENDER IMAGE");
-	for (pal in palettes) {
-		// console.log(pal);
-
-		var col = drawing.col;
-		var colStr = "" + col;
-
-		// slightly hacky initialization of image store for palettes with more than 3 colors ~~~ SECRET FEATURE DO NOT USE :P ~~~
-		if(imageStore.render[pal][colStr] === undefined || imageStore.render[pal][colStr] === null) {
-			// console.log("UNDEFINED " + colStr);
-			imageStore.render[pal][colStr] = {};
-		}
-
-		// console.log(drawing);
-		// console.log(drawing.drw);
-		// console.log(imageStore);
-
-		var imgSrc = imageStore.source[ drawing.drw ];
-
-		if ( imgSrc.length <= 1 ) {
-			// non-animated drawing
-			var frameSrc = imgSrc[0];
-			// console.log(drawing);
-			// console.log(imageStore);
-			imageStore.render[pal][colStr][drawing.drw] = imageDataFromImageSource( frameSrc, pal, col );
-		}
-		else {
-			// animated drawing
-			var frameCount = 0;
-			for (f in imgSrc) {
-				var frameSrc = imgSrc[f];
-				var frameId = drawing.drw + "_" + frameCount;
-				imageStore.render[pal][colStr][frameId] = imageDataFromImageSource( frameSrc, pal, col );
-				frameCount++;
-			}
-		}
+	if (colorIndex > palette.colors.length) { // do I need this failure case? (seems un-reliable)
+		colorIndex = 0;
 	}
 
-	console.log("IMAGE RENDER TIME " + timer.Milliseconds());
+	var color = palette.colors[colorIndex];
+
+	return {
+		r : color[0],
+		g : color[1],
+		b : color[2]
+	};
+}
+
+// TODO : change image store path from (pal > col > draw) to (draw > pal > col)
+function renderImage(drawing, paletteId) {
+	var col = drawing.col;
+	var colStr = "" + col;
+	var pal = paletteId;
+	var drwId = drawing.drw;
+	var imgSrc = imageStore.source[ drawing.drw ];
+
+	// slightly hacky initialization of image store for palettes with more than 3 colors ~~~ SECRET FEATURE DO NOT USE :P ~~~
+	if(imageStore.render[pal][colStr] === undefined || imageStore.render[pal][colStr] === null) {
+		imageStore.render[pal][colStr] = {};
+	}
+
+	imageStore.render[pal][colStr][drwId] = []; // create array of ImageData frames
+	for (var i = 0; i < imgSrc.length; i++) {
+		var frameSrc = imgSrc[i];
+		var frameData = imageDataFromImageSource( frameSrc, pal, col );
+		imageStore.render[pal][colStr][drwId].push(frameData);
+	}
 }
 
 function imageDataFromImageSource(imageSource, pal, col) {
 	//console.log(imageSource);
 
 	var img = context.createImageData(tilesize*scale,tilesize*scale);
+
+	var backgroundColor = getPaletteColor(pal,0);
+	var foregroundColor = getPaletteColor(pal,col);
+
 	for (var y = 0; y < tilesize; y++) {
 		for (var x = 0; x < tilesize; x++) {
 			var px = imageSource[y][x];
 			for (var sy = 0; sy < scale; sy++) {
 				for (var sx = 0; sx < scale; sx++) {
 					var pxl = (((y * scale) + sy) * tilesize * scale * 4) + (((x*scale) + sx) * 4);
-					if ( px === 1 && getPal(pal).length > col ) {
-						img.data[pxl + 0] = getPal(pal)[col][0]; //ugly
-						img.data[pxl + 1] = getPal(pal)[col][1];
-						img.data[pxl + 2] = getPal(pal)[col][2];
+					if ( px === 1 ) {
+						img.data[pxl + 0] = foregroundColor.r;
+						img.data[pxl + 1] = foregroundColor.g;
+						img.data[pxl + 2] = foregroundColor.b;
 						img.data[pxl + 3] = 255;
 					}
 					else { //ch === 0
-						img.data[pxl + 0] = getPal(pal)[0][0];
-						img.data[pxl + 1] = getPal(pal)[0][1];
-						img.data[pxl + 2] = getPal(pal)[0][2];
+						img.data[pxl + 0] = backgroundColor.r;
+						img.data[pxl + 1] = backgroundColor.g;
+						img.data[pxl + 2] = backgroundColor.b;
 						img.data[pxl + 3] = 255;
 					}
 				}
 			}
 		}
 	}
+
 	return img;
 }
 
+function isImageRendered(drawing, paletteId) {
+	var col = drawing.col;
+	var colStr = "" + col;
+	var pal = paletteId;
+	var drwId = drawing.drw;
+
+	return !(imageStore.render[pal][colStr][drwId] === undefined || imageStore.render[pal][colStr][drwId] === null);
+}
+
+function getImageSet(drawing, paletteId) {
+	return imageStore.render[paletteId][drawing.col][drawing.drw];
+}
+
+function getImageFrame(drawing, paletteId, frameOverride) {
+	var frameIndex = 0;
+	if (drawing.animation.isAnimated) {
+		if (frameOverride != undefined && frameOverride != null) {
+			frameIndex = frameOverride;
+		}
+		else {
+			frameIndex = drawing.animation.frameIndex;
+		}
+	}
+
+	return getImageSet(drawing, paletteId)[frameIndex];
+}
+
+function getOrRenderImage(drawing, paletteId, frameOverride) {
+	if (!isImageRendered(drawing, paletteId)) {
+		renderImage(drawing, paletteId);
+	}
+
+	return getImageFrame(drawing, paletteId, frameOverride);
+}
+
+/* PUBLIC INTERFACE */
+this.GetImage = getOrRenderImage;
+
+this.SetPalettes = setPalettes;
+
+this.SetImageSource = function(drawingId, imageSourceData) {
+	imageStore.source[drawingId] = imageSourceData;
+}
+
+this.GetImageSource = function(drawingId) {
+	return imageStore.source[drawingId];
+}
+
+this.GetFrameCount = function(drawingId) {
+	return imageStore.source[drawingId].length;
+}
+
+this.AttachContext = function(ctx) {
+	context = ctx;
+}
 
 } // Renderer()
 
