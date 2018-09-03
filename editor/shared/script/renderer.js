@@ -1,29 +1,20 @@
 /*
 TODO
-- use callbacks
-- remove globals
-	- tilesize
-	- scale
-	- palette data
-	- sprite, tile, item data
-- pass in loading update room?
-- tile picker is BROKEN!!!!
-- it's too flashy & slow right now :(
-- what if INSTEAD of doing everything at once.. I just rendered on an AS-NEEDED basis
-	- one image at a time
-	- need cacheing strategy
-	- need to keep editor renderer up-to-date when you change something WITHOUT re-rendering everything
-	- will this get rid of the need for a loading screen?
-	- renderer can CONTAIN an "imageStore" variable (instead of the game state)
-	- the longer it goes.. the more expensive rendering seems to get
-		- keep a memory limit? up to a certain number of sprites in memory? (IF THEY ARE NOT ON SCREEN DELETE THEM)
+- reset renderer function
+- react to changes in: drawings, palettes
+- possible future plan: limit size of cache (remove old images)
+- change image store path from (pal > col > draw) to (draw > pal > col)
+- get rid of old getSpriteImage (etc) methods
+- get rif of old renderImages method
+- get editor working again
+- move debug timer class into core (seems useful)
 */
 
 function Renderer(tilesize, scale) {
 
 console.log("!!!!! NEW RENDERER");
 
-var imageStore = {
+var imageStore = { // TODO : rename to imageCache
 	source: {},
 	render: {}
 };
@@ -173,14 +164,14 @@ this.AttachContext = function(ctx) {
 } // Renderer()
 
 
-function Timer() {
-	var start = Date.now();
+// function Timer() {
+// 	var start = Date.now();
 
-	this.Seconds = function() {
-		return Math.floor( (Date.now() - start) / 1000 );
-	}
+// 	this.Seconds = function() {
+// 		return Math.floor( (Date.now() - start) / 1000 );
+// 	}
 
-	this.Milliseconds = function() {
-		return Date.now() - start;
-	}
-}
+// 	this.Milliseconds = function() {
+// 		return Date.now() - start;
+// 	}
+// }
