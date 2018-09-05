@@ -22,17 +22,10 @@ var fontName = defaultFontName;
 
 // TODO : names, more???
 
-//stores all image data for tiles, sprites, drawings
-var imageStore = {
-	source: {},
-	render: {}
-};
-
 // TODO : is directly exposing these values the best idea?
 this.Tiles = tile;
 this.Sprites = sprite;
 this.Items = item;
 this.Palettes = palette;
-this.ImageStore = imageStore;
 
 } // GameState()

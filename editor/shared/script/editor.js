@@ -1059,7 +1059,7 @@ function duplicateDrawing() {
 	if (drawing.type == TileType.Tile) {
 
 		//copy drawing data
-		var sourceImageData = imageStore.source[ "TIL_" + drawing.id ];
+		var sourceImageData = renderer.GetImageSource( "TIL_" + drawing.id );
 		var copiedImageData = [];
 		for (f in sourceImageData) {
 			copiedImageData.push([]);
@@ -1093,7 +1093,7 @@ function duplicateDrawing() {
 	else if(drawing.type == TileType.Avatar || drawing.type == TileType.Sprite) {
 
 		//copy drawing data -- hacky duplication as usual between sprite and tile :(
-		var sourceImageData = imageStore.source[ "SPR_" + drawing.id ];
+		var sourceImageData = renderer.GetImageSource( "SPR_" + drawing.id );
 		var copiedImageData = [];
 		for (f in sourceImageData) {
 			copiedImageData.push([]);
@@ -1123,7 +1123,7 @@ function duplicateDrawing() {
 	else if(drawing.type == TileType.Item) {
 
 		//copy drawing data -- hacky duplication as usual between sprite and tile :(
-		var sourceImageData = imageStore.source[ "ITM_" + drawing.id ];
+		var sourceImageData = renderer.GetImageSource( "ITM_" + drawing.id );
 		var copiedImageData = [];
 		for (f in sourceImageData) {
 			copiedImageData.push([]);
@@ -1520,14 +1520,14 @@ function changeColorPickerIndex(index) {
 
 function onPaletteChange() {
 	refreshGameData();
-	renderImages(
-		function() {
-			paintTool.updateCanvas();
-			roomTool.drawEditMap();
-			paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
-			if( paintTool.isCurDrawingAnimated )
-				renderAnimationPreview( drawing.id );
-		});
+
+	// TODO RENDERER : refresh images
+
+	paintTool.updateCanvas();
+	roomTool.drawEditMap();
+	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
+	if( paintTool.isCurDrawingAnimated )
+		renderAnimationPreview( drawing.id );
 }
 
 function updatePaletteOptionsFromGameData() {
@@ -1949,49 +1949,47 @@ function on_game_data_change_core(onComplete) {
 		makeItem( drawing.id );
 	}
 
-	renderImages(
-		function() {
-			roomTool.drawEditMap();
+	// TODO RENDERER : refresh images
 
-			drawing.type = curPaintMode;
-			if ( drawing.type == TileType.Tile ) {
-				drawing.id = sortedTileIdList()[0];
-				paintTool.reloadDrawing();
-			}
-			else if( drawing.type === TileType.Item ) {
-				drawing.id = sortedItemIdList()[0];
-				paintTool.reloadDrawing();
-			}
-			else {
-				drawing.id = sortedSpriteIdList()[0];
-				paintTool.reloadDrawing();
-			}
+	roomTool.drawEditMap();
 
-			// if user pasted in a custom font into game data - update the stored custom font
-			if (areAllFontsLoaded && !editorFontManager.ContainsResource(fontName + editorFontManager.GetExtension())) {
-				var fontStorage = {
-					name : fontName,
-					fontdata : fontManager.GetData(fontName)
-				};
-				localStorage.custom_font = JSON.stringify(fontStorage);
-				editorFontManager.AddResource(fontName + editorFontManager.GetExtension(), fontManager.GetData(fontName));
-			}
+	drawing.type = curPaintMode;
+	if ( drawing.type == TileType.Tile ) {
+		drawing.id = sortedTileIdList()[0];
+		paintTool.reloadDrawing();
+	}
+	else if( drawing.type === TileType.Item ) {
+		drawing.id = sortedItemIdList()[0];
+		paintTool.reloadDrawing();
+	}
+	else {
+		drawing.id = sortedSpriteIdList()[0];
+		paintTool.reloadDrawing();
+	}
 
-			updatePaletteUI();
+	// if user pasted in a custom font into game data - update the stored custom font
+	if (areAllFontsLoaded && !editorFontManager.ContainsResource(fontName + editorFontManager.GetExtension())) {
+		var fontStorage = {
+			name : fontName,
+			fontdata : fontManager.GetData(fontName)
+		};
+		localStorage.custom_font = JSON.stringify(fontStorage);
+		editorFontManager.AddResource(fontName + editorFontManager.GetExtension(), fontManager.GetData(fontName));
+	}
 
-			updateInventoryUI();
+	updatePaletteUI();
 
-			updateFontSelectUI();
+	updateInventoryUI();
 
-			updateExitOptionsFromGameData();
+	updateFontSelectUI();
 
-			document.getElementById("titleText").value = title;
+	updateExitOptionsFromGameData();
 
-			if (onComplete) {
-				onComplete()
-			}
-		}
-	);
+	document.getElementById("titleText").value = title;
+
+	if (onComplete) {
+		onComplete()
+	}
 }
 
 function updateFontSelectUI() {
@@ -2573,27 +2571,27 @@ function finishRecordingGif(gif) {
 
 /* LOAD FROM FILE */
 function importGameFromFile(e) {
-	resetGameData(function() {
-		console.log("IMPORT START");
+	resetGameData();
 
-		// load file chosen by user
-		var files = e.target.files;
-		var file = files[0];
-		var reader = new FileReader();
-		reader.readAsText( file );
+	console.log("IMPORT START");
 
-		reader.onloadend = function() {
-			var fileText = reader.result;
-			gameDataStr = exporter.importGame( fileText );
+	// load file chosen by user
+	var files = e.target.files;
+	var file = files[0];
+	var reader = new FileReader();
+	reader.readAsText( file );
 
-			console.log("import load end");
-			// console.log(gameDataStr);
-			
-			// change game data & reload everything
-			document.getElementById("game_data").value = gameDataStr;
-			on_game_data_change();
-		}
-	});
+	reader.onloadend = function() {
+		var fileText = reader.result;
+		gameDataStr = exporter.importGame( fileText );
+
+		console.log("import load end");
+		// console.log(gameDataStr);
+		
+		// change game data & reload everything
+		document.getElementById("game_data").value = gameDataStr;
+		on_game_data_change();
+	}
 }
 
 function importFontFromFile(e) {
@@ -2681,12 +2679,11 @@ function addSpriteAnimation() {
 	else
 		addNewFrameToDrawing( spriteImageId );
 
+	// TODO RENDERER : refresh images
+
 	//refresh data model
-	renderImages(
-		function() {
-			refreshGameData();
-			paintTool.reloadDrawing();
-		});
+	refreshGameData();
+	paintTool.reloadDrawing();
 }
 
 function removeSpriteAnimation() {
@@ -2703,12 +2700,11 @@ function removeSpriteAnimation() {
 	cacheDrawingAnimation( sprite[drawing.id], spriteImageId );
 	removeDrawingAnimation( spriteImageId );
 
+	// TODO RENDERER : refresh images
+
 	//refresh data model
-	renderImages(
-		function() {
-			refreshGameData();
-			paintTool.reloadDrawing();
-		});
+	refreshGameData();
+	paintTool.reloadDrawing();
 }
 
 function addTileAnimation() {
@@ -2728,12 +2724,11 @@ function addTileAnimation() {
 	else
 		addNewFrameToDrawing( tileImageId );
 
+	// TODO RENDERER : refresh images
+
 	//refresh data model
-	renderImages(
-		function() {
-			refreshGameData();
-			paintTool.reloadDrawing();
-		});
+	refreshGameData();
+	paintTool.reloadDrawing();
 }
 
 function removeTileAnimation() {
@@ -2750,12 +2745,11 @@ function removeTileAnimation() {
 	cacheDrawingAnimation( tile[drawing.id], tileImageId );
 	removeDrawingAnimation( tileImageId );
 
+	// TODO RENDERER : refresh images
+
 	//refresh data model
-	renderImages(
-		function() {
-			refreshGameData();
-			paintTool.reloadDrawing();
-		});
+	refreshGameData();
+	paintTool.reloadDrawing();
 }
 
 // TODO : so much duplication it makes me sad :(
@@ -2776,12 +2770,11 @@ function addItemAnimation() {
 	else
 		addNewFrameToDrawing( itemImageId );
 
+	// TODO RENDERER : refresh images
+
 	//refresh data model
-	renderImages(
-		function() {
-			refreshGameData();
-			paintTool.reloadDrawing();
-		});
+	refreshGameData();
+	paintTool.reloadDrawing();
 }
 
 function removeItemAnimation() {
@@ -2798,17 +2791,17 @@ function removeItemAnimation() {
 	cacheDrawingAnimation( item[drawing.id], itemImageId );
 	removeDrawingAnimation( itemImageId );
 
-	//refresh data model
-	renderImages(
-		function() {
-			refreshGameData();
-			paintTool.reloadDrawing();
-		});
+	// TODO RENDERER : refresh images
+
+	//refresh data model (TODO : these should really be a shared method)
+	refreshGameData();
+	paintTool.reloadDrawing();
 }
 
 function addNewFrameToDrawing(drwId) {
 	// copy first frame data into new frame
-	var firstFrame = imageStore.source[ drwId ][0];
+	var imageSource = renderer.GetImageSource(drwId);
+	var firstFrame = imageSource[0];
 	var newFrame = [];
 	for (var y = 0; y < tilesize; y++) {
 		newFrame.push([]);
@@ -2816,24 +2809,29 @@ function addNewFrameToDrawing(drwId) {
 			newFrame[y].push( firstFrame[y][x] );
 		}
 	}
-	imageStore.source[ drwId ].push( newFrame );
+	imageSource.push( newFrame );
+	renderer.SetImageSource(drwId, imageSource);
 }
 
 function removeDrawingAnimation(drwId) {
-	var oldImageData = imageStore.source[ drwId ].slice(0);
-	imageStore.source[ drwId ] = [ oldImageData[0] ];
+	var imageSource = renderer.GetImageSource(drwId);
+	var oldImageData = imageSource.slice(0);
+	renderer.SetImageSource( drwId, [ oldImageData[0] ] );
 }
 
 // let's us restore the animation during the session if the user wants it back
-function cacheDrawingAnimation(drawing,imageStoreId) {
-	var oldImageData = imageStore.source[ imageStoreId ].slice(0);
+function cacheDrawingAnimation(drawing,sourceId) {
+	var imageSource = renderer.GetImageSource(sourceId);
+	var oldImageData = imageSource.slice(0);
 	drawing.cachedAnimation = [ oldImageData[1] ]; // ah the joys of javascript
 }
 
-function restoreDrawingAnimation(imageStoreId,cachedAnimation) {
+function restoreDrawingAnimation(sourceId,cachedAnimation) {
+	var imageSource = renderer.GetImageSource(sourceId);
 	for (f in cachedAnimation) {
-		imageStore.source[ imageStoreId ].push( cachedAnimation[f] );	
+		imageSource.push( cachedAnimation[f] );	
 	}
+	renderer.SetImageSource(sourceId, imageSource);
 }
 
 function on_paint_frame1() {
@@ -4083,7 +4081,7 @@ function showDialogToolsEffects() {
 
 /* INVENTORY UI */
 function updateInventoryUI() {
-	console.log("~~~ UPDATE INVENTORY ~~~");
+	// console.log("~~~ UPDATE INVENTORY ~~~");
 	updateInventoryItemUI();
 	updateInventoryVariableUI();
 }
@@ -4105,12 +4103,12 @@ function updateInventoryItemUI(){
 		}
 	}
 
-	console.log("UPDATE!!!!");
+	// console.log("UPDATE!!!!");
 	for(id in item) {
 		var itemName = item[id].name != null ? item[id].name : "item " + id;
-		console.log( id );
-		console.log( player() );
-		console.log( player().inventory );
+		// console.log( id );
+		// console.log( player() );
+		// console.log( player().inventory );
 		var itemCount = player().inventory[id] != undefined ? parseFloat( player().inventory[id] ) : 0;
 
 		var itemDiv = document.createElement("div");

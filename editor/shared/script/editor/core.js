@@ -207,8 +207,9 @@ function makeDrawing(id,imageData) {
 			[0,0,0,0,0,0,0,0]
 		]];
 	}
-	imageStore.source[id] = imageData;
-	renderImages(); //todo is this the right place for this?
+	// TODO RENDERER : stop using global renderer
+	renderer.SetImageSource(id,imageData);
+	// TODO RENDERER : re-render images?
 }
 
 /* EVENTS */
@@ -430,17 +431,15 @@ function ResourceLoader() {
 	}
 }
 
-function setDefaultGameState(onComplete) {
-	console.log("GET DEFAULT DATA");
-	console.log(onComplete);
-
+function setDefaultGameState() {
 	var defaultData = document.getElementById("defaultGameData").text;
 	// console.log("DEFAULT DATA \n" + defaultData);
 	document.getElementById("game_data").value = defaultData;
 	localStorage.game_data = document.getElementById("game_data").value; // save game
 	clearGameData();
 	parseWorld(document.getElementById("game_data").value); // load game
-	renderImages(onComplete);
+
+	// TODO RENDERER : refresh images
 	// TODO -- more setup???
 }
 
@@ -452,46 +451,38 @@ function newGameDialog() {
 	}
 }
 
-function resetGameData(onComplete) {
-	setDefaultGameState(function() {
-		console.log("reset complete");
-		console.log(onComplete);
+function resetGameData() {
+	setDefaultGameState();
 
-		// TODO : localize default_title
-		title = localization.GetStringOrFallback("default_title", "Write your game's title here");
+	// TODO : localize default_title
+	title = localization.GetStringOrFallback("default_title", "Write your game's title here");
 
-		pickDefaultFontForLanguage(localization.GetLanguage());
+	pickDefaultFontForLanguage(localization.GetLanguage());
 
-		// todo wrap these variable resets in a function
-		tileIndex = 0;
-		spriteIndex = 0;
+	// todo wrap these variable resets in a function
+	tileIndex = 0;
+	spriteIndex = 0;
 
-		refreshGameData();
+	refreshGameData();
 
-		// TODO : is this second renderImages REALLY necessary?????
-		renderImages(function() {
-			if ( Ed().platform == PlatformType.Desktop ) {
-				updatePaletteUI();
-				// updatePaletteControlsFromGameData();
-				updateExitOptionsFromGameData();
-				updateRoomName();
-				updateInventoryUI();
-				updateFontSelectUI(); // hmm is this really the place for this?
+	// TODO RENDERER : refresh images
 
-				on_paint_avatar();
-				document.getElementById('paintOptionAvatar').checked = true;
-			}
+	if ( Ed().platform == PlatformType.Desktop ) {
+		updatePaletteUI();
+		// updatePaletteControlsFromGameData();
+		updateExitOptionsFromGameData();
+		updateRoomName();
+		updateInventoryUI();
+		updateFontSelectUI(); // hmm is this really the place for this?
 
-			paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
-			roomTool.drawEditMap();
+		on_paint_avatar();
+		document.getElementById('paintOptionAvatar').checked = true;
+	}
 
-			document.getElementById("titleText").value = title;
+	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
+	roomTool.drawEditMap();
 
-			if (onComplete) {
-				onComplete();
-			}
-		});
-	});
+	document.getElementById("titleText").value = title;
 }
 
 function refreshGameData() {

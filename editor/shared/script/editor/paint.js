@@ -9,7 +9,8 @@ function DrawingId(type,id) { // TODO: is this the right name?
 	this.id = id;
 
 	this.getFrameData = function(frameIndex) {
-		return imageStore.source[ self.toString() ][ frameIndex ];
+		// TODO RENDERER : pass in renderer instead of using global?
+		return renderer.GetImageSource( self.toString() )[ frameIndex ];
 	}
 
 	this.toString = function() {
@@ -157,7 +158,7 @@ function PaintTool(canvas, roomTool) {
 		console.log("?????");
 		if (isPainting) {
 			isPainting = false;
-			renderImages();
+			// TODO RENDERER : refresh images
 			refreshGameData();
 			roomTool.drawEditMap(); // TODO : events instead of direct coupling
 
@@ -378,7 +379,7 @@ function PaintTool(canvas, roomTool) {
 				delete tile[ self.drawing.id ];
 				findAndReplaceTileInAllRooms( self.drawing.id, "0" );
 				refreshGameData();
-				renderImages();
+				// TODO RENDERER : refresh images
 				roomTool.drawEditMap();
 				nextTile();
 			}
@@ -393,7 +394,7 @@ function PaintTool(canvas, roomTool) {
 				delete sprite[ self.drawing.id ];
 
 				refreshGameData();
-				renderImages();
+				// TODO RENDERER : refresh images
 				roomTool.drawEditMap();
 				nextSprite();
 			}
@@ -408,7 +409,7 @@ function PaintTool(canvas, roomTool) {
 
 				removeAllItems( self.drawing.id );
 				refreshGameData();
-				renderImages();
+				// TODO RENDERER : refresh images
 				roomTool.drawEditMap();
 				nextItem();
 				updateInventoryItemUI();

@@ -1,3 +1,6 @@
+5.3:
+- new renderer decreases loading times
+
 5.2:
 - {say} function re-enabled
 - fix weird scrolling in mobile

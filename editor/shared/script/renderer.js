@@ -50,8 +50,13 @@ function getPaletteColor(paletteId, colorIndex) {
 	};
 }
 
+var debugRenderCount = 0;
+
 // TODO : change image store path from (pal > col > draw) to (draw > pal > col)
 function renderImage(drawing, paletteId) {
+	// debugRenderCount++;
+	// console.log("RENDER COUNT " + debugRenderCount);
+
 	var col = drawing.col;
 	var colStr = "" + col;
 	var pal = paletteId;

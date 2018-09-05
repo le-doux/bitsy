@@ -87,11 +87,7 @@ function clearGameData() {
 	isEnding = false; //todo - correct place for this?
 	variable = {};
 
-	//stores all image data for tiles, sprites, drawings
-	imageStore = {
-		source: {},
-		render: {}
-	};
+	// TODO RENDERER : clear data?
 
 	spriteStartLocations = {};
 
@@ -186,14 +182,6 @@ function load_game(game_data, startWithTitle) {
 	// setInterval(updateLoadingScreen, 300); // hack test
 
 	onready(startWithTitle);
-}
-
-// hack test new render version
-function renderImages(onComplete) {
-	// TODO -- remove
-	console.log("DEPRECATED RENDER IMAGES!!!!");
-	if (onComplete)
-		onComplete();
 }
 
 function reset_cur_game() {
@@ -1150,6 +1138,12 @@ function parseWorld(file) {
 	if (player().room != null) {
 		curRoom = player().room;
 	}
+
+	console.log("PALETTES PARSED : ");
+	console.log(palette);
+
+	console.log("ROOMS PARSED : ");
+	console.log(room);
 
 	renderer.SetPalettes(palette);
 
