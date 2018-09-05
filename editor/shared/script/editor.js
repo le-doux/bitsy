@@ -552,139 +552,138 @@ function start() {
 	drawingThumbnailCtx = drawingThumbnailCanvas.getContext("2d");
 
 
-	function afterGameLoads() {
-		// load panel preferences
-		var prefs = getPanelPrefs();
-		localStorage.panel_prefs = JSON.stringify(prefs); // save loaded prefs
-		var sortedWorkspace = prefs.workspace.sort( function(a,b) { return a.position - b.position; } );
-		var editorContent = document.getElementById("editorContent");
-		for(i in sortedWorkspace) {
-			var panelSettings = sortedWorkspace[i];
-			togglePanelCore( panelSettings.id, panelSettings.visible, false /*doUpdatePrefs*/ );
-			editorContent.insertBefore( document.getElementById(panelSettings.id), null ); //insert on the left
-		}
-
-		// Automatically open tool trays that are needed
-		if( sortedRoomIdList().length > 1 )
-		{
-			toggleRoomToolsCore( true );
-		}
-		if( sortedPaletteIdList().length > 1 )
-		{
-			togglePaletteToolsCore( true );
-		}
-
-		//draw everything
-		on_paint_avatar();
-		paintTool.updateCanvas();
-		roomTool.drawEditMap();
-		updateRoomPaletteSelect(); //dumb to have to specify this here --- wrap up room UI method?
-		updateRoomName(); // init the room UI
-		reloadEnding();
-
-		updateInventoryUI();
-
-		// init color picker
-		colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSlider', 'colorPickerSliderBg', 'colorPickerHexText');
-		document.getElementById("colorPaletteOptionBackground").checked = true;
-		paletteTool = new PaletteTool(colorPicker,["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"]);
-		paletteTool.onPaletteChange = onPaletteChange;
-		paletteTool.updateColorPickerUI();
-
-		// init paint explorer
-		paintExplorer = new PaintExplorer("paintExplorer",selectPaint);
-		paintExplorer.Refresh(TileType.Avatar);
-		paintExplorer.ChangeSelection("A");
-		paintTool.explorer = paintExplorer;
-		paintExplorer.SetDisplayCaptions( Ed().platform === PlatformType.Desktop );
-
-		//unsupported feature stuff
-		if(Ed().platform === PlatformType.Desktop) {
-			if (hasUnsupportedFeatures()) {
-				showUnsupportedFeatureWarning();
-			}
-			if (!browserFeatures.fileDownload) {
-				document.getElementById("downloadHelp").style.display = "block";
-			}
-		}
-
-		// gif recording init (should this go in its own file?)
-		gifCaptureCanvas = document.createElement("canvas");
-		gifCaptureCanvas.width = width * scale;
-		gifCaptureCanvas.height = width * scale;
-		gifCaptureCtx = gifCaptureCanvas.getContext("2d");
-
-		onInventoryChanged = function(id) {
-			updateInventoryUI();
-		
-			// animate to draw attention to change
-			document.getElementById("inventoryItem_" + id).classList.add("flash");
-			setTimeout(
-				function() {
-					// reset animations
-					document.getElementById("inventoryItem_" + id).classList.remove("flash");
-				},
-				400
-			);
-		};
-
-		onVariableChanged = function(id) {
-			updateInventoryUI();
-		
-			// animate to draw attention to change
-			document.getElementById("inventoryVariable_" + id).classList.add("flash");
-			setTimeout(
-				function() {
-					// reset animations
-					document.getElementById("inventoryVariable_" + id).classList.remove("flash");
-				},
-				400
-			);
-		};
-
-		// load custom font first, since it is synchronous
-		if (localStorage.custom_font != null) {
-			var fontStorage = JSON.parse(localStorage.custom_font);
-			editorFontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
-		}
-
-		// load built-in bitmap fonts from servery (async)
-		editorFontManager.LoadResources([
-			"ascii_small.bitsyfont",
-			"unicode_european_small.bitsyfont",
-			"unicode_european_large.bitsyfont",
-			"unicode_asian.bitsyfont"
-		], function() {
-			console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
-			switchFont(fontName); // hack - make sure the engine font manager is setup too
-			resetMissingCharacterWarning();
-			areAllFontsLoaded = true; // hack
-		});
-
-		//color testing
-		// on_change_color_bg();
-		// on_change_color_tile();
-		// on_change_color_sprite();
-
-		// save latest version used by editor (for compatibility)
-		localStorage.engine_version = JSON.stringify( version );
-
-		// load saved export settings
-		if( localStorage.export_settings ) {
-			export_settings = JSON.parse( localStorage.export_settings );
-			document.getElementById("pageColor").value = export_settings.page_color;
-		}
-	}
-
 	//load last auto-save
 	if (localStorage.game_data) {
 		//console.log("~~~ found old save data! ~~~");
 		//console.log(localStorage.game_data);
 		document.getElementById("game_data").value = localStorage.game_data;
-		on_game_data_change_core(afterGameLoads);
+		on_game_data_change_core();
 	}
 	else {
-		setDefaultGameState(afterGameLoads);
+		setDefaultGameState();
+	}
+
+	// load panel preferences
+	var prefs = getPanelPrefs();
+	localStorage.panel_prefs = JSON.stringify(prefs); // save loaded prefs
+	var sortedWorkspace = prefs.workspace.sort( function(a,b) { return a.position - b.position; } );
+	var editorContent = document.getElementById("editorContent");
+	for(i in sortedWorkspace) {
+		var panelSettings = sortedWorkspace[i];
+		togglePanelCore( panelSettings.id, panelSettings.visible, false /*doUpdatePrefs*/ );
+		editorContent.insertBefore( document.getElementById(panelSettings.id), null ); //insert on the left
+	}
+
+	// Automatically open tool trays that are needed
+	if( sortedRoomIdList().length > 1 )
+	{
+		toggleRoomToolsCore( true );
+	}
+	if( sortedPaletteIdList().length > 1 )
+	{
+		togglePaletteToolsCore( true );
+	}
+
+	//draw everything
+	on_paint_avatar();
+	paintTool.updateCanvas();
+	roomTool.drawEditMap();
+
+	updateRoomPaletteSelect(); //dumb to have to specify this here --- wrap up room UI method?
+	updateRoomName(); // init the room UI
+	reloadEnding();
+
+	updateInventoryUI();
+
+	// init color picker
+	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSlider', 'colorPickerSliderBg', 'colorPickerHexText');
+	document.getElementById("colorPaletteOptionBackground").checked = true;
+	paletteTool = new PaletteTool(colorPicker,["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"]);
+	paletteTool.onPaletteChange = onPaletteChange;
+	paletteTool.updateColorPickerUI();
+
+	// init paint explorer
+	paintExplorer = new PaintExplorer("paintExplorer",selectPaint);
+	paintExplorer.Refresh(TileType.Avatar);
+	paintExplorer.ChangeSelection("A");
+	paintTool.explorer = paintExplorer;
+	paintExplorer.SetDisplayCaptions( Ed().platform === PlatformType.Desktop );
+
+	//unsupported feature stuff
+	if(Ed().platform === PlatformType.Desktop) {
+		if (hasUnsupportedFeatures()) {
+			showUnsupportedFeatureWarning();
+		}
+		if (!browserFeatures.fileDownload) {
+			document.getElementById("downloadHelp").style.display = "block";
+		}
+	}
+
+	// gif recording init (should this go in its own file?)
+	gifCaptureCanvas = document.createElement("canvas");
+	gifCaptureCanvas.width = width * scale;
+	gifCaptureCanvas.height = width * scale;
+	gifCaptureCtx = gifCaptureCanvas.getContext("2d");
+
+	onInventoryChanged = function(id) {
+		updateInventoryUI();
+	
+		// animate to draw attention to change
+		document.getElementById("inventoryItem_" + id).classList.add("flash");
+		setTimeout(
+			function() {
+				// reset animations
+				document.getElementById("inventoryItem_" + id).classList.remove("flash");
+			},
+			400
+		);
+	};
+
+	onVariableChanged = function(id) {
+		updateInventoryUI();
+	
+		// animate to draw attention to change
+		document.getElementById("inventoryVariable_" + id).classList.add("flash");
+		setTimeout(
+			function() {
+				// reset animations
+				document.getElementById("inventoryVariable_" + id).classList.remove("flash");
+			},
+			400
+		);
+	};
+
+	// load custom font first, since it is synchronous
+	if (localStorage.custom_font != null) {
+		var fontStorage = JSON.parse(localStorage.custom_font);
+		editorFontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
+	}
+
+	// load built-in bitmap fonts from servery (async)
+	editorFontManager.LoadResources([
+		"ascii_small.bitsyfont",
+		"unicode_european_small.bitsyfont",
+		"unicode_european_large.bitsyfont",
+		"unicode_asian.bitsyfont"
+	], function() {
+		console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
+		switchFont(fontName); // hack - make sure the engine font manager is setup too
+		resetMissingCharacterWarning();
+		areAllFontsLoaded = true; // hack
+	});
+
+	//color testing
+	// on_change_color_bg();
+	// on_change_color_tile();
+	// on_change_color_sprite();
+
+	// save latest version used by editor (for compatibility)
+	localStorage.engine_version = JSON.stringify( version );
+
+	// load saved export settings
+	if( localStorage.export_settings ) {
+		export_settings = JSON.parse( localStorage.export_settings );
+		document.getElementById("pageColor").value = export_settings.page_color;
 	}
 }
 
@@ -1837,13 +1836,13 @@ function on_change_adv_dialog() {
 }
 
 function on_game_data_change() {
-	on_game_data_change_core(function() {
-		refreshGameData();
+	on_game_data_change_core();
 
-		// ui stuff
-		updateRoomName();
-		refreshGameData();
-	});
+	refreshGameData();
+
+	// ui stuff
+	updateRoomName();
+	refreshGameData();
 }
 
 function convertGameDataToCurVersion(importVersion) {
@@ -1894,7 +1893,7 @@ function convertGameDataToCurVersion(importVersion) {
 	}
 }
 
-function on_game_data_change_core(onComplete) {
+function on_game_data_change_core() {
 	clearGameData();
 	var version = parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
 
@@ -1986,10 +1985,6 @@ function on_game_data_change_core(onComplete) {
 	updateExitOptionsFromGameData();
 
 	document.getElementById("titleText").value = title;
-
-	if (onComplete) {
-		onComplete()
-	}
 }
 
 function updateFontSelectUI() {
