@@ -1520,7 +1520,7 @@ function changeColorPickerIndex(index) {
 function onPaletteChange() {
 	refreshGameData();
 
-	// TODO RENDERER : refresh images
+	renderer.SetPalettes(palette);
 
 	paintTool.updateCanvas();
 	roomTool.drawEditMap();
