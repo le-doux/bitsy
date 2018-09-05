@@ -472,9 +472,9 @@ var BlockNode = function(mode, doIndentFirstLine) {
 	this.Serialize = function(depth) {
 		if(depth === undefined) depth = 0;
 
-		console.log("SERIALIZE BLOCK!!!");
-		console.log(depth);
-		console.log(doIndentFirstLine);
+		// console.log("SERIALIZE BLOCK!!!");
+		// console.log(depth);
+		// console.log(doIndentFirstLine);
 
 		var str = "";
 		var lastNode = null;
@@ -962,7 +962,7 @@ var Parser = function(env) {
 
 			return sourceStr.slice( startIndex + open.length, i - close.length );
 		}
-		this.Print = function() {console.log(sourceStr);};
+		this.Print = function() { /*console.log(sourceStr);*/ };
 	};
 
 	function ParseDialog(state) {
@@ -1227,9 +1227,9 @@ var Parser = function(env) {
 		var curSymbol = "";
 		function OnSymbolEnd() {
 			curSymbol = curSymbol.trim();
-			console.log("PARAMTER " + curSymbol);
+			// console.log("PARAMTER " + curSymbol);
 			args.push( StringToValue(curSymbol) );
-			console.log(args);
+			// console.log(args);
 			curSymbol = "";
 		}
 
@@ -1269,7 +1269,7 @@ var Parser = function(env) {
 	function IsValidVariableName(str) {
 		var reg = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
 		var isValid = reg.test(str);
-		console.log("VALID variable??? " + isValid);
+		// console.log("VALID variable??? " + isValid);
 		return isValid;
 	}
 
@@ -1283,14 +1283,14 @@ var Parser = function(env) {
 		}
 		else if(valStr[0] === Sym.String) {
 			// STRING!!
-			console.log("STRING");
+			// console.log("STRING");
 			var str = "";
 			var i = 1;
 			while (i < valStr.length && valStr[i] != Sym.String) {
 				str += valStr[i];
 				i++;
 			}
-			console.log(str);
+			// console.log(str);
 			return new LiteralNode( str );
 		}
 		else if(valStr === "true") {

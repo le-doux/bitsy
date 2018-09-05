@@ -8,9 +8,24 @@ function DrawingId(type,id) { // TODO: is this the right name?
 	this.type = type;
 	this.id = id;
 
+	var imageSource = null;
+
 	this.getFrameData = function(frameIndex) {
-		// TODO RENDERER : pass in renderer instead of using global?
-		return renderer.GetImageSource( self.toString() )[ frameIndex ];
+		if (imageSource === null || imageSource === undefined) {
+			// TODO RENDERER : pass in renderer?
+			imageSource = (renderer.GetImageSource( self.toString() )).slice();
+			console.log(imageSource);
+		}
+
+		return imageSource[ frameIndex ];
+	}
+
+	this.updateImageSource = function() {
+		if (imageSource === null || imageSource === undefined) {
+			return;
+		}
+
+		renderer.SetImageSource(self.toString(), imageSource);
 	}
 
 	this.toString = function() {
@@ -90,6 +105,8 @@ function PaintTool(canvas, roomTool) {
 	this.curDrawingFrameIndex = 0; // TODO eventually this can be internal
 	this.drawPaintGrid = true;
 
+	console.log("NEW PAINT TOOL");
+	console.log(renderer);
 	this.drawing = new DrawingId( TileType.Avatar, "A" );
 
 	this.explorer = null; // TODO: hacky way to tie this to a paint explorer -- should use events instead
@@ -158,7 +175,7 @@ function PaintTool(canvas, roomTool) {
 		console.log("?????");
 		if (isPainting) {
 			isPainting = false;
-			// TODO RENDERER : refresh images
+			updateDrawingData();
 			refreshGameData();
 			roomTool.drawEditMap(); // TODO : events instead of direct coupling
 
@@ -240,6 +257,11 @@ function PaintTool(canvas, roomTool) {
 	function curDrawingAltFrameData() {
 		var frameIndex = (self.curDrawingFrameIndex === 0 ? 1 : 0);
 		return self.drawing.getFrameData(frameIndex);
+	}
+
+	// TODO : rename?
+	function updateDrawingData() {
+		self.drawing.updateImageSource();
 	}
 
 	// methods for updating the UI

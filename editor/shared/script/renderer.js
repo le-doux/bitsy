@@ -5,8 +5,7 @@ TODO
 - possible future plan: limit size of cache (remove old images)
 - change image store path from (pal > col > draw) to (draw > pal > col)
 - get rid of old getSpriteImage (etc) methods
-- get rif of old renderImages method
-- get editor working again
+- get editor working again [in progress]
 - move debug timer class into core (seems useful)
 */
 
@@ -26,12 +25,7 @@ function setPalettes(paletteObj) {
 	palettes = paletteObj;
 
 	// TODO : should this really clear out the render cache?
-	for (pal in palettes) {
-		imageStore.render[pal] = {
-			"1" : {}, //images with primary color index 1 (usually tiles)
-			"2" : {}  //images with primary color index 2 (usually sprites)
-		}
-	}
+	imageStore.render = {};
 }
 
 function getPaletteColor(paletteId, colorIndex) {
@@ -63,16 +57,22 @@ function renderImage(drawing, paletteId) {
 	var drwId = drawing.drw;
 	var imgSrc = imageStore.source[ drawing.drw ];
 
-	// slightly hacky initialization of image store for palettes with more than 3 colors ~~~ SECRET FEATURE DO NOT USE :P ~~~
-	if(imageStore.render[pal][colStr] === undefined || imageStore.render[pal][colStr] === null) {
-		imageStore.render[pal][colStr] = {};
+	// initialize render cache entry
+	if (imageStore.render[drwId] === undefined || imageStore.render[drwId] === null) {
+		imageStore.render[drwId] = {};
 	}
 
-	imageStore.render[pal][colStr][drwId] = []; // create array of ImageData frames
+	if (imageStore.render[drwId][pal] === undefined || imageStore.render[drwId][pal] === null) {
+		imageStore.render[drwId][pal] = {};
+	}
+
+	// create array of ImageData frames
+	imageStore.render[drwId][pal][colStr] = [];
+
 	for (var i = 0; i < imgSrc.length; i++) {
 		var frameSrc = imgSrc[i];
 		var frameData = imageDataFromImageSource( frameSrc, pal, col );
-		imageStore.render[pal][colStr][drwId].push(frameData);
+		imageStore.render[drwId][pal][colStr].push(frameData);
 	}
 }
 
@@ -110,17 +110,29 @@ function imageDataFromImageSource(imageSource, pal, col) {
 	return img;
 }
 
+// TODO : move into core
+function undefinedOrNull(x) {
+	return x === undefined || x === null;
+}
+
 function isImageRendered(drawing, paletteId) {
 	var col = drawing.col;
 	var colStr = "" + col;
 	var pal = paletteId;
 	var drwId = drawing.drw;
 
-	return !(imageStore.render[pal][colStr][drwId] === undefined || imageStore.render[pal][colStr][drwId] === null);
+	if (undefinedOrNull(imageStore.render[drwId]) ||
+		undefinedOrNull(imageStore.render[drwId][pal]) ||
+		undefinedOrNull(imageStore.render[drwId][pal][colStr])) {
+			return false;
+	}
+	else {
+		return true;
+	}
 }
 
 function getImageSet(drawing, paletteId) {
-	return imageStore.render[paletteId][drawing.col][drawing.drw];
+	return imageStore.render[drawing.drw][paletteId][drawing.col];
 }
 
 function getImageFrame(drawing, paletteId, frameOverride) {
@@ -152,6 +164,7 @@ this.SetPalettes = setPalettes;
 
 this.SetImageSource = function(drawingId, imageSourceData) {
 	imageStore.source[drawingId] = imageSourceData;
+	imageStore.render[drawingId] = {}; // reset render cache for this image
 }
 
 this.GetImageSource = function(drawingId) {
