@@ -2,6 +2,7 @@
 	PAINT
 */
 
+// TODO --- this object kind of sucks????
 function DrawingId(type,id) { // TODO: is this the right name?
 	var self = this;
 
@@ -12,12 +13,20 @@ function DrawingId(type,id) { // TODO: is this the right name?
 
 	this.getFrameData = function(frameIndex) {
 		if (imageSource === null || imageSource === undefined) {
-			// TODO RENDERER : pass in renderer?
-			imageSource = (renderer.GetImageSource( self.toString() )).slice();
-			console.log(imageSource);
+			self.reloadImageSource();
 		}
 
 		return imageSource[ frameIndex ];
+	}
+
+	this.reloadImageSource = function() {
+		if (renderer === null || renderer === undefined) {
+			return;
+		}
+
+		// TODO RENDERER : pass in renderer?
+		imageSource = (renderer.GetImageSource( self.toString() )).slice();
+		console.log(imageSource);
 	}
 
 	this.updateImageSource = function() {
@@ -269,6 +278,8 @@ function PaintTool(canvas, roomTool) {
 	this.onReloadSprite = null;
 	this.onReloadItem = null;
 	this.reloadDrawing = function() {
+		self.drawing.reloadImageSource();
+
 		if ( self.drawing.type === TileType.Tile) {
 			if(self.onReloadTile)
 				self.onReloadTile();
