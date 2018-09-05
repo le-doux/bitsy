@@ -563,6 +563,9 @@ function start() {
 		setDefaultGameState();
 	}
 
+	// HACK: avoids breaking the exit room panel if there is no "room 0"
+	selectedExitRoom = curRoom;
+
 	// load panel preferences
 	var prefs = getPanelPrefs();
 	localStorage.panel_prefs = JSON.stringify(prefs); // save loaded prefs
@@ -748,15 +751,15 @@ function on_drawing_name_change() {
 
 	// make sure items referenced in scripts update their names
 	if(drawing.type === TileType.Item) {
-		console.log("SWAP ITEM NAMES");
+		// console.log("SWAP ITEM NAMES");
 
 		var ItemNameSwapVisitor = function() {
 			var didSwap = false;
 			this.DidSwap = function() { return didSwap; };
 
 			this.Visit = function(node) {
-				console.log("VISIT!");
-				console.log(node);
+				// console.log("VISIT!");
+				// console.log(node);
 
 				if( node.type != "function" || node.name != "item" )
 					return; // not the right type of node
@@ -775,22 +778,22 @@ function on_drawing_name_change() {
 		if(newName === null || newName === undefined) newName = drawing.id;
 		if(oldName === null || oldName === undefined) oldName = drawing.id;
 
-		console.log(oldName + " <-> " + newName);
+		// console.log(oldName + " <-> " + newName);
 
 		if(newName != oldName) {
 			for(dlgId in dialog) {
-				console.log("DLG " + dlgId);
+				// console.log("DLG " + dlgId);
 				var dialogScript = scriptInterpreter.Parse( dialog[dlgId] );
 				var visitor = new ItemNameSwapVisitor();
 				dialogScript.VisitAll( visitor );
 				if( visitor.DidSwap() ) {
-					console.log("SWAP!");
-					console.log(dialog[dlgId]);
+					// console.log("SWAP!");
+					// console.log(dialog[dlgId]);
 					var newDialog = dialogScript.Serialize();
 					if(newDialog.indexOf("\n") > -1)
 						newDialog = '"""\n' + newDialog + '\n"""';
 					dialog[dlgId] = newDialog;
-					console.log(dialog[dlgId]);
+					// console.log(dialog[dlgId]);
 				}
 			}
 		}
@@ -1502,7 +1505,7 @@ function updateRoomPaletteSelect() {
 	var palOptions = document.getElementById("roomPaletteSelect").options;
 	for (i in palOptions) {
 		var o = palOptions[i];
-		console.log(o);
+		// console.log(o);
 		if (o.value === curPal()) {
 			o.selected = true;
 		}
@@ -1857,7 +1860,7 @@ function convertGameDataToCurVersion(importVersion) {
 				if ( node.type != "function" )
 					return;
 
-				console.log("VISIT " + node.name);
+				// console.log("VISIT " + node.name);
 
 				if ( node.name === "say" ) {
 					node.name = "print";
@@ -2212,7 +2215,7 @@ function exitDestinationRoomChange(event) {
 
 function drawExitDestinationRoom() {
 	//clear screen
-	console.log(selectedExitRoom);
+	console.log("SELECTED EXIT ROOM " + selectedExitRoom);
 	var roomPal = getRoomPal(selectedExitRoom);
 	exit_ctx.fillStyle = "rgb("+getPal(roomPal)[0][0]+","+getPal(roomPal)[0][1]+","+getPal(roomPal)[0][2]+")";
 	exit_ctx.fillRect(0,0,canvas.width,canvas.height);
