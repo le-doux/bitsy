@@ -31,6 +31,47 @@ function PaintExplorer(idPrefix,selectCallback) {
 		displayCaptions = display;
 	}
 
+	function getIdList() {
+		var idList = [];
+		if( drawingCategory == TileType.Avatar ) {
+			idList = ["A"];
+		}
+		else if( drawingCategory == TileType.Sprite ) {
+			idList = sortedSpriteIdList();
+		}
+		else if ( drawingCategory == TileType.Tile ) {
+			idList = sortedTileIdList();
+		}
+		else if ( drawingCategory == TileType.Item ) {
+			idList = sortedItemIdList();
+		}
+
+		return idList;
+	}
+
+	var scrollEndTimer = null;
+	document.getElementById("paintExplorerViewport") // should I pass in the div id?
+		.addEventListener("scroll", function() {
+			if (scrollEndTimer != null) {
+				clearTimeout(scrollEndTimer);
+			}
+			scrollEndTimer = setTimeout(function() {
+				renderOutOfDateThumbnailsInViewport();
+			},100);
+		});
+
+	// hack: have to use a timer to test if the viewport has been resized
+	var prevViewportBounds = document.getElementById("paintExplorerViewport").getBoundingClientRect();
+	var resizeCheckTimer = setInterval(function() {
+		var viewportBounds = document.getElementById("paintExplorerViewport").getBoundingClientRect();
+		if (viewportBounds.width != prevViewportBounds.width
+			|| viewportBounds.height != prevViewportBounds.height)
+		{
+			renderOutOfDateThumbnailsInViewport();
+		}
+		prevViewportBounds = viewportBounds;
+	},100);
+
 	function refresh( type, doKeepOldThumbnails, filterString, skipRenderStep ) {
 		drawingCategory = type;
 
@@ -45,19 +86,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 		if( skipRenderStep == null || skipRenderStep == undefined )
 			skipRenderStep = false;
 
-		var idList = [];
-		if( drawingCategory == TileType.Avatar ) {
-			idList = ["A"];
-		}
-		else if( drawingCategory == TileType.Sprite ) {
-			idList = sortedSpriteIdList();
-		}
-		else if ( drawingCategory == TileType.Tile ) {
-			idList = sortedTileIdList();
-		}
-		else if ( drawingCategory == TileType.Item ) {
-			idList = sortedItemIdList();
-		}
+		var idList = getIdList();
 
 		var hexPalette = [];
 		for (id in palette) {
@@ -79,7 +108,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 					if( !doKeepOldThumbnails )
 						addThumbnail( id ); // create thumbnail element and render thumbnail
 					else
-						renderThumbnail( id ); // just re-render the thumbnail
+						updateThumbnail( id ); // just re-render the thumbnail
 				}
 
 				if( doFilter )
@@ -88,6 +117,8 @@ function PaintExplorer(idPrefix,selectCallback) {
 					document.getElementById(idPrefix + "Label_" + id).style.display = "inline-block"; // make it visible otherwise
 			}
 		}
+
+		renderOutOfDateThumbnailsInViewport();
 	}
 	this.Refresh = function( type, doKeepOldThumbnails, filterString, skipRenderStep ) {
 		refresh( type, doKeepOldThumbnails, filterString, skipRenderStep );
@@ -117,7 +148,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 		// div.style.display = "inline-block";
 
 		var img = document.createElement("img");
-		img.id = idPrefix + "Thumbnail_" + id;
+		img.id = getThumbnailId(id);
 
 		// TODO : this localization global variable breaks mobile
 
@@ -157,7 +188,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 		radio.onclick = selectCallback;
 
-		renderThumbnail( id );
+		updateThumbnail( id );
 	}
 	this.AddThumbnail = function(id) {
 		addThumbnail(id);
@@ -165,7 +196,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 	function filterThumbnail(id,filterString) {
 		var label = document.getElementById(idPrefix + "Label_" + id);
-		var img = document.getElementById(idPrefix + "Thumbnail_" + id);
+		var img = document.getElementById(getThumbnailId(id));
 		var thumbTitle = img.title;
 
 		var foundFilter = thumbTitle.indexOf( filterString ) > -1;
@@ -175,16 +206,62 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 	// TODO : pull out core of this to make it re-usable
 	// var thumbnailRenderEncoders = {};
-	function renderThumbnail(id) {
+	function updateThumbnail(id) {
 		if( drawingCategory == null ) // TODO: used combined id + type instead?
 			return;
 
-		var imgId = idPrefix + "Thumbnail_" + id;
+		var imgId = getThumbnailId(id);
+
+		// set gif cache out of date (TODO : is this always necessary??? what if it's already the right palette?)
+		var cacheEntry = renderer.GetCacheEntry(imgId);
+		cacheEntry.outOfDate = true;
+
+		// get existing gif
+		if (cacheEntry.uri != null) {
+			var img = document.getElementById(imgId);
+			img.src = cacheEntry.uri;
+			img.style.background = "none";
+		}
+	}
+
+	function updateAndForceRenderThumbnail(id) {
+		updateThumbnail(id);
+		var imgId = getThumbnailId(id);
 		renderer.Render( imgId, new DrawingId(drawingCategory,id) );
 	}
+
 	this.RenderThumbnail = function(id) {
-		renderThumbnail(id);
+		updateAndForceRenderThumbnail(id);
 	};
+
+	function renderOutOfDateThumbnailsInViewport() {
+		var viewport = document.getElementById("paintExplorerViewport"); // too specific?
+		var viewportRect = viewport.getBoundingClientRect();
+
+		var idList = getIdList();
+
+		for(var i = 0; i < idList.length; i++) {
+			var id = idList[i];
+
+			if(id == "A" && drawingCategory == TileType.Sprite) { // skip avatar for sprite list
+				continue;
+			}
+
+			var imgId = getThumbnailId(id);
+			var img = document.getElementById(imgId);
+			var imgRect = img.getBoundingClientRect();
+			var isInViewport = !(imgRect.bottom < viewportRect.top || imgRect.top > viewportRect.bottom);
+			var cacheEntry = renderer.GetCacheEntry(imgId);
+
+			if (isInViewport && cacheEntry.outOfDate) {
+				renderer.Render( imgId, new DrawingId(drawingCategory,id) );
+			}
+		}
+	}
+
+	function getThumbnailId(id) {
+		return idPrefix + "Thumbnail_" + tileTypeToIdPrefix(drawingCategory) + id;
+	}
 
 	function changeSelection(id) {
 		console.log("CHANGE SELECTION " + id);
@@ -227,7 +304,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 	};
 
 	function changeThumbnailCaption(id,captionText) {
-		document.getElementById(idPrefix + "Thumbnail_" + id).title = captionText;
+		document.getElementById(getThumbnailId(id)).title = captionText;
 		var caption = document.getElementById(idPrefix + "Caption_" + id);
 		caption.innerText = captionText;
 		var obj = (new DrawingId(drawingCategory,id)).getEngineObject();
@@ -247,6 +324,8 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 // TODO : should this really live in this file?
 function ThumbnailRenderer() {
+	console.log("NEW THUMB RENDERER");
+
 	var drawingThumbnailCanvas, drawingThumbnailCtx;
 	drawingThumbnailCanvas = document.createElement("canvas");
 	drawingThumbnailCanvas.width = 8 * scale; // TODO: scale constants need to be contained somewhere
@@ -254,6 +333,7 @@ function ThumbnailRenderer() {
 	drawingThumbnailCtx = drawingThumbnailCanvas.getContext("2d");
 
 	var thumbnailRenderEncoders = {};
+	var cache = {};
 
 	function render(imgId,drawingId,frameIndex) {
 		var isAnimated = (frameIndex === undefined || frameIndex === null) ? true : false;
@@ -306,6 +386,26 @@ function ThumbnailRenderer() {
 	};
 
 	function createThumbnailRenderCallback(img) {
-		return function(uri) { img.src = uri; img.style.background = "none"; };
+		return function(uri) {
+			// update image
+			img.src = uri;
+			img.style.background = "none";
+
+			// update cache
+			cache[img.id] = {
+				uri : uri,
+				outOfDate : false
+			};
+		};
+	}
+
+	this.GetCacheEntry = function(imgId) {
+		if (!cache[imgId]) {
+			cache[imgId] = {
+				uri : null,
+				outOfDate : true
+			};
+		}
+		return cache[imgId];
 	}
 }

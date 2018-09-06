@@ -190,7 +190,7 @@ function PaintTool(canvas, roomTool) {
 
 			// if( Ed().platform == PlatformType.Desktop ) {
 				if(self.explorer != null) {
-					self.explorer.RenderThumbnail( self.drawing.id )
+					self.explorer.RenderThumbnail( self.drawing.id );
 				}
 				if( self.isCurDrawingAnimated )
 					renderAnimationPreview( roomTool.drawing.id );

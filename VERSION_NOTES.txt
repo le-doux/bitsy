@@ -1,5 +1,6 @@
 5.3:
 - new renderer decreases loading times
+- only render thumbnail gifs as needed
 
 5.2:
 - {say} function re-enabled
