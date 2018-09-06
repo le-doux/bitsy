@@ -1,6 +1,7 @@
 5.3:
-- new renderer decreases loading times
-- only render thumbnail gifs as needed
+- performance improvements:
+-- speed up game loading time with new renderer
+-- improve editor responsiveness by only loading thumbnails when needed
 
 5.2:
 - {say} function re-enabled
