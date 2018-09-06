@@ -2589,6 +2589,8 @@ function importGameFromFile(e) {
 		// change game data & reload everything
 		document.getElementById("game_data").value = gameDataStr;
 		on_game_data_change();
+
+		paintExplorer.Refresh(drawing.type);
 	}
 }
 
