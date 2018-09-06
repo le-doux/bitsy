@@ -235,6 +235,11 @@ function PaintExplorer(idPrefix,selectCallback) {
 	};
 
 	function renderOutOfDateThumbnailsInViewport() {
+		if (document.getElementById("paintExplorerPanel").style.display === "none") {
+			// don't render anything if the panel is hidden
+			return;
+		}
+
 		var viewport = document.getElementById("paintExplorerViewport"); // too specific?
 		var viewportRect = viewport.getBoundingClientRect();
 
