@@ -1,9 +1,8 @@
 /*
 PERF NOTES:
-- little duck load time: 20 seconds
-	- parse time: 0
-	- render time: 20 [it's all RENDERING!!!]
 - loading idea: use long animations to create the loading animation
+- handle parsing performance (especially LARGE fonts)
+- load hidden thumbnails over time
 
 POST 5.0 TODOs:
 X fix move on end dialog bug

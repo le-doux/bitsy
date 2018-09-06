@@ -180,16 +180,3 @@ this.AttachContext = function(ctx) {
 }
 
 } // Renderer()
-
-
-// function Timer() {
-// 	var start = Date.now();
-
-// 	this.Seconds = function() {
-// 		return Math.floor( (Date.now() - start) / 1000 );
-// 	}
-
-// 	this.Milliseconds = function() {
-// 		return Date.now() - start;
-// 	}
-// }

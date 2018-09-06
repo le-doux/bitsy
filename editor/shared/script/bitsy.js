@@ -1071,6 +1071,8 @@ function parseWorld(file) {
 	// console.log("~~~ PARSE WORLD ~~~");
 	// console.log(file);
 
+	// var parseTimer = new Timer();
+
 	resetFlags();
 
 	var versionNumber = 0;
@@ -1139,15 +1141,11 @@ function parseWorld(file) {
 		curRoom = player().room;
 	}
 
-	console.log("PALETTES PARSED : ");
-	console.log(palette);
-
-	console.log("ROOMS PARSED : ");
-	console.log(room);
-
 	renderer.SetPalettes(palette);
 
 	// console.log(names);
+
+	// console.log("~~~~~ PARSE TIME " + parseTimer.Milliseconds());
 
 	return versionNumber;
 }
