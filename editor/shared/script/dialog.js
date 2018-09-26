@@ -94,6 +94,10 @@ var DialogRenderer = function() {
 		// console.log("draw arrow!");
 		var top = (textboxInfo.height-5) * scale;
 		var left = (textboxInfo.width-(5+4)) * scale;
+		if (textDirection === TextDirection.RightToLeft) { // RTL hack
+			left = 4 * scale;
+		}
+
 		for (var y = 0; y < 3; y++) {
 			for (var x = 0; x < 5; x++) {
 				var i = (y * 5) + x;
@@ -230,14 +234,25 @@ var DialogBuffer = function() {
 			// console.log(charCount);
 
 			var leftPos = 0;
+			console.log(textDirection);
+			if (textDirection === TextDirection.RightToLeft) {
+				leftPos = 24 * 8; // hack -- I think this is correct?
+			}
 
 			for(var j = 0; j < charCount; j++) {
 				var char = row[j];
 				if(char) {
+					if (textDirection === TextDirection.RightToLeft) {
+						leftPos -= char.width;
+					}
+					// console.log(j + " " + leftPos);
+
 					// handler( char, i /*rowIndex*/, j /*colIndex*/ );
 					handler(char, i /*rowIndex*/, j /*colIndex*/, leftPos)
 
-					leftPos += char.width;
+					if (textDirection === TextDirection.LeftToRight) {
+						leftPos += char.width;
+					}
 				}
 			}
 		}

@@ -7,6 +7,10 @@ TODO
 - handle variable widths
 - handle RIGHT to LEFT
 - handle negative X OFFSETs
+
+look at hmtx
+ - width
+ - lsb (left offset)
 */
 
 // imports

@@ -18,6 +18,12 @@ var playerId = "A";
 
 var defaultFontName = "ascii_small";
 var fontName = defaultFontName;
+var TextDirection = {
+	LeftToRight : "LTR",
+	RightToLeft : "RTL"
+};
+var textDirection = TextDirection.RightToLeft;
+// var textDirection = TextDirection.LeftToRight;
 
 var names = {
 	room : new Map(),
