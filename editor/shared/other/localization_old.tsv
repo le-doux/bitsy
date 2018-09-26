@@ -1,0 +1,148 @@
+id	en	fr	pt	es	it	sv	de
+language_name	English	Français	Português	Español	Italiano	svenska	Deutsch
+language_translator_credit	English text by Adam Le Doux	Version française par Peter Februar & Dorian Beaugendre	Versão portuguesa por Bruno Silva	Versión española por Marina Díez (@Ninfa_dp)	Versione italiana a cura di Marina Díez (@Ninfa_dp)	Svensk översättning av Em (@Embotronic)	Deutsche Übersetzung von Kai Werder und Matthias Löwe
+bitsy_title	Bitsy	Bitsy	Bitsy	Bitsy	Bitsy	Bitsy	Bitsy
+tools_label	tools	outils	ferramentas	Herramientas	Utensili	verktyg	Werkzeuge
+author_by	by	par	de	por	a cura di	av	von
+author_twitter	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux
+about_tool_name	about	à propos	sobre	sobre	su	info	Über
+room_tool_name	room	salle	sala	room	room	rum	Räume
+exits_tool_name	exits	sorties	saídas	salidas	uscite	utgång	Ausgänge
+endings_tool_name	endings	fins	finais	finales	finali	slut	Enden
+paint_tool_name	paint	dessin	desenhar	dibujar	disegnare	rita	Zeichnen
+explorer_tool_name	find drawing	trouver un dessin	procurar desenho	buscar dibujo	cercare disegno	hitta bilder	Alle Zeichnungen
+palette_tool_name	colors	couleurs	cores	colores	colori	färger	Faben
+dialog_tool_name	dialog	dialogue	diálogo	diálogo	dialogo	dialog	Dialoge
+inventory_tool_name	inventory	inventaire	inventário	inventario	inventario	inventarie	Inventar
+download_tool_name	download	télécharger	descarregar	descargar	scaricare	ladda ned	Herrunterladen
+gif_tool_name	record gif	enregistrer un gif	gravar gif	grabar gif	registrare gif	spela in gif	GIF aufnehmen
+data_tool_name	game data	données du jeu	dados do jogo	datos del juego	data del gioco	speldata	Spieldaten
+settings_tool_name	settings	paramètres	definições	ajustes	settings	inställningar	Einstellungen
+reset_game	new game	nouveau jeu	novo jogo	nuevo juego	nuovo gioco	nytt spel	Neues Spiel
+unsupported_features	uh oh ~ your browser doesn't support all of bitsy's features, so some things might not work right. maybe try another browser, such as:	oh oh ~ ton navigateur internet ne supporte pas toutes les fonctionnalités de Bitsy, certaines choses pourraient ne pas fonctionner correctement, essaie un autre navigateur, comme :	uh oh - o teu explorador não suporta todas as funcionalidades do Bitsy, por isso algumas coisas poderão não funcionar correctamente. talvez queiras tentar outro explorador como:	oh oh! tu navegador no es compatible con todas las funcionalidades de Bitsy y es posible que algunas no funcionen correctamente. Puedes intentar utilizar otros como:	oh oh! il tuo navigator non è compatibile con tutte le funzionalità di Bitsy ed è possibile che alcune non funzionino bene. Puoi usare altri come:	oj då ~ bitsy har vissa funktioner som inte stöds av din webbläsare, så allt kanske inte fungerar som det ska. du kan prova med en annan webbläsare, till exempel:	Oh oh - Dein Browser unterstützt nicht alle Funktionen von Bitsy. Manche Dinge könnten nicht funktionieren, probiere doch einen der anderen Browser aus:
+browser_chrome	chrome	chrome	chrome	chrome	chrome	chrome	Chrome
+browser_firefox	firefox	firefox	firefox	firefox	firefox	firefox	Firefox
+unsupported_features_dismiss	I'll be ok, hide this message	j'ai compris, cacher ce message	eu compreendo, esconde esta mensagem	Entiendo. Oculta este mensaje. 	Capisco. Nasconde questo messaggio.	det går bra, göm det här meddelandet	Ist in Ordnung. Verberge diese Nachricht 
+ending_label	ending	fin	final	final	fine	slut	Ende
+ending_place	place ending	ajouter une fin	colocar final	colocar final	mettere finale	placera slut	Platziere Ende
+ending_place_help	click space in room to add ending	cliquez une case dans la salle pour ajouter une fin	clica num espaço da sala para adicionar um final	haz click en un espacio de la sala para añadir un final	fai click da uno spazio nella stanza	klicka någonstans i rummet för att lägga till ett slut	Klicke einen Bereich in einem Raum an, um ein Ende zu platzieren
+ending_remove	remove selected ending	retirer la fin sélectionnée	remover final selecionado	eliminar el final seleccionado	cancellare il finale selezionato	ta bort det valda slutet	Entferne ausgewähltes Ende
+reset_data	reset game data	réinitialiser les données du jeu	repor dados do jogo	reset datos de juego	reset data del gioco	nollställ speldata	Setze Spiel Daten zurück
+download_html	download game as html file:	télécharger en fichier html	descarregar jogo como ficheiro html:	descargar juego como html	scaricare gioco come html	ladda ned spelet som html-fil:	Lade das Spiel als HTML Datei herunter:
+download_game	download game	télécharger le jeu	descarregar jogo	descargar juego como html	scaricare gioco come html	ladda ned	Lade Spiel herunter
+import_html	import game from html file:	importer à partir d'un fichier html :	importar um jogo a partir de um ficheiro html:	importar juego desde archivo html	importare gioco da un file html	importera spel från html-fil	Spiel Dateien aus HTML Datei Importieren:
+options_label	options	options	opções	opciones	opzioni	inställningar	Optionen
+option_page_color	html page color:	couleur de la page html :	côr da página html:	color de la página html	colore della pagina html	färg på html-sidan:	HTML-Hintergrund-Farbe:
+option_window_size	game window size:	taille de l'écran de jeu :	tamanho da janela do jogo:	tamaño de la pantalla de juego	misura dello schermo di gioco	spelfönstrets storlek:	Spiel Fenstergröße:
+option_full_size	full page	plein écran	página completa	página completa	full page	hela sidan	Vollbild
+option_fixed_size	fixed size	résolution fixe	resolução fixa	resolución fija	resolution fissa	fast storlek	Feste Größe
+about_tool_title	about bitsy	à propos de Bitsy	sobre o Bitsy	Sobre Bitsy	Su Bitsy	om bitsy	Über Bitsy
+about1	hi! bitsy is a little editor for little games or worlds. the goal is to make it easy to make games where you can walk around and talk to people and be somewhere.	Salut ! Bitsy est un petit moteur de jeu vidéo pour des petits jeux ou des petits mondes. Le but est de rendre accessible la création de jeux dans lesquels tu peux te promener, parler à des personnes et découvrir de nouveaux environnements.	olá! o bitsy é um pequeno editor para pequenos jogos ou mundos. o objectivo é tornar fácil a criação de jogos onde podes mover-te, falar com pessoas e estar em algum lado.	¡Hola! Bitsy es un motor para crear pequeños juegos y mundos. El objetivo es crear juegos fácilmente en cualquier lugar.	 Ciao! Bitsy è un motore concepito per creare piccoli giocchi e mondi. Lo scopo è creare giochi in maniera facile ovunque. 	hej! bitsy är ett litet verktyg för små spel eller världar. syftet är att det ska vara lätt att göra spel där du kan gå omkring, prata med folk och vara någonstans.	Hi! Bitsy ist ein kleiner Editor für kleine Spiele oder Welten. Ziel ist, möglichst einfach Spiele machen zu können, in denen man umherlaufen, mit Figuren reden und sich irgendwo wiederfinden kann.
+about2	not sure where to start? try this helpful	Tu ne sais pas par où commencer ? Essaie ce 	sem certeza por onde começar? tenta este	¿No sabes por dónde empezar? ¡Prueba este	Non sai da dove cominciare? Da un occhiata a questo	Vet du inte var du ska börja? här finns en hjälpsam	Nicht sicher wie du loslegen kannst? Probiere diese hilfreiche
+about3_link_tutorial	bitsy tutorial!	tutoriel Bitsy !	tutorial do bitsy!	tutorial de Bitsy!	tutorial di Bitsy! 	bitsy-guide!	Bitsy Anleitung!
+about4	if you need inspiration, you can	Si tu as besoin d'inspiration, tu peux	se precisares de inspiração, podes	Si necesitas inspiración, puedes	Se hai bisogno d'ispirazione puoi	för att få mer inspiration kan du	Falls du Inspiration suchst, kannst du
+about5_link_games	play other bitsy games.	jouer à ces jeux Bitsy.	jogar outros jogos do bitsy.	jugar a otros juegos de Bitsy	giocare altri giochi di Bitsy	spela andra bitsy-spel.	andere Bitsy Spiele spielen
+about6	you can find many on	Tu peux aussi en trouver plein d'autres sur	podes encontrar muitos no	¡Puedes encontrar otros títulos en	Puoi trovare altri titoli in	du kan hitta många på	Du kannst viele von ihnen finden auf
+about7_link_itchio	itch.io	itch.io	itch.io	itch.io	itch.io	itch.io	itch.io
+about8	, which is a great place to share games!	, qui est un endroit fantastique pour partager des jeux!	, um sítio fantástico para partilhar jogos!	que es un gran lugar para compartir tus creaciones!	che è un bellissimo luogo per condividere le tue creazioni! 	, ett bra ställe att dela sina spel!	, was auch ein toller Ort ist um deine Spiele zu teilen!
+about9	have fun making things with bitsy!	Amuse-toi bien avec Bitsy!	diverte-te a criar coisas com o bitsy!	¡Diviértete creando en Bitsy! 	Divertiti creando con Bitsy! 	hoppas du har roligt med bitsy!	Viel Spaß beim Basteln mit Bitsy!
+about10_link_twitter	adam	adam	adam	adam	adam	adam	adam
+instructions_title	instructions	instructions	instruções	instrucciones	istruzioni	instruktioner	Anleitung
+instructions1	you can draw things in the paint panel, then place them in your world in the room panel. you can write dialog for your characters (aka sprites) too. you can also animate your drawings if you want to!	Tu peux dessiner des choses dans la fenêtre de dessin, puis les placer dans tes mondes dans la fenêtre de salle. Tu peux aussi écrire des dialogues pour tes personnages (tes sprites) . Enfin, tu peux animer tes dessins si tu le souhaites!	podes desenhar coisas no painel de desenho para as poderes colocar no teu mundo usando o painel da sala e escrever diálogos para as tuas personagens (os teus sprites). podes também animar os teus desenhos se quiseres!	puedes dibujar cosas en la caja de pintura, después colócalo en tu mundo en la caja de room. Puedes escribir también diálogos para tus personajes (aka sprites). ¡Ah! Y también puedes animar tus dibujos si quieres! 	Puoi disegnare cose dalla casella di pittura, poi piazzalo nel tuo mondo nella casella di room. Puoi anche scrivere dei dialoghi per i tuoi personaggi (aka sprites). Ah! E puoi anche animare i tuoi disegni se vuoi! 	du kan rita saker i rita-fönstret och sedan sätta in dem i din värld i rum-fönstret. du kan också skriva dialog till dina figurer(sprites), och göra animerade bilder!	Mit dem Zeichnen-Panel, kannst du Dinge zeichnen und anschließend im Räume-Panel in der Welt platzieren. Du kannst auch Dialoge für deine Figuren (Sprites) schreiben. Wenn du magst, kannst du deine Zeichnungen sogar animieren!
+instructions2	some words:	vocabulaire :	algumas palavras-chave:	algunas palabras clave: 	alcune parole chiavi	viktiga ord:	Einge Begriffe:
+instructions3	room - a place in your game world	salle - un environnement dans ton jeu 	sala - um sítio no teu jogo	room - una sala de tu juego	room - una stanza del tuo gioco	rum - en plats i din spel-värld	Raum - Ein Bereich deiner Spielwelt
+instructions4	avatar - the player's character	avatar - le personnage du joueur	avatar - a personagem do jogador	avatar: el personaje del jugador	avatar: il personaggio del giocatore	avatar - figuren som spelaren styr	Avatar - Die Spielfigur
+instructions5	tile - a piece of the scenery	tile - un élément du décor	tile - um elemento do cenário	tile: un elemento del escenario	tile: un'elemento dello scenario	ruta- en del av bakgrunden	Tile - Ein Teil des Hintergrundes
+instructions6	sprite - interactive characters or things	sprite - un élément ou personnage interactif	sprite - personagens ou coisas com que podes interagir 	sprite: un elemento o personaje interactivo	sprite: un'elemento o personaggio interattivo	sprite - interaktiva personer eller saker	Sprite - Interaktive Figuren oder Dinge
+instructions7	to try your game, switch the room to play mode:	Pour essayer ton jeu, clique sur le bouton "jouer" pour passer ta salle en mode jeu : 	para experimentares o teu jogo, muda a sala para o modo de jogo: 	para probar tu juego cambia a modo de juego:	per provare il tuo  gioco cambia a modo di gioco	för att prova ditt rum kan du starta rum-fönstrets spelläge:	Um dein Spiel zu testen, schalte das Räume-Panel in den Spielmodus:
+instructions8	walk around with the arrow keys	déplace-toi avec les flèches directionnelles 	move-te usando as teclas direccionais	para probar tu juego cambia al modo de juego: 	per provare il tuo gioco cambia a modo di gioco	gå omkring med piltangenterna	Laufe mit den Pfeiltasten umher
+instructions9	talk to sprites by walking up to them	parle aux sprites en marchant vers eux	fala com sprites movendo-te até eles	habla con los sprites acercándote a ellos	parla con gli sprite avvicinandoti a loro	gå in i en sprite för att prata med den	Rede mit Sprites indem du an sie trittst
+instructions10	you can make multiple rooms, but make sure you add some exits to connect them to each other!	Tu peux faire plusieurs salles, mais fais bien attention d'ajouter des sorties pour les connecter entre elles!	podes criar múltiplas salas, mas não te esqueças de as conectar adicionando algumas saídas 	puedes crear múltiples salas, pero no te olvides de conectarlas añadiendo algunas salidas	puoi creare varii sale, ma poi non dimenticare di aggiungere alcune uscite per collegarle	du kan göra flera rum, men kom ihåg att koppla ihop dem med utgångar!	Du kannst mehrere Räume anlegen - aber füge Ausgänge hinzu, um sie miteinander verbinden!
+instructions11	use "download game" to download the game as an html file. you can email the file to a friend, or host it online! 	Clique sur "partager mon jeu" pour télécharger ton jeu en fichier html. Tu peux l'envoyer par mail à tes amis ou le mettre en ligne! 	usa a opção de "partilhar jogo" para descarregares o teu jogo como ficheiro html. podes partilhá-lo com um amigo enviando um e-mail ou podes hospedá-lo online! 	usa "compartir juego" para descargarlo como un archivo html. Puedes enviarlo en un mail a un amigo o compartirlo online!	usa "condividere  gioco" per scaricarlo come un file html. Puoi inviarlo attacato da una email o condividerlo online! 	i fönstret "ladda ned" kan du ladda ned ditt spel som en html-fil. sen kan du maila filen till en vän, eller ladda upp det på internet!	Klick auf "Speichern/Laden" um dein Spiel als html Datei herrunterzuladen. Verschicke die Datei via eMail oder stelle sie woanders online!
+instructions12	if you want to talk about bitsy, report a bug, or share a game you made, i'm on twitter 	Si tu veux parler de Bitsy, rapporter un bug ou partager un jeu que tu as fait, je suis sur twitter	se queres falar sobre o bitsy, relatar um erro ou partilhar um jogo que criaste, podes-me encontrar no twitter	si quieres hablar sobre bitsy, reportar un bug, o compartir el juego que has creado, estoy en twitter	se vuoi parlare su Bitsy, reportare un bug o condividere il gioco che hai fatto, sono su twitter a 	om du vill prata om bitsy, rapportera en bugg, eller visa ditt spel, finns jag på twitter:	Wenn du über Bitsy reden möchtest, einen Fehler entdeckt hast oder ein Spiel von dir teilen magst - Ich bin auf Twitter
+instructions13_link_twitter	@adamledoux	@adamledoux	@adamledoux	@adamledoux	adamledoux	@adamledoux	@adamledoux
+instructions14	or you can post in the	ou tu peux poster dans le	ou podes postar no	o puedes escribir en	o puoi scrivere nel	eller så kan du skriva på	oder du schreibst in das
+instructions15_link_forum	community forum	forum de la communauté	forum da comunidade	el foro de la comunidad	forum della comu nità	vårt forum	Community Forum
+instructions16	special thanks to:	Remerciements spéciaux à :	agradecimentos especiais a:	Agradecimientos especiales a: 	Ringraziamenti speciali a:	tack till:	Besonderer Dank an:
+instructions17	mary-margaret	mary-margaret	mary-margaret	mary-margaret	mary-margaret	mary-margaret	mary-margaret
+instructions18	seattle game meetup folks	les gens du seattle game meetup	seattle game meetup folks	seattle game meetup folks	seattle game meetup folks	seattle game meetup folks	seattle game meetup folks
+instructions19	everyone in the bitsy community!	toutes les personnes de la communauté Bitsy!	toda a gente na comunidade do bitsy!	¡todas las personas que forman la comunidad de Bitsy!	tutte le persone che formano la communità di Bitsy! 	alla i bitsy-communityn!	alle in der Bitsy Community!
+version_notes_title	what's new in	quoi de neuf	o que há de novo na	qué hay de nuevo	cosa c'è di nuovo	nyheter i	Was gibt's Neues in
+palette_background	background color	couleur du fond	côr de fundo	color de fondo	colore del background	bakgrundsfärg	Hintergrundfarbe
+palette_tile	tile color	couleur des tiles	côr das tiles	color del tile	colore del tile	rut-färg	Tile Farbe
+palette_sprite	sprite color	couleur du sprite	côr das sprites	color del sprite	colore dello sprite	sprite-färg	Sprite Farbe
+palette_tool_advanced	palette select	sélectionner une palette	escolher uma palete	selecciona una paleta	selezionare una paletta	välj palett	Ausgewählte Farbpalette
+name_label	name	nom	nome	nombre	nome	namn	Name
+exit_new	place new exit	ajouter une nouvelle sortie	colocar uma nova saída	coloca una nueva salida	piazzare una nuova uscita	placera ny utgång	Platziere neuen Ausgang
+exit_selected	selected exit	sortie sélectionnée	saída selecionada	salida seleccionada	uscita selezionata	vald utgång	Ausgewählter Ausgang
+exit_selected_none	no exit selected	pas de sortie sélectionnée	não há uma saída selecionada	no has seleccionado una salida	non hai selezionata nessun uscita	ingen vald utgång	Kein Ausgang ausgewählt
+exit_destination	this exit goes to	cette sortie va à	esta saída leva-te a	esta salida te lleva a	questa uscita ti porta a	denna utgång leder till	Dieser Ausgang führt zu
+exit_delete	delete selected exit	supprimer la sortie sélectionnée	apagar saída selecionada	borrar salida seleccionada	cancellare uscita selezionata	ta bort den valda utgången	Ausgewählten Ausgang löschen
+language_label	language	langue	linguagem	idioma	lingua	språk	Sprache
+gif_start	start recording	commencer l'enregistrement	começar gravação	empezar grabación	cominciare registrazione	starta inspelning	Aufnahme starten
+gif_stop	stop recording	arrêter l'enregistrement 	parar gravação	parar grabación	femare registrazione	stoppa inspelning	Aufnahme stoppen
+gif_recording	recording...	enregistrement en cours...	a gravar...	grabando...	registrando...	spelar in...	Aufnehmen...
+gif_encoding	encoding...	encodage en cours...	a codificar...	codificando...	codificando...	kodar...	Verarbeiten...
+gif_snapshot	snapshot	capture d'écran	captura de ecrã	captura	istantanea	ta en bild	Schnappschuss
+gif_download	download gif	télécharger le gif	descarregar gif	descargar gif	scaricare gif	ladda ned gif	GIF herrunterladen
+avatar_label	avatar	avatar	avatar	avatar	avatar	avatar	Avatar
+tile_label	tile	tile	tile	tile	tile	ruta	Tile
+sprite_label	sprite	sprite  	sprite	sprite	sprite	sprite	Sprite
+item_label	item	item	item	item	item	föremål	Gegenstand
+grid_toggle_visible	grid	grille	grelha	grid	grid	rutnät	Gitter
+wall_toggle	wall	mur	parede	pared	muro	vägg	Wand
+animation_title	animation	animation	animação	animación	animazione	animation	Animation
+animation_preview	preview	aperçu 	pré-vizualizar	previsualizar	previsualizzare	förhandsvisning	Vorschau
+animation_frame1	frame 1	calque 1	frame 1	frame 1	frame 1	bild 1	Frame 1
+animation_frame2	frame 2	calque 2	frame 2	frame 2	frame 2	bild 2	Frame 2
+play_game	play	jouer	jogar	jugar	giocare	spela	Spielen
+room_tool_advanced	room tools	outils d'édition de salle	outras ferramentas para a edição de sala	herramientas de juego	utensili di gioco	rum-verktyg	Raum-Werkzeuge
+walls_toggle_visible	walls	murs	paredes	muros	muri	väggar	Wände
+room_add_exits	add exits	ajouter une sortie	adicionar saídas	añadir salidas	aggiungere uscite	lägg till utgångar	Ausgang hinzufügen
+room_add_endings	add endings	ajouter une fin	adicionar finais	añadir finales	aggiungere finali	lägg till slut	Ende hinzufügen
+items_label	items	items	items	items	items	föremål	Gegenstände
+variables_label	variables	variables	variáveis	variables	variabili	variabler	Variablen
+dialog_start_preview	preview	aperçu	pré-vizualizar	previsualizar	previsualizzare	förhandsvisning	Vorschau
+dialog_show_code	show code	afficher le code	mostrar códiogo	mostrar código	mostrare codice	visa kod	Code zeigen
+dialog_hide_code	hide code	cacher le code	esconder código	esconder código	nascondere codice	göm kod	Code verbergen
+dialog_block_new	new section	nouvelle section	nova secção	nueva sección	nuova sezione	ny replik	Neuer Absatz
+dialog_effect_new	text effects	effets de texte	efeitos do texto	efectos de texto	efetti di testo	texteffekter	Text Effekte
+dialog_block_basic	dialog	dialogue	diálogo	diálogo	dialogo	dialog	Dialog
+dialog_block_list	list	liste	lista	lista	lista	lista	Liste
+dialog_block_conditional	conditional	conditions	condicional	condicional	condizionale	villkor	Bedingungen
+dialog_effect_color1	color 1	couleur 1	côr 1	color 1	colore 1 	färg 1	Farbe 1
+dialog_effect_color2	color 2	couleur 2	côr 2	color 2	colore 2	färg 2	Farbe 2
+dialog_effect_color3	color 3	couleur 3	côr 3	color 3	colore 3	färg 3	Farbe 3
+dialog_effect_wavy	wavy	vague	ondulado	ondulado	ondulato	vågor	wellig
+dialog_effect_shaky	shaky	tremblement	tremido	tembloroso	tremante	skakig	zitternd
+dialog_effect_rainbow	rainbow	arc-en-ciel	arco-íris	arcoiris	arcoballeno	regnbåge	Regenbogen
+dialog_no_selection	Select a sprite or item to edit its dialog.	sélectionner un sprite ou un item pour éditer ses lignes de dialogue	seleciona um sprite ou item para editares o seu diálogo	Selecciona un sprite u objeto para editar este diálogo	Seleziona uno sprite per modificare questo dialogo	välj en sprite eller föremål för att ändra dess dialog	Wähle einen Sprite oder Gegenstand aus, um den Dialog zu editieren.
+dialog_list_order	order:	ordre :	ordem:	orden:	ordine	ordning:	Reihenfolge
+list_type_description_sequence	sequence (say each line once)	séquence (lit chaque phrase une fois)	sequência (diz uma fala de cada vez)	secuencia (dice cada línea una vez) 	sequenza (dice la linea ogni volta)	sekvens (säg repliker i ordning)	Hintereinander (sage jede Zeile einmal)
+list_type_description_cycle	cycle (say each line, then repeat)	boucle (lit chaque phrase, puis recommence)	ciclo (diz cada fala, depois repete)	ciclo (dice cada línea, entonces repite)	ciclo (dice ogni linea, poi ripete)	cykel (säg repliker i ordning och upprepa)	Schleife (sage jede Zeile einmal und fange dann von vorne an)
+list_type_description_shuffle	shuffle (say lines in random order)	mélange (lit les phrases dans un ordre aléatoire)	baralho (diz falas numa ordem aleatória	shuffle (dice cada línea en un orden cualquiera)	shuffle (dice ogni linea in un ordine qualsiasi)	blanda (säg repliker i slumpad ordning)	Mischen (sage alle Zeilen in zufälliger Reihenfolge)
+dialog_list_add	add line	ajouter une ligne	adicionar fala	añadir línea	aggiungere linea	lägg till replik	Zeile hinzufügen
+variable_label	variable	variable	variável	variables	variabili	variabel	Variablen
+condition_type_default	default	par défault	padrão	por defecto	per difetto	standard	Standard
+condition_type_custom	custom	customisée	costumizado	personalizado	custom	anpassa	Benutzerdefiniert
+dialog_conditional_add	add option	ajouter une option	adicionar opção	añadir opción	aggiungere opzione	lägg till alternativ	Option hinzufügen
+dialog_conditional_when	when	quand	quando	cuando	quando	om	Wenn
+variable_add	add variable	ajouter une variable	adicionar variável	añadir variable	aggiungere variabile	lägg till variabel	Variable hinzufügen
+editor_settings	editor settings	paramètres de l'éditeur	definições do editor				Editor-Einstellungen
+game_settings	game settings	paramètres du jeu	definições do jogo				Spiel-Einstellungen
+font_label	font	police	fonte				Schriftart
+font_ascii_small	ASCII Small	ASCII - petit	ASCII - pequeno				ASCII Small
+font_unicode_european_small	Unicode European Small	Unicode européen - petit	Unicode Europeu - pequeno				Unicode European Small
+font_unicode_european_large	Unicode European Large	Unicode européen - large	Unicode Europeu - grande				Unicode European Large
+font_unicode_asian	Unicode Asian	Unicode asiatique	Unicode Asiático				Unicode Asian
+font_ascii_small_description	Small font limited to ASCII, which includes English characters and some symbols.	Petite police limitée à l'ASCII, incluant les caractères anglais et quelques symboles.	Fonte pequena limitada a ASCII que inclui caracteres ingleses e pequenos símbolos				Kleine Schriftart, auf ASCII limitiert (englische Zeichen).
+font_unicode_european_small_description	Small font with some unicode support. Includes characters for most European languages.	Petite police supportant l'unicode, incluant les caractères de la plupart des langages européens.	Fonte pequena com algum suporte para unicode. Inclui caracteres de maior parte das linguagens Europeias.				Kleine Schriftart, unterstützt teilweise Unicode (fast alle Europäischen Zeichen).
+font_unicode_european_large_description	Large font with more unicode support. Includes characters for all European languages.	Large police supportant plus d'unicode, incluant les caractères de la plupart des langages européens.	Fonte grande com mais suporte para unicode. Inclui caracteres para todas as linguas Europeias.				Große Schriftart, unterstützt Unicode (alle Europäischen Zeichen).
+font_unicode_asian_description	Large font which includes characters for Asian languages such as Chinese, Japanese, and Korean.	Large police incluant les caractères de langues asiatiques, comme le chinois, le japonais ou le coréen.	Fonte grande que inclui caracteres para linguagens asiáticas como o Chinês, o Japonês e o Coreano.				Große Schriftart, unterstützt Asiatische Zeichen für z.B. Japan, China, Korea.
+font_custom_description	Upload your own custom font in the ".bitsyfont" format!	Importe ta propre police customisée dans le format ".bitsy"!	 Envia a tua própria fonte costumizada no formato ".bitsyfont"				Lade deine eigene Schriftart im ".bitsyfont" Format hoch!
+download_font	download font	télécharger la police	descarregar fonte				Schriftart herunterladen
+download_data	download data	télécharger les données	descarregar data				Daten herunterladen
+default_title	Write your game's title here	Ecris le nom de ton jeu ici	Escreve o título do teu jogo aqui				Hier solltest du deinen Spieltitel hinschreiben
+font_missing_character	The current font is missing some of the characters used in your dialog. Not all text in your game will display correctly. Consider picking a different font in the settings.	Certains caractères utilisés dans tes dialogues ne sont pas présents dans la police d'écriture sélectionnée. Certains textes ne s'afficheront pas correctement. Peut-être devrais-tu changer de police d'écriture dans les paramètres.	A fonte actual não possui alguns dos caracteres usados no teu diálogo. Partes do texto no teu jogo podem não aparecer correctamente. Considera escolher uma fonte diferente nas definições.				Die aktuelle Schriftart unterstützt nicht alle Zeichen aus deinem Dialog. Das kann merkwürdig aussehen. Wähle lieber eine andere Schriftart in den Einstellungen.
+open_settings	open settings	ouvrir les paramètres	abrir definições				Öffne Einstellungen
+close_label	close	fermer	fechar				Schließen

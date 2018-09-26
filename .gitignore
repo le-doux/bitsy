@@ -12,3 +12,4 @@ dist/*
 package-lock.json
 build/*
 cache/*
+experiments/node_modules/*

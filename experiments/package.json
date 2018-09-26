@@ -24,5 +24,8 @@
     "electron": "^1.7.9",
     "electron-packager": "^10.1.0"
   },
-  "productName": "Bitsy"
+  "productName": "Bitsy",
+  "dependencies": {
+    "xml2js": "^0.4.19"
+  }
 }

@@ -245,6 +245,8 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 		var idList = getIdList();
 
+		var x = 0;
+
 		for(var i = 0; i < idList.length; i++) {
 			var id = idList[i];
 
@@ -259,9 +261,12 @@ function PaintExplorer(idPrefix,selectCallback) {
 			var cacheEntry = renderer.GetCacheEntry(imgId);
 
 			if (isInViewport && cacheEntry.outOfDate) {
+				x++;
 				renderer.Render( imgId, new DrawingId(drawingCategory,id) );
 			}
 		}
+
+		console.log("RENDER COUNT " + x);
 	}
 
 	function getThumbnailId(id) {

@@ -214,4 +214,8 @@ this.ExportDynamicEnglishStrings = function() {
 	exportEnglishStringsDictionary(unlocalizedDynamicStrings);
 }
 
+this.GetStringCount = function(langId) {
+	return Object.keys(localizationStrings[langId]).length;
+}
+
 } // Localization()

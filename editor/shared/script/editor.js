@@ -4,13 +4,14 @@ PERF NOTES:
 - handle parsing performance (especially LARGE fonts)
 - load hidden thumbnails over time
 
-POST 5.0 TODOs:
-X fix move on end dialog bug
-icelandic
-estonian
-arabic
-esperanto
-[one other? hungarian?]
+reach out:
+X icelandic
+X estonian
+X arabic
+X esperanto
+X russian
+X hungarian
+
 X bug where big fonts slow down re-writing the game data (toggle to show the font data?)
 	- cause: writing a ton of data into the game data text box
 		fixes: hide/show font in game data, make "async" re-write of textbox (will that work?)
@@ -666,6 +667,7 @@ function start() {
 		"ascii_small.bitsyfont",
 		"unicode_european_small.bitsyfont",
 		"unicode_european_large.bitsyfont",
+		"arabic.bitsyfont",
 		"unicode_asian.bitsyfont"
 	], function() {
 		console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
