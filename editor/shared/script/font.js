@@ -1,6 +1,33 @@
 /*
 TODO:
 - untangle local & external resource use in font manager (still more to do here)
+- variable width & height characters
+	- how should this be represented in game data?
+
+infer width / height?
+CHAR a
+OFFSET x y
+****
+****
+****
+
+explicit
+CHAR a
+SIZE x y
+OFFSET x y
+***
+***
+***
+
+properties block
+CHAR a
+PROPERTIES
+SIZE x y
+OFFSET x y
+ENDPROPERTIES
+***
+***
+***
 */
 
 function FontManager(useExternalResources) {
@@ -86,7 +113,7 @@ function Font(fontData) {
 	var name = "unknown";
 	var width = 6; // default size so if you have NO font or an invalid font it displays boxes
 	var height = 8;
-	var fontdata = {};
+	var chardata = {};
 	var invalidCharData = [];
 
 	this.getName = function() {
@@ -94,7 +121,7 @@ function Font(fontData) {
 	}
 
 	this.getData = function() {
-		return fontdata;
+		return chardata;
 	}
 
 	this.getWidth = function() {
@@ -107,15 +134,15 @@ function Font(fontData) {
 
 	this.hasChar = function(char) {
 		var codepoint = char.charCodeAt(0);
-		return fontdata[codepoint] != null;
+		return chardata[codepoint] != null;
 	}
 
 	this.getChar = function(char) {
 
 		var codepoint = char.charCodeAt(0);
 
-		if (fontdata[codepoint] != null) {
-			return fontdata[codepoint];
+		if (chardata[codepoint] != null) {
+			return chardata[codepoint];
 		}
 		else {
 			return invalidCharData;
@@ -129,6 +156,7 @@ function Font(fontData) {
 		var lines = fontData.split("\n");
 
 		var isReadingChar = false;
+		var isReadingCharProperties = false;
 		var curCharLineCount = 0;
 		var curCharCode = 0;
 
@@ -146,21 +174,43 @@ function Font(fontData) {
 				}
 				else if (args[0] == "CHAR") {
 					isReadingChar = true;
+					isReadingCharProperties = true;
 					curCharLineCount = 0;
 					curCharCode = parseInt(args[1]);
-					fontdata[curCharCode] = [];
+					chardata[curCharCode] = { width:width, height:height, data:[] };
 				}
 			}
 			else {
-				// READING CHARACTER DATA LINE
-				for (var j = 0; j < width; j++)
-				{
-					fontdata[curCharCode].push( parseInt(line[j]) );
+				// CHAR PROPERTIES
+				if (isReadingCharProperties) {
+					var args = line.split(" ");
+					if (args[0] == "SIZE") {
+						// CUSTOM CHAR SIZE
+						chardata[curCharCode].width = parseInt(args[1]);
+						chardata[curCharCode].height = parseInt(args[2]);
+					}
+					else if (args[0] == "OFFSET") {
+						// CUSTOM CHAR OFFSET
+						// // TODO
+					}
+					else {
+						isReadingCharProperties = false;
+					}
 				}
 
-				curCharLineCount++;
-				if (curCharLineCount >= height) {
-					isReadingChar = false;
+				// CHAR DATA
+				if (!isReadingCharProperties) {
+					// READING CHARACTER DATA LINE
+					// for (var j = 0; j < width; j++)
+					for (var j = 0; j < chardata[curCharCode].width; j++)
+					{
+						chardata[curCharCode].data.push( parseInt(line[j]) );
+					}
+
+					curCharLineCount++;
+					if (curCharLineCount >= height) {
+						isReadingChar = false;
+					}
 				}
 			}
 		}

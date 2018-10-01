@@ -408,9 +408,10 @@ var DialogBuffer = function() {
 	function DialogFontChar(font, char, effectList) {
 		Object.assign(this, new DialogChar(effectList));
 
-		this.bitmap = font.getChar(char);
-		this.width = font.getWidth();
-		this.height = font.getHeight();
+		var charData = font.getChar(char);
+		this.bitmap = charData.data;
+		this.width = charData.width;
+		this.height = charData.height;
 	}
 
 	function DialogDrawingChar(drawingId, effectList) {
@@ -446,7 +447,8 @@ var DialogBuffer = function() {
 	function GetStringWidth(str) {
 		var width = 0;
 		for (var i = 0; i < str.length; i++) {
-			width += font.getWidth();
+			var charData = font.getChar(str[i]);
+			width += charData.width;
 		}
 		return width;
 	}

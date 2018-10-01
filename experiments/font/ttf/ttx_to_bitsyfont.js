@@ -77,8 +77,8 @@ fs.readFile("arabic.ttx", "utf8", function(err, data) {
 
 		var xMax = getHeadValue("xMax");
 		var yMax = getHeadValue("yMax");
-		var width = xMax * pixelsPerUnit;
-		var height = yMax * pixelsPerUnit;
+		var width = Math.floor( xMax * pixelsPerUnit );
+		var height = Math.floor( yMax * pixelsPerUnit );
 
 		function pixelToPoint(x,y) {
 			return {
@@ -97,19 +97,42 @@ fs.readFile("arabic.ttx", "utf8", function(err, data) {
 			nameToCharCode[map["$"].name] = map["$"].code;
 		}
 
+		var mtx = font.hmtx[0].mtx;
+		var nameToLeft = {};
+		var nameToWidth = {};
+		for (var i = 0; i < mtx.length; i++) {
+			var mtxName = mtx[i]["$"].name;
+			var mtxLeft = parseInt( mtx[i]["$"].lsb );
+			var mtxWidth = parseInt( mtx[i]["$"].width );
+			nameToLeft[mtxName] = mtxLeft;
+			nameToWidth[mtxName] = mtxWidth;
+		}
+
 		var glyphList = font.glyf[0].TTGlyph;
 		for (var i = 0; i < glyphList.length; i++) {
 			var glyph = glyphList[i];
 			var name = glyph["$"].name;
+			var glyphWidth = Math.floor( nameToWidth[name] * pixelsPerUnit );
+			var glyphWidth2 = Math.floor( (parseInt( glyph["$"].xMax ) - parseInt( glyph["$"].xMin )) * pixelsPerUnit );
+			glyphWidth = glyphWidth2 > glyphWidth ? glyphWidth2 : glyphWidth; // hack!!!!! why????????
+			var glyphXMin = Math.floor( nameToLeft[name] * pixelsPerUnit );
+			var glyphXMax = glyphXMin + glyphWidth;
+			// var glyphYMin = parseInt( glyph["$"].yMin ); // TODO --- different heights
+			// var glyphYMax = parseInt( glyph["$"].yMax );
 
 			if (!nameToCharCode[name])
 				continue;
 
 			var code = parseInt( nameToCharCode[name] );
 
-			console.log(name);
+			// console.log(name + " " + glyphXMin + " " + glyphWidth);
+			if (glyphWidth <= 0) console.log("WARNING !!!!!!!!!!!")
 
 			bitsyFontData += "CHAR " + code + "\n";
+
+			if (glyphWidth != width) {
+				bitsyFontData += "SIZE " + glyphWidth + " " + height + "\n";
+			}
 
 			var pathList = [];
 			if (glyph.contour) {
@@ -127,7 +150,8 @@ fs.readFile("arabic.ttx", "utf8", function(err, data) {
 
 			for (var y = 0; y < height; y++) {
 				var row = "";
-				for (var x = 0; x < width; x++) {
+				// for (var x = 0; x < width; x++) {
+				for (var x = glyphXMin; x < glyphXMax; x++) {
 					var pixelPoint = pixelToPoint(x,y);
 					var isPixelFilled = false;
 					for (var p = 0; p < pathList.length; p++) {
