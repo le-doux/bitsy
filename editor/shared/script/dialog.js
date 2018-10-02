@@ -119,7 +119,10 @@ var DialogRenderer = function() {
 
 	var text_scale = 2; //using a different scaling factor for text feels like cheating... but it looks better
 	this.DrawChar = function(char, row, col, leftPos) {
-		char.offset = {x:0, y:0};
+		char.offset = {
+			x: char.base_offset.x,
+			y: char.base_offset.y
+		}; // compute render offset *every* frame
 
 		char.SetPosition(row,col);
 		char.ApplyEffects(effectTime);
@@ -403,6 +406,10 @@ var DialogBuffer = function() {
 		this.bitmap = [];
 		this.width = 0;
 		this.height = 0;
+		this.base_offset = { // hacky name
+ 			x: 0,
+			y: 0
+		};
 	}
 
 	function DialogFontChar(font, char, effectList) {
@@ -412,6 +419,8 @@ var DialogBuffer = function() {
 		this.bitmap = charData.data;
 		this.width = charData.width;
 		this.height = charData.height;
+		this.base_offset.x = charData.offset.x;
+		this.base_offset.y = charData.offset.y;
 	}
 
 	function DialogDrawingChar(drawingId, effectList) {

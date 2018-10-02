@@ -134,6 +134,10 @@ fs.readFile("arabic.ttx", "utf8", function(err, data) {
 				bitsyFontData += "SIZE " + glyphWidth + " " + height + "\n";
 			}
 
+			if (glyphXMin != 0) {
+				bitsyFontData += "OFFSET " + glyphXMin + " " + "0" + "\n"; // TODO Y OFFSET
+			}
+
 			var pathList = [];
 			if (glyph.contour) {
 				for (var j = 0; j < glyph.contour.length; j++) {

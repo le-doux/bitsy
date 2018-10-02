@@ -149,6 +149,14 @@ function Font(fontData) {
 		}
 	}
 
+	this.allCharCodes = function() {
+		var codeList = [];
+		for (var code in chardata) {
+			codeList.push(code);
+		}
+		return codeList;
+	}
+
 	function parseFont(fontData) {
 		if (fontData == null)
 			return;
@@ -177,7 +185,15 @@ function Font(fontData) {
 					isReadingCharProperties = true;
 					curCharLineCount = 0;
 					curCharCode = parseInt(args[1]);
-					chardata[curCharCode] = { width:width, height:height, data:[] };
+					chardata[curCharCode] = { 
+						width: width,
+						height: height,
+						offset: {
+							x: 0,
+							y: 0
+						},
+						data: []
+					};
 				}
 			}
 			else {
@@ -191,7 +207,8 @@ function Font(fontData) {
 					}
 					else if (args[0] == "OFFSET") {
 						// CUSTOM CHAR OFFSET
-						// // TODO
+						chardata[curCharCode].offset.x = parseInt(args[1]);
+						chardata[curCharCode].offset.y = parseInt(args[2]);
 					}
 					else {
 						isReadingCharProperties = false;

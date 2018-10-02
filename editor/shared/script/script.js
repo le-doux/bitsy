@@ -192,6 +192,16 @@ function printItemFunc(environment,parameters,onReturn) {
 	printDrawingFunc(environment, [drawingId], onReturn);
 }
 
+function printFontFunc(environment, parameters, onReturn) {
+	var allCharacters = "";
+	var font = fontManager.Get( fontName );
+	var codeList = font.allCharCodes();
+	for (var i = 0; i < codeList.length; i++) {
+		allCharacters += String.fromCharCode(codeList[i]) + " ";
+	}
+	printFunc(environment, [allCharacters], onReturn);
+}
+
 function itemFunc(environment,parameters,onReturn) {
 	var itemId = parameters[0];
 	if(names.item.has(itemId)) itemId = names.item.get(itemId); // id is actually a name
@@ -343,6 +353,7 @@ var Environment = function() {
 	functionMap.set("printSprite", printSpriteFunc);
 	functionMap.set("printTile", printTileFunc);
 	functionMap.set("printItem", printItemFunc);
+	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn) {
