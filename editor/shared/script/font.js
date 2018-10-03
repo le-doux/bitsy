@@ -1,41 +1,21 @@
 /*
 TODO:
 - untangle local & external resource use in font manager (still more to do here)
-- variable width & height characters
-	- how should this be represented in game data?
 
-infer width / height?
-CHAR a
-OFFSET x y
-****
-****
-****
-
-explicit
-CHAR a
-SIZE x y
-OFFSET x y
-***
-***
-***
-
-properties block
-CHAR a
-PROPERTIES
-SIZE x y
-OFFSET x y
-ENDPROPERTIES
-***
-***
-***
-
-TODO
+TODO for arabic
 X - handle variable widths
 X - handle RIGHT to LEFT
 X - handle negative X OFFSETs
 X - handle when glyph width & spacing width are not the same (diacritics)
 X - should sub properties use a > to indent?
 X - what should the name of SIZE and WIDTH be? BOUNDS and SPACE?
+-
+- new font formatting decisions
+- save LTR in the game data
+- LTR option in menu
+- new localization strings
+- LTR textareas in the editor
+- testing
 */
 
 function FontManager(useExternalResources) {

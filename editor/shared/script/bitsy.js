@@ -1132,6 +1132,9 @@ function parseWorld(file) {
 		else if (getType(curLine) === "DEFAULT_FONT") {
 			i = parseFontName(lines, i);
 		}
+		else if (getType(curLine) === "TEXT_DIRECTION") {
+			i = parseTextDirection(lines, i);
+		}
 		else if (getType(curLine) === "FONT") {
 			i = parseFontData(lines, i);
 		}
@@ -1176,6 +1179,10 @@ function serializeWorld(skipFonts) {
 	/* FONT */
 	if (fontName != defaultFontName) {
 		worldStr += "DEFAULT_FONT " + fontName + "\n";
+		worldStr += "\n"
+	}
+	if (textDirection != TextDirection.LeftToRight) {
+		worldStr += "TEXT_DIRECTION " + textDirection + "\n";
 		worldStr += "\n"
 	}
 	/* PALETTE */
@@ -1836,6 +1843,12 @@ function parseVariable(lines, i) {
 
 function parseFontName(lines, i) {
 	fontName = getArg(lines[i], 1);
+	i++;
+	return i;
+}
+
+function parseTextDirection(lines, i) {
+	textDirection = getArg(lines[i], 1);
 	i++;
 	return i;
 }
