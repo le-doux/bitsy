@@ -105,6 +105,7 @@ function clearGameData() {
 	};
 
 	fontName = defaultFontName; // TODO : reset font manager too?
+	textDirection = TextDirection.LeftToRight;
 }
 
 var width = 128;

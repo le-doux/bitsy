@@ -2011,6 +2011,7 @@ function updateFontSelectUI() {
 	}
 
 	updateFontDescriptionUI();
+	updateTextDirectionSelectUI(); // a bit hacky but probably ok?
 }
 
 function updateFontDescriptionUI() {
@@ -4351,10 +4352,13 @@ function on_change_language(e) {
 function pickDefaultFontForLanguage(lang) {
 	// TODO : switch to asian characters when we get asian language translations of editor
 	if (lang === "en") {
-		switchFont("ascii_small");
+		switchFont("ascii_small", true /*doPickTextDirection*/);
+	}
+	else if (lang === "ar") {
+		switchFont("arabic", true /*doPickTextDirection*/);
 	}
 	else {
-		switchFont("unicode_european_small");
+		switchFont("unicode_european_small", true /*doPickTextDirection*/);
 	}
 	updateFontSelectUI();
 	resetMissingCharacterWarning();
@@ -4362,27 +4366,38 @@ function pickDefaultFontForLanguage(lang) {
 
 function on_change_font(e) {
 	if (e.target.value != "custom") {
-		switchFont(e.target.value);
+		switchFont(e.target.value, true /*doPickTextDirection*/);
 	}
 	else {
 		if (localStorage.custom_font != null) {
 			var fontStorage = JSON.parse(localStorage.custom_font);
-			switchFont(fontStorage.name);
+			switchFont(fontStorage.name, true /*doPickTextDirection*/);
 		}
 		else {
 			// fallback
-			switchFont("ascii_small");
+			switchFont("ascii_small", true /*doPickTextDirection*/);
 		}
 	}
 	updateFontDescriptionUI();
 	resetMissingCharacterWarning();
 }
 
-function switchFont(newFontName) {
+function switchFont(newFontName, doPickTextDirection) {
+	if (doPickTextDirection === undefined || doPickTextDirection === null) {
+		doPickTextDirection = false;
+	}
+
+	console.log("SWITCH FONT " + doPickTextDirection);
+
 	fontName = newFontName;
 
 	// hacky - move the font data from the editor to the engine
 	fontManager.AddResource(fontName + fontManager.GetExtension(), editorFontManager.GetData(fontName));
+
+	if (doPickTextDirection) {
+		console.log("PICK TEXT DIR");
+		pickDefaultTextDirectionForFont(newFontName);
+	}
 
 	refreshGameData()
 }
@@ -4400,6 +4415,33 @@ function initLanguageOptions() {
 		option.value = languageList[i].id;
 		option.selected = languageList[i].id === localization.GetLanguage();
 		languageSelect.add(option);
+	}
+}
+
+function on_change_text_direction(e) {
+	console.log("CHANGE TEXT DIR " + e.target.value);
+	textDirection = e.target.value;
+	refreshGameData();
+}
+
+function pickDefaultTextDirectionForFont(newFontName) {
+	if (newFontName === "arabic") {
+		textDirection = TextDirection.RightToLeft;
+	}
+	else {
+		textDirection = TextDirection.LeftToRight;
+	}
+	updateTextDirectionSelectUI();
+}
+
+function updateTextDirectionSelectUI() {
+	console.log("UPDATE TEXT DIR SELECT " + textDirection);
+	console.trace();
+
+	var textDirSelect = document.getElementById("textDirectionSelect");
+	for (var i in textDirSelect.options) {
+		var option = textDirSelect.options[i];
+		option.selected = (option.value === textDirection);
 	}
 }
 

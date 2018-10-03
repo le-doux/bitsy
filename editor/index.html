@@ -1190,6 +1190,13 @@
 								<br/>
 								<input title="import font from bitsyfont file on your computer" type="file" onchange="importFontFromFile(event);"/>
 							</div>
+							<div>
+								<span class="localize text_direction_label">text direction</span>:
+								<select id="textDirectionSelect" onchange="on_change_text_direction(event);">
+									<option value="LTR" class="localize text_direction_ltr">Left to Right</option>
+									<option value="RTL" class="localize text_direction_rtl">Right to Left</option>
+								</select>
+							</div>
 							<button title="download font file" class="color0" onclick="exportFont();">
 								<i class="material-icons">file_download</i>
 								<span class="localize download_font">download font</span>

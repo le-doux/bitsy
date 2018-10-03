@@ -15,6 +15,7 @@ X - what should the name of SIZE and WIDTH be? BOUNDS and SPACE?
 - LTR option in menu
 - new localization strings
 - LTR textareas in the editor
+- font credit
 - testing
 */
 
