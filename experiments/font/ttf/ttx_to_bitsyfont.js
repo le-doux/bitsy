@@ -4,9 +4,10 @@
 	- AND some have negative X start values
 
 TODO
-- handle variable widths
-- handle RIGHT to LEFT
-- handle negative X OFFSETs
+X - handle variable widths
+X - handle RIGHT to LEFT
+X - handle negative X OFFSETs
+- handle when glyph width & spacing width are not the same (diacritics)
 
 look at hmtx
  - width
@@ -92,9 +93,15 @@ fs.readFile("arabic.ttx", "utf8", function(err, data) {
 
 		var cmap = font.cmap[0].cmap_format_4[0].map;
 		var nameToCharCode = {};
+		var nameToComment = {};
 		for (var i = 0; i < cmap.length; i++) {
 			var map = cmap[i];
 			nameToCharCode[map["$"].name] = map["$"].code;
+
+			// hack requires manual edit of ttx file
+			if (map["$"].comment) {
+				nameToComment[map["$"].name] = map["$"].comment;
+			}
 		}
 
 		var mtx = font.hmtx[0].mtx;
@@ -112,9 +119,18 @@ fs.readFile("arabic.ttx", "utf8", function(err, data) {
 		for (var i = 0; i < glyphList.length; i++) {
 			var glyph = glyphList[i];
 			var name = glyph["$"].name;
-			var glyphWidth = Math.floor( nameToWidth[name] * pixelsPerUnit );
-			var glyphWidth2 = Math.floor( (parseInt( glyph["$"].xMax ) - parseInt( glyph["$"].xMin )) * pixelsPerUnit );
-			glyphWidth = glyphWidth2 > glyphWidth ? glyphWidth2 : glyphWidth; // hack!!!!! why????????
+			var spacingWidth = Math.floor( nameToWidth[name] * pixelsPerUnit );
+			var glyphWidth = Math.floor( (parseInt( glyph["$"].xMax ) - parseInt( glyph["$"].xMin )) * pixelsPerUnit );
+			if (isNaN(glyphWidth)) {
+				// console.log("IS NAN " + name);
+				glyphWidth = spacingWidth; // HACK!!!
+			}
+			
+			// if (glyphWidth != glyphWidth2) {
+			// 	console.log("~~~ glyph width doesn't match!!!!!! ~~~");
+			// }
+			// glyphWidth = glyphWidth2 > glyphWidth ? glyphWidth2 : glyphWidth; // hack!!!!! why????????
+
 			var glyphXMin = Math.floor( nameToLeft[name] * pixelsPerUnit );
 			var glyphXMax = glyphXMin + glyphWidth;
 			// var glyphYMin = parseInt( glyph["$"].yMin ); // TODO --- different heights
@@ -126,16 +142,27 @@ fs.readFile("arabic.ttx", "utf8", function(err, data) {
 			var code = parseInt( nameToCharCode[name] );
 
 			// console.log(name + " " + glyphXMin + " " + glyphWidth);
-			if (glyphWidth <= 0) console.log("WARNING !!!!!!!!!!!")
+			// if (glyphWidth <= 0) console.log("WARNING !!!!!!!!!!!")
+
+			if (nameToComment[name]) {
+				bitsyFontData += "# " + nameToComment[name] + "\n";
+			}
+			else {
+				bitsyFontData += "# " + name + "\n";
+			}
 
 			bitsyFontData += "CHAR " + code + "\n";
 
 			if (glyphWidth != width) {
-				bitsyFontData += "SIZE " + glyphWidth + " " + height + "\n";
+				bitsyFontData += "- SIZE " + glyphWidth + " " + height + "\n";
 			}
 
 			if (glyphXMin != 0) {
-				bitsyFontData += "OFFSET " + glyphXMin + " " + "0" + "\n"; // TODO Y OFFSET
+				bitsyFontData += "- OFFSET " + glyphXMin + " " + "0" + "\n"; // TODO Y OFFSET
+			}
+
+			if (spacingWidth != glyphWidth) {
+				bitsyFontData += "- WIDTH " + spacingWidth + "\n";
 			}
 
 			var pathList = [];

@@ -28,6 +28,14 @@ ENDPROPERTIES
 ***
 ***
 ***
+
+TODO
+X - handle variable widths
+X - handle RIGHT to LEFT
+X - handle negative X OFFSETs
+X - handle when glyph width & spacing width are not the same (diacritics)
+X - should sub properties use a > to indent?
+X - what should the name of SIZE and WIDTH be? BOUNDS and SPACE?
 */
 
 function FontManager(useExternalResources) {
@@ -114,7 +122,7 @@ function Font(fontData) {
 	var width = 6; // default size so if you have NO font or an invalid font it displays boxes
 	var height = 8;
 	var chardata = {};
-	var invalidCharData = [];
+	var invalidCharData = {};
 
 	this.getName = function() {
 		return name;
@@ -170,6 +178,11 @@ function Font(fontData) {
 
 		for (var i = 0; i < lines.length; i++) {
 			var line = lines[i];
+
+			if (line[0] === "#") {
+				continue; // skip comment lines
+			}
+
 			if (!isReadingChar) {
 				// READING NON CHARACTER DATA LINE
 				var args = line.split(" ");
@@ -192,6 +205,7 @@ function Font(fontData) {
 							x: 0,
 							y: 0
 						},
+						spacing: width, // TODO : name?
 						data: []
 					};
 				}
@@ -200,15 +214,21 @@ function Font(fontData) {
 				// CHAR PROPERTIES
 				if (isReadingCharProperties) {
 					var args = line.split(" ");
-					if (args[0] == "SIZE") {
-						// CUSTOM CHAR SIZE
-						chardata[curCharCode].width = parseInt(args[1]);
-						chardata[curCharCode].height = parseInt(args[2]);
-					}
-					else if (args[0] == "OFFSET") {
-						// CUSTOM CHAR OFFSET
-						chardata[curCharCode].offset.x = parseInt(args[1]);
-						chardata[curCharCode].offset.y = parseInt(args[2]);
+					if (args[0] == "-") { // SUB PROPERTIES START WITH A DASH TO INDENT
+						if (args[1] == "SIZE") {
+							// CUSTOM CHAR SIZE
+							chardata[curCharCode].width = parseInt(args[2]);
+							chardata[curCharCode].height = parseInt(args[3]);
+							chardata[curCharCode].spacing = parseInt(args[2]); // HACK : assumes SIZE is always declared first
+						}
+						else if (args[1] == "OFFSET") {
+							// CUSTOM CHAR OFFSET
+							chardata[curCharCode].offset.x = parseInt(args[2]);
+							chardata[curCharCode].offset.y = parseInt(args[3]);
+						}
+						else if (args[1] == "WIDTH") {
+							chardata[curCharCode].spacing = parseInt(args[2]);
+						}
 					}
 					else {
 						isReadingCharProperties = false;
@@ -233,14 +253,23 @@ function Font(fontData) {
 		}
 
 		// init invalid character box
-		invalidCharData = [];
+		invalidCharData = { 
+			width: width,
+			height: height,
+			offset: {
+				x: 0,
+				y: 0
+			},
+			spacing: width, // TODO : name?
+			data: []
+		};
 		for (var y = 0; y < height; y++) {
 			for (var x = 0; x < width; x++) {
 				if (x < width-1 && y < height-1) {
-					invalidCharData.push(1);
+					invalidCharData.data.push(1);
 				}
 				else {
-					invalidCharData.push(0);
+					invalidCharData.data.push(0);
 				}
 			}
 		}

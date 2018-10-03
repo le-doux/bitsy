@@ -626,254 +626,254 @@
   <cmap>
     <tableVersion version="0"/>
     <cmap_format_4 platformID="0" platEncID="3" language="0">
-      <map code="0x20" name="space"/><!-- SPACE -->
-      <map code="0x21" name="exclam"/><!-- EXCLAMATION MARK -->
-      <map code="0x22" name="quotedbl"/><!-- QUOTATION MARK -->
-      <map code="0x23" name="numbersign"/><!-- NUMBER SIGN -->
-      <map code="0x24" name="dollar"/><!-- DOLLAR SIGN -->
-      <map code="0x28" name="parenleft"/><!-- LEFT PARENTHESIS -->
-      <map code="0x29" name="parenright"/><!-- RIGHT PARENTHESIS -->
-      <map code="0x2c" name="comma"/><!-- COMMA -->
-      <map code="0x2d" name="hyphen"/><!-- HYPHEN-MINUS -->
-      <map code="0x2e" name="period"/><!-- FULL STOP -->
-      <map code="0x30" name="zero"/><!-- DIGIT ZERO -->
-      <map code="0x31" name="one"/><!-- DIGIT ONE -->
-      <map code="0x32" name="two"/><!-- DIGIT TWO -->
-      <map code="0x33" name="three"/><!-- DIGIT THREE -->
-      <map code="0x34" name="four"/><!-- DIGIT FOUR -->
-      <map code="0x35" name="five"/><!-- DIGIT FIVE -->
-      <map code="0x36" name="six"/><!-- DIGIT SIX -->
-      <map code="0x37" name="seven"/><!-- DIGIT SEVEN -->
-      <map code="0x38" name="eight"/><!-- DIGIT EIGHT -->
-      <map code="0x39" name="nine"/><!-- DIGIT NINE -->
-      <map code="0x3a" name="colon"/><!-- COLON -->
-      <map code="0x3b" name="semicolon"/><!-- SEMICOLON -->
-      <map code="0x3c" name="less"/><!-- LESS-THAN SIGN -->
-      <map code="0x3d" name="equal"/><!-- EQUALS SIGN -->
-      <map code="0x3e" name="greater"/><!-- GREATER-THAN SIGN -->
-      <map code="0x3f" name="question"/><!-- QUESTION MARK -->
-      <map code="0x41" name="A"/><!-- LATIN CAPITAL LETTER A -->
-      <map code="0x42" name="B"/><!-- LATIN CAPITAL LETTER B -->
-      <map code="0x43" name="C"/><!-- LATIN CAPITAL LETTER C -->
-      <map code="0x44" name="D"/><!-- LATIN CAPITAL LETTER D -->
-      <map code="0x45" name="E"/><!-- LATIN CAPITAL LETTER E -->
-      <map code="0x46" name="F"/><!-- LATIN CAPITAL LETTER F -->
-      <map code="0x47" name="G"/><!-- LATIN CAPITAL LETTER G -->
-      <map code="0x48" name="H"/><!-- LATIN CAPITAL LETTER H -->
-      <map code="0x49" name="I"/><!-- LATIN CAPITAL LETTER I -->
-      <map code="0x4a" name="J"/><!-- LATIN CAPITAL LETTER J -->
-      <map code="0x4b" name="K"/><!-- LATIN CAPITAL LETTER K -->
-      <map code="0x4c" name="L"/><!-- LATIN CAPITAL LETTER L -->
-      <map code="0x4d" name="M"/><!-- LATIN CAPITAL LETTER M -->
-      <map code="0x4e" name="N"/><!-- LATIN CAPITAL LETTER N -->
-      <map code="0x4f" name="O"/><!-- LATIN CAPITAL LETTER O -->
-      <map code="0x50" name="P"/><!-- LATIN CAPITAL LETTER P -->
-      <map code="0x51" name="Q"/><!-- LATIN CAPITAL LETTER Q -->
-      <map code="0x52" name="R"/><!-- LATIN CAPITAL LETTER R -->
-      <map code="0x53" name="S"/><!-- LATIN CAPITAL LETTER S -->
-      <map code="0x54" name="T"/><!-- LATIN CAPITAL LETTER T -->
-      <map code="0x55" name="U"/><!-- LATIN CAPITAL LETTER U -->
-      <map code="0x56" name="V"/><!-- LATIN CAPITAL LETTER V -->
-      <map code="0x57" name="W"/><!-- LATIN CAPITAL LETTER W -->
-      <map code="0x58" name="X"/><!-- LATIN CAPITAL LETTER X -->
-      <map code="0x59" name="Y"/><!-- LATIN CAPITAL LETTER Y -->
-      <map code="0x5a" name="Z"/><!-- LATIN CAPITAL LETTER Z -->
-      <map code="0x5b" name="bracketleft"/><!-- LEFT SQUARE BRACKET -->
-      <map code="0x5c" name="backslash"/><!-- REVERSE SOLIDUS -->
-      <map code="0x5d" name="bracketright"/><!-- RIGHT SQUARE BRACKET -->
-      <map code="0x5e" name="asciicircum"/><!-- CIRCUMFLEX ACCENT -->
-      <map code="0x5f" name="underscore"/><!-- LOW LINE -->
-      <map code="0x60" name="grave"/><!-- GRAVE ACCENT -->
-      <map code="0x61" name="a"/><!-- LATIN SMALL LETTER A -->
-      <map code="0x62" name="b"/><!-- LATIN SMALL LETTER B -->
-      <map code="0x63" name="c"/><!-- LATIN SMALL LETTER C -->
-      <map code="0x64" name="d"/><!-- LATIN SMALL LETTER D -->
-      <map code="0x65" name="e"/><!-- LATIN SMALL LETTER E -->
-      <map code="0x66" name="f"/><!-- LATIN SMALL LETTER F -->
-      <map code="0x67" name="g"/><!-- LATIN SMALL LETTER G -->
-      <map code="0x68" name="h"/><!-- LATIN SMALL LETTER H -->
-      <map code="0x69" name="i"/><!-- LATIN SMALL LETTER I -->
-      <map code="0x6a" name="j"/><!-- LATIN SMALL LETTER J -->
-      <map code="0x6b" name="k"/><!-- LATIN SMALL LETTER K -->
-      <map code="0x6c" name="l"/><!-- LATIN SMALL LETTER L -->
-      <map code="0x6d" name="m"/><!-- LATIN SMALL LETTER M -->
-      <map code="0x6e" name="n"/><!-- LATIN SMALL LETTER N -->
-      <map code="0x6f" name="o"/><!-- LATIN SMALL LETTER O -->
-      <map code="0x70" name="p"/><!-- LATIN SMALL LETTER P -->
-      <map code="0x71" name="q"/><!-- LATIN SMALL LETTER Q -->
-      <map code="0x72" name="r"/><!-- LATIN SMALL LETTER R -->
-      <map code="0x73" name="s"/><!-- LATIN SMALL LETTER S -->
-      <map code="0x74" name="t"/><!-- LATIN SMALL LETTER T -->
-      <map code="0x75" name="u"/><!-- LATIN SMALL LETTER U -->
-      <map code="0x76" name="v"/><!-- LATIN SMALL LETTER V -->
-      <map code="0x77" name="w"/><!-- LATIN SMALL LETTER W -->
-      <map code="0x78" name="x"/><!-- LATIN SMALL LETTER X -->
-      <map code="0x79" name="y"/><!-- LATIN SMALL LETTER Y -->
-      <map code="0x7a" name="z"/><!-- LATIN SMALL LETTER Z -->
-      <map code="0x7b" name="braceleft"/><!-- LEFT CURLY BRACKET -->
-      <map code="0x7c" name="bar"/><!-- VERTICAL LINE -->
-      <map code="0x7d" name="braceright"/><!-- RIGHT CURLY BRACKET -->
-      <map code="0x60c" name="uni060C"/><!-- ARABIC COMMA -->
-      <map code="0x61f" name="uni061F"/><!-- ARABIC QUESTION MARK -->
-      <map code="0x621" name="uni0621"/><!-- ARABIC LETTER HAMZA -->
-      <map code="0x622" name="uni0622"/><!-- ARABIC LETTER ALEF WITH MADDA ABOVE -->
-      <map code="0x623" name="uni0623"/><!-- ARABIC LETTER ALEF WITH HAMZA ABOVE -->
-      <map code="0x624" name="uni0624"/><!-- ARABIC LETTER WAW WITH HAMZA ABOVE -->
-      <map code="0x625" name="uni0625"/><!-- ARABIC LETTER ALEF WITH HAMZA BELOW -->
-      <map code="0x626" name="uni0626"/><!-- ARABIC LETTER YEH WITH HAMZA ABOVE -->
-      <map code="0x627" name="uni0627"/><!-- ARABIC LETTER ALEF -->
-      <map code="0x628" name="uni0628"/><!-- ARABIC LETTER BEH -->
-      <map code="0x629" name="uni0629"/><!-- ARABIC LETTER TEH MARBUTA -->
-      <map code="0x62a" name="uni062A"/><!-- ARABIC LETTER TEH -->
-      <map code="0x62b" name="uni062B"/><!-- ARABIC LETTER THEH -->
-      <map code="0x62c" name="uni062C"/><!-- ARABIC LETTER JEEM -->
-      <map code="0x62d" name="uni062D"/><!-- ARABIC LETTER HAH -->
-      <map code="0x62e" name="uni062E"/><!-- ARABIC LETTER KHAH -->
-      <map code="0x62f" name="uni062F"/><!-- ARABIC LETTER DAL -->
-      <map code="0x630" name="uni0630"/><!-- ARABIC LETTER THAL -->
-      <map code="0x631" name="uni0631"/><!-- ARABIC LETTER REH -->
-      <map code="0x632" name="uni0632"/><!-- ARABIC LETTER ZAIN -->
-      <map code="0x633" name="uni0633"/><!-- ARABIC LETTER SEEN -->
-      <map code="0x634" name="uni0634"/><!-- ARABIC LETTER SHEEN -->
-      <map code="0x635" name="uni0635"/><!-- ARABIC LETTER SAD -->
-      <map code="0x636" name="uni0636"/><!-- ARABIC LETTER DAD -->
-      <map code="0x637" name="uni0637"/><!-- ARABIC LETTER TAH -->
-      <map code="0x638" name="uni0638"/><!-- ARABIC LETTER ZAH -->
-      <map code="0x639" name="uni0639"/><!-- ARABIC LETTER AIN -->
-      <map code="0x63a" name="uni063A"/><!-- ARABIC LETTER GHAIN -->
-      <map code="0x640" name="uni0640"/><!-- ARABIC TATWEEL -->
-      <map code="0x641" name="uni0641"/><!-- ARABIC LETTER FEH -->
-      <map code="0x642" name="uni0642"/><!-- ARABIC LETTER QAF -->
-      <map code="0x643" name="uni0643"/><!-- ARABIC LETTER KAF -->
-      <map code="0x644" name="uni0644"/><!-- ARABIC LETTER LAM -->
-      <map code="0x645" name="uni0645"/><!-- ARABIC LETTER MEEM -->
-      <map code="0x646" name="uni0646"/><!-- ARABIC LETTER NOON -->
-      <map code="0x647" name="uni0647"/><!-- ARABIC LETTER HEH -->
-      <map code="0x648" name="uni0648"/><!-- ARABIC LETTER WAW -->
-      <map code="0x649" name="uni0649"/><!-- ARABIC LETTER ALEF MAKSURA -->
-      <map code="0x64a" name="uni064A"/><!-- ARABIC LETTER YEH -->
-      <map code="0x64b" name="uni064B"/><!-- ARABIC FATHATAN -->
-      <map code="0x64c" name="uni064C"/><!-- ARABIC DAMMATAN -->
-      <map code="0x64d" name="uni064D"/><!-- ARABIC KASRATAN -->
-      <map code="0x64e" name="uni064E"/><!-- ARABIC FATHA -->
-      <map code="0x64f" name="uni064F"/><!-- ARABIC DAMMA -->
-      <map code="0x650" name="uni0650"/><!-- ARABIC KASRA -->
-      <map code="0x651" name="uni0651"/><!-- ARABIC SHADDA -->
-      <map code="0x652" name="uni0652"/><!-- ARABIC SUKUN -->
-      <map code="0x660" name="uni0660"/><!-- ARABIC-INDIC DIGIT ZERO -->
-      <map code="0x661" name="uni0661"/><!-- ARABIC-INDIC DIGIT ONE -->
-      <map code="0x662" name="uni0662"/><!-- ARABIC-INDIC DIGIT TWO -->
-      <map code="0x663" name="uni0663"/><!-- ARABIC-INDIC DIGIT THREE -->
-      <map code="0x664" name="uni0664"/><!-- ARABIC-INDIC DIGIT FOUR -->
-      <map code="0x665" name="uni0665"/><!-- ARABIC-INDIC DIGIT FIVE -->
-      <map code="0x666" name="uni0666"/><!-- ARABIC-INDIC DIGIT SIX -->
-      <map code="0x667" name="uni0667"/><!-- ARABIC-INDIC DIGIT SEVEN -->
-      <map code="0x668" name="uni0668"/><!-- ARABIC-INDIC DIGIT EIGHT -->
-      <map code="0x669" name="uni0669"/><!-- ARABIC-INDIC DIGIT NINE -->
-      <map code="0x67e" name="uni067E"/><!-- ARABIC LETTER PEH -->
-      <map code="0x6f1" name="uni06F1"/><!-- EXTENDED ARABIC-INDIC DIGIT ONE -->
-      <map code="0x6f2" name="uni06F2"/><!-- EXTENDED ARABIC-INDIC DIGIT TWO -->
-      <map code="0x6f3" name="uni06F3"/><!-- EXTENDED ARABIC-INDIC DIGIT THREE -->
-      <map code="0xfe80" name="uniFE80"/><!-- ARABIC LETTER HAMZA ISOLATED FORM -->
-      <map code="0xfe81" name="uniFE81"/><!-- ARABIC LETTER ALEF WITH MADDA ABOVE ISOLATED FORM -->
-      <map code="0xfe82" name="uniFE82"/><!-- ARABIC LETTER ALEF WITH MADDA ABOVE FINAL FORM -->
-      <map code="0xfe85" name="uniFE85"/><!-- ARABIC LETTER WAW WITH HAMZA ABOVE ISOLATED FORM -->
-      <map code="0xfe86" name="uniFE86"/><!-- ARABIC LETTER WAW WITH HAMZA ABOVE FINAL FORM -->
-      <map code="0xfe87" name="uniFE87"/><!-- ARABIC LETTER ALEF WITH HAMZA BELOW ISOLATED FORM -->
-      <map code="0xfe88" name="uniFE88"/><!-- ARABIC LETTER ALEF WITH HAMZA BELOW FINAL FORM -->
-      <map code="0xfe89" name="uniFE89"/><!-- ARABIC LETTER YEH WITH HAMZA ABOVE ISOLATED FORM -->
-      <map code="0xfe8a" name="uniFE8A"/><!-- ARABIC LETTER YEH WITH HAMZA ABOVE FINAL FORM -->
-      <map code="0xfe8b" name="uniFE8B"/><!-- ARABIC LETTER YEH WITH HAMZA ABOVE INITIAL FORM -->
-      <map code="0xfe8c" name="uniFE8C"/><!-- ARABIC LETTER YEH WITH HAMZA ABOVE MEDIAL FORM -->
-      <map code="0xfe8e" name="uniFE8E"/><!-- ARABIC LETTER ALEF FINAL FORM -->
-      <map code="0xfe90" name="uniFE90"/><!-- ARABIC LETTER BEH FINAL FORM -->
-      <map code="0xfe91" name="uniFE91"/><!-- ARABIC LETTER BEH INITIAL FORM -->
-      <map code="0xfe92" name="uniFE92"/><!-- ARABIC LETTER BEH MEDIAL FORM -->
-      <map code="0xfe94" name="uniFE94"/><!-- ARABIC LETTER TEH MARBUTA FINAL FORM -->
-      <map code="0xfe95" name="uniFE95"/><!-- ARABIC LETTER TEH ISOLATED FORM -->
-      <map code="0xfe96" name="uniFE96"/><!-- ARABIC LETTER TEH FINAL FORM -->
-      <map code="0xfe97" name="uniFE97"/><!-- ARABIC LETTER TEH INITIAL FORM -->
-      <map code="0xfe98" name="uniFE98"/><!-- ARABIC LETTER TEH MEDIAL FORM -->
-      <map code="0xfe9a" name="uniFE9A"/><!-- ARABIC LETTER THEH FINAL FORM -->
-      <map code="0xfe9b" name="uniFE9B"/><!-- ARABIC LETTER THEH INITIAL FORM -->
-      <map code="0xfe9c" name="uniFE9C"/><!-- ARABIC LETTER THEH MEDIAL FORM -->
-      <map code="0xfe9e" name="uniFE9E"/><!-- ARABIC LETTER JEEM FINAL FORM -->
-      <map code="0xfe9f" name="uniFE9F"/><!-- ARABIC LETTER JEEM INITIAL FORM -->
-      <map code="0xfea0" name="uniFEA0"/><!-- ARABIC LETTER JEEM MEDIAL FORM -->
-      <map code="0xfea2" name="uniFEA2"/><!-- ARABIC LETTER HAH FINAL FORM -->
-      <map code="0xfea3" name="uniFEA3"/><!-- ARABIC LETTER HAH INITIAL FORM -->
-      <map code="0xfea4" name="uniFEA4"/><!-- ARABIC LETTER HAH MEDIAL FORM -->
-      <map code="0xfea6" name="uniFEA6"/><!-- ARABIC LETTER KHAH FINAL FORM -->
-      <map code="0xfea7" name="uniFEA7"/><!-- ARABIC LETTER KHAH INITIAL FORM -->
-      <map code="0xfea8" name="uniFEA8"/><!-- ARABIC LETTER KHAH MEDIAL FORM -->
-      <map code="0xfeaa" name="uniFEAA"/><!-- ARABIC LETTER DAL FINAL FORM -->
-      <map code="0xfeab" name="uniFEAB"/><!-- ARABIC LETTER THAL ISOLATED FORM -->
-      <map code="0xfeac" name="uniFEAC"/><!-- ARABIC LETTER THAL FINAL FORM -->
-      <map code="0xfead" name="uniFEAD"/><!-- ARABIC LETTER REH ISOLATED FORM -->
-      <map code="0xfeae" name="uniFEAE"/><!-- ARABIC LETTER REH FINAL FORM -->
-      <map code="0xfeaf" name="uniFEAF"/><!-- ARABIC LETTER ZAIN ISOLATED FORM -->
-      <map code="0xfeb0" name="uniFEB0"/><!-- ARABIC LETTER ZAIN FINAL FORM -->
-      <map code="0xfeb2" name="uniFEB2"/><!-- ARABIC LETTER SEEN FINAL FORM -->
-      <map code="0xfeb3" name="uniFEB3"/><!-- ARABIC LETTER SEEN INITIAL FORM -->
-      <map code="0xfeb4" name="uniFEB4"/><!-- ARABIC LETTER SEEN MEDIAL FORM -->
-      <map code="0xfeb6" name="uniFEB6"/><!-- ARABIC LETTER SHEEN FINAL FORM -->
-      <map code="0xfeb7" name="uniFEB7"/><!-- ARABIC LETTER SHEEN INITIAL FORM -->
-      <map code="0xfeb8" name="uniFEB8"/><!-- ARABIC LETTER SHEEN MEDIAL FORM -->
-      <map code="0xfeba" name="uniFEBA"/><!-- ARABIC LETTER SAD FINAL FORM -->
-      <map code="0xfebb" name="uniFEBB"/><!-- ARABIC LETTER SAD INITIAL FORM -->
-      <map code="0xfebc" name="uniFEBC"/><!-- ARABIC LETTER SAD MEDIAL FORM -->
-      <map code="0xfebe" name="uniFEBE"/><!-- ARABIC LETTER DAD FINAL FORM -->
-      <map code="0xfebf" name="uniFEBF"/><!-- ARABIC LETTER DAD INITIAL FORM -->
-      <map code="0xfec0" name="uniFEC0"/><!-- ARABIC LETTER DAD MEDIAL FORM -->
-      <map code="0xfec2" name="uniFEC2"/><!-- ARABIC LETTER TAH FINAL FORM -->
-      <map code="0xfec3" name="uniFEC3"/><!-- ARABIC LETTER TAH INITIAL FORM -->
-      <map code="0xfec4" name="uniFEC4"/><!-- ARABIC LETTER TAH MEDIAL FORM -->
-      <map code="0xfec6" name="uniFEC6"/><!-- ARABIC LETTER ZAH FINAL FORM -->
-      <map code="0xfec7" name="uniFEC7"/><!-- ARABIC LETTER ZAH INITIAL FORM -->
-      <map code="0xfec8" name="uniFEC8"/><!-- ARABIC LETTER ZAH MEDIAL FORM -->
-      <map code="0xfeca" name="uniFECA"/><!-- ARABIC LETTER AIN FINAL FORM -->
-      <map code="0xfecb" name="uniFECB"/><!-- ARABIC LETTER AIN INITIAL FORM -->
-      <map code="0xfecc" name="uniFECC"/><!-- ARABIC LETTER AIN MEDIAL FORM -->
-      <map code="0xfece" name="uniFECE"/><!-- ARABIC LETTER GHAIN FINAL FORM -->
-      <map code="0xfecf" name="uniFECF"/><!-- ARABIC LETTER GHAIN INITIAL FORM -->
-      <map code="0xfed0" name="uniFED0"/><!-- ARABIC LETTER GHAIN MEDIAL FORM -->
-      <map code="0xfed2" name="uniFED2"/><!-- ARABIC LETTER FEH FINAL FORM -->
-      <map code="0xfed3" name="uniFED3"/><!-- ARABIC LETTER FEH INITIAL FORM -->
-      <map code="0xfed4" name="uniFED4"/><!-- ARABIC LETTER FEH MEDIAL FORM -->
-      <map code="0xfed6" name="uniFED6"/><!-- ARABIC LETTER QAF FINAL FORM -->
-      <map code="0xfed7" name="uniFED7"/><!-- ARABIC LETTER QAF INITIAL FORM -->
-      <map code="0xfed8" name="uniFED8"/><!-- ARABIC LETTER QAF MEDIAL FORM -->
-      <map code="0xfeda" name="uniFEDA"/><!-- ARABIC LETTER KAF FINAL FORM -->
-      <map code="0xfedb" name="uniFEDB"/><!-- ARABIC LETTER KAF INITIAL FORM -->
-      <map code="0xfedc" name="uniFEDC"/><!-- ARABIC LETTER KAF MEDIAL FORM -->
-      <map code="0xfede" name="uniFEDE"/><!-- ARABIC LETTER LAM FINAL FORM -->
-      <map code="0xfedf" name="uniFEDF"/><!-- ARABIC LETTER LAM INITIAL FORM -->
-      <map code="0xfee0" name="uniFEE0"/><!-- ARABIC LETTER LAM MEDIAL FORM -->
-      <map code="0xfee2" name="uniFEE2"/><!-- ARABIC LETTER MEEM FINAL FORM -->
-      <map code="0xfee3" name="uniFEE3"/><!-- ARABIC LETTER MEEM INITIAL FORM -->
-      <map code="0xfee4" name="uniFEE4"/><!-- ARABIC LETTER MEEM MEDIAL FORM -->
-      <map code="0xfee6" name="uniFEE6"/><!-- ARABIC LETTER NOON FINAL FORM -->
-      <map code="0xfee7" name="uniFEE7"/><!-- ARABIC LETTER NOON INITIAL FORM -->
-      <map code="0xfee8" name="uniFEE8"/><!-- ARABIC LETTER NOON MEDIAL FORM -->
-      <map code="0xfeea" name="uniFEEA"/><!-- ARABIC LETTER HEH FINAL FORM -->
-      <map code="0xfeeb" name="uniFEEB"/><!-- ARABIC LETTER HEH INITIAL FORM -->
-      <map code="0xfeec" name="uniFEEC"/><!-- ARABIC LETTER HEH MEDIAL FORM -->
-      <map code="0xfeed" name="uniFEED"/><!-- ARABIC LETTER WAW ISOLATED FORM -->
-      <map code="0xfeee" name="uniFEEE"/><!-- ARABIC LETTER WAW FINAL FORM -->
-      <map code="0xfeef" name="uniFEEF"/><!-- ARABIC LETTER ALEF MAKSURA ISOLATED FORM -->
-      <map code="0xfef0" name="uniFEF0"/><!-- ARABIC LETTER ALEF MAKSURA FINAL FORM -->
-      <map code="0xfef1" name="uniFEF1"/><!-- ARABIC LETTER YEH ISOLATED FORM -->
-      <map code="0xfef2" name="uniFEF2"/><!-- ARABIC LETTER YEH FINAL FORM -->
-      <map code="0xfef3" name="uniFEF3"/><!-- ARABIC LETTER YEH INITIAL FORM -->
-      <map code="0xfef4" name="uniFEF4"/><!-- ARABIC LETTER YEH MEDIAL FORM -->
-      <map code="0xfef5" name="uniFEF5"/><!-- ARABIC LIGATURE LAM WITH ALEF WITH MADDA ABOVE ISOLATED FORM -->
-      <map code="0xfef6" name="uniFEF6"/><!-- ARABIC LIGATURE LAM WITH ALEF WITH MADDA ABOVE FINAL FORM -->
-      <map code="0xfef7" name="uniFEF7"/><!-- ARABIC LIGATURE LAM WITH ALEF WITH HAMZA ABOVE ISOLATED FORM -->
-      <map code="0xfef8" name="uniFEF8"/><!-- ARABIC LIGATURE LAM WITH ALEF WITH HAMZA ABOVE FINAL FORM -->
-      <map code="0xfef9" name="uniFEF9"/><!-- ARABIC LIGATURE LAM WITH ALEF WITH HAMZA BELOW ISOLATED FORM -->
-      <map code="0xfefa" name="uniFEFA"/><!-- ARABIC LIGATURE LAM WITH ALEF WITH HAMZA BELOW FINAL FORM -->
-      <map code="0xfefb" name="uniFEFB"/><!-- ARABIC LIGATURE LAM WITH ALEF ISOLATED FORM -->
-      <map code="0xfefc" name="uniFEFC"/><!-- ARABIC LIGATURE LAM WITH ALEF FINAL FORM -->
+        <map code="0x20" name="space" comment="SPACE"/>
+        <map code="0x21" name="exclam" comment="EXCLAMATION MARK"/>
+        <map code="0x22" name="quotedbl" comment="QUOTATION MARK"/>
+        <map code="0x23" name="numbersign" comment="NUMBER SIGN"/>
+        <map code="0x24" name="dollar" comment="DOLLAR SIGN"/>
+        <map code="0x28" name="parenleft" comment="LEFT PARENTHESIS"/>
+        <map code="0x29" name="parenright" comment="RIGHT PARENTHESIS"/>
+        <map code="0x2c" name="comma" comment="COMMA"/>
+        <map code="0x2d" name="hyphen" comment="HYPHEN-MINUS"/>
+        <map code="0x2e" name="period" comment="FULL STOP"/>
+        <map code="0x30" name="zero" comment="DIGIT ZERO"/>
+        <map code="0x31" name="one" comment="DIGIT ONE"/>
+        <map code="0x32" name="two" comment="DIGIT TWO"/>
+        <map code="0x33" name="three" comment="DIGIT THREE"/>
+        <map code="0x34" name="four" comment="DIGIT FOUR"/>
+        <map code="0x35" name="five" comment="DIGIT FIVE"/>
+        <map code="0x36" name="six" comment="DIGIT SIX"/>
+        <map code="0x37" name="seven" comment="DIGIT SEVEN"/>
+        <map code="0x38" name="eight" comment="DIGIT EIGHT"/>
+        <map code="0x39" name="nine" comment="DIGIT NINE"/>
+        <map code="0x3a" name="colon" comment="COLON"/>
+        <map code="0x3b" name="semicolon" comment="SEMICOLON"/>
+        <map code="0x3c" name="less" comment="LESS-THAN SIGN"/>
+        <map code="0x3d" name="equal" comment="EQUALS SIGN"/>
+        <map code="0x3e" name="greater" comment="GREATER-THAN SIGN"/>
+        <map code="0x3f" name="question" comment="QUESTION MARK"/>
+        <map code="0x41" name="A" comment="LATIN CAPITAL LETTER A"/>
+        <map code="0x42" name="B" comment="LATIN CAPITAL LETTER B"/>
+        <map code="0x43" name="C" comment="LATIN CAPITAL LETTER C"/>
+        <map code="0x44" name="D" comment="LATIN CAPITAL LETTER D"/>
+        <map code="0x45" name="E" comment="LATIN CAPITAL LETTER E"/>
+        <map code="0x46" name="F" comment="LATIN CAPITAL LETTER F"/>
+        <map code="0x47" name="G" comment="LATIN CAPITAL LETTER G"/>
+        <map code="0x48" name="H" comment="LATIN CAPITAL LETTER H"/>
+        <map code="0x49" name="I" comment="LATIN CAPITAL LETTER I"/>
+        <map code="0x4a" name="J" comment="LATIN CAPITAL LETTER J"/>
+        <map code="0x4b" name="K" comment="LATIN CAPITAL LETTER K"/>
+        <map code="0x4c" name="L" comment="LATIN CAPITAL LETTER L"/>
+        <map code="0x4d" name="M" comment="LATIN CAPITAL LETTER M"/>
+        <map code="0x4e" name="N" comment="LATIN CAPITAL LETTER N"/>
+        <map code="0x4f" name="O" comment="LATIN CAPITAL LETTER O"/>
+        <map code="0x50" name="P" comment="LATIN CAPITAL LETTER P"/>
+        <map code="0x51" name="Q" comment="LATIN CAPITAL LETTER Q"/>
+        <map code="0x52" name="R" comment="LATIN CAPITAL LETTER R"/>
+        <map code="0x53" name="S" comment="LATIN CAPITAL LETTER S"/>
+        <map code="0x54" name="T" comment="LATIN CAPITAL LETTER T"/>
+        <map code="0x55" name="U" comment="LATIN CAPITAL LETTER U"/>
+        <map code="0x56" name="V" comment="LATIN CAPITAL LETTER V"/>
+        <map code="0x57" name="W" comment="LATIN CAPITAL LETTER W"/>
+        <map code="0x58" name="X" comment="LATIN CAPITAL LETTER X"/>
+        <map code="0x59" name="Y" comment="LATIN CAPITAL LETTER Y"/>
+        <map code="0x5a" name="Z" comment="LATIN CAPITAL LETTER Z"/>
+        <map code="0x5b" name="bracketleft" comment="LEFT SQUARE BRACKET"/>
+        <map code="0x5c" name="backslash" comment="REVERSE SOLIDUS"/>
+        <map code="0x5d" name="bracketright" comment="RIGHT SQUARE BRACKET"/>
+        <map code="0x5e" name="asciicircum" comment="CIRCUMFLEX ACCENT"/>
+        <map code="0x5f" name="underscore" comment="LOW LINE"/>
+        <map code="0x60" name="grave" comment="GRAVE ACCENT"/>
+        <map code="0x61" name="a" comment="LATIN SMALL LETTER A"/>
+        <map code="0x62" name="b" comment="LATIN SMALL LETTER B"/>
+        <map code="0x63" name="c" comment="LATIN SMALL LETTER C"/>
+        <map code="0x64" name="d" comment="LATIN SMALL LETTER D"/>
+        <map code="0x65" name="e" comment="LATIN SMALL LETTER E"/>
+        <map code="0x66" name="f" comment="LATIN SMALL LETTER F"/>
+        <map code="0x67" name="g" comment="LATIN SMALL LETTER G"/>
+        <map code="0x68" name="h" comment="LATIN SMALL LETTER H"/>
+        <map code="0x69" name="i" comment="LATIN SMALL LETTER I"/>
+        <map code="0x6a" name="j" comment="LATIN SMALL LETTER J"/>
+        <map code="0x6b" name="k" comment="LATIN SMALL LETTER K"/>
+        <map code="0x6c" name="l" comment="LATIN SMALL LETTER L"/>
+        <map code="0x6d" name="m" comment="LATIN SMALL LETTER M"/>
+        <map code="0x6e" name="n" comment="LATIN SMALL LETTER N"/>
+        <map code="0x6f" name="o" comment="LATIN SMALL LETTER O"/>
+        <map code="0x70" name="p" comment="LATIN SMALL LETTER P"/>
+        <map code="0x71" name="q" comment="LATIN SMALL LETTER Q"/>
+        <map code="0x72" name="r" comment="LATIN SMALL LETTER R"/>
+        <map code="0x73" name="s" comment="LATIN SMALL LETTER S"/>
+        <map code="0x74" name="t" comment="LATIN SMALL LETTER T"/>
+        <map code="0x75" name="u" comment="LATIN SMALL LETTER U"/>
+        <map code="0x76" name="v" comment="LATIN SMALL LETTER V"/>
+        <map code="0x77" name="w" comment="LATIN SMALL LETTER W"/>
+        <map code="0x78" name="x" comment="LATIN SMALL LETTER X"/>
+        <map code="0x79" name="y" comment="LATIN SMALL LETTER Y"/>
+        <map code="0x7a" name="z" comment="LATIN SMALL LETTER Z"/>
+        <map code="0x7b" name="braceleft" comment="LEFT CURLY BRACKET"/>
+        <map code="0x7c" name="bar" comment="VERTICAL LINE"/>
+        <map code="0x7d" name="braceright" comment="RIGHT CURLY BRACKET"/>
+        <map code="0x60c" name="uni060C" comment="ARABIC COMMA"/>
+        <map code="0x61f" name="uni061F" comment="ARABIC QUESTION MARK"/>
+        <map code="0x621" name="uni0621" comment="ARABIC LETTER HAMZA"/>
+        <map code="0x622" name="uni0622" comment="ARABIC LETTER ALEF WITH MADDA ABOVE"/>
+        <map code="0x623" name="uni0623" comment="ARABIC LETTER ALEF WITH HAMZA ABOVE"/>
+        <map code="0x624" name="uni0624" comment="ARABIC LETTER WAW WITH HAMZA ABOVE"/>
+        <map code="0x625" name="uni0625" comment="ARABIC LETTER ALEF WITH HAMZA BELOW"/>
+        <map code="0x626" name="uni0626" comment="ARABIC LETTER YEH WITH HAMZA ABOVE"/>
+        <map code="0x627" name="uni0627" comment="ARABIC LETTER ALEF"/>
+        <map code="0x628" name="uni0628" comment="ARABIC LETTER BEH"/>
+        <map code="0x629" name="uni0629" comment="ARABIC LETTER TEH MARBUTA"/>
+        <map code="0x62a" name="uni062A" comment="ARABIC LETTER TEH"/>
+        <map code="0x62b" name="uni062B" comment="ARABIC LETTER THEH"/>
+        <map code="0x62c" name="uni062C" comment="ARABIC LETTER JEEM"/>
+        <map code="0x62d" name="uni062D" comment="ARABIC LETTER HAH"/>
+        <map code="0x62e" name="uni062E" comment="ARABIC LETTER KHAH"/>
+        <map code="0x62f" name="uni062F" comment="ARABIC LETTER DAL"/>
+        <map code="0x630" name="uni0630" comment="ARABIC LETTER THAL"/>
+        <map code="0x631" name="uni0631" comment="ARABIC LETTER REH"/>
+        <map code="0x632" name="uni0632" comment="ARABIC LETTER ZAIN"/>
+        <map code="0x633" name="uni0633" comment="ARABIC LETTER SEEN"/>
+        <map code="0x634" name="uni0634" comment="ARABIC LETTER SHEEN"/>
+        <map code="0x635" name="uni0635" comment="ARABIC LETTER SAD"/>
+        <map code="0x636" name="uni0636" comment="ARABIC LETTER DAD"/>
+        <map code="0x637" name="uni0637" comment="ARABIC LETTER TAH"/>
+        <map code="0x638" name="uni0638" comment="ARABIC LETTER ZAH"/>
+        <map code="0x639" name="uni0639" comment="ARABIC LETTER AIN"/>
+        <map code="0x63a" name="uni063A" comment="ARABIC LETTER GHAIN"/>
+        <map code="0x640" name="uni0640" comment="ARABIC TATWEEL"/>
+        <map code="0x641" name="uni0641" comment="ARABIC LETTER FEH"/>
+        <map code="0x642" name="uni0642" comment="ARABIC LETTER QAF"/>
+        <map code="0x643" name="uni0643" comment="ARABIC LETTER KAF"/>
+        <map code="0x644" name="uni0644" comment="ARABIC LETTER LAM"/>
+        <map code="0x645" name="uni0645" comment="ARABIC LETTER MEEM"/>
+        <map code="0x646" name="uni0646" comment="ARABIC LETTER NOON"/>
+        <map code="0x647" name="uni0647" comment="ARABIC LETTER HEH"/>
+        <map code="0x648" name="uni0648" comment="ARABIC LETTER WAW"/>
+        <map code="0x649" name="uni0649" comment="ARABIC LETTER ALEF MAKSURA"/>
+        <map code="0x64a" name="uni064A" comment="ARABIC LETTER YEH"/>
+        <map code="0x64b" name="uni064B" comment="ARABIC FATHATAN"/>
+        <map code="0x64c" name="uni064C" comment="ARABIC DAMMATAN"/>
+        <map code="0x64d" name="uni064D" comment="ARABIC KASRATAN"/>
+        <map code="0x64e" name="uni064E" comment="ARABIC FATHA"/>
+        <map code="0x64f" name="uni064F" comment="ARABIC DAMMA"/>
+        <map code="0x650" name="uni0650" comment="ARABIC KASRA"/>
+        <map code="0x651" name="uni0651" comment="ARABIC SHADDA"/>
+        <map code="0x652" name="uni0652" comment="ARABIC SUKUN"/>
+        <map code="0x660" name="uni0660" comment="ARABIC-INDIC DIGIT ZERO"/>
+        <map code="0x661" name="uni0661" comment="ARABIC-INDIC DIGIT ONE"/>
+        <map code="0x662" name="uni0662" comment="ARABIC-INDIC DIGIT TWO"/>
+        <map code="0x663" name="uni0663" comment="ARABIC-INDIC DIGIT THREE"/>
+        <map code="0x664" name="uni0664" comment="ARABIC-INDIC DIGIT FOUR"/>
+        <map code="0x665" name="uni0665" comment="ARABIC-INDIC DIGIT FIVE"/>
+        <map code="0x666" name="uni0666" comment="ARABIC-INDIC DIGIT SIX"/>
+        <map code="0x667" name="uni0667" comment="ARABIC-INDIC DIGIT SEVEN"/>
+        <map code="0x668" name="uni0668" comment="ARABIC-INDIC DIGIT EIGHT"/>
+        <map code="0x669" name="uni0669" comment="ARABIC-INDIC DIGIT NINE"/>
+        <map code="0x67e" name="uni067E" comment="ARABIC LETTER PEH"/>
+        <map code="0x6f1" name="uni06F1" comment="EXTENDED ARABIC-INDIC DIGIT ONE"/>
+        <map code="0x6f2" name="uni06F2" comment="EXTENDED ARABIC-INDIC DIGIT TWO"/>
+        <map code="0x6f3" name="uni06F3" comment="EXTENDED ARABIC-INDIC DIGIT THREE"/>
+        <map code="0xfe80" name="uniFE80" comment="ARABIC LETTER HAMZA ISOLATED FORM"/>
+        <map code="0xfe81" name="uniFE81" comment="ARABIC LETTER ALEF WITH MADDA ABOVE ISOLATED FORM"/>
+        <map code="0xfe82" name="uniFE82" comment="ARABIC LETTER ALEF WITH MADDA ABOVE FINAL FORM"/>
+        <map code="0xfe85" name="uniFE85" comment="ARABIC LETTER WAW WITH HAMZA ABOVE ISOLATED FORM"/>
+        <map code="0xfe86" name="uniFE86" comment="ARABIC LETTER WAW WITH HAMZA ABOVE FINAL FORM"/>
+        <map code="0xfe87" name="uniFE87" comment="ARABIC LETTER ALEF WITH HAMZA BELOW ISOLATED FORM"/>
+        <map code="0xfe88" name="uniFE88" comment="ARABIC LETTER ALEF WITH HAMZA BELOW FINAL FORM"/>
+        <map code="0xfe89" name="uniFE89" comment="ARABIC LETTER YEH WITH HAMZA ABOVE ISOLATED FORM"/>
+        <map code="0xfe8a" name="uniFE8A" comment="ARABIC LETTER YEH WITH HAMZA ABOVE FINAL FORM"/>
+        <map code="0xfe8b" name="uniFE8B" comment="ARABIC LETTER YEH WITH HAMZA ABOVE INITIAL FORM"/>
+        <map code="0xfe8c" name="uniFE8C" comment="ARABIC LETTER YEH WITH HAMZA ABOVE MEDIAL FORM"/>
+        <map code="0xfe8e" name="uniFE8E" comment="ARABIC LETTER ALEF FINAL FORM"/>
+        <map code="0xfe90" name="uniFE90" comment="ARABIC LETTER BEH FINAL FORM"/>
+        <map code="0xfe91" name="uniFE91" comment="ARABIC LETTER BEH INITIAL FORM"/>
+        <map code="0xfe92" name="uniFE92" comment="ARABIC LETTER BEH MEDIAL FORM"/>
+        <map code="0xfe94" name="uniFE94" comment="ARABIC LETTER TEH MARBUTA FINAL FORM"/>
+        <map code="0xfe95" name="uniFE95" comment="ARABIC LETTER TEH ISOLATED FORM"/>
+        <map code="0xfe96" name="uniFE96" comment="ARABIC LETTER TEH FINAL FORM"/>
+        <map code="0xfe97" name="uniFE97" comment="ARABIC LETTER TEH INITIAL FORM"/>
+        <map code="0xfe98" name="uniFE98" comment="ARABIC LETTER TEH MEDIAL FORM"/>
+        <map code="0xfe9a" name="uniFE9A" comment="ARABIC LETTER THEH FINAL FORM"/>
+        <map code="0xfe9b" name="uniFE9B" comment="ARABIC LETTER THEH INITIAL FORM"/>
+        <map code="0xfe9c" name="uniFE9C" comment="ARABIC LETTER THEH MEDIAL FORM"/>
+        <map code="0xfe9e" name="uniFE9E" comment="ARABIC LETTER JEEM FINAL FORM"/>
+        <map code="0xfe9f" name="uniFE9F" comment="ARABIC LETTER JEEM INITIAL FORM"/>
+        <map code="0xfea0" name="uniFEA0" comment="ARABIC LETTER JEEM MEDIAL FORM"/>
+        <map code="0xfea2" name="uniFEA2" comment="ARABIC LETTER HAH FINAL FORM"/>
+        <map code="0xfea3" name="uniFEA3" comment="ARABIC LETTER HAH INITIAL FORM"/>
+        <map code="0xfea4" name="uniFEA4" comment="ARABIC LETTER HAH MEDIAL FORM"/>
+        <map code="0xfea6" name="uniFEA6" comment="ARABIC LETTER KHAH FINAL FORM"/>
+        <map code="0xfea7" name="uniFEA7" comment="ARABIC LETTER KHAH INITIAL FORM"/>
+        <map code="0xfea8" name="uniFEA8" comment="ARABIC LETTER KHAH MEDIAL FORM"/>
+        <map code="0xfeaa" name="uniFEAA" comment="ARABIC LETTER DAL FINAL FORM"/>
+        <map code="0xfeab" name="uniFEAB" comment="ARABIC LETTER THAL ISOLATED FORM"/>
+        <map code="0xfeac" name="uniFEAC" comment="ARABIC LETTER THAL FINAL FORM"/>
+        <map code="0xfead" name="uniFEAD" comment="ARABIC LETTER REH ISOLATED FORM"/>
+        <map code="0xfeae" name="uniFEAE" comment="ARABIC LETTER REH FINAL FORM"/>
+        <map code="0xfeaf" name="uniFEAF" comment="ARABIC LETTER ZAIN ISOLATED FORM"/>
+        <map code="0xfeb0" name="uniFEB0" comment="ARABIC LETTER ZAIN FINAL FORM"/>
+        <map code="0xfeb2" name="uniFEB2" comment="ARABIC LETTER SEEN FINAL FORM"/>
+        <map code="0xfeb3" name="uniFEB3" comment="ARABIC LETTER SEEN INITIAL FORM"/>
+        <map code="0xfeb4" name="uniFEB4" comment="ARABIC LETTER SEEN MEDIAL FORM"/>
+        <map code="0xfeb6" name="uniFEB6" comment="ARABIC LETTER SHEEN FINAL FORM"/>
+        <map code="0xfeb7" name="uniFEB7" comment="ARABIC LETTER SHEEN INITIAL FORM"/>
+        <map code="0xfeb8" name="uniFEB8" comment="ARABIC LETTER SHEEN MEDIAL FORM"/>
+        <map code="0xfeba" name="uniFEBA" comment="ARABIC LETTER SAD FINAL FORM"/>
+        <map code="0xfebb" name="uniFEBB" comment="ARABIC LETTER SAD INITIAL FORM"/>
+        <map code="0xfebc" name="uniFEBC" comment="ARABIC LETTER SAD MEDIAL FORM"/>
+        <map code="0xfebe" name="uniFEBE" comment="ARABIC LETTER DAD FINAL FORM"/>
+        <map code="0xfebf" name="uniFEBF" comment="ARABIC LETTER DAD INITIAL FORM"/>
+        <map code="0xfec0" name="uniFEC0" comment="ARABIC LETTER DAD MEDIAL FORM"/>
+        <map code="0xfec2" name="uniFEC2" comment="ARABIC LETTER TAH FINAL FORM"/>
+        <map code="0xfec3" name="uniFEC3" comment="ARABIC LETTER TAH INITIAL FORM"/>
+        <map code="0xfec4" name="uniFEC4" comment="ARABIC LETTER TAH MEDIAL FORM"/>
+        <map code="0xfec6" name="uniFEC6" comment="ARABIC LETTER ZAH FINAL FORM"/>
+        <map code="0xfec7" name="uniFEC7" comment="ARABIC LETTER ZAH INITIAL FORM"/>
+        <map code="0xfec8" name="uniFEC8" comment="ARABIC LETTER ZAH MEDIAL FORM"/>
+        <map code="0xfeca" name="uniFECA" comment="ARABIC LETTER AIN FINAL FORM"/>
+        <map code="0xfecb" name="uniFECB" comment="ARABIC LETTER AIN INITIAL FORM"/>
+        <map code="0xfecc" name="uniFECC" comment="ARABIC LETTER AIN MEDIAL FORM"/>
+        <map code="0xfece" name="uniFECE" comment="ARABIC LETTER GHAIN FINAL FORM"/>
+        <map code="0xfecf" name="uniFECF" comment="ARABIC LETTER GHAIN INITIAL FORM"/>
+        <map code="0xfed0" name="uniFED0" comment="ARABIC LETTER GHAIN MEDIAL FORM"/>
+        <map code="0xfed2" name="uniFED2" comment="ARABIC LETTER FEH FINAL FORM"/>
+        <map code="0xfed3" name="uniFED3" comment="ARABIC LETTER FEH INITIAL FORM"/>
+        <map code="0xfed4" name="uniFED4" comment="ARABIC LETTER FEH MEDIAL FORM"/>
+        <map code="0xfed6" name="uniFED6" comment="ARABIC LETTER QAF FINAL FORM"/>
+        <map code="0xfed7" name="uniFED7" comment="ARABIC LETTER QAF INITIAL FORM"/>
+        <map code="0xfed8" name="uniFED8" comment="ARABIC LETTER QAF MEDIAL FORM"/>
+        <map code="0xfeda" name="uniFEDA" comment="ARABIC LETTER KAF FINAL FORM"/>
+        <map code="0xfedb" name="uniFEDB" comment="ARABIC LETTER KAF INITIAL FORM"/>
+        <map code="0xfedc" name="uniFEDC" comment="ARABIC LETTER KAF MEDIAL FORM"/>
+        <map code="0xfede" name="uniFEDE" comment="ARABIC LETTER LAM FINAL FORM"/>
+        <map code="0xfedf" name="uniFEDF" comment="ARABIC LETTER LAM INITIAL FORM"/>
+        <map code="0xfee0" name="uniFEE0" comment="ARABIC LETTER LAM MEDIAL FORM"/>
+        <map code="0xfee2" name="uniFEE2" comment="ARABIC LETTER MEEM FINAL FORM"/>
+        <map code="0xfee3" name="uniFEE3" comment="ARABIC LETTER MEEM INITIAL FORM"/>
+        <map code="0xfee4" name="uniFEE4" comment="ARABIC LETTER MEEM MEDIAL FORM"/>
+        <map code="0xfee6" name="uniFEE6" comment="ARABIC LETTER NOON FINAL FORM"/>
+        <map code="0xfee7" name="uniFEE7" comment="ARABIC LETTER NOON INITIAL FORM"/>
+        <map code="0xfee8" name="uniFEE8" comment="ARABIC LETTER NOON MEDIAL FORM"/>
+        <map code="0xfeea" name="uniFEEA" comment="ARABIC LETTER HEH FINAL FORM"/>
+        <map code="0xfeeb" name="uniFEEB" comment="ARABIC LETTER HEH INITIAL FORM"/>
+        <map code="0xfeec" name="uniFEEC" comment="ARABIC LETTER HEH MEDIAL FORM"/>
+        <map code="0xfeed" name="uniFEED" comment="ARABIC LETTER WAW ISOLATED FORM"/>
+        <map code="0xfeee" name="uniFEEE" comment="ARABIC LETTER WAW FINAL FORM"/>
+        <map code="0xfeef" name="uniFEEF" comment="ARABIC LETTER ALEF MAKSURA ISOLATED FORM"/>
+        <map code="0xfef0" name="uniFEF0" comment="ARABIC LETTER ALEF MAKSURA FINAL FORM"/>
+        <map code="0xfef1" name="uniFEF1" comment="ARABIC LETTER YEH ISOLATED FORM"/>
+        <map code="0xfef2" name="uniFEF2" comment="ARABIC LETTER YEH FINAL FORM"/>
+        <map code="0xfef3" name="uniFEF3" comment="ARABIC LETTER YEH INITIAL FORM"/>
+        <map code="0xfef4" name="uniFEF4" comment="ARABIC LETTER YEH MEDIAL FORM"/>
+        <map code="0xfef5" name="uniFEF5" comment="ARABIC LIGATURE LAM WITH ALEF WITH MADDA ABOVE ISOLATED FORM"/>
+        <map code="0xfef6" name="uniFEF6" comment="ARABIC LIGATURE LAM WITH ALEF WITH MADDA ABOVE FINAL FORM"/>
+        <map code="0xfef7" name="uniFEF7" comment="ARABIC LIGATURE LAM WITH ALEF WITH HAMZA ABOVE ISOLATED FORM"/>
+        <map code="0xfef8" name="uniFEF8" comment="ARABIC LIGATURE LAM WITH ALEF WITH HAMZA ABOVE FINAL FORM"/>
+        <map code="0xfef9" name="uniFEF9" comment="ARABIC LIGATURE LAM WITH ALEF WITH HAMZA BELOW ISOLATED FORM"/>
+        <map code="0xfefa" name="uniFEFA" comment="ARABIC LIGATURE LAM WITH ALEF WITH HAMZA BELOW FINAL FORM"/>
+        <map code="0xfefb" name="uniFEFB" comment="ARABIC LIGATURE LAM WITH ALEF ISOLATED FORM"/>
+        <map code="0xfefc" name="uniFEFC" comment="ARABIC LIGATURE LAM WITH ALEF FINAL FORM"/>
     </cmap_format_4>
     <cmap_format_4 platformID="3" platEncID="1" language="0">
       <map code="0x20" name="space"/><!-- SPACE -->

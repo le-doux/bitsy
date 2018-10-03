@@ -246,7 +246,7 @@ var DialogBuffer = function() {
 				var char = row[j];
 				if(char) {
 					if (textDirection === TextDirection.RightToLeft) {
-						leftPos -= char.width;
+						leftPos -= char.spacing;
 					}
 					// console.log(j + " " + leftPos);
 
@@ -254,7 +254,7 @@ var DialogBuffer = function() {
 					handler(char, i /*rowIndex*/, j /*colIndex*/, leftPos)
 
 					if (textDirection === TextDirection.LeftToRight) {
-						leftPos += char.width;
+						leftPos += char.spacing;
 					}
 				}
 			}
@@ -410,17 +410,20 @@ var DialogBuffer = function() {
  			x: 0,
 			y: 0
 		};
+		this.spacing = 0;
 	}
 
 	function DialogFontChar(font, char, effectList) {
 		Object.assign(this, new DialogChar(effectList));
 
 		var charData = font.getChar(char);
+		console.log(charData);
 		this.bitmap = charData.data;
 		this.width = charData.width;
 		this.height = charData.height;
 		this.base_offset.x = charData.offset.x;
 		this.base_offset.y = charData.offset.y;
+		this.spacing = charData.spacing;
 	}
 
 	function DialogDrawingChar(drawingId, effectList) {
@@ -436,6 +439,7 @@ var DialogBuffer = function() {
 		this.bitmap = imageDataFlat;
 		this.width = 8;
 		this.height = 8;
+		this.spacing = 8;
 	}
 
 	function AddWordToCharArray(charArray,word,effectList) {
@@ -448,7 +452,7 @@ var DialogBuffer = function() {
 	function GetCharArrayWidth(charArray) {
 		var width = 0;
 		for(var i = 0; i < charArray.length; i++) {
-			width += charArray[i].width;
+			width += charArray[i].spacing;
 		}
 		return width;
 	}
@@ -457,7 +461,7 @@ var DialogBuffer = function() {
 		var width = 0;
 		for (var i = 0; i < str.length; i++) {
 			var charData = font.getChar(str[i]);
-			width += charData.width;
+			width += charData.spacing;
 		}
 		return width;
 	}
@@ -477,7 +481,7 @@ var DialogBuffer = function() {
 		var rowLength = GetCharArrayWidth(curRowArr);
 
 		// TODO : clean up copy-pasted code here :/
-		if (rowLength + drawingChar.width  <= pixelsPerRow || rowLength <= 0)
+		if (rowLength + drawingChar.spacing  <= pixelsPerRow || rowLength <= 0)
 		{
 			//stay on same row
 			curRowArr.push( drawingChar );
