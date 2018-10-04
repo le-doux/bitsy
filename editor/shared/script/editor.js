@@ -2012,6 +2012,7 @@ function updateFontSelectUI() {
 
 	updateFontDescriptionUI();
 	updateTextDirectionSelectUI(); // a bit hacky but probably ok?
+	updateEditorTextDirection();
 }
 
 function updateFontDescriptionUI() {
@@ -3294,6 +3295,8 @@ var DialogBlockUI = function(nodes, num) {
 	textArea.addEventListener('select', textChangeHandler);
 	textArea.addEventListener('blur', textChangeHandler);
 	textArea.title = "type dialog here";
+	textArea.style.direction = textDirection;
+	textArea.style["unicode-bidi"] = "bidi-override";
 	div.appendChild( textArea );
 
 	this.GetEl = function() {
@@ -3647,6 +3650,8 @@ var IfBlockUI = function(node, num) {
 		textArea.addEventListener('blur', textChangeHandler);
 		textArea.title = "type dialog option to say when this condition is true"
 		textArea.style.display = "inline-block";
+		textArea.style.direction = textDirection;
+		textArea.style["unicode-bidi"] = "bidi-override";
 		conditionDiv.appendChild( textArea );
 		// div.appendChild( document.createElement("br") );
 
@@ -3821,6 +3826,8 @@ var SeqBlockUI = function(node, num) {
 		// textArea.style.float = "left";
 		// div.insertBefore( textArea, addOptionEl );
 		textArea.style.display = "inline-block";
+		textArea.style.direction = textDirection;
+		textArea.style["unicode-bidi"] = "bidi-override";
 		optionDiv.appendChild( textArea );
 
 		var deleteOptionEl = document.createElement("button");
@@ -4379,6 +4386,7 @@ function on_change_font(e) {
 		}
 	}
 	updateFontDescriptionUI();
+	updateEditorTextDirection();
 	resetMissingCharacterWarning();
 }
 
@@ -4421,6 +4429,7 @@ function initLanguageOptions() {
 function on_change_text_direction(e) {
 	console.log("CHANGE TEXT DIR " + e.target.value);
 	textDirection = e.target.value;
+	updateEditorTextDirection();
 	refreshGameData();
 }
 
@@ -4431,13 +4440,22 @@ function pickDefaultTextDirectionForFont(newFontName) {
 	else {
 		textDirection = TextDirection.LeftToRight;
 	}
+	updateEditorTextDirection();
 	updateTextDirectionSelectUI();
 }
 
-function updateTextDirectionSelectUI() {
-	console.log("UPDATE TEXT DIR SELECT " + textDirection);
-	console.trace();
+function updateEditorTextDirection() {
+	console.log("TEXT BOX TEXT DIR " + textDirection);
+	document.getElementById("titleText").style.direction = textDirection;
+	document.getElementById("titleText").style["unicode-bidi"] = "bidi-override";
+	document.getElementById("dialogText").style.direction = textDirection;
+	document.getElementById("dialogText").style["unicode-bidi"] = "bidi-override";
+	document.getElementById("endingText").style.direction = textDirection;
+	document.getElementById("endingText").style["unicode-bidi"] = "bidi-override";
+	reloadAdvDialogUI();
+}
 
+function updateTextDirectionSelectUI() {
 	var textDirSelect = document.getElementById("textDirectionSelect");
 	for (var i in textDirSelect.options) {
 		var option = textDirSelect.options[i];

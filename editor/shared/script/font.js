@@ -11,8 +11,8 @@ X - should sub properties use a > to indent?
 X - what should the name of SIZE and WIDTH be? BOUNDS and SPACE?
 -
 - new font formatting decisions
-- save LTR in the game data
-- LTR option in menu
+X - save LTR in the game data
+X - LTR option in menu
 - new localization strings
 - LTR textareas in the editor
 - font credit
