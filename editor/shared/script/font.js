@@ -14,7 +14,8 @@ X - what should the name of SIZE and WIDTH be? BOUNDS and SPACE?
 X - save LTR in the game data
 X - LTR option in menu
 - new localization strings
-- LTR textareas in the editor
+X LTR textareas in the editor
+- update localization from google drive
 - font credit
 - testing
 */
