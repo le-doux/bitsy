@@ -667,7 +667,7 @@ function start() {
 		"ascii_small.bitsyfont",
 		"unicode_european_small.bitsyfont",
 		"unicode_european_large.bitsyfont",
-		"arabic.bitsyfont",
+		"arabic_pixel.bitsyfont",
 		"unicode_asian.bitsyfont"
 	], function() {
 		console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
@@ -4362,7 +4362,7 @@ function pickDefaultFontForLanguage(lang) {
 		switchFont("ascii_small", true /*doPickTextDirection*/);
 	}
 	else if (lang === "ar") {
-		switchFont("arabic", true /*doPickTextDirection*/);
+		switchFont("arabic_pixel", true /*doPickTextDirection*/);
 	}
 	else {
 		switchFont("unicode_european_small", true /*doPickTextDirection*/);
@@ -4434,7 +4434,7 @@ function on_change_text_direction(e) {
 }
 
 function pickDefaultTextDirectionForFont(newFontName) {
-	if (newFontName === "arabic") {
+	if (newFontName === "arabic_pixel") {
 		textDirection = TextDirection.RightToLeft;
 	}
 	else {

@@ -1,4 +1,5 @@
-FONT arabic
+FONT arabic_pixel
+# Arabic Pixel 2 by @alex_clay_
 SIZE 9 13
 # LATIN CAPITAL LETTER A
 CHAR 65
