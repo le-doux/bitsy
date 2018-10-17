@@ -16,21 +16,63 @@
 
 <script src="shared/script/editor/core.js"></script>
 
+<style>
+.editableContainer {
+	background: gray;
+	border-bottom: solid 2px black;
+}
+
+.editableCanvas {
+	width: 100%;
+	/*max-width: 512px;*/
+}
+</style>
+
 <script>
 /*
 TODO
-	- assumption that room has to be drawn on a particular canvas
-	- sprite rendering
-	- really need an event system
-		- to update game data
-		- to update all visuals that rely on game data (all of them?)
+	- assumption that room has to be drawn on a particular canvas (hack fix)
+	-X sprite rendering
+	- modes??
+	- X events
 	- Qs
 		- what palette should sprites use?
-		- 
+	- longterm thoughts for game data
+		- new id generation system (hex starting with 0)
+		- dialog attached to sprites
+		- endings attached to rooms
+		- fixed width tile ids
+		- sprite & item layers in room map
 */
+
+	// TODO : this is awesome... port to original editor
+	function EventManager() {
+		var callbacks = {};
+
+		this.Listen = function(eventName, callback) {
+			if (callbacks[eventName] == null) {
+				callbacks[eventName] = [];
+			}
+
+			callbacks[eventName].push(callback);
+		}
+
+		// this.Remove // TODO (use indexOf)
+
+		this.Raise = function(eventName, eventObj) {
+			if (callbacks[eventName] == null)
+				return;
+
+			for (var i = 0; i < callbacks[eventName].length; i++) {
+				callbacks[eventName][i](eventObj);
+			}
+		}
+	}
+	var events = new EventManager();
 
 	function EditableObject(name) {
 		var rootElement = document.createElement("div");
+		rootElement.className = "editableContainer";
 
 		var nameElement = document.createElement("div");
 		nameElement.innerText = name;
@@ -49,19 +91,30 @@ TODO
 		var roomCanvas = document.createElement("canvas");
 		roomCanvas.width = 512;
 		roomCanvas.height = 512;
+		roomCanvas.className = "editableCanvas";
 		rootElement.appendChild(roomCanvas);
 
 		var context = roomCanvas.getContext("2d");
-		console.log(context);
 
-		// hack (assumed singular canvas)
-		canvas = roomCanvas;
-		renderer.AttachContext(context);
+		function redraw() {
+			// hack (assumed singular canvas)
+			canvas = roomCanvas;
+			renderer.AttachContext(context);
 
-		// extra SUPER HACK
-		curRoom = room.id;
+			// extra SUPER HACK
+			curRoom = room.id;
 
-		drawRoom(room,context,0);
+			drawRoom(room,context,0);
+		}
+		redraw();
+
+		events.Listen("edit_sprite", function() {
+			redraw();
+		});
+
+		events.Listen("edit_tile", function() {
+			redraw();
+		});
 	}
 
 	var paint_scale = 32; // super hacky global
@@ -70,7 +123,7 @@ TODO
 	function renderDrawing(ctx,drw,color,drawPaintGrid) {
 		//background
 		ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
-		ctx.fillRect(0,0,canvas.width,canvas.height);
+		ctx.fillRect(0,0,canvas.width,canvas.height); // TODO : replace global "canvas"
 
 		//pixel color
 		ctx.fillStyle = "rgb("+color[0]+","+color[1]+","+color[2]+")";
@@ -98,6 +151,20 @@ TODO
 		}
 	}
 
+	function editDrawing(e, drw) {
+		var off = getOffset(e);
+
+		off = mobileOffsetCorrection(off,e,(tilesize));
+
+		var x = Math.floor(off.x);
+		var y = Math.floor(off.y);
+
+		var drawingData = renderer.GetImageSource(drw);
+		// hack: only use first frame
+		drawingData[0][y][x] = drawingData[0][y][x] == 1 ? 0 : 1;
+		renderer.SetImageSource(drw, drawingData);
+	}
+
 	function SpriteObject(sprite) {
 		Object.assign( this, new EditableObject("SPRITE " + sprite.id) ); // TODO : store real id
 
@@ -108,9 +175,18 @@ TODO
 		var paintCanvas = document.createElement("canvas");
 		paintCanvas.width = paint_scale * tilesize;
 		paintCanvas.height = paint_scale * tilesize;
+		paintCanvas.className = "editableCanvas";
 		rootElement.appendChild(paintCanvas);
 
 		var context = paintCanvas.getContext("2d"); // TODO : rename to context
+
+		paintCanvas.addEventListener("mousedown", function(e) {
+			editDrawing(e, sprite.drw);
+
+			renderDrawing(context,sprite.drw,getPal(curPal())[2],drawPaintGrid);
+
+			events.Raise("edit_sprite"); // TODO : specify WHICH sprite
+		});
 
 		renderDrawing(context,sprite.drw,getPal(curPal())[2],drawPaintGrid);
 	}
@@ -125,9 +201,18 @@ TODO
 		var paintCanvas = document.createElement("canvas");
 		paintCanvas.width = paint_scale * tilesize;
 		paintCanvas.height = paint_scale * tilesize;
+		paintCanvas.className = "editableCanvas";
 		rootElement.appendChild(paintCanvas);
 
 		var context = paintCanvas.getContext("2d"); // TODO : rename to context
+
+		paintCanvas.addEventListener("mousedown", function(e) {
+			editDrawing(e, tile.drw);
+
+			renderDrawing(context,tile.drw,getPal(curPal())[1],drawPaintGrid);
+
+			events.Raise("edit_tile"); // TODO : specify WHICH sprite
+		});
 
 		renderDrawing(context,tile.drw,getPal(curPal())[1],drawPaintGrid);
 	}
@@ -137,7 +222,6 @@ TODO
 		parseWorld(gameData);
 
 		var gameHolder = document.getElementById("gameHolder");
-		console.log(gameHolder);
 
 		for (var r in room) {
 			var obj = new RoomObject(room[r]);
