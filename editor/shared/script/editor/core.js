@@ -145,6 +145,7 @@ function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
 function makeTile(id,imageData) {
 	var drwId = "TIL_" + id;
 	tile[id] = {
+		id : id,
 		drw : drwId,
 		col : 1,
 		animation : { //todo
@@ -160,6 +161,7 @@ function makeTile(id,imageData) {
 function makeSprite(id,imageData) {
 	var drwId = "SPR_" + id;
 	sprite[id] = { //todo create default sprite creation method
+		id : id,
 		drw : drwId,
 		col : 2,
 		room : null,
@@ -181,6 +183,7 @@ function makeItem(id,imageData) { // NOTE : same as tile right now? make more li
 	var drwId = "ITM_" + id;
 	// console.log(drwId);
 	item[id] = {
+		id : id,
 		drw : drwId,
 		col : 2, // TODO color not column (bad name)
 		animation : { //todo

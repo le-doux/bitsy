@@ -17,6 +17,13 @@
 <script src="shared/script/editor/core.js"></script>
 
 <style>
+body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+
 .editableContainer {
 	background: gray;
 	border-bottom: solid 2px black;
@@ -43,6 +50,18 @@ TODO
 		- endings attached to rooms
 		- fixed width tile ids
 		- sprite & item layers in room map
+	- todo for first testable version
+		- export game data
+		- edit rooms
+			- how do you select the current tile?
+		- add drawings (sprite / tile)
+		- edit dialog
+		- play game
+		- remove drawings?
+		- edit title?
+		- change color palette?
+		- modes?
+	- toolbar command state manager thingy
 */
 
 	// TODO : this is awesome... port to original editor
@@ -69,6 +88,24 @@ TODO
 		}
 	}
 	var events = new EventManager();
+
+	// this object feels hacky to me!!!
+	function GameDataManager(data) {
+		var gameDataTextArea = document.getElementById("gameData");
+		gameDataTextArea.value = data;
+
+		generateDocument();
+
+		function updateGameData() {
+			data = serializeWorld(true);
+			gameDataTextArea.value = data;
+		}
+
+		events.Listen("edit_sprite", updateGameData);
+		events.Listen("edit_tile", updateGameData);
+		events.Listen("add_sprite", updateGameData);
+		events.Listen("add_tile", updateGameData);
+	}
 
 	function EditableObject(name) {
 		var rootElement = document.createElement("div");
@@ -168,7 +205,7 @@ TODO
 	function SpriteObject(sprite) {
 		Object.assign( this, new EditableObject("SPRITE " + sprite.id) ); // TODO : store real id
 
-		var drawPaintGrid = false;
+		var drawPaintGrid = true;
 
 		var rootElement = this.GetRootElement();
 
@@ -194,7 +231,7 @@ TODO
 	function TileObject(tile) { // hacky copying
 		Object.assign( this, new EditableObject("TILE " + tile.id) );
 
-		var drawPaintGrid = false;
+		var drawPaintGrid = true;
 
 		var rootElement = this.GetRootElement();
 
@@ -217,11 +254,19 @@ TODO
 		renderDrawing(context,tile.drw,getPal(curPal())[1],drawPaintGrid);
 	}
 
+	var gameDataManager;
+
 	function init() {
 		var gameData = document.getElementById("exportedGameData").text;
 		parseWorld(gameData);
 
+		gameDataManager = new GameDataManager(gameData);
+		// generateDocument();
+	}
+
+	function generateDocument() {
 		var gameHolder = document.getElementById("gameHolder");
+		gameHolder.innerHTML = "";
 
 		for (var r in room) {
 			var obj = new RoomObject(room[r]);
@@ -238,12 +283,46 @@ TODO
 			gameHolder.appendChild(obj.GetRootElement());
 		}
 	}
+
+	function addSprite() {
+		makeSprite(nextSpriteId());
+		generateDocument(); // will this work without saving the game data & re-building it?
+		events.Raise("add_sprite");
+	}
+
+	function addTile() {
+		makeTile(nextTileId());
+		generateDocument(); // will this work without saving the game data & re-building it?
+		events.Raise("add_tile");
+	}
+
+	function toggleGameData() {
+		var gameData = document.getElementById("gameData");
+		var gameHolder = document.getElementById("gameHolder");
+
+		if (gameData.style.display == "none") {
+			gameData.style.display = "block";
+			gameHolder.style.display = "none";
+		}
+		else {
+			gameData.style.display = "none";
+			gameHolder.style.display = "block";
+		}
+	}
 </script>
 
 </head>
 
 <body onload="init();">
-	<div id="gameHolder">
+	<div style="width:100vw; height:90vh; background:red; overflow:scroll;">
+		<textarea id="gameData" style="width:100%;height:100%;margin:0;border:none;display:none;"></textarea>
+		<div id="gameHolder"></div>
+	</div>
+	<div style="width:100vw; height:10vh; background:black; color:white;">
+		toolbar
+		<button onclick="addSprite();">+ Sprite</button>
+		<button onclick="addTile();">+ Tile</button>
+		<button onclick="toggleGameData();">Data</button>
 	</div>
 
 <script type="bitsyGameData" id="defaultGameData">
