@@ -25,7 +25,7 @@ body {
 }
 
 .editableContainer {
-	background: gray;
+	background: blue;
 	border-bottom: solid 2px black;
 }
 
@@ -217,13 +217,13 @@ TODO
 
 		var context = paintCanvas.getContext("2d"); // TODO : rename to context
 
-		paintCanvas.addEventListener("mousedown", function(e) {
-			editDrawing(e, sprite.drw);
+		// paintCanvas.addEventListener("mousedown", function(e) {
+		// 	editDrawing(e, sprite.drw);
 
-			renderDrawing(context,sprite.drw,getPal(curPal())[2],drawPaintGrid);
+		// 	renderDrawing(context,sprite.drw,getPal(curPal())[2],drawPaintGrid);
 
-			events.Raise("edit_sprite"); // TODO : specify WHICH sprite
-		});
+		// 	events.Raise("edit_sprite"); // TODO : specify WHICH sprite
+		// });
 
 		renderDrawing(context,sprite.drw,getPal(curPal())[2],drawPaintGrid);
 	}
@@ -243,13 +243,13 @@ TODO
 
 		var context = paintCanvas.getContext("2d"); // TODO : rename to context
 
-		paintCanvas.addEventListener("mousedown", function(e) {
-			editDrawing(e, tile.drw);
+		// paintCanvas.addEventListener("mousedown", function(e) {
+		// 	editDrawing(e, tile.drw);
 
-			renderDrawing(context,tile.drw,getPal(curPal())[1],drawPaintGrid);
+		// 	renderDrawing(context,tile.drw,getPal(curPal())[1],drawPaintGrid);
 
-			events.Raise("edit_tile"); // TODO : specify WHICH sprite
-		});
+		// 	events.Raise("edit_tile"); // TODO : specify WHICH sprite
+		// });
 
 		renderDrawing(context,tile.drw,getPal(curPal())[1],drawPaintGrid);
 	}
