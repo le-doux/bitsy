@@ -72,6 +72,75 @@ TODO
 	- improve state changes between: document, data, play
 */
 
+	var InputType = {
+		Mouse : 0,
+		Touch : 1
+	};
+	var curInputType = InputType.Mouse;
+
+	var gameDataManager;
+	var events;
+
+	function init() {
+		events = new EventManager();
+
+		var gameData = document.getElementById("exportedGameData").text.slice(1);
+		parseWorld(gameData);
+
+		gameDataManager = new GameDataManager(gameData);
+		// generateDocument();
+
+		isPlayerEmbeddedInEditor = true; // HACK!!!!
+		textDirection = "LTR"; //hack
+
+		// hack
+		fontManager = new FontManager(true /*useExternalResources*/);
+		fontManager.LoadResources([
+			"ascii_small.bitsyfont",
+			// "unicode_european_small.bitsyfont",
+			// "unicode_european_large.bitsyfont",
+			// "arabic_pixel.bitsyfont",
+			// "unicode_asian.bitsyfont"
+		], function() {
+			console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
+		});
+
+		// detect mouse or touch
+		window.addEventListener("mousedown", function(e) {
+			if (curInputType != InputType.Mouse) {
+				curInputType = InputType.Mouse;
+				events.Raise("change_input_type", { type: curInputType });
+			}
+		});
+
+		window.addEventListener("touchstart", function(e) {
+			if (curInputType != InputType.Touch) {
+				curInputType = InputType.Touch;
+				events.Raise("change_input_type", { type: curInputType });
+			}
+		});
+	}
+
+	function generateDocument() { // TODO -- take in string input?
+		var gameHolder = document.getElementById("gameHolder");
+		gameHolder.innerHTML = "";
+
+		for (var r in room) {
+			var obj = new RoomObject(room[r]);
+			gameHolder.appendChild(obj.GetRootElement());
+		}
+
+		for (var s in sprite) {
+			var obj = new SpriteObject(sprite[s]);
+			gameHolder.appendChild(obj.GetRootElement());
+		}
+
+		for (var t in tile) {
+			var obj = new TileObject(tile[t]);
+			gameHolder.appendChild(obj.GetRootElement());
+		}
+	}
+
 	// TODO : this is awesome... port to original editor
 	function EventManager() {
 		var callbacks = {};
@@ -95,7 +164,6 @@ TODO
 			}
 		}
 	}
-	var events = new EventManager();
 
 	// this object feels hacky to me!!!
 	function GameDataManager(data) {
@@ -242,11 +310,27 @@ TODO
 				events.Raise("select_canvas", { id: drawing.drw } );
 			}
 		}
-		paintCanvas.addEventListener("mousedown", onmousedown);
-		paintCanvas.addEventListener("touchstart", function(e) {
-			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 
+		function ontouchstart(e) {
+			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmousedown(e);
+		}
+
+		function initInput(inputType) {
+			paintCanvas.removeEventListener("mousedown", onmousedown);
+			paintCanvas.removeEventListener("touchstart", ontouchstart);
+
+			if (inputType == InputType.Mouse) {
+				paintCanvas.addEventListener("mousedown", onmousedown);
+			}
+			else if (inputType == InputType.Touch) {
+				paintCanvas.addEventListener("touchstart", ontouchstart);
+			}
+		}
+		initInput(curInputType);
+
+		events.Listen("change_input_type", function(e) {
+			initInput(e.type);
 		});
 
 		events.Listen("select_canvas", function(e) {
@@ -265,51 +349,6 @@ TODO
 
 	function TileObject(tile) {
 		Object.assign( this, new DrawingObject("TILE " + tile.id, tile, 1, "edit_tile"));
-	}
-
-	var gameDataManager;
-
-	function init() {
-		var gameData = document.getElementById("exportedGameData").text.slice(1);
-		parseWorld(gameData);
-
-		gameDataManager = new GameDataManager(gameData);
-		// generateDocument();
-
-		isPlayerEmbeddedInEditor = true; // HACK!!!!
-		textDirection = "LTR"; //hack
-
-		// hack
-		fontManager = new FontManager(true /*useExternalResources*/);
-		fontManager.LoadResources([
-			"ascii_small.bitsyfont",
-			// "unicode_european_small.bitsyfont",
-			// "unicode_european_large.bitsyfont",
-			// "arabic_pixel.bitsyfont",
-			// "unicode_asian.bitsyfont"
-		], function() {
-			console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
-		});
-	}
-
-	function generateDocument() { // TODO -- take in string input?
-		var gameHolder = document.getElementById("gameHolder");
-		gameHolder.innerHTML = "";
-
-		for (var r in room) {
-			var obj = new RoomObject(room[r]);
-			gameHolder.appendChild(obj.GetRootElement());
-		}
-
-		for (var s in sprite) {
-			var obj = new SpriteObject(sprite[s]);
-			gameHolder.appendChild(obj.GetRootElement());
-		}
-
-		for (var t in tile) {
-			var obj = new TileObject(tile[t]);
-			gameHolder.appendChild(obj.GetRootElement());
-		}
 	}
 
 	function addSprite() {
