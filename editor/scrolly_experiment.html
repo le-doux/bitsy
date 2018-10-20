@@ -33,6 +33,12 @@ body {
 	width: 100%;
 	/*max-width: 512px;*/
 }
+
+#game {
+	width:100%;
+	margin-top: calc(50vh - 5vh - 50%);
+	background: black;
+}
 </style>
 
 <script>
@@ -51,17 +57,19 @@ TODO
 		- fixed width tile ids
 		- sprite & item layers in room map
 	- todo for first testable version
-		- export game data
+		X export game data
 		- edit rooms
 			- how do you select the current tile?
-		- add drawings (sprite / tile)
+		X add drawings (sprite / tile)
 		- edit dialog
-		- play game
+		X play game
 		- remove drawings?
 		- edit title?
 		- change color palette?
 		- modes?
 	- toolbar command state manager thingy
+	- improve game data management
+	- improve state changes between: document, data, play
 */
 
 	// TODO : this is awesome... port to original editor
@@ -105,6 +113,10 @@ TODO
 		events.Listen("edit_tile", updateGameData);
 		events.Listen("add_sprite", updateGameData);
 		events.Listen("add_tile", updateGameData);
+
+		this.GetData = function() {
+			return data;
+		}
 	}
 
 	function EditableObject(name) {
@@ -202,10 +214,10 @@ TODO
 		renderer.SetImageSource(drw, drawingData);
 	}
 
-	function SpriteObject(sprite) {
-		Object.assign( this, new EditableObject("SPRITE " + sprite.id) ); // TODO : store real id
+	function DrawingObject(name, drawing, colorIndex, editEvent) { // TODO rename "Objects" to something more descriptive: Editors? Editables? EditViews?
+		Object.assign( this, new EditableObject(name) );
 
-		var drawPaintGrid = true;
+		var isCanvasSelected = false;
 
 		var rootElement = this.GetRootElement();
 
@@ -217,58 +229,70 @@ TODO
 
 		var context = paintCanvas.getContext("2d"); // TODO : rename to context
 
+		function onmousedown(e) {
+			if (isCanvasSelected) {
+				editDrawing(e, drawing.drw);
+
+				renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
+
+				events.Raise(editEvent); // TODO : specify WHICH drawing
+			}
+			else
+			{
+				events.Raise("select_canvas", { id: drawing.drw } );
+			}
+		}
+		paintCanvas.addEventListener("mousedown", onmousedown);
 		paintCanvas.addEventListener("touchstart", function(e) {
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 
-			editDrawing(fakeEvent, sprite.drw);
-
-			renderDrawing(context,sprite.drw,getPal(curPal())[2],drawPaintGrid);
-
-			events.Raise("edit_sprite"); // TODO : specify WHICH sprite
+			onmousedown(e);
 		});
 
-		renderDrawing(context,sprite.drw,getPal(curPal())[2],drawPaintGrid);
+		events.Listen("select_canvas", function(e) {
+			var selected = (e.id === drawing.drw);
+			var didChange = isCanvasSelected != selected;
+			isCanvasSelected = selected;
+			renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
+		});
+
+		renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
 	}
 
-	function TileObject(tile) { // hacky copying
-		Object.assign( this, new EditableObject("TILE " + tile.id) );
+	function SpriteObject(sprite) {
+		Object.assign( this, new DrawingObject("SPRITE " + sprite.id, sprite, 2, "edit_sprite"));
+	}
 
-		var drawPaintGrid = true;
-
-		var rootElement = this.GetRootElement();
-
-		var paintCanvas = document.createElement("canvas");
-		paintCanvas.width = paint_scale * tilesize;
-		paintCanvas.height = paint_scale * tilesize;
-		paintCanvas.className = "editableCanvas";
-		rootElement.appendChild(paintCanvas);
-
-		var context = paintCanvas.getContext("2d"); // TODO : rename to context
-
-		paintCanvas.addEventListener("touchstart", function(e) {
-			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
-
-			editDrawing(fakeEvent, tile.drw);
-
-			renderDrawing(context,tile.drw,getPal(curPal())[1],drawPaintGrid);
-
-			events.Raise("edit_tile"); // TODO : specify WHICH sprite
-		});
-
-		renderDrawing(context,tile.drw,getPal(curPal())[1],drawPaintGrid);
+	function TileObject(tile) {
+		Object.assign( this, new DrawingObject("TILE " + tile.id, tile, 1, "edit_tile"));
 	}
 
 	var gameDataManager;
 
 	function init() {
-		var gameData = document.getElementById("exportedGameData").text;
+		var gameData = document.getElementById("exportedGameData").text.slice(1);
 		parseWorld(gameData);
 
 		gameDataManager = new GameDataManager(gameData);
 		// generateDocument();
+
+		isPlayerEmbeddedInEditor = true; // HACK!!!!
+		textDirection = "LTR"; //hack
+
+		// hack
+		fontManager = new FontManager(true /*useExternalResources*/);
+		fontManager.LoadResources([
+			"ascii_small.bitsyfont",
+			// "unicode_european_small.bitsyfont",
+			// "unicode_european_large.bitsyfont",
+			// "arabic_pixel.bitsyfont",
+			// "unicode_asian.bitsyfont"
+		], function() {
+			console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
+		});
 	}
 
-	function generateDocument() {
+	function generateDocument() { // TODO -- take in string input?
 		var gameHolder = document.getElementById("gameHolder");
 		gameHolder.innerHTML = "";
 
@@ -300,17 +324,45 @@ TODO
 		events.Raise("add_tile");
 	}
 
+	// !!!! TODO - turn these "toggles" into raised events handled by objects / managers
 	function toggleGameData() {
 		var gameData = document.getElementById("gameData");
 		var gameHolder = document.getElementById("gameHolder");
+		var playHolder = document.getElementById("playHolder");
 
 		if (gameData.style.display == "none") {
 			gameData.style.display = "block";
 			gameHolder.style.display = "none";
+			playHolder.style.display = "none";
 		}
 		else {
 			gameData.style.display = "none";
 			gameHolder.style.display = "block";
+			playHolder.style.display = "none";
+		}
+	}
+
+	function togglePlay() {
+		var gameData = document.getElementById("gameData");
+		var gameHolder = document.getElementById("gameHolder");
+		var playHolder = document.getElementById("playHolder");
+
+		if (playHolder.style.display == "none") {
+			gameData.style.display = "none";
+			gameHolder.style.display = "none";
+			playHolder.style.display = "block";
+
+			attachCanvas(document.getElementById("game"));
+			load_game(serializeWorld());
+		}
+		else {
+			gameData.style.display = "none";
+			gameHolder.style.display = "block";
+			playHolder.style.display = "none";
+
+			stopGame();
+			parseWorld(gameDataManager.GetData());
+			generateDocument(); // feels hacky -- replace with data manager thingy?
 		}
 	}
 </script>
@@ -318,16 +370,18 @@ TODO
 </head>
 
 <body onload="init();">
-	<!-- <div style="width:100vw; height:90vh; background:red; overflow:scroll;"> -->
-		<textarea id="gameData" style="width:100%;height:100%;margin:0;border:none;display:none;"></textarea>
-		<div id="gameHolder"></div>
-<!-- 	</div>
-	<div style="width:100vw; height:10vh; background:black; color:white;">
+	<div id="gameHolder"></div><!-- TODO : RENAME -->
+	<div id="playHolder" style="width:100vw; height:90vh; background:blue; display:none;">
+		<canvas id="game"></canvas>
+	</div>
+	<textarea id="gameData" style="width:100vw; height:90vh; margin:0; border:none; display:none; resize:none;"></textarea>
+	<div style="position:fixed; top:90vh; left:0; width:100vw; height:10vh; background:black; color:white;">
 		toolbar
+		<button onclick="togglePlay();">Play/Stop</button>
 		<button onclick="addSprite();">+ Sprite</button>
 		<button onclick="addTile();">+ Tile</button>
 		<button onclick="toggleGameData();">Data</button>
-	</div> -->
+	</div>
 
 <script type="bitsyGameData" id="defaultGameData">
 Write your game's title here
