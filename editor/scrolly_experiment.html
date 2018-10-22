@@ -257,7 +257,8 @@ TODO
 
 		//draw grid
 		if (drawPaintGrid) {
-			ctx.fillStyle = getContrastingColor();
+			ctx.fillStyle = curInputType == InputType.Mouse ? "red" : "green"; // getContrastingColor();
+			console.log(ctx.fillStyle);
 
 			for (var x = 1; x < tilesize; x++) {
 				ctx.fillRect(x*paint_scale,0*paint_scale,1,tilesize*paint_scale);
