@@ -270,14 +270,22 @@ TODO
 	}
 
 	function editDrawing(e, drw) {
+		console.log(e);
+
 		var off = getOffset(e);
 
+		console.log(off);
+
 		off = mobileOffsetCorrection(off,e,(tilesize));
+
+		console.log(off);
 
 		var x = Math.floor(off.x);
 		var y = Math.floor(off.y);
 
+		console.log(drw);
 		var drawingData = renderer.GetImageSource(drw);
+		console.log(drawingData);
 		// hack: only use first frame
 		drawingData[0][y][x] = drawingData[0][y][x] == 1 ? 0 : 1;
 		renderer.SetImageSource(drw, drawingData);
@@ -313,8 +321,10 @@ TODO
 		}
 
 		function ontouchstart(e) {
+			console.log("TOUCH START");
+			console.log(e);
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
-			onmousedown(e);
+			onmousedown(fakeEvent);
 		}
 
 		function initInput(inputType) {
