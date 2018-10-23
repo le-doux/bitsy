@@ -70,6 +70,7 @@ TODO
 	- toolbar command state manager thingy
 	- improve game data management
 	- improve state changes between: document, data, play
+	- idea: Wrapper for UI elements that makes it easier to append shit to them
 */
 
 	var InputType = {
@@ -234,69 +235,14 @@ TODO
 		});
 	}
 
-	var paint_scale = 32; // super hacky global
-
-	// hacky over-specialization?
-	function renderDrawing(ctx,drw,color,drawPaintGrid) {
-		//background
-		ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
-		ctx.fillRect(0,0,canvas.width,canvas.height); // TODO : replace global "canvas"
-
-		//pixel color
-		ctx.fillStyle = "rgb("+color[0]+","+color[1]+","+color[2]+")";
-
-		//draw pixels
-		for (var x = 0; x < 8; x++) {
-			for (var y = 0; y < 8; y++) {
-				// draw first frame
-				if (renderer.GetImageSource(drw)[0][y][x] === 1) {
-					ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
-				}
-			}
-		}
-
-		//draw grid
-		if (drawPaintGrid) {
-			ctx.fillStyle = curInputType == InputType.Mouse ? "red" : "green"; // getContrastingColor();
-			console.log(ctx.fillStyle);
-
-			for (var x = 1; x < tilesize; x++) {
-				ctx.fillRect(x*paint_scale,0*paint_scale,1,tilesize*paint_scale);
-			}
-			for (var y = 1; y < tilesize; y++) {
-				ctx.fillRect(0*paint_scale,y*paint_scale,tilesize*paint_scale,1);
-			}
-		}
-	}
-
-	function editDrawing(e, drw) {
-		console.log(e);
-
-		var off = getOffset(e);
-
-		console.log(off);
-
-		off = mobileOffsetCorrection(off,e,(tilesize));
-
-		console.log(off);
-
-		var x = Math.floor(off.x);
-		var y = Math.floor(off.y);
-
-		console.log(drw);
-		var drawingData = renderer.GetImageSource(drw);
-		console.log(drawingData);
-		// hack: only use first frame
-		drawingData[0][y][x] = drawingData[0][y][x] == 1 ? 0 : 1;
-		renderer.SetImageSource(drw, drawingData);
-	}
-
 	function DrawingObject(name, drawing, colorIndex, editEvent) { // TODO rename "Objects" to something more descriptive: Editors? Editables? EditViews?
 		Object.assign( this, new EditableObject(name) );
 
 		var isCanvasSelected = false;
 
 		var rootElement = this.GetRootElement();
+
+		var paint_scale = 32;
 
 		var paintCanvas = document.createElement("canvas");
 		paintCanvas.width = paint_scale * tilesize;
@@ -306,9 +252,72 @@ TODO
 
 		var context = paintCanvas.getContext("2d"); // TODO : rename to context
 
+		// hacky over-specialization?
+		function renderDrawing(ctx,drw,color,drawPaintGrid) {
+			//background
+			ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
+			ctx.fillRect(0,0,canvas.width,canvas.height); // TODO : replace global "canvas"
+
+			//pixel color
+			ctx.fillStyle = "rgb("+color[0]+","+color[1]+","+color[2]+")";
+
+			//draw pixels
+			for (var x = 0; x < 8; x++) {
+				for (var y = 0; y < 8; y++) {
+					// draw first frame
+					if (renderer.GetImageSource(drw)[0][y][x] === 1) {
+						ctx.fillRect(x*paint_scale,y*paint_scale,1*paint_scale,1*paint_scale);
+					}
+				}
+			}
+
+			//draw grid
+			if (drawPaintGrid) {
+				ctx.fillStyle = curInputType == InputType.Mouse ? "red" : "green"; // getContrastingColor();
+				console.log(ctx.fillStyle);
+
+				for (var x = 1; x < tilesize; x++) {
+					ctx.fillRect(x*paint_scale,0*paint_scale,1,tilesize*paint_scale);
+				}
+				for (var y = 1; y < tilesize; y++) {
+					ctx.fillRect(0*paint_scale,y*paint_scale,tilesize*paint_scale,1);
+				}
+			}
+		}
+
+		function editDrawing(e, drw, drawingState) {
+			var off = getOffset(e);
+			off = mobileOffsetCorrection(off,e,(tilesize));
+
+			var x = Math.floor(off.x);
+			var y = Math.floor(off.y);
+
+			var drawingData = renderer.GetImageSource(drw);
+			drawingData[0][y][x] = drawingState;
+
+			renderer.SetImageSource(drw, drawingData);
+		}
+
+		function startEditDrawing(e, drw) {
+			var off = getOffset(e);
+			off = mobileOffsetCorrection(off,e,(tilesize));
+
+			var x = Math.floor(off.x);
+			var y = Math.floor(off.y);
+
+			var drawingData = renderer.GetImageSource(drw);
+			var drawingState = drawingData[0][y][x] == 1 ? 0 : 1;
+
+			editDrawing(e, drw, drawingState);
+
+			return drawingState;
+		}
+
+		var curDrawingState = -1;
+
 		function onmousedown(e) {
 			if (isCanvasSelected) {
-				editDrawing(e, drawing.drw);
+				curDrawingState = startEditDrawing(e, drawing.drw);
 
 				renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
 
@@ -320,22 +329,54 @@ TODO
 			}
 		}
 
+		function onmousemove(e) {
+			if (curDrawingState > -1) {
+				editDrawing(e, drawing.drw, curDrawingState);
+
+				renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
+
+				events.Raise(editEvent); // TODO : specify WHICH drawing
+			}
+		}
+
+		function onmouseup(e) {
+			curDrawingState = -1;
+		}
+
 		function ontouchstart(e) {
 			console.log("TOUCH START");
-			console.log(e);
+			// console.log(e);
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmousedown(fakeEvent);
 		}
 
+		function ontouchmove(e) {
+			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+			onmousemove(fakeEvent);
+		}
+
+		function ontouchend(e) {
+			// var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+			onmouseup({});
+		}
+
 		function initInput(inputType) {
 			paintCanvas.removeEventListener("mousedown", onmousedown);
+			paintCanvas.removeEventListener("mousemove", onmousemove);
+			paintCanvas.removeEventListener("mouseup", onmouseup);
 			paintCanvas.removeEventListener("touchstart", ontouchstart);
+			paintCanvas.removeEventListener("touchmove", ontouchmove);
+			paintCanvas.removeEventListener("touchend", ontouchend);
 
 			if (inputType == InputType.Mouse) {
 				paintCanvas.addEventListener("mousedown", onmousedown);
+				paintCanvas.addEventListener("mousemove", onmousemove);
+				paintCanvas.addEventListener("mouseup", onmouseup);
 			}
 			else if (inputType == InputType.Touch) {
 				paintCanvas.addEventListener("touchstart", ontouchstart);
+				paintCanvas.addEventListener("touchmove", ontouchmove);
+				paintCanvas.addEventListener("touchend", ontouchend);
 			}
 		}
 		initInput(curInputType);
@@ -360,6 +401,27 @@ TODO
 
 	function TileObject(tile) {
 		Object.assign( this, new DrawingObject("TILE " + tile.id, tile, 1, "edit_tile"));
+
+		// console.log(tile);
+
+		var rootElement = this.GetRootElement();
+
+		var wallDiv = document.createElement("div");
+		rootElement.appendChild(wallDiv);
+
+		var wallLabel = document.createElement("span");
+		wallLabel.innerText = "Wall: ";
+		wallDiv.appendChild(wallLabel);
+
+		var wallCheckbox = document.createElement("input");
+		wallCheckbox.type = "checkbox";
+		wallCheckbox.checked = tile.isWall == true;
+		wallCheckbox.addEventListener("click", function(e) {
+			// console.log("CHECK!!! " + wallCheckbox.checked);
+			tile.isWall = wallCheckbox.checked;
+			events.Raise("edit_tile"); // TODO : this forces a re-draw which seems bad
+		});
+		wallDiv.appendChild(wallCheckbox);
 	}
 
 	function addSprite() {
