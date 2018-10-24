@@ -78,6 +78,11 @@ TODO
 	- improve game data management
 	- improve state changes between: document, data, play
 	- idea: Wrapper for UI elements that makes it easier to append shit to them
+	- views: document, play mode, data, tile picker
+	- control bar manager
+	X dialog!
+		- what about multiline dialog???
+		- what about "inline" dialog
 */
 
 	var InputType = {
@@ -92,7 +97,7 @@ TODO
 	function init() {
 		events = new EventManager();
 
-		var gameData = document.getElementById("defaultGameData").text.slice(1);
+		var gameData = document.getElementById("exportedGameData").text.slice(1);
 		parseWorld(gameData);
 
 		gameDataManager = new GameDataManager(gameData);
@@ -133,26 +138,32 @@ TODO
 		var gameHolder = document.getElementById("gameHolder");
 		gameHolder.innerHTML = "";
 
-		var titleObj = new TitleObject();
+		var titleObj = new TitleCell();
 		gameHolder.appendChild(titleObj.GetRootElement());
 
 		for (var p in palette) {
-			var obj = new PaletteObject(palette[p]);
+			var obj = new PaletteCell(palette[p]);
 			gameHolder.appendChild(obj.GetRootElement());
 		}
 
 		for (var r in room) {
-			var obj = new RoomObject(room[r]);
+			var obj = new RoomCell(room[r]);
 			gameHolder.appendChild(obj.GetRootElement());
 		}
 
 		for (var s in sprite) {
-			var obj = new SpriteObject(sprite[s]);
+			var obj;
+			if (s === "A") {
+				obj = new AvatarCell(sprite[s]);
+			}
+			else {
+				obj = new SpriteCell(sprite[s]);
+			}
 			gameHolder.appendChild(obj.GetRootElement());
 		}
 
 		for (var t in tile) {
-			var obj = new TileObject(tile[t]);
+			var obj = new TileCell(tile[t]);
 			gameHolder.appendChild(obj.GetRootElement());
 		}
 	}
@@ -199,13 +210,14 @@ TODO
 		events.Listen("add_tile", updateGameData);
 		events.Listen("edit_title", updateGameData);
 		events.Listen("edit_palette", updateGameData);
+		events.Listen("edit_dialog", updateGameData);
 
 		this.GetData = function() {
 			return data;
 		}
 	}
 
-	function EditableObject(name) {
+	function EditableCell(name) {
 		var rootElement = document.createElement("div");
 		rootElement.className = "editableContainer";
 
@@ -218,8 +230,8 @@ TODO
 		}
 	}
 
-	function RoomObject(room) {
-		Object.assign( this, new EditableObject("ROOM " + room.id) );
+	function RoomCell(room) {
+		Object.assign( this, new EditableCell("ROOM " + room.id) );
 
 		var rootElement = this.GetRootElement();
 
@@ -257,8 +269,8 @@ TODO
 		});
 	}
 
-	function DrawingObject(name, drawing, colorIndex, editEvent) { // TODO rename "Objects" to something more descriptive: Editors? Editables? EditViews?
-		Object.assign( this, new EditableObject(name) );
+	function DrawingCell(name, drawing, colorIndex, editEvent) { // TODO rename "Objects" to something more descriptive: Editors? Editables? EditViews?
+		Object.assign( this, new EditableCell(name) );
 
 		var isCanvasSelected = false;
 
@@ -422,12 +434,50 @@ TODO
 		renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
 	}
 
-	function SpriteObject(sprite) {
-		Object.assign( this, new DrawingObject("SPRITE " + sprite.id, sprite, 2, "edit_sprite"));
+	function AvatarCell(sprite) {
+		Object.assign( this, new DrawingCell("AVATAR", sprite, 2, "edit_sprite") );
 	}
 
-	function TileObject(tile) {
-		Object.assign( this, new DrawingObject("TILE " + tile.id, tile, 1, "edit_tile"));
+	function SpriteCell(sprite) {
+		Object.assign( this, new DrawingCell("SPRITE " + sprite.id, sprite, 2, "edit_sprite"));
+
+		var rootElement = this.GetRootElement();
+
+		var dialogDiv = document.createElement("div");
+		rootElement.appendChild(dialogDiv);
+
+		var dialogLabel = document.createElement("div");
+		dialogLabel.innerText = "Dialog:";
+		dialogDiv.appendChild(dialogLabel);
+
+		var dialogTextarea = document.createElement("textarea");
+		dialogTextarea.type = "textbox";
+		if (sprite.dlg != null) {
+			dialogTextarea.value = dialog[sprite.dlg];
+		}
+		dialogTextarea.addEventListener("change", function() {
+			var dialogStr = dialogTextarea.value;
+
+			if (dialogStr.length <= 0) {
+				if (sprite.dlg != null) {
+					delete dialog[sprite.dlg];
+					sprite.dlg = null;
+				}
+			}
+			else {
+				if (sprite.dlg == null) {
+					sprite.dlg = nextAvailableDialogId("SPR_"); // hacky!!!
+				}
+				dialog[sprite.dlg] = dialogStr;
+			}
+
+			events.Raise("edit_dialog"); // TODO identify target
+		});
+		dialogDiv.appendChild(dialogTextarea);
+	}
+
+	function TileCell(tile) {
+		Object.assign( this, new DrawingCell("TILE " + tile.id, tile, 1, "edit_tile"));
 
 		// console.log(tile);
 
@@ -451,8 +501,8 @@ TODO
 		wallDiv.appendChild(wallCheckbox);
 	}
 
-	function TitleObject() {
-		Object.assign( this, new EditableObject("Title") );
+	function TitleCell() {
+		Object.assign( this, new EditableCell("Title") );
 
 		var rootElement = this.GetRootElement();
 
@@ -469,8 +519,8 @@ TODO
 		titleDiv.appendChild(titleTextbox);
 	}
 
-	function PaletteObject(palette) {
-		Object.assign( this, new EditableObject("PALETTE " + palette.id) );
+	function PaletteCell(palette) {
+		Object.assign( this, new EditableCell("PALETTE " + palette.id) );
 		console.log(palette);
 
 		var rootElement = this.GetRootElement();
