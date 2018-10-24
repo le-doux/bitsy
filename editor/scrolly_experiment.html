@@ -126,6 +126,14 @@ TODO
 		var gameHolder = document.getElementById("gameHolder");
 		gameHolder.innerHTML = "";
 
+		var titleObj = new TitleObject();
+		gameHolder.appendChild(titleObj.GetRootElement());
+
+		for (var p in palette) {
+			var obj = new PaletteObject(palette[p]);
+			gameHolder.appendChild(obj.GetRootElement());
+		}
+
 		for (var r in room) {
 			var obj = new RoomObject(room[r]);
 			gameHolder.appendChild(obj.GetRootElement());
@@ -182,6 +190,8 @@ TODO
 		events.Listen("edit_tile", updateGameData);
 		events.Listen("add_sprite", updateGameData);
 		events.Listen("add_tile", updateGameData);
+		events.Listen("edit_title", updateGameData);
+		events.Listen("edit_palette", updateGameData);
 
 		this.GetData = function() {
 			return data;
@@ -232,6 +242,11 @@ TODO
 
 		events.Listen("edit_tile", function() {
 			redraw();
+		});
+
+		events.Listen("edit_palette", function() {
+			renderer.SetPalettes(palette); // TODO : less hacky way to clear renderer
+			redraw(); // todo: respond to id
 		});
 	}
 
@@ -392,6 +407,11 @@ TODO
 			renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
 		});
 
+		events.Listen("edit_palette", function(e) {
+			// todo : check ID
+			renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
+		})
+
 		renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
 	}
 
@@ -422,6 +442,76 @@ TODO
 			events.Raise("edit_tile"); // TODO : this forces a re-draw which seems bad
 		});
 		wallDiv.appendChild(wallCheckbox);
+	}
+
+	function TitleObject() {
+		Object.assign( this, new EditableObject("Title") );
+
+		var rootElement = this.GetRootElement();
+
+		var titleDiv = document.createElement("div");
+		rootElement.appendChild(titleDiv);
+
+		var titleTextbox = document.createElement("input");
+		titleTextbox.type = "textbox";
+		titleTextbox.value = title; // HACK global (but unavoidalbe in this case)
+		titleTextbox.addEventListener("change", function(e) {
+			title = titleTextbox.value;
+			events.Raise("edit_title");
+		});
+		titleDiv.appendChild(titleTextbox);
+	}
+
+	function PaletteObject(palette) {
+		Object.assign( this, new EditableObject("PALETTE " + palette.id) );
+		console.log(palette);
+
+		var rootElement = this.GetRootElement();
+
+		var colorDiv1 = document.createElement("div");
+		rootElement.appendChild(colorDiv1);
+
+		var colorTextbox1 = document.createElement("input");
+		colorTextbox1.type = "textbox";
+		colorTextbox1.value = rgbToHex(palette.colors[0][0], palette.colors[0][1], palette.colors[0][2]);
+		colorTextbox1.style.border = "solid 2px " + colorTextbox1.value;
+		colorTextbox1.addEventListener("change", function(e) {
+			var rgb = hexToRgb(colorTextbox1.value);
+			palette.colors[0] = [rgb.r, rgb.g, rgb.b];
+			colorTextbox1.style.border = "solid 2px " + colorTextbox1.value;
+			events.Raise("edit_palette", { id: palette.id });
+		});
+		colorDiv1.appendChild(colorTextbox1);
+
+		var colorDiv2 = document.createElement("div");
+		rootElement.appendChild(colorDiv2);
+
+		var colorTextbox2 = document.createElement("input");
+		colorTextbox2.type = "textbox";
+		colorTextbox2.value = rgbToHex(palette.colors[1][0], palette.colors[1][1], palette.colors[1][2]);
+		colorTextbox2.style.border = "solid 2px " + colorTextbox2.value;
+		colorTextbox2.addEventListener("change", function(e) {
+			var rgb = hexToRgb(colorTextbox2.value);
+			palette.colors[1] = [rgb.r, rgb.g, rgb.b];
+			colorTextbox2.style.border = "solid 2px " + colorTextbox2.value;
+			events.Raise("edit_palette", { id: palette.id });
+		});
+		colorDiv2.appendChild(colorTextbox2);
+
+		var colorDiv3 = document.createElement("div");
+		rootElement.appendChild(colorDiv3);
+
+		var colorTextbox3 = document.createElement("input");
+		colorTextbox3.type = "textbox";
+		colorTextbox3.value = rgbToHex(palette.colors[2][0], palette.colors[2][1], palette.colors[2][2]);
+		colorTextbox3.style.border = "solid 2px " + colorTextbox3.value;
+		colorTextbox3.addEventListener("change", function(e) {
+			var rgb = hexToRgb(colorTextbox3.value);
+			palette.colors[2] = [rgb.r, rgb.g, rgb.b];
+			colorTextbox3.style.border = "solid 2px " + colorTextbox3.value;
+			events.Raise("edit_palette", { id: palette.id });
+		});
+		colorDiv3.appendChild(colorTextbox3);
 	}
 
 	function addSprite() {

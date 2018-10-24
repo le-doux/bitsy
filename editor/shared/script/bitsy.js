@@ -1568,6 +1568,7 @@ function parsePalette(lines,i) { //todo this has to go first right now :(
 		i++;
 	}
 	palette[id] = {
+		id : id,
 		name : name,
 		colors : colors
 	};
