@@ -3,6 +3,9 @@
 
 <head>
 
+<!-- stop weird zooming out -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <!-- UTIL SCRIPTS -->
 <script src="shared/script/color_util.js"></script>
 
@@ -38,6 +41,10 @@ body {
 	width:100%;
 	margin-top: calc(50vh - 5vh - 50%);
 	background: black;
+}
+
+#gameHolder {
+	padding-top: 10vh;
 }
 </style>
 
@@ -85,7 +92,7 @@ TODO
 	function init() {
 		events = new EventManager();
 
-		var gameData = document.getElementById("exportedGameData").text.slice(1);
+		var gameData = document.getElementById("defaultGameData").text.slice(1);
 		parseWorld(gameData);
 
 		gameDataManager = new GameDataManager(gameData);
@@ -498,6 +505,7 @@ TODO
 		});
 		colorDiv2.appendChild(colorTextbox2);
 
+		// TOO much copy paste :(
 		var colorDiv3 = document.createElement("div");
 		rootElement.appendChild(colorDiv3);
 
@@ -573,12 +581,13 @@ TODO
 
 <body onload="init();">
 	<div id="gameHolder"></div><!-- TODO : RENAME -->
-	<div id="playHolder" style="width:100vw; height:90vh; background:blue; display:none;">
+	<div id="playHolder" style="width:100vw; height:90vh; margin-top: 10vh; background:blue; display:none;">
 		<canvas id="game"></canvas>
 	</div>
-	<textarea id="gameData" style="width:100vw; height:90vh; margin:0; border:none; display:none; resize:none;"></textarea>
-	<div style="position:fixed; top:90vh; left:0; width:100vw; height:10vh; background:black; color:white;">
+	<textarea id="gameData" style="width:100vw; height:90vh; margin:0; margin-top: 10vh; border:none; display:none; resize:none;"></textarea>
+	<div style="position:fixed; top:0vh; left:0; width:100vw; height:10vh; background:black; color:white;">
 		toolbar
+		<br/>
 		<button onclick="togglePlay();">Play/Stop</button>
 		<button onclick="addSprite();">+ Sprite</button>
 		<button onclick="addTile();">+ Tile</button>
