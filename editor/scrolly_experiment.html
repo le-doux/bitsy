@@ -85,8 +85,8 @@ TODO
 		- what about "inline" dialog
 	- usability
 		- scroll to new tiles
-		- only select drawings when NOT scrolling
-		- stop scrolling while editing drawings
+		-X only select drawings when NOT scrolling
+		-X stop scrolling while editing drawings
 		- need way to deselect drawings
 		- try shrinking drawings when not selected?
 */
@@ -106,6 +106,10 @@ TODO
 		events = new EventManager();
 
 		var gameData = document.getElementById("defaultGameData").text.slice(1);
+		if (localStorage.game_data) {
+			gameData = localStorage.game_data;
+		}
+
 		parseWorld(gameData);
 
 		gameDataManager = new GameDataManager(gameData);
@@ -215,6 +219,7 @@ TODO
 		function updateGameData() {
 			data = serializeWorld(true);
 			gameDataTextArea.value = data;
+			localStorage.game_data = data;
 		}
 
 		events.Listen("edit_sprite", updateGameData);
@@ -229,6 +234,15 @@ TODO
 		this.GetData = function() {
 			return data;
 		}
+
+		events.Listen("reset_game", function() {
+			data = document.getElementById("defaultGameData").text.slice(1);
+			gameDataTextArea.value = data;
+			localStorage.game_data = data;
+			parseWorld(data);
+			generateDocument();
+			// TODO FIX
+		});
 	}
 
 	function EditableCell(name) {
@@ -847,6 +861,10 @@ TODO
 			generateDocument(); // feels hacky -- replace with data manager thingy?
 		}
 	}
+
+	function clearGameData() {
+		events.Raise("reset_game");
+	}
 </script>
 
 </head>
@@ -859,11 +877,11 @@ TODO
 	<textarea id="gameData" style="width:100vw; height:90vh; margin:0; margin-top: 10vh; border:none; display:none; resize:none;"></textarea>
 	<div style="position:fixed; top:0vh; left:0; width:100vw; height:10vh; background:black; color:white;">
 		toolbar
-		<br/>
-		<button onclick="togglePlay();">Play/Stop</button>
-		<button onclick="addSprite();">+ Sprite</button>
-		<button onclick="addTile();">+ Tile</button>
+		<button onclick="togglePlay();">Play</button>
+		<button onclick="addSprite();">+ SPR</button>
+		<button onclick="addTile();">+ TIL</button>
 		<button onclick="toggleGameData();">Data</button>
+		<button onclick="clearGameData();">Clear</button>
 		<br/>
 		paint: <span id="paintSelectName">AVATAR</span>
 	</div>
@@ -952,609 +970,6 @@ You found a nice warm cup of tea
 
 VAR a
 42
-</script>
-
-<script type="bitsyGameData" id="exportedGameData">
-Out of the rain
-
-# BITSY VERSION 5.3
-
-! ROOM_FORMAT 1
-
-PAL 0
-64,64,109
-198,223,255
-255,232,95
-
-PAL 1
-28,31,46
-254,178,234
-255,232,95
-
-ROOM 0
-a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a
-a,a,a,a,a,a,a,a,a,a,a,a,d,d,a,a
-a,a,a,a,a,a,a,a,a,a,a,d,d,d,d,a
-a,a,a,a,a,a,a,a,a,a,a,d,c,d,d,a
-0,0,0,0,0,u,0,0,0,0,0,c,0,c,d,0
-0,0,p,0,0,q,0,0,b,0,0,0,u,0,c,0
-0,0,n,n,n,n,0,0,0,0,0,u,0,s,0,s
-0,0,n,n,n,n,0,0,0,0,s,0,0,0,0,0
-0,0,g,g,v,g,0,0,0,0,0,0,0,n,n,n
-0,0,v,v,w,v,0,0,p,0,0,q,0,n,n,n
-0,0,0,0,x,0,0,0,n,n,n,n,0,g,g,g
-0,0,0,0,0,0,0,o,r,r,r,n,e,f,f,f
-0,e,e,e,l,m,l,o,n,n,o,n,e,e,l,e
-0,0,e,e,e,k,k,k,g,g,o,v,e,m,k,k
-0,0,0,0,e,e,e,e,f,f,o,f,e,m,l,e
-0,0,0,0,0,0,e,e,e,e,k,k,k,k,e,e
-PAL 0
-
-ROOM 1
-a,a,a,a,a,a,a,a,z,a,a,a,a,a,a,a
-a,a,a,a,a,p,a,a,q,a,a,a,a,a,a,a
-a,d,a,d,a,n,n,n,n,a,a,a,a,a,d,a
-d,d,a,d,d,n,n,n,n,a,d,a,d,d,d,d
-d,d,d,d,d,g,v,g,g,d,d,d,d,d,d,d
-c,d,d,c,c,v,w,v,v,c,d,d,c,d,c,d
-d,c,c,0,0,0,x,0,0,b,c,d,0,c,u,d
-d,u,0,0,0,b,0,0,0,0,0,c,b,0,0,c
-d,0,0,b,0,0,s,s,s,0,s,0,0,0,s,s
-c,0,0,0,u,0,s,s,0,0,0,s,s,0,u,d
-e,e,u,0,0,0,0,0,0,b,0,0,0,0,0,d
-e,e,e,0,0,0,0,s,0,0,0,u,0,0,d,d
-l,e,l,e,e,0,0,s,0,u,u,0,0,0,d,c
-k,k,k,k,k,0,s,0,0,0,0,0,b,d,d,0
-l,e,l,e,e,e,0,0,b,0,u,d,0,d,c,d
-e,e,e,e,e,e,u,0,0,u,u,d,d,d,0,0
-EXT 6,5 2 6,11
-PAL 1
-
-ROOM 2
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,z,0,0,0,0,0,0
-0,0,0,0,0,p,0,0,0,q,0,0,0,0,0,0
-0,0,0,0,n,n,n,n,n,n,n,n,0,0,0,0
-0,0,0,0,v,v,v,v,v,0,v,v,0,0,0,0
-0,0,0,0,v,0,0,0,0,0,0,v,0,0,0,0
-0,0,0,0,v,0,10,0,0,0,0,v,0,0,0,0
-0,0,0,0,v,0,0,0,10,0,0,v,0,0,0,0
-0,0,0,0,v,0,0,0,0,0,y,v,0,0,0,0
-0,0,0,0,v,0,10,0,0,10,0,v,0,0,0,0
-0,0,0,0,v,0,0,0,0,0,0,v,0,0,0,0
-0,0,0,0,v,v,0,v,v,v,v,v,0,0,0,0
-0,0,0,0,0,0,x,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-ITM 0 8,5
-EXT 6,12 1 6,6
-PAL 1
-
-ROOM 3
-a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a
-d,a,a,a,d,d,a,a,a,a,a,a,a,a,a,d
-d,a,d,d,d,d,d,a,d,a,d,a,a,d,a,d
-d,d,d,d,d,d,d,d,d,d,d,d,d,d,d,d
-d,d,c,c,d,c,d,d,d,d,c,d,d,d,d,c
-c,c,u,0,c,u,d,c,d,c,0,d,c,c,d,d
-s,s,0,b,0,0,c,0,c,u,0,c,0,b,c,d
-d,u,s,0,0,u,u,0,0,0,b,0,u,0,0,c
-d,0,0,s,0,0,0,b,0,u,0,0,0,n,n,n
-d,0,e,m,e,e,0,0,q,0,0,p,0,n,n,n
-c,e,l,m,l,e,e,e,n,n,n,n,0,g,g,g
-e,e,e,m,e,e,e,o,r,r,r,n,e,f,f,f
-e,e,e,m,e,l,e,o,n,n,o,n,e,e,l,e
-n,n,e,k,k,k,k,k,g,g,o,v,e,m,k,k
-n,n,e,e,e,l,e,e,f,f,o,f,e,m,l,e
-f,f,e,e,e,e,e,e,e,e,k,k,k,k,e,e
-EXT 15,13 1 0,13
-EXT 0,6 4 15,6
-PAL 1
-
-ROOM 4
-a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a
-a,a,a,a,d,a,a,d,a,a,a,a,d,a,a,a
-d,a,d,d,d,d,a,d,a,d,a,d,d,a,a,d
-d,d,d,d,d,d,d,d,d,d,d,d,d,d,d,d
-d,d,c,c,c,d,c,c,c,d,d,c,d,d,d,d
-d,c,0,s,s,c,s,s,0,c,d,u,c,d,c,c
-c,s,0,b,u,d,d,0,d,d,d,b,0,c,0,s
-d,0,s,0,0,d,d,d,d,c,c,0,0,0,s,d
-d,b,0,s,0,c,c,d,c,u,0,s,s,b,0,d
-d,0,0,s,0,e,e,c,d,0,s,0,0,0,u,c
-c,e,e,m,e,e,e,e,d,e,m,e,e,e,e,u
-e,e,l,m,l,e,e,e,d,0,0,b,e,e,e,e
-e,e,e,k,k,k,0,0,c,b,0,t,e,e,e,e
-e,e,e,e,e,e,t,t,t,t,t,e,e,e,e,e
-e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e
-e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e
-EXT 15,6 3 0,6
-PAL 1
-
-TIL 10
-00000000
-00000000
-01110100
-00000000
-11011110
-00000000
-00111000
-00000000
-
-TIL a
-00000000
-01000000
-01000010
-00000010
-00000000
-10010000
-10010000
-10000000
->
-00010000
-00010100
-00000100
-01000100
-01000000
-00000000
-00000010
-00000010
-
-TIL b
-00000000
-00000000
-00000000
-00110000
-00000000
-00000000
-00000000
-00000000
->
-00000000
-00000000
-00110000
-01001000
-00110000
-00000000
-00000000
-00000000
-
-TIL c
-01011000
-00011000
-00011000
-00011010
-00000000
-00000000
-00000000
-00000000
->
-00011010
-00011000
-01011000
-00011000
-00000000
-00000000
-00000000
-00000000
-
-TIL d
-00011000
-00011000
-00111100
-00111100
-00111100
-01111110
-01111110
-01111110
-
-TIL e
-10011001
-01100110
-00000000
-00000000
-11001100
-00110011
-00000000
-00000000
->
-00000000
-11001100
-00110011
-00000000
-00000000
-10011001
-01100110
-00000000
-
-TIL f
-11111111
-11111111
-11111111
-11111111
-11111111
-10011001
-00000000
-00000000
->
-11111111
-11111111
-11111111
-11111111
-11111111
-11111111
-00110011
-00000000
-
-TIL g
-11111111
-11111111
-11111111
-11100111
-11100111
-11111111
-11111111
-11111111
-
-TIL k
-00000000
-10101010
-10101010
-10101010
-10101010
-10101010
-10101010
-00000000
-
-TIL l
-00011000
-00100100
-00111100
-00100100
-00100100
-01000010
-00111100
-00000000
->
-00011000
-00100100
-00111100
-00100100
-01000010
-00111100
-00000000
-00000000
-
-TIL m
-00000000
-01111110
-00000000
-01111110
-00000000
-01111110
-00000000
-01111110
-
-TIL n
-01110111
-01110111
-00110011
-00000000
-11101110
-11101110
-01100110
-00000000
-
-TIL o
-01000010
-01111110
-01000010
-01111110
-01000010
-01111110
-01000010
-01111110
-
-TIL p
-00000000
-00000000
-01010100
-11111110
-01010100
-00010000
-00010000
-00010000
-
-TIL q
-00000000
-00000000
-00011000
-00100100
-00111100
-00011000
-00011000
-00011000
-
-TIL r
-01110111
-00000000
-11101110
-00000000
-01110111
-00000000
-11101110
-00000000
-
-TIL s
-00000000
-00001000
-00000000
-01000000
-00000000
-00000000
-00000100
-00000000
-
-TIL t
-00000000
-00000000
-00000000
-00000000
-00000000
-00000000
-11111111
-00000000
->
-00000000
-00000000
-00000000
-00000000
-00000000
-00000000
-11111111
-11111111
-
-TIL u
-00000000
-00001000
-00001000
-00101000
-00100000
-00100100
-00000100
-00000000
->
-00000000
-00010000
-00001000
-01001000
-00100000
-00101000
-00000100
-00000000
-
-TIL v
-11111111
-11111111
-11111111
-11111111
-11111111
-11111111
-11111111
-11111111
-
-TIL w
-00000000
-00111100
-01111110
-01111110
-01111110
-01111110
-01111110
-01111110
-NAME door
-COL 2
-
-TIL x
-00000000
-01111110
-01111110
-00000000
-01111110
-00000000
-01111110
-00000000
-NAME door light
-COL 2
-
-TIL y
-11111110
-11111110
-01000100
-01000100
-00000000
-00000000
-00000000
-00000000
-
-TIL z
-00000000
-00001000
-00000000
-00000000
-00010000
-00000000
-00000000
-00001000
->
-00010000
-00000000
-00000000
-00001000
-00000000
-00000000
-00010000
-00000000
-
-SPR A
-00011000
-00110100
-00110100
-00110100
-00011000
-00111100
-01111100
-01111100
->
-00011000
-00110100
-01110100
-00110100
-00111000
-01111100
-11111100
-00111000
-POS 4 1,6
-
-SPR a
-00111100
-01111110
-00101100
-00101110
-00101110
-00011110
-00011110
-00010100
->
-00000000
-00111100
-01111110
-00101110
-00101110
-00101110
-00011110
-00010100
-DLG SPR_0
-POS 0 10,4
-
-SPR b
-00111100
-01111110
-00110100
-01110100
-01110100
-01111100
-01111100
-00100100
->
-00000000
-00111100
-01111110
-01110100
-01110100
-01111100
-01111100
-00100100
-DLG SPR_1
-POS 2 6,8
-
-SPR c
-00000000
-00010000
-01001010
-00011010
-01110110
-01100110
-00111100
-00000000
->
-01000000
-00001010
-00100000
-00110100
-01101110
-01100110
-00111110
-00000000
-NAME fire
-DLG SPR_2
-POS 2 9,4
-
-SPR d
-00000000
-00000000
-00010000
-00001000
-00000100
-01111100
-01011100
-01111100
-DLG SPR_3
-POS 2 10,7
-
-ITM 0
-00000000
-00000000
-00011000
-01111100
-10111111
-01111110
-00111100
-00000000
-NAME tea
-DLG ITM_0
-
-DLG SPR_0
-I'm a cat
-
-DLG SPR_1
-"""
-{
-  - {item "0"} == 1 ?
-    {sequence
-        - Thank you. Which way are you heading?
-        - East, huh? I'm going west. Not sure what I expect to find.
-        - It's lucky whoever lived here left firewood.
-        - Stay as long as you like. I'll be moving on soon.
-    }
-  - else ?
-    {sequence
-        - I'm just passing through. Want to share some {clr3}tea {printItem "tea"}{clr3} with me?
-       - I've set a {clr3}pot {printItem "tea"}{clr3} brewing by the fire. We can talk over tea.
-    }
-}
-"""
-
-DLG ITM_0
-You gently cradle the warm pot of tea.
-
-DLG SPR_2
-"""
-{sequence
-  - The fire dries your cold hands - you almost forgot this feeling.
-  - {shk}crackle crackle crackle{shk}
-}
-"""
-
-DLG SPR_3
-"""
-{sequence
-  - The radio is playing the hit song "1000 days & nights of rain (in my heart)."
-  - It's a weather broadcast: "The forecast for tomorrow is... rain!"
-  - And now a statement from 
-    {wvy}The King of the Dry Lands{wvy}:
-    "It's not raining & if it is it's someone else's fault!"
-  - {shk}hisssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss{shk}
-    
-    This channel is just static.
-}
-"""
-
-VAR a
-42
-
-
 </script>
 
 </body>
