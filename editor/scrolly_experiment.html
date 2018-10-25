@@ -100,6 +100,8 @@ TODO
 	var gameDataManager;
 	var events;
 
+	var curPaintSelect = { type: TileType.Avatar, id: "A" };
+
 	function init() {
 		events = new EventManager();
 
@@ -137,6 +139,11 @@ TODO
 				curInputType = InputType.Touch;
 				events.Raise("change_input_type", { type: curInputType });
 			}
+		});
+
+		events.Listen("paint_select", function (e) {
+			curPaintSelect = e;
+			document.getElementById("paintSelectName").innerText = e.name;
 		});
 	}
 
@@ -291,21 +298,21 @@ TODO
 
 		function initInput(inputType) {
 			roomCanvas.removeEventListener("mousedown", onmousedown);
-			// paintCanvas.removeEventListener("mousemove", onmousemove);
-			// paintCanvas.removeEventListener("mouseup", onmouseup);
+			roomCanvas.removeEventListener("mousemove", onmousemove);
+			roomCanvas.removeEventListener("mouseup", onmouseup);
 			roomCanvas.removeEventListener("touchstart", ontouchstart);
-			// paintCanvas.removeEventListener("touchmove", ontouchmove);
-			// paintCanvas.removeEventListener("touchend", ontouchend);
+			roomCanvas.removeEventListener("touchmove", ontouchmove);
+			roomCanvas.removeEventListener("touchend", ontouchend);
 
 			if (inputType == InputType.Mouse) {
 				roomCanvas.addEventListener("mousedown", onmousedown);
-				// paintCanvas.addEventListener("mousemove", onmousemove);
-				// paintCanvas.addEventListener("mouseup", onmouseup);
+				roomCanvas.addEventListener("mousemove", onmousemove);
+				roomCanvas.addEventListener("mouseup", onmouseup);
 			}
 			else if (inputType == InputType.Touch) {
 				roomCanvas.addEventListener("touchstart", ontouchstart);
-				// paintCanvas.addEventListener("touchmove", ontouchmove);
-				// paintCanvas.addEventListener("touchend", ontouchend);
+				roomCanvas.addEventListener("touchmove", ontouchmove);
+				roomCanvas.addEventListener("touchend", ontouchend);
 			}
 		}
 		initInput(curInputType);
@@ -316,11 +323,8 @@ TODO
 
 		function onmousedown(e) {
 			if (isCanvasSelected) {
-				editRoom(e);
-
+				editRoomStart(e);
 				redraw();
-
-				events.Raise("edit_room", { id: room.id });
 			}
 			else
 			{
@@ -328,9 +332,34 @@ TODO
 			}
 		}
 
+		function onmousemove(e) {
+			if (isCanvasSelected) {
+				editRoomMove(e);
+				redraw();
+			}
+		}
+
+		function onmouseup(e) {
+			if (isCanvasSelected) {
+				editRoomEnd(e);
+				redraw();
+				events.Raise("edit_room", { id: room.id });
+			}
+		}
+
 		function ontouchstart(e) {
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmousedown(fakeEvent);
+		}
+
+		function ontouchmove(e) {
+			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+			onmousemove(fakeEvent);
+		}
+
+		function ontouchend(e) {
+			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+			onmouseup(fakeEvent);
 		}
 
 		events.Listen("select_canvas", function(e) {
@@ -342,35 +371,76 @@ TODO
 			}
 		});
 
-		var roomToolMode = TileType.Avatar;
-		var selectedAvatarId = "A";
-		var selectedSpriteId = "a";
-		var selectedTileId = "a";
+		var paintSelect = curPaintSelect; // hacky global way to maintain state
 
-		function editRoom(e) {
+		events.Listen("paint_select", function (e) {
+			paintSelect = e; // a bit hacky
+		});
+
+		var DragType = {
+			None : 0,
+			Add : 1,
+			Delete : 2
+		};
+		var curDragType = DragType.None;
+
+		function editRoomStart(e) {
 			var off = getOffset(e);
 
-			console.log(off);
-
 			off = mobileOffsetCorrection(off,e,(mapsize)); // TODO ... rename this to a more descriptive function name
-
-			console.log(off);
 
 			var x = Math.floor(off.x);
 			var y = Math.floor(off.y);
 
-			console.log(x + " " + y);
-
-			if (roomToolMode === TileType.Avatar) {
-				sprite[selectedAvatarId].room = room.id;
-				sprite[selectedAvatarId].x = x;
-				sprite[selectedAvatarId].y = y;
+			if (paintSelect.type === TileType.Avatar || paintSelect.type === TileType.Sprite) {
+				if (sprite[paintSelect.id].room === room.id && sprite[paintSelect.id].x === x && sprite[paintSelect.id].y === y) {
+					sprite[paintSelect.id].room = null;
+					sprite[paintSelect.id].x = 0;
+					sprite[paintSelect.id].y = 0;
+					delete spriteStartLocations[paintSelect.id]; // HACKY as fuck
+				}
+				else {
+					sprite[paintSelect.id].room = room.id;
+					sprite[paintSelect.id].x = x;
+					sprite[paintSelect.id].y = y;
+				}
+			}
+			else if (paintSelect.type === TileType.Tile)
+			{
+				if ( room.tilemap[y][x] === "0" ) {
+					room.tilemap[y][x] = paintSelect.id;
+					curDragType = DragType.Add;
+				}
+				else {
+					room.tilemap[y][x] = "0";
+					curDragType = DragType.Delete;
+				}
 			}
 			// TODO : other modes
 		}
+
+		function editRoomMove(e) {
+			var off = getOffset(e);
+			off = mobileOffsetCorrection(off,e,(mapsize));
+			var x = Math.floor(off.x);
+			var y = Math.floor(off.y);
+
+			if (paintSelect.type === TileType.Tile && curDragType != DragType.None) {
+				if (curDragType == DragType.Add) {
+					room.tilemap[y][x] = paintSelect.id;
+				}
+				else if (curDragType == DragType.Delete) {
+					room.tilemap[y][x] = "0";
+				}
+			}
+		}
+
+		function editRoomEnd(e) {
+			curDragType = DragType.None;
+		}
 	}
 
-	function DrawingCell(name, drawing, colorIndex, editEvent) { // TODO rename "Objects" to something more descriptive: Editors? Editables? EditViews?
+	function DrawingCell(name, type, drawing, colorIndex, editEvent) { // TODO rename "Objects" to something more descriptive: Editors? Editables? EditViews?
 		Object.assign( this, new EditableCell(name) );
 
 		var isCanvasSelected = false;
@@ -378,6 +448,16 @@ TODO
 		var rootElement = this.GetRootElement();
 
 		var paint_scale = 32;
+
+		var paintSelectDiv = document.createElement("div");
+		rootElement.appendChild(paintSelectDiv);
+
+		var paintSelectButton = document.createElement("button");
+		paintSelectButton.innerText = "Paint";
+		paintSelectButton.addEventListener("click", function(e) {
+			events.Raise("paint_select", { name : name, type : type, id : drawing.id });
+		});
+		paintSelectDiv.appendChild(paintSelectButton);
 
 		var paintCanvas = document.createElement("canvas");
 		paintCanvas.width = paint_scale * tilesize;
@@ -453,10 +533,7 @@ TODO
 		function onmousedown(e) {
 			if (isCanvasSelected) {
 				curDrawingState = startEditDrawing(e, drawing.drw);
-
 				renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
-
-				events.Raise(editEvent); // TODO : specify WHICH drawing
 			}
 			else
 			{
@@ -465,17 +542,19 @@ TODO
 		}
 
 		function onmousemove(e) {
-			if (curDrawingState > -1) {
-				editDrawing(e, drawing.drw, curDrawingState);
-
-				renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
-
-				events.Raise(editEvent); // TODO : specify WHICH drawing
+			if (isCanvasSelected) {
+				if (curDrawingState > -1) {
+					editDrawing(e, drawing.drw, curDrawingState);
+					renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
+				}
 			}
 		}
 
 		function onmouseup(e) {
-			curDrawingState = -1;
+			if (isCanvasSelected) {
+				curDrawingState = -1;
+				events.Raise(editEvent); // TODO : specify WHICH drawing
+			}
 		}
 
 		function ontouchstart(e) {
@@ -538,11 +617,11 @@ TODO
 	}
 
 	function AvatarCell(sprite) {
-		Object.assign( this, new DrawingCell("AVATAR", sprite, 2, "edit_sprite") );
+		Object.assign( this, new DrawingCell("AVATAR", TileType.Avatar, sprite, 2, "edit_sprite") );
 	}
 
 	function SpriteCell(sprite) {
-		Object.assign( this, new DrawingCell("SPRITE " + sprite.id, sprite, 2, "edit_sprite"));
+		Object.assign( this, new DrawingCell("SPRITE " + sprite.id, TileType.Sprite, sprite, 2, "edit_sprite"));
 
 		var rootElement = this.GetRootElement();
 
@@ -580,7 +659,7 @@ TODO
 	}
 
 	function TileCell(tile) {
-		Object.assign( this, new DrawingCell("TILE " + tile.id, tile, 1, "edit_tile"));
+		Object.assign( this, new DrawingCell("TILE " + tile.id, TileType.Tile, tile, 1, "edit_tile"));
 
 		// console.log(tile);
 
@@ -745,6 +824,8 @@ TODO
 		<button onclick="addSprite();">+ Sprite</button>
 		<button onclick="addTile();">+ Tile</button>
 		<button onclick="toggleGameData();">Data</button>
+		<br/>
+		paint: <span id="paintSelectName">AVATAR</span>
 	</div>
 
 <script type="bitsyGameData" id="defaultGameData">
