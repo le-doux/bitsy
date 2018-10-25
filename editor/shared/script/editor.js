@@ -1,4 +1,22 @@
 /*
+arabic update feedback:
+- use rtl to right align text in the editor
+- watch out for hard-coded punctuation
+- mixed arabic + english is in the wrong order (example: version number should be on the left)
+- some of the button icons are in the wrong place
+- words should be on the right of the buttons or dropdowns or icons
+- default title text doesn't change correctly
+- english text in some areas (pop up dialog, others?)
+- (ahmed put together some mockups)
+- english text in arabic font could be improved (no apostrophe)
+	- combine with default bitsy font?
+- button icons should be to the right of the text
+- rtl
+- check translation proofread notes
+- explain that rtl setting is for right to left languages in settings menu
+other thoughts:
+- finalize font format changes
+
 PERF NOTES:
 - loading idea: use long animations to create the loading animation
 - handle parsing performance (especially LARGE fonts)
