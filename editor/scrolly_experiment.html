@@ -321,6 +321,8 @@ TODO
 			initInput(e.type);
 		});
 
+		var mouseStartEvent;
+
 		function onmousedown(e) {
 			if (isCanvasSelected) {
 				editRoomStart(e);
@@ -328,7 +330,7 @@ TODO
 			}
 			else
 			{
-				events.Raise("select_canvas", { id: "ROOM_" + room.id } ); // hacky id... need a better system
+				mouseStartEvent = e;
 			}
 		}
 
@@ -345,19 +347,35 @@ TODO
 				redraw();
 				events.Raise("edit_room", { id: room.id });
 			}
+			else {
+				if (mouseStartEvent != null && 
+					Math.abs(mouseStartEvent.clientX - e.clientX) < 5 &&
+					Math.abs(mouseStartEvent.clientY - e.clientY) < 5) { // hacky distance calc
+					events.Raise("select_canvas", { id: "ROOM_" + room.id } ); // hacky id... need a better system
+				}
+			}
 		}
 
 		function ontouchstart(e) {
+			if (isCanvasSelected) {
+				e.preventDefault();
+			}
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmousedown(fakeEvent);
 		}
 
 		function ontouchmove(e) {
+			if (isCanvasSelected) {
+				e.preventDefault();
+			}
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmousemove(fakeEvent);
 		}
 
 		function ontouchend(e) {
+			if (isCanvasSelected) {
+				e.preventDefault();
+			}
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmouseup(fakeEvent);
 		}
@@ -377,12 +395,12 @@ TODO
 			paintSelect = e; // a bit hacky
 		});
 
-		var DragType = {
+		var EditType = {
 			None : 0,
 			Add : 1,
 			Delete : 2
 		};
-		var curDragType = DragType.None;
+		var curEditType = EditType.None;
 
 		function editRoomStart(e) {
 			var off = getOffset(e);
@@ -409,14 +427,13 @@ TODO
 			{
 				if ( room.tilemap[y][x] === "0" ) {
 					room.tilemap[y][x] = paintSelect.id;
-					curDragType = DragType.Add;
+					curEditType = EditType.Add;
 				}
 				else {
 					room.tilemap[y][x] = "0";
-					curDragType = DragType.Delete;
+					curEditType = EditType.Delete;
 				}
 			}
-			// TODO : other modes
 		}
 
 		function editRoomMove(e) {
@@ -425,18 +442,18 @@ TODO
 			var x = Math.floor(off.x);
 			var y = Math.floor(off.y);
 
-			if (paintSelect.type === TileType.Tile && curDragType != DragType.None) {
-				if (curDragType == DragType.Add) {
+			if (paintSelect.type === TileType.Tile && curEditType != EditType.None) {
+				if (curEditType == EditType.Add) {
 					room.tilemap[y][x] = paintSelect.id;
 				}
-				else if (curDragType == DragType.Delete) {
+				else if (curEditType == EditType.Delete) {
 					room.tilemap[y][x] = "0";
 				}
 			}
 		}
 
 		function editRoomEnd(e) {
-			curDragType = DragType.None;
+			curEditType = EditType.None;
 		}
 	}
 
@@ -500,7 +517,7 @@ TODO
 			}
 		}
 
-		function editDrawing(e, drw, drawingState) {
+		function editDrawing(e, drw, paintType) {
 			var off = getOffset(e);
 			off = mobileOffsetCorrection(off,e,(tilesize));
 
@@ -508,7 +525,7 @@ TODO
 			var y = Math.floor(off.y);
 
 			var drawingData = renderer.GetImageSource(drw);
-			drawingData[0][y][x] = drawingState;
+			drawingData[0][y][x] = paintType;
 
 			renderer.SetImageSource(drw, drawingData);
 		}
@@ -521,30 +538,38 @@ TODO
 			var y = Math.floor(off.y);
 
 			var drawingData = renderer.GetImageSource(drw);
-			var drawingState = drawingData[0][y][x] == 1 ? 0 : 1;
+			var paintType = drawingData[0][y][x] == 1 ? PaintType.Erase : PaintType.Draw;
 
-			editDrawing(e, drw, drawingState);
+			editDrawing(e, drw, paintType);
 
-			return drawingState;
+			return paintType;
 		}
 
-		var curDrawingState = -1;
+		var PaintType = {
+			None : -1,
+			Erase : 0,
+			Draw : 1
+		};
+		var curPaintType = PaintType.None;
+
+		var mouseStartEvent;
 
 		function onmousedown(e) {
 			if (isCanvasSelected) {
-				curDrawingState = startEditDrawing(e, drawing.drw);
+				curPaintType = startEditDrawing(e, drawing.drw);
 				renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
 			}
 			else
 			{
-				events.Raise("select_canvas", { id: drawing.drw } );
+				mouseStartEvent = e;
+				console.log(mouseStartEvent);
 			}
 		}
 
 		function onmousemove(e) {
 			if (isCanvasSelected) {
-				if (curDrawingState > -1) {
-					editDrawing(e, drawing.drw, curDrawingState);
+				if (curPaintType != PaintType.None) {
+					editDrawing(e, drawing.drw, curPaintType);
 					renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
 				}
 			}
@@ -552,26 +577,41 @@ TODO
 
 		function onmouseup(e) {
 			if (isCanvasSelected) {
-				curDrawingState = -1;
+				curPaintType = PaintType.None;
 				events.Raise(editEvent); // TODO : specify WHICH drawing
+			}
+			else {
+				if (mouseStartEvent != null && 
+					Math.abs(mouseStartEvent.clientX - e.clientX) < 5 &&
+					Math.abs(mouseStartEvent.clientY - e.clientY) < 5) { // hacky distance calc
+					events.Raise("select_canvas", { id: drawing.drw } );
+				}
 			}
 		}
 
 		function ontouchstart(e) {
-			console.log("TOUCH START");
-			// console.log(e);
+			if (isCanvasSelected) {
+				e.preventDefault();
+			}
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmousedown(fakeEvent);
 		}
 
 		function ontouchmove(e) {
+			if (isCanvasSelected) {
+				e.preventDefault();
+			}
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmousemove(fakeEvent);
 		}
 
 		function ontouchend(e) {
-			// var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
-			onmouseup({});
+			if (isCanvasSelected) {
+				e.preventDefault();
+			}
+			console.log(e);
+			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+			onmouseup(fakeEvent);
 		}
 
 		function initInput(inputType) {
