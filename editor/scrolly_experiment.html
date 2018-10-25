@@ -103,7 +103,7 @@ TODO
 	function init() {
 		events = new EventManager();
 
-		var gameData = document.getElementById("exportedGameData").text.slice(1);
+		var gameData = document.getElementById("defaultGameData").text.slice(1);
 		parseWorld(gameData);
 
 		gameDataManager = new GameDataManager(gameData);
@@ -217,6 +217,7 @@ TODO
 		events.Listen("edit_title", updateGameData);
 		events.Listen("edit_palette", updateGameData);
 		events.Listen("edit_dialog", updateGameData);
+		events.Listen("edit_room", updateGameData);
 
 		this.GetData = function() {
 			return data;
@@ -249,6 +250,8 @@ TODO
 
 		var context = roomCanvas.getContext("2d");
 
+		var isCanvasSelected = false;
+
 		function redraw() {
 			// hack (assumed singular canvas)
 			canvas = roomCanvas;
@@ -258,7 +261,19 @@ TODO
 			curRoom = room.id;
 
 			drawRoom(room,context,0);
+
+			//draw grid
+			if (isCanvasSelected) {
+				context.fillStyle = getContrastingColor();
+				for (var x = 1; x < mapsize; x++) {
+					context.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
+				}
+				for (var y = 1; y < mapsize; y++) {
+					context.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
+				}
+			}
 		}
+
 		redraw();
 
 		events.Listen("edit_sprite", function() {
@@ -273,6 +288,86 @@ TODO
 			renderer.SetPalettes(palette); // TODO : less hacky way to clear renderer
 			redraw(); // todo: respond to id
 		});
+
+		function initInput(inputType) {
+			roomCanvas.removeEventListener("mousedown", onmousedown);
+			// paintCanvas.removeEventListener("mousemove", onmousemove);
+			// paintCanvas.removeEventListener("mouseup", onmouseup);
+			roomCanvas.removeEventListener("touchstart", ontouchstart);
+			// paintCanvas.removeEventListener("touchmove", ontouchmove);
+			// paintCanvas.removeEventListener("touchend", ontouchend);
+
+			if (inputType == InputType.Mouse) {
+				roomCanvas.addEventListener("mousedown", onmousedown);
+				// paintCanvas.addEventListener("mousemove", onmousemove);
+				// paintCanvas.addEventListener("mouseup", onmouseup);
+			}
+			else if (inputType == InputType.Touch) {
+				roomCanvas.addEventListener("touchstart", ontouchstart);
+				// paintCanvas.addEventListener("touchmove", ontouchmove);
+				// paintCanvas.addEventListener("touchend", ontouchend);
+			}
+		}
+		initInput(curInputType);
+
+		events.Listen("change_input_type", function(e) {
+			initInput(e.type);
+		});
+
+		function onmousedown(e) {
+			if (isCanvasSelected) {
+				editRoom(e);
+
+				redraw();
+
+				events.Raise("edit_room", { id: room.id });
+			}
+			else
+			{
+				events.Raise("select_canvas", { id: "ROOM_" + room.id } ); // hacky id... need a better system
+			}
+		}
+
+		function ontouchstart(e) {
+			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+			onmousedown(fakeEvent);
+		}
+
+		events.Listen("select_canvas", function(e) {
+			var selected = (e.id === "ROOM_" + room.id);
+			var didChange = isCanvasSelected != selected;
+			isCanvasSelected = selected;
+			if (didChange) {
+				redraw();
+			}
+		});
+
+		var roomToolMode = TileType.Avatar;
+		var selectedAvatarId = "A";
+		var selectedSpriteId = "a";
+		var selectedTileId = "a";
+
+		function editRoom(e) {
+			var off = getOffset(e);
+
+			console.log(off);
+
+			off = mobileOffsetCorrection(off,e,(mapsize)); // TODO ... rename this to a more descriptive function name
+
+			console.log(off);
+
+			var x = Math.floor(off.x);
+			var y = Math.floor(off.y);
+
+			console.log(x + " " + y);
+
+			if (roomToolMode === TileType.Avatar) {
+				sprite[selectedAvatarId].room = room.id;
+				sprite[selectedAvatarId].x = x;
+				sprite[selectedAvatarId].y = y;
+			}
+			// TODO : other modes
+		}
 	}
 
 	function DrawingCell(name, drawing, colorIndex, editEvent) { // TODO rename "Objects" to something more descriptive: Editors? Editables? EditViews?
@@ -313,8 +408,8 @@ TODO
 
 			//draw grid
 			if (drawPaintGrid) {
-				ctx.fillStyle = curInputType == InputType.Mouse ? "red" : "green"; // getContrastingColor();
-				console.log(ctx.fillStyle);
+				ctx.fillStyle = getContrastingColor(); // curInputType == InputType.Mouse ? "red" : "green";
+				// console.log(ctx.fillStyle);
 
 				for (var x = 1; x < tilesize; x++) {
 					ctx.fillRect(x*paint_scale,0*paint_scale,1,tilesize*paint_scale);
@@ -429,7 +524,9 @@ TODO
 			var selected = (e.id === drawing.drw);
 			var didChange = isCanvasSelected != selected;
 			isCanvasSelected = selected;
-			renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
+			if (didChange) {
+				renderDrawing(context,drawing.drw,getPal(curPal())[colorIndex],isCanvasSelected);
+			}
 		});
 
 		events.Listen("edit_palette", function(e) {
