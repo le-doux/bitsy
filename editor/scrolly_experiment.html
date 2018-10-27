@@ -89,6 +89,10 @@ TODO
 		-X stop scrolling while editing drawings
 		- need way to deselect drawings
 		- try shrinking drawings when not selected?
+
+
+TODO : handle weird first-time loading bug
+	- how do we validate that the saved data is a valid bitsy game?
 */
 
 	var InputType = {
@@ -110,6 +114,8 @@ TODO
 			gameData = localStorage.game_data;
 		}
 
+		console.log("--- parse ---");
+		console.log(gameData);
 		parseWorld(gameData);
 
 		gameDataManager = new GameDataManager(gameData);
@@ -362,9 +368,11 @@ TODO
 				events.Raise("edit_room", { id: room.id });
 			}
 			else {
-				if (mouseStartEvent != null && 
-					Math.abs(mouseStartEvent.clientX - e.clientX) < 5 &&
-					Math.abs(mouseStartEvent.clientY - e.clientY) < 5) { // hacky distance calc
+				if (mouseStartEvent == null) return; // hack
+				var moveDist = dist(mouseStartEvent.clientX, mouseStartEvent.clientY, e.clientX, e.clientY);
+				console.log(moveDist);
+				var maxDist = window.height * 0.1;
+				if (moveDist < maxDist) {
 					events.Raise("select_canvas", { id: "ROOM_" + room.id } ); // hacky id... need a better system
 				}
 			}
@@ -595,9 +603,13 @@ TODO
 				events.Raise(editEvent); // TODO : specify WHICH drawing
 			}
 			else {
-				if (mouseStartEvent != null && 
-					Math.abs(mouseStartEvent.clientX - e.clientX) < 5 &&
-					Math.abs(mouseStartEvent.clientY - e.clientY) < 5) { // hacky distance calc
+				if (mouseStartEvent == null) return;
+				console.log(mouseStartEvent);
+				console.log(e);
+				var moveDist = dist(mouseStartEvent.clientX, mouseStartEvent.clientY, e.clientX, e.clientY);
+				console.log(moveDist);
+				var maxDist = window.height * 0.1;
+				if (moveDist < maxDist) {
 					events.Raise("select_canvas", { id: drawing.drw } );
 				}
 			}
@@ -864,6 +876,10 @@ TODO
 
 	function clearGameData() {
 		events.Raise("reset_game");
+	}
+
+	function dist(x0, y0, x1, y1) {
+		return Math.sqrt( Math.pow(x0 - x1, 2) + Math.pow(y0 - y1, 2) );
 	}
 </script>
 
