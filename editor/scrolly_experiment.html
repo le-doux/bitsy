@@ -371,7 +371,7 @@ TODO : handle weird first-time loading bug
 				if (mouseStartEvent == null) return; // hack
 				var moveDist = dist(mouseStartEvent.clientX, mouseStartEvent.clientY, e.clientX, e.clientY);
 				console.log(moveDist);
-				var maxDist = window.innerHeight * 0.12;
+				var maxDist = window.innerHeight * 0.15;
 				if (moveDist < maxDist) {
 					events.Raise("select_canvas", { id: "ROOM_" + room.id } ); // hacky id... need a better system
 				}
@@ -384,6 +384,7 @@ TODO : handle weird first-time loading bug
 			}
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmousedown(fakeEvent);
+			lastTouch = fakeEvent;
 		}
 
 		var lastTouch = null;
@@ -610,7 +611,7 @@ TODO : handle weird first-time loading bug
 				console.log(e);
 				var moveDist = dist(mouseStartEvent.clientX, mouseStartEvent.clientY, e.clientX, e.clientY);
 				console.log("- " + moveDist);
-				var maxDist = window.innerHeight * 0.12;
+				var maxDist = window.innerHeight * 0.15;
 				console.log("-- " + maxDist);
 				if (moveDist < maxDist) {
 					events.Raise("select_canvas", { id: drawing.drw } );
@@ -624,6 +625,7 @@ TODO : handle weird first-time loading bug
 			}
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmousedown(fakeEvent);
+			lastTouch = fakeEvent;
 		}
 
 		var lastTouch = null;
