@@ -882,7 +882,9 @@ TODO : handle weird first-time loading bug
 	}
 
 	function clearGameData() {
-		events.Raise("reset_game");
+		if (window.confirm("reset game?")) {
+			events.Raise("reset_game");
+		}
 	}
 
 	function dist(x0, y0, x1, y1) {
