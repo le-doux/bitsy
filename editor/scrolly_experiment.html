@@ -371,7 +371,7 @@ TODO : handle weird first-time loading bug
 				if (mouseStartEvent == null) return; // hack
 				var moveDist = dist(mouseStartEvent.clientX, mouseStartEvent.clientY, e.clientX, e.clientY);
 				console.log(moveDist);
-				var maxDist = window.height * 0.1;
+				var maxDist = window.innerHeight * 0.12;
 				if (moveDist < maxDist) {
 					events.Raise("select_canvas", { id: "ROOM_" + room.id } ); // hacky id... need a better system
 				}
@@ -609,8 +609,9 @@ TODO : handle weird first-time loading bug
 				console.log(mouseStartEvent);
 				console.log(e);
 				var moveDist = dist(mouseStartEvent.clientX, mouseStartEvent.clientY, e.clientX, e.clientY);
-				console.log(moveDist);
-				var maxDist = window.height * 0.1;
+				console.log("- " + moveDist);
+				var maxDist = window.innerHeight * 0.12;
+				console.log("-- " + maxDist);
 				if (moveDist < maxDist) {
 					events.Raise("select_canvas", { id: drawing.drw } );
 				}
