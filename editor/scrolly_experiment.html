@@ -386,20 +386,22 @@ TODO : handle weird first-time loading bug
 			onmousedown(fakeEvent);
 		}
 
+		var lastTouch = null;
 		function ontouchmove(e) {
 			if (isCanvasSelected) {
 				e.preventDefault();
 			}
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmousemove(fakeEvent);
+			lastTouch = fakeEvent;
 		}
 
 		function ontouchend(e) {
 			if (isCanvasSelected) {
 				e.preventDefault();
 			}
-			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
-			onmouseup(fakeEvent);
+			// var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+			onmouseup(lastTouch);
 		}
 
 		events.Listen("select_canvas", function(e) {
@@ -623,12 +625,14 @@ TODO : handle weird first-time loading bug
 			onmousedown(fakeEvent);
 		}
 
+		var lastTouch = null;
 		function ontouchmove(e) {
 			if (isCanvasSelected) {
 				e.preventDefault();
 			}
 			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 			onmousemove(fakeEvent);
+			lastTouch = fakeEvent;
 		}
 
 		function ontouchend(e) {
@@ -636,8 +640,8 @@ TODO : handle weird first-time loading bug
 				e.preventDefault();
 			}
 			console.log(e);
-			var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
-			onmouseup(fakeEvent);
+			// var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
+			onmouseup(lastTouch);
 		}
 
 		function initInput(inputType) {
