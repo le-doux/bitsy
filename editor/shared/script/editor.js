@@ -4360,8 +4360,13 @@ function chooseExportSizeFixed() {
 }
 
 // LOCALIZATION
+var curEditorLanguageCode = "en";
 var localization;
 function on_change_language(e) {
+	document.body.classList.remove("lang_" + curEditorLanguageCode);
+	curEditorLanguageCode = e.target.value;
+	document.body.classList.add("lang_" + curEditorLanguageCode);
+
 	localization.ChangeLanguage(e.target.value);
 	pickDefaultFontForLanguage(e.target.value);
 
