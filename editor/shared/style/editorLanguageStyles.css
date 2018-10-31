@@ -1,3 +1,35 @@
 .lang_ar {
 	direction: rtl;
 }
+
+.lang_ar input[type=radio] + label.left {
+	border-radius: 0px 2px 2px 0px;
+}
+.lang_ar input[type=radio] + label.right {
+	border-radius: 2px 0px 0px 2px;
+}
+
+.lang_ar input[type=radio] + label.left {
+	border-right: none;
+}
+.lang_ar input[type=radio] + label.right {
+	border-right: solid 1px #6767b2;
+}
+.lang_ar input[type=radio] + label.middle {
+	border-right: solid 1px #6767b2;
+}
+
+/* sort of hacky css way to reverse these arrow icons */
+.lang_ar .navigate_before span {
+	display: none;
+}
+.lang_ar .navigate_before:after {
+	content: 'navigate_next';
+}
+
+.lang_ar .navigate_next span {
+	display: none;
+}
+.lang_ar .navigate_next:after {
+	content: 'navigate_before';
+}
