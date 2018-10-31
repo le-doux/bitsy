@@ -61,7 +61,7 @@
 					</div>
 
 					<div id="titleFlexItem">
-						<input title="title text for your game" type="text" id="titleText" onchange="on_change_title(event);" value="Write your game's title here" placeholder="Title" style="width:100%;">
+						<input title="title text for your game" type="text" id="titleText" class="gameTextDir" onchange="on_change_title(event);" value="Write your game's title here" placeholder="Title" style="width:100%;">
 					</div>
 
 					<div id="toolsCheckFlexItem">
@@ -340,7 +340,7 @@
 								<i id="versionNotesCheckIcon" class="material-icons">expand_less</i>
 							</label>
 
-							<div id="versionNotes" style="display:none;">
+							<div id="versionNotes" style="display:none; direction:ltr">
 								<br>
 								5.3:<br>
 								- performance improvements:<br>
@@ -537,7 +537,7 @@
 							<span class="localize endings_tool_name">endings</span>
 						</div>
 					</div>
-					<textarea title="text displayed on player reaching this ending" id="endingText" class="dialogTextArea" onkeydown="on_change_ending();" onkeyup="on_change_ending();" onchange="on_change_ending();"></textarea>
+					<textarea title="text displayed on player reaching this ending" id="endingText" class="dialogTextArea gameTextDir" onkeydown="on_change_ending();" onkeyup="on_change_ending();" onchange="on_change_ending();"></textarea>
 					<div id="endingNav">
 						<div class="buttonGroup">
 							<span class="localize ending_label">ending</span> <span id="endingId">0</span>
@@ -667,7 +667,7 @@
 							<i class="material-icons">open_in_new</i>
 						</button>
 						<br>
-						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog_finished();"></textarea> <!-- rows="2" cols="32" -->
+						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea gameTextDir" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog_finished();"></textarea> <!-- rows="2" cols="32" -->
 					</div>
 
 					<div id="animationOuter" class="controlBox">

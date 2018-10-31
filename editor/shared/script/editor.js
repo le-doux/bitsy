@@ -19,12 +19,11 @@ other thoughts:
 X fix CSS formats that don't work with RTL
 	X radio "tab" thingies
 - fix re-positioning panels with RTL
-- fix english things that should remain LTR
-	- version notes
+X fix english things that should remain LTR
+	X version notes
 - add new localizable strings
 X previous & next drawing buttons are reversed weirdly
-- text area text direction could be set by css using dialogTextArea class
-	 (search "style.direction")
+X text area text direction could be set by css using dialogTextArea class
 
 
 PERF NOTES:
@@ -2040,7 +2039,7 @@ function updateFontSelectUI() {
 
 	updateFontDescriptionUI();
 	updateTextDirectionSelectUI(); // a bit hacky but probably ok?
-	updateEditorTextDirection();
+	updateEditorTextDirection(textDirection); // EXTREMELY hack :(
 }
 
 function updateFontDescriptionUI() {
@@ -3315,6 +3314,7 @@ var DialogBlockUI = function(nodes, num) {
 		serializeAdvDialog();
 	}
 	textArea.classList.add('advDialogTextBlock');
+	textArea.classList.add('gameTextDir');
 	textArea.value = dialogNode.Serialize();
 	textArea.addEventListener('change', onChangeDialogBlock);
 	textArea.addEventListener('keyup', onChangeDialogBlock);
@@ -3323,8 +3323,6 @@ var DialogBlockUI = function(nodes, num) {
 	textArea.addEventListener('select', textChangeHandler);
 	textArea.addEventListener('blur', textChangeHandler);
 	textArea.title = "type dialog here";
-	textArea.style.direction = textDirection;
-	textArea.style["unicode-bidi"] = "bidi-override";
 	div.appendChild( textArea );
 
 	this.GetEl = function() {
@@ -3667,6 +3665,7 @@ var IfBlockUI = function(node, num) {
 
 		var textArea = document.createElement("textarea");
 		textArea.classList.add('advDialogTextOption');
+		textArea.classList.add('gameTextDir');
 		textArea.value = result.Serialize();
 		var onChangeResult = createOnChangeResult(index);
 		textArea.addEventListener('change', onChangeResult);
@@ -3678,8 +3677,6 @@ var IfBlockUI = function(node, num) {
 		textArea.addEventListener('blur', textChangeHandler);
 		textArea.title = "type dialog option to say when this condition is true"
 		textArea.style.display = "inline-block";
-		textArea.style.direction = textDirection;
-		textArea.style["unicode-bidi"] = "bidi-override";
 		conditionDiv.appendChild( textArea );
 		// div.appendChild( document.createElement("br") );
 
@@ -3840,6 +3837,7 @@ var SeqBlockUI = function(node, num) {
 
 		var textArea = document.createElement("textarea");
 		textArea.classList.add('advDialogTextOption');
+		textArea.classList.add('gameTextDir');
 		textArea.value = option.Serialize();
 		// textArea.style.float = "left";
 		var onChangeOption = createOnChangeOption( index );
@@ -3854,8 +3852,6 @@ var SeqBlockUI = function(node, num) {
 		// textArea.style.float = "left";
 		// div.insertBefore( textArea, addOptionEl );
 		textArea.style.display = "inline-block";
-		textArea.style.direction = textDirection;
-		textArea.style["unicode-bidi"] = "bidi-override";
 		optionDiv.appendChild( textArea );
 
 		var deleteOptionEl = document.createElement("button");
@@ -4423,7 +4419,7 @@ function on_change_font(e) {
 		}
 	}
 	updateFontDescriptionUI();
-	updateEditorTextDirection();
+	// updateEditorTextDirection();
 	resetMissingCharacterWarning();
 }
 
@@ -4467,31 +4463,29 @@ function initLanguageOptions() {
 
 function on_change_text_direction(e) {
 	console.log("CHANGE TEXT DIR " + e.target.value);
-	textDirection = e.target.value;
-	updateEditorTextDirection();
+	updateEditorTextDirection(e.target.value);
 	refreshGameData();
 }
 
 function pickDefaultTextDirectionForFont(newFontName) {
+	var newTextDirection = TextDirection.LeftToRight;
 	if (newFontName === "arabic_pixel") {
-		textDirection = TextDirection.RightToLeft;
+		newTextDirection = TextDirection.RightToLeft;
 	}
-	else {
-		textDirection = TextDirection.LeftToRight;
-	}
-	updateEditorTextDirection();
+	updateEditorTextDirection(newTextDirection);
 	updateTextDirectionSelectUI();
 }
 
-function updateEditorTextDirection() {
+function updateEditorTextDirection(newTextDirection) {
+	var prevTextDirection = textDirection;
+	textDirection = newTextDirection;
+
 	console.log("TEXT BOX TEXT DIR " + textDirection);
-	document.getElementById("titleText").style.direction = textDirection;
-	document.getElementById("titleText").style["unicode-bidi"] = "bidi-override";
-	document.getElementById("dialogText").style.direction = textDirection;
-	document.getElementById("dialogText").style["unicode-bidi"] = "bidi-override";
-	document.getElementById("endingText").style.direction = textDirection;
-	document.getElementById("endingText").style["unicode-bidi"] = "bidi-override";
-	reloadAdvDialogUI();
+
+	if (prevTextDirection != null) {
+		document.body.classList.remove("dir_" + prevTextDirection.toLowerCase());
+	}
+	document.body.classList.add("dir_" + textDirection.toLowerCase());
 }
 
 function updateTextDirectionSelectUI() {

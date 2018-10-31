@@ -1,3 +1,4 @@
+/* language styles */
 .lang_ar {
 	direction: rtl;
 }
@@ -32,4 +33,15 @@
 }
 .lang_ar .navigate_next:after {
 	content: 'navigate_before';
+}
+
+/* text direction styles */
+.dir_ltr .gameTextDir {
+	direction: ltr;
+	unicode-bidi: bidi-override;
+}
+
+.dir_rtl .gameTextDir {
+	direction: rtl;
+	unicode-bidi: bidi-override;
 }
