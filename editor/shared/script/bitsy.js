@@ -22,8 +22,7 @@ var TextDirection = {
 	LeftToRight : "LTR",
 	RightToLeft : "RTL"
 };
-var textDirection = TextDirection.RightToLeft;
-// var textDirection = TextDirection.LeftToRight;
+var textDirection = TextDirection.LeftToRight;
 
 var names = {
 	room : new Map(),

@@ -45,3 +45,15 @@
 	direction: rtl;
 	unicode-bidi: bidi-override;
 }
+
+.dir_ltr .panel {
+	direction: ltr;
+}
+
+.dir_rtl .panel {
+	direction: rtl;
+}
+
+#editorWindow {
+	direction: ltr;
+}

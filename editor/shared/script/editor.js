@@ -1,7 +1,7 @@
 /*
 arabic update feedback:
 X use rtl to right align text in the editor
-- watch out for hard-coded punctuation
+X watch out for hard-coded punctuation (is this actually a problem now that the RTL is set right?)
 X mixed arabic + english is in the wrong order (example: version number should be on the left)
 X some of the button icons are in the wrong place
 X words should not be on the right of the buttons or dropdowns or icons
@@ -13,7 +13,7 @@ X default title text doesn't change correctly [works for me?]
 X button icons should be to the right of the text
 X rtl
 - check translation proofread notes
-- explain that rtl setting is for right to left languages in settings menu
+X explain that rtl setting is for right to left languages in settings menu
 other thoughts:
 - finalize font format changes
 X fix CSS formats that don't work with RTL
@@ -2420,10 +2420,10 @@ function savePanelPref(id,visible) {
 }
 
 function updatePanelPrefs() {
-	console.log("UPDATE PREFS");
+	// console.log("UPDATE PREFS");
 
 	var prefs = getPanelPrefs();
-	console.log(prefs);
+	// console.log(prefs);
 
 	var editorContent = document.getElementById("editorContent");
 	var cards = editorContent.getElementsByClassName("panel");
@@ -2442,9 +2442,9 @@ function updatePanelPrefs() {
 		}
 	}
 
-	console.log(prefs);
+	// console.log(prefs);
 	localStorage.panel_prefs = JSON.stringify( prefs );
-	console.log(localStorage.panel_prefs);
+	// console.log(localStorage.panel_prefs);
 }
 
 
@@ -3035,6 +3035,7 @@ function grabCard(e) {
 
 	// e.preventDefault();
 
+	console.log("--- GRAB START");
 	console.log(grabbedPanel.card);
 
 	if (grabbedPanel.card != null) return;
@@ -3045,6 +3046,9 @@ function grabCard(e) {
 	}
 
 	if(grabbedPanel.card == null) return; // couldn't find a panel above the handle - abort!
+
+	console.log(grabbedPanel.card);
+	console.log("--")
 
 	grabbedPanel.size = getElementSize( grabbedPanel.card );
 	var pos = getElementPosition( grabbedPanel.card );
@@ -3074,6 +3078,9 @@ function grabCard(e) {
 function panel_onMouseMove(e) {
 	if (grabbedPanel.card == null) return;
 
+	console.log("-- PANEL MOVE");
+	console.log(grabbedPanel.card);
+
 	grabbedPanel.card.style.left = e.clientX - grabbedPanel.cursorOffset.x + "px";
 	grabbedPanel.card.style.top = e.clientY - grabbedPanel.cursorOffset.y + "px";
 
@@ -3081,20 +3088,47 @@ function panel_onMouseMove(e) {
 	var cardSize = grabbedPanel.size;
 	var cardCenter = { x:cardPos.x+cardSize.x/2, y:cardPos.y+cardSize.y/2 };
 
+	console.log(cardCenter);
+
 	var editorContent = document.getElementById("editorContent");
+	var editorContentWidth = editorContent.getBoundingClientRect().width;
 	var otherCards = editorContent.getElementsByClassName("panel");
+
+	// var cardCollection = editorContent.getElementsByClassName("panel");
+	// var otherCards = [];
+	// for (var i = 0; i < cardCollection.length; i++) {
+	// 	otherCards.push(cardCollection[i]);
+	// }
+	// // console.log(otherCards);
+
+	// // hacky fix for arabic -- need better solution
+	// if (curEditorLanguageCode === "ar") {
+	// 	// otherCards.reverse();
+	// 	cardCenter.x = editorContentWidth - cardCenter.x;
+	// }
+
+	// console.log(cardCenter);
+	// console.log("---");
 
 	for(var j = 0; j < otherCards.length; j++) {
 		var other = otherCards[j];
+		// console.log(other);
 		var otherPos = getElementPosition( other );
 		var otherSize = getElementSize( other );
 		var otherCenter = { x:otherPos.x+otherSize.x/2, y:otherPos.y+otherSize.y/2 };
 
+		// console.log(otherCenter);
+
 		if ( cardCenter.x < otherCenter.x ) {
+			console.log("INSERT " + cardCenter.x + " " + otherCenter.x);
+			console.log(other);
+
 			editorContent.insertBefore( grabbedPanel.shadow, other );
 			break;
 		}
 	}
+
+	console.log("********")
 }
 document.addEventListener("mousemove",panel_onMouseMove);
 
@@ -3122,8 +3156,14 @@ document.addEventListener("mouseup",panel_onMouseUp);
 
 // TODO consolidate these into one function?
 function getElementPosition(e) { /* gets absolute position on page */
+	if (!e.getBoundingClientRect) {
+		console.log("NOOO BOUNDING RECT!!!");
+		return {x:0,y:0};
+	}
+
 	var rect = e.getBoundingClientRect();
 	var pos = {x:rect.left,y:rect.top};
+	// console.log(pos);
 	return pos;
 }
 
