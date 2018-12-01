@@ -2067,7 +2067,9 @@ function updateExitOptionsFromGameData() {
 	}
 
 	// then, add an option for each room
-	for (roomId in room) {
+	var roomIds = sortedRoomIdList();
+	for (var j = 0; j < roomIds.length; j++) {
+		var roomId = roomIds[j];
 		var option = document.createElement("option");
 		if(room[roomId].name != null)
 			option.text = room[roomId].name;
