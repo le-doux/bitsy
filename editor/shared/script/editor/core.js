@@ -447,8 +447,8 @@ function setDefaultGameState() {
 }
 
 function newGameDialog() {
-	if ( Ed().platform == PlatformType.Mobile ||
-			confirm("Starting a new game will erase your old data. Consider exporting your work first! Are you sure you want to start over?") )
+	var resetMessage = localization.GetStringOrFallback("reset_game_message", "Starting a new game will erase your old data. Consider exporting your work first! Are you sure you want to start over?");
+	if ( Ed().platform == PlatformType.Mobile || confirm(resetMessage) )
 	{
 		resetGameData();
 	}

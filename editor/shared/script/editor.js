@@ -1,31 +1,4 @@
 /*
-arabic update feedback:
-X use rtl to right align text in the editor
-X watch out for hard-coded punctuation (is this actually a problem now that the RTL is set right?)
-X mixed arabic + english is in the wrong order (example: version number should be on the left)
-X some of the button icons are in the wrong place
-X words should not be on the right of the buttons or dropdowns or icons
-X default title text doesn't change correctly [works for me?]
-- english text in some areas (pop up dialog, others?)
-- (ahmed put together some mockups)
-- english text in arabic font could be improved (no apostrophe)
-	- combine with default bitsy font?
-X button icons should be to the right of the text
-X rtl
-- check translation proofread notes
-X explain that rtl setting is for right to left languages in settings menu
-other thoughts:
-- finalize font format changes
-X fix CSS formats that don't work with RTL
-	X radio "tab" thingies
-- fix re-positioning panels with RTL
-X fix english things that should remain LTR
-	X version notes
-- add new localizable strings
-X previous & next drawing buttons are reversed weirdly
-X text area text direction could be set by css using dialogTextArea class
-
-
 PERF NOTES:
 - loading idea: use long animations to create the loading animation
 - handle parsing performance (especially LARGE fonts)
@@ -4334,6 +4307,7 @@ function updateInventoryVariableUI(){
 		addVarEl.appendChild( createIconElement("add") );
 		var addVarText = document.createElement("span");
 		addVarText.innerText = localization.GetStringOrFallback("variable_add", "add variable");
+		console.log("CREATE ADD BUTTON " + addVarText.innerText);
 		addVarEl.appendChild( addVarText );
 		addVarEl.addEventListener('click', function() {
 			viewport.removeChild(addVarEl);
@@ -4412,6 +4386,7 @@ function on_change_language(e) {
 
 	localization.ChangeLanguage(e.target.value);
 	pickDefaultFontForLanguage(e.target.value);
+	updateInventoryUI();
 
 	// update title in new language IF the user hasn't made any changes to the default title
 	if (localization.LocalizationContains("default_title", title)) {
@@ -4423,7 +4398,7 @@ function on_change_language(e) {
 }
 
 var curEditorLanguageCode = "en";
-function changeLnaguageStyle(newCode) {
+function changeLnaguageStyle(newCode) { // TODO : fix function name
 	document.body.classList.remove("lang_" + curEditorLanguageCode);
 	curEditorLanguageCode = newCode;
 	document.body.classList.add("lang_" + curEditorLanguageCode);

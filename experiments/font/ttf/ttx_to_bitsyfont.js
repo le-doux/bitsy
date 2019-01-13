@@ -58,7 +58,7 @@ function cross(p0, p1) {
 
 
 // xml parsing
-fs.readFile("arabic.ttx", "utf8", function(err, data) {
+fs.readFile("bitsy-with-arabic.ttx", "utf8", function(err, data) {
 	// console.log(data);
 	// console.log(xml2js);
 	xml2js.parseString(data, function(err, result) {
@@ -84,7 +84,7 @@ fs.readFile("arabic.ttx", "utf8", function(err, data) {
 		function pixelToPoint(x,y) {
 			return {
 				x : ((x / width) * xMax) + (unitsPerPixel * 0.5),
-				y : ((1 - (y / height)) * yMax) + (unitsPerPixel * 0.5)
+				y : ((1 - ((y+2) / height)) * yMax) + (unitsPerPixel * 0.5)
 			};
 		}
 
@@ -124,6 +124,16 @@ fs.readFile("arabic.ttx", "utf8", function(err, data) {
 			if (isNaN(glyphWidth)) {
 				// console.log("IS NAN " + name);
 				glyphWidth = spacingWidth; // HACK!!!
+			}
+
+
+			if (name === "A") {
+				console.log("--A--");
+				console.log(xMax);
+				console.log(yMax);
+				console.log("-");
+				console.log(glyph["$"].xMax);
+				console.log(glyph["$"].yMax);
 			}
 			
 			// if (glyphWidth != glyphWidth2) {
@@ -184,6 +194,10 @@ fs.readFile("arabic.ttx", "utf8", function(err, data) {
 				// for (var x = 0; x < width; x++) {
 				for (var x = glyphXMin; x < glyphXMax; x++) {
 					var pixelPoint = pixelToPoint(x,y);
+					if (name === "A") {
+						console.log(x + " " + y);
+						console.log(pixelPoint); 
+					}
 					var isPixelFilled = false;
 					for (var p = 0; p < pathList.length; p++) {
 						var path = pathList[p];
@@ -199,6 +213,6 @@ fs.readFile("arabic.ttx", "utf8", function(err, data) {
 			}
 		}
 
-		fs.writeFile("arabic.txt", bitsyFontData);
+		fs.writeFile("bitsy-with-arabic.txt", bitsyFontData);
 	});
 });
