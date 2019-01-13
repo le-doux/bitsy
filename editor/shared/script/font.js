@@ -177,7 +177,11 @@ function Font(fontData) {
 				}
 				else if (args[0] == "CHAR") {
 					isReadingChar = true;
-					isReadingCharProperties = true;
+
+					if (editorDevFlags != null && editorDevFlags.arabicFeatures) {
+						isReadingCharProperties = true;
+					}
+
 					curCharLineCount = 0;
 					curCharCode = parseInt(args[1]);
 					chardata[curCharCode] = { 

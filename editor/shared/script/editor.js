@@ -1,4 +1,11 @@
 /*
+other todos:
+X fix tutorial link
+- alt text localization??
+
+arabic update TODO:
+- finalize font format changes
+
 PERF NOTES:
 - loading idea: use long animations to create the loading animation
 - handle parsing performance (especially LARGE fonts)
@@ -495,6 +502,10 @@ function readUrlFlags() {
 	}
 	console.log(urlFlags);
 }
+
+var editorDevFlags = {
+	arabicFeatures : false
+};
 
 function start() {
 	// Ed().platform = PlatformType.Mobile;
@@ -4504,10 +4515,12 @@ function updateEditorTextDirection(newTextDirection) {
 }
 
 function updateTextDirectionSelectUI() {
-	var textDirSelect = document.getElementById("textDirectionSelect");
-	for (var i in textDirSelect.options) {
-		var option = textDirSelect.options[i];
-		option.selected = (option.value === textDirection);
+	if (editorDevFlags.arabicFeatures) {
+		var textDirSelect = document.getElementById("textDirectionSelect");
+		for (var i in textDirSelect.options) {
+			var option = textDirSelect.options[i];
+			option.selected = (option.value === textDirection);
+		}
 	}
 }
 
