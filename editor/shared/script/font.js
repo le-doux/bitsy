@@ -178,7 +178,7 @@ function Font(fontData) {
 				else if (args[0] == "CHAR") {
 					isReadingChar = true;
 
-					if (editorDevFlags != null && editorDevFlags.arabicFeatures) {
+					if (editorDevFlags != undefined && editorDevFlags != null && editorDevFlags.arabicFeatures) {
 						isReadingCharProperties = true;
 					}
 

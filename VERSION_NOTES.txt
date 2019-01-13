@@ -1,3 +1,15 @@
+5.4:
+- editor translated into Esperanto, Estonian, Hungarian, Icelandic, Russian
+***** huge thanks to the translators *****
+Ariel J Moody (Esperanto)
+Raul (Estonian)
+Ádám Török (Hungarian)
+Game Makers Iceland (Icelandic)
+Vinvirinvi & Onion (Russian)
+******************************************
+- link to updated Bitsy tutorial by Claire Morley
+- added link to "games made with Bitsy" on itch.io
+
 5.3:
 - performance improvements:
 -- speed up game loading time with new renderer

@@ -503,10 +503,6 @@ function readUrlFlags() {
 	console.log(urlFlags);
 }
 
-var editorDevFlags = {
-	arabicFeatures : false
-};
-
 function start() {
 	// Ed().platform = PlatformType.Mobile;
 

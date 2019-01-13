@@ -60,7 +60,7 @@ var spriteStartLocations = {};
 /* VERSION */
 var version = {
 	major: 5, // for file format / engine changes
-	minor: 3 // for editor changes and bugfixes
+	minor: 4 // for editor changes and bugfixes
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
@@ -74,6 +74,11 @@ function resetFlags() {
 	};
 }
 resetFlags(); //init flags on load script
+
+// SUPER hacky location... :/
+var editorDevFlags = {
+	arabicFeatures : false
+};
 
 function clearGameData() {
 	title = "";
