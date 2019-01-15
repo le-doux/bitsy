@@ -208,6 +208,10 @@ input {
 	overflow:auto;
 }
 
+.panelBarClose {
+	float: right;
+}
+
 #gifDownload .material-icons {
 	line-height: 100%;
 	vertical-align: middle;

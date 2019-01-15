@@ -8,7 +8,12 @@ other todos:
 arabic update TODO:
 - finalize font format changes
 - fix layout & numbering of dialogue tool
-- stop button text needs to be translateable
+	- Xs on the left
+		X tool panels
+		- dialog nodes
+		- dialog options
+	- arabic numerals
+X stop button text needs to be translateable
 - filter text needs to be translateable?
 
 PERF NOTES:

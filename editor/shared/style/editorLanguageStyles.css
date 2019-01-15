@@ -35,6 +35,10 @@
 	content: 'navigate_before';
 }
 
+.lang_ar .panelBarClose { /* should this be in arabic or ltr style? */
+	float: left;
+}
+
 /* text direction styles */
 .dir_ltr .gameTextDir {
 	direction: ltr;
