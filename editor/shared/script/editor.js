@@ -1,23 +1,20 @@
 /*
 other todos:
-X fix tutorial link
 - alt text localization??
+- chinese
+- debug MP bug
+- credits panel
 
 arabic update TODO:
 - finalize font format changes
+- fix layout & numbering of dialogue tool
+- stop button text needs to be translateable
+- filter text needs to be translateable?
 
 PERF NOTES:
 - loading idea: use long animations to create the loading animation
 - handle parsing performance (especially LARGE fonts)
 - load hidden thumbnails over time
-
-reach out:
-X icelandic
-X estonian
-X arabic
-X esperanto
-X russian
-X hungarian
 
 X bug where big fonts slow down re-writing the game data (toggle to show the font data?)
 	- cause: writing a ton of data into the game data text box
@@ -4418,6 +4415,9 @@ function pickDefaultFontForLanguage(lang) {
 	}
 	else if (lang === "ar") {
 		switchFont("arabic_pixel", true /*doPickTextDirection*/);
+	}
+	else if (lang === "zh") {
+		switchFont("unicode_asian", true /*doPickTextDirection*/);
 	}
 	else {
 		switchFont("unicode_european_small", true /*doPickTextDirection*/);
