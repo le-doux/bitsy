@@ -238,7 +238,6 @@ var DialogBuffer = function() {
 			// console.log(charCount);
 
 			var leftPos = 0;
-			console.log(textDirection);
 			if (textDirection === TextDirection.RightToLeft) {
 				leftPos = 24 * 8; // hack -- I think this is correct?
 			}

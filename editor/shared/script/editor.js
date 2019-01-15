@@ -1446,13 +1446,19 @@ function on_play_mode() {
 function updatePlayModeButton() {
 	document.getElementById("playModeCheck").checked = isPlayMode;
 	document.getElementById("playModeIcon").innerHTML = isPlayMode ? "stop" : "play_arrow";
-	document.getElementById("playModeText").innerHTML = isPlayMode ? "stop" : "play";
+
+	var stopText = localization.GetStringOrFallback("stop_game", "stop");
+	var playText = localization.GetStringOrFallback("play_game", "play");
+	document.getElementById("playModeText").innerHTML = isPlayMode ? stopText : playText;
 }
 
 function updatePreviewDialogButton() {
 	document.getElementById("previewDialogCheck").checked = isPreviewDialogMode;
 	document.getElementById("previewDialogIcon").innerHTML = isPreviewDialogMode ? "stop" : "play_arrow";
-	document.getElementById("previewDialogText").innerHTML = isPreviewDialogMode ? "stop" : "preview";
+
+	var stopText = localization.GetStringOrFallback("stop_game", "stop");
+	var previewText = localization.GetStringOrFallback("dialog_start_preview", "preview");
+	document.getElementById("previewDialogText").innerHTML = isPreviewDialogMode ? stopText : previewText;
 }
 
 function togglePaintGrid(e) {
