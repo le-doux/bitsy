@@ -118,3 +118,24 @@ input[type=radio] + label.right {
 	/*border-radius: 4px;*/
 	/*font-size: 16px;*/
 }
+
+.filePickerLabel {
+	font-family: "Nunito", Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	padding: 3px;
+	padding-bottom: 4px; /* hack to line up with checkboxes */
+	margin: 0px;
+	margin-right: 2px;
+	margin-bottom: 2px;
+	margin-left: none;
+	/*margin-top: 2px;*/
+	border: none;
+	vertical-align: middle;
+	/*line-height: 100%;*/
+	border-radius: 2px;
+}
+.filePickerLabel .material-icons {
+	font-size: 18px;
+	vertical-align: middle;
+	line-height: 100%;
+}

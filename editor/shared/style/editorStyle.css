@@ -465,6 +465,14 @@ input {
 	height: 30px;
 }
 
+.advDialogBlockName {
+	float: left;
+}
+
+.advDialogBlockDelete {
+	float: right;
+}
+
 .advDialogIcon {
 	line-height: 150%;
 	vertical-align: middle;

@@ -152,3 +152,15 @@ button:disabled {
 	background: #6767b2;
 	color: white;
 }
+
+.filePickerLabel {
+	background: #e8e8ff;
+	color: #6767b2;
+}
+.controlBox .filePickerLabel {
+	background: #ccccff;
+}
+.filePickerLabel:active {
+	background: #6767b2;
+	color:white;
+}

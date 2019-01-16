@@ -1030,7 +1030,11 @@
 					<div class="notMobile">
 						<span class="localize import_html">import game from html file:</span>
 						<br>
-						<input title="import game from html file on your computer" type="file" onchange="importGameFromFile(event);"/>
+						<label for="importGamePicker" class="filePickerLabel" title="import game from html file on your computer">
+							<i class="material-icons">file_upload</i>
+							<span class="localize upload_game">upload game</span>
+						</label>
+						<input type="file" id="importGamePicker" style="visibility:hidden;" onchange="importGameFromFile(event);"/>
 					</div>
 
 					<!-- TODO LOCALIZE - word wrap -->
@@ -1204,7 +1208,11 @@
 							<div id="custom_description" style="font-size: 14px;">
 								<span class="localize font_custom_description">Upload your own custom font in the ".bitsyfont" format!</span>
 								<br/>
-								<input title="import font from bitsyfont file on your computer" type="file" onchange="importFontFromFile(event);"/>
+								<label for="importFontPicker" class="filePickerLabel" title="import font from bitsyfont file on your computer">
+									<i class="material-icons">file_upload</i>
+									<span class="localize upload_font">upload font</span>
+								</label>
+								<input title="import font from bitsyfont file on your computer" type="file" id="importFontPicker" style="visibility:hidden;" onchange="importFontFromFile(event);"/>
 							</div>
 							<div>
 								<span class="localize text_direction_label">text direction</span>:

@@ -35,7 +35,15 @@
 	content: 'navigate_before';
 }
 
-.lang_ar .panelBarClose { /* should this be in arabic or ltr style? */
+.lang_ar .panelBarClose {
+	float: left;
+}
+
+.lang_ar .advDialogBlockName {
+	float: right;
+}
+
+.lang_ar .advDialogBlockDelete {
 	float: left;
 }
 

@@ -10,11 +10,16 @@ arabic update TODO:
 - fix layout & numbering of dialogue tool
 	- Xs on the left
 		X tool panels
-		- dialog nodes
-		- dialog options
+		X dialog nodes
+		X dialog options
 	- arabic numerals
 X stop button text needs to be translateable
-- filter text needs to be translateable?
+
+chinese update TODO:
+- placeholder title bug (works for me??)
+- add variable bug (also works for me??)
+X mark for translate "filter drawings"
+X mark for translate file picker
 
 PERF NOTES:
 - loading idea: use long animations to create the loading animation
@@ -3288,7 +3293,7 @@ var DialogBlockUI = function(nodes, num) {
 	div.appendChild(topDiv);
 
 	var leftSpan = document.createElement('span');
-	leftSpan.style.float = "left";
+	leftSpan.classList.add('advDialogBlockName');
 	topDiv.appendChild(leftSpan);
 
 	var topIcon = createIconElement("subject");
@@ -3307,8 +3312,8 @@ var DialogBlockUI = function(nodes, num) {
 	//
 	var deleteEl = document.createElement("button");
 	deleteEl.appendChild( createIconElement("clear") );
-	deleteEl.style.float = "right";
 	deleteEl.classList.add('light');
+	deleteEl.classList.add('advDialogBlockDelete');
 	var self = this; // hack
 	deleteEl.addEventListener('click', function() {
 		var i = advDialogUIComponents.indexOf(self);
@@ -3389,7 +3394,7 @@ var IfBlockUI = function(node, num) {
 	div.appendChild(topDiv);
 
 	var leftSpan = document.createElement('span');
-	leftSpan.style.float = "left";
+	leftSpan.classList.add('advDialogBlockName');
 	topDiv.appendChild(leftSpan);
 
 	var topIcon = createIconElement("call_split");
@@ -3410,8 +3415,8 @@ var IfBlockUI = function(node, num) {
 	//
 	var deleteEl = document.createElement("button");
 	deleteEl.appendChild( createIconElement("clear") );
-	deleteEl.style.float = "right";
 	deleteEl.classList.add('light');
+	deleteEl.classList.add('advDialogBlockDelete');
 	var self = this; // hack
 	deleteEl.addEventListener('click', function() {
 		var i = advDialogUIComponents.indexOf(self);
@@ -3766,7 +3771,7 @@ var SeqBlockUI = function(node, num) {
 	div.appendChild(topDiv);
 
 	var leftSpan = document.createElement('span');
-	leftSpan.style.float = "left";
+	leftSpan.classList.add('advDialogBlockName');
 	topDiv.appendChild(leftSpan);
 
 	var topIcon = createIconElement("list");
@@ -3785,8 +3790,8 @@ var SeqBlockUI = function(node, num) {
 	//
 	var deleteEl = document.createElement("button");
 	deleteEl.appendChild( createIconElement("clear") );
-	deleteEl.style.float = "right";
 	deleteEl.classList.add('light');
+	deleteEl.classList.add('advDialogBlockDelete');
 	var self = this; // hack
 	deleteEl.addEventListener('click', function() {
 		var i = advDialogUIComponents.indexOf(self);
@@ -4397,11 +4402,16 @@ function chooseExportSizeFixed() {
 // LOCALIZATION
 var localization;
 function on_change_language(e) {
-	changeLnaguageStyle(e.target.value);
+	on_change_language_inner(e.target.value);
+}
 
-	localization.ChangeLanguage(e.target.value);
-	pickDefaultFontForLanguage(e.target.value);
+function on_change_language_inner(language) {
+	changeLnaguageStyle(language);
+
+	localization.ChangeLanguage(language);
+	pickDefaultFontForLanguage(language);
 	updateInventoryUI();
+	hackyUpdatePlaceholderText();
 
 	// update title in new language IF the user hasn't made any changes to the default title
 	if (localization.LocalizationContains("default_title", title)) {
@@ -4409,7 +4419,16 @@ function on_change_language(e) {
 		title = localization.GetStringOrFallback("default_title", "Write your game's title here");
 		document.getElementById("titleText").value = title;
 	}
+
 	refreshGameData();
+}
+
+// TODO : create a system for placeholder text like I have for innerText
+function hackyUpdatePlaceholderText() {
+	var titlePlaceholder = localization.GetStringOrFallback("title_placeholder", "Title");
+	document.getElementById("titleText").placeholder = titlePlaceholder;
+	var filterPlaceholder = localization.GetStringOrFallback("filter_placeholder", "filter drawings");
+	document.getElementById("paintExplorerFilterInput").placeholder = filterPlaceholder;
 }
 
 var curEditorLanguageCode = "en";
@@ -4491,7 +4510,8 @@ function initLanguageOptions() {
 		languageSelect.add(option);
 	}
 
-	changeLnaguageStyle( localization.GetLanguage() );
+	// is this doing duplicate work??
+	on_change_language_inner( localization.GetLanguage() );
 }
 
 function on_change_text_direction(e) {
