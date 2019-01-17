@@ -7,17 +7,17 @@ other todos:
 
 arabic update TODO:
 - finalize font format changes
-- fix layout & numbering of dialogue tool
+X fix layout & numbering of dialogue tool
 	- Xs on the left
 		X tool panels
 		X dialog nodes
 		X dialog options
-	- arabic numerals
+	X arabic numerals
 X stop button text needs to be translateable
 
 chinese update TODO:
-- placeholder title bug (works for me??)
-- add variable bug (also works for me??)
+X placeholder title bug
+X add variable bug
 X mark for translate "filter drawings"
 X mark for translate file picker
 
@@ -3272,6 +3272,19 @@ function wrapTextSelection(effect) {
 	}
 }
 
+function ConvertNumberStringToArabic(numberString) {
+	var arabicNumerals = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+
+	var arabicNumberString = "";
+
+	for (var i = 0; i < numberString.length; i++)
+	{
+		arabicNumberString += arabicNumerals[parseInt(numberString[i])];
+	}
+
+	return arabicNumberString;
+}
+
 var DialogBlockUI = function(nodes, num) {
 	var dialogNode = scriptUtils.CreateDialogBlock( nodes );
 
@@ -3301,7 +3314,11 @@ var DialogBlockUI = function(nodes, num) {
 	leftSpan.appendChild( topIcon );
 
 	var numSpan = document.createElement("span");
-	numSpan.innerText = num + ". ";
+	var numString = "" + num;
+	if (localization.GetLanguage() === "ar") { // arabic
+		numString = ConvertNumberStringToArabic(numString);
+	}
+	numSpan.innerText = numString + ". ";
 	leftSpan.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
@@ -3404,7 +3421,11 @@ var IfBlockUI = function(node, num) {
 	// div.appendChild( createIconElement("help_outline") );
 
 	var numSpan = document.createElement("span");
-	numSpan.innerText = num + ". ";
+	var numString = "" + num;
+	if (localization.GetLanguage() === "ar") { // arabic
+		numString = ConvertNumberStringToArabic(numString);
+	}
+	numSpan.innerText = numString + ". ";
 	leftSpan.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
@@ -3779,7 +3800,11 @@ var SeqBlockUI = function(node, num) {
 	leftSpan.appendChild( topIcon );
 
 	var numSpan = document.createElement("span");
-	numSpan.innerText = num + ". ";
+	var numString = "" + num;
+	if (localization.GetLanguage() === "ar") { // arabic
+		numString = ConvertNumberStringToArabic(numString);
+	}
+	numSpan.innerText = numString + ". ";
 	leftSpan.appendChild( numSpan );
 
 	var typeEl = document.createElement("span");
@@ -4411,6 +4436,7 @@ function on_change_language_inner(language) {
 	localization.ChangeLanguage(language);
 	pickDefaultFontForLanguage(language);
 	updateInventoryUI();
+	reloadDialogUI();
 	hackyUpdatePlaceholderText();
 
 	// update title in new language IF the user hasn't made any changes to the default title
