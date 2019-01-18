@@ -69,3 +69,12 @@
 #editorWindow {
 	direction: ltr;
 }
+
+/* LTR overrides */
+#game_data {
+	direction: ltr;
+}
+
+#dialogCodeText {
+	direction: ltr;
+}

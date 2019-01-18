@@ -7,19 +7,10 @@ other todos:
 
 arabic update TODO:
 - finalize font format changes
-X fix layout & numbering of dialogue tool
-	- Xs on the left
-		X tool panels
-		X dialog nodes
-		X dialog options
-	X arabic numerals
-X stop button text needs to be translateable
-
-chinese update TODO:
-X placeholder title bug
-X add variable bug
-X mark for translate "filter drawings"
-X mark for translate file picker
+X @ handle in twitter should stay on the left
+X flip back the text in game data / code (*** MOST IMPORTANT ***)
+- room, palette, etc name placeholder text needs to be translated
+- translate for "I'm a cat" and other default dialog
 
 PERF NOTES:
 - loading idea: use long animations to create the loading animation
@@ -4431,6 +4422,9 @@ function on_change_language(e) {
 }
 
 function on_change_language_inner(language) {
+	var curLangDefaultSpriteDlg = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
+	var curLangDefaultItemDlg = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
+
 	changeLnaguageStyle(language);
 
 	localization.ChangeLanguage(language);
@@ -4445,6 +4439,16 @@ function on_change_language_inner(language) {
 		title = localization.GetStringOrFallback("default_title", "Write your game's title here");
 		document.getElementById("titleText").value = title;
 	}
+
+	// update default sprite
+	var defaultSpriteDlgExists = dialog["SPR_0"] != null && dialog["SPR_0"] === curLangDefaultSpriteDlg;
+	if (defaultSpriteDlgExists) {
+		dialog["SPR_0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
+		// TODO -- make this work on NEW game as well as SWTICH FROM NEW GAME
+	}
+
+	// update default item
+	// TODO
 
 	refreshGameData();
 }
