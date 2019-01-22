@@ -9,7 +9,7 @@ arabic update TODO:
 - finalize font format changes
 X @ handle in twitter should stay on the left
 X flip back the text in game data / code (*** MOST IMPORTANT ***)
-- room, palette, etc name placeholder text needs to be translated
+X room, palette, etc name placeholder text needs to be translated
 X translate for "I'm a cat" and other default dialog
 
 PERF NOTES:
@@ -719,7 +719,8 @@ function prevTile() {
 
 function updateRoomName() {
 	// document.getElementById("roomId").innerHTML = curRoom;
-	document.getElementById("roomName").placeholder = "room " + curRoom;
+	var roomLabel = localization.GetStringOrFallback("room_label", "room");
+	document.getElementById("roomName").placeholder = roomLabel + " " + curRoom;
 	if(room[curRoom].name != null)
 		document.getElementById("roomName").value = room[curRoom].name;
 	else
@@ -902,7 +903,8 @@ function duplicateRoom() {
 	// add new exit destination option to exits panel
 	var select = document.getElementById("exitDestinationSelect");
 	var option = document.createElement("option");
-	option.text = "room " + newRoomId;
+	var roomLabel = localization.GetStringOrFallback("room_label", "room");
+	option.text = roomLabel + " " + newRoomId;
 	option.value = newRoomId;
 	select.add(option);
 }
@@ -964,7 +966,8 @@ function newRoom() {
 	// add new exit destination option to exits panel
 	var select = document.getElementById("exitDestinationSelect");
 	var option = document.createElement("option");
-	option.text = "room " + roomId;
+	var roomLabel = localization.GetStringOrFallback("room_label", "room");
+	option.text = roomLabel + " " + roomId;
 	option.value = roomId;
 	select.add(option);
 }
@@ -1501,7 +1504,8 @@ function updatePaletteUI() {
 	// 	document.getElementById("paletteNav").style.display = "none";
 	// }
 
-	document.getElementById("paletteName").placeholder = "palette " + selectedColorPal();
+	var palettePlaceholderName = localization.GetStringOrFallback("palette_label", "palette");
+	document.getElementById("paletteName").placeholder = palettePlaceholderName + " " + selectedColorPal();
 	var name = palette[ selectedColorPal() ].name;
 	if( name )
 		document.getElementById("paletteName").value = name;
@@ -1554,9 +1558,10 @@ function updatePaletteOptionsFromGameData() {
 	}
 
 	// then, add an option for each room
+	var paletteLabel = localization.GetStringOrFallback("palette_label", "palette");
 	for (palId in palette) {
 		var option = document.createElement("option");
-		option.text = palette[palId].name ? palette[palId].name : "palette " + palId;
+		option.text = palette[palId].name ? palette[palId].name : paletteLabel + " " + palId;
 		option.value = palId;
 		option.selected = ( palId === room[ curRoom ].pal );
 		select.add(option);
@@ -2050,12 +2055,13 @@ function updateExitOptionsFromGameData() {
 	}
 
 	// then, add an option for each room
+	var roomLabel = localization.GetStringOrFallback("room_label", "room");
 	for (roomId in room) {
 		var option = document.createElement("option");
 		if(room[roomId].name != null)
 			option.text = room[roomId].name;
 		else
-			option.text = "room " + roomId;
+			option.text = roomLabel + " " + roomId;
 		option.value = roomId;
 		select.add(option);
 	}
@@ -4186,8 +4192,9 @@ function updateInventoryItemUI(){
 	}
 
 	// console.log("UPDATE!!!!");
+	var itemLabel = localization.GetStringOrFallback("item_label", "item");
 	for(id in item) {
-		var itemName = item[id].name != null ? item[id].name : "item " + id;
+		var itemName = item[id].name != null ? item[id].name : itemLabel + " " + id;
 		// console.log( id );
 		// console.log( player() );
 		// console.log( player().inventory );
