@@ -459,6 +459,8 @@ function resetGameData() {
 
 	// TODO : localize default_title
 	title = localization.GetStringOrFallback("default_title", "Write your game's title here");
+	dialog["SPR_0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"); // hacky to do this in two places :(
+	dialog["ITM_0"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
 
 	pickDefaultFontForLanguage(localization.GetLanguage());
 

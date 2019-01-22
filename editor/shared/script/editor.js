@@ -10,7 +10,7 @@ arabic update TODO:
 X @ handle in twitter should stay on the left
 X flip back the text in game data / code (*** MOST IMPORTANT ***)
 - room, palette, etc name placeholder text needs to be translated
-- translate for "I'm a cat" and other default dialog
+X translate for "I'm a cat" and other default dialog
 
 PERF NOTES:
 - loading idea: use long animations to create the loading animation
@@ -4422,10 +4422,7 @@ function on_change_language(e) {
 }
 
 function on_change_language_inner(language) {
-	var curLangDefaultSpriteDlg = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
-	var curLangDefaultItemDlg = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
-
-	changeLnaguageStyle(language);
+	changeLnaguageStyle(language); // TODO : misspelled funciton name
 
 	localization.ChangeLanguage(language);
 	pickDefaultFontForLanguage(language);
@@ -4441,14 +4438,18 @@ function on_change_language_inner(language) {
 	}
 
 	// update default sprite
-	var defaultSpriteDlgExists = dialog["SPR_0"] != null && dialog["SPR_0"] === curLangDefaultSpriteDlg;
+	var defaultSpriteDlgExists = dialog["SPR_0"] != null && localization.LocalizationContains("default_sprite_dlg", dialog["SPR_0"]);
 	if (defaultSpriteDlgExists) {
 		dialog["SPR_0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
-		// TODO -- make this work on NEW game as well as SWTICH FROM NEW GAME
+		paintTool.reloadDrawing();
 	}
 
 	// update default item
-	// TODO
+	var defaultItemDlgExists = dialog["ITM_0"] != null && localization.LocalizationContains("default_item_dlg", dialog["ITM_0"]);
+	if (defaultItemDlgExists) {
+		dialog["ITM_0"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
+		paintTool.reloadDrawing(); // hacky to do this twice
+	}
 
 	refreshGameData();
 }
