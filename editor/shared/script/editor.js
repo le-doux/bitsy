@@ -738,7 +738,7 @@ function on_room_name_change() {
 	updateNamesFromCurData()
 
 	refreshGameData();
-	updateExitOptionsFromGameData();
+	// updateExitOptionsFromGameData();
 }
 
 function on_drawing_name_change() {
@@ -1000,7 +1000,7 @@ function deleteRoom() {
 		roomTool.drawEditMap();
 		paintTool.updateCanvas();
 		updateRoomPaletteSelect();
-		updateExitOptionsFromGameData();
+		// updateExitOptionsFromGameData();
 		//recreate exit options
 	}
 }
@@ -2002,7 +2002,7 @@ function on_game_data_change_core() {
 
 	updateFontSelectUI();
 
-	updateExitOptionsFromGameData();
+	// updateExitOptionsFromGameData();
 
 	document.getElementById("titleText").value = title;
 }
@@ -2044,29 +2044,29 @@ function updateFontDescriptionUI() {
 }
 
 function updateExitOptionsFromGameData() {
-	console.log("UPDATE EXIT OPTIONS");
+	// console.log("UPDATE EXIT OPTIONS");
 
-	var select = document.getElementById("exitDestinationSelect");
+	// var select = document.getElementById("exitDestinationSelect");
 
-	// first, remove all current options
-	var i;
-	for(i = select.options.length - 1 ; i >= 0 ; i--) {
-		select.remove(i);
-	}
+	// // first, remove all current options
+	// var i;
+	// for(i = select.options.length - 1 ; i >= 0 ; i--) {
+	// 	select.remove(i);
+	// }
 
-	// then, add an option for each room
-	var roomLabel = localization.GetStringOrFallback("room_label", "room");
-	for (roomId in room) {
-		var option = document.createElement("option");
-		if(room[roomId].name != null)
-			option.text = room[roomId].name;
-		else
-			option.text = roomLabel + " " + roomId;
-		option.value = roomId;
-		select.add(option);
-	}
+	// // then, add an option for each room
+	// var roomLabel = localization.GetStringOrFallback("room_label", "room");
+	// for (roomId in room) {
+	// 	var option = document.createElement("option");
+	// 	if(room[roomId].name != null)
+	// 		option.text = room[roomId].name;
+	// 	else
+	// 		option.text = roomLabel + " " + roomId;
+	// 	option.value = roomId;
+	// 	select.add(option);
+	// }
 
-	updateRoomChoiceForSelectedExit();
+	// updateRoomChoiceForSelectedExit();
 }
 
 function on_toggle_wall(e) {
