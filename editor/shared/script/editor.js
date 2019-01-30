@@ -542,13 +542,13 @@ function start() {
 	paintTool.onReloadSprite = function(){ reloadSprite() };
 	paintTool.onReloadItem = function(){ reloadItem() };
 
-	//exit destination canvas & context
-	exit_canvas = document.getElementById("exitCanvas");
-	exit_canvas.width = width * scale;
-	exit_canvas.height = width * scale;
-	exit_ctx = exit_canvas.getContext("2d");
-	//exit events
-	exit_canvas.addEventListener("mousedown", exit_onMouseDown);
+	// //exit destination canvas & context
+	// exit_canvas = document.getElementById("exitCanvas");
+	// exit_canvas.width = width * scale;
+	// exit_canvas.height = width * scale;
+	// exit_ctx = exit_canvas.getContext("2d");
+	// //exit events
+	// exit_canvas.addEventListener("mousedown", exit_onMouseDown);
 
 	//
 	drawingThumbnailCanvas = document.createElement("canvas");
@@ -2134,13 +2134,13 @@ function toggleVersionNotes(e) {
 /* EXITS */
 var isAddingExit = false;
 var selectedExit = null;
-var exit_canvas;
-var exit_ctx;
+// var exit_canvas;
+// var exit_ctx;
 var selectedExitRoom = "0";
 
 function resetExitVars() {
 	isAddingExit = false;
-	setSelectedExit(null);
+	// setSelectedExit(null);
 }
 
 function showExits() {
@@ -2161,7 +2161,7 @@ function hideExits() {
 
 function addExit() { //todo rename something less vague
 	isAddingExit = true;
-	setSelectedExit(null);
+	// setSelectedExit(null);
 	setSelectedEnding(null);
 	document.getElementById("addExitButton").style.display = "none";
 	document.getElementById("addingExitHelpText").style.display = "block";
@@ -2182,48 +2182,48 @@ function addExitToCurRoom(x,y) {
 	}
 	room[curRoom].exits.push( newExit );
 	refreshGameData();
-	setSelectedExit(newExit);
+	// setSelectedExit(newExit);
 }
 
 function updateRoomChoiceForSelectedExit() {
-	var destOptions = document.getElementById("exitDestinationSelect").options;
-	for (i in destOptions) {
-		var o = destOptions[i];
-		if (o.value === selectedExitRoom) {
-			o.selected = true;
-		}
-	}
+	// var destOptions = document.getElementById("exitDestinationSelect").options;
+	// for (i in destOptions) {
+	// 	var o = destOptions[i];
+	// 	if (o.value === selectedExitRoom) {
+	// 		o.selected = true;
+	// 	}
+	// }
 }
 
 function setSelectedExit(e) {
-	// var didChange = selectedExit != e;
-	var didChange = (e != null) || (e == null && selectedExit != null);
+	// // var didChange = selectedExit != e;
+	// var didChange = (e != null) || (e == null && selectedExit != null);
 
-	selectedExit = e;
+	// selectedExit = e;
 
-	if (selectedExit == null) {
-		document.getElementById("noExitSelected").style.display = "block";
-		document.getElementById("exitSelected").style.display = "none";
-	}
-	else {
-		document.getElementById("noExitSelected").style.display = "none";
-		document.getElementById("exitSelected").style.display = "block";
+	// if (selectedExit == null) {
+	// 	document.getElementById("noExitSelected").style.display = "block";
+	// 	document.getElementById("exitSelected").style.display = "none";
+	// }
+	// else {
+	// 	document.getElementById("noExitSelected").style.display = "none";
+	// 	document.getElementById("exitSelected").style.display = "block";
 
-		selectedExitRoom = selectedExit.dest.room;
-		updateRoomChoiceForSelectedExit();
+	// 	selectedExitRoom = selectedExit.dest.room;
+	// 	updateRoomChoiceForSelectedExit();
 
-		drawExitDestinationRoom();
-	}
+	// 	drawExitDestinationRoom();
+	// }
 
-	roomTool.drawEditMap();
+	// roomTool.drawEditMap();
 
-	return didChange;
+	// return didChange;
 }
 
 function deleteSelectedExit() {
 	room[curRoom].exits.splice( room[curRoom].exits.indexOf( selectedExit ), 1 );
 	refreshGameData();
-	setSelectedExit(null);
+	// setSelectedExit(null);
 }
 
 function exitDestinationRoomChange(event) {
@@ -2234,59 +2234,59 @@ function exitDestinationRoomChange(event) {
 }
 
 function drawExitDestinationRoom() {
-	//clear screen
-	console.log("SELECTED EXIT ROOM " + selectedExitRoom);
-	var roomPal = getRoomPal(selectedExitRoom);
-	exit_ctx.fillStyle = "rgb("+getPal(roomPal)[0][0]+","+getPal(roomPal)[0][1]+","+getPal(roomPal)[0][2]+")";
-	exit_ctx.fillRect(0,0,canvas.width,canvas.height);
+	// //clear screen
+	// console.log("SELECTED EXIT ROOM " + selectedExitRoom);
+	// var roomPal = getRoomPal(selectedExitRoom);
+	// exit_ctx.fillStyle = "rgb("+getPal(roomPal)[0][0]+","+getPal(roomPal)[0][1]+","+getPal(roomPal)[0][2]+")";
+	// exit_ctx.fillRect(0,0,canvas.width,canvas.height);
 
-	//draw map
-	drawRoom( room[selectedExitRoom], exit_ctx );
+	// //draw map
+	// drawRoom( room[selectedExitRoom], exit_ctx );
 
-	//draw grid
-	exit_ctx.fillStyle = getContrastingColor( roomPal );
-	for (var x = 1; x < mapsize; x++) {
-		exit_ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
-	}
-	for (var y = 1; y < mapsize; y++) {
-		exit_ctx.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
-	}
+	// //draw grid
+	// exit_ctx.fillStyle = getContrastingColor( roomPal );
+	// for (var x = 1; x < mapsize; x++) {
+	// 	exit_ctx.fillRect(x*tilesize*scale,0*tilesize*scale,1,mapsize*tilesize*scale);
+	// }
+	// for (var y = 1; y < mapsize; y++) {
+	// 	exit_ctx.fillRect(0*tilesize*scale,y*tilesize*scale,mapsize*tilesize*scale,1);
+	// }
 
-	//draw exits and entrances (TODO: turn this into a function)
-	for( r in room ) {
-		if( r === selectedExitRoom ) {
-			for (i in room[selectedExitRoom].exits) {
-				var e = room[selectedExitRoom].exits[i];
-				exit_ctx.fillStyle = getContrastingColor();
-				exit_ctx.globalAlpha = 0.5;
-				exit_ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
-				exit_ctx.strokeStyle = getComplimentingColor();
-				exit_ctx.globalAlpha = 1.0;
-				exit_ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-			}
-		}
-		else {
-			for (i in room[r].exits) {
-				var e = room[r].exits[i];
-				if (e.dest.room === selectedExitRoom){
-					exit_ctx.fillStyle = getContrastingColor();
-					exit_ctx.globalAlpha = 0.3;
-					exit_ctx.fillRect(e.dest.x * tilesize * scale, e.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
-					exit_ctx.strokeStyle = getComplimentingColor();
-					exit_ctx.globalAlpha = 0.6;
-					exit_ctx.strokeRect( (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-				}
-			}
-		}
-	}
+	// //draw exits and entrances (TODO: turn this into a function)
+	// for( r in room ) {
+	// 	if( r === selectedExitRoom ) {
+	// 		for (i in room[selectedExitRoom].exits) {
+	// 			var e = room[selectedExitRoom].exits[i];
+	// 			exit_ctx.fillStyle = getContrastingColor();
+	// 			exit_ctx.globalAlpha = 0.5;
+	// 			exit_ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
+	// 			exit_ctx.strokeStyle = getComplimentingColor();
+	// 			exit_ctx.globalAlpha = 1.0;
+	// 			exit_ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+	// 		}
+	// 	}
+	// 	else {
+	// 		for (i in room[r].exits) {
+	// 			var e = room[r].exits[i];
+	// 			if (e.dest.room === selectedExitRoom){
+	// 				exit_ctx.fillStyle = getContrastingColor();
+	// 				exit_ctx.globalAlpha = 0.3;
+	// 				exit_ctx.fillRect(e.dest.x * tilesize * scale, e.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
+	// 				exit_ctx.strokeStyle = getComplimentingColor();
+	// 				exit_ctx.globalAlpha = 0.6;
+	// 				exit_ctx.strokeRect( (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+	// 			}
+	// 		}
+	// 	}
+	// }
 
-	//draw exit destination
-	if ( selectedExit && isExitValid(selectedExit) && selectedExit.dest.room === selectedExitRoom ) {
-		exit_ctx.fillStyle = "#ff0";
-		exit_ctx.globalAlpha = 0.9;
-		exit_ctx.fillRect(selectedExit.dest.x * tilesize * scale, selectedExit.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
-		exit_ctx.globalAlpha = 1;
-	}
+	// //draw exit destination
+	// if ( selectedExit && isExitValid(selectedExit) && selectedExit.dest.room === selectedExitRoom ) {
+	// 	exit_ctx.fillStyle = "#ff0";
+	// 	exit_ctx.globalAlpha = 0.9;
+	// 	exit_ctx.fillRect(selectedExit.dest.x * tilesize * scale, selectedExit.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
+	// 	exit_ctx.globalAlpha = 1;
+	// }
 }
 
 var exit_scale = 16;
@@ -2940,7 +2940,7 @@ function reloadEnding() {
 
 function addEnding() {
 	isAddingEnding = true;
-	setSelectedExit(null);
+	// setSelectedExit(null);
 	setSelectedEnding(null);
 	document.getElementById("addEndingButton").style.display = "none";
 	document.getElementById("addingEndingHelpText").style.display = "block";
