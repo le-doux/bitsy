@@ -71,4 +71,44 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		exitIndex = room[selectedRoom].exits.length > 0 ? 0 : -1; // TODO : make this logic better so it doesn't jump back all the time
 		RenderExits();
 	}
+
+	this.IsPlacingExit = function () {
+		return true; // hack
+	}
+
+	this.PlaceExit = function(x,y) {
+		// TODO : make this more general
+		exitsList[exitIndex].x = x;
+		exitsList[exitIndex].y = y;
+
+		refreshGameData();
+
+		RenderExits();
+	}
+
+	this.PrevExit = function() {
+		if (exitsList.length > 0) {
+			exitIndex--;
+			if (exitIndex < 0) {
+				exitIndex = exitsList.length - 1;
+			}
+		}
+		else {
+			exitIndex = -1;
+		}
+		RenderExits();
+	}
+
+	this.NextExit = function() {
+		if (exitsList.length > 0) {
+			exitIndex++
+			if (exitIndex >= exitsList.length) {
+				exitIndex = 0;
+			}
+		}
+		else {
+			exitIndex = -1;
+		}
+		RenderExits();
+	}
 } // ExitTool

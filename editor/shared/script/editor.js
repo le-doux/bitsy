@@ -2152,10 +2152,12 @@ function deleteExit() {
 
 function prevExit() {
 	console.log("PREV EXIT");
+	exitTool.NextExit();
 }
 
 function nextExit() {
 	console.log("NEXT EXIT");
+	exitTool.PrevExit();
 }
 
 var isAddingExit = false;

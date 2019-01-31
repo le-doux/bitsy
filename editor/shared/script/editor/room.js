@@ -55,10 +55,11 @@ function RoomTool(canvas) {
 			if( selectedExit != null ) isDragMovingExit = true;
 			if( selectedEndingTile != null ) isDragMovingEnding = true;
 		}
-		else if ( Ed().platform == PlatformType.Desktop && isAddingExit) { //todo - mutually exclusive with adding an ending?
+		else if ( Ed().platform == PlatformType.Desktop && self.exits.IsPlacingExit()) { //todo - mutually exclusive with adding an ending?
 			//add exit
 			if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
-				addExitToCurRoom(x,y);
+				// addExitToCurRoom(x,y);
+				self.exits.PlaceExit(x,y);
 			}
 		}
 		else if ( Ed().platform == PlatformType.Desktop && isAddingEnding ) {
