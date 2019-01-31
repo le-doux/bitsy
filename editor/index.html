@@ -28,6 +28,7 @@
 		<script src="shared/script/editor/core.js"></script>
 		<script src="shared/script/editor/paint.js"></script>
 		<script src="shared/script/editor/room.js"></script>
+		<script src="shared/script/editor/exit.js"></script>
 		<script src="shared/script/editor/explorer.js"></script>
 		<script src="shared/script/editor/localization.js"></script>
 
@@ -540,7 +541,7 @@
 					<div id="exitsPanelContent">
 						<div id="exitsSelect">
 							<!-- <div style="display: inline-block;"> -->
-								<canvas id="exitRoom1" style="width:100px; height:100px; display: inline-block;"></canvas>
+								<canvas id="exitCanvas1" style="width:100px; height:100px; display: inline-block;"></canvas>
 							<!-- </div> -->
 							<!-- <i class="material-icons">arrow_back</i> -->
 							<!-- <div style="height:100px; display: inline-block;"> -->
@@ -551,23 +552,23 @@
 							<!-- </div> -->
 							<!-- <i class="material-icons">compare_arrows</i> --><!-- 
 							<div style="display: inline-block;"> -->
-								<canvas id="exitRoom2" style="width:100px; height:100px; display: inline-block;"></canvas>
+								<canvas id="exitCanvas2" style="width:100px; height:100px; display: inline-block;"></canvas>
 							<!-- </div> -->
 						</div>
 						<div id="exitsControls">
 							<div id="exitsNav" class="buttonGroup">
-								<button title="previous drawing" class="color0" onclick="prev();">
+								<button title="previous exit" class="color0" onclick="prevExit();">
 									<i class="navigate_before material-icons"><span>navigate_before</span></i>
 								</button>
-								<button title="next drawing" class="color0" onclick="next();" style="margin-left:-5px;">
+								<button title="next exit" class="color0" onclick="nextExit();" style="margin-left:-5px;">
 									<i class="navigate_next material-icons"><span>navigate_next</span></i>
 								</button>
 							</div>
 							<div id="exitsCommands" class="buttonGroup">
-								<button title="add drawing" class="color0" onclick="newDrawing();">
+								<button title="add exit" class="color0" onclick="newExit();">
 									<i class="material-icons">add</i>
 								</button>
-								<button title="delete drawing" class="color0" onclick="deleteDrawing();">
+								<button title="delete exit" class="color0" onclick="deleteExit();">
 									<i class="material-icons">remove_circle</i>
 								</button>
 							</div>

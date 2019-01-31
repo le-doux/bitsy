@@ -549,6 +549,8 @@ function start() {
 	// exit_ctx = exit_canvas.getContext("2d");
 	// //exit events
 	// exit_canvas.addEventListener("mousedown", exit_onMouseDown);
+	exitTool = new ExitTool( document.getElementById("exitCanvas1"), document.getElementById("exitCanvas2") );
+	console.log(exitTool);
 
 	//
 	drawingThumbnailCanvas = document.createElement("canvas");
@@ -569,7 +571,8 @@ function start() {
 	}
 
 	// HACK: avoids breaking the exit room panel if there is no "room 0"
-	selectedExitRoom = curRoom;
+	// selectedExitRoom = curRoom;
+	exitTool.SetRoom(curRoom);
 
 	// load panel preferences
 	var prefs = getPanelPrefs();
@@ -836,6 +839,7 @@ function nextRoom() {
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
 	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
+	exitTool.SetRoom(curRoom);
 
 	if (drawing.type === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -852,6 +856,7 @@ function prevRoom() {
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
 	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
+	exitTool.SetRoom(curRoom);
 
 	if (drawing.type === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -964,12 +969,12 @@ function newRoom() {
 	updateRoomName();
 
 	// add new exit destination option to exits panel
-	var select = document.getElementById("exitDestinationSelect");
-	var option = document.createElement("option");
-	var roomLabel = localization.GetStringOrFallback("room_label", "room");
-	option.text = roomLabel + " " + roomId;
-	option.value = roomId;
-	select.add(option);
+	// var select = document.getElementById("exitDestinationSelect");
+	// var option = document.createElement("option");
+	// var roomLabel = localization.GetStringOrFallback("room_label", "room");
+	// option.text = roomLabel + " " + roomId;
+	// option.value = roomId;
+	// select.add(option);
 }
 
 function deleteRoom() {
@@ -2035,7 +2040,7 @@ function updateFontDescriptionUI() {
 	for (var i in fontSelect.options) {
 		var fontOption = fontSelect.options[i];
 		var fontDescriptionId = fontOption.value + "_description";
-		console.log(fontDescriptionId);
+		// console.log(fontDescriptionId);
 		var fontDescription = document.getElementById(fontDescriptionId);
 		if (fontDescription != null) {
 			fontDescription.style.display = fontOption.selected ? "block" : "none";
@@ -2132,6 +2137,25 @@ function toggleVersionNotes(e) {
 }
 
 /* EXITS */
+var exitTool;
+
+function newExit() {
+	console.log("NEW EXIT");
+	exitTool.AddExit();
+}
+
+function deleteExit() {
+	console.log("DELETE EXIT");
+}
+
+function prevExit() {
+	console.log("PREV EXIT");
+}
+
+function nextExit() {
+	console.log("NEXT EXIT");
+}
+
 var isAddingExit = false;
 var selectedExit = null;
 // var exit_canvas;
