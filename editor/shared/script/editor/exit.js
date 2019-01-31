@@ -1,3 +1,13 @@
+/*
+TODO:
+- place exits & entrances
+- consider the UI for that? "placement button"? or select the picture??
+- also consider that you may be moving an exit into a totally different room
+- connect to room tool
+- remove exit
+*/
+
+
 function ExitTool(exitCanvas1, exitCanvas2) {
 	var selectedRoom = null;
 	var exitsList = [];
@@ -26,6 +36,10 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 			}
 		}
 		room[selectedRoom].exits.push( newExit );
+
+		exitsList = room[selectedRoom].exits; // recreate exits list -- SHOULD be a function
+		exitIndex = exitsList.length - 1;
+		RenderExits();
 	};
 
 	this.SetRoom = function(roomId) {
@@ -44,5 +58,17 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 			drawRoom( room[selectedRoom], exitCtx1 );
 			drawRoom( room[exit.dest.room], exitCtx2 );
 		}
+		else {
+			exitCtx1.clearRect(0, 0, exitCanvas1.width, exitCanvas1.height);
+			exitCtx2.clearRect(0, 0, exitCanvas2.width, exitCanvas2.height);
+		}
+	}
+
+	this.RemoveExit = function() {
+		var exit = exitsList[exitIndex];
+		room[selectedRoom].exits.splice(room[selectedRoom].exits.indexOf(exit),1);
+		exitsList = room[selectedRoom].exits;
+		exitIndex = room[selectedRoom].exits.length > 0 ? 0 : -1; // TODO : make this logic better so it doesn't jump back all the time
+		RenderExits();
 	}
 } // ExitTool

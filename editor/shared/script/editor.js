@@ -551,6 +551,7 @@ function start() {
 	// exit_canvas.addEventListener("mousedown", exit_onMouseDown);
 	exitTool = new ExitTool( document.getElementById("exitCanvas1"), document.getElementById("exitCanvas2") );
 	console.log(exitTool);
+	roomTool.exits = exitTool;
 
 	//
 	drawingThumbnailCanvas = document.createElement("canvas");
@@ -2146,6 +2147,7 @@ function newExit() {
 
 function deleteExit() {
 	console.log("DELETE EXIT");
+	exitTool.RemoveExit();
 }
 
 function prevExit() {

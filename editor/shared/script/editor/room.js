@@ -30,6 +30,8 @@ function RoomTool(canvas) {
 	this.areExitsVisible = false;
 	this.areEndingsVisible = false;
 
+	this.exits = null;
+
 	function onMouseDown(e) {
 		var off = getOffset(e);
 		off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
