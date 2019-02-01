@@ -5,13 +5,24 @@ TODO:
 - also consider that you may be moving an exit into a totally different room
 - connect to room tool
 - remove exit
+- should I have direct exit value manipulation (room + coords) as dropdowns?
+
+
+available exits:
+- two way exits
+- exits that start in the current room
+- exits that END in the current room
+- ** whatever the CURRENT exit was when you switched rooms (this is kind of weird??)
+	- this might exist "outside the list" such that if you de-select it won't return to the list
+- principle: ANY exit that is VISIBLE in the current room should be part of the list
 */
 
 
 function ExitTool(exitCanvas1, exitCanvas2) {
 	var selectedRoom = null;
-	var exitsList = [];
-	var exitIndex = 0;
+
+	var exitInfoList = [];
+	var curExitInfo = null;
 
 	exitCanvas1.width = width * scale; // TODO : globals?
 	exitCanvas1.height = width * scale;
@@ -37,26 +48,27 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		}
 		room[selectedRoom].exits.push( newExit );
 
-		exitsList = room[selectedRoom].exits; // recreate exits list -- SHOULD be a function
-		exitIndex = exitsList.length - 1;
+		exitInfoList = GatherExitInfoList();
+		curExitInfo = exitInfoList.find(function(e) { return e.exit == newExit; });
+
 		RenderExits();
 	};
 
 	this.SetRoom = function(roomId) {
 		selectedRoom = roomId;
 
-		// TODO : get all exits function
-		exitsList = room[selectedRoom].exits;
-		exitIndex = exitsList.length > 0 ? 0 : -1;
+		exitInfoList = GatherExitInfoList();
+		if (curExitInfo == null && exitInfoList.length > 0) {
+			curExitInfo = exitInfoList[0];
+		}
 
 		RenderExits();
 	}
 
 	function RenderExits() {
-		if (exitIndex > -1) {
-			var exit = exitsList[exitIndex];
-			drawRoom( room[selectedRoom], exitCtx1 );
-			drawRoom( room[exit.dest.room], exitCtx2 );
+		if (curExitInfo != null) {
+			drawRoom( room[curExitInfo.parentRoom], exitCtx1 );
+			drawRoom( room[curExitInfo.exit.dest.room], exitCtx2 );
 		}
 		else {
 			exitCtx1.clearRect(0, 0, exitCanvas1.width, exitCanvas1.height);
@@ -65,10 +77,12 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	}
 
 	this.RemoveExit = function() {
-		var exit = exitsList[exitIndex];
-		room[selectedRoom].exits.splice(room[selectedRoom].exits.indexOf(exit),1);
-		exitsList = room[selectedRoom].exits;
-		exitIndex = room[selectedRoom].exits.length > 0 ? 0 : -1; // TODO : make this logic better so it doesn't jump back all the time
+		var i = room[curExitInfo.parentRoom].exits.indexOf(curExitInfo.exit);
+		room[curExitInfo.parentRoom].exits.splice(i,1);
+
+		exitInfoList = GatherExitInfoList();
+		curExitInfo = exitInfoList.length > 0 ? exitInfoList[0] : null;
+
 		RenderExits();
 	}
 
@@ -78,37 +92,92 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 
 	this.PlaceExit = function(x,y) {
 		// TODO : make this more general
-		exitsList[exitIndex].x = x;
-		exitsList[exitIndex].y = y;
+		if (curExitInfo != null) {
+			curExitInfo.exit.x = x;
+			curExitInfo.exit.y = y;
 
-		refreshGameData();
-
-		RenderExits();
+			refreshGameData();
+			RenderExits();
+		}
 	}
 
 	this.PrevExit = function() {
-		if (exitsList.length > 0) {
-			exitIndex--;
-			if (exitIndex < 0) {
-				exitIndex = exitsList.length - 1;
+		if (exitInfoList.length > 0) {
+			if (curExitInfo != null) {
+				var index = exitInfoList.indexOf(curExitInfo);
+				if (index != -1) {
+					index--;
+					if (index < 0) {
+						index = exitInfoList.length - 1;
+					}
+
+					curExitInfo = exitInfoList[index];
+				}
+				else {
+					curExitInfo = exitInfoList[0];
+				}
+			}
+			else {
+				curExitInfo = exitInfoList[0];
 			}
 		}
 		else {
-			exitIndex = -1;
+			curExitInfo = null;
 		}
 		RenderExits();
 	}
 
 	this.NextExit = function() {
-		if (exitsList.length > 0) {
-			exitIndex++
-			if (exitIndex >= exitsList.length) {
-				exitIndex = 0;
+		if (exitInfoList.length > 0) {
+			if (curExitInfo != null) {
+				var index = exitInfoList.indexOf(curExitInfo);
+				if (index != -1) {
+					index++;
+					if (index >= exitInfoList.length) {
+						index = 0;
+					}
+
+					curExitInfo = exitInfoList[index];
+				}
+				else {
+					curExitInfo = exitInfoList[0];
+				}
+			}
+			else {
+				curExitInfo = exitInfoList[0];
 			}
 		}
 		else {
-			exitIndex = -1;
+			curExitInfo = null;
 		}
 		RenderExits();
+	}
+
+	function GatherExitInfoList()
+	{
+		var infoList = [];
+
+		for (var i in room[selectedRoom].exits) {
+			infoList.push({
+				parentRoom: selectedRoom,
+				exit: room[selectedRoom].exits[i]
+			});
+		}
+
+		for (var r in room) {
+			if (r != selectedRoom) {
+				for (var i in room[r].exits) {
+					var exit = room[r].exits[i];
+					if (exit.dest.room === selectedRoom) {
+						infoList.push({
+							parentRoom: r,
+							exit: exit
+						});
+					}
+				}
+			}
+		}
+
+		return infoList;
 	}
 } // ExitTool
