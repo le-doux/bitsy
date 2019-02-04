@@ -3,8 +3,8 @@ TODO:
 - place exits & entrances
 - consider the UI for that? "placement button"? or select the picture??
 - also consider that you may be moving an exit into a totally different room
-- connect to room tool
-- remove exit
+X connect to room tool
+X remove exit
 - should I have direct exit value manipulation (room + coords) as dropdowns?
 
 
@@ -34,6 +34,13 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 
 	console.log("EXIT TOOOL!!");
 	console.log(exitCtx1);
+
+	var PlacementMode = { // TODO : awkward name
+		None : 0,
+		Exit : 1,
+		Destination : 2 // TODO : will I have to rename this?
+	};
+	var placementMode = PlacementMode.None;
 
 	this.AddExit = function() {
 		console.log(room);
@@ -87,18 +94,39 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	}
 
 	this.IsPlacingExit = function () {
-		return true; // hack
+		return placementMode != PlacementMode.None;
+	}
+
+	this.StartPlacingExit = function() {
+		placementMode = PlacementMode.Exit;
+	}
+
+	this.StartPlacingDestination = function() {
+		placementMode = PlacementMode.Destination;
 	}
 
 	this.PlaceExit = function(x,y) {
-		// TODO : make this more general
-		if (curExitInfo != null) {
-			curExitInfo.exit.x = x;
-			curExitInfo.exit.y = y;
+		if (placementMode == PlacementMode.Exit) {
+			if (curExitInfo != null) {
+				curExitInfo.exit.x = x;
+				curExitInfo.exit.y = y;
 
-			refreshGameData();
-			RenderExits();
+				refreshGameData();
+				RenderExits();
+			}
 		}
+		else if (placementMode == PlacementMode.Destination) {
+			if (curExitInfo != null) {
+				curExitInfo.exit.dest.room = selectedRoom;
+				curExitInfo.exit.dest.x = x;
+				curExitInfo.exit.dest.y = y;
+
+				refreshGameData();
+				RenderExits();
+			}
+		}
+
+		placementMode = PlacementMode.None;
 	}
 
 	this.PrevExit = function() {

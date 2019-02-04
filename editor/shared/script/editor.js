@@ -2160,6 +2160,14 @@ function nextExit() {
 	exitTool.PrevExit();
 }
 
+function startPlacingExit() {
+	exitTool.StartPlacingExit();
+}
+
+function startPlacingExitDestination() {
+	exitTool.StartPlacingDestination();
+}
+
 var isAddingExit = false;
 var selectedExit = null;
 // var exit_canvas;
