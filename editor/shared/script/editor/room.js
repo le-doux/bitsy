@@ -306,6 +306,8 @@ function RoomTool(canvas) {
 
 		//draw exits (and entrances)
 		if (self.areExitsVisible) {
+			var w = tilesize * scale;
+
 			for( r in room ) {
 				if( r === curRoom ) {
 					for (i in room[curRoom].exits) {
@@ -313,24 +315,25 @@ function RoomTool(canvas) {
 						if( !room[e.dest.room] )
 							continue;
 
-						if (e == selectedExit) {
-							ctx.fillStyle = "#ff0";
-							ctx.globalAlpha = 0.9;
-						}
-						else {
-							ctx.fillStyle = getContrastingColor();
-							ctx.globalAlpha = 0.5;
-						}
-						ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
-						ctx.strokeStyle = getComplimentingColor();
+						ctx.fillStyle = getContrastingColor();
+						ctx.globalAlpha = 0.5;
+						ctx.fillRect(e.x * w, e.y * w, w, w);
+
 						ctx.globalAlpha = 1.0;
-						ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+						var centerX = (e.x * w) + (w/2);
+						var centerY = (e.y * w) + (w/2);
+						ctx.beginPath();
+						ctx.moveTo(centerX, centerY - (w/4));
+						ctx.lineTo(centerX + (w/4), centerY + (w/4));
+						ctx.lineTo(centerX - (w/4), centerY + (w/4));
+						ctx.fill();
 
-						ctx.font = '14px sans-serif';
-						var roomStr = "To " + ( (room[e.dest.room].name != null) ? room[e.dest.room].name : ("room " + e.dest.room) );
-						ctx.fillText( roomStr, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
-
-						//todo (tilesize*scale) should be a function
+						if (e == self.exits.GetSelectedExit()) {
+							ctx.strokeStyle = getContrastingColor();
+							ctx.globalAlpha = 1.0;
+							ctx.lineWidth = 2.0;
+							ctx.strokeRect((e.x * w) - (w/4), (e.y * w) - (w/4), w * 1.5, w * 1.5);
+						}
 					}
 				}
 				else {
@@ -340,16 +343,26 @@ function RoomTool(canvas) {
 							continue;
 
 						if (e.dest.room === curRoom){
+
 							ctx.fillStyle = getContrastingColor();
-							ctx.globalAlpha = 0.3;
-							ctx.fillRect(e.dest.x * tilesize * scale, e.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
-							ctx.strokeStyle = getComplimentingColor();
-							ctx.globalAlpha = 0.6;
-							ctx.strokeRect( (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-		
-							ctx.font = '14px sans-serif';
-							var roomStr = "From " + ( (room[r].name != null) ? room[r].name : ("room " + r) );
-							ctx.fillText( roomStr, (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 5 );
+							ctx.globalAlpha = 0.5;
+							ctx.fillRect(e.dest.x * w, e.dest.y * w, w, w);
+
+							ctx.globalAlpha = 1.0;
+							var centerX = (e.dest.x * w) + (w/2);
+							var centerY = (e.dest.y * w) + (w/2);
+							ctx.beginPath();
+							ctx.moveTo(centerX, centerY + (w/4));
+							ctx.lineTo(centerX + (w/4), centerY - (w/4));
+							ctx.lineTo(centerX - (w/4), centerY - (w/4));
+							ctx.fill();
+
+							if (e == self.exits.GetSelectedExit()) {
+								ctx.strokeStyle = getContrastingColor();
+								ctx.globalAlpha = 1.0;
+								ctx.lineWidth = 2.0;
+								ctx.strokeRect((e.dest.x * w) - (w/4), (e.dest.y * w) - (w/4), w * 1.5, w * 1.5);
+							}
 						}
 					}
 				}

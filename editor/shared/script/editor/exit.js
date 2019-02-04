@@ -9,8 +9,8 @@ X remove exit
 ~~~~~~
 X move exit into a different room
 X shortcut to room containing exit
-- render exit location in preview image
-- new way of rendering exits & entrances
+X render exit location in preview image
+X new way of rendering exits & entrances
 - trigger re-render of room immediately (don't wait for animation loop)
 - swap exit / entrance
 - two-way exits
@@ -132,6 +132,15 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 
 	this.IsPlacingExit = function () {
 		return placementMode != PlacementMode.None;
+	}
+
+	this.GetSelectedExit = function() {
+		if (curExitInfo != null) {
+			return curExitInfo.exit;
+		}
+		else {
+			return null;
+		}
 	}
 
 	// this.StartPlacingExit = function() {
