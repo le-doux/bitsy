@@ -1911,7 +1911,7 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	}
 
 	//clear screen
-	context.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
+	context.fillStyle = "rgb(" + getPal(room.pal)[0][0] + "," + getPal(room.pal)[0][1] + "," + getPal(room.pal)[0][2] + ")";
 	context.fillRect(0,0,canvas.width,canvas.height);
 
 	//draw tiles

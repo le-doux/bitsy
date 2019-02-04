@@ -96,8 +96,23 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 
 	function RenderExits() {
 		if (curExitInfo != null) {
+			var w = tilesize * scale;
+
 			drawRoom( room[curExitInfo.parentRoom], exitCtx1 );
+
+			exitCtx1.fillStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
+			exitCtx1.strokeStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
+			exitCtx1.lineWidth = 4;
+			exitCtx1.fillRect(curExitInfo.exit.x * w, curExitInfo.exit.y * w, w, w);
+			exitCtx1.strokeRect((curExitInfo.exit.x * w) - (w/2), (curExitInfo.exit.y * w) - (w/2), w * 2, w * 2);
+
 			drawRoom( room[curExitInfo.exit.dest.room], exitCtx2 );
+
+			exitCtx2.fillStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
+			exitCtx2.strokeStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
+			exitCtx2.lineWidth = 4;
+			exitCtx2.fillRect(curExitInfo.exit.dest.x * w, curExitInfo.exit.dest.y * w, w, w);
+			exitCtx2.strokeRect((curExitInfo.exit.dest.x * w) - (w/2), (curExitInfo.exit.dest.y * w) - (w/2), w * 2, w * 2);
 		}
 		else {
 			exitCtx1.clearRect(0, 0, exitCanvas1.width, exitCanvas1.height);
