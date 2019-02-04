@@ -1,12 +1,24 @@
 /*
 TODO:
-- place exits & entrances
-- consider the UI for that? "placement button"? or select the picture??
-- also consider that you may be moving an exit into a totally different room
+X place exits & entrances
+X consider the UI for that? "placement button"? or select the picture??
+X also consider that you may be moving an exit into a totally different room
 X connect to room tool
 X remove exit
 - should I have direct exit value manipulation (room + coords) as dropdowns?
-
+~~~~~~
+X move exit into a different room
+X shortcut to room containing exit
+- render exit location in preview image
+- new way of rendering exits & entrances
+- trigger re-render of room immediately (don't wait for animation loop)
+- swap exit / entrance
+- two-way exits
+- re-enable selecting an exit (OR entrance) from the room map
+- re-enable click & drag for exits and entrances
+- how do we handle overlapping exits & entrances????
+- BUG: don't duplicate "current exit" in exit info list if the exit already exists in the new room (how???)
+- show exit count to help navigation??
 
 available exits:
 - two way exits
@@ -137,6 +149,21 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		UpdatePlacementButtons();
 	}
 
+	this.SelectExitRoom = function() {
+		// hacky global method!!
+		if (curExitInfo != null) {
+			selectRoom(curExitInfo.parentRoom);
+		}
+	}
+
+	this.SelectDestinationRoom = function() {
+		console.log("SELECT DEST ROOM");
+		// hacky global method!!
+		if (curExitInfo != null) {
+			selectRoom(curExitInfo.exit.dest.room);
+		}
+	}
+
 	function UpdatePlacementButtons() {
 		// hackily relies on global UI names oh well D:
 		if (placementMode == PlacementMode.Exit) {
@@ -165,6 +192,13 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	this.PlaceExit = function(x,y) {
 		if (placementMode == PlacementMode.Exit) {
 			if (curExitInfo != null) {
+				if (curExitInfo.parentRoom != selectedRoom) {
+					var oldExitIndex = room[curExitInfo.parentRoom].exits.indexOf(curExitInfo.exit);
+					room[curExitInfo.parentRoom].exits.splice(oldExitIndex,1);
+					room[selectedRoom].exits.push(curExitInfo.exit);
+					curExitInfo.parentRoom = selectedRoom;
+				}
+
 				curExitInfo.exit.x = x;
 				curExitInfo.exit.y = y;
 
@@ -177,6 +211,7 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		else if (placementMode == PlacementMode.Destination) {
 			if (curExitInfo != null) {
 				curExitInfo.exit.dest.room = selectedRoom;
+
 				curExitInfo.exit.dest.x = x;
 				curExitInfo.exit.dest.y = y;
 

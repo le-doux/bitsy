@@ -832,6 +832,35 @@ function on_palette_name_change() {
 	updatePaletteOptionsFromGameData();
 }
 
+function selectRoom(roomId) {
+	console.log("SELECT ROOM " + roomId);
+
+	// ok watch out this is gonna be hacky
+	var ids = sortedRoomIdList();
+
+	var nextRoomIndex = -1;
+	for (var i = 0; i < ids.length; i++) {
+		if (ids[i] === roomId) {
+			nextRoomIndex = i;
+		}
+	}
+
+	if (nextRoomIndex != -1) {
+		roomIndex = nextRoomIndex;
+		curRoom = ids[roomIndex];
+		roomTool.drawEditMap();
+		paintTool.updateCanvas();
+		updateRoomPaletteSelect();
+		paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
+		exitTool.SetRoom(curRoom);
+
+		if (drawing.type === TileType.Tile)
+			updateWallCheckboxOnCurrentTile();
+
+		updateRoomName();
+	}
+}
+
 function nextRoom() {
 	var ids = sortedRoomIdList();
 	roomIndex = (roomIndex + 1) % ids.length;
@@ -965,6 +994,7 @@ function newRoom() {
 	//console.log(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
+	exitTool.SetRoom(curRoom);
 	updateRoomPaletteSelect();
 
 	updateRoomName();
@@ -2170,12 +2200,20 @@ function cancelMoveExitDoor1() {
 	exitTool.TogglePlacingExit(false);
 }
 
+function selectExitRoom1() {
+	exitTool.SelectExitRoom();
+}
+
 function toggleMoveExitDoor2(e) {
 	exitTool.TogglePlacingDestination(e.target.checked);
 }
 
 function cancelMoveExitDoor2() {
 	exitTool.TogglePlacingDestination(false);
+}
+
+function selectExitRoom2() {
+	exitTool.SelectDestinationRoom();
 }
 
 var isAddingExit = false;
