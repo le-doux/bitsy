@@ -42,6 +42,8 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	};
 	var placementMode = PlacementMode.None;
 
+	UpdatePlacementButtons();
+
 	this.AddExit = function() {
 		console.log(room);
 		var newExit = {
@@ -63,7 +65,15 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 
 	this.SetRoom = function(roomId) {
 		selectedRoom = roomId;
+		ResetExitList();
+	}
 
+	this.Refresh = function() { // TODO: rename "Reset"???
+		curExitInfo = null;
+		ResetExitList();
+	}
+
+	function ResetExitList() {
 		exitInfoList = GatherExitInfoList();
 		if (curExitInfo == null && exitInfoList.length > 0) {
 			curExitInfo = exitInfoList[0];
@@ -97,12 +107,59 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		return placementMode != PlacementMode.None;
 	}
 
-	this.StartPlacingExit = function() {
-		placementMode = PlacementMode.Exit;
+	// this.StartPlacingExit = function() {
+	// 	console.log("START PLACING EXIT");
+	// 	placementMode = PlacementMode.Exit;
+	// }
+
+	// this.StartPlacingDestination = function() {
+	// 	console.log("START PLACING Destination");
+	// 	placementMode = PlacementMode.Destination;
+	// }
+
+	this.TogglePlacingExit = function(isPlacing) {
+		if (isPlacing) {
+			placementMode = PlacementMode.Exit;
+		}
+		else {
+			placementMode = PlacementMode.None;
+		}
+		UpdatePlacementButtons();
 	}
 
-	this.StartPlacingDestination = function() {
-		placementMode = PlacementMode.Destination;
+	this.TogglePlacingDestination = function(isPlacing) {
+		if (isPlacing) {
+			placementMode = PlacementMode.Destination;
+		}
+		else {
+			placementMode = PlacementMode.None;
+		}
+		UpdatePlacementButtons();
+	}
+
+	function UpdatePlacementButtons() {
+		// hackily relies on global UI names oh well D:
+		if (placementMode == PlacementMode.Exit) {
+			document.getElementById("toggleMoveExitDoor1").checked = true;
+			document.getElementById("textMoveExitDoor1").innerText = "moving"; // TODO localize
+			document.getElementById("cancelMoveExitDoor1").style.display = "inline";
+		}
+		else {
+			document.getElementById("toggleMoveExitDoor1").checked = false;
+			document.getElementById("textMoveExitDoor1").innerText = "move door"; // TODO localize
+			document.getElementById("cancelMoveExitDoor1").style.display = "none";
+		}
+
+		if (placementMode == PlacementMode.Destination) {
+			document.getElementById("toggleMoveExitDoor2").checked = true;
+			document.getElementById("textMoveExitDoor2").innerText = "moving"; // TODO localize
+			document.getElementById("cancelMoveExitDoor2").style.display = "inline";
+		}
+		else {
+			document.getElementById("toggleMoveExitDoor2").checked = false;
+			document.getElementById("textMoveExitDoor2").innerText = "move door"; // TODO localize
+			document.getElementById("cancelMoveExitDoor2").style.display = "none";
+		}
 	}
 
 	this.PlaceExit = function(x,y) {
@@ -110,6 +167,8 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 			if (curExitInfo != null) {
 				curExitInfo.exit.x = x;
 				curExitInfo.exit.y = y;
+
+				console.log(curExitInfo);
 
 				refreshGameData();
 				RenderExits();
@@ -127,6 +186,7 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		}
 
 		placementMode = PlacementMode.None;
+		UpdatePlacementButtons();
 	}
 
 	this.PrevExit = function() {

@@ -1419,6 +1419,8 @@ function on_edit_mode() {
 
 	roomTool.listenEditEvents();
 
+	exitTool.Refresh();
+
 	updateInventoryUI();
 
 	if(isPreviewDialogMode) {
@@ -2160,12 +2162,20 @@ function nextExit() {
 	exitTool.PrevExit();
 }
 
-function startPlacingExit() {
-	exitTool.StartPlacingExit();
+function toggleMoveExitDoor1(e) {
+	exitTool.TogglePlacingExit(e.target.checked);
 }
 
-function startPlacingExitDestination() {
-	exitTool.StartPlacingDestination();
+function cancelMoveExitDoor1() {
+	exitTool.TogglePlacingExit(false);
+}
+
+function toggleMoveExitDoor2(e) {
+	exitTool.TogglePlacingDestination(e.target.checked);
+}
+
+function cancelMoveExitDoor2() {
+	exitTool.TogglePlacingDestination(false);
 }
 
 var isAddingExit = false;

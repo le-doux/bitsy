@@ -539,23 +539,45 @@
  -->
 
 					<div id="exitsPanelContent">
-						<div id="exitsSelect">
-							<!-- <div style="display: inline-block;"> -->
-								<canvas id="exitCanvas1" style="width:100px; height:100px; display: inline-block;" onclick="startPlacingExit();"></canvas>
-							<!-- </div> -->
+						<div id="exitsSelect" style="display: flex;">
+							<div class="controlBox" style="display: flex; flex-direction: column;">
+								<!-- <span>A:</span> -->
+								<canvas id="exitCanvas1" style="width:100px; height:100px;" onclick="startPlacingExit();"></canvas>
+								<div style="margin-top: 4px;">
+									<input type="checkbox" id="toggleMoveExitDoor1" onclick="toggleMoveExitDoor1(event);" />
+									<label for="toggleMoveExitDoor1">
+										<i class="material-icons">location_searching</i>
+										<span id="textMoveExitDoor1">move door</span>
+									</label>
+									<button id="cancelMoveExitDoor1" onclick="cancelMoveExitDoor1();">
+										<i class="material-icons">cancel</i>
+									</button>
+								</div>
+							</div>
 							<!-- <i class="material-icons">arrow_back</i> -->
-							<!-- <div style="height:100px; display: inline-block;"> -->
-								<button title="change direction" onclick="console.log('test_exit');" style="margin-top: -90px;">
+							<div style="padding-left: 5px; padding-right: 5px;">
+								<button title="change direction" onclick="console.log('test_exit');" style="margin-top: 50px;">
 									<i class="material-icons">arrow_back</i>
 									<i class="material-icons">arrow_forward</i>
 								</button>
-							<!-- </div> -->
-							<!-- <i class="material-icons">compare_arrows</i> --><!-- 
-							<div style="display: inline-block;"> -->
-								<canvas id="exitCanvas2" style="width:100px; height:100px; display: inline-block;" onclick="startPlacingExitDestination();"></canvas>
-							<!-- </div> -->
+							</div>
+							<!-- <i class="material-icons">compare_arrows</i> -->
+							<div class="controlBox" style="display: flex; flex-direction: column;">
+								<!-- <span>B:</span> -->
+								<canvas id="exitCanvas2" style="width:100px; height:100px;" onclick="startPlacingExitDestination();"></canvas>
+								<div style="margin-top: 4px;">
+									<input type="checkbox" id="toggleMoveExitDoor2" onclick="toggleMoveExitDoor2(event);" />
+									<label for="toggleMoveExitDoor2">
+										<i class="material-icons">location_searching</i>
+										<span id="textMoveExitDoor2">move door</span>
+									</label>
+									<button id="cancelMoveExitDoor2" onclick="cancelMoveExitDoor2();">
+										<i class="material-icons">cancel</i>
+									</button>
+								</div>
+							</div>
 						</div>
-						<div id="exitsControls">
+						<div id="exitsControls" class="controlBox">
 							<div id="exitsNav" class="buttonGroup">
 								<button title="previous exit" class="color0" onclick="prevExit();">
 									<i class="navigate_before material-icons"><span>navigate_before</span></i>
@@ -602,7 +624,7 @@
 								<i class="material-icons">add</i>
 							</button>
 						</div>
-						<!-- <button onclick="deleteEnding();"> x delete x </button> -->
+						<!-- <button onclick="deleteEnding();"> x delete x </button>
 					</div>
 					<div class="buttonGroup">
 						<button title="click to place ending in current room" class="color0" id="addEndingButton" onclick="addEnding();">
