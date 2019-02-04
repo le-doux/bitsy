@@ -143,15 +143,36 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		}
 	}
 
-	// this.StartPlacingExit = function() {
-	// 	console.log("START PLACING EXIT");
-	// 	placementMode = PlacementMode.Exit;
-	// }
+	this.TrySelectExitByLocation = function(x,y) {
+		if (placementMode != PlacementMode.None) {
+			return false;
+		}
 
-	// this.StartPlacingDestination = function() {
-	// 	console.log("START PLACING Destination");
-	// 	placementMode = PlacementMode.Destination;
-	// }
+		for (var i = 0; i < exitInfoList.length; i++) {
+			var exitInfo = exitInfoList[i];
+			if (exitInfo.parentRoom === selectedRoom) {
+				if (exitInfo.exit.x == x && exitInfo.exit.y == y) {
+					curExitInfo = exitInfo;
+					RenderExits();
+					return true;
+				}
+				else if (exitInfo.exit.dest.x == x && exitInfo.exit.dest.y == y) {
+					curExitInfo = exitInfo;
+					RenderExits();
+					return true;
+				}
+			}
+			else if (exitInfo.exit.dest.room === selectedRoom) {
+				if (exitInfo.exit.dest.x == x && exitInfo.exit.dest.y == y) {
+					curExitInfo = exitInfo;
+					RenderExits();
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 
 	this.TogglePlacingExit = function(isPlacing) {
 		if (isPlacing) {

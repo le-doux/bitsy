@@ -45,14 +45,19 @@ function RoomTool(canvas) {
 			return;
 		}
 
+		var didSelectedExitChange = false;
+
 		if( Ed().platform == PlatformType.Desktop ) {
-			var didSelectedExitChange = self.areExitsVisible ? setSelectedExit( getExit(curRoom,x,y) ) : false;
+			var prevExit = self.exits.GetSelectedExit();
+			var didSelectExit = self.areExitsVisible ? self.exits.TrySelectExitByLocation(x,y) : false;
+			didSelectedExitChange = self.areExitsVisible && didSelectExit && (prevExit != self.exits.GetSelectedExit());
+
 			var didSelectedEndingChange = self.areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;	
 		}
 
 		if ( Ed().platform == PlatformType.Desktop && (didSelectedExitChange || didSelectedEndingChange) ) {
 			//don't do anything else
-			if( selectedExit != null ) isDragMovingExit = true;
+			if( self.exits.GetSelectedExit() != null ) isDragMovingExit = true;
 			if( selectedEndingTile != null ) isDragMovingEnding = true;
 		}
 		else if ( Ed().platform == PlatformType.Desktop && self.exits.IsPlacingExit()) { //todo - mutually exclusive with adding an ending?
@@ -135,19 +140,21 @@ function RoomTool(canvas) {
 	}
 
 	function onMouseMove(e) {
-		if( Ed().platform == PlatformType.Desktop && selectedExit != null && isDragMovingExit )
+		if( Ed().platform == PlatformType.Desktop && self.exits.GetSelectedExit() != null && isDragMovingExit )
 		{
 			// drag exit around
 			var off = getOffset(e);
 			var x = Math.floor(off.x / (tilesize*scale));
 			var y = Math.floor(off.y / (tilesize*scale));
-			if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
-			{
-				selectedExit.x = x;
-				selectedExit.y = y;
-				refreshGameData();
-				self.drawEditMap();
-			}
+
+			// TODO -- update for new exit tool code
+			// if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
+			// {
+			// 	selectedExit.x = x;
+			// 	selectedExit.y = y;
+			// 	refreshGameData();
+			// 	self.drawEditMap();
+			// }
 		}
 		else if( Ed().platform == PlatformType.Desktop && selectedEndingTile != null && isDragMovingEnding )
 		{
@@ -333,6 +340,29 @@ function RoomTool(canvas) {
 							ctx.globalAlpha = 1.0;
 							ctx.lineWidth = 2.0;
 							ctx.strokeRect((e.x * w) - (w/4), (e.y * w) - (w/4), w * 1.5, w * 1.5);
+						}
+
+						if (e.dest.room === curRoom){
+
+							ctx.fillStyle = getContrastingColor();
+							ctx.globalAlpha = 0.5;
+							ctx.fillRect(e.dest.x * w, e.dest.y * w, w, w);
+
+							ctx.globalAlpha = 1.0;
+							var centerX = (e.dest.x * w) + (w/2);
+							var centerY = (e.dest.y * w) + (w/2);
+							ctx.beginPath();
+							ctx.moveTo(centerX, centerY + (w/4));
+							ctx.lineTo(centerX + (w/4), centerY - (w/4));
+							ctx.lineTo(centerX - (w/4), centerY - (w/4));
+							ctx.fill();
+
+							if (e == self.exits.GetSelectedExit()) {
+								ctx.strokeStyle = getContrastingColor();
+								ctx.globalAlpha = 1.0;
+								ctx.lineWidth = 2.0;
+								ctx.strokeRect((e.dest.x * w) - (w/4), (e.dest.y * w) - (w/4), w * 1.5, w * 1.5);
+							}
 						}
 					}
 				}

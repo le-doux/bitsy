@@ -571,8 +571,6 @@ function start() {
 		setDefaultGameState();
 	}
 
-	// HACK: avoids breaking the exit room panel if there is no "room 0"
-	// selectedExitRoom = curRoom;
 	exitTool.SetRoom(curRoom);
 
 	// load panel preferences
@@ -2082,29 +2080,7 @@ function updateFontDescriptionUI() {
 }
 
 function updateExitOptionsFromGameData() {
-	// console.log("UPDATE EXIT OPTIONS");
-
-	// var select = document.getElementById("exitDestinationSelect");
-
-	// // first, remove all current options
-	// var i;
-	// for(i = select.options.length - 1 ; i >= 0 ; i--) {
-	// 	select.remove(i);
-	// }
-
-	// // then, add an option for each room
-	// var roomLabel = localization.GetStringOrFallback("room_label", "room");
-	// for (roomId in room) {
-	// 	var option = document.createElement("option");
-	// 	if(room[roomId].name != null)
-	// 		option.text = room[roomId].name;
-	// 	else
-	// 		option.text = roomLabel + " " + roomId;
-	// 	option.value = roomId;
-	// 	select.add(option);
-	// }
-
-	// updateRoomChoiceForSelectedExit();
+	// TODO ???
 }
 
 function on_toggle_wall(e) {
@@ -2218,18 +2194,14 @@ function selectExitRoom2() {
 
 function showExits() {
 	console.log("show exits");
-	resetExitVars();
 	roomTool.areExitsVisible = true;
 	roomTool.drawEditMap();
-	drawExitDestinationRoom();
 }
 
 function hideExits() {
 	console.log("hide exits");
-	resetExitVars();
 	roomTool.areExitsVisible = false;
 	roomTool.drawEditMap();
-	drawExitDestinationRoom();
 }
 
 function togglePanelAnimated(e) {
@@ -2869,7 +2841,6 @@ function reloadEnding() {
 
 function addEnding() {
 	isAddingEnding = true;
-	// setSelectedExit(null);
 	setSelectedEnding(null);
 	document.getElementById("addEndingButton").style.display = "none";
 	document.getElementById("addingEndingHelpText").style.display = "block";
@@ -2891,7 +2862,6 @@ function addEndingToCurRoom(x,y) {
 }
 
 function showEndings() {
-	// resetExitVars(); -- what's this for?
 	roomTool.areEndingsVisible = true;
 	roomTool.drawEditMap();
 }
