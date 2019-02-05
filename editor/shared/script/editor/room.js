@@ -149,7 +149,6 @@ function RoomTool(canvas) {
 			var y = Math.floor(off.y / (tilesize*scale));
 
 			self.exits.ContinueDrag(x,y);
-			refreshGameData();
 			self.drawEditMap();
 		}
 		else if( Ed().platform == PlatformType.Desktop && selectedEndingTile != null && isDragMovingEnding )
@@ -345,6 +344,8 @@ function RoomTool(canvas) {
 							ctx.globalAlpha = 0.5;
 							ctx.fillRect(e.dest.x * w, e.dest.y * w, w, w);
 
+							ctx.strokeStyle = getContrastingColor();
+							ctx.lineWidth = 2.0;
 							ctx.globalAlpha = 1.0;
 							var centerX = (e.dest.x * w) + (w/2);
 							var centerY = (e.dest.y * w) + (w/2);
@@ -352,7 +353,8 @@ function RoomTool(canvas) {
 							ctx.moveTo(centerX, centerY + (w/4));
 							ctx.lineTo(centerX + (w/4), centerY - (w/4));
 							ctx.lineTo(centerX - (w/4), centerY - (w/4));
-							ctx.fill();
+							ctx.lineTo(centerX, centerY + (w/4));
+							ctx.stroke();
 
 							if (e == self.exits.GetSelectedExit()) {
 								ctx.strokeStyle = getContrastingColor();
@@ -375,6 +377,8 @@ function RoomTool(canvas) {
 							ctx.globalAlpha = 0.5;
 							ctx.fillRect(e.dest.x * w, e.dest.y * w, w, w);
 
+							ctx.strokeStyle = getContrastingColor();
+							ctx.lineWidth = 2.0;
 							ctx.globalAlpha = 1.0;
 							var centerX = (e.dest.x * w) + (w/2);
 							var centerY = (e.dest.y * w) + (w/2);
@@ -382,7 +386,8 @@ function RoomTool(canvas) {
 							ctx.moveTo(centerX, centerY + (w/4));
 							ctx.lineTo(centerX + (w/4), centerY - (w/4));
 							ctx.lineTo(centerX - (w/4), centerY - (w/4));
-							ctx.fill();
+							ctx.lineTo(centerX, centerY + (w/4));
+							ctx.stroke();
 
 							if (e == self.exits.GetSelectedExit()) {
 								ctx.strokeStyle = getContrastingColor();
