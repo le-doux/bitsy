@@ -143,35 +143,35 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		}
 	}
 
-	this.TrySelectExitByLocation = function(x,y) {
+	this.TrySelectExitAtLocation = function(x,y) {
 		if (placementMode != PlacementMode.None) {
 			return false;
 		}
 
+		curExitInfo = FindExitAtLocation(x,y);
+		RenderExits();
+
+		return curExitInfo != null;
+	}
+
+	function FindExitAtLocation(x,y) {
 		for (var i = 0; i < exitInfoList.length; i++) {
 			var exitInfo = exitInfoList[i];
 			if (exitInfo.parentRoom === selectedRoom) {
 				if (exitInfo.exit.x == x && exitInfo.exit.y == y) {
-					curExitInfo = exitInfo;
-					RenderExits();
-					return true;
+					return exitInfo;
 				}
 				else if (exitInfo.exit.dest.x == x && exitInfo.exit.dest.y == y) {
-					curExitInfo = exitInfo;
-					RenderExits();
-					return true;
+					return exitInfo;
 				}
 			}
 			else if (exitInfo.exit.dest.room === selectedRoom) {
 				if (exitInfo.exit.dest.x == x && exitInfo.exit.dest.y == y) {
-					curExitInfo = exitInfo;
-					RenderExits();
-					return true;
+					return exitInfo;
 				}
 			}
 		}
-
-		return false;
+		return null;
 	}
 
 	this.TogglePlacingExit = function(isPlacing) {
@@ -347,5 +347,54 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		}
 
 		return infoList;
+	}
+
+	var dragMode = PlacementMode.None;
+	var dragExitInfo = null;
+	this.StartDrag = function(x,y) {
+		dragMode == PlacementMode.None;
+		dragExitInfo = FindExitAtLocation(x,y);
+
+		if (dragExitInfo != null) {
+			if (dragExitInfo.parentRoom === selectedRoom &&
+					dragExitInfo.exit.x == x && dragExitInfo.exit.y == y) {
+				dragMode = PlacementMode.Exit;
+			}
+			else if (dragExitInfo.exit.dest.room === selectedRoom &&
+						dragExitInfo.exit.dest.x == x && dragExitInfo.exit.dest.y == y) {
+				dragMode = PlacementMode.Destination;
+			}
+		}
+	}
+
+	this.ContinueDrag = function(x,y) {
+		if (dragExitInfo == null) {
+			return;
+		}
+
+		if (dragMode == PlacementMode.Exit) {
+			dragExitInfo.exit.x = x;
+			dragExitInfo.exit.y = y;
+		}
+		else if (dragMode == PlacementMode.Destination) {
+			dragExitInfo.exit.dest.x = x;
+			dragExitInfo.exit.dest.y = y;
+		}
+		
+		refreshGameData();
+		RenderExits();
+	}
+
+	this.EndDrag = function() {
+		if (dragMode != PlacementMode.None) {
+			dragMode = PlacementMode.None;
+			dragExitInfo = null;
+			refreshGameData();
+			RenderExits();
+		}
+	}
+
+	this.IsDraggingExit = function() {
+		return dragMode != PlacementMode.None;
 	}
 } // ExitTool

@@ -21,7 +21,6 @@ function RoomTool(canvas) {
 	// edit flags
 	var isDragAddingTiles = false;
 	var isDragDeletingTiles = false;
-	var isDragMovingExit = false;
 	var isDragMovingEnding = false;
 
 	// render flags
@@ -48,17 +47,19 @@ function RoomTool(canvas) {
 		var didSelectedExitChange = false;
 
 		if( Ed().platform == PlatformType.Desktop ) {
-			var prevExit = self.exits.GetSelectedExit();
-			var didSelectExit = self.areExitsVisible ? self.exits.TrySelectExitByLocation(x,y) : false;
-			didSelectedExitChange = self.areExitsVisible && didSelectExit && (prevExit != self.exits.GetSelectedExit());
+			if (self.areExitsVisible) {
+				self.exits.TrySelectExitAtLocation(x,y);
+			}
 
 			var didSelectedEndingChange = self.areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;	
 		}
 
-		if ( Ed().platform == PlatformType.Desktop && (didSelectedExitChange || didSelectedEndingChange) ) {
+		if ( Ed().platform == PlatformType.Desktop && (didSelectedEndingChange) ) {
 			//don't do anything else
-			if( self.exits.GetSelectedExit() != null ) isDragMovingExit = true;
 			if( selectedEndingTile != null ) isDragMovingEnding = true;
+		}
+		else if (self.areExitsVisible && self.exits.GetSelectedExit() != null && !self.exits.IsPlacingExit()) {
+			self.exits.StartDrag(x,y);
 		}
 		else if ( Ed().platform == PlatformType.Desktop && self.exits.IsPlacingExit()) { //todo - mutually exclusive with adding an ending?
 			//add exit
@@ -140,21 +141,16 @@ function RoomTool(canvas) {
 	}
 
 	function onMouseMove(e) {
-		if( Ed().platform == PlatformType.Desktop && self.exits.GetSelectedExit() != null && isDragMovingExit )
+		if( Ed().platform == PlatformType.Desktop && self.exits.GetSelectedExit() != null && self.exits.IsDraggingExit() )
 		{
 			// drag exit around
 			var off = getOffset(e);
 			var x = Math.floor(off.x / (tilesize*scale));
 			var y = Math.floor(off.y / (tilesize*scale));
 
-			// TODO -- update for new exit tool code
-			// if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
-			// {
-			// 	selectedExit.x = x;
-			// 	selectedExit.y = y;
-			// 	refreshGameData();
-			// 	self.drawEditMap();
-			// }
+			self.exits.ContinueDrag(x,y);
+			refreshGameData();
+			self.drawEditMap();
 		}
 		else if( Ed().platform == PlatformType.Desktop && selectedEndingTile != null && isDragMovingEnding )
 		{
@@ -179,8 +175,9 @@ function RoomTool(canvas) {
 		editTilesOnDrag(e);
 		isDragAddingTiles = false;
 		isDragDeletingTiles = false;
-		isDragMovingExit = false;
 		isDragMovingEnding = false;
+
+		self.exits.EndDrag();
 	}
 
 	function editTilesOnDrag(e) {
