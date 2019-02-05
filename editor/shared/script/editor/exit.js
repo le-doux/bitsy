@@ -51,6 +51,18 @@ Major questions:
 - should two-way exits be two exits.. or one exit with a return marker?
 - should other properties of exits be hard-code? or triggered by an attached dialog?
 - out there ideas: multiple exit functions (on touch, on enter, during transition) each with their own dialog
+
+
+possible new functions
+{nextTransition "transitionName"}
+{setAvatar "IDorName"}
+{getAvatar}
+
+
+
+a weird thought.. an exit that always returned false would become a trigger (support that explicitly???)
+
+would I need a way to edit the exit dialog code directly? what happens if the user does something weird??? (default to "custom")
 */
 
 
