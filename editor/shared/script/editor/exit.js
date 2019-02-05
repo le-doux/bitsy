@@ -12,12 +12,45 @@ features:
 - two way exits
 - transitions
 - swap characters
+- ? play dialog
+- ? lock based on variables
 - future expansion
 
 future:
 - start from room / exit / location?
 - should I have direct exit value manipulation (room + coords) as dropdowns?
 - better logic for initial placement of entrance / exit for door
+
+
+
+prototype file formats:
+EXT 13,4 0 7,9
+
+EXT 13,4 0 7,9
+- RETURN 1
+- AVATAR 11
+- TRANSITION fade
+
+EXT 13,4 0 7,9 DLG EXT_15
+
+DLG EXT_15
+"""
+{changeAvatar "11"}
+{playTransition "fade"}
+"""
+
+how to handle transitions in code?
+- {playTransition} {nextTransition} {setTransition}
+- thought: easiest is {nextTransition} that resets after transition is done
+
+locks could be:
+- if dialog returns false.. you can't go through the door!
+	- this suggests all dialog plays BEFORE you enter the door.. is that true?
+
+Major questions:
+- should two-way exits be two exits.. or one exit with a return marker?
+- should other properties of exits be hard-code? or triggered by an attached dialog?
+- out there ideas: multiple exit functions (on touch, on enter, during transition) each with their own dialog
 */
 
 
