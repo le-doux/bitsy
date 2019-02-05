@@ -48,7 +48,9 @@ function RoomTool(canvas) {
 
 		if( Ed().platform == PlatformType.Desktop ) {
 			if (self.areExitsVisible) {
-				self.exits.TrySelectExitAtLocation(x,y);
+				if (self.exits.TrySelectExitAtLocation(x,y)) {
+					self.drawEditMap();
+				}
 			}
 
 			var didSelectedEndingChange = self.areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;	
@@ -66,6 +68,7 @@ function RoomTool(canvas) {
 			if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
 				// addExitToCurRoom(x,y);
 				self.exits.PlaceExit(x,y);
+				self.drawEditMap();
 			}
 		}
 		else if ( Ed().platform == PlatformType.Desktop && isAddingEnding ) {

@@ -1,32 +1,23 @@
 /*
 TODO:
-X place exits & entrances
-X consider the UI for that? "placement button"? or select the picture??
-X also consider that you may be moving an exit into a totally different room
-X connect to room tool
-X remove exit
-- should I have direct exit value manipulation (room + coords) as dropdowns?
-~~~~~~
-X move exit into a different room
-X shortcut to room containing exit
-X render exit location in preview image
-X new way of rendering exits & entrances
-- trigger re-render of room immediately (don't wait for animation loop)
 - swap exit / entrance
 - two-way exits
-- re-enable selecting an exit (OR entrance) from the room map
-- re-enable click & drag for exits and entrances
 - how do we handle overlapping exits & entrances????
 - BUG: don't duplicate "current exit" in exit info list if the exit already exists in the new room (how???)
 - show exit count to help navigation??
 
-available exits:
+the big think to think about:
+**** new file format for exits ****
+features:
 - two way exits
-- exits that start in the current room
-- exits that END in the current room
-- ** whatever the CURRENT exit was when you switched rooms (this is kind of weird??)
-	- this might exist "outside the list" such that if you de-select it won't return to the list
-- principle: ANY exit that is VISIBLE in the current room should be part of the list
+- transitions
+- swap characters
+- future expansion
+
+future:
+- start from room / exit / location?
+- should I have direct exit value manipulation (room + coords) as dropdowns?
+- better logic for initial placement of entrance / exit for door
 */
 
 
@@ -43,9 +34,6 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	exitCanvas2.width = width * scale; // TODO : globals?
 	exitCanvas2.height = width * scale;
 	var exitCtx2 = exitCanvas2.getContext("2d");
-
-	console.log("EXIT TOOOL!!");
-	console.log(exitCtx1);
 
 	var PlacementMode = { // TODO : awkward name
 		None : 0,
@@ -246,8 +234,6 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 
 				curExitInfo.exit.x = x;
 				curExitInfo.exit.y = y;
-
-				console.log(curExitInfo);
 
 				refreshGameData();
 				RenderExits();
