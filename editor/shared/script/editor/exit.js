@@ -14,6 +14,8 @@ TODO:
 - how do we handle overlapping exits & entrances????
 - BUG: don't duplicate "current exit" in exit info list if the exit already exists in the new room (how???)
 - show exit count to help navigation??
+- BUG: moving exit into a new room doesn't update exit info list
+- BUG: on switching rooms, paired exits don't render correctly at first
 
 the big think to think about:
 **** new file format for exits ****
@@ -368,10 +370,27 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	{
 		var infoList = [];
 
+		var findReturnExit = function(parentRoom, startExit) {
+			var returnExit = null;
+			for (var j in room[startExit.dest.room].exits) {
+				var otherExit = room[startExit.dest.room].exits[j];
+				if (otherExit.dest.room === parentRoom &&
+					otherExit.dest.x == startExit.x && otherExit.dest.y == startExit.y) {
+						returnExit = otherExit;
+				}
+			}
+			return returnExit;
+		}
+
 		for (var i in room[selectedRoom].exits) {
+			var localExit = room[selectedRoom].exits[i];
+			var returnExit = findReturnExit(selectedRoom, localExit);
+
 			infoList.push({
 				parentRoom: selectedRoom,
-				exit: room[selectedRoom].exits[i]
+				exit: room[selectedRoom].exits[i],
+				hasReturn: returnExit != null,
+				return: returnExit,
 			});
 		}
 
@@ -379,10 +398,12 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 			if (r != selectedRoom) {
 				for (var i in room[r].exits) {
 					var exit = room[r].exits[i];
-					if (exit.dest.room === selectedRoom) {
+					if (exit.dest.room === selectedRoom && findReturnExit(r,exit) == null) {
 						infoList.push({
 							parentRoom: r,
-							exit: exit
+							exit: exit,
+							hasReturn: false,
+							return: null
 						});
 					}
 				}

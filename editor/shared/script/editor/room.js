@@ -362,21 +362,71 @@ function RoomTool(canvas) {
 				}
 			}
 
+			var drawTwoWayExit = function(e) {
+				ctx.fillStyle = getContrastingColor();
+				ctx.strokeStyle = getContrastingColor();
+				ctx.lineWidth = 3.0;
+				
+				ctx.globalAlpha = 0.5;
+				ctx.fillRect(e.x * w, e.y * w, w, w);
+
+				ctx.globalAlpha = 1.0;
+				var centerX = (e.x * w) + (w/2);
+				var centerY = (e.y * w) + (w/2);
+				ctx.beginPath();
+				ctx.moveTo(centerX, centerY - (w/4));
+				ctx.lineTo(centerX + (w/4), centerY - (w * 0.1));
+				ctx.lineTo(centerX - (w/4), centerY - (w * 0.1));
+				ctx.fill();
+				ctx.beginPath();
+				ctx.moveTo(centerX, centerY + (w/4));
+				ctx.lineTo(centerX + (w/4), centerY + (w * 0.1));
+				ctx.lineTo(centerX - (w/4), centerY + (w * 0.1));
+				ctx.fill();
+				ctx.beginPath();
+				ctx.moveTo(centerX, centerY - (w * 0.2));
+				ctx.lineTo(centerX, centerY + (w * 0.2));
+				ctx.stroke();
+
+				if (e == self.exits.GetSelectedExit()) {
+					ctx.strokeStyle = getContrastingColor();
+					ctx.globalAlpha = 1.0;
+					ctx.lineWidth = 2.0;
+					ctx.strokeRect((e.x * w) - (w/4), (e.y * w) - (w/4), w * 1.5, w * 1.5);
+				}
+			}
+
+			var drawExitPair = function(exitInfo) {
+				drawTwoWayExit(exitInfo.exit);
+
+				if (exitInfo.exit.dest.room === curRoom) {
+					drawTwoWayExit(exitInfo.return);
+				}
+			}
+
 			for (var i = 0; i < exitInfoList.length; i++) {
 				var exitInfo = exitInfoList[i];
 
 				if (exitInfo.parentRoom === curRoom) {
-					var e = exitInfo.exit;
-					if( !room[e.dest.room] )
-						continue;
+					if (exitInfo.hasReturn) {
+						// draw two way exit
+						drawExitPair(exitInfo);
+					}
+					else {
+						// draw one-way exit starting in this room
+						var e = exitInfo.exit;
+						if( !room[e.dest.room] )
+							continue;
 
-					drawExit(e);
+						drawExit(e);
 
-					if (e.dest.room === curRoom){
-						drawEntrance(e);
+						if (e.dest.room === curRoom){
+							drawEntrance(e);
+						}
 					}
 				}
 				else {
+					// draw one-way exit *ending* in this room
 					var e = exitInfo.exit;
 					if( !room[e.dest.room] )
 						continue;
