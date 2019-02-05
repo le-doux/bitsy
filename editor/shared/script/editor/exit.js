@@ -1,5 +1,14 @@
 /*
 TODO:
+- exit pairs
+- exit direction control
+- exit dialog
+	- file format
+	- new script functions
+	- UI control
+
+
+TODO:
 - swap exit / entrance
 - two-way exits
 - how do we handle overlapping exits & entrances????
@@ -181,7 +190,10 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 			return false;
 		}
 
-		curExitInfo = FindExitAtLocation(x,y);
+		var foundExit = FindExitAtLocation(x,y);
+		if (foundExit != null) {
+			curExitInfo = foundExit;
+		}
 		RenderExits();
 
 		return curExitInfo != null;
@@ -427,5 +439,9 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 
 	this.IsDraggingExit = function() {
 		return dragMode != PlacementMode.None;
+	}
+
+	this.GetExitInfoList = function() {
+		return exitInfoList;
 	}
 } // ExitTool

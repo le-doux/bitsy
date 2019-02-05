@@ -313,95 +313,80 @@ function RoomTool(canvas) {
 		//draw exits (and entrances)
 		if (self.areExitsVisible) {
 			var w = tilesize * scale;
+			var exitInfoList = self.exits.GetExitInfoList();
 
-			for( r in room ) {
-				if( r === curRoom ) {
-					for (i in room[curRoom].exits) {
-						var e = room[curRoom].exits[i];
-						if( !room[e.dest.room] )
-							continue;
+			var drawExit = function(e) {
+				ctx.fillStyle = getContrastingColor();
+				ctx.globalAlpha = 0.5;
+				ctx.fillRect(e.x * w, e.y * w, w, w);
 
-						ctx.fillStyle = getContrastingColor();
-						ctx.globalAlpha = 0.5;
-						ctx.fillRect(e.x * w, e.y * w, w, w);
+				ctx.globalAlpha = 1.0;
+				var centerX = (e.x * w) + (w/2);
+				var centerY = (e.y * w) + (w/2);
+				ctx.beginPath();
+				ctx.moveTo(centerX, centerY - (w/4));
+				ctx.lineTo(centerX + (w/4), centerY + (w/4));
+				ctx.lineTo(centerX - (w/4), centerY + (w/4));
+				ctx.fill();
 
-						ctx.globalAlpha = 1.0;
-						var centerX = (e.x * w) + (w/2);
-						var centerY = (e.y * w) + (w/2);
-						ctx.beginPath();
-						ctx.moveTo(centerX, centerY - (w/4));
-						ctx.lineTo(centerX + (w/4), centerY + (w/4));
-						ctx.lineTo(centerX - (w/4), centerY + (w/4));
-						ctx.fill();
+				if (e == self.exits.GetSelectedExit()) {
+					ctx.strokeStyle = getContrastingColor();
+					ctx.globalAlpha = 1.0;
+					ctx.lineWidth = 2.0;
+					ctx.strokeRect((e.x * w) - (w/4), (e.y * w) - (w/4), w * 1.5, w * 1.5);
+				}
+			}
 
-						if (e == self.exits.GetSelectedExit()) {
-							ctx.strokeStyle = getContrastingColor();
-							ctx.globalAlpha = 1.0;
-							ctx.lineWidth = 2.0;
-							ctx.strokeRect((e.x * w) - (w/4), (e.y * w) - (w/4), w * 1.5, w * 1.5);
-						}
+			var drawEntrance = function(e) {
+				ctx.fillStyle = getContrastingColor();
+				ctx.globalAlpha = 0.5;
+				ctx.fillRect(e.dest.x * w, e.dest.y * w, w, w);
 
-						if (e.dest.room === curRoom){
+				ctx.strokeStyle = getContrastingColor();
+				ctx.lineWidth = 2.0;
+				ctx.globalAlpha = 1.0;
+				var centerX = (e.dest.x * w) + (w/2);
+				var centerY = (e.dest.y * w) + (w/2);
+				ctx.beginPath();
+				ctx.moveTo(centerX, centerY + (w/4));
+				ctx.lineTo(centerX + (w/4), centerY - (w/4));
+				ctx.lineTo(centerX - (w/4), centerY - (w/4));
+				ctx.lineTo(centerX, centerY + (w/4));
+				ctx.stroke();
 
-							ctx.fillStyle = getContrastingColor();
-							ctx.globalAlpha = 0.5;
-							ctx.fillRect(e.dest.x * w, e.dest.y * w, w, w);
+				if (e == self.exits.GetSelectedExit()) {
+					ctx.strokeStyle = getContrastingColor();
+					ctx.globalAlpha = 1.0;
+					ctx.lineWidth = 2.0;
+					ctx.strokeRect((e.dest.x * w) - (w/4), (e.dest.y * w) - (w/4), w * 1.5, w * 1.5);
+				}
+			}
 
-							ctx.strokeStyle = getContrastingColor();
-							ctx.lineWidth = 2.0;
-							ctx.globalAlpha = 1.0;
-							var centerX = (e.dest.x * w) + (w/2);
-							var centerY = (e.dest.y * w) + (w/2);
-							ctx.beginPath();
-							ctx.moveTo(centerX, centerY + (w/4));
-							ctx.lineTo(centerX + (w/4), centerY - (w/4));
-							ctx.lineTo(centerX - (w/4), centerY - (w/4));
-							ctx.lineTo(centerX, centerY + (w/4));
-							ctx.stroke();
+			for (var i = 0; i < exitInfoList.length; i++) {
+				var exitInfo = exitInfoList[i];
 
-							if (e == self.exits.GetSelectedExit()) {
-								ctx.strokeStyle = getContrastingColor();
-								ctx.globalAlpha = 1.0;
-								ctx.lineWidth = 2.0;
-								ctx.strokeRect((e.dest.x * w) - (w/4), (e.dest.y * w) - (w/4), w * 1.5, w * 1.5);
-							}
-						}
+				if (exitInfo.parentRoom === curRoom) {
+					var e = exitInfo.exit;
+					if( !room[e.dest.room] )
+						continue;
+
+					drawExit(e);
+
+					if (e.dest.room === curRoom){
+						drawEntrance(e);
 					}
 				}
 				else {
-					for (i in room[r].exits) {
-						var e = room[r].exits[i];
-						if( !room[e.dest.room] )
-							continue;
+					var e = exitInfo.exit;
+					if( !room[e.dest.room] )
+						continue;
 
-						if (e.dest.room === curRoom){
-
-							ctx.fillStyle = getContrastingColor();
-							ctx.globalAlpha = 0.5;
-							ctx.fillRect(e.dest.x * w, e.dest.y * w, w, w);
-
-							ctx.strokeStyle = getContrastingColor();
-							ctx.lineWidth = 2.0;
-							ctx.globalAlpha = 1.0;
-							var centerX = (e.dest.x * w) + (w/2);
-							var centerY = (e.dest.y * w) + (w/2);
-							ctx.beginPath();
-							ctx.moveTo(centerX, centerY + (w/4));
-							ctx.lineTo(centerX + (w/4), centerY - (w/4));
-							ctx.lineTo(centerX - (w/4), centerY - (w/4));
-							ctx.lineTo(centerX, centerY + (w/4));
-							ctx.stroke();
-
-							if (e == self.exits.GetSelectedExit()) {
-								ctx.strokeStyle = getContrastingColor();
-								ctx.globalAlpha = 1.0;
-								ctx.lineWidth = 2.0;
-								ctx.strokeRect((e.dest.x * w) - (w/4), (e.dest.y * w) - (w/4), w * 1.5, w * 1.5);
-							}
-						}
+					if (e.dest.room === curRoom){
+						drawEntrance(e);
 					}
 				}
 			}
+
 			ctx.globalAlpha = 1;
 		}
 
