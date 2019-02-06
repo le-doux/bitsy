@@ -206,6 +206,15 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		}
 	}
 
+	this.GetSelectedReturn = function() {
+		if (curExitInfo != null && curExitInfo.hasReturn) {
+			return curExitInfo.return;
+		}
+		else {
+			return null;
+		}
+	}
+
 	this.TrySelectExitAtLocation = function(x,y) {
 		if (placementMode != PlacementMode.None) {
 			return false;
@@ -427,6 +436,13 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		for (var i in room[selectedRoom].exits) {
 			var localExit = room[selectedRoom].exits[i];
 			var returnExit = findReturnExit(selectedRoom, localExit);
+
+			if (returnExit != null) {
+				var alreadyExistingExitInfo = infoList.find(function(e) { return e.exit == returnExit; });
+				if (alreadyExistingExitInfo != null && alreadyExistingExitInfo != undefined) {
+					continue; // avoid duplicates when both parts of a paired exit are in the same room
+				}
+			}
 
 			infoList.push({
 				parentRoom: selectedRoom,

@@ -388,7 +388,7 @@ function RoomTool(canvas) {
 				ctx.lineTo(centerX, centerY + (w * 0.2));
 				ctx.stroke();
 
-				if (e == self.exits.GetSelectedExit()) {
+				if (e == self.exits.GetSelectedExit() || e == self.exits.GetSelectedReturn()) {
 					ctx.strokeStyle = getContrastingColor();
 					ctx.globalAlpha = 1.0;
 					ctx.lineWidth = 2.0;
