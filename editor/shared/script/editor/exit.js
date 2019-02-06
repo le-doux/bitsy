@@ -16,6 +16,8 @@ TODO:
 - show exit count to help navigation??
 - BUG: moving exit into a new room doesn't update exit info list
 - BUG: on switching rooms, paired exits don't render correctly at first
+- BUG: exit pair shows up twice when it's in the same room
+- BUG: exit pair doesn't draw selection correctly when it's in the same room!
 
 the big think to think about:
 **** new file format for exits ****
@@ -113,10 +115,22 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		}
 		room[selectedRoom].exits.push( newExit );
 
+		var newReturn = {
+			x : newExit.dest.x,
+			y : newExit.dest.y,
+			dest : {
+				room : selectedRoom,
+				x : newExit.x,
+				y : newExit.y
+			}
+		}
+		room[newExit.dest.room].exits.push( newReturn );
+
 		exitInfoList = GatherExitInfoList();
 		curExitInfo = exitInfoList.find(function(e) { return e.exit == newExit; });
 
 		RenderExits();
+		refreshGameData();
 	};
 
 	this.SetRoom = function(roomId) {
@@ -165,13 +179,18 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	}
 
 	this.RemoveExit = function() {
-		var i = room[curExitInfo.parentRoom].exits.indexOf(curExitInfo.exit);
-		room[curExitInfo.parentRoom].exits.splice(i,1);
+		if (curExitInfo.hasReturn) {
+			var returnIndex = room[curExitInfo.exit.dest.room].exits.indexOf(curExitInfo.return);
+			room[curExitInfo.exit.dest.room].exits.splice(returnIndex,1);
+		}
+		var exitIndex = room[curExitInfo.parentRoom].exits.indexOf(curExitInfo.exit);
+		room[curExitInfo.parentRoom].exits.splice(exitIndex,1);
 
 		exitInfoList = GatherExitInfoList();
 		curExitInfo = exitInfoList.length > 0 ? exitInfoList[0] : null;
 
 		RenderExits();
+		refreshGameData();
 	}
 
 	this.IsPlacingExit = function () {
@@ -284,6 +303,14 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	this.PlaceExit = function(x,y) {
 		if (placementMode == PlacementMode.Exit) {
 			if (curExitInfo != null) {
+				// return (change return destination)
+				if (curExitInfo.hasReturn) {
+					curExitInfo.return.dest.room = selectedRoom;
+					curExitInfo.return.dest.x = x;
+					curExitInfo.return.dest.y = y;
+				}
+
+				// room
 				if (curExitInfo.parentRoom != selectedRoom) {
 					var oldExitIndex = room[curExitInfo.parentRoom].exits.indexOf(curExitInfo.exit);
 					room[curExitInfo.parentRoom].exits.splice(oldExitIndex,1);
@@ -291,6 +318,7 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 					curExitInfo.parentRoom = selectedRoom;
 				}
 
+				// exit pos
 				curExitInfo.exit.x = x;
 				curExitInfo.exit.y = y;
 
@@ -300,8 +328,22 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		}
 		else if (placementMode == PlacementMode.Destination) {
 			if (curExitInfo != null) {
+				// return (change return origin)
+				if (curExitInfo.hasReturn) {
+					if (curExitInfo.exit.dest.room != selectedRoom) {
+						var oldReturnIndex = room[curExitInfo.exit.dest.room].exits.indexOf(curExitInfo.return);
+						room[curExitInfo.exit.dest.room].exits.splice(oldReturnIndex,1);
+						room[selectedRoom].exits.push(curExitInfo.return);
+					}
+
+					curExitInfo.return.x = x;
+					curExitInfo.return.y = y;
+				}
+
+				// room
 				curExitInfo.exit.dest.room = selectedRoom;
 
+				// destination pos
 				curExitInfo.exit.dest.x = x;
 				curExitInfo.exit.dest.y = y;
 
@@ -439,10 +481,18 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		if (dragMode == PlacementMode.Exit) {
 			dragExitInfo.exit.x = x;
 			dragExitInfo.exit.y = y;
+			if (dragExitInfo.hasReturn) {
+				dragExitInfo.return.dest.x = x;
+				dragExitInfo.return.dest.y = y;
+			}
 		}
 		else if (dragMode == PlacementMode.Destination) {
 			dragExitInfo.exit.dest.x = x;
 			dragExitInfo.exit.dest.y = y;
+			if (dragExitInfo.hasReturn) {
+				dragExitInfo.return.x = x;
+				dragExitInfo.return.y = y;
+			}
 		}
 		
 		refreshGameData();
