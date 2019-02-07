@@ -2151,21 +2151,25 @@ var exitTool;
 function newExit() {
 	console.log("NEW EXIT");
 	exitTool.AddExit();
+	roomTool.drawEditMap();
 }
 
 function deleteExit() {
 	console.log("DELETE EXIT");
 	exitTool.RemoveExit();
+	roomTool.drawEditMap();
 }
 
 function prevExit() {
 	console.log("PREV EXIT");
 	exitTool.NextExit();
+	roomTool.drawEditMap();
 }
 
 function nextExit() {
 	console.log("NEXT EXIT");
 	exitTool.PrevExit();
+	roomTool.drawEditMap();
 }
 
 function toggleMoveExitDoor1(e) {
@@ -2190,6 +2194,11 @@ function cancelMoveExitDoor2() {
 
 function selectExitRoom2() {
 	exitTool.SelectDestinationRoom();
+}
+
+function changeExitDirection() {
+	exitTool.ChangeExitLink();
+	roomTool.drawEditMap();
 }
 
 function showExits() {

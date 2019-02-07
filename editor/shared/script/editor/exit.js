@@ -1,12 +1,18 @@
 /*
 TODO:
-- exit pairs
-- exit direction control
+X exit pairs
+X exit direction control
 - exit dialog
 	- file format
 	- new script functions
 	- UI control
 
+
+TODO:
+- exit direction switching more or less works BUT with some major bugs
+	- when switching back to two-way the exits swap
+	- weird rendering stuff
+	- weird room switching stuff
 
 TODO:
 - swap exit / entrance
@@ -163,26 +169,36 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		if (curExitInfo != null) {
 			var w = tilesize * scale;
 
-			drawRoom( room[curExitInfo.parentRoom], exitCtx1 );
+			var exitCtx = exitCtx1;
+			var destCtx = exitCtx2;
+			if (curExitInfo.linkState == LinkState.OneWaySwapped) {
+				exitCtx = exitCtx2;
+				destCtx = exitCtx1;
+			}
 
-			exitCtx1.fillStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
-			exitCtx1.strokeStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
-			exitCtx1.lineWidth = 4;
-			exitCtx1.fillRect(curExitInfo.exit.x * w, curExitInfo.exit.y * w, w, w);
-			exitCtx1.strokeRect((curExitInfo.exit.x * w) - (w/2), (curExitInfo.exit.y * w) - (w/2), w * 2, w * 2);
+			drawRoom( room[curExitInfo.parentRoom], exitCtx );
 
-			drawRoom( room[curExitInfo.exit.dest.room], exitCtx2 );
+			exitCtx.fillStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
+			exitCtx.strokeStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
+			exitCtx.lineWidth = 4;
+			exitCtx.fillRect(curExitInfo.exit.x * w, curExitInfo.exit.y * w, w, w);
+			exitCtx.strokeRect((curExitInfo.exit.x * w) - (w/2), (curExitInfo.exit.y * w) - (w/2), w * 2, w * 2);
 
-			exitCtx2.fillStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
-			exitCtx2.strokeStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
-			exitCtx2.lineWidth = 4;
-			exitCtx2.fillRect(curExitInfo.exit.dest.x * w, curExitInfo.exit.dest.y * w, w, w);
-			exitCtx2.strokeRect((curExitInfo.exit.dest.x * w) - (w/2), (curExitInfo.exit.dest.y * w) - (w/2), w * 2, w * 2);
+			drawRoom( room[curExitInfo.exit.dest.room], destCtx );
+
+			destCtx.fillStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
+			destCtx.strokeStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
+			destCtx.lineWidth = 4;
+			destCtx.fillRect(curExitInfo.exit.dest.x * w, curExitInfo.exit.dest.y * w, w, w);
+			destCtx.strokeRect((curExitInfo.exit.dest.x * w) - (w/2), (curExitInfo.exit.dest.y * w) - (w/2), w * 2, w * 2);
 		}
 		else {
 			exitCtx1.clearRect(0, 0, exitCanvas1.width, exitCanvas1.height);
 			exitCtx2.clearRect(0, 0, exitCanvas2.width, exitCanvas2.height);
 		}
+
+		// just tacking this on here to make sure it updates
+		UpdateExitDirectionUI();
 	}
 
 	this.RemoveExit = function() {
@@ -544,16 +560,81 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	this.ChangeExitLink = function() {
 		if (curExitInfo != null) {
 			if (curExitInfo.linkState == LinkState.TwoWay) {
-				// TODO -- get rid of return exit --> LinkState.OneWayOriginal
+				// -- get rid of return exit --
+
+				if (curExitInfo.hasReturn) {
+					var returnIndex = room[curExitInfo.exit.dest.room].exits.indexOf(curExitInfo.return);
+					room[curExitInfo.exit.dest.room].exits.splice(returnIndex,1);
+
+					curExitInfo.return = null;
+					curExitInfo.hasReturn = false;
+				}
+
+				curExitInfo.linkState = LinkState.OneWayOriginal;
 			}
 			else if (curExitInfo.linkState == LinkState.OneWayOriginal) {
-				// TODO -- swap the exit & entrance --> LinkState.OneWaySwapped
+				// -- swap the exit & entrance --
+
+				var tempDestRoom = curExitInfo.parentRoom;
+				var tempDestX = curExitInfo.exit.x;
+				var tempDestY = curExitInfo.exit.y;
+
+				// remove exit from current parent room
+				var exitIndex = room[curExitInfo.parentRoom].exits.indexOf(curExitInfo.exit);
+				room[curExitInfo.parentRoom].exits.splice(exitIndex,1);
+
+				// add to destination room
+				room[curExitInfo.exit.dest.room].exits.push(curExitInfo.exit);
+				curExitInfo.parentRoom = curExitInfo.exit.dest.room;
+
+				// swap positions
+				curExitInfo.exit.x = curExitInfo.exit.dest.x;
+				curExitInfo.exit.y = curExitInfo.exit.dest.y;
+				curExitInfo.exit.dest.room = tempDestRoom;
+				curExitInfo.exit.dest.x = tempDestX;
+				curExitInfo.exit.dest.y = tempDestY;
+
+				curExitInfo.linkState = LinkState.OneWaySwapped;
 			}
 			else if (curExitInfo.linkState == LinkState.OneWaySwapped) {
-				// TODO -- create a return exit --> LinkState.TwoWay
+				// -- create a return exit --
+				var newReturn = {
+					x : curExitInfo.exit.dest.x,
+					y : curExitInfo.exit.dest.y,
+					dest : {
+						room : curExitInfo.parentRoom,
+						x : curExitInfo.exit.x,
+						y : curExitInfo.exit.y
+					}
+				}
+				room[curExitInfo.exit.dest.room].exits.push( newReturn );
+
+				curExitInfo.return = newReturn;
+				curExitInfo.hasReturn = true;
+
+				curExitInfo.linkState = LinkState.TwoWay;
 			}
 
+			refreshGameData();
 			RenderExits();
+		}
+	}
+
+	function UpdateExitDirectionUI() {
+		//hacky globals again
+		if (curExitInfo != null) {
+			if (curExitInfo.linkState == LinkState.TwoWay) {
+				document.getElementById("exitDirectionBackIcon").style.visibility = "visible";
+				document.getElementById("exitDirectionForwardIcon").style.visibility = "visible";
+			}
+			else if (curExitInfo.linkState == LinkState.OneWayOriginal) {
+				document.getElementById("exitDirectionBackIcon").style.visibility = "hidden";
+				document.getElementById("exitDirectionForwardIcon").style.visibility = "visible";
+			}
+			else if (curExitInfo.linkState == LinkState.OneWaySwapped) {
+				document.getElementById("exitDirectionBackIcon").style.visibility = "visible";
+				document.getElementById("exitDirectionForwardIcon").style.visibility = "hidden";
+			}
 		}
 	}
 } // ExitTool
