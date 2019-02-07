@@ -100,6 +100,13 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	};
 	var placementMode = PlacementMode.None;
 
+	// NOTE: the "link state" is a UI time concept -- it is not stored in the game data
+	var LinkState = {
+		TwoWay : 0, // two way exit
+		OneWayOriginal : 1, // one way exit - in same state as when it was "gathered"
+		OneWaySwapped : 2, // one way exit - swapped direction from how it was "gathered"
+	};
+
 	UpdatePlacementButtons();
 
 	this.AddExit = function() {
@@ -449,6 +456,7 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 				exit: room[selectedRoom].exits[i],
 				hasReturn: returnExit != null,
 				return: returnExit,
+				linkState: returnExit ? LinkState.TwoWay : LinkState.OneWayOriginal
 			});
 		}
 
@@ -461,7 +469,8 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 							parentRoom: r,
 							exit: exit,
 							hasReturn: false,
-							return: null
+							return: null,
+							linkState: LinkState.OneWayOriginal
 						});
 					}
 				}
@@ -530,5 +539,21 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 
 	this.GetExitInfoList = function() {
 		return exitInfoList;
+	}
+
+	this.ChangeExitLink = function() {
+		if (curExitInfo != null) {
+			if (curExitInfo.linkState == LinkState.TwoWay) {
+				// TODO -- get rid of return exit --> LinkState.OneWayOriginal
+			}
+			else if (curExitInfo.linkState == LinkState.OneWayOriginal) {
+				// TODO -- swap the exit & entrance --> LinkState.OneWaySwapped
+			}
+			else if (curExitInfo.linkState == LinkState.OneWaySwapped) {
+				// TODO -- create a return exit --> LinkState.TwoWay
+			}
+
+			RenderExits();
+		}
 	}
 } // ExitTool
