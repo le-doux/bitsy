@@ -10,20 +10,20 @@ X exit direction control
 
 TODO:
 - exit direction switching more or less works BUT with some major bugs
-	- when switching back to two-way the exits swap
-	- weird rendering stuff
+	X when switching back to two-way the exits swap
+	X weird rendering stuff
 	- weird room switching stuff
+- lots of issues when "carrying over" exits from other room
+
+NEW TODOS:
+- stop room tool relying on "curRoom" -- give it an internal state
 
 TODO:
-- swap exit / entrance
-- two-way exits
 - how do we handle overlapping exits & entrances????
 - BUG: don't duplicate "current exit" in exit info list if the exit already exists in the new room (how???)
 - show exit count to help navigation??
 - BUG: moving exit into a new room doesn't update exit info list
 - BUG: on switching rooms, paired exits don't render correctly at first
-- BUG: exit pair shows up twice when it's in the same room
-- BUG: exit pair doesn't draw selection correctly when it's in the same room!
 
 the big think to think about:
 **** new file format for exits ****
@@ -554,14 +554,36 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	}
 
 	this.GetExitInfoList = function() {
+		console.log("get exit info " + selectedRoom);
+		// ResetExitList(); // make sure we are up to date!
 		return exitInfoList;
 	}
 
 	this.ChangeExitLink = function() {
+		function swapExitAndEntrance() {
+			var tempDestRoom = curExitInfo.parentRoom;
+			var tempDestX = curExitInfo.exit.x;
+			var tempDestY = curExitInfo.exit.y;
+
+			// remove exit from current parent room
+			var exitIndex = room[curExitInfo.parentRoom].exits.indexOf(curExitInfo.exit);
+			room[curExitInfo.parentRoom].exits.splice(exitIndex,1);
+
+			// add to destination room
+			room[curExitInfo.exit.dest.room].exits.push(curExitInfo.exit);
+			curExitInfo.parentRoom = curExitInfo.exit.dest.room;
+
+			// swap positions
+			curExitInfo.exit.x = curExitInfo.exit.dest.x;
+			curExitInfo.exit.y = curExitInfo.exit.dest.y;
+			curExitInfo.exit.dest.room = tempDestRoom;
+			curExitInfo.exit.dest.x = tempDestX;
+			curExitInfo.exit.dest.y = tempDestY;
+		}
+
 		if (curExitInfo != null) {
 			if (curExitInfo.linkState == LinkState.TwoWay) {
 				// -- get rid of return exit --
-
 				if (curExitInfo.hasReturn) {
 					var returnIndex = room[curExitInfo.exit.dest.room].exits.indexOf(curExitInfo.return);
 					room[curExitInfo.exit.dest.room].exits.splice(returnIndex,1);
@@ -574,30 +596,14 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 			}
 			else if (curExitInfo.linkState == LinkState.OneWayOriginal) {
 				// -- swap the exit & entrance --
-
-				var tempDestRoom = curExitInfo.parentRoom;
-				var tempDestX = curExitInfo.exit.x;
-				var tempDestY = curExitInfo.exit.y;
-
-				// remove exit from current parent room
-				var exitIndex = room[curExitInfo.parentRoom].exits.indexOf(curExitInfo.exit);
-				room[curExitInfo.parentRoom].exits.splice(exitIndex,1);
-
-				// add to destination room
-				room[curExitInfo.exit.dest.room].exits.push(curExitInfo.exit);
-				curExitInfo.parentRoom = curExitInfo.exit.dest.room;
-
-				// swap positions
-				curExitInfo.exit.x = curExitInfo.exit.dest.x;
-				curExitInfo.exit.y = curExitInfo.exit.dest.y;
-				curExitInfo.exit.dest.room = tempDestRoom;
-				curExitInfo.exit.dest.x = tempDestX;
-				curExitInfo.exit.dest.y = tempDestY;
+				swapExitAndEntrance();
 
 				curExitInfo.linkState = LinkState.OneWaySwapped;
 			}
 			else if (curExitInfo.linkState == LinkState.OneWaySwapped) {
 				// -- create a return exit --
+				swapExitAndEntrance(); // swap first
+
 				var newReturn = {
 					x : curExitInfo.exit.dest.x,
 					y : curExitInfo.exit.dest.y,

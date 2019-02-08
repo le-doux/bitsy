@@ -846,11 +846,11 @@ function selectRoom(roomId) {
 	if (nextRoomIndex != -1) {
 		roomIndex = nextRoomIndex;
 		curRoom = ids[roomIndex];
+		exitTool.SetRoom(curRoom);
 		roomTool.drawEditMap();
 		paintTool.updateCanvas();
 		updateRoomPaletteSelect();
 		paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
-		exitTool.SetRoom(curRoom);
 
 		if (drawing.type === TileType.Tile)
 			updateWallCheckboxOnCurrentTile();
@@ -863,11 +863,11 @@ function nextRoom() {
 	var ids = sortedRoomIdList();
 	roomIndex = (roomIndex + 1) % ids.length;
 	curRoom = ids[roomIndex];
+	exitTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
 	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
-	exitTool.SetRoom(curRoom);
 
 	if (drawing.type === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -880,11 +880,11 @@ function prevRoom() {
 	roomIndex--;
 	if (roomIndex < 0) roomIndex = (ids.length-1);
 	curRoom = ids[roomIndex];
+	exitTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
 	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
-	exitTool.SetRoom(curRoom);
 
 	if (drawing.type === TileType.Tile)
 		updateWallCheckboxOnCurrentTile();
@@ -990,9 +990,9 @@ function newRoom() {
 
 	curRoom = roomId;
 	//console.log(curRoom);
+	exitTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
-	exitTool.SetRoom(curRoom);
 	updateRoomPaletteSelect();
 
 	updateRoomName();
