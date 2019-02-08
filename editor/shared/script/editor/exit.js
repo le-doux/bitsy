@@ -1,88 +1,32 @@
 /*
 TODO:
-X exit pairs
-X exit direction control
 - exit dialog
 	- file format
 	- new script functions
 	- UI control
 
-
-TODO:
-- exit direction switching more or less works BUT with some major bugs
-	X when switching back to two-way the exits swap
-	X weird rendering stuff
-	X weird room switching stuff
-X lots of issues when "carrying over" exits from other room
-- cancel "carry over" room when closing exit tool??
-
-NEW TODOS:
+NOTES / ideas:
 - stop room tool relying on "curRoom" -- give it an internal state
-
-TODO:
-- how do we handle overlapping exits & entrances????
-- BUG: don't duplicate "current exit" in exit info list if the exit already exists in the new room (how???)
 - show exit count to help navigation??
-- BUG: moving exit into a new room doesn't update exit info list
-- BUG: on switching rooms, paired exits don't render correctly at first
-
-the big think to think about:
-**** new file format for exits ****
-features:
-- two way exits
-- transitions
-- swap characters
-- ? play dialog
-- ? lock based on variables
-- future expansion
-
-future:
-- start from room / exit / location?
 - should I have direct exit value manipulation (room + coords) as dropdowns?
 - better logic for initial placement of entrance / exit for door
 
+TODO advanced exits:
+- transition animations
+- swap characters
+- play dialog
+- lock based on return variable
 
-
-prototype file formats:
-EXT 13,4 0 7,9
-
-EXT 13,4 0 7,9
-- RETURN 1
-- AVATAR 11
-- TRANSITION fade
-
-EXT 13,4 0 7,9 DLG EXT_15
-
-DLG EXT_15
-"""
-{changeAvatar "11"}
-{playTransition "fade"}
-"""
-
-how to handle transitions in code?
-- {playTransition} {nextTransition} {setTransition}
-- thought: easiest is {nextTransition} that resets after transition is done
-
-locks could be:
-- if dialog returns false.. you can't go through the door!
-	- this suggests all dialog plays BEFORE you enter the door.. is that true?
-
-Major questions:
-- should two-way exits be two exits.. or one exit with a return marker?
-- should other properties of exits be hard-code? or triggered by an attached dialog?
-- out there ideas: multiple exit functions (on touch, on enter, during transition) each with their own dialog
-
-
-possible new functions
-{nextTransition "transitionName"}
-{setAvatar "IDorName"}
-{getAvatar}
-
-
-
-a weird thought.. an exit that always returned false would become a trigger (support that explicitly???)
-
-would I need a way to edit the exit dialog code directly? what happens if the user does something weird??? (default to "custom")
+plan for advanced exits:
+- exits can have an associated dialog
+	EXT 13,4 0 7,9 DLG EXT_15
+- if the dialog script returns true you can enter it.. otherwise it's cancelled
+- it can play dialog as normal
+- other features are new functions
+	- {changeAvatar}
+	- {nextTransition}
+- detect supported scripts and show UI for that
+	- arbitrary scripts can be run through "custom" plaintext
 */
 
 
