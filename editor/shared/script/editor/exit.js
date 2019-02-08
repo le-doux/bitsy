@@ -12,8 +12,9 @@ TODO:
 - exit direction switching more or less works BUT with some major bugs
 	X when switching back to two-way the exits swap
 	X weird rendering stuff
-	- weird room switching stuff
-- lots of issues when "carrying over" exits from other room
+	X weird room switching stuff
+X lots of issues when "carrying over" exits from other room
+- cancel "carry over" room when closing exit tool??
 
 NEW TODOS:
 - stop room tool relying on "curRoom" -- give it an internal state
@@ -158,8 +159,23 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 
 	function ResetExitList() {
 		exitInfoList = GatherExitInfoList();
-		if (curExitInfo == null && exitInfoList.length > 0) {
-			curExitInfo = exitInfoList[0];
+
+		if (curExitInfo != null) {
+			// check for exit info that duplicates the carry over exit info
+			var duplicate = exitInfoList.find(function(info) {
+				return (curExitInfo.exit == info.exit && curExitInfo.return == info.return) ||
+					(curExitInfo.exit == info.return && curExitInfo.return == info.exit);
+			});
+			if (duplicate != undefined && duplicate != null) {
+				// if there is a duplicate.. replace it with the carry over exit
+				exitInfoList[exitInfoList.indexOf(duplicate)] = curExitInfo;
+			}
+		}
+		else {
+			if (exitInfoList.length > 0) {
+				// fallback selected exit
+				curExitInfo = exitInfoList[0];
+			}
 		}
 
 		RenderExits();
@@ -330,6 +346,13 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 			document.getElementById("textMoveExitDoor2").innerText = "move door"; // TODO localize
 			document.getElementById("cancelMoveExitDoor2").style.display = "none";
 		}
+
+		if (placementMode == PlacementMode.None) {
+			document.body.style.cursor = "pointer";
+		}
+		else {
+			document.body.style.cursor = "crosshair";
+		}
 	}
 
 	this.PlaceExit = function(x,y) {
@@ -355,7 +378,7 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 				curExitInfo.exit.y = y;
 
 				refreshGameData();
-				RenderExits();
+				ResetExitList();
 			}
 		}
 		else if (placementMode == PlacementMode.Destination) {
@@ -380,7 +403,7 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 				curExitInfo.exit.dest.y = y;
 
 				refreshGameData();
-				RenderExits();
+				ResetExitList();
 			}
 		}
 

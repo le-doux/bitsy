@@ -397,7 +397,9 @@ function RoomTool(canvas) {
 			}
 
 			var drawExitPair = function(exitInfo) {
-				drawTwoWayExit(exitInfo.exit);
+				if (exitInfo.parentRoom === curRoom) {
+					drawTwoWayExit(exitInfo.exit);
+				}
 
 				if (exitInfo.exit.dest.room === curRoom) {
 					drawTwoWayExit(exitInfo.return);
@@ -426,13 +428,19 @@ function RoomTool(canvas) {
 					}
 				}
 				else {
-					// draw one-way exit *ending* in this room
-					var e = exitInfo.exit;
-					if( !room[e.dest.room] )
-						continue;
+					if (exitInfo.hasReturn) {
+						// draw two way exit
+						drawExitPair(exitInfo);
+					}
+					else {
+						// draw one-way exit *ending* in this room
+						var e = exitInfo.exit;
+						if( !room[e.dest.room] )
+							continue;
 
-					if (e.dest.room === curRoom){
-						drawEntrance(e);
+						if (e.dest.room === curRoom){
+							drawEntrance(e);
+						}
 					}
 				}
 			}
