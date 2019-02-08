@@ -27,6 +27,9 @@ plan for advanced exits:
 	- {nextTransition}
 - detect supported scripts and show UI for that
 	- arbitrary scripts can be run through "custom" plaintext
+
+advanced exit notes:
+- should there be a "trigger" option where there is no actual exit.. just a scrip that's run?
 */
 
 
