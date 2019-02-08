@@ -2202,13 +2202,12 @@ function changeExitDirection() {
 }
 
 function showExits() {
-	console.log("show exits");
+	exitTool.Refresh();
 	roomTool.areExitsVisible = true;
 	roomTool.drawEditMap();
 }
 
 function hideExits() {
-	console.log("hide exits");
 	roomTool.areExitsVisible = false;
 	roomTool.drawEditMap();
 }
