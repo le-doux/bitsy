@@ -19,6 +19,9 @@ TODO:
 	- consider "triggers" AKA script-only exits
 		EXT 0,0 NULL DLG dlg_id (or something) (what about? TRG 0,0 dlg_id)
 
+NOTES
+- the handling of onExitDialog is weird... will I create strange bugs if I change it??
+
 - exit dialog
 	- file format
 	- new script functions

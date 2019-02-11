@@ -551,7 +551,8 @@ function updateInput() {
 					// ignore currently held keys UNTIL they are released (stops player from insta-moving)
 					input.ignoreHeldKeys();
 
-					onExitDialog();
+					// var otherTestfunc = function() { console.log("it's the other function!!!"); };
+					// onExitDialog(otherTestfunc); // TODO : will this cause a problem for exits???? (spoiler: yes)
 				}
 			}
 			else {
@@ -957,13 +958,16 @@ function movePlayer(direction) {
 	else if (ext) {
 		if(ext.dlg != null && dialog[ext.dlg]){
 			var dialogStr = dialog[ext.dlg];
-			startDialog(dialogStr,ext.dlg);
+			var testfunc = function () { console.log("~~~ TEST DIALOG CALLBACK ~~~"); };
+			console.log("DIALOG FOR EXIT!!!!");
+			console.log(testfunc);
+			startDialog(dialogStr,ext.dlg, function() {
+				player().room = ext.dest.room;
+				player().x = ext.dest.x;
+				player().y = ext.dest.y;
+				curRoom = ext.dest.room;
+			});
 		}
-
-		player().room = ext.dest.room;
-		player().x = ext.dest.x;
-		player().y = ext.dest.y;
-		curRoom = ext.dest.room;
 	}
 	else if (spr) {
 		startSpriteDialog( spr /*spriteId*/ );
@@ -2004,16 +2008,21 @@ var dialogRenderer = dialogModule.CreateRenderer();
 var dialogBuffer = dialogModule.CreateBuffer();
 var fontManager = new FontManager();
 
-function onExitDialog() {
+function onExitDialog(dialogCallback) {
 	// var breakShit = null;
 	// breakShit();
 	console.log("EXIT DIALOG");
+	console.log(dialogCallback);
 	isDialogMode = false;
 	if (isNarrating) isNarrating = false;
 	if (isDialogPreview) {
 		isDialogPreview = false;
 		if (onDialogPreviewEnd != null)
 			onDialogPreviewEnd();
+	}
+
+	if (dialogCallback != undefined && dialogCallback != null) {
+		dialogCallback();
 	}
 }
 
@@ -2053,13 +2062,14 @@ function startSpriteDialog(spriteId) {
 	}
 }
 
-function startDialog(dialogStr,scriptId) {
+function startDialog(dialogStr,scriptId,dialogCallback) {
 	console.log("START DIALOG ");
 	console.log(dialogStr);
+	console.log(dialogCallback);
 
 	if(dialogStr.length <= 0) {
 		console.log("ON EXIT DIALOG -- startDialog 1");
-		onExitDialog();
+		onExitDialog(dialogCallback);
 		return;
 	}
 
@@ -2071,18 +2081,20 @@ function startDialog(dialogStr,scriptId) {
 	scriptInterpreter.SetDialogBuffer( dialogBuffer );
 
 	var onScriptEnd = function() {
-		if(!dialogBuffer.IsActive()){
+		console.log("ON SCRIPT END " + scriptId);
+		// if(!dialogBuffer.IsActive()){
 			console.log("ON EXIT DIALOG -- startDialog 2");
-			onExitDialog();
-		}
+			onExitDialog(dialogCallback);
+		// }
 	};
 
 	if(scriptId === undefined) {
 		scriptInterpreter.Interpret( dialogStr, onScriptEnd );		
 	}
 	else {
-		if( !scriptInterpreter.HasScript(scriptId) )
+		if( !scriptInterpreter.HasScript(scriptId) ) {
 			scriptInterpreter.Compile( scriptId, dialogStr );
+		}
 		scriptInterpreter.Run( scriptId, onScriptEnd );
 	}
 
