@@ -2,8 +2,9 @@ README on how to use the provided scripts to create an Arabic bitsyfont
 
 Steps:
 1- install "ttx-to-ttf" https://github.com/fonttools/fonttools
-2- run the provided file "CommandsRun.bat" in this directory
-The bat file will execute the following commands and output a file named "arabic2.bitsyfont"
+2- Name your font file "bitsy-with-arabic.ttf"
+3- Run the provided file "CommandsRun.bat" in this directory
+The bat file will input "bitsy-with-arabic.ttf" and output a file named "arabic2.bitsyfont"
 
 ttx bitsy-with-arabic.ttf
 node ttx_to_bitsyfont.js
