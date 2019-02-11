@@ -73,18 +73,23 @@ fs.readFile("bitsy-with-arabic.ttx", "utf8", function(err, data) {
 
 		var unitsPerEm = getHeadValue("unitsPerEm");
 		var pixelsPerEm = getHeadValue("lowestRecPPEM");
-		var pixelsPerUnit = pixelsPerEm / unitsPerEm;
-		var unitsPerPixel = unitsPerEm / pixelsPerEm;
+		// 8 / 4096 = 0.001953125
+		// 4096 / 8 = 512
+		var pixelsPerUnit = pixelsPerEm / unitsPerEm; // pixelsPerUnit = 0.001953125
+		var unitsPerPixel = unitsPerEm / pixelsPerEm; // unitsPerPixel = 512
 
 		var xMax = getHeadValue("xMax");
 		var yMax = getHeadValue("yMax");
 		var width = Math.floor( xMax * pixelsPerUnit );
-		var height = Math.floor( yMax * pixelsPerUnit );
+		var height = Math.floor( yMax * pixelsPerUnit ); // this is always 8? But the Arabic font's height is 10
 
 		function pixelToPoint(x,y) {
 			return {
 				x : ((x / width) * xMax) + (unitsPerPixel * 0.5),
-				y : ((1 - (y / height)) * yMax) + (unitsPerPixel * 0.5)
+				//    ((3072 / 8)*4096) + 256
+				//y : ((0.8124 - ((y) / height)) * yMax) + (unitsPerPixel * 0.5)
+				y : ((1 - ((y+1) / height)) * yMax) + (unitsPerPixel * 0.5)
+				//     (8 /   8   )  * 4096  +  256
 			};
 		}
 
@@ -158,7 +163,10 @@ fs.readFile("bitsy-with-arabic.ttx", "utf8", function(err, data) {
 			}
 
 			if (glyphXMin != 0) {
-				bitsyFontData += "- OFFSET " + glyphXMin + " " + "0" + "\n"; // TODO Y OFFSET
+				// hack: I muiltiplied glyphXMin by 2
+				// to avoid a little half-pixel gap if a letter starts with an empty column
+				// I think the real issue is the text renderer halves the offset, or centers the character.
+				bitsyFontData += "- OFFSET " + (glyphXMin*2) + " " + "0" + "\n"; // TODO Y OFFSET
 			}
 
 			if (spacingWidth != glyphWidth) {
