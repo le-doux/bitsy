@@ -148,8 +148,14 @@ function printFunc(environment,parameters,onReturn) {
 		var textStr = "" + parameters[0];
 		// console.log(textStr);
 		var onFinishHandler = function() {
-			// console.log("FINISHED PRINTING ---- SCRIPT");
+			console.log("FINISHED PRINTING ---- SCRIPT");
+			console.log(">> end print: " + textStr);
+			console.log(">> x = " + environment.GetVariable("x"));
 			onReturn(null);
+			console.log(">> after onReturn print: " + textStr);
+			console.log(">> buffer active? " + environment.GetDialogBuffer().IsActive());
+			console.log(">> x = " + environment.GetVariable("x"));
+			console.log(">> ----");
 		}; // called when dialog is finished printing
 		environment.GetDialogBuffer().AddText( textStr, onFinishHandler );
 	}

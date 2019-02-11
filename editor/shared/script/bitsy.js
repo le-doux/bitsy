@@ -541,6 +541,8 @@ function update() {
 	input.resetTapReleased();
 }
 
+var hackTestFunc = null;
+
 function updateInput() {
 	if( dialogBuffer.IsActive() ) {
 		if (input.anyKeyPressed() || input.isTapReleased()) {
@@ -552,7 +554,7 @@ function updateInput() {
 					input.ignoreHeldKeys();
 
 					// var otherTestfunc = function() { console.log("it's the other function!!!"); };
-					// onExitDialog(otherTestfunc); // TODO : will this cause a problem for exits???? (spoiler: yes)
+					onExitDialog(hackTestFunc); // TODO : will this cause a problem for exits???? (spoiler: yes)
 				}
 			}
 			else {
@@ -2067,6 +2069,9 @@ function startDialog(dialogStr,scriptId,dialogCallback) {
 	console.log(dialogStr);
 	console.log(dialogCallback);
 
+	// hack
+	hackTestFunc = dialogCallback;
+
 	if(dialogStr.length <= 0) {
 		console.log("ON EXIT DIALOG -- startDialog 1");
 		onExitDialog(dialogCallback);
@@ -2082,10 +2087,10 @@ function startDialog(dialogStr,scriptId,dialogCallback) {
 
 	var onScriptEnd = function() {
 		console.log("ON SCRIPT END " + scriptId);
-		// if(!dialogBuffer.IsActive()){
+		if(!dialogBuffer.IsActive()){
 			console.log("ON EXIT DIALOG -- startDialog 2");
 			onExitDialog(dialogCallback);
-		// }
+		}
 	};
 
 	if(scriptId === undefined) {

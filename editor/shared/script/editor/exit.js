@@ -21,6 +21,7 @@ TODO:
 
 NOTES
 - the handling of onExitDialog is weird... will I create strange bugs if I change it??
+	- need to try to refactor this before I continue
 
 - exit dialog
 	- file format
