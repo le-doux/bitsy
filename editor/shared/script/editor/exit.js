@@ -29,6 +29,7 @@ NOTES / ideas:
 - show exit count to help navigation??
 - should I have direct exit value manipulation (room + coords) as dropdowns?
 - better logic for initial placement of entrance / exit for door
+- there is some kind of bug with the title disappearing off of games
 
 TODO advanced exits:
 - transition animations

@@ -955,6 +955,11 @@ function movePlayer(direction) {
 		startNarrating( ending[end.id], true /*isEnding*/ );
 	}
 	else if (ext) {
+		if(ext.dlg != null && dialog[ext.dlg]){
+			var dialogStr = dialog[ext.dlg];
+			startDialog(dialogStr,ext.dlg);
+		}
+
 		player().room = ext.dest.room;
 		player().x = ext.dest.x;
 		player().y = ext.dest.y;
@@ -1255,6 +1260,9 @@ function serializeWorld(skipFonts) {
 				var e = room[id].exits[j];
 				if ( isExitValid(e) ) {
 					worldStr += "EXT " + e.x + "," + e.y + " " + e.dest.room + " " + e.dest.x + "," + e.dest.y;
+					if (e.dlg != undefined && e.dlg != null) {
+						worldStr += " DLG " + e.dlg;
+					}
 					worldStr += "\n";
 				}
 			}
@@ -1523,8 +1531,14 @@ function parseRoom(lines, i) {
 					room : destName,
 					x : parseInt(destCoords[0]),
 					y : parseInt(destCoords[1])
-				}
+				},
+				dlg : null,
 			};
+
+			if (exitArgs.length >= 6 && exitArgs[4] === "DLG") { // TODO : temp naming?
+				ext.dlg = exitArgs[5];
+			}
+
 			room[id].exits.push(ext);
 		}
 		else if (getType(lines[i]) === "END") {
