@@ -1,5 +1,24 @@
 /*
 TODO:
+- advanced exit TODO:
+	- play dialog on (before?) exit
+	- script return values
+	- lock exits on return false
+	- {changeAvatar} function
+	- room transitions system
+	- {nextTransition} function
+	- change how sprites work?
+		- allow multiple?
+		- allow switching of avatar
+	- consider changes to scripting format
+		- return values
+		- {} multi-line blocks (functions??)
+		- deprecate """ blocks?
+		- replace DLG with SCRIPT (name?) blocks?
+		- bigger API? scene objects?? structs??
+	- consider "triggers" AKA script-only exits
+		EXT 0,0 NULL DLG dlg_id (or something) (what about? TRG 0,0 dlg_id)
+
 - exit dialog
 	- file format
 	- new script functions
