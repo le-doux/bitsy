@@ -22,6 +22,10 @@ TODO:
 NOTES
 - the handling of onExitDialog is weird... will I create strange bugs if I change it??
 	- need to try to refactor this before I continue
+	- **** DIALOG END CALLBACK DECISION ***
+		- force script to wait for dialog to close and then return?
+		- OR let script finish but delay dialog callback on the bitsy.js side?
+		- functionally the same???
 
 - exit dialog
 	- file format

@@ -541,8 +541,6 @@ function update() {
 	input.resetTapReleased();
 }
 
-var hackTestFunc = null;
-
 function updateInput() {
 	if( dialogBuffer.IsActive() ) {
 		if (input.anyKeyPressed() || input.isTapReleased()) {
@@ -552,9 +550,6 @@ function updateInput() {
 				if(!hasMoreDialog) {
 					// ignore currently held keys UNTIL they are released (stops player from insta-moving)
 					input.ignoreHeldKeys();
-
-					// var otherTestfunc = function() { console.log("it's the other function!!!"); };
-					onExitDialog(hackTestFunc); // TODO : will this cause a problem for exits???? (spoiler: yes)
 				}
 			}
 			else {
@@ -960,9 +955,6 @@ function movePlayer(direction) {
 	else if (ext) {
 		if(ext.dlg != null && dialog[ext.dlg]){
 			var dialogStr = dialog[ext.dlg];
-			var testfunc = function () { console.log("~~~ TEST DIALOG CALLBACK ~~~"); };
-			console.log("DIALOG FOR EXIT!!!!");
-			console.log(testfunc);
 			startDialog(dialogStr,ext.dlg, function() {
 				player().room = ext.dest.room;
 				player().x = ext.dest.x;
@@ -2011,10 +2003,6 @@ var dialogBuffer = dialogModule.CreateBuffer();
 var fontManager = new FontManager();
 
 function onExitDialog(dialogCallback) {
-	// var breakShit = null;
-	// breakShit();
-	console.log("EXIT DIALOG");
-	console.log(dialogCallback);
 	isDialogMode = false;
 	if (isNarrating) isNarrating = false;
 	if (isDialogPreview) {
@@ -2065,15 +2053,9 @@ function startSpriteDialog(spriteId) {
 }
 
 function startDialog(dialogStr,scriptId,dialogCallback) {
-	console.log("START DIALOG ");
-	console.log(dialogStr);
-	console.log(dialogCallback);
-
-	// hack
-	hackTestFunc = dialogCallback;
-
+	// console.log("START DIALOG ");
 	if(dialogStr.length <= 0) {
-		console.log("ON EXIT DIALOG -- startDialog 1");
+		// console.log("ON EXIT DIALOG -- startDialog 1");
 		onExitDialog(dialogCallback);
 		return;
 	}
@@ -2086,11 +2068,10 @@ function startDialog(dialogStr,scriptId,dialogCallback) {
 	scriptInterpreter.SetDialogBuffer( dialogBuffer );
 
 	var onScriptEnd = function() {
-		console.log("ON SCRIPT END " + scriptId);
-		if(!dialogBuffer.IsActive()){
-			console.log("ON EXIT DIALOG -- startDialog 2");
+		// console.log("ON SCRIPT END " + scriptId);
+		dialogBuffer.OnDialogEnd(function() {
 			onExitDialog(dialogCallback);
-		}
+		});
 	};
 
 	if(scriptId === undefined) {
