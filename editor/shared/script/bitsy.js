@@ -953,14 +953,24 @@ function movePlayer(direction) {
 		startNarrating( ending[end.id], true /*isEnding*/ );
 	}
 	else if (ext) {
+		var MovePlayerToDest = function() {
+			player().room = ext.dest.room;
+			player().x = ext.dest.x;
+			player().y = ext.dest.y;
+			curRoom = ext.dest.room;
+		};
+
 		if(ext.dlg != null && dialog[ext.dlg]){
 			var dialogStr = dialog[ext.dlg];
-			startDialog(dialogStr,ext.dlg, function() {
-				player().room = ext.dest.room;
-				player().x = ext.dest.x;
-				player().y = ext.dest.y;
-				curRoom = ext.dest.room;
+			startDialog(dialogStr, ext.dlg, function(isExitUnlocked) {
+				console.log("EXIT?? " + isExitUnlocked);
+				if (isExitUnlocked == true) {
+					MovePlayerToDest();
+				}
 			});
+		}
+		else {
+			MovePlayerToDest();
 		}
 	}
 	else if (spr) {
@@ -2002,7 +2012,7 @@ var dialogRenderer = dialogModule.CreateRenderer();
 var dialogBuffer = dialogModule.CreateBuffer();
 var fontManager = new FontManager();
 
-function onExitDialog(dialogCallback) {
+function onExitDialog(scriptResult, dialogCallback) {
 	isDialogMode = false;
 	if (isNarrating) isNarrating = false;
 	if (isDialogPreview) {
@@ -2012,7 +2022,7 @@ function onExitDialog(dialogCallback) {
 	}
 
 	if (dialogCallback != undefined && dialogCallback != null) {
-		dialogCallback();
+		dialogCallback(scriptResult);
 	}
 }
 
@@ -2067,15 +2077,14 @@ function startDialog(dialogStr,scriptId,dialogCallback) {
 	dialogBuffer.Reset();
 	scriptInterpreter.SetDialogBuffer( dialogBuffer );
 
-	var onScriptEnd = function() {
-		// console.log("ON SCRIPT END " + scriptId);
+	var onScriptEnd = function(scriptResult) {
 		dialogBuffer.OnDialogEnd(function() {
-			onExitDialog(dialogCallback);
+			onExitDialog(scriptResult, dialogCallback);
 		});
 	};
 
 	if(scriptId === undefined) {
-		scriptInterpreter.Interpret( dialogStr, onScriptEnd );		
+		scriptInterpreter.Interpret( dialogStr, onScriptEnd );
 	}
 	else {
 		if( !scriptInterpreter.HasScript(scriptId) ) {

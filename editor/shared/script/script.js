@@ -22,8 +22,9 @@ var Interpreter = function() {
 	}
 	this.Run = function(scriptName, exitHandler) { // Runs pre-compiled script
 		// console.log("RUN");
+		console.log(env.GetScript( scriptName ));
 		env.GetScript( scriptName )
-			.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
+			.Eval( env, function(result) { if(exitHandler!=null) exitHandler(result); } );
 
 		// console.log("SERIALIZE!!!!");
 		// console.log( env.GetScript( scriptName ).Serialize() );
@@ -31,7 +32,7 @@ var Interpreter = function() {
 	this.Interpret = function(scriptStr, exitHandler) { // Compiles and runs code immediately
 		// console.log("INTERPRET");
 		var script = parser.Parse( scriptStr );
-		script.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
+		script.Eval( env, function(result) { if(exitHandler!=null) exitHandler(result); } );
 	}
 	this.HasScript = function(name) { return env.HasScript(name); };
 
@@ -49,8 +50,8 @@ var Interpreter = function() {
 	this.Parse = function(scriptStr) { // parses a script but doesn't save it
 		return parser.Parse( scriptStr );
 	}
-	this.Eval = function(scripTree, exitHandler) { // runs a script stored externally
-		scripTree.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
+	this.Eval = function(scriptTree, exitHandler) { // runs a script stored externally
+		scriptTree.Eval( env, function(result) { if(exitHandler!=null) exitHandler(result); } );
 	}
 
 	this.CreateExpression = function(expStr) {
@@ -1331,9 +1332,10 @@ var Parser = function(env) {
 	var setSymbol = "=";
 	var ifSymbol = "?";
 	var elseSymbol = ":";
-	// var operatorSymbols = ["==", ">", "<", ">=", "<=", "*", "/", "+", "-"];
-	var operatorSymbols = ["-", "+", "/", "*", "<=", ">=", "<", ">", "=="]; // operators need to be in reverse order
+	var operatorSymbols = ["==", ">", "<", ">=", "<=", "-", "+", "/", "*"]; // operators need to be in reverse order of precedence
 	function CreateExpression(expStr) {
+		console.log("CREATE EXPRESSION --- " + expStr);
+
 		expStr = expStr.trim();
 
 		function IsInsideString(index) {
@@ -1361,7 +1363,7 @@ var Parser = function(env) {
 			}
 			return false;
 		}
-	
+
 		var operator = null;
 
 		// set is special because other operator can look like it, and it has to go first in the order of operations

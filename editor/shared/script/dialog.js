@@ -346,10 +346,8 @@ var DialogBuffer = function() {
 	}
 
 	this.EndDialog = function() {
-		console.log("END!!!!");
 		isActive = false; // no more text to show... this should be a sign to stop rendering dialog
 
-		console.log(onDialogEndCallbacks);
 		for (var i = 0; i < onDialogEndCallbacks.length; i++) {
 			onDialogEndCallbacks[i]();
 		}

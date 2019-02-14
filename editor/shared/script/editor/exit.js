@@ -26,6 +26,10 @@ NOTES
 		- force script to wait for dialog to close and then return?
 		- OR let script finish but delay dialog callback on the bitsy.js side?
 		- functionally the same???
+- fix expressions that start with a function (like so): {{item "tea"} == 3}
+	currently results in {{item "tea"} {eqExp null 3}}
+	but SHOULD result in {eqExp {item "tea"} 3}
+	the revers {3 == {item "tea"}} works though!!!
 
 - exit dialog
 	- file format
