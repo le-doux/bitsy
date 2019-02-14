@@ -22,7 +22,7 @@ var Interpreter = function() {
 	}
 	this.Run = function(scriptName, exitHandler) { // Runs pre-compiled script
 		// console.log("RUN");
-		console.log(env.GetScript( scriptName ));
+		// console.log(env.GetScript( scriptName ));
 		env.GetScript( scriptName )
 			.Eval( env, function(result) { if(exitHandler!=null) exitHandler(result); } );
 
@@ -77,6 +77,16 @@ var Interpreter = function() {
 	}
 	this.GetVariable = function(name) {
 		return env.GetVariable(name);
+	}
+
+	this.DebugVisualizeScriptTree = function(scriptName) {
+		var printVisitor = {
+			Visit : function(node,depth) {
+				console.log("-".repeat(depth) + "- " + node.ToString());
+			},
+		};
+
+		env.GetScript( scriptName ).VisitAll( printVisitor );
 	}
 }
 
@@ -432,10 +442,14 @@ var TreeRelationship = function() {
 		node.parent = this;
 	};
 
-	this.VisitAll = function(visitor) {
-		visitor.Visit( this );
+	this.VisitAll = function(visitor, depth) {
+		if (depth == undefined || depth == null) {
+			depth = 0;
+		}
+
+		visitor.Visit( this, depth );
 		for( var i = 0; i < this.children.length; i++ ) {
-			this.children[i].VisitAll( visitor );
+			this.children[i].VisitAll( visitor, depth + 1 );
 		}
 	};
 }
@@ -508,6 +522,10 @@ var BlockNode = function(mode, doIndentFirstLine) {
 		if (this.mode === BlockMode.Code) str += "}";
 		return str;
 	}
+
+	this.ToString = function() {
+		return this.type + " " + this.mode;
+	};
 }
 
 function isBlockWithNoNewline(node) {
@@ -597,6 +615,10 @@ var FuncNode = function(name,arguments) {
 			return str;
 		}
 	}
+
+	this.ToString = function() {
+		return this.type + " " + this.name;
+	};
 }
 
 var LiteralNode = function(value) {
@@ -621,6 +643,10 @@ var LiteralNode = function(value) {
 
 		return str;
 	}
+
+	this.ToString = function() {
+		return this.type + " " + this.value;
+	};
 }
 
 var VarNode = function(name) {
@@ -641,6 +667,10 @@ var VarNode = function(name) {
 		var str = "" + this.name;
 		return str;
 	}
+
+	this.ToString = function() {
+		return this.type + " " + this.name;
+	};
 }
 
 var ExpNode = function(operator, left, right) {
@@ -676,12 +706,20 @@ var ExpNode = function(operator, left, right) {
 		}
 	}
 
-	this.VisitAll = function(visitor) {
-		visitor.Visit( this );
+	this.VisitAll = function(visitor, depth) {
+		if (depth == undefined || depth == null) {
+			depth = 0;
+		}
+
+		visitor.Visit( this, depth );
 		if(this.left != null)
-			this.left.VisitAll( visitor );
+			this.left.VisitAll( visitor, depth + 1 );
 		if(this.right != null)
-			this.right.VisitAll( visitor );
+			this.right.VisitAll( visitor, depth + 1 );
+	};
+
+	this.ToString = function() {
+		return this.type + " " + this.operator;
 	};
 }
 
@@ -699,10 +737,18 @@ var SequenceBase = function() {
 	}
 
 	this.VisitAll = function(visitor) {
-		visitor.Visit( this );
-		for( var i = 0; i < this.options.length; i++ ) {
-			this.options[i].VisitAll( visitor );
+		if (depth == undefined || depth == null) {
+			depth = 0;
 		}
+
+		visitor.Visit( this, depth );
+		for( var i = 0; i < this.options.length; i++ ) {
+			this.options[i].VisitAll( visitor, depth + 1 );
+		}
+	};
+
+	this.ToString = function() {
+		return this.type;
 	};
 }
 
@@ -829,13 +875,21 @@ var IfNode = function(conditions, results, isSingleLine) {
 	}
 
 	this.VisitAll = function(visitor) {
-		visitor.Visit( this );
+		if (depth == undefined || depth == null) {
+			depth = 0;
+		}
+
+		visitor.Visit( this, depth );
 		for( var i = 0; i < this.conditions.length; i++ ) {
-			this.conditions[i].VisitAll( visitor );
+			this.conditions[i].VisitAll( visitor, depth + 1 );
 		}
 		for( var i = 0; i < this.results.length; i++ ) {
-			this.results[i].VisitAll( visitor );
+			this.results[i].VisitAll( visitor, depth + 1 );
 		}
+	};
+
+	this.ToString = function() {
+		return this.type + " " + this.mode;
 	};
 }
 
@@ -850,6 +904,10 @@ var ElseNode = function() {
 	this.Serialize = function() {
 		return "else";
 	}
+
+	this.ToString = function() {
+		return this.type + " " + this.mode;
+	};
 }
 
 var Sym = {

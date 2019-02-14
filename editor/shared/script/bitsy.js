@@ -2090,6 +2090,7 @@ function startDialog(dialogStr,scriptId,dialogCallback) {
 		if( !scriptInterpreter.HasScript(scriptId) ) {
 			scriptInterpreter.Compile( scriptId, dialogStr );
 		}
+		scriptInterpreter.DebugVisualizeScriptTree(scriptId);
 		scriptInterpreter.Run( scriptId, onScriptEnd );
 	}
 
