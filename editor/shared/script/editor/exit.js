@@ -20,16 +20,74 @@ TODO:
 		EXT 0,0 NULL DLG dlg_id (or something) (what about? TRG 0,0 dlg_id)
 
 NOTES
-- the handling of onExitDialog is weird... will I create strange bugs if I change it??
-	- need to try to refactor this before I continue
-	- **** DIALOG END CALLBACK DECISION ***
-		- force script to wait for dialog to close and then return?
-		- OR let script finish but delay dialog callback on the bitsy.js side?
-		- functionally the same???
+- now would also be a good time to consider adding code commenting
 - fix expressions that start with a function (like so): {{item "tea"} == 3}
 	currently results in {{item "tea"} {eqExp null 3}}
 	but SHOULD result in {eqExp {item "tea"} 3}
-	the revers {3 == {item "tea"}} works though!!!
+	the reverse {3 == {item "tea"}} works though!!!
+	-- this fails because what makes an "expression" is vague
+		- it is the fallback option when we don't see anything (code, function, sequence) else first
+		- we look for code blocks first, which ends up with them being excluded from the expression if they come first!
+
+f = a b c => {
+	a * b * c
+}
+
+f = {func a b c {
+	a * b * c
+}}
+
+o = {obj a b:value c}
+
+{sequence
+	-
+	-
+	-
+}
+
+{function a b c}
+
+{ex + pre = ssion}
+
+{{nested code}}
+
+
+multiline block
+{
+	x = 5
+	{func a b}
+	{sequence
+		-
+		-
+	}
+	X = 1 + 1
+	z = 2
+	5
+	{func a} == 3
+}
+OR
+{
+	{x = 5}
+	{func a b}
+	{sequence
+		-
+		-
+	}
+	{X = 1 + 1}
+	{z = 2}
+	{5}
+	{{func a} == 3}
+}
+
+I need to clarify some things about the code
+- how do multiline blocks work???
+- WHERE does an expression end?? (does it require a surrounding bracket {} inside a multiline block OR does it end at the newline)
+- what is the role of newlines?
+	- so far they... break up sequences, at {br} to dialog blocks
+	- currently whitespace inside a code block is meaningless
+	- ON THE OTHER HAND expressions currently end at a newline.. so the metaphor here is very muddle
+	- not sure which way I'm leaning, but line breaks do give a unique way to test for expressions (vs. anything in a code block)
+
 
 - exit dialog
 	- file format

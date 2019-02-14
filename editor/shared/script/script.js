@@ -1032,7 +1032,8 @@ var Parser = function(env) {
 
 			return sourceStr.slice( startIndex + open.length, i - close.length );
 		}
-		this.Print = function() { /*console.log(sourceStr);*/ };
+		this.Print = function() { console.log(sourceStr); };
+		this.Source = function() { return sourceStr; };
 	};
 
 	function ParseDialog(state) {
@@ -1500,6 +1501,8 @@ var Parser = function(env) {
 	}
 
 	function ParseCode(state) {
+		console.log("PARSE CODE --- " + state.Source());
+
 		// TODO : how do I do this parsing??? one expression per block? or per line?
 		while ( !state.Done() ) {
 
