@@ -1293,6 +1293,8 @@ var Parser = function(env) {
 	}
 
 	function ParseFunction(state, funcName) {
+		console.log("~~~ PARSE FUNCTION " + funcName);
+
 		var args = [];
 
 		var curSymbol = "";
@@ -1490,8 +1492,33 @@ var Parser = function(env) {
 	}
 	this.CreateExpression = CreateExpression;
 
+	function IsWhitespace(str) {
+		return ( str === " " || str === "\t" || str === "\n" );
+	}
+
+	function IsExpression(str) {
+		var tempState = new ParserState(null, str); // hacky
+		var nonWhitespaceCount = 0;
+
+		while (!tempState.Done()) {
+			if( IsWhitespace(tempState.Char()) ) {
+				tempState.Step(); // consume whitespace
+			}
+			else if( tempState.MatchAhead(Sym.CodeOpen) ) {
+				tempState.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose );
+			}
+			else {
+				nonWhitespaceCount++;
+				tempState.Step();
+			}
+		}
+
+		var isExpression = nonWhitespaceCount > 0;
+		return isExpression;
+	}
+
 	function ParseExpression(state) {
-		var line = state.Peak( [Sym.Linebreak] );
+		var line = state.Source(); // state.Peak( [Sym.Linebreak] ); // TODO : remove the linebreak thing
 		// console.log("EXPRESSION " + line);
 		var exp = CreateExpression( line );
 		// console.log(exp);
@@ -1503,36 +1530,43 @@ var Parser = function(env) {
 	function ParseCode(state) {
 		console.log("PARSE CODE --- " + state.Source());
 
-		// TODO : how do I do this parsing??? one expression per block? or per line?
-		while ( !state.Done() ) {
+		// skip leading whitespace
+		while (IsWhitespace(state.Char())) {
+			state.Step();
+		}
 
-			if( state.Char() === " " || state.Char() === "\t" || state.Char() === "\n" ) { // TODO: symbols? IsWhitespace func?
-				state.Step(); // consume whitespace
+		if( state.Char() === Sym.List && (state.Peak([]).indexOf("?") > -1) ) { // TODO : symbols? matchahead?
+			// console.log("PEAK IF " + state.Peak( ["?"] ));
+			state = ParseIf( state );
+		}
+		else if( environment.HasFunction( state.Peak( [" "] ) ) ) { // TODO --- what about newlines???
+			var funcName = state.Peak( [" "] );
+			state.Step( funcName.length );
+			state = ParseFunction( state, funcName );
+		}
+		else if( IsSequence( state.Peak( [" ", Sym.Linebreak] ) ) ) {
+			var sequenceType = state.Peak( [" ", Sym.Linebreak] );
+			state.Step( sequenceType.length );
+			state = ParseSequence( state, sequenceType );
+		}
+		else if (IsExpression(state.Source())) {
+			state = ParseExpression(state);
+		}
+		else {
+			// multi-line code block
+			while (!state.Done()) {
+				if( state.MatchAhead(Sym.CodeOpen) ) {
+					state = ParseCodeBlock( state );
+				}
+				else {
+					state.Step();
+				}
 			}
-			else if( state.MatchAhead(Sym.CodeOpen) ) {
-				state = ParseCodeBlock( state );
-			}
-			// NOTE: nested dialog blocks disabled for now
-			// else if( state.MatchAhead(Sym.DialogOpen) ) {
-			// 	state = ParseDialogBlock( state ); // These can be nested (should they though???)
-			// }
-			else if( state.Char() === Sym.List && (state.Peak([]).indexOf("?") > -1) ) { // TODO : symbols? matchahead?
-				// console.log("PEAK IF " + state.Peak( ["?"] ));
-				state = ParseIf( state );
-			}
-			else if( environment.HasFunction( state.Peak( [" "] ) ) ) { // TODO --- what about newlines???
-				var funcName = state.Peak( [" "] );
-				state.Step( funcName.length );
-				state = ParseFunction( state, funcName );
-			}
-			else if( IsSequence( state.Peak( [" ", Sym.Linebreak] ) ) ) {
-				var sequenceType = state.Peak( [" ", Sym.Linebreak] );
-				state.Step( sequenceType.length );
-				state = ParseSequence( state, sequenceType );
-			}
-			else {
-				state = ParseExpression( state );
-			}
+		}
+
+		// just go to the end now
+		while (!state.Done()) {
+			state.Step();
 		}
 
 		return state;
