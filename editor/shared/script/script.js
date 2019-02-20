@@ -149,6 +149,19 @@ function deprecatedFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
+// TODO : this is kind of hacky
+// - needs to work with names too
+// - should it work only on the drawing? or other things too??
+// - need to think about how the sprite model should work (multiple sprites?)
+// 		- will avatars still need to be unique in a multi sprite world?
+// - need a way to detect the sprite ID / name in code {avatarName} (or something???)
+function changeAvatarFunc(environment,parameters,onReturn) {
+	if( parameters[0] != undefined && parameters[0] != null ) {
+		sprite["A"].drw = "SPR_" + parameters[0];
+	}
+	onReturn(null);
+}
+
 function printFunc(environment,parameters,onReturn) {
 	// console.log("PRINT FUNC");
 	// console.log(parameters);
@@ -364,6 +377,7 @@ var Environment = function() {
 	functionMap.set("printSprite", printSpriteFunc);
 	functionMap.set("printTile", printTileFunc);
 	functionMap.set("printItem", printItemFunc);
+	functionMap.set("changeAvatar", changeAvatarFunc);
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
