@@ -493,9 +493,9 @@ function update() {
 
 	updateInput();
 
-	if (RoomTransitionInfo.isTransitioning) {
+	if (transition.IsTransitionActive()) {
 		// transition animation takes over everything!
-		updateTransition();
+		transition.UpdateTransition(deltaTime);
 	}
 	else {
 		if (!isNarrating && !isEnding) {
@@ -966,63 +966,20 @@ function movePlayer(direction) {
 	}
 }
 
-// TODO : turn this into a proper object
-var RoomTransitionInfo = {
-	startImage : null,
-	endImage : null,
-	effectImage : null,
-	isTransitioning : false,
-	transitionTime : 0,
-	maxTransitionTime : 500,
-	doTransitionEffect : function() {},
-};
-
-function updateTransition() {
-	//make sure to still clear screen
-	ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
-	ctx.fillRect(0,0,canvas.width,canvas.height);
-
-	// console.log(RoomTransitionInfo.effectImage.data.length);
-	// for (var i = 0; i < RoomTransitionInfo.effectImage.data.length; i++) {
-	// 	var pixelA = RoomTransitionInfo.startImage.data[i];
-	// 	var pixelB = RoomTransitionInfo.endImage.data[i];
-	// 	var pixelDelta = (RoomTransitionInfo.transitionTime / RoomTransitionInfo.maxTransitionTime);
-	// 	RoomTransitionInfo.effectImage.data[i] = pixelA + ((pixelB - pixelA) * pixelDelta);
-	// }
-
-	var transitionDelta = RoomTransitionInfo.transitionTime / RoomTransitionInfo.maxTransitionTime;
-	for (var y = 0; y < 128; y++) {
-		for (var x = 0; x < 128; x++) {
-			RoomTransitionInfo.doTransitionEffect(x,y,transitionDelta);
-		}
-	}
-
-	ctx.putImageData(RoomTransitionInfo.effectImage, 0, 0);
-
-	RoomTransitionInfo.transitionTime += deltaTime;
-	if (RoomTransitionInfo.transitionTime >= RoomTransitionInfo.maxTransitionTime) {
-		RoomTransitionInfo.transitionTime = 0;
-		RoomTransitionInfo.isTransitioning = false;
-	}
-}
+var transition = new TransitionManager();
 
 function movePlayerThroughExit(ext) {
 	var GoToDest = function() {
-		drawRoom(room[curRoom]);
-		RoomTransitionInfo.startImage = ctx.getImageData(0,0,canvas.width,canvas.height);
+		var transitionInfo = {
+			showPlayerStart : false,
+			showPlayerEnd : true
+		};
+		transition.BeginTransition(player().room, player().x, player().y, ext.dest.room, ext.dest.x, ext.dest.y, transitionInfo);
 
 		player().room = ext.dest.room;
 		player().x = ext.dest.x;
 		player().y = ext.dest.y;
 		curRoom = ext.dest.room;
-
-		drawRoom(room[curRoom]);
-		RoomTransitionInfo.endImage = ctx.getImageData(0,0,canvas.width,canvas.height);
-
-		RoomTransitionInfo.effectImage = ctx.createImageData(canvas.width,canvas.height);
-
-		RoomTransitionInfo.isTransitioning = true;
-		RoomTransitionInfo.transitionTime = 0;
 	};
 
 	if(ext.dlg != null && dialog[ext.dlg]){
