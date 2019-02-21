@@ -12,15 +12,24 @@ TODO:
 		- allow switching of avatar
 	- consider changes to scripting format
 		- return values
-		- {} multi-line blocks (functions??)
+		X {} multi-line blocks (functions??)
 		- deprecate """ blocks?
 		- replace DLG with SCRIPT (name?) blocks?
 		- bigger API? scene objects?? structs??
 	- consider "triggers" AKA script-only exits
 		EXT 0,0 NULL DLG dlg_id (or something) (what about? TRG 0,0 dlg_id)
 
+changeAvatar notes
+// TODO : this is kind of hacky
+// - needs to work with names too
+// - should it work only on the drawing? or other things too??
+// - need to think about how the sprite model should work (multiple sprites?)
+// 		- will avatars still need to be unique in a multi sprite world?
+// - need a way to detect the sprite ID / name in code {avatarName} (or something???)
+
 NOTES
 - now would also be a good time to consider adding code commenting
+- should exit dialog be regular dialog?? or "narration"?? or should there be a variable/function to control it?
 
 - exit dialog
 	- file format

@@ -961,9 +961,10 @@ function movePlayer(direction) {
 		};
 
 		if(ext.dlg != null && dialog[ext.dlg]){
+			isNarrating = true; // hack test -- should this be the way this works?
 			var dialogStr = dialog[ext.dlg];
 			startDialog(dialogStr, ext.dlg, function(isExitUnlocked) {
-				console.log("EXIT?? " + isExitUnlocked);
+				isNarrating = false;
 				if (isExitUnlocked == true) {
 					MovePlayerToDest();
 				}
