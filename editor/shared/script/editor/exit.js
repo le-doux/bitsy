@@ -19,6 +19,12 @@ TODO:
 	- consider "triggers" AKA script-only exits
 		EXT 0,0 NULL DLG dlg_id (or something) (what about? TRG 0,0 dlg_id)
 
+transition system notes
+- fade: black, white, color?
+- slide: left, right, up, down
+- other? fuzz, wave, flash, pie circle, circle collapse (cartoon end), other??
+- this basically requires a post-processing effect
+
 changeAvatar notes
 // TODO : this is kind of hacky
 // - needs to work with names too
@@ -30,6 +36,9 @@ changeAvatar notes
 NOTES
 - now would also be a good time to consider adding code commenting
 - should exit dialog be regular dialog?? or "narration"?? or should there be a variable/function to control it?
+- improve the two-way arrows for exits
+- should I allow multiple copies of sprites?
+- should I have enums or something for the exit types / transition types: exit.locked, exit.no_transition, exit.fade_white???
 
 - exit dialog
 	- file format

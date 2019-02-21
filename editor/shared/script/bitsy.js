@@ -493,35 +493,41 @@ function update() {
 
 	updateInput();
 
-	if (!isNarrating && !isEnding) {
-		updateAnimation();
-		drawRoom( room[curRoom] ); // draw world if game has begun
+	if (RoomTransitionInfo.isTransitioning) {
+		// transition animation takes over everything!
+		updateTransition();
 	}
 	else {
-		//make sure to still clear screen
-		ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
-		ctx.fillRect(0,0,canvas.width,canvas.height);
-	}
+		if (!isNarrating && !isEnding) {
+			updateAnimation();
+			drawRoom( room[curRoom] ); // draw world if game has begun
+		}
+		else {
+			//make sure to still clear screen
+			ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
+			ctx.fillRect(0,0,canvas.width,canvas.height);
+		}
 
-	// if (isDialogMode) { // dialog mode
-	if(dialogBuffer.IsActive()) {
-		dialogRenderer.Draw( dialogBuffer, deltaTime );
-		dialogBuffer.Update( deltaTime );
-	}
-	else if (!isEnding) {
-		moveSprites();
-	}
+		// if (isDialogMode) { // dialog mode
+		if(dialogBuffer.IsActive()) {
+			dialogRenderer.Draw( dialogBuffer, deltaTime );
+			dialogBuffer.Update( deltaTime );
+		}
+		else if (!isEnding) {
+			moveSprites(); // TODO : I probably need to remove this..
+		}
 
-	// keep moving avatar if player holds down button
-	if( !dialogBuffer.IsActive() && !isEnding )
-	{
-		if( curPlayerDirection != Direction.None ) {
-			playerHoldToMoveTimer -= deltaTime;
+		// keep moving avatar if player holds down button
+		if( !dialogBuffer.IsActive() && !isEnding )
+		{
+			if( curPlayerDirection != Direction.None ) {
+				playerHoldToMoveTimer -= deltaTime;
 
-			if( playerHoldToMoveTimer <= 0 )
-			{
-				movePlayer( curPlayerDirection );
-				playerHoldToMoveTimer = 150;
+				if( playerHoldToMoveTimer <= 0 )
+				{
+					movePlayer( curPlayerDirection );
+					playerHoldToMoveTimer = 150;
+				}
 			}
 		}
 	}
@@ -539,6 +545,28 @@ function update() {
 
 	input.resetKeyPressed();
 	input.resetTapReleased();
+}
+
+function updateTransition() {
+	//make sure to still clear screen
+	ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
+	ctx.fillRect(0,0,canvas.width,canvas.height);
+
+	// console.log(RoomTransitionInfo.effectImage.data.length);
+	for (var i = 0; i < RoomTransitionInfo.effectImage.data.length; i++) {
+		var pixelA = RoomTransitionInfo.startImage.data[i];
+		var pixelB = RoomTransitionInfo.endImage.data[i];
+		var pixelDelta = (RoomTransitionInfo.transitionTime / RoomTransitionInfo.maxTransitionTime);
+		RoomTransitionInfo.effectImage.data[i] = pixelA + ((pixelB - pixelA) * pixelDelta);
+	}
+
+	ctx.putImageData(RoomTransitionInfo.effectImage, 0, 0);
+
+	RoomTransitionInfo.transitionTime += deltaTime;
+	if (RoomTransitionInfo.transitionTime >= RoomTransitionInfo.maxTransitionTime) {
+		RoomTransitionInfo.transitionTime = 0;
+		RoomTransitionInfo.isTransitioning = false;
+	}
 }
 
 function updateInput() {
@@ -953,29 +981,53 @@ function movePlayer(direction) {
 		startNarrating( ending[end.id], true /*isEnding*/ );
 	}
 	else if (ext) {
-		var MovePlayerToDest = function() {
-			player().room = ext.dest.room;
-			player().x = ext.dest.x;
-			player().y = ext.dest.y;
-			curRoom = ext.dest.room;
-		};
-
-		if(ext.dlg != null && dialog[ext.dlg]){
-			isNarrating = true; // hack test -- should this be the way this works?
-			var dialogStr = dialog[ext.dlg];
-			startDialog(dialogStr, ext.dlg, function(isExitUnlocked) {
-				isNarrating = false;
-				if (isExitUnlocked == true) {
-					MovePlayerToDest();
-				}
-			});
-		}
-		else {
-			MovePlayerToDest();
-		}
+		movePlayerThroughExit(ext);
 	}
 	else if (spr) {
 		startSpriteDialog( spr /*spriteId*/ );
+	}
+}
+
+var RoomTransitionInfo = {
+	startImage : null,
+	endImage : null,
+	effectImage : null,
+	isTransitioning : false,
+	transitionTime : 0,
+	maxTransitionTime : 1000
+};
+
+function movePlayerThroughExit(ext) {
+	var GoToDest = function() {
+		drawRoom(room[curRoom]);
+		RoomTransitionInfo.startImage = ctx.getImageData(0,0,canvas.width,canvas.height);
+
+		player().room = ext.dest.room;
+		player().x = ext.dest.x;
+		player().y = ext.dest.y;
+		curRoom = ext.dest.room;
+
+		drawRoom(room[curRoom]);
+		RoomTransitionInfo.endImage = ctx.getImageData(0,0,canvas.width,canvas.height);
+
+		RoomTransitionInfo.effectImage = ctx.createImageData(canvas.width,canvas.height);
+
+		RoomTransitionInfo.isTransitioning = true;
+		RoomTransitionInfo.transitionTime = 0;
+	};
+
+	if(ext.dlg != null && dialog[ext.dlg]){
+		isNarrating = true; // hack test -- should this be the way this works?
+		var dialogStr = dialog[ext.dlg];
+		startDialog(dialogStr, ext.dlg, function(isExitUnlocked) {
+			isNarrating = false;
+			if (isExitUnlocked == true) {
+				GoToDest();
+			}
+		});
+	}
+	else {
+		GoToDest();
 	}
 }
 
