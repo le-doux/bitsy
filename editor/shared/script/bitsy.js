@@ -547,28 +547,6 @@ function update() {
 	input.resetTapReleased();
 }
 
-function updateTransition() {
-	//make sure to still clear screen
-	ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
-	ctx.fillRect(0,0,canvas.width,canvas.height);
-
-	// console.log(RoomTransitionInfo.effectImage.data.length);
-	for (var i = 0; i < RoomTransitionInfo.effectImage.data.length; i++) {
-		var pixelA = RoomTransitionInfo.startImage.data[i];
-		var pixelB = RoomTransitionInfo.endImage.data[i];
-		var pixelDelta = (RoomTransitionInfo.transitionTime / RoomTransitionInfo.maxTransitionTime);
-		RoomTransitionInfo.effectImage.data[i] = pixelA + ((pixelB - pixelA) * pixelDelta);
-	}
-
-	ctx.putImageData(RoomTransitionInfo.effectImage, 0, 0);
-
-	RoomTransitionInfo.transitionTime += deltaTime;
-	if (RoomTransitionInfo.transitionTime >= RoomTransitionInfo.maxTransitionTime) {
-		RoomTransitionInfo.transitionTime = 0;
-		RoomTransitionInfo.isTransitioning = false;
-	}
-}
-
 function updateInput() {
 	if( dialogBuffer.IsActive() ) {
 		if (input.anyKeyPressed() || input.isTapReleased()) {
@@ -988,14 +966,45 @@ function movePlayer(direction) {
 	}
 }
 
+// TODO : turn this into a proper object
 var RoomTransitionInfo = {
 	startImage : null,
 	endImage : null,
 	effectImage : null,
 	isTransitioning : false,
 	transitionTime : 0,
-	maxTransitionTime : 1000
+	maxTransitionTime : 500,
+	doTransitionEffect : function() {},
 };
+
+function updateTransition() {
+	//make sure to still clear screen
+	ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
+	ctx.fillRect(0,0,canvas.width,canvas.height);
+
+	// console.log(RoomTransitionInfo.effectImage.data.length);
+	// for (var i = 0; i < RoomTransitionInfo.effectImage.data.length; i++) {
+	// 	var pixelA = RoomTransitionInfo.startImage.data[i];
+	// 	var pixelB = RoomTransitionInfo.endImage.data[i];
+	// 	var pixelDelta = (RoomTransitionInfo.transitionTime / RoomTransitionInfo.maxTransitionTime);
+	// 	RoomTransitionInfo.effectImage.data[i] = pixelA + ((pixelB - pixelA) * pixelDelta);
+	// }
+
+	var transitionDelta = RoomTransitionInfo.transitionTime / RoomTransitionInfo.maxTransitionTime;
+	for (var y = 0; y < 128; y++) {
+		for (var x = 0; x < 128; x++) {
+			RoomTransitionInfo.doTransitionEffect(x,y,transitionDelta);
+		}
+	}
+
+	ctx.putImageData(RoomTransitionInfo.effectImage, 0, 0);
+
+	RoomTransitionInfo.transitionTime += deltaTime;
+	if (RoomTransitionInfo.transitionTime >= RoomTransitionInfo.maxTransitionTime) {
+		RoomTransitionInfo.transitionTime = 0;
+		RoomTransitionInfo.isTransitioning = false;
+	}
+}
 
 function movePlayerThroughExit(ext) {
 	var GoToDest = function() {

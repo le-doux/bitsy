@@ -24,6 +24,11 @@ transition system notes
 - slide: left, right, up, down
 - other? fuzz, wave, flash, pie circle, circle collapse (cartoon end), other??
 - this basically requires a post-processing effect
+- TODO
+	- make sure it is pixel bound to the correct resolution 128 x 128
+	- try a few effects!
+	- try limiting the frame rate!
+	- make real transition manager object
 
 changeAvatar notes
 // TODO : this is kind of hacky
