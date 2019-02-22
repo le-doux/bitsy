@@ -1,8 +1,8 @@
 /*
 TODO:
-- make multiple transitions choose-able
+X make multiple transitions choose-able
 - test fancy transitions (wave, etc)
-- make wrapper objects for image data
+X make wrapper objects for image data
 - only run pixel func on frame step
 */
 
@@ -16,69 +16,18 @@ var TransitionManager = function() {
 	var maxTransitionTime = 500; //Ms // TODO : pick final speed
 
 	var maxStep = 6; // TODO : pick final "chunkiness"
+	var prevStep = -1; // used to avoid running post-process effect constantly
 
-	/* CROSS FADE */
-	// var pixelTransitionFunc = function(startImage,endImage,effectImage,pixelX,pixelY,step,maxStep) {
-	// 	var pixelDelta = step / maxStep;
-	// 	var pixelColorA = TransitionHelper.SamplePixelColor(startImage,pixelX,pixelY);
-	// 	var pixelColorB = TransitionHelper.SamplePixelColor(endImage,pixelX,pixelY);
+	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
+		curEffect = effectName;
 
-	// 	var pixelColor = {
-	// 		r : pixelColorA.r + ((pixelColorB.r - pixelColorA.r) * pixelDelta),
-	// 		g : pixelColorA.g + ((pixelColorB.g - pixelColorA.g) * pixelDelta),
-	// 		b : pixelColorA.b + ((pixelColorB.b - pixelColorA.b) * pixelDelta),
-	// 		a : pixelColorA.a + ((pixelColorB.a - pixelColorA.a) * pixelDelta),
-	// 	};
-
-	/* FADE BLACK */
-	// 	TransitionHelper.SetPixelColor(effectImage,pixelX,pixelY,pixelColor);
-	// };
-
-	// var pixelTransitionFunc = function(startImage,endImage,effectImage,pixelX,pixelY,step,maxStep) {
-	// 	var pixelDelta = step / maxStep;
-
-	// 	var pixelColorA = pixelDelta < 0.5 ? TransitionHelper.SamplePixelColor(startImage,pixelX,pixelY) : {r:0,g:0,b:0,a:255};
-	// 	var pixelColorB = pixelDelta < 0.5 ? {r:0,g:0,b:0,a:255} : TransitionHelper.SamplePixelColor(endImage,pixelX,pixelY);
-
-	// 	pixelDelta = pixelDelta < 0.5 ? (pixelDelta / 0.5) : ((pixelDelta - 0.5) / 0.5); // hacky
-
-	// 	var pixelColor = {
-	// 		r : pixelColorA.r + ((pixelColorB.r - pixelColorA.r) * pixelDelta),
-	// 		g : pixelColorA.g + ((pixelColorB.g - pixelColorA.g) * pixelDelta),
-	// 		b : pixelColorA.b + ((pixelColorB.b - pixelColorA.b) * pixelDelta),
-	// 		a : pixelColorA.a + ((pixelColorB.a - pixelColorA.a) * pixelDelta),
-	// 	};
-
-	// 	TransitionHelper.SetPixelColor(effectImage,pixelX,pixelY,pixelColor);
-	// };
-
-	/* FADE WHITE */
-	var pixelTransitionFunc = function(startImage,endImage,effectImage,pixelX,pixelY,step,maxStep) {
-		var pixelDelta = step / maxStep;
-
-		var pixelColorA = pixelDelta < 0.5 ? TransitionHelper.SamplePixelColor(startImage,pixelX,pixelY) : {r:255,g:255,b:255,a:255};
-		var pixelColorB = pixelDelta < 0.5 ? {r:255,g:255,b:255,a:255} : TransitionHelper.SamplePixelColor(endImage,pixelX,pixelY);
-
-		pixelDelta = pixelDelta < 0.5 ? (pixelDelta / 0.5) : ((pixelDelta - 0.5) / 0.5); // hacky
-
-		var pixelColor = {
-			r : pixelColorA.r + ((pixelColorB.r - pixelColorA.r) * pixelDelta),
-			g : pixelColorA.g + ((pixelColorB.g - pixelColorA.g) * pixelDelta),
-			b : pixelColorA.b + ((pixelColorB.b - pixelColorA.b) * pixelDelta),
-			a : pixelColorA.a + ((pixelColorB.a - pixelColorA.a) * pixelDelta),
-		};
-
-		TransitionHelper.SetPixelColor(effectImage,pixelX,pixelY,pixelColor);
-	};
-
-	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,transitionInfo) {
 		// var tmpRoom = curRoom;
 		var tmpRoom = player().room;
 		var tmpX = player().x;
 		var tmpY = player().y;
 
 		// curRoom = startRoom; // question: do I need to use curRoom??
-		if (transitionInfo.showPlayerStart) {
+		if (transitionEffects[curEffect].showPlayerStart) {
 			player().room = startRoom;
 			player().x = startX;
 			player().y = startY;
@@ -88,9 +37,9 @@ var TransitionManager = function() {
 		}
 
 		drawRoom(room[startRoom]);
-		startImage = ctx.getImageData(0,0,canvas.width,canvas.height); // TODO : don't use global ctx?
+		startImage = new PostProcessImage( ctx.getImageData(0,0,canvas.width,canvas.height) ); // TODO : don't use global ctx?
 
-		if (transitionInfo.showPlayerEnd) {
+		if (transitionEffects[curEffect].showPlayerEnd) {
 			player().room = endRoom;
 			player().x = endX;
 			player().y = endY;
@@ -100,12 +49,13 @@ var TransitionManager = function() {
 		}
 
 		drawRoom(room[endRoom]);
-		endImage = ctx.getImageData(0,0,canvas.width,canvas.height);
+		endImage = new PostProcessImage( ctx.getImageData(0,0,canvas.width,canvas.height) );
 
-		effectImage = ctx.createImageData(canvas.width,canvas.height);
+		effectImage = new PostProcessImage( ctx.createImageData(canvas.width,canvas.height) );
 
 		isTransitioning = true;
 		transitionTime = 0;
+		prevStep = -1;
 
 		player().room = tmpRoom;
 		player().x = tmpX;
@@ -121,20 +71,19 @@ var TransitionManager = function() {
 
 		var transitionDelta = transitionTime / maxTransitionTime;
 
-		// clear screen! (necessary?)
-		ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
-		ctx.fillRect(0,0,canvas.width,canvas.height);
-
-		var w = effectImage.width / scale;
-		var h = effectImage.height / scale;
 		var step = Math.floor(transitionDelta * maxStep); // TODO : only update on step change!
-		for (var y = 0; y < h; y++) {
-			for (var x = 0; x < w; x++) {
-				pixelTransitionFunc(startImage,endImage,effectImage,x,y,step,maxStep);
+		if (step != prevStep) {
+			// console.log("step! " + step);
+			for (var y = 0; y < effectImage.Height; y++) {
+				for (var x = 0; x < effectImage.Width; x++) {
+					var color = transitionEffects[curEffect].pixelEffectFunc(startImage,endImage,x,y,step,maxStep);
+					effectImage.SetPixel(x,y,color);
+				}
 			}
 		}
+		prevStep = step;
 
-		ctx.putImageData(effectImage, 0, 0);
+		ctx.putImageData(effectImage.GetData(), 0, 0);
 
 		if (transitionTime >= maxTransitionTime) {
 			isTransitioning = false;
@@ -142,15 +91,73 @@ var TransitionManager = function() {
 			startImage = null;
 			endImage = null;
 			effectImage = null;
+			prevStep = -1;
 		}
 	}
 
 	this.IsTransitionActive = function() {
 		return isTransitioning;
 	}
-}
 
-var TransitionHelper = {
+	var transitionEffects = {};
+	var curEffect = "none";
+	this.RegisterTransitionEffect = function(name, effect) {
+		transitionEffects[name] = effect;
+	}
+
+	this.RegisterTransitionEffect("none", {
+		showPlayerStart : false,
+		showPlayerEnd : false,
+		pixelEffectFunc : function() {},
+	});
+
+	this.RegisterTransitionEffect("fade_white", { // TODO : have it linger on full white briefly?
+		showPlayerStart : false,
+		showPlayerEnd : true,
+		pixelEffectFunc : function(startImage,endImage,pixelX,pixelY,step,maxStep) {
+			var pixelDelta = step / maxStep;
+
+			var pixelColorA = pixelDelta < 0.5 ? startImage.GetPixel(pixelX,pixelY) : {r:255,g:255,b:255,a:255};
+			var pixelColorB = pixelDelta < 0.5 ? {r:255,g:255,b:255,a:255} : endImage.GetPixel(pixelX,pixelY);
+
+			pixelDelta = pixelDelta < 0.5 ? (pixelDelta / 0.5) : ((pixelDelta - 0.5) / 0.5); // hacky
+
+			return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, pixelDelta);
+		}
+	});
+
+	this.RegisterTransitionEffect("fade_black", {
+		showPlayerStart : false,
+		showPlayerEnd : true,
+		pixelEffectFunc : function(startImage,endImage,pixelX,pixelY,step,maxStep) {
+			var pixelDelta = step / maxStep;
+
+			var pixelColorA = pixelDelta < 0.5 ? startImage.GetPixel(pixelX,pixelY) : {r:0,g:0,b:0,a:255};
+			var pixelColorB = pixelDelta < 0.5 ? {r:0,g:0,b:0,a:255} : endImage.GetPixel(pixelX,pixelY);
+
+			pixelDelta = pixelDelta < 0.5 ? (pixelDelta / 0.5) : ((pixelDelta - 0.5) / 0.5); // hacky
+
+			return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, pixelDelta);
+		}
+	});
+
+	this.RegisterTransitionEffect("cross_fade", {
+		showPlayerStart : true,
+		showPlayerEnd : true,
+		pixelEffectFunc : function(startImage,endImage,pixelX,pixelY,step,maxStep) {
+			var pixelDelta = step / maxStep;
+
+			var pixelColorA = startImage.GetPixel(pixelX,pixelY);
+			var pixelColorB = endImage.GetPixel(pixelX,pixelY);
+
+			return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, pixelDelta);
+		}
+	});
+}; // TransitionManager()
+
+
+// TODO : extract the scale variable so it can be changed?
+var PostProcessUtilities = {
 	SamplePixelColor : function(image,x,y) {
 		var pixelIndex = (y * scale * image.width * 4) + (x * scale * 4);
 		var r = image.data[pixelIndex + 0];
@@ -169,5 +176,31 @@ var TransitionHelper = {
 				image.data[pixelIndex + 3] = colorRgba.a;
 			}
 		}
-	}
-}
+	},
+	LerpColor : function(colorA,colorB,t) {
+		// TODO: move to color_util.js?
+		return {
+			r : colorA.r + ((colorB.r - colorA.r) * t),
+			g : colorA.g + ((colorB.g - colorA.g) * t),
+			b : colorA.b + ((colorB.b - colorA.b) * t),
+			a : colorA.a + ((colorB.a - colorA.a) * t),
+		};
+	},
+};
+
+var PostProcessImage = function(imageData) {
+	this.Width = imageData.width / scale;
+	this.Height = imageData.height / scale;
+
+	this.GetPixel = function(x,y) {
+		return PostProcessUtilities.SamplePixelColor(imageData,x,y);
+	};
+
+	this.SetPixel = function(x,y,colorRgba) {
+		PostProcessUtilities.SetPixelColor(imageData,x,y,colorRgba);
+	};
+
+	this.GetData = function() {
+		return imageData;
+	};
+};
