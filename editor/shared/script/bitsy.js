@@ -970,7 +970,7 @@ var transition = new TransitionManager();
 
 function movePlayerThroughExit(ext) {
 	var GoToDest = function() {
-		transition.BeginTransition(player().room, player().x, player().y, ext.dest.room, ext.dest.x, ext.dest.y, "fade_black");
+		transition.BeginTransition(player().room, player().x, player().y, ext.dest.room, ext.dest.x, ext.dest.y, "wave");
 
 		player().room = ext.dest.room;
 		player().x = ext.dest.x;

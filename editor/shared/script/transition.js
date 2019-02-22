@@ -15,7 +15,7 @@ var TransitionManager = function() {
 	var transitionTime = 0; // Ms
 	var maxTransitionTime = 500; //Ms // TODO : pick final speed
 
-	var maxStep = 6; // TODO : pick final "chunkiness"
+	var maxStep = 5; // TODO : pick final "chunkiness"
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
@@ -72,7 +72,7 @@ var TransitionManager = function() {
 		var transitionDelta = transitionTime / maxTransitionTime;
 
 		var step = Math.floor(transitionDelta * maxStep); // TODO : only update on step change!
-		if (step != prevStep) {
+		// if (step != prevStep) {
 			// console.log("step! " + step);
 			for (var y = 0; y < effectImage.Height; y++) {
 				for (var x = 0; x < effectImage.Width; x++) {
@@ -80,7 +80,7 @@ var TransitionManager = function() {
 					effectImage.SetPixel(x,y,color);
 				}
 			}
-		}
+		// }
 		prevStep = step;
 
 		ctx.putImageData(effectImage.GetData(), 0, 0);
@@ -151,6 +151,39 @@ var TransitionManager = function() {
 			var pixelColorB = endImage.GetPixel(pixelX,pixelY);
 
 			return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, pixelDelta);
+		}
+	});
+
+	this.RegisterTransitionEffect("slide_from_right", {
+		showPlayerStart : false,
+		showPlayerEnd : true,
+		pixelEffectFunc : function(startImage,endImage,pixelX,pixelY,step,maxStep) {
+			var pixelOffset = Math.floor(startImage.Width * (step / maxStep));
+			var slidePixelX = pixelX + pixelOffset;
+
+			if (slidePixelX < startImage.Width) {
+				return startImage.GetPixel(slidePixelX,pixelY);
+			}
+			else {
+				slidePixelX -= startImage.Width;
+				return endImage.GetPixel(slidePixelX,pixelY);
+			}
+		}
+	});
+
+	this.RegisterTransitionEffect("wave", {
+		showPlayerStart : false,
+		showPlayerEnd : true,
+		pixelEffectFunc : function(startImage,endImage,pixelX,pixelY,step,maxStep) {
+			var d = (step / maxStep);
+			pixelX += Math.floor((8+(32 * d)) * Math.sin( ((pixelY + (d*startImage.Width*8)) / 8) ));
+
+			if (pixelX > 0 && pixelX < startImage.Width) {
+				return startImage.GetPixel(pixelX,pixelY);
+			}
+			else {
+				return {r:255,g:255,b:255,a:255};
+			}
 		}
 	});
 }; // TransitionManager()
