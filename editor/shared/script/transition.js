@@ -3,7 +3,8 @@ TODO:
 X make multiple transitions choose-able
 - test fancy transitions (wave, etc)
 X make wrapper objects for image data
-- only run pixel func on frame step
+X only run pixel func on frame step
+- in sliding transition.. lerp colors (that would be cool!)
 */
 
 var TransitionManager = function() {
@@ -15,7 +16,7 @@ var TransitionManager = function() {
 	var transitionTime = 0; // Ms
 	var maxTransitionTime = 500; //Ms // TODO : pick final speed
 
-	var maxStep = 5; // TODO : pick final "chunkiness"
+	var maxStep = 16; // TODO : pick final "chunkiness"
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
@@ -176,10 +177,11 @@ var TransitionManager = function() {
 		showPlayerEnd : true,
 		pixelEffectFunc : function(startImage,endImage,pixelX,pixelY,step,maxStep) {
 			var d = (step / maxStep);
+
 			pixelX += Math.floor((8+(32 * d)) * Math.sin( ((pixelY + (d*startImage.Width*8)) / 8) ));
 
 			if (pixelX > 0 && pixelX < startImage.Width) {
-				return startImage.GetPixel(pixelX,pixelY);
+				return transitionEffects["cross_fade"].pixelEffectFunc(startImage,endImage,pixelX,pixelY,step,maxStep);
 			}
 			else {
 				return {r:255,g:255,b:255,a:255};
