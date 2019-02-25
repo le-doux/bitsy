@@ -72,7 +72,7 @@ var TransitionManager = function() {
 		var transitionDelta = transitionTime / maxTransitionTime;
 
 		var step = Math.floor(transitionDelta * maxStep); // TODO : only update on step change!
-		// if (step != prevStep) {
+		if (step != prevStep) {
 			// console.log("step! " + step);
 			for (var y = 0; y < effectImage.Height; y++) {
 				for (var x = 0; x < effectImage.Width; x++) {
@@ -80,7 +80,7 @@ var TransitionManager = function() {
 					effectImage.SetPixel(x,y,color);
 				}
 			}
-		// }
+		}
 		prevStep = step;
 
 		ctx.putImageData(effectImage.GetData(), 0, 0);
