@@ -19,50 +19,24 @@ TODO:
 	- consider "triggers" AKA script-only exits
 		EXT 0,0 NULL DLG dlg_id (or something) (what about? TRG 0,0 dlg_id)
 
-objects
-- Q: can function calls contain nested code blocks??
-DEFINE AND CREATE:
-x = {obj name:"bob" money:5 other:{item "x"}} <-- more javascript like
-* or *
-DEFINE:
-{obj type-name var1 var2 var3:option-default-value}
-CREATE:
-{type-name var1:val var2:val var3:override-val}
-CREATE:
-{new type-name var1:val var2:val var3:override-val}
-OR
-{obj type-name: var1 var2} // global
-{obj : var1 var2} // local
-
-OBJECT USE
-{obj1.var1 = 5}
-{obj1.func 5 10} // this one will be tricky!
-{5 == obj1.var2}
-{obj1.bool ? 1 : 2}
-{say obl1.string}
-
-{obj name :: var1 var2}
-{obj name = var1 var2}
-{obj name # var1 var2}
-{obj name := var1 var2}
-
-functions
-{func name {param1 param2 param3} body}
-{func name param1 param2 param3 body}
-{func name param1 param2 param3: body}
-{func name param1 param2 param3 => body}
-f = {func param1 param2 param3 body}
-OR
-{func name : param1 param2 => body} // global function
-f = {func : param1 param2 => body} // local function (lambda)
-{run f x 5} // how do run local functions?
-{obj x:5 f:{func : param1 => body}}
-- requires nested environments for local variables (the parameters)
-- functions should have a "this" if they are called from an object! (can insert "this" for sprites, rooms, etc)
-
-alternatively.. spell it all out
-{obj type:type-name var1 var2 var2:val}
-{func name:func-name param1 param2 param3 body:{body}}
+=== object and function notation ideas ===
+-- anonymous object
+{obj var1=a var2=b} // create instance
+{obj : var1=a var2=b} // with separator
+-- named object
+{obj name : var1=a var2} // define prototype (globally?)
+{new name var2=c} // create instance
+-- access object properties
+{obj1.x = 5} // set
+{2 == obj1.y} // test value
+{obj1.func a b} // call method
+-- anonymous function
+fx = {func param1 param2 => body} // create
+{fx a b} // invoke
+{func : param1 param2 => body} // create with separator
+-- named function
+{func name : param1 param2 => body} // define (globally?)
+{name a b} // invoke
 
 transition system notes
 - fade: black, white, color?
