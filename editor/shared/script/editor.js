@@ -1,16 +1,23 @@
 /*
 other todos:
 - alt text localization??
-- chinese
 - debug MP bug
-- credits panel
 
-arabic update TODO:
+5.5 todos:
 - finalize font format changes
-X @ handle in twitter should stay on the left
-X flip back the text in game data / code (*** MOST IMPORTANT ***)
-X room, palette, etc name placeholder text needs to be translated
-X translate for "I'm a cat" and other default dialog
+- make sure arabic font is working
+- update translations
+	- arabic
+	- chinese
+	- polish
+	- let translators know there are new strings to update
+- credits panel
+- version notes
+
+final font format thoughts
+- instead of introducing dashes to create sub-properties, just use CHAR_
+	"- SIZE" vs "CHAR_SIZE"
+	other possibilities: "_SIZE", "C_SIZE", "CH_SIZE"
 
 PERF NOTES:
 - loading idea: use long animations to create the loading animation
