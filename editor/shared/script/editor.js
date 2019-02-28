@@ -2,6 +2,7 @@
 other todos:
 - alt text localization??
 - debug MP bug
+- credits panel
 
 5.5 todos:
 - finalize font format changes
@@ -11,7 +12,6 @@ other todos:
 	- chinese
 	- polish
 	- let translators know there are new strings to update
-- credits panel
 - version notes
 
 final font format thoughts
@@ -680,6 +680,7 @@ function start() {
 		"unicode_european_small.bitsyfont",
 		"unicode_european_large.bitsyfont",
 		"arabic_pixel.bitsyfont",
+		"arabic2.bitsyfont",
 		"unicode_asian.bitsyfont"
 	], function() {
 		console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
@@ -4567,7 +4568,7 @@ function on_change_text_direction(e) {
 
 function pickDefaultTextDirectionForFont(newFontName) {
 	var newTextDirection = TextDirection.LeftToRight;
-	if (newFontName === "arabic_pixel") {
+	if (newFontName === "arabic_pixel" || newFontName === "arabic2") {
 		newTextDirection = TextDirection.RightToLeft;
 	}
 	updateEditorTextDirection(newTextDirection);
