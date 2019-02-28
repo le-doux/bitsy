@@ -13,6 +13,30 @@ other todos:
 	- polish
 	- let translators know there are new strings to update
 - version notes
+- bug where RTL font changes the editor!! -- should only do that for the language setting
+- add in some comments from the previous version of the arabic font?
+test string: شُكْرًا
+tiny test string: رً
+offset thoughts: is it still necessary with the latest version of the font?
+- with each character, the left edge moves by the spacing of the character
+- the offset displaces that left edge (either left or right)
+	- positive offsets are equivalent to moving it further to the right
+	- negative offsets are equivalent to moving it further to the left
+	- positive offsets COULD potentially be represented with some blank columns on the left side of the glyph
+width thoughts: we can also decrease the use of special widths
+- if the "WIDTH" >= "SIZE X" + "OFFSET X" and "OFFSET X" > 0 (is positive)
+	- we can use blank cols on the left for the offset and blank cols on the right to make up the remaining width
+custom character sizes are still very necessary BECAUSE there are some extra wide and extra skinny characters
+	- range 4 to 9 pixels wide (most are 6)
+final thoughts:
+	- I could get rid of the offset property entirely
+	- I could greatly reduce the use of widths (spacing) (down to only widths that are less than the size of the glyph)
+	- BUT I would still have a lot of custom character sizes (since MOST are smaller than the maximum character size)
+	- HOWEVER... do I want to make the conversion just to decrease the amount of new font information?
+		- it would require more data to represent the font (lots of empty cols)
+		- it might create bugs in the font and require more testing
+		- the only property I can actually get rid of is the offset
+
 
 final font format thoughts
 - instead of introducing dashes to create sub-properties, just use CHAR_
