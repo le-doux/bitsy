@@ -1,23 +1,6 @@
 /*
 TODO:
 - untangle local & external resource use in font manager (still more to do here)
-
-TODO for arabic
-X - handle variable widths
-X - handle RIGHT to LEFT
-X - handle negative X OFFSETs
-X - handle when glyph width & spacing width are not the same (diacritics)
-X - should sub properties use a > to indent?
-X - what should the name of SIZE and WIDTH be? BOUNDS and SPACE?
--
-- new font formatting decisions
-X - save LTR in the game data
-X - LTR option in menu
-- new localization strings
-X LTR textareas in the editor
-- update localization from google drive
-- font credit
-- testing
 */
 
 function FontManager(useExternalResources) {
@@ -191,7 +174,7 @@ function Font(fontData) {
 							x: 0,
 							y: 0
 						},
-						spacing: width, // TODO : name?
+						spacing: width,
 						data: []
 					};
 				}
@@ -200,19 +183,22 @@ function Font(fontData) {
 				// CHAR PROPERTIES
 				if (isReadingCharProperties) {
 					var args = line.split(" ");
-					if (args[0].indexOf("CHAR_") == 0) { // SUB PROPERTIES START WITH "CHAR_"
+					if (args[0].indexOf("CHAR_") == 0) { // Sub-properties start with "CHAR_"
 						if (args[0] == "CHAR_SIZE") {
-							// CUSTOM CHAR SIZE
+							// Custom character size - overrides the default character size for the font
 							chardata[curCharCode].width = parseInt(args[1]);
 							chardata[curCharCode].height = parseInt(args[2]);
-							chardata[curCharCode].spacing = parseInt(args[1]); // HACK : assumes SIZE is always declared first
+							chardata[curCharCode].spacing = parseInt(args[1]); // HACK : assumes CHAR_SIZE is always declared first
 						}
 						else if (args[0] == "CHAR_OFFSET") {
-							// CUSTOM CHAR OFFSET
+							// Character offset - shift the origin of the character on the X or Y axis
 							chardata[curCharCode].offset.x = parseInt(args[1]);
 							chardata[curCharCode].offset.y = parseInt(args[2]);
 						}
-						else if (args[0] == "CHAR_WIDTH") { // TODO : CHAR_WIDTH or CHAR_SPACE or CHAR_SPACING
+						else if (args[0] == "CHAR_SPACING") {
+							// Character spacing:
+							// specify total horizontal space taken up by the character
+							// lets chars take up more or less space on a line than its bitmap does
 							chardata[curCharCode].spacing = parseInt(args[1]);
 						}
 					}
@@ -224,7 +210,6 @@ function Font(fontData) {
 				// CHAR DATA
 				if (!isReadingCharProperties) {
 					// READING CHARACTER DATA LINE
-					// for (var j = 0; j < width; j++)
 					for (var j = 0; j < chardata[curCharCode].width; j++)
 					{
 						chardata[curCharCode].data.push( parseInt(line[j]) );

@@ -5,9 +5,7 @@ other todos:
 - credits panel
 
 5.5 todos:
-- finalize font format changes
-	- switch to CHAR_ prefix for sub-properties
-	- CHAR_WIDTH vs CHAR_SPACING???
+X finalize font format changes
 - make sure arabic font is working
 - update translations
 	- arabic
