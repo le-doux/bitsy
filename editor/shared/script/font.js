@@ -160,10 +160,7 @@ function Font(fontData) {
 				}
 				else if (args[0] == "CHAR") {
 					isReadingChar = true;
-
-					if (editorDevFlags != undefined && editorDevFlags != null && editorDevFlags.arabicFeatures) {
-						isReadingCharProperties = true;
-					}
+					isReadingCharProperties = true;
 
 					curCharLineCount = 0;
 					curCharCode = parseInt(args[1]);

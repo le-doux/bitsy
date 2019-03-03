@@ -6,7 +6,9 @@ other todos:
 
 5.5 todos:
 X finalize font format changes
-- make sure arabic font is working
+X make sure arabic font is working
+X make sure old fonts still work!
+- new arabic font strings localization
 - update translations
 	- arabic
 	- chinese
@@ -14,8 +16,7 @@ X finalize font format changes
 	- let translators know there are new strings to update
 - version notes
 - bug where RTL font changes the editor!! -- should only do that for the language setting
-- add in some comments from the previous version of the arabic font?
-
+- default title string still fails! why???
 
 final font format thoughts
 - instead of introducing dashes to create sub-properties, just use CHAR_
@@ -682,9 +683,8 @@ function start() {
 		"ascii_small.bitsyfont",
 		"unicode_european_small.bitsyfont",
 		"unicode_european_large.bitsyfont",
-		"arabic_pixel.bitsyfont",
-		"arabic2.bitsyfont",
-		"unicode_asian.bitsyfont"
+		"unicode_asian.bitsyfont",
+		"arabic.bitsyfont",
 	], function() {
 		console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
 		switchFont(fontName); // hack - make sure the engine font manager is setup too
@@ -4493,7 +4493,7 @@ function pickDefaultFontForLanguage(lang) {
 		switchFont("ascii_small", true /*doPickTextDirection*/);
 	}
 	else if (lang === "ar") {
-		switchFont("arabic_pixel", true /*doPickTextDirection*/);
+		switchFont("arabic", true /*doPickTextDirection*/);
 	}
 	else if (lang === "zh") {
 		switchFont("unicode_asian", true /*doPickTextDirection*/);
@@ -4571,7 +4571,7 @@ function on_change_text_direction(e) {
 
 function pickDefaultTextDirectionForFont(newFontName) {
 	var newTextDirection = TextDirection.LeftToRight;
-	if (newFontName === "arabic_pixel" || newFontName === "arabic2") {
+	if (newFontName === "arabic") {
 		newTextDirection = TextDirection.RightToLeft;
 	}
 	updateEditorTextDirection(newTextDirection);
@@ -4591,12 +4591,10 @@ function updateEditorTextDirection(newTextDirection) {
 }
 
 function updateTextDirectionSelectUI() {
-	if (editorDevFlags.arabicFeatures) {
-		var textDirSelect = document.getElementById("textDirectionSelect");
-		for (var i in textDirSelect.options) {
-			var option = textDirSelect.options[i];
-			option.selected = (option.value === textDirection);
-		}
+	var textDirSelect = document.getElementById("textDirectionSelect");
+	for (var i in textDirSelect.options) {
+		var option = textDirSelect.options[i];
+		option.selected = (option.value === textDirection);
 	}
 }
 

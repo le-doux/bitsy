@@ -77,7 +77,7 @@ resetFlags(); //init flags on load script
 
 // SUPER hacky location... :/
 var editorDevFlags = {
-	arabicFeatures : true
+	// NONE right now!
 };
 
 function clearGameData() {
