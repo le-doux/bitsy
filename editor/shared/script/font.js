@@ -200,20 +200,20 @@ function Font(fontData) {
 				// CHAR PROPERTIES
 				if (isReadingCharProperties) {
 					var args = line.split(" ");
-					if (args[0] == "-") { // SUB PROPERTIES START WITH A DASH TO INDENT
-						if (args[1] == "SIZE") {
+					if (args[0].indexOf("CHAR_") == 0) { // SUB PROPERTIES START WITH "CHAR_"
+						if (args[0] == "CHAR_SIZE") {
 							// CUSTOM CHAR SIZE
-							chardata[curCharCode].width = parseInt(args[2]);
-							chardata[curCharCode].height = parseInt(args[3]);
-							chardata[curCharCode].spacing = parseInt(args[2]); // HACK : assumes SIZE is always declared first
+							chardata[curCharCode].width = parseInt(args[1]);
+							chardata[curCharCode].height = parseInt(args[2]);
+							chardata[curCharCode].spacing = parseInt(args[1]); // HACK : assumes SIZE is always declared first
 						}
-						else if (args[1] == "OFFSET") {
+						else if (args[0] == "CHAR_OFFSET") {
 							// CUSTOM CHAR OFFSET
-							chardata[curCharCode].offset.x = parseInt(args[2]);
-							chardata[curCharCode].offset.y = parseInt(args[3]);
+							chardata[curCharCode].offset.x = parseInt(args[1]);
+							chardata[curCharCode].offset.y = parseInt(args[2]);
 						}
-						else if (args[1] == "WIDTH") {
-							chardata[curCharCode].spacing = parseInt(args[2]);
+						else if (args[0] == "CHAR_WIDTH") { // TODO : CHAR_WIDTH or CHAR_SPACE or CHAR_SPACING
+							chardata[curCharCode].spacing = parseInt(args[1]);
 						}
 					}
 					else {
