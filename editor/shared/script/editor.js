@@ -1,43 +1,27 @@
 /*
-other todos:
-- alt text localization??
-- debug MP bug
-- credits panel
-
 5.5 todos:
 X finalize font format changes
 X make sure arabic font is working
 X make sure old fonts still work!
 - new arabic font strings localization
-- update translations
-	- arabic
-	- chinese
-	- polish
-	- let translators know there are new strings to update
-- version notes
+X update translations
+	X arabic
+	X chinese
+	X polish
+- let translators know there are new strings to update
+X version notes
 - bug where RTL font changes the editor!! -- should only do that for the language setting
-- default title string still fails! why???
-
-final font format thoughts
-- instead of introducing dashes to create sub-properties, just use CHAR_
-	"- SIZE" vs "CHAR_SIZE"
-	other possibilities: "_SIZE", "C_SIZE", "CH_SIZE"
+- changing the font doesn't save sometimes??
 
 PERF NOTES:
 - loading idea: use long animations to create the loading animation
 - handle parsing performance (especially LARGE fonts)
 - load hidden thumbnails over time
 
-X bug where big fonts slow down re-writing the game data (toggle to show the font data?)
-	- cause: writing a ton of data into the game data text box
-		fixes: hide/show font in game data, make "async" re-write of textbox (will that work?)
-X asian font : NS_ERROR_DOM_QUOTA_REACHED: Persistent storage maximum size reached
-	- ideas: don't save fonts in the game data until download ... just store the names (note: could cause some bugs)
-
 POST 5.0 longer term:
-- desktop apps
-- homepage (bitsy.org)
-- arabic pixel font
+- alt text localization??
+- debug MP bug
+- credits panel
 - scripting documentation
 - fix perf of game data box (async writing?)
 - perf of sprite selector

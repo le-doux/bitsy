@@ -1,12 +1,24 @@
+5.5:
+- editor translated into Arabic, Chinese, and Polish
+***** shout outs to the translators! *****
+Ahmed Khalifa (Arabic)
+Ray Song (Chinese)
+Mateusz Teklak (Polish)
+******************************************
+- new Arabic pixel font
+- right to left text
+- bitsyfont supports variable-width fonts
+
+
 5.4:
 - editor translated into Esperanto, Estonian, Hungarian, Icelandic, Russian
-***** huge thanks to the translators *****
+***** thank you translators!!!! :) *****
 Ariel J Moody (Esperanto)
 Raul (Estonian)
 Ádám Török (Hungarian)
 Game Makers Iceland (Icelandic)
 Vinvirinvi & Onion (Russian)
-******************************************
+****************************************
 - link to updated Bitsy tutorial by Claire Morley
 - added link to "games made with Bitsy" on itch.io
 
