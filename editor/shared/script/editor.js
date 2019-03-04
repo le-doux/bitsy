@@ -4420,14 +4420,15 @@ function chooseExportSizeFixed() {
 // LOCALIZATION
 var localization;
 function on_change_language(e) {
-	on_change_language_inner(e.target.value);
+	var language = e.target.value;
+	pickDefaultFontForLanguage(language);
+	on_change_language_inner(language);
 }
 
 function on_change_language_inner(language) {
 	changeLnaguageStyle(language); // TODO : misspelled funciton name
 
 	localization.ChangeLanguage(language);
-	pickDefaultFontForLanguage(language);
 	updateInventoryUI();
 	reloadDialogUI();
 	hackyUpdatePlaceholderText();
@@ -4512,8 +4513,6 @@ function switchFont(newFontName, doPickTextDirection) {
 	if (doPickTextDirection === undefined || doPickTextDirection === null) {
 		doPickTextDirection = false;
 	}
-
-	console.log("SWITCH FONT " + doPickTextDirection);
 
 	fontName = newFontName;
 
