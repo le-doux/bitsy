@@ -10,7 +10,7 @@ X update translations
 	X polish
 - let translators know there are new strings to update
 X version notes
-- bug where RTL font changes the editor!! -- should only do that for the language setting
+X bug where RTL font changes the editor!! -- should only do that for the language setting
 - changing the font doesn't save sometimes??
 
 PERF NOTES:

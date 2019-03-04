@@ -47,6 +47,14 @@
 	float: left;
 }
 
+.lang_ar .panel {
+	direction: ltr;
+}
+
+.lang_ar .panel {
+	direction: rtl;
+}
+
 /* text direction styles */
 .dir_ltr .gameTextDir {
 	direction: ltr;
@@ -56,14 +64,6 @@
 .dir_rtl .gameTextDir {
 	direction: rtl;
 	unicode-bidi: bidi-override;
-}
-
-.dir_ltr .panel {
-	direction: ltr;
-}
-
-.dir_rtl .panel {
-	direction: rtl;
 }
 
 #editorWindow {
