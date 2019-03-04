@@ -970,7 +970,9 @@ var transition = new TransitionManager();
 
 function movePlayerThroughExit(ext) {
 	var GoToDest = function() {
-		transition.BeginTransition(player().room, player().x, player().y, ext.dest.room, ext.dest.x, ext.dest.y, "wave");
+		if (ext.transition_effect != null) {
+			transition.BeginTransition(player().room, player().x, player().y, ext.dest.room, ext.dest.x, ext.dest.y, ext.transition_effect);
+		}
 
 		player().room = ext.dest.room;
 		player().x = ext.dest.x;
@@ -1283,6 +1285,9 @@ function serializeWorld(skipFonts) {
 				var e = room[id].exits[j];
 				if ( isExitValid(e) ) {
 					worldStr += "EXT " + e.x + "," + e.y + " " + e.dest.room + " " + e.dest.x + "," + e.dest.y;
+					if (e.transition_effect != undefined && e.transition_effect != null) {
+						worldStr += " FX " + e.transition_effect;
+					}
 					if (e.dlg != undefined && e.dlg != null) {
 						worldStr += " DLG " + e.dlg;
 					}
@@ -1556,10 +1561,23 @@ function parseRoom(lines, i) {
 					y : parseInt(destCoords[1])
 				},
 				dlg : null,
+				transition_effect : null,
 			};
 
-			if (exitArgs.length >= 6 && exitArgs[4] === "DLG") { // TODO : temp naming?
-				ext.dlg = exitArgs[5];
+			// optional arguments
+			var exitArgIndex = 4;
+			while (exitArgIndex < exitArgs.length) {
+				if (exitArgs[exitArgIndex] == "DLG") { // TODO : temp naming?
+					ext.dlg = exitArgs[exitArgIndex+1];
+					exitArgIndex += 2;
+				}
+				else if (exitArgs[exitArgIndex] == "FX") {
+					ext.transition_effect = exitArgs[exitArgIndex+1];
+					exitArgIndex += 2;
+				}
+				else {
+					exitArgIndex += 1;
+				}
 			}
 
 			room[id].exits.push(ext);

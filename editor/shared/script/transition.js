@@ -14,9 +14,9 @@ var TransitionManager = function() {
 
 	var isTransitioning = false;
 	var transitionTime = 0; // Ms
-	var maxTransitionTime = 500; //Ms // TODO : pick final speed
+	var maxTransitionTime = 750; //Ms // TODO : pick final speed
 
-	var maxStep = 48; // TODO : pick final "chunkiness"
+	var maxStep = 16; // TODO : pick final "chunkiness"
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
@@ -112,6 +112,7 @@ var TransitionManager = function() {
 		pixelEffectFunc : function() {},
 	});
 
+	// TODO -- shorter effect names?
 	this.RegisterTransitionEffect("fade_white", { // TODO : have it linger on full white briefly?
 		showPlayerStart : false,
 		showPlayerEnd : true,
@@ -176,15 +177,12 @@ var TransitionManager = function() {
 		showPlayerStart : false,
 		showPlayerEnd : true,
 		pixelEffectFunc : function(startImage,endImage,pixelX,pixelY,step,maxStep) {
-			var d = (step / maxStep);
+			var delta = (step / maxStep);
+			var waveDelta = delta < 0.5 ? delta / 0.5 : 1 - ((delta - 0.5) / 0.5);
 
-			if (pixelX == 0 && pixelY == 0) {
-				console.log("WAVE " + d);
-			}
-
-			var offset = (pixelY + (d * d * 0.5 * startImage.Height));
+			var offset = (pixelY + (waveDelta * waveDelta * 0.2 * startImage.Height));
 			var freq = 4;
-			var size = 2 + (6 * d);
+			var size = 2 + (14 * waveDelta);
 			pixelX += Math.floor(Math.sin(offset / freq) * size);
 
 			if (pixelX < 0) {
@@ -194,8 +192,8 @@ var TransitionManager = function() {
 				pixelX -= startImage.Width;
 			}
 
-
-			return startImage.GetPixel(pixelX,pixelY);
+			return transitionEffects["cross_fade"].pixelEffectFunc(startImage,endImage,pixelX,pixelY,step,maxStep);
+			// return startImage.GetPixel(pixelX,pixelY);
 			
 			// TODO: try this
 			//return PostProcessUtilities.LerpColor( startImage.GetPixel(pixelX,pixelY), {r:255,g:255,b:255,a:255}, d*d*d );
