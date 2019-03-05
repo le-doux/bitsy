@@ -1,20 +1,26 @@
 /*
 TODO:
 X make multiple transitions choose-able
-- test fancy transitions (wave, etc)
+X test fancy transitions (wave, etc)
 X make wrapper objects for image data
 X only run pixel func on frame step
-- in sliding transition.. lerp colors (that would be cool!)
+X in sliding transition.. lerp colors (that would be cool!)
+- tunnel transition
+	- in progress : transition info object that stores start & end position
+		- is storing the palette in the image a good idea?? or is there something better?
+		- what about storing the player position?
 */
 
 var TransitionManager = function() {
-	var startImage = null;
-	var endImage = null;
+	// var startImage = null;
+	// var endImage = null;
+	var transitionStart = null;
+	var transitionEnd = null;
 	var effectImage = null;
 
 	var isTransitioning = false;
-	var transitionTime = 0; // Ms
-	var maxTransitionTime = 500; //Ms // TODO : pick final speed
+	var transitionTime = 0; // milliseconds
+	var maxTransitionTime = 500; // milliseconds // TODO : pick final speed
 
 	var maxStep = 4; // TODO : pick final "chunkiness"
 	var prevStep = -1; // used to avoid running post-process effect constantly
@@ -38,7 +44,8 @@ var TransitionManager = function() {
 
 		drawRoom(room[startRoom]);
 		var startPalette = getPal( room[startRoom].pal );
-		startImage = new PostProcessImage( ctx.getImageData(0,0,canvas.width,canvas.height), startPalette ); // TODO : don't use global ctx?
+		var startImage = new PostProcessImage( ctx.getImageData(0,0,canvas.width,canvas.height), startPalette ); // TODO : don't use global ctx?
+		transitionStart = new TransitionInfo(startImage, startPalette, startX, startY);
 
 		if (transitionEffects[curEffect].showPlayerEnd) {
 			player().room = endRoom;
@@ -51,7 +58,8 @@ var TransitionManager = function() {
 
 		drawRoom(room[endRoom]);
 		var endPalette = getPal( room[endRoom].pal );
-		endImage = new PostProcessImage( ctx.getImageData(0,0,canvas.width,canvas.height), endPalette );
+		var endImage = new PostProcessImage( ctx.getImageData(0,0,canvas.width,canvas.height), endPalette );
+		transitionEnd = new TransitionInfo(endImage, endPalette, endX, endY);
 
 		effectImage = new PostProcessImage( ctx.createImageData(canvas.width,canvas.height) );
 
@@ -78,7 +86,7 @@ var TransitionManager = function() {
 			// console.log("step! " + step);
 			for (var y = 0; y < effectImage.Height; y++) {
 				for (var x = 0; x < effectImage.Width; x++) {
-					var color = transitionEffects[curEffect].pixelEffectFunc(startImage,endImage,x,y,step,maxStep);
+					var color = transitionEffects[curEffect].pixelEffectFunc(transitionStart,transitionEnd,x,y,step,maxStep);
 					effectImage.SetPixel(x,y,color);
 				}
 			}
@@ -90,8 +98,10 @@ var TransitionManager = function() {
 		if (transitionTime >= maxTransitionTime) {
 			isTransitioning = false;
 			transitionTime = 0;
-			startImage = null;
-			endImage = null;
+			// startImage = null;
+			// endImage = null;
+			transitionStart = null;
+			transitionEnd = null;
 			effectImage = null;
 			prevStep = -1;
 		}
@@ -207,7 +217,7 @@ var TransitionManager = function() {
 		}
 	});
 
-	this.RegisterTransitionEffect("wave", {
+	this.RegisterTransitionEffect("distort", { // name? wave? distort? shiver?
 		showPlayerStart : false,
 		showPlayerEnd : true,
 		pixelEffectFunc : function(startImage,endImage,pixelX,pixelY,step,maxStep) {
@@ -228,13 +238,30 @@ var TransitionManager = function() {
 
 			var curImage = delta < 0.5 ? startImage : endImage;
 			return curImage.GetPixel(pixelX,pixelY);
+		}
+	});
 
-			// return transitionEffects["cross_fade"].pixelEffectFunc(startImage,endImage,pixelX,pixelY,step,maxStep);
-			
-			// return startImage.GetPixel(pixelX,pixelY);
-			
-			// TODO: try this
-			//return PostProcessUtilities.LerpColor( startImage.GetPixel(pixelX,pixelY), {r:255,g:255,b:255,a:255}, d*d*d );
+	this.RegisterTransitionEffect("tunnel", {
+		showPlayerStart : true,
+		showPlayerEnd : true,
+		pixelEffectFunc : function(startImage,endImage,pixelX,pixelY,step,maxStep) {
+			var delta = (step / maxStep);
+			var waveDelta = delta < 0.5 ? delta / 0.5 : 1 - ((delta - 0.5) / 0.5);
+
+			var offset = (pixelY + (waveDelta * waveDelta * 0.2 * startImage.Height));
+			var freq = 4;
+			var size = 2 + (14 * waveDelta);
+			pixelX += Math.floor(Math.sin(offset / freq) * size);
+
+			if (pixelX < 0) {
+				pixelX += startImage.Width;
+			}
+			else if (pixelX >= startImage.Width) {
+				pixelX -= startImage.Width;
+			}
+
+			var curImage = delta < 0.5 ? startImage : endImage;
+			return curImage.GetPixel(pixelX,pixelY);
 		}
 	});
 }; // TransitionManager()
@@ -305,4 +332,10 @@ var PostProcessImage = function(imageData, palette) {
 	this.GetData = function() {
 		return imageData;
 	};
+};
+
+var TransitionInfo = function(image, palette, playerX, playerY) {
+	this.Image = image;
+	this.Palette = palette;
+	this.PlayerPos = { x:playerX, y:playerY }
 };
