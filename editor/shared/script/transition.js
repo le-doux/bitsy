@@ -20,9 +20,9 @@ var TransitionManager = function() {
 
 	var isTransitioning = false;
 	var transitionTime = 0; // milliseconds
-	var maxTransitionTime = 500; // milliseconds // TODO : pick final speed
+	var maxTransitionTime = 750; // milliseconds // TODO : pick final speed
 
-	var maxStep = 4; // TODO : pick final "chunkiness"
+	var maxStep = 10; // TODO : pick final "chunkiness"
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
@@ -246,7 +246,48 @@ var TransitionManager = function() {
 		showPlayerEnd : true,
 		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
 			var delta = (step / maxStep);
-			// TODO
+
+			if (delta <= 0.33) {
+				var tunnelDelta = 1 - (delta / 0.33);
+
+				// V1
+				// var xDist = start.PlayerCenter.x - pixelX;
+				// var yDist = start.PlayerCenter.y - pixelY;
+				// var dist = Math.sqrt((xDist * xDist) + (yDist * yDist));
+
+				// if (dist > start.Image.Width * tunnelDelta) {
+
+				// V2
+				var xDist = Math.abs(start.PlayerCenter.x - pixelX);
+				var yDist = Math.abs(start.PlayerCenter.y - pixelY);
+				// var dist = Math.sqrt((xDist * xDist) + (yDist * yDist));
+
+				if (xDist > start.Image.Width * tunnelDelta || yDist > start.Image.Width * tunnelDelta) {
+					// return {r:0,g:0,b:0,a:255};
+					return { r:start.Palette[1][0], g:start.Palette[1][1], b:start.Palette[1][2], a:255 };
+				}
+				else {
+					return start.Image.GetPixel(pixelX,pixelY);
+				}
+			}
+			else if (delta <= 0.66)
+			{
+				return {r:0,g:0,b:0,a:255};
+			}
+			else {
+				var tunnelDelta = (delta - 0.66) / 0.33;
+
+				var xDist = end.PlayerCenter.x - pixelX;
+				var yDist = end.PlayerCenter.y - pixelY;
+				var dist = Math.sqrt((xDist * xDist) + (yDist * yDist));
+
+				if (dist > end.Image.Width * tunnelDelta) {
+					return {r:0,g:0,b:0,a:255};
+				}
+				else {
+					return end.Image.GetPixel(pixelX,pixelY);
+				}
+			}
 		}
 	});
 }; // TransitionManager()
@@ -320,5 +361,6 @@ var PostProcessImage = function(imageData) {
 var TransitionInfo = function(image, palette, playerX, playerY) {
 	this.Image = image;
 	this.Palette = palette;
-	this.PlayerPos = { x:playerX, y:playerY }
+	this.PlayerTilePos = { x: playerX, y: playerY };
+	this.PlayerCenter = { x: Math.floor((playerX * tilesize) + (tilesize / 2)), y: Math.floor((playerY * tilesize) + (tilesize / 2)) };
 };
