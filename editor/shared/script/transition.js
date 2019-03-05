@@ -20,9 +20,9 @@ var TransitionManager = function() {
 
 	var isTransitioning = false;
 	var transitionTime = 0; // milliseconds
-	var maxTransitionTime = 750; // milliseconds // TODO : pick final speed
+	var maxTransitionTime = 1000; // milliseconds // TODO : pick final speed
 
-	var maxStep = 10; // TODO : pick final "chunkiness"
+	var maxStep = 10; // TODO : pick final "chunkiness", move this to timePerFrame or something more precise
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
