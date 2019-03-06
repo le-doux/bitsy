@@ -217,7 +217,7 @@ var TransitionManager = function() {
 		}
 	});
 
-	this.RegisterTransitionEffect("distort", { // name? wave? distort? shiver?
+	this.RegisterTransitionEffect("wave", { // name? wave? distort? shiver?
 		showPlayerStart : false,
 		showPlayerEnd : true,
 		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
@@ -241,6 +241,7 @@ var TransitionManager = function() {
 		}
 	});
 
+	// TODO : try dithering?
 	this.RegisterTransitionEffect("tunnel", {
 		showPlayerStart : true,
 		showPlayerEnd : true,
@@ -250,21 +251,12 @@ var TransitionManager = function() {
 			if (delta <= 0.33) {
 				var tunnelDelta = 1 - (delta / 0.33);
 
-				// V1
-				// var xDist = start.PlayerCenter.x - pixelX;
-				// var yDist = start.PlayerCenter.y - pixelY;
-				// var dist = Math.sqrt((xDist * xDist) + (yDist * yDist));
+				var xDist = start.PlayerCenter.x - pixelX;
+				var yDist = start.PlayerCenter.y - pixelY;
+				var dist = Math.sqrt((xDist * xDist) + (yDist * yDist));
 
-				// if (dist > start.Image.Width * tunnelDelta) {
-
-				// V2
-				var xDist = Math.abs(start.PlayerCenter.x - pixelX);
-				var yDist = Math.abs(start.PlayerCenter.y - pixelY);
-				// var dist = Math.sqrt((xDist * xDist) + (yDist * yDist));
-
-				if (xDist > start.Image.Width * tunnelDelta || yDist > start.Image.Width * tunnelDelta) {
-					// return {r:0,g:0,b:0,a:255};
-					return { r:start.Palette[1][0], g:start.Palette[1][1], b:start.Palette[1][2], a:255 };
+				if (dist > start.Image.Width * tunnelDelta) {
+					return {r:0,g:0,b:0,a:255};
 				}
 				else {
 					return start.Image.GetPixel(pixelX,pixelY);
@@ -288,6 +280,30 @@ var TransitionManager = function() {
 					return end.Image.GetPixel(pixelX,pixelY);
 				}
 			}
+		}
+	});
+
+	this.RegisterTransitionEffect("fuzz", {
+		showPlayerStart : false,
+		showPlayerEnd : true,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
+			// TODO: actually implement by getting average color?... this just caused a zoom effect oops
+			// var delta = (step / maxStep);
+
+			// if (delta <= 0.5) {
+			// 	delta = delta / 0.5;
+			// 	var fuzziness = 1 / (1 + (3 * delta));
+			// 	pixelX = Math.floor( pixelX  * fuzziness );
+			// 	pixelY = Math.floor( pixelY * fuzziness );
+			// 	return start.Image.GetPixel(pixelX,pixelY);
+			// }
+			// else {
+			// 	delta = 1 - ((delta - 0.5) / 0.5)
+			// 	var fuzziness = 1 / (1 + (3 * delta));
+			// 	pixelX = Math.floor( pixelX  * fuzziness );
+			// 	pixelY = Math.floor( pixelY * fuzziness );
+			// 	return end.Image.GetPixel(pixelX,pixelY);
+			// }
 		}
 	});
 }; // TransitionManager()
