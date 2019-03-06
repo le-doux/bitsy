@@ -549,8 +549,10 @@ function start() {
 	// exit_ctx = exit_canvas.getContext("2d");
 	// //exit events
 	// exit_canvas.addEventListener("mousedown", exit_onMouseDown);
-	exitTool = new ExitTool( document.getElementById("exitCanvas1"), document.getElementById("exitCanvas2") );
-	console.log(exitTool);
+	exitTool = new ExitTool(
+					document.getElementById("exitCanvas1"),
+					document.getElementById("exitCanvas2"),
+					document.getElementById("endingCanvas") );
 	roomTool.exits = exitTool;
 
 	//

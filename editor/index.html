@@ -578,6 +578,22 @@
 								</div>
 							</div>
 						</div>
+						<div id="endingsSelect" style="display: flex;">
+							<div class="controlBox" style="display: flex; flex-direction: column;">
+								<!-- <span>A:</span> -->
+								<canvas id="endingCanvas" style="width:100px; height:100px;" onclick="/*selectExitRoom1();*/"></canvas>
+								<div style="margin-top: 4px;">
+									<input type="checkbox" id="toggleMoveEnding" onclick="/*toggleMoveExitDoor1(event);*/" />
+									<label for="toggleMoveEnding">
+										<i class="material-icons">location_searching</i>
+										<span id="textMoveEnding">move ending</span>
+									</label>
+									<button id="cancelMoveEnding" onclick="cancelMoveExitDoor1();">
+										<i class="material-icons">cancel</i>
+									</button>
+								</div>
+							</div>
+						</div>
 						<div id="exitsControls" class="controlBox">
 							<div id="exitsNav" class="buttonGroup">
 								<button title="previous exit" class="color0" onclick="prevExit();">
@@ -589,7 +605,10 @@
 							</div>
 							<div id="exitsCommands" class="buttonGroup">
 								<button title="add exit" class="color0" onclick="newExit();">
-									<i class="material-icons">add</i>
+									<i class="material-icons">add</i> exit
+								</button>
+								<button title="add ending" class="color0" onclick="/*newEnding();*/">
+									<i class="material-icons">add</i> end
 								</button>
 								<button title="delete exit" class="color0" onclick="deleteExit();">
 									<i class="material-icons">remove_circle</i>
@@ -625,7 +644,7 @@
 								<i class="material-icons">add</i>
 							</button>
 						</div>
-						<!-- <button onclick="deleteEnding();"> x delete x </button>
+						<!-- <button onclick="deleteEnding();"> x delete x </button> -->
 					</div>
 					<div class="buttonGroup">
 						<button title="click to place ending in current room" class="color0" id="addEndingButton" onclick="addEnding();">

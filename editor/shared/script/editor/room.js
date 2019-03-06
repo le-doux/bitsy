@@ -409,6 +409,10 @@ function RoomTool(canvas) {
 			for (var i = 0; i < exitInfoList.length; i++) {
 				var exitInfo = exitInfoList[i];
 
+				if (exitInfo.type != 0) {
+					return; // TODO: hacky way to avoid crashing on endings!!!!
+				}
+
 				if (exitInfo.parentRoom === curRoom) {
 					if (exitInfo.hasReturn) {
 						// draw two way exit

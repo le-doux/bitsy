@@ -1,5 +1,10 @@
 /*
 TODO:
+- add endings and "triggers"
+- rename tool?
+	- rename everything that is so exit specific
+
+TODO:
 - advanced exit TODO:
 	X play dialog on (before?) exit
 	X script return values
@@ -98,7 +103,11 @@ advanced exit notes:
 */
 
 
-function ExitTool(exitCanvas1, exitCanvas2) {
+function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
+	console.log("NEW EXIT TOOL");
+	console.log(endingCanvas);
+	console.log(curRoom);
+
 	var selectedRoom = null;
 
 	var exitInfoList = [];
@@ -112,6 +121,12 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	exitCanvas2.height = width * scale;
 	var exitCtx2 = exitCanvas2.getContext("2d");
 
+	// TODO : re-use the exit canvases instead?
+	endingCanvas.width = width * scale;
+	endingCanvas.height = width * scale;
+	var endingCtx = endingCanvas.getContext("2d");
+	console.log(endingCtx);
+
 	var PlacementMode = { // TODO : awkward name
 		None : 0,
 		Exit : 1,
@@ -124,6 +139,12 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 		TwoWay : 0, // two way exit
 		OneWayOriginal : 1, // one way exit - in same state as when it was "gathered"
 		OneWaySwapped : 2, // one way exit - swapped direction from how it was "gathered"
+	};
+
+	var ExitType = { // TODO : figure out a name that includes everything
+		Exit : 0,
+		Ending : 1,
+		// TODO : trigger??
 	};
 
 	UpdatePlacementButtons();
@@ -194,31 +215,38 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 	}
 
 	function RenderExits() {
+		console.log("RENDER EXITS");
 		if (curExitInfo != null) {
-			var w = tilesize * scale;
+			console.log(curExitInfo);
+			if (curExitInfo.type == ExitType.Exit) {
+				var w = tilesize * scale;
 
-			var exitCtx = exitCtx1;
-			var destCtx = exitCtx2;
-			if (curExitInfo.linkState == LinkState.OneWaySwapped) {
-				exitCtx = exitCtx2;
-				destCtx = exitCtx1;
+				var exitCtx = exitCtx1;
+				var destCtx = exitCtx2;
+				if (curExitInfo.linkState == LinkState.OneWaySwapped) {
+					exitCtx = exitCtx2;
+					destCtx = exitCtx1;
+				}
+
+				drawRoom( room[curExitInfo.parentRoom], exitCtx );
+
+				exitCtx.fillStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
+				exitCtx.strokeStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
+				exitCtx.lineWidth = 4;
+				exitCtx.fillRect(curExitInfo.exit.x * w, curExitInfo.exit.y * w, w, w);
+				exitCtx.strokeRect((curExitInfo.exit.x * w) - (w/2), (curExitInfo.exit.y * w) - (w/2), w * 2, w * 2);
+
+				drawRoom( room[curExitInfo.exit.dest.room], destCtx );
+
+				destCtx.fillStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
+				destCtx.strokeStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
+				destCtx.lineWidth = 4;
+				destCtx.fillRect(curExitInfo.exit.dest.x * w, curExitInfo.exit.dest.y * w, w, w);
+				destCtx.strokeRect((curExitInfo.exit.dest.x * w) - (w/2), (curExitInfo.exit.dest.y * w) - (w/2), w * 2, w * 2);
 			}
-
-			drawRoom( room[curExitInfo.parentRoom], exitCtx );
-
-			exitCtx.fillStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
-			exitCtx.strokeStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
-			exitCtx.lineWidth = 4;
-			exitCtx.fillRect(curExitInfo.exit.x * w, curExitInfo.exit.y * w, w, w);
-			exitCtx.strokeRect((curExitInfo.exit.x * w) - (w/2), (curExitInfo.exit.y * w) - (w/2), w * 2, w * 2);
-
-			drawRoom( room[curExitInfo.exit.dest.room], destCtx );
-
-			destCtx.fillStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
-			destCtx.strokeStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
-			destCtx.lineWidth = 4;
-			destCtx.fillRect(curExitInfo.exit.dest.x * w, curExitInfo.exit.dest.y * w, w, w);
-			destCtx.strokeRect((curExitInfo.exit.dest.x * w) - (w/2), (curExitInfo.exit.dest.y * w) - (w/2), w * 2, w * 2);
+			else if (curExitInfo.type == ExitType.Ending) {
+				drawRoom( room[selectedRoom], endingCtx );
+			}
 		}
 		else {
 			exitCtx1.clearRect(0, 0, exitCanvas1.width, exitCanvas1.height);
@@ -359,12 +387,13 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 			document.getElementById("cancelMoveExitDoor2").style.display = "none";
 		}
 
-		if (placementMode == PlacementMode.None) {
-			document.body.style.cursor = "pointer";
-		}
-		else {
-			document.body.style.cursor = "crosshair";
-		}
+		// TODO : this behaves oddly... change??
+		// if (placementMode == PlacementMode.None) {
+		// 	document.body.style.cursor = "pointer";
+		// }
+		// else {
+		// 	document.body.style.cursor = "crosshair";
+		// }
 	}
 
 	this.PlaceExit = function(x,y) {
@@ -477,6 +506,8 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 
 	function GatherExitInfoList()
 	{
+		console.log("GATHER EXITS!!");
+
 		var infoList = [];
 
 		var findReturnExit = function(parentRoom, startExit) {
@@ -503,6 +534,7 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 			}
 
 			infoList.push({
+				type: ExitType.Exit,
 				parentRoom: selectedRoom,
 				exit: room[selectedRoom].exits[i],
 				hasReturn: returnExit != null,
@@ -517,6 +549,7 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 					var exit = room[r].exits[i];
 					if (exit.dest.room === selectedRoom && findReturnExit(r,exit) == null) {
 						infoList.push({
+							type: ExitType.Exit,
 							parentRoom: r,
 							exit: exit,
 							hasReturn: false,
@@ -526,6 +559,14 @@ function ExitTool(exitCanvas1, exitCanvas2) {
 					}
 				}
 			}
+		}
+
+		for (var e in room[selectedRoom].endings) {
+			var ending = room[selectedRoom].endings[e];
+			infoList.push({
+				type: ExitType.Ending,
+				ending: ending
+			});
 		}
 
 		return infoList;
