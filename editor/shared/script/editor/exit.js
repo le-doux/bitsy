@@ -3,6 +3,7 @@ TODO:
 - add endings and "triggers"
 - rename tool?
 	- rename everything that is so exit specific
+- remove areEndingsVisible
 
 TODO:
 - advanced exit TODO:
@@ -141,12 +142,6 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		OneWaySwapped : 2, // one way exit - swapped direction from how it was "gathered"
 	};
 
-	var ExitType = { // TODO : figure out a name that includes everything
-		Exit : 0,
-		Ending : 1,
-		// TODO : trigger??
-	};
-
 	UpdatePlacementButtons();
 
 	this.AddExit = function() {
@@ -215,11 +210,14 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 	}
 
 	function RenderExits() {
-		console.log("RENDER EXITS");
 		if (curExitInfo != null) {
-			console.log(curExitInfo);
+			var w = tilesize * scale;
 			if (curExitInfo.type == ExitType.Exit) {
-				var w = tilesize * scale;
+				document.getElementById("exitsSelect").style.display = "flex";
+				document.getElementById("endingsSelect").style.display = "none";
+
+				// just tacking this on here to make sure it updates
+				UpdateExitDirectionUI();
 
 				var exitCtx = exitCtx1;
 				var destCtx = exitCtx2;
@@ -245,16 +243,22 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 				destCtx.strokeRect((curExitInfo.exit.dest.x * w) - (w/2), (curExitInfo.exit.dest.y * w) - (w/2), w * 2, w * 2);
 			}
 			else if (curExitInfo.type == ExitType.Ending) {
-				drawRoom( room[selectedRoom], endingCtx );
+				document.getElementById("exitsSelect").style.display = "none";
+				document.getElementById("endingsSelect").style.display = "flex";
+
+				drawRoom( room[curExitInfo.parentRoom], endingCtx );
+
+				endingCtx.fillStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
+				endingCtx.strokeStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
+				endingCtx.lineWidth = 4;
+				endingCtx.fillRect(curExitInfo.ending.x * w, curExitInfo.ending.y * w, w, w);
+				endingCtx.strokeRect((curExitInfo.ending.x * w) - (w/2), (curExitInfo.ending.y * w) - (w/2), w * 2, w * 2);
 			}
 		}
 		else {
 			exitCtx1.clearRect(0, 0, exitCanvas1.width, exitCanvas1.height);
 			exitCtx2.clearRect(0, 0, exitCanvas2.width, exitCanvas2.height);
 		}
-
-		// just tacking this on here to make sure it updates
-		UpdateExitDirectionUI();
 	}
 
 	this.RemoveExit = function() {
@@ -284,6 +288,8 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 			return null;
 		}
 	}
+
+	// TODO : GetSelectedEnding ???
 
 	this.GetSelectedReturn = function() {
 		if (curExitInfo != null && curExitInfo.hasReturn) {
@@ -565,6 +571,7 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 			var ending = room[selectedRoom].endings[e];
 			infoList.push({
 				type: ExitType.Ending,
+				parentRoom: selectedRoom,
 				ending: ending
 			});
 		}
@@ -720,3 +727,9 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		}
 	}
 } // ExitTool
+
+var ExitType = { // TODO : figure out a name that includes everything
+	Exit : 0,
+	Ending : 1,
+	// TODO : trigger??
+};

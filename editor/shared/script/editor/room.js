@@ -406,74 +406,97 @@ function RoomTool(canvas) {
 				}
 			}
 
+			var drawEnding = function(e) {
+				ctx.fillStyle = getContrastingColor();
+				ctx.globalAlpha = 0.5;
+				ctx.fillRect(e.x * w, e.y * w, w, w);
+
+				ctx.globalAlpha = 1.0;
+				var centerX = (e.x * w) + (w/2);
+				var centerY = (e.y * w) + (w/2);
+				ctx.beginPath();
+				ctx.moveTo(centerX, centerY - (w/4));
+				ctx.lineTo(centerX + (w/4), centerY + (w/4));
+				ctx.lineTo(centerX - (w/4), centerY + (w/4));
+				ctx.fill();
+
+				if (e == self.exits.GetSelectedExit()) { // TODO rename
+					ctx.strokeStyle = getContrastingColor();
+					ctx.globalAlpha = 1.0;
+					ctx.lineWidth = 2.0;
+					ctx.strokeRect((e.x * w) - (w/4), (e.y * w) - (w/4), w * 1.5, w * 1.5);
+				}
+			}
+
 			for (var i = 0; i < exitInfoList.length; i++) {
 				var exitInfo = exitInfoList[i];
 
-				if (exitInfo.type != 0) {
-					return; // TODO: hacky way to avoid crashing on endings!!!!
-				}
+				if (exitInfo.type == ExitType.Exit) { // TODO hacky to make exit type global?
+					if (exitInfo.parentRoom === curRoom) {
+						if (exitInfo.hasReturn) {
+							// draw two way exit
+							drawExitPair(exitInfo);
+						}
+						else {
+							// draw one-way exit starting in this room
+							var e = exitInfo.exit;
+							if( !room[e.dest.room] )
+								continue;
 
-				if (exitInfo.parentRoom === curRoom) {
-					if (exitInfo.hasReturn) {
-						// draw two way exit
-						drawExitPair(exitInfo);
+							drawExit(e);
+
+							if (e.dest.room === curRoom){
+								drawEntrance(e);
+							}
+						}
 					}
 					else {
-						// draw one-way exit starting in this room
-						var e = exitInfo.exit;
-						if( !room[e.dest.room] )
-							continue;
+						if (exitInfo.hasReturn) {
+							// draw two way exit
+							drawExitPair(exitInfo);
+						}
+						else {
+							// draw one-way exit *ending* in this room
+							var e = exitInfo.exit;
+							if( !room[e.dest.room] )
+								continue;
 
-						drawExit(e);
-
-						if (e.dest.room === curRoom){
-							drawEntrance(e);
+							if (e.dest.room === curRoom){
+								drawEntrance(e);
+							}
 						}
 					}
 				}
-				else {
-					if (exitInfo.hasReturn) {
-						// draw two way exit
-						drawExitPair(exitInfo);
-					}
-					else {
-						// draw one-way exit *ending* in this room
-						var e = exitInfo.exit;
-						if( !room[e.dest.room] )
-							continue;
-
-						if (e.dest.room === curRoom){
-							drawEntrance(e);
-						}
-					}
+				else if (exitInfo.type == ExitType.Ending) {
+					drawEnding(exitInfo.ending);
 				}
 			}
 
 			ctx.globalAlpha = 1;
 		}
 
-		//draw endings
-		if (self.areEndingsVisible) {
-			for (i in room[curRoom].endings) {
-				var e = room[curRoom].endings[i];
-				if (e == selectedEndingTile) {
-					ctx.fillStyle = "#ff0";
-					ctx.globalAlpha = 0.9;
-				}
-				else {
-					ctx.fillStyle = getContrastingColor();
-					ctx.globalAlpha = 0.5;
-				}
-				ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
-				ctx.strokeStyle = getComplimentingColor();
-				ctx.globalAlpha = 1.0;
-				ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
+		// //draw endings
+		// if (self.areEndingsVisible) {
+		// 	for (i in room[curRoom].endings) {
+		// 		var e = room[curRoom].endings[i];
+		// 		if (e == selectedEndingTile) {
+		// 			ctx.fillStyle = "#ff0";
+		// 			ctx.globalAlpha = 0.9;
+		// 		}
+		// 		else {
+		// 			ctx.fillStyle = getContrastingColor();
+		// 			ctx.globalAlpha = 0.5;
+		// 		}
+		// 		ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
+		// 		ctx.strokeStyle = getComplimentingColor();
+		// 		ctx.globalAlpha = 1.0;
+		// 		ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
 
-				ctx.font = '14px sans-serif';
-				ctx.fillText( "To ending " + e.id, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
-			}
-			ctx.globalAlpha = 1;
-		}
+		// 		ctx.font = '14px sans-serif';
+		// 		ctx.fillText( "To ending " + e.id, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
+		// 	}
+		// 	ctx.globalAlpha = 1;
+		// }
 	}
 }
 
