@@ -4,6 +4,8 @@ TODO:
 - rename tool?
 	- rename everything that is so exit specific
 - remove areEndingsVisible
+- triggers
+	- alternate names: events (EVT), effects (EFF, EFX, EFC, EFCT)
 
 TODO:
 - advanced exit TODO:
@@ -289,7 +291,10 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		}
 	}
 
-	// TODO : GetSelectedEnding ???
+	// TODO name? GetSelectedEvent ? GetSelectedEventLocation?
+	this.GetSelectedLocation = function() {
+		return curExitInfo;
+	}
 
 	this.GetSelectedReturn = function() {
 		if (curExitInfo != null && curExitInfo.hasReturn) {
@@ -539,14 +544,23 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 				}
 			}
 
-			infoList.push({
-				type: ExitType.Exit,
-				parentRoom: selectedRoom,
-				exit: room[selectedRoom].exits[i],
-				hasReturn: returnExit != null,
-				return: returnExit,
-				linkState: returnExit ? LinkState.TwoWay : LinkState.OneWayOriginal
-			});
+			// infoList.push({
+			// 	type: ExitType.Exit,
+			// 	parentRoom: selectedRoom,
+			// 	exit: room[selectedRoom].exits[i],
+			// 	hasReturn: returnExit != null,
+			// 	return: returnExit,
+			// 	linkState: returnExit ? LinkState.TwoWay : LinkState.OneWayOriginal
+			// });
+
+			infoList.push(
+				new ExitLocation(
+					selectedRoom,
+					room[selectedRoom].exits[i],
+					returnExit != null,
+					returnExit,
+					returnExit ? LinkState.TwoWay : LinkState.OneWayOriginal)
+				);
 		}
 
 		for (var r in room) {
@@ -554,14 +568,23 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 				for (var i in room[r].exits) {
 					var exit = room[r].exits[i];
 					if (exit.dest.room === selectedRoom && findReturnExit(r,exit) == null) {
-						infoList.push({
-							type: ExitType.Exit,
-							parentRoom: r,
-							exit: exit,
-							hasReturn: false,
-							return: null,
-							linkState: LinkState.OneWayOriginal
-						});
+						// infoList.push({
+						// 	type: ExitType.Exit,
+						// 	parentRoom: r,
+						// 	exit: exit,
+						// 	hasReturn: false,
+						// 	return: null,
+						// 	linkState: LinkState.OneWayOriginal
+						// });
+
+						infoList.push(
+							new ExitLocation(
+								r,
+								exit,
+								false,
+								null,
+								LinkState.OneWayOriginal)
+							);
 					}
 				}
 			}
@@ -569,11 +592,17 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 
 		for (var e in room[selectedRoom].endings) {
 			var ending = room[selectedRoom].endings[e];
-			infoList.push({
-				type: ExitType.Ending,
-				parentRoom: selectedRoom,
-				ending: ending
-			});
+			// infoList.push({
+			// 	type: ExitType.Ending,
+			// 	parentRoom: selectedRoom,
+			// 	ending: ending
+			// });
+
+			infoList.push(
+				new EndingLocation(
+					selectedRoom,
+					ending)
+				);
 		}
 
 		return infoList;
@@ -728,8 +757,151 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 	}
 } // ExitTool
 
+// required if I'm using inheritance?
 var ExitType = { // TODO : figure out a name that includes everything
 	Exit : 0,
 	Ending : 1,
 	// TODO : trigger??
 };
+
+// TODO if this proves useful.. move into a shared file
+function InitObj(obj, parent) {
+	Object.assign(obj, parent);
+	obj.self = obj;
+	obj.base = parent;
+}
+
+function EventLocationBase(parentRoom) {
+	this.parentRoom = parentRoom;
+
+	this.Draw = function(ctx,x,y,w,selected) {
+		ctx.fillStyle = getContrastingColor();
+		ctx.globalAlpha = 0.5;
+		ctx.fillRect(x * w, y * w, w, w);
+
+		if (selected) {
+			ctx.strokeStyle = getContrastingColor();
+			ctx.globalAlpha = 1.0;
+			ctx.lineWidth = 2.0;
+			ctx.strokeRect((x * w) - (w/4), (y * w) - (w/4), w * 1.5, w * 1.5);
+		}
+	}
+}
+
+function ExitLocation(parentRoom, exit, hasReturn, returnExit, linkState) {
+	InitObj( this, new EventLocationBase(parentRoom) );
+
+	this.type = ExitType.Exit; // TODO remove
+
+	this.exit = exit;
+	this.hasReturn = hasReturn;
+	this.return = returnExit; // TODO naming?
+	this.linkState = linkState;
+
+	this.Draw = function(ctx,roomId,w,selected) {
+		console.log("TEST CHILD");
+		// this.base.Draw(ctx, this.exit.x, this.exit.y, w, selected);
+
+		if (this.parentRoom === roomId) {
+			this.base.Draw(ctx, this.exit.x, this.exit.y, w, selected);
+
+			if (this.hasReturn) {
+				DrawTwoWayExit(ctx, this.exit.x, this.exit.y, w);
+			}
+			else {
+				DrawExit(ctx, this.exit.x, this.exit.y, w);
+			}
+		}
+
+		if (this.exit.dest.room === roomId) {
+			this.base.Draw(ctx, this.exit.dest.x, this.exit.dest.y, w, selected);
+
+			if (this.hasReturn) {
+				DrawTwoWayExit(ctx, this.exit.dest.x, this.exit.dest.y, w);
+			}
+			else {
+				DrawEntrance(ctx, this.exit.dest.x, this.exit.dest.y, w);
+			}
+		}
+	}
+
+	function DrawExit(ctx,x,y,w) {
+		ctx.fillStyle = getContrastingColor();
+		ctx.globalAlpha = 1.0;
+		var centerX = (x * w) + (w/2);
+		var centerY = (y * w) + (w/2);
+		ctx.beginPath();
+		ctx.moveTo(centerX, centerY - (w/4));
+		ctx.lineTo(centerX + (w/4), centerY + (w/4));
+		ctx.lineTo(centerX - (w/4), centerY + (w/4));
+		ctx.fill();
+	}
+
+	function DrawEntrance(ctx,x,y,w) {
+		ctx.strokeStyle = getContrastingColor();
+		ctx.lineWidth = 2.0;
+		ctx.globalAlpha = 1.0;
+		var centerX = (x * w) + (w/2);
+		var centerY = (y * w) + (w/2);
+		ctx.beginPath();
+		ctx.moveTo(centerX, centerY + (w/4));
+		ctx.lineTo(centerX + (w/4), centerY - (w/4));
+		ctx.lineTo(centerX - (w/4), centerY - (w/4));
+		ctx.lineTo(centerX, centerY + (w/4));
+		ctx.stroke();
+	}
+
+	function DrawTwoWayExit(ctx,x,y,w) {
+		ctx.fillStyle = getContrastingColor();
+		ctx.strokeStyle = getContrastingColor();
+		ctx.lineWidth = 3.0;
+		ctx.globalAlpha = 1.0;
+		var centerX = (x * w) + (w/2);
+		var centerY = (y * w) + (w/2);
+		ctx.beginPath();
+		ctx.moveTo(centerX, centerY - (w/4));
+		ctx.lineTo(centerX + (w/4), centerY - (w * 0.1));
+		ctx.lineTo(centerX - (w/4), centerY - (w * 0.1));
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(centerX, centerY + (w/4));
+		ctx.lineTo(centerX + (w/4), centerY + (w * 0.1));
+		ctx.lineTo(centerX - (w/4), centerY + (w * 0.1));
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(centerX, centerY - (w * 0.2));
+		ctx.lineTo(centerX, centerY + (w * 0.2));
+		ctx.stroke();
+	}
+}
+
+function EndingLocation(parentRoom, ending) {
+	InitObj( this, new EventLocationBase(parentRoom) );
+
+	this.type = ExitType.Ending; // TODO remove
+
+	this.ending = ending;
+
+	this.Draw = function(ctx,roomId,w,selected) {
+		if (this.parentRoom === roomId) {
+			this.base.Draw(ctx, this.ending.x, this.ending.y, w, selected);
+			DrawEnding(ctx, this.ending.x, this.ending.y, w);
+		}
+	}
+
+	function DrawEnding(ctx,x,y,w) {
+		ctx.strokeStyle = getContrastingColor();
+		ctx.lineWidth = 2.0;
+		ctx.globalAlpha = 1.0;
+
+		ctx.beginPath();
+		ctx.moveTo((x * w) + (w * 0.1), (y * w) + (w * 0.1));
+		ctx.lineTo((x * w) + (w * 0.9), (y * w) + (w * 0.9));
+		ctx.stroke();
+
+		ctx.beginPath();
+		ctx.moveTo((x * w) + (w * 0.1), (y * w) + (w * 0.9));
+		ctx.lineTo((x * w) + (w * 0.9), (y * w) + (w * 0.1));
+		ctx.stroke();
+	}
+}
