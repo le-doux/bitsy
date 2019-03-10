@@ -148,8 +148,8 @@ open_settings	open settings	ouvrir les paramètres	abrir definições			откр
 close_label	close	fermer	fechar			закрыть		Schließen	أغلق	loka	bezárás	fermi	sulge	关闭	zamknij
 exit_click_add	click space in room to add exit								حدد فراغ في الغرفة لوضع النهاية					在房间中选中格子增加出口	kliknij na wolnym miejscu w pomieszczeniu, aby dodać wyjście
 font_data_toggle_visible	font data								بيانات الخط					字体数据	dane czcionki
-font_arabic_pixel	Arabic Pixel 2								Arabic Pixel 2					Arabic Pixel 2	Arabic Pixel 2
-font_arabic_pixel_description	Pixel font with Arabic characters, by @alex_clay_								الخط العربي بواسطة _alex_clay@					用 Arabic 字母制作的像素字体, 来自 @alex_clay_	Czcionka pikselowa z Arabskimi znakami, od @alex_clay_
+font_arabic	Arabic								العربية					Arabic	
+font_arabic_description	Pixel font with Arabic characters								خط بكسل يحتوي على الحروف العربية					使用 Arabic 字母的像素字体	
 text_direction_label	text direction								إتجاة الخط					文字方向	kierunek tekstu
 text_direction_ltr	Left to Right								من اليسار إلى اليمين					从左向右	Od lewej do prawej
 text_direction_rtl	Right to Left								من اليمين إلى اليسار					从右向左	Od prawej do lewej
