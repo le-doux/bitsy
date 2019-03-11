@@ -4,8 +4,10 @@ TODO:
 - rename tool?
 	- rename everything that is so exit specific
 - remove areEndingsVisible
-- triggers
-	- alternate names: events (EVT), effects (EFF, EFX, EFC, EFCT)
+- effects or EFF
+- placement mode
+	- get rid of enum
+	- replace w/ internal state in markers AND exit tool
 
 TODO:
 - advanced exit TODO:
@@ -106,15 +108,15 @@ advanced exit notes:
 */
 
 
-function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
+function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
 	console.log("NEW EXIT TOOL");
 	console.log(endingCanvas);
 	console.log(curRoom);
 
 	var selectedRoom = null;
 
-	var exitInfoList = [];
-	var curExitInfo = null;
+	var markerList = [];
+	var curMarker = null;
 
 	exitCanvas1.width = width * scale; // TODO : globals?
 	exitCanvas1.height = width * scale;
@@ -130,11 +132,6 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 	var endingCtx = endingCanvas.getContext("2d");
 	console.log(endingCtx);
 
-	var PlacementMode = { // TODO : awkward name
-		None : 0,
-		Exit : 1,
-		Destination : 2 // TODO : will I have to rename this?
-	};
 	var placementMode = PlacementMode.None;
 
 	// NOTE: the "link state" is a UI time concept -- it is not stored in the game data
@@ -170,8 +167,8 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		}
 		room[newExit.dest.room].exits.push( newReturn );
 
-		exitInfoList = GatherExitInfoList();
-		curExitInfo = exitInfoList.find(function(e) { return e.exit == newExit; });
+		markerList = GatherMarkerList();
+		curMarker = markerList.find(function(e) { return e.exit == newExit; });
 
 		RenderExits();
 		refreshGameData();
@@ -183,28 +180,28 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 	}
 
 	this.Refresh = function() { // TODO: rename "Reset"???
-		curExitInfo = null;
+		curMarker = null;
 		ResetExitList();
 	}
 
 	function ResetExitList() {
-		exitInfoList = GatherExitInfoList();
+		markerList = GatherMarkerList();
 
-		if (curExitInfo != null) {
+		if (curMarker != null) {
 			// check for exit info that duplicates the carry over exit info
-			var duplicate = exitInfoList.find(function(info) {
-				return (curExitInfo.exit == info.exit && curExitInfo.return == info.return) ||
-					(curExitInfo.exit == info.return && curExitInfo.return == info.exit);
+			var duplicate = markerList.find(function(info) {
+				return (curMarker.exit == info.exit && curMarker.return == info.return) ||
+					(curMarker.exit == info.return && curMarker.return == info.exit);
 			});
 			if (duplicate != undefined && duplicate != null) {
 				// if there is a duplicate.. replace it with the carry over exit
-				exitInfoList[exitInfoList.indexOf(duplicate)] = curExitInfo;
+				markerList[markerList.indexOf(duplicate)] = curMarker;
 			}
 		}
 		else {
-			if (exitInfoList.length > 0) {
+			if (markerList.length > 0) {
 				// fallback selected exit
-				curExitInfo = exitInfoList[0];
+				curMarker = markerList[0];
 			}
 		}
 
@@ -212,9 +209,9 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 	}
 
 	function RenderExits() {
-		if (curExitInfo != null) {
+		if (curMarker != null) {
 			var w = tilesize * scale;
-			if (curExitInfo.type == ExitType.Exit) {
+			if (curMarker.type == MarkerType.Exit) {
 				document.getElementById("exitsSelect").style.display = "flex";
 				document.getElementById("endingsSelect").style.display = "none";
 
@@ -223,38 +220,38 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 
 				var exitCtx = exitCtx1;
 				var destCtx = exitCtx2;
-				if (curExitInfo.linkState == LinkState.OneWaySwapped) {
+				if (curMarker.linkState == LinkState.OneWaySwapped) {
 					exitCtx = exitCtx2;
 					destCtx = exitCtx1;
 				}
 
-				drawRoom( room[curExitInfo.parentRoom], exitCtx );
+				drawRoom( room[curMarker.parentRoom], exitCtx );
 
-				exitCtx.fillStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
-				exitCtx.strokeStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
+				exitCtx.fillStyle = getContrastingColor(room[curMarker.parentRoom].pal);
+				exitCtx.strokeStyle = getContrastingColor(room[curMarker.parentRoom].pal);
 				exitCtx.lineWidth = 4;
-				exitCtx.fillRect(curExitInfo.exit.x * w, curExitInfo.exit.y * w, w, w);
-				exitCtx.strokeRect((curExitInfo.exit.x * w) - (w/2), (curExitInfo.exit.y * w) - (w/2), w * 2, w * 2);
+				exitCtx.fillRect(curMarker.exit.x * w, curMarker.exit.y * w, w, w);
+				exitCtx.strokeRect((curMarker.exit.x * w) - (w/2), (curMarker.exit.y * w) - (w/2), w * 2, w * 2);
 
-				drawRoom( room[curExitInfo.exit.dest.room], destCtx );
+				drawRoom( room[curMarker.exit.dest.room], destCtx );
 
-				destCtx.fillStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
-				destCtx.strokeStyle = getContrastingColor(room[curExitInfo.exit.dest.room].pal);
+				destCtx.fillStyle = getContrastingColor(room[curMarker.exit.dest.room].pal);
+				destCtx.strokeStyle = getContrastingColor(room[curMarker.exit.dest.room].pal);
 				destCtx.lineWidth = 4;
-				destCtx.fillRect(curExitInfo.exit.dest.x * w, curExitInfo.exit.dest.y * w, w, w);
-				destCtx.strokeRect((curExitInfo.exit.dest.x * w) - (w/2), (curExitInfo.exit.dest.y * w) - (w/2), w * 2, w * 2);
+				destCtx.fillRect(curMarker.exit.dest.x * w, curMarker.exit.dest.y * w, w, w);
+				destCtx.strokeRect((curMarker.exit.dest.x * w) - (w/2), (curMarker.exit.dest.y * w) - (w/2), w * 2, w * 2);
 			}
-			else if (curExitInfo.type == ExitType.Ending) {
+			else if (curMarker.type == MarkerType.Ending) {
 				document.getElementById("exitsSelect").style.display = "none";
 				document.getElementById("endingsSelect").style.display = "flex";
 
-				drawRoom( room[curExitInfo.parentRoom], endingCtx );
+				drawRoom( room[curMarker.parentRoom], endingCtx );
 
-				endingCtx.fillStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
-				endingCtx.strokeStyle = getContrastingColor(room[curExitInfo.parentRoom].pal);
+				endingCtx.fillStyle = getContrastingColor(room[curMarker.parentRoom].pal);
+				endingCtx.strokeStyle = getContrastingColor(room[curMarker.parentRoom].pal);
 				endingCtx.lineWidth = 4;
-				endingCtx.fillRect(curExitInfo.ending.x * w, curExitInfo.ending.y * w, w, w);
-				endingCtx.strokeRect((curExitInfo.ending.x * w) - (w/2), (curExitInfo.ending.y * w) - (w/2), w * 2, w * 2);
+				endingCtx.fillRect(curMarker.ending.x * w, curMarker.ending.y * w, w, w);
+				endingCtx.strokeRect((curMarker.ending.x * w) - (w/2), (curMarker.ending.y * w) - (w/2), w * 2, w * 2);
 			}
 		}
 		else {
@@ -264,84 +261,64 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 	}
 
 	this.RemoveExit = function() {
-		if (curExitInfo.hasReturn) {
-			var returnIndex = room[curExitInfo.exit.dest.room].exits.indexOf(curExitInfo.return);
-			room[curExitInfo.exit.dest.room].exits.splice(returnIndex,1);
+		if (curMarker.hasReturn) {
+			var returnIndex = room[curMarker.exit.dest.room].exits.indexOf(curMarker.return);
+			room[curMarker.exit.dest.room].exits.splice(returnIndex,1);
 		}
-		var exitIndex = room[curExitInfo.parentRoom].exits.indexOf(curExitInfo.exit);
-		room[curExitInfo.parentRoom].exits.splice(exitIndex,1);
+		var exitIndex = room[curMarker.parentRoom].exits.indexOf(curMarker.exit);
+		room[curMarker.parentRoom].exits.splice(exitIndex,1);
 
-		exitInfoList = GatherExitInfoList();
-		curExitInfo = exitInfoList.length > 0 ? exitInfoList[0] : null;
+		markerList = GatherMarkerList();
+		curMarker = markerList.length > 0 ? markerList[0] : null;
 
 		RenderExits();
 		refreshGameData();
 	}
 
-	this.IsPlacingExit = function () {
+	this.IsPlacingMarker = function () {
 		return placementMode != PlacementMode.None;
 	}
 
-	this.GetSelectedExit = function() {
-		if (curExitInfo != null) {
-			return curExitInfo.exit;
-		}
-		else {
-			return null;
-		}
-	}
-
-	// TODO name? GetSelectedEvent ? GetSelectedEventLocation?
-	this.GetSelectedLocation = function() {
-		return curExitInfo;
+	this.GetSelectedMarker = function() {
+		return curMarker;
 	}
 
 	this.GetSelectedReturn = function() {
-		if (curExitInfo != null && curExitInfo.hasReturn) {
-			return curExitInfo.return;
+		if (curMarker != null && curMarker.hasReturn) {
+			return curMarker.return;
 		}
 		else {
 			return null;
 		}
 	}
 
-	this.TrySelectExitAtLocation = function(x,y) {
+	this.TrySelectMarkerAtLocation = function(x,y) {
 		if (placementMode != PlacementMode.None) {
 			return false;
 		}
 
-		var foundExit = FindExitAtLocation(x,y);
+		var foundExit = FindMarkerAtLocation(x,y);
 		if (foundExit != null) {
-			curExitInfo = foundExit;
+			curMarker = foundExit;
 		}
 		RenderExits();
 
-		return curExitInfo != null;
+		return curMarker != null;
 	}
 
-	function FindExitAtLocation(x,y) {
-		for (var i = 0; i < exitInfoList.length; i++) {
-			var exitInfo = exitInfoList[i];
-			if (exitInfo.parentRoom === selectedRoom) {
-				if (exitInfo.exit.x == x && exitInfo.exit.y == y) {
-					return exitInfo;
-				}
-				else if (exitInfo.exit.dest.x == x && exitInfo.exit.dest.y == y) {
-					return exitInfo;
-				}
-			}
-			else if (exitInfo.exit.dest.room === selectedRoom) {
-				if (exitInfo.exit.dest.x == x && exitInfo.exit.dest.y == y) {
-					return exitInfo;
-				}
+	function FindMarkerAtLocation(x,y) {
+		for (var i = 0; i < markerList.length; i++) {
+			var marker = markerList[i];
+			if (marker.IsAtLocation(selectedRoom,x,y)) {
+				return marker;
 			}
 		}
 		return null;
 	}
 
-	this.TogglePlacingExit = function(isPlacing) {
+	this.TogglePlacingFirstMarker = function(isPlacing) {
 		if (isPlacing) {
-			placementMode = PlacementMode.Exit;
+			placementMode = PlacementMode.FirstMarker;
 		}
 		else {
 			placementMode = PlacementMode.None;
@@ -349,9 +326,9 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		UpdatePlacementButtons();
 	}
 
-	this.TogglePlacingDestination = function(isPlacing) {
+	this.TogglePlacingSecondMarker = function(isPlacing) {
 		if (isPlacing) {
-			placementMode = PlacementMode.Destination;
+			placementMode = PlacementMode.SecondMarker;
 		}
 		else {
 			placementMode = PlacementMode.None;
@@ -361,22 +338,22 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 
 	this.SelectExitRoom = function() {
 		// hacky global method!!
-		if (curExitInfo != null) {
-			selectRoom(curExitInfo.parentRoom);
+		if (curMarker != null) {
+			selectRoom(curMarker.parentRoom);
 		}
 	}
 
 	this.SelectDestinationRoom = function() {
 		console.log("SELECT DEST ROOM");
 		// hacky global method!!
-		if (curExitInfo != null) {
-			selectRoom(curExitInfo.exit.dest.room);
+		if (curMarker != null) {
+			selectRoom(curMarker.exit.dest.room);
 		}
 	}
 
 	function UpdatePlacementButtons() {
 		// hackily relies on global UI names oh well D:
-		if (placementMode == PlacementMode.Exit) {
+		if (placementMode == PlacementMode.FirstMarker) {
 			document.getElementById("toggleMoveExitDoor1").checked = true;
 			document.getElementById("textMoveExitDoor1").innerText = "moving"; // TODO localize
 			document.getElementById("cancelMoveExitDoor1").style.display = "inline";
@@ -387,7 +364,7 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 			document.getElementById("cancelMoveExitDoor1").style.display = "none";
 		}
 
-		if (placementMode == PlacementMode.Destination) {
+		if (placementMode == PlacementMode.SecondMarker) {
 			document.getElementById("toggleMoveExitDoor2").checked = true;
 			document.getElementById("textMoveExitDoor2").innerText = "moving"; // TODO localize
 			document.getElementById("cancelMoveExitDoor2").style.display = "inline";
@@ -407,52 +384,52 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		// }
 	}
 
-	this.PlaceExit = function(x,y) {
-		if (placementMode == PlacementMode.Exit) {
-			if (curExitInfo != null) {
+	this.PlaceMarker = function(x,y) {
+		if (placementMode == PlacementMode.FirstMarker) {
+			if (curMarker != null) {
 				// return (change return destination)
-				if (curExitInfo.hasReturn) {
-					curExitInfo.return.dest.room = selectedRoom;
-					curExitInfo.return.dest.x = x;
-					curExitInfo.return.dest.y = y;
+				if (curMarker.hasReturn) {
+					curMarker.return.dest.room = selectedRoom;
+					curMarker.return.dest.x = x;
+					curMarker.return.dest.y = y;
 				}
 
 				// room
-				if (curExitInfo.parentRoom != selectedRoom) {
-					var oldExitIndex = room[curExitInfo.parentRoom].exits.indexOf(curExitInfo.exit);
-					room[curExitInfo.parentRoom].exits.splice(oldExitIndex,1);
-					room[selectedRoom].exits.push(curExitInfo.exit);
-					curExitInfo.parentRoom = selectedRoom;
+				if (curMarker.parentRoom != selectedRoom) {
+					var oldExitIndex = room[curMarker.parentRoom].exits.indexOf(curMarker.exit);
+					room[curMarker.parentRoom].exits.splice(oldExitIndex,1);
+					room[selectedRoom].exits.push(curMarker.exit);
+					curMarker.parentRoom = selectedRoom;
 				}
 
 				// exit pos
-				curExitInfo.exit.x = x;
-				curExitInfo.exit.y = y;
+				curMarker.exit.x = x;
+				curMarker.exit.y = y;
 
 				refreshGameData();
 				ResetExitList();
 			}
 		}
-		else if (placementMode == PlacementMode.Destination) {
-			if (curExitInfo != null) {
+		else if (placementMode == PlacementMode.SecondMarker) {
+			if (curMarker != null) {
 				// return (change return origin)
-				if (curExitInfo.hasReturn) {
-					if (curExitInfo.exit.dest.room != selectedRoom) {
-						var oldReturnIndex = room[curExitInfo.exit.dest.room].exits.indexOf(curExitInfo.return);
-						room[curExitInfo.exit.dest.room].exits.splice(oldReturnIndex,1);
-						room[selectedRoom].exits.push(curExitInfo.return);
+				if (curMarker.hasReturn) {
+					if (curMarker.exit.dest.room != selectedRoom) {
+						var oldReturnIndex = room[curMarker.exit.dest.room].exits.indexOf(curMarker.return);
+						room[curMarker.exit.dest.room].exits.splice(oldReturnIndex,1);
+						room[selectedRoom].exits.push(curMarker.return);
 					}
 
-					curExitInfo.return.x = x;
-					curExitInfo.return.y = y;
+					curMarker.return.x = x;
+					curMarker.return.y = y;
 				}
 
 				// room
-				curExitInfo.exit.dest.room = selectedRoom;
+				curMarker.exit.dest.room = selectedRoom;
 
 				// destination pos
-				curExitInfo.exit.dest.x = x;
-				curExitInfo.exit.dest.y = y;
+				curMarker.exit.dest.x = x;
+				curMarker.exit.dest.y = y;
 
 				refreshGameData();
 				ResetExitList();
@@ -463,63 +440,63 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		UpdatePlacementButtons();
 	}
 
-	this.PrevExit = function() {
-		if (exitInfoList.length > 0) {
-			if (curExitInfo != null) {
-				var index = exitInfoList.indexOf(curExitInfo);
+	this.PrevExit = function() { // TODO : rename
+		if (markerList.length > 0) {
+			if (curMarker != null) {
+				var index = markerList.indexOf(curMarker);
 				if (index != -1) {
 					index--;
 					if (index < 0) {
-						index = exitInfoList.length - 1;
+						index = markerList.length - 1;
 					}
 
-					curExitInfo = exitInfoList[index];
+					curMarker = markerList[index];
 				}
 				else {
-					curExitInfo = exitInfoList[0];
+					curMarker = markerList[0];
 				}
 			}
 			else {
-				curExitInfo = exitInfoList[0];
+				curMarker = markerList[0];
 			}
 		}
 		else {
-			curExitInfo = null;
+			curMarker = null;
 		}
 		RenderExits();
 	}
 
-	this.NextExit = function() {
-		if (exitInfoList.length > 0) {
-			if (curExitInfo != null) {
-				var index = exitInfoList.indexOf(curExitInfo);
+	this.NextExit = function() { // TODO : rename
+		if (markerList.length > 0) {
+			if (curMarker != null) {
+				var index = markerList.indexOf(curMarker);
 				if (index != -1) {
 					index++;
-					if (index >= exitInfoList.length) {
+					if (index >= markerList.length) {
 						index = 0;
 					}
 
-					curExitInfo = exitInfoList[index];
+					curMarker = markerList[index];
 				}
 				else {
-					curExitInfo = exitInfoList[0];
+					curMarker = markerList[0];
 				}
 			}
 			else {
-				curExitInfo = exitInfoList[0];
+				curMarker = markerList[0];
 			}
 		}
 		else {
-			curExitInfo = null;
+			curMarker = null;
 		}
 		RenderExits();
 	}
 
-	function GatherExitInfoList()
+	function GatherMarkerList()
 	{
 		console.log("GATHER EXITS!!");
 
-		var infoList = [];
+		var markerList = [];
 
 		var findReturnExit = function(parentRoom, startExit) {
 			var returnExit = null;
@@ -538,23 +515,14 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 			var returnExit = findReturnExit(selectedRoom, localExit);
 
 			if (returnExit != null) {
-				var alreadyExistingExitInfo = infoList.find(function(e) { return e.exit == returnExit; });
+				var alreadyExistingExitInfo = markerList.find(function(e) { return e.exit == returnExit; });
 				if (alreadyExistingExitInfo != null && alreadyExistingExitInfo != undefined) {
 					continue; // avoid duplicates when both parts of a paired exit are in the same room
 				}
 			}
 
-			// infoList.push({
-			// 	type: ExitType.Exit,
-			// 	parentRoom: selectedRoom,
-			// 	exit: room[selectedRoom].exits[i],
-			// 	hasReturn: returnExit != null,
-			// 	return: returnExit,
-			// 	linkState: returnExit ? LinkState.TwoWay : LinkState.OneWayOriginal
-			// });
-
-			infoList.push(
-				new ExitLocation(
+			markerList.push(
+				new ExitMarker(
 					selectedRoom,
 					room[selectedRoom].exits[i],
 					returnExit != null,
@@ -568,17 +536,9 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 				for (var i in room[r].exits) {
 					var exit = room[r].exits[i];
 					if (exit.dest.room === selectedRoom && findReturnExit(r,exit) == null) {
-						// infoList.push({
-						// 	type: ExitType.Exit,
-						// 	parentRoom: r,
-						// 	exit: exit,
-						// 	hasReturn: false,
-						// 	return: null,
-						// 	linkState: LinkState.OneWayOriginal
-						// });
 
-						infoList.push(
-							new ExitLocation(
+						markerList.push(
+							new ExitMarker(
 								r,
 								exit,
 								false,
@@ -592,46 +552,34 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 
 		for (var e in room[selectedRoom].endings) {
 			var ending = room[selectedRoom].endings[e];
-			// infoList.push({
-			// 	type: ExitType.Ending,
-			// 	parentRoom: selectedRoom,
-			// 	ending: ending
-			// });
 
-			infoList.push(
-				new EndingLocation(
+			markerList.push(
+				new EndingMarker(
 					selectedRoom,
 					ending)
 				);
 		}
 
-		return infoList;
+		return markerList;
 	}
 
 	var dragMode = PlacementMode.None;
-	var dragExitInfo = null;
+	var dragMarker = null;
 	this.StartDrag = function(x,y) {
 		dragMode == PlacementMode.None;
-		dragExitInfo = FindExitAtLocation(x,y);
+		dragMarker = FindMarkerAtLocation(x,y);
 
-		if (dragExitInfo != null) {
-			if (dragExitInfo.parentRoom === selectedRoom &&
-					dragExitInfo.exit.x == x && dragExitInfo.exit.y == y) {
-				dragMode = PlacementMode.Exit;
-			}
-			else if (dragExitInfo.exit.dest.room === selectedRoom &&
-						dragExitInfo.exit.dest.x == x && dragExitInfo.exit.dest.y == y) {
-				dragMode = PlacementMode.Destination;
-			}
+		if (dragMarker != null) {
+			dragMode = dragMarker.GetPlacementMode(selectedRoom,x,y);
 		}
 	}
 
 	this.ContinueDrag = function(x,y) {
-		if (dragExitInfo == null) {
+		if (dragMarker == null) {
 			return;
 		}
 
-		if (dragMode == PlacementMode.Exit) {
+		if (dragMode == PlacementMode.FirstMarker) {
 			dragExitInfo.exit.x = x;
 			dragExitInfo.exit.y = y;
 			if (dragExitInfo.hasReturn) {
@@ -639,7 +587,7 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 				dragExitInfo.return.dest.y = y;
 			}
 		}
-		else if (dragMode == PlacementMode.Destination) {
+		else if (dragMode == PlacementMode.SecondMarker) {
 			dragExitInfo.exit.dest.x = x;
 			dragExitInfo.exit.dest.y = y;
 			if (dragExitInfo.hasReturn) {
@@ -665,72 +613,71 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		return dragMode != PlacementMode.None;
 	}
 
-	this.GetExitInfoList = function() {
-		console.log("get exit info " + selectedRoom);
+	this.GetMarkerList = function() {
 		// ResetExitList(); // make sure we are up to date!
-		return exitInfoList;
+		return markerList;
 	}
 
 	this.ChangeExitLink = function() {
 		function swapExitAndEntrance() {
-			var tempDestRoom = curExitInfo.parentRoom;
-			var tempDestX = curExitInfo.exit.x;
-			var tempDestY = curExitInfo.exit.y;
+			var tempDestRoom = curMarker.parentRoom;
+			var tempDestX = curMarker.exit.x;
+			var tempDestY = curMarker.exit.y;
 
 			// remove exit from current parent room
-			var exitIndex = room[curExitInfo.parentRoom].exits.indexOf(curExitInfo.exit);
-			room[curExitInfo.parentRoom].exits.splice(exitIndex,1);
+			var exitIndex = room[curMarker.parentRoom].exits.indexOf(curMarker.exit);
+			room[curMarker.parentRoom].exits.splice(exitIndex,1);
 
 			// add to destination room
-			room[curExitInfo.exit.dest.room].exits.push(curExitInfo.exit);
-			curExitInfo.parentRoom = curExitInfo.exit.dest.room;
+			room[curMarker.exit.dest.room].exits.push(curMarker.exit);
+			curMarker.parentRoom = curMarker.exit.dest.room;
 
 			// swap positions
-			curExitInfo.exit.x = curExitInfo.exit.dest.x;
-			curExitInfo.exit.y = curExitInfo.exit.dest.y;
-			curExitInfo.exit.dest.room = tempDestRoom;
-			curExitInfo.exit.dest.x = tempDestX;
-			curExitInfo.exit.dest.y = tempDestY;
+			curMarker.exit.x = curMarker.exit.dest.x;
+			curMarker.exit.y = curMarker.exit.dest.y;
+			curMarker.exit.dest.room = tempDestRoom;
+			curMarker.exit.dest.x = tempDestX;
+			curMarker.exit.dest.y = tempDestY;
 		}
 
-		if (curExitInfo != null) {
-			if (curExitInfo.linkState == LinkState.TwoWay) {
+		if (curMarker != null) {
+			if (curMarker.linkState == LinkState.TwoWay) {
 				// -- get rid of return exit --
-				if (curExitInfo.hasReturn) {
-					var returnIndex = room[curExitInfo.exit.dest.room].exits.indexOf(curExitInfo.return);
-					room[curExitInfo.exit.dest.room].exits.splice(returnIndex,1);
+				if (curMarker.hasReturn) {
+					var returnIndex = room[curMarker.exit.dest.room].exits.indexOf(curMarker.return);
+					room[curMarker.exit.dest.room].exits.splice(returnIndex,1);
 
-					curExitInfo.return = null;
-					curExitInfo.hasReturn = false;
+					curMarker.return = null;
+					curMarker.hasReturn = false;
 				}
 
-				curExitInfo.linkState = LinkState.OneWayOriginal;
+				curMarker.linkState = LinkState.OneWayOriginal;
 			}
-			else if (curExitInfo.linkState == LinkState.OneWayOriginal) {
+			else if (curMarker.linkState == LinkState.OneWayOriginal) {
 				// -- swap the exit & entrance --
 				swapExitAndEntrance();
 
-				curExitInfo.linkState = LinkState.OneWaySwapped;
+				curMarker.linkState = LinkState.OneWaySwapped;
 			}
-			else if (curExitInfo.linkState == LinkState.OneWaySwapped) {
+			else if (curMarker.linkState == LinkState.OneWaySwapped) {
 				// -- create a return exit --
 				swapExitAndEntrance(); // swap first
 
 				var newReturn = {
-					x : curExitInfo.exit.dest.x,
-					y : curExitInfo.exit.dest.y,
+					x : curMarker.exit.dest.x,
+					y : curMarker.exit.dest.y,
 					dest : {
-						room : curExitInfo.parentRoom,
-						x : curExitInfo.exit.x,
-						y : curExitInfo.exit.y
+						room : curMarker.parentRoom,
+						x : curMarker.exit.x,
+						y : curMarker.exit.y
 					}
 				}
-				room[curExitInfo.exit.dest.room].exits.push( newReturn );
+				room[curMarker.exit.dest.room].exits.push( newReturn );
 
-				curExitInfo.return = newReturn;
-				curExitInfo.hasReturn = true;
+				curMarker.return = newReturn;
+				curMarker.hasReturn = true;
 
-				curExitInfo.linkState = LinkState.TwoWay;
+				curMarker.linkState = LinkState.TwoWay;
 			}
 
 			refreshGameData();
@@ -740,16 +687,16 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 
 	function UpdateExitDirectionUI() {
 		//hacky globals again
-		if (curExitInfo != null) {
-			if (curExitInfo.linkState == LinkState.TwoWay) {
+		if (curMarker != null) {
+			if (curMarker.linkState == LinkState.TwoWay) {
 				document.getElementById("exitDirectionBackIcon").style.visibility = "visible";
 				document.getElementById("exitDirectionForwardIcon").style.visibility = "visible";
 			}
-			else if (curExitInfo.linkState == LinkState.OneWayOriginal) {
+			else if (curMarker.linkState == LinkState.OneWayOriginal) {
 				document.getElementById("exitDirectionBackIcon").style.visibility = "hidden";
 				document.getElementById("exitDirectionForwardIcon").style.visibility = "visible";
 			}
-			else if (curExitInfo.linkState == LinkState.OneWaySwapped) {
+			else if (curMarker.linkState == LinkState.OneWaySwapped) {
 				document.getElementById("exitDirectionBackIcon").style.visibility = "visible";
 				document.getElementById("exitDirectionForwardIcon").style.visibility = "hidden";
 			}
@@ -758,10 +705,16 @@ function ExitTool(exitCanvas1, exitCanvas2, endingCanvas) {
 } // ExitTool
 
 // required if I'm using inheritance?
-var ExitType = { // TODO : figure out a name that includes everything
+var MarkerType = {
 	Exit : 0,
 	Ending : 1,
-	// TODO : trigger??
+	Effect: 2, // TODO : implement this
+};
+
+var PlacementMode = { // TODO : awkward name
+	None : 0,
+	FirstMarker : 1,
+	SecondMarker : 2
 };
 
 // TODO if this proves useful.. move into a shared file
@@ -771,7 +724,7 @@ function InitObj(obj, parent) {
 	obj.base = parent;
 }
 
-function EventLocationBase(parentRoom) {
+function RoomMarkerBase(parentRoom) {
 	this.parentRoom = parentRoom;
 
 	this.Draw = function(ctx,x,y,w,selected) {
@@ -786,12 +739,20 @@ function EventLocationBase(parentRoom) {
 			ctx.strokeRect((x * w) - (w/4), (y * w) - (w/4), w * 1.5, w * 1.5);
 		}
 	}
+
+	this.IsAtLocation = function(roomId,x,y) {
+		return false;
+	}
+
+	this.GetPlacementMode = function(roomId,x,y) { // TODO : make this all internal with just a StartDrag??
+		return PlacementMode.None;
+	}
 }
 
-function ExitLocation(parentRoom, exit, hasReturn, returnExit, linkState) {
-	InitObj( this, new EventLocationBase(parentRoom) );
+function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
+	InitObj( this, new RoomMarkerBase(parentRoom) );
 
-	this.type = ExitType.Exit; // TODO remove
+	this.type = MarkerType.Exit; // TODO remove
 
 	this.exit = exit;
 	this.hasReturn = hasReturn;
@@ -873,12 +834,42 @@ function ExitLocation(parentRoom, exit, hasReturn, returnExit, linkState) {
 		ctx.lineTo(centerX, centerY + (w * 0.2));
 		ctx.stroke();
 	}
+
+	this.IsAtLocation = function(roomId,x,y) {
+		// TODO : there is a more robust simple implementation of this test
+		if (this.parentRoom === roomId) {
+			if (this.exit.x == x && this.exit.y == y) {
+				return true;
+			}
+			else if (this.exit.dest.x == x && this.exit.dest.y == y) {
+				return true;
+			}
+		}
+		else if (this.exit.dest.room === roomId) {
+			if (this.exit.dest.x == x && this.exit.dest.y == y) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	this.GetPlacementMode = function(roomId,x,y) {
+		if (this.parentRoom === roomId &&
+				this.exit.x == x && this.exit.y == y) {
+			return PlacementMode.FirstMarker;
+		}
+		else if (this.exit.dest.room === roomId &&
+					this.exit.dest.x == x && this.exit.dest.y == y) {
+			return PlacementMode.SecondMarker;
+		}
+		return PlacementMode.None;
+	}
 }
 
-function EndingLocation(parentRoom, ending) {
-	InitObj( this, new EventLocationBase(parentRoom) );
+function EndingMarker(parentRoom, ending) {
+	InitObj( this, new RoomMarkerBase(parentRoom) );
 
-	this.type = ExitType.Ending; // TODO remove
+	this.type = MarkerType.Ending; // TODO remove
 
 	this.ending = ending;
 
@@ -895,13 +886,21 @@ function EndingLocation(parentRoom, ending) {
 		ctx.globalAlpha = 1.0;
 
 		ctx.beginPath();
-		ctx.moveTo((x * w) + (w * 0.1), (y * w) + (w * 0.1));
-		ctx.lineTo((x * w) + (w * 0.9), (y * w) + (w * 0.9));
+		ctx.moveTo((x * w) + (w * 0.2), (y * w) + (w * 0.2));
+		ctx.lineTo((x * w) + (w * 0.8), (y * w) + (w * 0.8));
 		ctx.stroke();
 
 		ctx.beginPath();
-		ctx.moveTo((x * w) + (w * 0.1), (y * w) + (w * 0.9));
-		ctx.lineTo((x * w) + (w * 0.9), (y * w) + (w * 0.1));
+		ctx.moveTo((x * w) + (w * 0.2), (y * w) + (w * 0.8));
+		ctx.lineTo((x * w) + (w * 0.8), (y * w) + (w * 0.2));
 		ctx.stroke();
+	}
+
+	this.IsAtLocation = function(roomId,x,y) {
+		return this.parentRoom === roomId && this.ending.x == x && this.ending.y == y;
+	}
+
+	this.GetPlacementMode = function(roomId,x,y) {
+		return this.IsAtLocation(roomId,x,y) ? PlacementMode.FirstMarker : PlacementMode.None;
 	}
 }

@@ -549,7 +549,7 @@ function start() {
 	// exit_ctx = exit_canvas.getContext("2d");
 	// //exit events
 	// exit_canvas.addEventListener("mousedown", exit_onMouseDown);
-	exitTool = new ExitTool(
+	exitTool = new RoomMarkerTool(
 					document.getElementById("exitCanvas1"),
 					document.getElementById("exitCanvas2"),
 					document.getElementById("endingCanvas") );
@@ -2175,11 +2175,11 @@ function nextExit() {
 }
 
 function toggleMoveExitDoor1(e) {
-	exitTool.TogglePlacingExit(e.target.checked);
+	exitTool.TogglePlacingFirstMarker(e.target.checked);
 }
 
 function cancelMoveExitDoor1() {
-	exitTool.TogglePlacingExit(false);
+	exitTool.TogglePlacingFirstMarker(false);
 }
 
 function selectExitRoom1() {
@@ -2187,11 +2187,11 @@ function selectExitRoom1() {
 }
 
 function toggleMoveExitDoor2(e) {
-	exitTool.TogglePlacingDestination(e.target.checked);
+	exitTool.TogglePlacingSecondMarker(e.target.checked);
 }
 
 function cancelMoveExitDoor2() {
-	exitTool.TogglePlacingDestination(false);
+	exitTool.TogglePlacingSecondMarker(false);
 }
 
 function selectExitRoom2() {
@@ -2205,12 +2205,12 @@ function changeExitDirection() {
 
 function showExits() {
 	exitTool.Refresh();
-	roomTool.areExitsVisible = true;
+	roomTool.areMarkersVisible = true;
 	roomTool.drawEditMap();
 }
 
 function hideExits() {
-	roomTool.areExitsVisible = false;
+	roomTool.areMarkersVisible = false;
 	roomTool.drawEditMap();
 }
 
@@ -2872,34 +2872,34 @@ function addEndingToCurRoom(x,y) {
 }
 
 function showEndings() {
-	roomTool.areEndingsVisible = true;
+	// roomTool.areEndingsVisible = true;
 	roomTool.drawEditMap();
 }
 
 function hideEndings() {
-	roomTool.areEndingsVisible = false;
+	// roomTool.areEndingsVisible = false;
 	roomTool.drawEditMap();
 }
 
-function setSelectedEnding(e) { //todo
-	// var didChange = selectedEndingTile != e;
-	var didChange = (e != null) || (e == null && selectedEndingTile != null);
+// function setSelectedEnding(e) { //todo
+// 	// var didChange = selectedEndingTile != e;
+// 	var didChange = (e != null) || (e == null && selectedEndingTile != null);
 
-	selectedEndingTile = e;
+// 	selectedEndingTile = e;
 
-	if (selectedEndingTile == null) {
-		document.getElementById("removeEndingButton").style.display = "none";
-	}
-	else {
-		endingIndex = sortedEndingIdList().indexOf( e.id );
-		reloadEnding();
-		document.getElementById("removeEndingButton").style.display = "block";
-	}
+// 	if (selectedEndingTile == null) {
+// 		document.getElementById("removeEndingButton").style.display = "none";
+// 	}
+// 	else {
+// 		endingIndex = sortedEndingIdList().indexOf( e.id );
+// 		reloadEnding();
+// 		document.getElementById("removeEndingButton").style.display = "block";
+// 	}
 
-	roomTool.drawEditMap();
+// 	roomTool.drawEditMap();
 
-	return didChange;
-}
+// 	return didChange;
+// }
 
 function removeSelectedEnding() {
 	room[curRoom].endings.splice( room[curRoom].endings.indexOf( selectedEndingTile ), 1 );

@@ -26,8 +26,7 @@ function RoomTool(canvas) {
 	// render flags
 	this.drawMapGrid = true;
 	this.drawCollisionMap = false;
-	this.areExitsVisible = false;
-	this.areEndingsVisible = false;
+	this.areMarkersVisible = false;
 
 	this.exits = null;
 
@@ -46,28 +45,22 @@ function RoomTool(canvas) {
 
 		var didSelectedExitChange = false;
 
-		if( Ed().platform == PlatformType.Desktop ) {
-			if (self.areExitsVisible) {
-				if (self.exits.TrySelectExitAtLocation(x,y)) {
+		if( Ed().platform == PlatformType.Desktop ) { // TODO : why wrap this up this way?
+			if (self.areMarkersVisible) {
+				if (self.exits.TrySelectMarkerAtLocation(x,y)) {
 					self.drawEditMap();
 				}
 			}
-
-			var didSelectedEndingChange = self.areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;	
 		}
 
-		if ( Ed().platform == PlatformType.Desktop && (didSelectedEndingChange) ) {
-			//don't do anything else
-			if( selectedEndingTile != null ) isDragMovingEnding = true;
-		}
-		else if (self.areExitsVisible && self.exits.GetSelectedExit() != null && !self.exits.IsPlacingExit()) {
+		if (self.areMarkersVisible && self.exits.GetSelectedMarker() != null && !self.exits.IsPlacingMarker()) {
 			self.exits.StartDrag(x,y);
 		}
-		else if ( Ed().platform == PlatformType.Desktop && self.exits.IsPlacingExit()) { //todo - mutually exclusive with adding an ending?
+		else if ( Ed().platform == PlatformType.Desktop && self.exits.IsPlacingMarker()) { //todo - mutually exclusive with adding an ending?
 			//add exit
 			if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
 				// addExitToCurRoom(x,y);
-				self.exits.PlaceExit(x,y);
+				self.exits.PlaceMarker(x,y);
 				self.drawEditMap();
 			}
 		}
@@ -144,7 +137,7 @@ function RoomTool(canvas) {
 	}
 
 	function onMouseMove(e) {
-		if( Ed().platform == PlatformType.Desktop && self.exits.GetSelectedExit() != null && self.exits.IsDraggingExit() )
+		if( Ed().platform == PlatformType.Desktop && self.exits.GetSelectedMarker() != null && self.exits.IsDraggingExit() )
 		{
 			// drag exit around
 			var off = getOffset(e);
@@ -311,13 +304,13 @@ function RoomTool(canvas) {
 		}
 
 		//draw exits (and entrances)
-		if (self.areExitsVisible) {
+		if (self.areMarkersVisible) {
 			var w = tilesize * scale;
-			var exitInfoList = self.exits.GetExitInfoList();
+			var markerList = self.exits.GetMarkerList();
 
-			for (var i = 0; i < exitInfoList.length; i++) {
-				var exitInfo = exitInfoList[i]; // todo name
-				exitInfo.Draw(ctx,curRoom,w,self.exits.GetSelectedLocation() == exitInfo);
+			for (var i = 0; i < markerList.length; i++) {
+				var marker = markerList[i]; // todo name
+				marker.Draw(ctx,curRoom,w,self.exits.GetSelectedMarker() == marker);
 			}
 
 			ctx.globalAlpha = 1;
