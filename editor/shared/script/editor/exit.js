@@ -297,9 +297,9 @@ function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
 			return false;
 		}
 
-		var foundExit = FindMarkerAtLocation(x,y);
-		if (foundExit != null) {
-			curMarker = foundExit;
+		var foundMarker = FindMarkerAtLocation(x,y);
+		if (foundMarker != null) {
+			curMarker = foundMarker;
 		}
 		RenderExits();
 
@@ -385,55 +385,10 @@ function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
 	}
 
 	this.PlaceMarker = function(x,y) {
-		if (placementMode == PlacementMode.FirstMarker) {
-			if (curMarker != null) {
-				// return (change return destination)
-				if (curMarker.hasReturn) {
-					curMarker.return.dest.room = selectedRoom;
-					curMarker.return.dest.x = x;
-					curMarker.return.dest.y = y;
-				}
-
-				// room
-				if (curMarker.parentRoom != selectedRoom) {
-					var oldExitIndex = room[curMarker.parentRoom].exits.indexOf(curMarker.exit);
-					room[curMarker.parentRoom].exits.splice(oldExitIndex,1);
-					room[selectedRoom].exits.push(curMarker.exit);
-					curMarker.parentRoom = selectedRoom;
-				}
-
-				// exit pos
-				curMarker.exit.x = x;
-				curMarker.exit.y = y;
-
-				refreshGameData();
-				ResetExitList();
-			}
-		}
-		else if (placementMode == PlacementMode.SecondMarker) {
-			if (curMarker != null) {
-				// return (change return origin)
-				if (curMarker.hasReturn) {
-					if (curMarker.exit.dest.room != selectedRoom) {
-						var oldReturnIndex = room[curMarker.exit.dest.room].exits.indexOf(curMarker.return);
-						room[curMarker.exit.dest.room].exits.splice(oldReturnIndex,1);
-						room[selectedRoom].exits.push(curMarker.return);
-					}
-
-					curMarker.return.x = x;
-					curMarker.return.y = y;
-				}
-
-				// room
-				curMarker.exit.dest.room = selectedRoom;
-
-				// destination pos
-				curMarker.exit.dest.x = x;
-				curMarker.exit.dest.y = y;
-
-				refreshGameData();
-				ResetExitList();
-			}
+		if (curMarker != null) {
+			curMarker.PlaceMarker(placementMode,selectedRoom,x,y);
+			refreshGameData();
+			ResetExitList();
 		}
 
 		placementMode = PlacementMode.None;
@@ -695,7 +650,7 @@ var MarkerType = {
 	Effect: 2, // TODO : implement this
 };
 
-var PlacementMode = { // TODO : awkward name
+var PlacementMode = {
 	None : 0,
 	FirstMarker : 1,
 	SecondMarker : 2
@@ -733,6 +688,8 @@ function RoomMarkerBase(parentRoom) {
 	this.ContinueDrag = function(roomId,x,y) {}
 
 	this.EndDrag = function() {}
+
+	this.PlaceMarker = function(placementMode,roomId,x,y) {}
 }
 
 function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
@@ -885,6 +842,49 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 	this.EndDrag = function() {
 		dragMode = Drag.None;
 	}
+
+	this.PlaceMarker = function(placementMode,roomId,x,y) {
+		if (placementMode == PlacementMode.FirstMarker) {
+			// return (change return destination)
+			if (this.hasReturn) {
+				this.return.dest.room = roomId;
+				this.return.dest.x = x;
+				this.return.dest.y = y;
+			}
+
+			// room
+			if (this.parentRoom != roomId) {
+				var oldExitIndex = room[this.parentRoom].exits.indexOf(this.exit);
+				room[this.parentRoom].exits.splice(oldExitIndex,1);
+				room[roomId].exits.push(this.exit);
+				this.parentRoom = roomId;
+			}
+
+			// exit pos
+			this.exit.x = x;
+			this.exit.y = y;
+		}
+		else if (placementMode == PlacementMode.SecondMarker) {
+			// return (change return origin)
+			if (this.hasReturn) {
+				if (this.exit.dest.room != roomId) {
+					var oldReturnIndex = room[this.exit.dest.room].exits.indexOf(this.return);
+					room[this.exit.dest.room].exits.splice(oldReturnIndex,1);
+					room[roomId].exits.push(this.return);
+				}
+
+				this.return.x = x;
+				this.return.y = y;
+			}
+
+			// room
+			this.exit.dest.room = roomId;
+
+			// destination pos
+			this.exit.dest.x = x;
+			this.exit.dest.y = y;
+		}
+	}
 }
 
 function EndingMarker(parentRoom, ending) {
@@ -936,5 +936,9 @@ function EndingMarker(parentRoom, ending) {
 
 	this.EndDrag = function() {
 		isDragging = false;
+	}
+
+	this.PlaceMarker = function(placementMode,roomId,x,y) {
+		// TODO
 	}
 }
