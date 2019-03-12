@@ -563,14 +563,13 @@ function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		return markerList;
 	}
 
-	var dragMode = PlacementMode.None;
 	var dragMarker = null;
+
 	this.StartDrag = function(x,y) {
-		dragMode == PlacementMode.None;
 		dragMarker = FindMarkerAtLocation(x,y);
 
 		if (dragMarker != null) {
-			dragMode = dragMarker.GetPlacementMode(selectedRoom,x,y);
+			dragMarker.StartDrag(selectedRoom,x,y);
 		}
 	}
 
@@ -579,38 +578,23 @@ function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
 			return;
 		}
 
-		if (dragMode == PlacementMode.FirstMarker) {
-			dragExitInfo.exit.x = x;
-			dragExitInfo.exit.y = y;
-			if (dragExitInfo.hasReturn) {
-				dragExitInfo.return.dest.x = x;
-				dragExitInfo.return.dest.y = y;
-			}
-		}
-		else if (dragMode == PlacementMode.SecondMarker) {
-			dragExitInfo.exit.dest.x = x;
-			dragExitInfo.exit.dest.y = y;
-			if (dragExitInfo.hasReturn) {
-				dragExitInfo.return.x = x;
-				dragExitInfo.return.y = y;
-			}
-		}
-		
+		dragMarker.ContinueDrag(selectedRoom,x,y);
+
 		refreshGameData();
 		RenderExits();
 	}
 
 	this.EndDrag = function() {
-		if (dragMode != PlacementMode.None) {
-			dragMode = PlacementMode.None;
-			dragExitInfo = null;
+		if (dragMarker != null) {
+			dragMarker.EndDrag();
+			dragMarker = null;
 			refreshGameData();
 			RenderExits();
 		}
 	}
 
 	this.IsDraggingExit = function() {
-		return dragMode != PlacementMode.None;
+		return dragMarker != null;
 	}
 
 	this.GetMarkerList = function() {
@@ -744,9 +728,11 @@ function RoomMarkerBase(parentRoom) {
 		return false;
 	}
 
-	this.GetPlacementMode = function(roomId,x,y) { // TODO : make this all internal with just a StartDrag??
-		return PlacementMode.None;
-	}
+	this.StartDrag = function(roomId,x,y) {}
+
+	this.ContinueDrag = function(roomId,x,y) {}
+
+	this.EndDrag = function() {}
 }
 
 function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
@@ -853,16 +839,51 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 		return false;
 	}
 
-	this.GetPlacementMode = function(roomId,x,y) {
+	var Drag = {
+		None : -1,
+		Exit : 0,
+		Destination : 1,
+	};
+	var dragMode = Drag.None;
+
+	this.StartDrag = function(roomId,x,y) {
+		dragMode = Drag.None;
+
 		if (this.parentRoom === roomId &&
 				this.exit.x == x && this.exit.y == y) {
-			return PlacementMode.FirstMarker;
+			dragMode = Drag.Exit;
 		}
 		else if (this.exit.dest.room === roomId &&
 					this.exit.dest.x == x && this.exit.dest.y == y) {
-			return PlacementMode.SecondMarker;
+			dragMode = Drag.Destination;
 		}
-		return PlacementMode.None;
+	}
+
+	this.ContinueDrag = function(roomId,x,y) {
+		if (dragMode == Drag.None) {
+			return;
+		}
+
+		if (dragMode == Drag.Exit) {
+			this.exit.x = x;
+			this.exit.y = y;
+			if (this.hasReturn) {
+				this.return.dest.x = x;
+				this.return.dest.y = y;
+			}
+		}
+		else if (dragMode == Drag.Destination) {
+			this.exit.dest.x = x;
+			this.exit.dest.y = y;
+			if (this.hasReturn) {
+				this.return.x = x;
+				this.return.y = y;
+			}
+		}
+	}
+
+	this.EndDrag = function() {
+		dragMode = Drag.None;
 	}
 }
 
@@ -900,7 +921,20 @@ function EndingMarker(parentRoom, ending) {
 		return this.parentRoom === roomId && this.ending.x == x && this.ending.y == y;
 	}
 
-	this.GetPlacementMode = function(roomId,x,y) {
-		return this.IsAtLocation(roomId,x,y) ? PlacementMode.FirstMarker : PlacementMode.None;
+	var isDragging = false;
+
+	this.StartDrag = function(roomId,x,y) {
+		isDragging = this.IsAtLocation(roomId,x,y);
+	}
+
+	this.ContinueDrag = function(roomId,x,y) {
+		if (isDragging) {
+			this.ending.x = x;
+			this.ending.y = y;
+		}
+	}
+
+	this.EndDrag = function() {
+		isDragging = false;
 	}
 }
