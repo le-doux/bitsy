@@ -5,9 +5,6 @@ TODO:
 	- rename everything that is so exit specific
 - remove areEndingsVisible
 - effects or EFF
-- placement mode
-	- get rid of enum
-	- replace w/ internal state in markers AND exit tool
 
 TODO:
 - advanced exit TODO:
@@ -108,29 +105,19 @@ advanced exit notes:
 */
 
 
-function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
-	console.log("NEW EXIT TOOL");
-	console.log(endingCanvas);
-	console.log(curRoom);
-
+function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	var selectedRoom = null;
 
 	var markerList = [];
 	var curMarker = null;
 
-	exitCanvas1.width = width * scale; // TODO : globals?
-	exitCanvas1.height = width * scale;
-	var exitCtx1 = exitCanvas1.getContext("2d");
+	markerCanvas1.width = width * scale; // TODO : globals?
+	markerCanvas1.height = width * scale;
+	var markerCtx1 = markerCanvas1.getContext("2d");
 
-	exitCanvas2.width = width * scale; // TODO : globals?
-	exitCanvas2.height = width * scale;
-	var exitCtx2 = exitCanvas2.getContext("2d");
-
-	// TODO : re-use the exit canvases instead?
-	endingCanvas.width = width * scale;
-	endingCanvas.height = width * scale;
-	var endingCtx = endingCanvas.getContext("2d");
-	console.log(endingCtx);
+	markerCanvas2.width = width * scale; // TODO : globals?
+	markerCanvas2.height = width * scale;
+	var markerCtx2 = markerCanvas2.getContext("2d");
 
 	var placementMode = PlacementMode.None;
 
@@ -209,58 +196,73 @@ function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
 	}
 
 	function RenderExits() {
+		var markerControl1 = document.getElementById("markerControl1");
+		var markerControl2 = document.getElementById("markerControl2");
+		var markerLinkControl = document.getElementById("markerLinkControl");
+		markerControl1.style.display = "none";
+		markerControl2.style.display = "none";
+		markerLinkControl.style.display = "none";
+
 		if (curMarker != null) {
 			var w = tilesize * scale;
-			if (curMarker.type == MarkerType.Exit) {
-				document.getElementById("exitsSelect").style.display = "flex";
-				document.getElementById("endingsSelect").style.display = "none";
+			if (curMarker.MarkerCount() == 2) {
+				markerControl1.style.display = "flex";
+				markerControl2.style.display = "flex";
 
-				// just tacking this on here to make sure it updates
-				UpdateExitDirectionUI();
-
-				var exitCtx = exitCtx1;
-				var destCtx = exitCtx2;
-				if (curMarker.linkState == LinkState.OneWaySwapped) {
-					exitCtx = exitCtx2;
-					destCtx = exitCtx1;
+				var startCtx = markerCtx1;
+				var endCtx = markerCtx2;
+				if (curMarker.type == MarkerType.Exit && curMarker.linkState == LinkState.OneWaySwapped) {
+					startCtx = markerCtx2;
+					endCtx = markerCtx1;
 				}
 
-				drawRoom( room[curMarker.parentRoom], exitCtx );
+				var startPos = curMarker.GetMarkerPos(0);
+				var endPos = curMarker.GetMarkerPos(1);
 
-				exitCtx.fillStyle = getContrastingColor(room[curMarker.parentRoom].pal);
-				exitCtx.strokeStyle = getContrastingColor(room[curMarker.parentRoom].pal);
-				exitCtx.lineWidth = 4;
-				exitCtx.fillRect(curMarker.exit.x * w, curMarker.exit.y * w, w, w);
-				exitCtx.strokeRect((curMarker.exit.x * w) - (w/2), (curMarker.exit.y * w) - (w/2), w * 2, w * 2);
+				drawRoom( room[startPos.room], startCtx );
 
-				drawRoom( room[curMarker.exit.dest.room], destCtx );
+				startCtx.fillStyle = getContrastingColor(room[startPos.room].pal);
+				startCtx.strokeStyle = getContrastingColor(room[startPos.room].pal);
+				startCtx.lineWidth = 4;
+				startCtx.fillRect(startPos.x * w, startPos.y * w, w, w);
+				startCtx.strokeRect((startPos.x * w) - (w/2), (startPos.y * w) - (w/2), w * 2, w * 2);
 
-				destCtx.fillStyle = getContrastingColor(room[curMarker.exit.dest.room].pal);
-				destCtx.strokeStyle = getContrastingColor(room[curMarker.exit.dest.room].pal);
-				destCtx.lineWidth = 4;
-				destCtx.fillRect(curMarker.exit.dest.x * w, curMarker.exit.dest.y * w, w, w);
-				destCtx.strokeRect((curMarker.exit.dest.x * w) - (w/2), (curMarker.exit.dest.y * w) - (w/2), w * 2, w * 2);
+				drawRoom( room[endPos.room], endCtx );
+
+				endCtx.fillStyle = getContrastingColor(room[endPos.room].pal);
+				endCtx.strokeStyle = getContrastingColor(room[endPos.room].pal);
+				endCtx.lineWidth = 4;
+				endCtx.fillRect(endPos.x * w, endPos.y * w, w, w);
+				endCtx.strokeRect((endPos.x * w) - (w/2), (endPos.y * w) - (w/2), w * 2, w * 2);
 			}
-			else if (curMarker.type == MarkerType.Ending) {
-				document.getElementById("exitsSelect").style.display = "none";
-				document.getElementById("endingsSelect").style.display = "flex";
+			else if (curMarker.MarkerCount() == 1) {
+				markerControl1.style.display = "flex";
 
-				drawRoom( room[curMarker.parentRoom], endingCtx );
+				var markerPos = curMarker.GetMarkerPos(0);
 
-				endingCtx.fillStyle = getContrastingColor(room[curMarker.parentRoom].pal);
-				endingCtx.strokeStyle = getContrastingColor(room[curMarker.parentRoom].pal);
-				endingCtx.lineWidth = 4;
-				endingCtx.fillRect(curMarker.ending.x * w, curMarker.ending.y * w, w, w);
-				endingCtx.strokeRect((curMarker.ending.x * w) - (w/2), (curMarker.ending.y * w) - (w/2), w * 2, w * 2);
+				drawRoom( room[markerPos.room], markerCtx1 );
+
+				markerCtx1.fillStyle = getContrastingColor(room[markerPos.room].pal);
+				markerCtx1.strokeStyle = getContrastingColor(room[markerPos.room].pal);
+				markerCtx1.lineWidth = 4;
+				markerCtx1.fillRect(markerPos.x * w, markerPos.y * w, w, w);
+				markerCtx1.strokeRect((markerPos.x * w) - (w/2), (markerPos.y * w) - (w/2), w * 2, w * 2);
+			}
+
+			if (curMarker.type == MarkerType.Exit) {
+				markerLinkControl.style.display = "inline-block";
+				// just tacking this on here to make sure it updates
+				UpdateExitDirectionUI();
 			}
 		}
 		else {
-			exitCtx1.clearRect(0, 0, exitCanvas1.width, exitCanvas1.height);
-			exitCtx2.clearRect(0, 0, exitCanvas2.width, exitCanvas2.height);
+			// TODO!
+			// exitCtx1.clearRect(0, 0, exitCanvas1.width, exitCanvas1.height);
+			// exitCtx2.clearRect(0, 0, exitCanvas2.width, exitCanvas2.height);
 		}
 	}
 
-	this.RemoveExit = function() {
+	this.RemoveExit = function() { // TODO make general
 		if (curMarker.hasReturn) {
 			var returnIndex = room[curMarker.exit.dest.room].exits.indexOf(curMarker.return);
 			room[curMarker.exit.dest.room].exits.splice(returnIndex,1);
@@ -306,6 +308,10 @@ function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		return curMarker != null;
 	}
 
+	this.IsMarkerAtLocation = function(x,y) {
+		return FindMarkerAtLocation(x,y) != null;
+	}
+
 	function FindMarkerAtLocation(x,y) {
 		for (var i = 0; i < markerList.length; i++) {
 			var marker = markerList[i];
@@ -336,43 +342,42 @@ function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		UpdatePlacementButtons();
 	}
 
-	this.SelectExitRoom = function() {
+	this.SelectMarkerRoom1 = function() { // TODO : swap if link direction is swapped!!!
 		// hacky global method!!
-		if (curMarker != null) {
-			selectRoom(curMarker.parentRoom);
+		if (curMarker != null && curMarker.MarkerCount() >= 1) {
+			selectRoom(curMarker.GetMarkerPos(0).room);
 		}
 	}
 
-	this.SelectDestinationRoom = function() {
-		console.log("SELECT DEST ROOM");
+	this.SelectMarkerRoom2 = function() {
 		// hacky global method!!
-		if (curMarker != null) {
-			selectRoom(curMarker.exit.dest.room);
+		if (curMarker != null && curMarker.MarkerCount() >= 2) {
+			selectRoom(curMarker.GetMarkerPos(1).room);
 		}
 	}
 
 	function UpdatePlacementButtons() {
 		// hackily relies on global UI names oh well D:
 		if (placementMode == PlacementMode.FirstMarker) {
-			document.getElementById("toggleMoveExitDoor1").checked = true;
-			document.getElementById("textMoveExitDoor1").innerText = "moving"; // TODO localize
-			document.getElementById("cancelMoveExitDoor1").style.display = "inline";
+			document.getElementById("toggleMoveMarker1").checked = true;
+			document.getElementById("textMoveMarker1").innerText = "moving"; // TODO localize
+			document.getElementById("cancelMoveMarker1").style.display = "inline";
 		}
 		else {
-			document.getElementById("toggleMoveExitDoor1").checked = false;
-			document.getElementById("textMoveExitDoor1").innerText = "move door"; // TODO localize
-			document.getElementById("cancelMoveExitDoor1").style.display = "none";
+			document.getElementById("toggleMoveMarker1").checked = false;
+			document.getElementById("textMoveMarker1").innerText = "move"; // TODO localize
+			document.getElementById("cancelMoveMarker1").style.display = "none";
 		}
 
 		if (placementMode == PlacementMode.SecondMarker) {
-			document.getElementById("toggleMoveExitDoor2").checked = true;
-			document.getElementById("textMoveExitDoor2").innerText = "moving"; // TODO localize
-			document.getElementById("cancelMoveExitDoor2").style.display = "inline";
+			document.getElementById("toggleMoveMarker2").checked = true;
+			document.getElementById("textMoveMarker2").innerText = "moving"; // TODO localize
+			document.getElementById("cancelMoveMarker2").style.display = "inline";
 		}
 		else {
-			document.getElementById("toggleMoveExitDoor2").checked = false;
-			document.getElementById("textMoveExitDoor2").innerText = "move door"; // TODO localize
-			document.getElementById("cancelMoveExitDoor2").style.display = "none";
+			document.getElementById("toggleMoveMarker2").checked = false;
+			document.getElementById("textMoveMarker2").innerText = "move"; // TODO localize
+			document.getElementById("cancelMoveMarker2").style.display = "none";
 		}
 
 		// TODO : this behaves oddly... change??
@@ -395,7 +400,7 @@ function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		UpdatePlacementButtons();
 	}
 
-	this.PrevExit = function() { // TODO : rename
+	this.PrevMarker = function() {
 		if (markerList.length > 0) {
 			if (curMarker != null) {
 				var index = markerList.indexOf(curMarker);
@@ -421,7 +426,7 @@ function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		RenderExits();
 	}
 
-	this.NextExit = function() { // TODO : rename
+	this.NextMarker = function() {
 		if (markerList.length > 0) {
 			if (curMarker != null) {
 				var index = markerList.indexOf(curMarker);
@@ -548,7 +553,7 @@ function RoomMarkerTool(exitCanvas1, exitCanvas2, endingCanvas) {
 		}
 	}
 
-	this.IsDraggingExit = function() {
+	this.IsDraggingMarker = function() {
 		return dragMarker != null;
 	}
 
@@ -690,6 +695,14 @@ function RoomMarkerBase(parentRoom) {
 	this.EndDrag = function() {}
 
 	this.PlaceMarker = function(placementMode,roomId,x,y) {}
+
+	this.MarkerCount = function() {
+		return 0;
+	}
+
+	this.GetMarkerPos = function(markerIndex) { // TODO : use this to make the base Draw() smarter??
+		return null;
+	}
 }
 
 function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
@@ -885,6 +898,28 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 			this.exit.dest.y = y;
 		}
 	}
+
+	this.MarkerCount = function() {
+		return 2;
+	}
+
+	this.GetMarkerPos = function(markerIndex) { // TODO : swap if link direction is swapped???
+		if (markerIndex == 0) {
+			return {
+				room : this.parentRoom,
+				x : this.exit.x,
+				y : this.exit.y,
+			};
+		}
+		else if (markerIndex == 1) {
+			return {
+				room : this.exit.dest.room,
+				x : this.exit.dest.x,
+				y : this.exit.dest.y,
+			};
+		}
+		return null;
+	}
 }
 
 function EndingMarker(parentRoom, ending) {
@@ -940,5 +975,20 @@ function EndingMarker(parentRoom, ending) {
 
 	this.PlaceMarker = function(placementMode,roomId,x,y) {
 		// TODO
+	}
+
+	this.MarkerCount = function() {
+		return 1;
+	}
+
+	this.GetMarkerPos = function(markerIndex) {
+		if (markerIndex == 0) {
+			return {
+				room : this.parentRoom,
+				x : this.ending.x,
+				y : this.ending.y,
+			};
+		}
+		return null;
 	}
 }

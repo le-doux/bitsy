@@ -21,14 +21,13 @@ function RoomTool(canvas) {
 	// edit flags
 	var isDragAddingTiles = false;
 	var isDragDeletingTiles = false;
-	var isDragMovingEnding = false;
 
 	// render flags
 	this.drawMapGrid = true;
 	this.drawCollisionMap = false;
 	this.areMarkersVisible = false;
 
-	this.exits = null;
+	this.markers = null;
 
 	function onMouseDown(e) {
 		var off = getOffset(e);
@@ -43,31 +42,21 @@ function RoomTool(canvas) {
 			return;
 		}
 
-		var didSelectedExitChange = false;
-
 		if( Ed().platform == PlatformType.Desktop ) { // TODO : why wrap this up this way?
 			if (self.areMarkersVisible) {
-				if (self.exits.TrySelectMarkerAtLocation(x,y)) {
+				if (self.markers.TrySelectMarkerAtLocation(x,y)) {
 					self.drawEditMap();
 				}
 			}
 		}
 
-		if (self.areMarkersVisible && self.exits.GetSelectedMarker() != null && !self.exits.IsPlacingMarker()) {
-			self.exits.StartDrag(x,y);
+		if (self.areMarkersVisible && self.markers.GetSelectedMarker() != null && !self.markers.IsPlacingMarker()) {
+			self.markers.StartDrag(x,y);
 		}
-		else if ( Ed().platform == PlatformType.Desktop && self.exits.IsPlacingMarker()) { //todo - mutually exclusive with adding an ending?
-			//add exit
-			if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
-				// addExitToCurRoom(x,y);
-				self.exits.PlaceMarker(x,y);
+		else if ( Ed().platform == PlatformType.Desktop && self.markers.IsPlacingMarker()) {
+			if ( !self.markers.IsMarkerAtLocation(x,y) ) {
+				self.markers.PlaceMarker(x,y);
 				self.drawEditMap();
-			}
-		}
-		else if ( Ed().platform == PlatformType.Desktop && isAddingEnding ) {
-			//add ending
-			if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
-				addEndingToCurRoom(x,y);
 			}
 		}
 		else if (self.drawing.id != null) {
@@ -137,42 +126,26 @@ function RoomTool(canvas) {
 	}
 
 	function onMouseMove(e) {
-		if( Ed().platform == PlatformType.Desktop && self.exits.GetSelectedMarker() != null && self.exits.IsDraggingExit() )
-		{
-			// drag exit around
+		if( self.markers.GetSelectedMarker() != null && self.markers.IsDraggingMarker() ) {
+			// drag marker around
 			var off = getOffset(e);
 			var x = Math.floor(off.x / (tilesize*scale));
 			var y = Math.floor(off.y / (tilesize*scale));
 
-			self.exits.ContinueDrag(x,y);
+			self.markers.ContinueDrag(x,y);
 			self.drawEditMap();
 		}
-		else if( Ed().platform == PlatformType.Desktop && selectedEndingTile != null && isDragMovingEnding )
-		{
-			// drag ending around
-			var off = getOffset(e);
-			var x = Math.floor(off.x / (tilesize*scale));
-			var y = Math.floor(off.y / (tilesize*scale));
-			var y = Math.floor(off.y / (tilesize*scale));
-			if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
-			{
-				selectedEndingTile.x = x;
-				selectedEndingTile.y = y;
-				refreshGameData();
-				self.drawEditMap();
-			}
-		}
-		else
+		else {
 			editTilesOnDrag(e);
+		}
 	}
 
 	function onMouseUp(e) {
 		editTilesOnDrag(e);
 		isDragAddingTiles = false;
 		isDragDeletingTiles = false;
-		isDragMovingEnding = false;
 
-		self.exits.EndDrag();
+		self.markers.EndDrag();
 	}
 
 	function editTilesOnDrag(e) {
@@ -303,41 +276,18 @@ function RoomTool(canvas) {
 			}
 		}
 
-		//draw exits (and entrances)
+		//draw exits (and entrances) and endings
 		if (self.areMarkersVisible) {
 			var w = tilesize * scale;
-			var markerList = self.exits.GetMarkerList();
+			var markerList = self.markers.GetMarkerList();
 
 			for (var i = 0; i < markerList.length; i++) {
 				var marker = markerList[i]; // todo name
-				marker.Draw(ctx,curRoom,w,self.exits.GetSelectedMarker() == marker);
+				marker.Draw(ctx,curRoom,w,self.markers.GetSelectedMarker() == marker);
 			}
 
 			ctx.globalAlpha = 1;
 		}
-
-		// //draw endings
-		// if (self.areEndingsVisible) {
-		// 	for (i in room[curRoom].endings) {
-		// 		var e = room[curRoom].endings[i];
-		// 		if (e == selectedEndingTile) {
-		// 			ctx.fillStyle = "#ff0";
-		// 			ctx.globalAlpha = 0.9;
-		// 		}
-		// 		else {
-		// 			ctx.fillStyle = getContrastingColor();
-		// 			ctx.globalAlpha = 0.5;
-		// 		}
-		// 		ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
-		// 		ctx.strokeStyle = getComplimentingColor();
-		// 		ctx.globalAlpha = 1.0;
-		// 		ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-
-		// 		ctx.font = '14px sans-serif';
-		// 		ctx.fillText( "To ending " + e.id, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
-		// 	}
-		// 	ctx.globalAlpha = 1;
-		// }
 	}
 }
 

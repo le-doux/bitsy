@@ -549,11 +549,8 @@ function start() {
 	// exit_ctx = exit_canvas.getContext("2d");
 	// //exit events
 	// exit_canvas.addEventListener("mousedown", exit_onMouseDown);
-	exitTool = new RoomMarkerTool(
-					document.getElementById("exitCanvas1"),
-					document.getElementById("exitCanvas2"),
-					document.getElementById("endingCanvas") );
-	roomTool.exits = exitTool;
+	markerTool = new RoomMarkerTool(document.getElementById("markerCanvas1"), document.getElementById("markerCanvas2") );
+	roomTool.markers = markerTool;
 
 	//
 	drawingThumbnailCanvas = document.createElement("canvas");
@@ -573,7 +570,7 @@ function start() {
 		setDefaultGameState();
 	}
 
-	exitTool.SetRoom(curRoom);
+	markerTool.SetRoom(curRoom);
 
 	// load panel preferences
 	var prefs = getPanelPrefs();
@@ -848,7 +845,7 @@ function selectRoom(roomId) {
 	if (nextRoomIndex != -1) {
 		roomIndex = nextRoomIndex;
 		curRoom = ids[roomIndex];
-		exitTool.SetRoom(curRoom);
+		markerTool.SetRoom(curRoom);
 		roomTool.drawEditMap();
 		paintTool.updateCanvas();
 		updateRoomPaletteSelect();
@@ -865,7 +862,7 @@ function nextRoom() {
 	var ids = sortedRoomIdList();
 	roomIndex = (roomIndex + 1) % ids.length;
 	curRoom = ids[roomIndex];
-	exitTool.SetRoom(curRoom);
+	markerTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
@@ -882,7 +879,7 @@ function prevRoom() {
 	roomIndex--;
 	if (roomIndex < 0) roomIndex = (ids.length-1);
 	curRoom = ids[roomIndex];
-	exitTool.SetRoom(curRoom);
+	markerTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
@@ -992,7 +989,7 @@ function newRoom() {
 
 	curRoom = roomId;
 	//console.log(curRoom);
-	exitTool.SetRoom(curRoom);
+	markerTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
@@ -1449,7 +1446,7 @@ function on_edit_mode() {
 
 	roomTool.listenEditEvents();
 
-	exitTool.Refresh();
+	markerTool.Refresh();
 
 	updateInventoryUI();
 
@@ -2147,69 +2144,69 @@ function toggleVersionNotes(e) {
 	document.getElementById("versionNotesCheckIcon").innerHTML = e.target.checked ? "expand_more" : "expand_less";
 }
 
-/* EXITS */
-var exitTool;
+/* MARKERS (exits & endings) */
+var markerTool;
 
 function newExit() {
 	console.log("NEW EXIT");
-	exitTool.AddExit();
+	markerTool.AddExit();
 	roomTool.drawEditMap();
 }
 
-function deleteExit() {
+function deleteMarker() {
 	console.log("DELETE EXIT");
-	exitTool.RemoveExit();
+	markerTool.RemoveExit();
 	roomTool.drawEditMap();
 }
 
-function prevExit() {
+function prevMarker() {
 	console.log("PREV EXIT");
-	exitTool.NextExit();
+	markerTool.NextMarker();
 	roomTool.drawEditMap();
 }
 
-function nextExit() {
+function nextMarker() {
 	console.log("NEXT EXIT");
-	exitTool.PrevExit();
+	markerTool.PrevMarker();
 	roomTool.drawEditMap();
 }
 
-function toggleMoveExitDoor1(e) {
-	exitTool.TogglePlacingFirstMarker(e.target.checked);
+function toggleMoveMarker1(e) {
+	markerTool.TogglePlacingFirstMarker(e.target.checked);
 }
 
-function cancelMoveExitDoor1() {
-	exitTool.TogglePlacingFirstMarker(false);
+function cancelMoveMarker1() {
+	markerTool.TogglePlacingFirstMarker(false);
 }
 
-function selectExitRoom1() {
-	exitTool.SelectExitRoom();
+function selectMarkerRoom1() {
+	markerTool.SelectMarkerRoom1();
 }
 
-function toggleMoveExitDoor2(e) {
-	exitTool.TogglePlacingSecondMarker(e.target.checked);
+function toggleMoveMarker2(e) {
+	markerTool.TogglePlacingSecondMarker(e.target.checked);
 }
 
-function cancelMoveExitDoor2() {
-	exitTool.TogglePlacingSecondMarker(false);
+function cancelMoveMarker2() {
+	markerTool.TogglePlacingSecondMarker(false);
 }
 
-function selectExitRoom2() {
-	exitTool.SelectDestinationRoom();
+function selectMarkerRoom2() {
+	markerTool.SelectMarkerRoom2();
 }
 
 function changeExitDirection() {
-	exitTool.ChangeExitLink();
+	markerTool.ChangeExitLink();
 	roomTool.drawEditMap();
 }
 
-function showExits() {
-	exitTool.Refresh();
+function showExits() { // TODO : rename
+	markerTool.Refresh();
 	roomTool.areMarkersVisible = true;
 	roomTool.drawEditMap();
 }
 
-function hideExits() {
+function hideExits() { // TODO : rename
 	roomTool.areMarkersVisible = false;
 	roomTool.drawEditMap();
 }

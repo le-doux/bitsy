@@ -540,45 +540,45 @@
  -->
 
 					<div id="exitsPanelContent">
-						<div id="exitsSelect" style="display: flex;">
-							<div class="controlBox" style="display: flex; flex-direction: column;">
-								<span style="font-size: 14px; line-height: 12px;">exit 1</span>
-								<canvas id="exitCanvas1" style="width:100px; height:100px;" onclick="selectExitRoom1();"></canvas>
+						<div id="markersSelect" style="display: flex;">
+							<div id="markerControl1" class="controlBox" style="display: flex; flex-direction: column;">
+								<span style="font-size: 14px; line-height: 12px;">marker 1</span>
+								<canvas id="markerCanvas1" style="width:100px; height:100px;" onclick="selectMarkerRoom1();"></canvas>
 								<div style="margin-top: 4px;">
-									<input type="checkbox" id="toggleMoveExitDoor1" onclick="toggleMoveExitDoor1(event);" />
-									<label for="toggleMoveExitDoor1">
+									<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
+									<label for="toggleMoveMarker1">
 										<i class="material-icons">location_searching</i>
-										<span id="textMoveExitDoor1">move door</span>
+										<span id="textMoveMarker1">move</span>
 									</label>
-									<button id="cancelMoveExitDoor1" onclick="cancelMoveExitDoor1();">
+									<button id="cancelMoveMarker1" onclick="cancelMoveMarker1();">
 										<i class="material-icons">cancel</i>
 									</button>
 								</div>
 							</div>
 							<!-- <i class="material-icons">arrow_back</i> -->
-							<div style="padding-left: 5px; padding-right: 5px;">
+							<div id="markerLinkControl" style="padding-left: 5px; padding-right: 5px; display:inline-block;">
 								<button title="change direction" onclick="changeExitDirection();" style="margin-top: 50px;">
 									<i class="material-icons" id="exitDirectionBackIcon">arrow_back</i>
 									<i class="material-icons" id="exitDirectionForwardIcon">arrow_forward</i>
 								</button>
 							</div>
 							<!-- <i class="material-icons">compare_arrows</i> -->
-							<div class="controlBox" style="display: flex; flex-direction: column;">
-								<span style="font-size: 14px; line-height: 12px;">exit 2</span>
-								<canvas id="exitCanvas2" style="width:100px; height:100px;" onclick="selectExitRoom2();"></canvas>
+							<div id="markerControl2" class="controlBox" style="display: flex; flex-direction: column;">
+								<span style="font-size: 14px; line-height: 12px;">marker 2</span>
+								<canvas id="markerCanvas2" style="width:100px; height:100px;" onclick="selectMarkerRoom2();"></canvas>
 								<div style="margin-top: 4px;">
-									<input type="checkbox" id="toggleMoveExitDoor2" onclick="toggleMoveExitDoor2(event);" />
-									<label for="toggleMoveExitDoor2">
+									<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" />
+									<label for="toggleMoveMarker2">
 										<i class="material-icons">location_searching</i>
-										<span id="textMoveExitDoor2">move door</span>
+										<span id="textMoveMarker2">move</span>
 									</label>
-									<button id="cancelMoveExitDoor2" onclick="cancelMoveExitDoor2();">
+									<button id="cancelMoveMarker2" onclick="cancelMoveMarker2();">
 										<i class="material-icons">cancel</i>
 									</button>
 								</div>
 							</div>
 						</div>
-						<div id="endingsSelect" style="display: flex;">
+<!-- 						<div id="endingsSelect" style="display: flex;">
 							<div class="controlBox" style="display: flex; flex-direction: column;">
 								<span style="font-size: 14px; line-height: 12px;">ending</span>
 								<canvas id="endingCanvas" style="width:100px; height:100px;" onclick="/*selectExitRoom1();*/"></canvas>
@@ -593,25 +593,25 @@
 									</button>
 								</div>
 							</div>
-						</div>
-						<div id="exitsControls" class="controlBox">
-							<div id="exitsNav" class="buttonGroup">
-								<button title="previous exit" class="color0" onclick="prevExit();">
+						</div> -->
+						<div id="markersControls" class="controlBox">
+							<div id="markersNav" class="buttonGroup">
+								<button title="previous" class="color0" onclick="prevMarker();">
 									<i class="navigate_before material-icons"><span>navigate_before</span></i>
 								</button>
-								<button title="next exit" class="color0" onclick="nextExit();" style="margin-left:-5px;">
+								<button title="next" class="color0" onclick="nextMarker();" style="margin-left:-5px;">
 									<i class="navigate_next material-icons"><span>navigate_next</span></i>
 								</button>
+								<button title="delete" class="color0" onclick="deleteExit();">
+									<i class="material-icons">remove_circle</i>
+								</button>
 							</div>
-							<div id="exitsCommands" class="buttonGroup">
+							<div id="markersAddCommands" class="buttonGroup">
 								<button title="add exit" class="color0" onclick="newExit();">
 									<i class="material-icons">add</i> exit
 								</button>
 								<button title="add ending" class="color0" onclick="/*newEnding();*/">
 									<i class="material-icons">add</i> end
-								</button>
-								<button title="delete exit" class="color0" onclick="deleteExit();">
-									<i class="material-icons">remove_circle</i>
 								</button>
 							</div>
 						</div>
