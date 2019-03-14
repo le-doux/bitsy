@@ -3,8 +3,11 @@ TODO:
 - add endings and "triggers"
 - rename tool?
 	- rename everything that is so exit specific
-- remove areEndingsVisible
 - effects or EFF
+- don't forget localization!!!
+- remove ending tool
+- rename exit tool (and exit.js)
+- need to re-render exits on palette change
 
 TODO:
 - advanced exit TODO:
@@ -121,13 +124,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	var placementMode = PlacementMode.None;
 
-	// NOTE: the "link state" is a UI time concept -- it is not stored in the game data
-	var LinkState = {
-		TwoWay : 0, // two way exit
-		OneWayOriginal : 1, // one way exit - in same state as when it was "gathered"
-		OneWaySwapped : 2, // one way exit - swapped direction from how it was "gathered"
-	};
-
 	UpdatePlacementButtons();
 
 	this.AddExit = function() {
@@ -157,7 +153,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		markerList = GatherMarkerList();
 		curMarker = markerList.find(function(e) { return e.exit == newExit; });
 
-		RenderExits();
+		RenderMarkerSelection();
 		refreshGameData();
 	};
 
@@ -192,16 +188,18 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 		}
 
-		RenderExits();
+		RenderMarkerSelection();
 	}
 
-	function RenderExits() {
+	function RenderMarkerSelection() {
 		var markerControl1 = document.getElementById("markerControl1");
 		var markerControl2 = document.getElementById("markerControl2");
 		var markerLinkControl = document.getElementById("markerLinkControl");
+		var noMarkerMessage = document.getElementById("noMarkerMessage");
 		markerControl1.style.display = "none";
 		markerControl2.style.display = "none";
 		markerLinkControl.style.display = "none";
+		noMarkerMessage.style.display = "none";
 
 		if (curMarker != null) {
 			var w = tilesize * scale;
@@ -209,31 +207,24 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				markerControl1.style.display = "flex";
 				markerControl2.style.display = "flex";
 
-				var startCtx = markerCtx1;
-				var endCtx = markerCtx2;
-				if (curMarker.type == MarkerType.Exit && curMarker.linkState == LinkState.OneWaySwapped) {
-					startCtx = markerCtx2;
-					endCtx = markerCtx1;
-				}
-
 				var startPos = curMarker.GetMarkerPos(0);
 				var endPos = curMarker.GetMarkerPos(1);
 
-				drawRoom( room[startPos.room], startCtx );
+				drawRoom( room[startPos.room], markerCtx1 );
 
-				startCtx.fillStyle = getContrastingColor(room[startPos.room].pal);
-				startCtx.strokeStyle = getContrastingColor(room[startPos.room].pal);
-				startCtx.lineWidth = 4;
-				startCtx.fillRect(startPos.x * w, startPos.y * w, w, w);
-				startCtx.strokeRect((startPos.x * w) - (w/2), (startPos.y * w) - (w/2), w * 2, w * 2);
+				markerCtx1.fillStyle = getContrastingColor(room[startPos.room].pal);
+				markerCtx1.strokeStyle = getContrastingColor(room[startPos.room].pal);
+				markerCtx1.lineWidth = 4;
+				markerCtx1.fillRect(startPos.x * w, startPos.y * w, w, w);
+				markerCtx1.strokeRect((startPos.x * w) - (w/2), (startPos.y * w) - (w/2), w * 2, w * 2);
 
-				drawRoom( room[endPos.room], endCtx );
+				drawRoom( room[endPos.room], markerCtx2 );
 
-				endCtx.fillStyle = getContrastingColor(room[endPos.room].pal);
-				endCtx.strokeStyle = getContrastingColor(room[endPos.room].pal);
-				endCtx.lineWidth = 4;
-				endCtx.fillRect(endPos.x * w, endPos.y * w, w, w);
-				endCtx.strokeRect((endPos.x * w) - (w/2), (endPos.y * w) - (w/2), w * 2, w * 2);
+				markerCtx2.fillStyle = getContrastingColor(room[endPos.room].pal);
+				markerCtx2.strokeStyle = getContrastingColor(room[endPos.room].pal);
+				markerCtx2.lineWidth = 4;
+				markerCtx2.fillRect(endPos.x * w, endPos.y * w, w, w);
+				markerCtx2.strokeRect((endPos.x * w) - (w/2), (endPos.y * w) - (w/2), w * 2, w * 2);
 			}
 			else if (curMarker.MarkerCount() == 1) {
 				markerControl1.style.display = "flex";
@@ -256,24 +247,21 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 		}
 		else {
-			// TODO!
-			// exitCtx1.clearRect(0, 0, exitCanvas1.width, exitCanvas1.height);
-			// exitCtx2.clearRect(0, 0, exitCanvas2.width, exitCanvas2.height);
+			noMarkerMessage.style.display = "inline-block";
 		}
 	}
 
-	this.RemoveExit = function() { // TODO make general
-		if (curMarker.hasReturn) {
-			var returnIndex = room[curMarker.exit.dest.room].exits.indexOf(curMarker.return);
-			room[curMarker.exit.dest.room].exits.splice(returnIndex,1);
+	this.RemoveMarker = function() {
+		if (curMarker == null) {
+			return;
 		}
-		var exitIndex = room[curMarker.parentRoom].exits.indexOf(curMarker.exit);
-		room[curMarker.parentRoom].exits.splice(exitIndex,1);
+
+		curMarker.Remove();
 
 		markerList = GatherMarkerList();
 		curMarker = markerList.length > 0 ? markerList[0] : null;
 
-		RenderExits();
+		RenderMarkerSelection();
 		refreshGameData();
 	}
 
@@ -303,7 +291,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		if (foundMarker != null) {
 			curMarker = foundMarker;
 		}
-		RenderExits();
+		RenderMarkerSelection();
 
 		return curMarker != null;
 	}
@@ -423,7 +411,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		else {
 			curMarker = null;
 		}
-		RenderExits();
+		RenderMarkerSelection();
 	}
 
 	this.NextMarker = function() {
@@ -449,7 +437,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		else {
 			curMarker = null;
 		}
-		RenderExits();
+		RenderMarkerSelection();
 	}
 
 	function GatherMarkerList()
@@ -541,7 +529,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		dragMarker.ContinueDrag(selectedRoom,x,y);
 
 		refreshGameData();
-		RenderExits();
+		RenderMarkerSelection();
 	}
 
 	this.EndDrag = function() {
@@ -549,7 +537,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			dragMarker.EndDrag();
 			dragMarker = null;
 			refreshGameData();
-			RenderExits();
+			RenderMarkerSelection();
 		}
 	}
 
@@ -563,69 +551,11 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	this.ChangeExitLink = function() {
-		function swapExitAndEntrance() {
-			var tempDestRoom = curMarker.parentRoom;
-			var tempDestX = curMarker.exit.x;
-			var tempDestY = curMarker.exit.y;
-
-			// remove exit from current parent room
-			var exitIndex = room[curMarker.parentRoom].exits.indexOf(curMarker.exit);
-			room[curMarker.parentRoom].exits.splice(exitIndex,1);
-
-			// add to destination room
-			room[curMarker.exit.dest.room].exits.push(curMarker.exit);
-			curMarker.parentRoom = curMarker.exit.dest.room;
-
-			// swap positions
-			curMarker.exit.x = curMarker.exit.dest.x;
-			curMarker.exit.y = curMarker.exit.dest.y;
-			curMarker.exit.dest.room = tempDestRoom;
-			curMarker.exit.dest.x = tempDestX;
-			curMarker.exit.dest.y = tempDestY;
-		}
-
-		if (curMarker != null) {
-			if (curMarker.linkState == LinkState.TwoWay) {
-				// -- get rid of return exit --
-				if (curMarker.hasReturn) {
-					var returnIndex = room[curMarker.exit.dest.room].exits.indexOf(curMarker.return);
-					room[curMarker.exit.dest.room].exits.splice(returnIndex,1);
-
-					curMarker.return = null;
-					curMarker.hasReturn = false;
-				}
-
-				curMarker.linkState = LinkState.OneWayOriginal;
-			}
-			else if (curMarker.linkState == LinkState.OneWayOriginal) {
-				// -- swap the exit & entrance --
-				swapExitAndEntrance();
-
-				curMarker.linkState = LinkState.OneWaySwapped;
-			}
-			else if (curMarker.linkState == LinkState.OneWaySwapped) {
-				// -- create a return exit --
-				swapExitAndEntrance(); // swap first
-
-				var newReturn = {
-					x : curMarker.exit.dest.x,
-					y : curMarker.exit.dest.y,
-					dest : {
-						room : curMarker.parentRoom,
-						x : curMarker.exit.x,
-						y : curMarker.exit.y
-					}
-				}
-				room[curMarker.exit.dest.room].exits.push( newReturn );
-
-				curMarker.return = newReturn;
-				curMarker.hasReturn = true;
-
-				curMarker.linkState = LinkState.TwoWay;
-			}
+		if (curMarker != null && curMarker.type == MarkerType.Exit) {
+			curMarker.ChangeLink();
 
 			refreshGameData();
-			RenderExits();
+			RenderMarkerSelection();
 		}
 	}
 
@@ -703,7 +633,16 @@ function RoomMarkerBase(parentRoom) {
 	this.GetMarkerPos = function(markerIndex) { // TODO : use this to make the base Draw() smarter??
 		return null;
 	}
+
+	this.Remove = function() {}
 }
+
+// NOTE: the "link state" is a UI time concept -- it is not stored in the game data
+var LinkState = {
+	TwoWay : 0, // two way exit
+	OneWayOriginal : 1, // one way exit - in same state as when it was "gathered"
+	OneWaySwapped : 2, // one way exit - swapped direction from how it was "gathered"
+};
 
 function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 	InitObj( this, new RoomMarkerBase(parentRoom) );
@@ -903,7 +842,12 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 		return 2;
 	}
 
-	this.GetMarkerPos = function(markerIndex) { // TODO : swap if link direction is swapped???
+	this.GetMarkerPos = function(markerIndex) {
+		if (this.linkState == LinkState.OneWaySwapped) {
+			// swap index
+			markerIndex = markerIndex == 0 ? 1 : 0;
+		}
+
 		if (markerIndex == 0) {
 			return {
 				room : this.parentRoom,
@@ -918,7 +862,79 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 				y : this.exit.dest.y,
 			};
 		}
+
 		return null;
+	}
+
+	this.Remove = function() {
+		if (this.hasReturn) {
+			var returnIndex = room[this.exit.dest.room].exits.indexOf(this.return);
+			room[this.exit.dest.room].exits.splice(returnIndex,1);
+		}
+		var exitIndex = room[this.parentRoom].exits.indexOf(this.exit);
+		room[this.parentRoom].exits.splice(exitIndex,1);
+	}
+
+	this.SwapExitAndEntrance = function() {
+		var tempDestRoom = this.parentRoom;
+		var tempDestX = this.exit.x;
+		var tempDestY = this.exit.y;
+
+		// remove exit from current parent room
+		var exitIndex = room[this.parentRoom].exits.indexOf(this.exit);
+		room[this.parentRoom].exits.splice(exitIndex,1);
+
+		// add to destination room
+		room[this.exit.dest.room].exits.push(this.exit);
+		this.parentRoom = this.exit.dest.room;
+
+		// swap positions
+		this.exit.x = this.exit.dest.x;
+		this.exit.y = this.exit.dest.y;
+		this.exit.dest.room = tempDestRoom;
+		this.exit.dest.x = tempDestX;
+		this.exit.dest.y = tempDestY;
+	}
+
+	this.ChangeLink = function() {
+		if (this.linkState == LinkState.TwoWay) {
+			// -- get rid of return exit --
+			if (this.hasReturn) {
+				var returnIndex = room[this.exit.dest.room].exits.indexOf(this.return);
+				room[this.exit.dest.room].exits.splice(returnIndex,1);
+
+				this.return = null;
+				this.hasReturn = false;
+			}
+
+			this.linkState = LinkState.OneWayOriginal;
+		}
+		else if (this.linkState == LinkState.OneWayOriginal) {
+			// -- swap the exit & entrance --
+			this.SwapExitAndEntrance();
+
+			this.linkState = LinkState.OneWaySwapped;
+		}
+		else if (this.linkState == LinkState.OneWaySwapped) {
+			// -- create a return exit --
+			this.SwapExitAndEntrance(); // swap first
+
+			var newReturn = {
+				x : this.exit.dest.x,
+				y : this.exit.dest.y,
+				dest : {
+					room : this.parentRoom,
+					x : this.exit.x,
+					y : this.exit.y
+				}
+			}
+			room[this.exit.dest.room].exits.push( newReturn );
+
+			this.return = newReturn;
+			this.hasReturn = true;
+
+			this.linkState = LinkState.TwoWay;
+		}
 	}
 }
 
@@ -990,5 +1006,9 @@ function EndingMarker(parentRoom, ending) {
 			};
 		}
 		return null;
+	}
+
+	this.Remove = function() {
+		// TODO
 	}
 }

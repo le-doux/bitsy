@@ -512,34 +512,10 @@
 							<span class="localize exits_tool_name">exits</span>
 						</div>
 					</div>
-<!-- 
-					<button title="create new exit and place it in the current room" class="color0" onclick="addExit();" id="addExitButton">
-						<i class="material-icons">location_searching</i>
-						<span class="localize exit_new">place new exit</span>
-					</button>
-					<span id="addingExitHelpText" style="display:none;"><i class="localize exit_click_add">click space in room to add exit</i></span>
-					<div title="edit selected exit" id="editSelectedExit" class="controlBox">
-						<u><span class="localize exit_selected">selected exit</span></u><br>
-						<div id="noExitSelected">
-							<i><span class="localize exit_selected_none">no exit selected</span></i>
-						</div>
-						<div id="exitSelected" style="display:none;">
-							<span class="localize exit_destination">this exit goes to</span>: 
-							<select title="choose which room the selected exit goes to" id="exitDestinationSelect" onchange="exitDestinationRoomChange(event);">
-								<option value="0">room 0</option>
-							</select>
-							<br>
-							<canvas title="click to place exit destination in selected room" id="exitCanvas"></canvas>
-							<br>
-							<button title="delete selected exit" class="color0" onclick="deleteSelectedExit();">
-								<i class="material-icons">remove</i>
-								<span class="localize exit_delete">delete selected exit</span>
-							</button>
-						</div>
-					</div>
- -->
-
 					<div id="exitsPanelContent">
+						<div id="noMarkerMessage" class="controlBox" style="width:300px;">
+							<span style="white-space: pre-wrap; word-wrap: break-word;">There are no exits, endings, or effects in this room yet! You can add one with this tool. :)</span>
+						</div>
 						<div id="markersSelect" style="display: flex;">
 							<div id="markerControl1" class="controlBox" style="display: flex; flex-direction: column;">
 								<span style="font-size: 14px; line-height: 12px;">marker 1</span>
@@ -555,14 +531,12 @@
 									</button>
 								</div>
 							</div>
-							<!-- <i class="material-icons">arrow_back</i> -->
 							<div id="markerLinkControl" style="padding-left: 5px; padding-right: 5px; display:inline-block;">
 								<button title="change direction" onclick="changeExitDirection();" style="margin-top: 50px;">
 									<i class="material-icons" id="exitDirectionBackIcon">arrow_back</i>
 									<i class="material-icons" id="exitDirectionForwardIcon">arrow_forward</i>
 								</button>
 							</div>
-							<!-- <i class="material-icons">compare_arrows</i> -->
 							<div id="markerControl2" class="controlBox" style="display: flex; flex-direction: column;">
 								<span style="font-size: 14px; line-height: 12px;">marker 2</span>
 								<canvas id="markerCanvas2" style="width:100px; height:100px;" onclick="selectMarkerRoom2();"></canvas>
@@ -578,22 +552,6 @@
 								</div>
 							</div>
 						</div>
-<!-- 						<div id="endingsSelect" style="display: flex;">
-							<div class="controlBox" style="display: flex; flex-direction: column;">
-								<span style="font-size: 14px; line-height: 12px;">ending</span>
-								<canvas id="endingCanvas" style="width:100px; height:100px;" onclick="/*selectExitRoom1();*/"></canvas>
-								<div style="margin-top: 4px;">
-									<input type="checkbox" id="toggleMoveEnding" onclick="/*toggleMoveExitDoor1(event);*/" />
-									<label for="toggleMoveEnding">
-										<i class="material-icons">location_searching</i>
-										<span id="textMoveEnding">move ending</span>
-									</label>
-									<button id="cancelMoveEnding" onclick="cancelMoveExitDoor1();">
-										<i class="material-icons">cancel</i>
-									</button>
-								</div>
-							</div>
-						</div> -->
 						<div id="markersControls" class="controlBox">
 							<div id="markersNav" class="buttonGroup">
 								<button title="previous" class="color0" onclick="prevMarker();">
@@ -602,7 +560,7 @@
 								<button title="next" class="color0" onclick="nextMarker();" style="margin-left:-5px;">
 									<i class="navigate_next material-icons"><span>navigate_next</span></i>
 								</button>
-								<button title="delete" class="color0" onclick="deleteExit();">
+								<button title="delete" class="color0" onclick="deleteMarker();">
 									<i class="material-icons">remove_circle</i>
 								</button>
 							</div>
@@ -612,6 +570,9 @@
 								</button>
 								<button title="add ending" class="color0" onclick="/*newEnding();*/">
 									<i class="material-icons">add</i> end
+								</button>
+								<button title="add custom effect" class="color0" onclick="/*newEffect();*/">
+									<i class="material-icons">add</i> effect
 								</button>
 							</div>
 						</div>

@@ -2148,25 +2148,21 @@ function toggleVersionNotes(e) {
 var markerTool;
 
 function newExit() {
-	console.log("NEW EXIT");
 	markerTool.AddExit();
 	roomTool.drawEditMap();
 }
 
 function deleteMarker() {
-	console.log("DELETE EXIT");
-	markerTool.RemoveExit();
+	markerTool.RemoveMarker();
 	roomTool.drawEditMap();
 }
 
 function prevMarker() {
-	console.log("PREV EXIT");
 	markerTool.NextMarker();
 	roomTool.drawEditMap();
 }
 
 function nextMarker() {
-	console.log("NEXT EXIT");
 	markerTool.PrevMarker();
 	roomTool.drawEditMap();
 }
