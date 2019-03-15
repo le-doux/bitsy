@@ -42,26 +42,27 @@ function RoomTool(canvas) {
 			return;
 		}
 
-		if( Ed().platform == PlatformType.Desktop ) { // TODO : why wrap this up this way?
-			if (self.areMarkersVisible) {
-				if (self.markers.TrySelectMarkerAtLocation(x,y)) {
+		var isEditingMarker = false;
+
+		if (self.areMarkersVisible) {
+			if (self.markers.IsPlacingMarker()) {
+				if (!self.markers.IsMarkerAtLocation(x,y)) {
+					self.markers.PlaceMarker(x,y);
 					self.drawEditMap();
+
+					isEditingMarker = true;
 				}
+			}
+			else if (self.markers.TrySelectMarkerAtLocation(x,y)) {
+				self.markers.StartDrag(x,y);
+				self.drawEditMap();
+
+				isEditingMarker = true;
 			}
 		}
 
-		if (self.areMarkersVisible && self.markers.GetSelectedMarker() != null && !self.markers.IsPlacingMarker()) {
-			self.markers.StartDrag(x,y);
-		}
-		else if ( Ed().platform == PlatformType.Desktop && self.markers.IsPlacingMarker()) {
-			if ( !self.markers.IsMarkerAtLocation(x,y) ) {
-				self.markers.PlaceMarker(x,y);
-				self.drawEditMap();
-			}
-		}
-		else if (self.drawing.id != null) {
+		if (!isEditingMarker && self.drawing.id != null) {
 			//add tiles/sprites to map
-			console.log("DRAWING");
 			if (self.drawing.type == TileType.Tile) {
 				if ( room[curRoom].tilemap[y][x] === "0" ) {
 					console.log("ADD");
@@ -106,7 +107,7 @@ function RoomTool(canvas) {
 					sprite[self.drawing.id].y = -1;
 				}
 			}
-			else if( Ed().platform == PlatformType.Desktop && self.drawing.type == TileType.Item ) {
+			else if(self.drawing.type == TileType.Item ) {
 				// TODO : is this the final behavior I want?
 
 				var otherItem = getItem(curRoom,x,y);

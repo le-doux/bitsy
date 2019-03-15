@@ -127,7 +127,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	UpdatePlacementButtons();
 
 	this.AddExit = function() {
-		console.log(room);
+		// console.log(room);
 		var newExit = {
 			x : 0,
 			y : 0,
@@ -151,7 +151,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		room[newExit.dest.room].exits.push( newReturn );
 
 		markerList = GatherMarkerList();
-		curMarker = markerList.find(function(e) { return e.exit == newExit; });
+		curMarker = markerList.find(function(m) { return m.type == MarkerType.Exit && m.exit == newExit; });
 
 		RenderMarkerSelection();
 		refreshGameData();
@@ -159,25 +159,24 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	this.SetRoom = function(roomId) {
 		selectedRoom = roomId;
-		ResetExitList();
+		ResetMarkerList();
 	}
 
 	this.Refresh = function() { // TODO: rename "Reset"???
 		curMarker = null;
-		ResetExitList();
+		ResetMarkerList();
 	}
 
-	function ResetExitList() {
+	function ResetMarkerList() {
 		markerList = GatherMarkerList();
 
 		if (curMarker != null) {
-			// check for exit info that duplicates the carry over exit info
-			var duplicate = markerList.find(function(info) {
-				return (curMarker.exit == info.exit && curMarker.return == info.return) ||
-					(curMarker.exit == info.return && curMarker.return == info.exit);
+			// check for marker that duplicates carry-over marker
+			var duplicate = markerList.find(function(marker) {
+				return curMarker.Match(marker);
 			});
 			if (duplicate != undefined && duplicate != null) {
-				// if there is a duplicate.. replace it with the carry over exit
+				// if there is a duplicate.. replace it with the carry-over marker
 				markerList[markerList.indexOf(duplicate)] = curMarker;
 			}
 		}
@@ -271,15 +270,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	this.GetSelectedMarker = function() {
 		return curMarker;
-	}
-
-	this.GetSelectedReturn = function() {
-		if (curMarker != null && curMarker.hasReturn) {
-			return curMarker.return;
-		}
-		else {
-			return null;
-		}
 	}
 
 	this.TrySelectMarkerAtLocation = function(x,y) {
@@ -381,7 +371,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		if (curMarker != null) {
 			curMarker.PlaceMarker(placementMode,selectedRoom,x,y);
 			refreshGameData();
-			ResetExitList();
+			ResetMarkerList();
 		}
 
 		placementMode = PlacementMode.None;
@@ -546,7 +536,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	this.GetMarkerList = function() {
-		// ResetExitList(); // make sure we are up to date!
+		// ResetMarkerList(); // make sure we are up to date!
 		return markerList;
 	}
 
@@ -635,6 +625,10 @@ function RoomMarkerBase(parentRoom) {
 	}
 
 	this.Remove = function() {}
+
+	this.Match = function(otherMarker) {
+		return false;
+	}
 }
 
 // NOTE: the "link state" is a UI time concept -- it is not stored in the game data
@@ -936,6 +930,16 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 			this.linkState = LinkState.TwoWay;
 		}
 	}
+
+	this.Match = function(otherMarker) {
+		if (otherMarker.type == MarkerType.Exit) {
+			if ((this.exit == otherMarker.exit && this.return == otherMarker.return) ||
+					(this.exit == otherMarker.return && this.return == otherMarker.exit)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
 
 function EndingMarker(parentRoom, ending) {
@@ -1010,5 +1014,9 @@ function EndingMarker(parentRoom, ending) {
 
 	this.Remove = function() {
 		// TODO
+	}
+
+	this.Match = function(otherMarker) {
+		return this.type == otherMarker.type && this.ending == otherMarker.ending;
 	}
 }
