@@ -36,7 +36,6 @@ function RoomTool(canvas) {
 		var y = Math.floor( off.y / (tilesize*scale) );
 		// console.log(x + " " + y);
 
-		console.log(e);
 		if( self.editDrawingAtCoordinateCallback != null && e.altKey ) {
 			self.editDrawingAtCoordinateCallback(x,y); // "eye dropper"
 			return;
@@ -49,17 +48,17 @@ function RoomTool(canvas) {
 				if (!self.markers.IsMarkerAtLocation(x,y)) {
 					self.markers.PlaceMarker(x,y);
 					self.drawEditMap();
-
-					isEditingMarker = true;
 				}
+				isEditingMarker = true;
 			}
 			else if (self.markers.TrySelectMarkerAtLocation(x,y)) {
 				self.markers.StartDrag(x,y);
 				self.drawEditMap();
-
 				isEditingMarker = true;
 			}
 		}
+
+		console.log("IS MARKER " + isEditingMarker);
 
 		if (!isEditingMarker && self.drawing.id != null) {
 			//add tiles/sprites to map

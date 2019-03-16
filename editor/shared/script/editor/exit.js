@@ -283,7 +283,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 		RenderMarkerSelection();
 
-		return curMarker != null;
+		return foundMarker != null;
 	}
 
 	this.IsMarkerAtLocation = function(x,y) {
