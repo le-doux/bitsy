@@ -58,8 +58,6 @@ function RoomTool(canvas) {
 			}
 		}
 
-		console.log("IS MARKER " + isEditingMarker);
-
 		if (!isEditingMarker && self.drawing.id != null) {
 			//add tiles/sprites to map
 			if (self.drawing.type == TileType.Tile) {

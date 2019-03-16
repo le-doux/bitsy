@@ -278,6 +278,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 
 		var foundMarker = FindMarkerAtLocation(x,y);
+		console.log(foundMarker);
 		if (foundMarker != null) {
 			curMarker = foundMarker;
 		}
@@ -291,6 +292,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	function FindMarkerAtLocation(x,y) {
+		console.log(markerList);
 		for (var i = 0; i < markerList.length; i++) {
 			var marker = markerList[i];
 			if (marker.IsAtLocation(selectedRoom,x,y)) {
@@ -320,7 +322,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		UpdatePlacementButtons();
 	}
 
-	this.SelectMarkerRoom1 = function() { // TODO : swap if link direction is swapped!!!
+	this.SelectMarkerRoom1 = function() {
 		// hacky global method!!
 		if (curMarker != null && curMarker.MarkerCount() >= 1) {
 			selectRoom(curMarker.GetMarkerPos(0).room);
@@ -641,7 +643,7 @@ var LinkState = {
 function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 	InitObj( this, new RoomMarkerBase(parentRoom) );
 
-	this.type = MarkerType.Exit; // TODO remove
+	this.type = MarkerType.Exit;
 
 	this.exit = exit;
 	this.hasReturn = hasReturn;
@@ -725,21 +727,9 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 	}
 
 	this.IsAtLocation = function(roomId,x,y) {
-		// TODO : there is a more robust simple implementation of this test
-		if (this.parentRoom === roomId) {
-			if (this.exit.x == x && this.exit.y == y) {
-				return true;
-			}
-			else if (this.exit.dest.x == x && this.exit.dest.y == y) {
-				return true;
-			}
-		}
-		else if (this.exit.dest.room === roomId) {
-			if (this.exit.dest.x == x && this.exit.dest.y == y) {
-				return true;
-			}
-		}
-		return false;
+		var startsInThisRoom = this.parentRoom === roomId && this.exit.x == x && this.exit.y == y;
+		var endsInThisRoom = this.exit.dest.room === roomId && this.exit.dest.x == x && this.exit.dest.y == y;
+		return startsInThisRoom || endsInThisRoom;
 	}
 
 	var Drag = {
@@ -945,7 +935,7 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 function EndingMarker(parentRoom, ending) {
 	InitObj( this, new RoomMarkerBase(parentRoom) );
 
-	this.type = MarkerType.Ending; // TODO remove
+	this.type = MarkerType.Ending;
 
 	this.ending = ending;
 
@@ -994,7 +984,14 @@ function EndingMarker(parentRoom, ending) {
 	}
 
 	this.PlaceMarker = function(placementMode,roomId,x,y) {
-		// TODO
+		if (placementMode != PlacementMode.None) {
+			this.ending.x = x;
+			this.ending.y = y;
+			if (roomId != this.parentRoom) {
+				this.Remove(); // TODO -- not working
+				room[roomId].endings.push(this.ending);
+			}
+		}
 	}
 
 	this.MarkerCount = function() {
@@ -1013,7 +1010,8 @@ function EndingMarker(parentRoom, ending) {
 	}
 
 	this.Remove = function() {
-		// TODO
+		var endingIndex = room[this.parentRoom].endings.indexOf(this.ending);
+		room[this.parentRoom].endings.splice(endingIndex,1);
 	}
 
 	this.Match = function(otherMarker) {
