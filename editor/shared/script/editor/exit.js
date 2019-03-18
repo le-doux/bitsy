@@ -990,6 +990,7 @@ function EndingMarker(parentRoom, ending) {
 			if (roomId != this.parentRoom) {
 				this.Remove(); // TODO -- not working
 				room[roomId].endings.push(this.ending);
+				this.parentRoom = roomId;
 			}
 		}
 	}
