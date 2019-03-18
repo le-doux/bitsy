@@ -2152,6 +2152,11 @@ function newExit() {
 	roomTool.drawEditMap();
 }
 
+function newEnding() {
+	markerTool.AddEnding();
+	roomTool.drawEditMap();
+}
+
 function deleteMarker() {
 	markerTool.RemoveMarker();
 	roomTool.drawEditMap();
@@ -2796,21 +2801,6 @@ function on_change_ending() { //todo get rid of these underscore functions uggh
 	if ( hasEndings() ) curEndingId = sortedEndingIdList()[endingIndex];
 	ending[ curEndingId ] = document.getElementById("endingText").value;
 	refreshGameData();
-}
-
-function newEnding() {
-	if ( !hasEndings() ) return; //do nothin
-
-	// create new ending and save the data
-	var id = nextEndingId();
-	ending[ id ] = "";
-	refreshGameData();
-
-	// change the UI
-	endingIndex = Object.keys(ending).length - 1;
-	reloadEnding();
-
-	setSelectedEnding(null);
 }
 
 function prevEnding() {

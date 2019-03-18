@@ -126,7 +126,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	UpdatePlacementButtons();
 
-	this.AddExit = function() {
+	this.AddExit = function() { // TODO : make destination select smarter
 		// console.log(room);
 		var newExit = {
 			x : 0,
@@ -156,6 +156,22 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		RenderMarkerSelection();
 		refreshGameData();
 	};
+
+	this.AddEnding = function() {
+		var newEnding = {
+			x : 0,
+			y : 0,
+			id : nextEndingId(),
+		};
+		room[selectedRoom].endings.push( newEnding );
+		ending[ newEnding.id ] = ""; // TODO : required for now -- remove later
+
+		markerList = GatherMarkerList();
+		curMarker = markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; });
+
+		RenderMarkerSelection();
+		refreshGameData();
+	}
 
 	this.SetRoom = function(roomId) {
 		selectedRoom = roomId;
@@ -988,7 +1004,7 @@ function EndingMarker(parentRoom, ending) {
 			this.ending.x = x;
 			this.ending.y = y;
 			if (roomId != this.parentRoom) {
-				this.Remove(); // TODO -- not working
+				this.Remove();
 				room[roomId].endings.push(this.ending);
 				this.parentRoom = roomId;
 			}
