@@ -1,14 +1,18 @@
 /*
 TODO:
-- add endings and "triggers"
-- effects or EFF
-- don't forget localization!!!
-- remove ending tool
-	- how does this effect settings?
-- rename exit tool (and exit.js)
+- customize "marker 1" and "marker 2" names
+- add ending dialog
+- add effects
+- add PRG
+- add exit options
+	- transition effect
+	- lock
+	- dialog
+	- customize?
+- rename exit tool and exit.js
 - need to re-render exits on palette change
 - update panel prefs for v6.0
-- rename the exits panel
+- localization
 
 TODO:
 - advanced exit TODO:
@@ -261,10 +265,17 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				// just tacking this on here to make sure it updates
 				UpdateExitDirectionUI();
 			}
+
+			UpdateMarkerNames();
 		}
 		else {
 			noMarkerMessage.style.display = "inline-block";
 		}
+	}
+
+	function UpdateMarkerNames() {
+		// TODO
+		// document.getElementById("markerName1");
 	}
 
 	this.RemoveMarker = function() {
