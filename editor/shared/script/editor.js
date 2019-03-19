@@ -452,7 +452,6 @@ var defaultPanelPrefs = {
 		{ id:"gifPanel", 			visible:false, 	position:5  },
 		{ id:"dataPanel", 			visible:false, 	position:6  },
 		{ id:"exitsPanel", 			visible:false, 	position:7  },
-		{ id:"endingsPanel", 		visible:false, 	position:8  },
 		{ id:"paintExplorerPanel",	visible:false,	position:9  },
 		{ id:"dialogPanel",			visible:false,	position:10 },
 		{ id:"inventoryPanel",		visible:false,	position:11 },
@@ -579,8 +578,11 @@ function start() {
 	var editorContent = document.getElementById("editorContent");
 	for(i in sortedWorkspace) {
 		var panelSettings = sortedWorkspace[i];
-		togglePanelCore( panelSettings.id, panelSettings.visible, false /*doUpdatePrefs*/ );
-		editorContent.insertBefore( document.getElementById(panelSettings.id), null ); //insert on the left
+		var panelElement = document.getElementById(panelSettings.id);
+		if (panelElement != undefined && panelElement != null) {
+			togglePanelCore( panelSettings.id, panelSettings.visible, false /*doUpdatePrefs*/ );
+			editorContent.insertBefore( panelElement, null ); //insert on the left
+		}
 	}
 
 	// Automatically open tool trays that are needed
@@ -600,7 +602,6 @@ function start() {
 
 	updateRoomPaletteSelect(); //dumb to have to specify this here --- wrap up room UI method?
 	updateRoomName(); // init the room UI
-	reloadEnding();
 
 	updateInventoryUI();
 
@@ -1631,7 +1632,7 @@ function nextPalette() {
 }
 
 function newPalette() {
-	// create new ending and save the data
+	// create new palette and save the data
 	var id = nextPaletteId();
 	palette[ id ] = {
 		name : null,
@@ -2201,13 +2202,13 @@ function changeExitDirection() {
 	roomTool.drawEditMap();
 }
 
-function showExits() { // TODO : rename
+function showMarkers() {
 	markerTool.Refresh();
 	roomTool.areMarkersVisible = true;
 	roomTool.drawEditMap();
 }
 
-function hideExits() { // TODO : rename
+function hideMarkers() {
 	roomTool.areMarkersVisible = false;
 	roomTool.drawEditMap();
 }
@@ -2302,13 +2303,15 @@ function afterTogglePanel(id,visible) {
 }
 
 function afterShowPanel(id) {
-	if (id === "exitsPanel") showExits();
-	if (id === "endingsPanel") showEndings();
+	if (id === "exitsPanel") {
+		showMarkers();
+	}
 }
 
 function afterHidePanel(id) {
-	if (id === "exitsPanel") hideExits();
-	if (id === "endingsPanel") hideEndings();
+	if (id === "exitsPanel") {
+		hideMarkers();
+	}
 }
 
 // DEPRECATED
@@ -2786,108 +2789,6 @@ function on_change_color_page() {
 	export_settings.page_color = hex;
 
 	localStorage.export_settings = JSON.stringify( export_settings );
-}
-
-/* ENDINGS */
-var isAddingEnding = false;
-var selectedEndingTile = null;
-
-function hasEndings() {
-	return Object.keys(ending).length > 0;
-}
-
-function on_change_ending() { //todo get rid of these underscore functions uggh
-	var curEndingId = "0"; //default in case no endings have been created yet
-	if ( hasEndings() ) curEndingId = sortedEndingIdList()[endingIndex];
-	ending[ curEndingId ] = document.getElementById("endingText").value;
-	refreshGameData();
-}
-
-function prevEnding() {
-	// update index
-	endingIndex = (endingIndex - 1);
-	if (endingIndex < 0) endingIndex = Object.keys(ending).length - 1;
-
-	// change the UI
-	reloadEnding();
-
-	setSelectedEnding(null);
-}
-
-function nextEnding() {
-	// update index
-	endingIndex = (endingIndex + 1);
-	if (endingIndex >= Object.keys(ending).length) endingIndex = 0;
-
-	// change the UI
-	reloadEnding();
-
-	setSelectedEnding(null);
-}
-
-function reloadEnding() {
-	if ( !hasEndings() ) return; //do nothin
-	var id = sortedEndingIdList()[ endingIndex ];
-	document.getElementById("endingId").innerHTML = id;
-	document.getElementById("endingText").value = ending[ id ];
-}
-
-function addEnding() {
-	isAddingEnding = true;
-	setSelectedEnding(null);
-	document.getElementById("addEndingButton").style.display = "none";
-	document.getElementById("addingEndingHelpText").style.display = "block";
-}
-
-function addEndingToCurRoom(x,y) {
-	isAddingEnding = false;
-	document.getElementById("addEndingButton").style.display = "block";
-	document.getElementById("addingEndingHelpText").style.display = "none";
-	var id = sortedEndingIdList()[ endingIndex ];
-	var newEnding = {
-		x : x,
-		y : y,
-		id : id
-	};
-	room[ curRoom ].endings.push( newEnding );
-	refreshGameData();
-	setSelectedEnding( newEnding );
-}
-
-function showEndings() {
-	// roomTool.areEndingsVisible = true;
-	roomTool.drawEditMap();
-}
-
-function hideEndings() {
-	// roomTool.areEndingsVisible = false;
-	roomTool.drawEditMap();
-}
-
-// function setSelectedEnding(e) { //todo
-// 	// var didChange = selectedEndingTile != e;
-// 	var didChange = (e != null) || (e == null && selectedEndingTile != null);
-
-// 	selectedEndingTile = e;
-
-// 	if (selectedEndingTile == null) {
-// 		document.getElementById("removeEndingButton").style.display = "none";
-// 	}
-// 	else {
-// 		endingIndex = sortedEndingIdList().indexOf( e.id );
-// 		reloadEnding();
-// 		document.getElementById("removeEndingButton").style.display = "block";
-// 	}
-
-// 	roomTool.drawEditMap();
-
-// 	return didChange;
-// }
-
-function removeSelectedEnding() {
-	room[curRoom].endings.splice( room[curRoom].endings.indexOf( selectedEndingTile ), 1 );
-	refreshGameData();
-	setSelectedEnding(null);
 }
 
 function getComplimentingColor(palId) {

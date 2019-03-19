@@ -109,12 +109,6 @@
 					<span class="localize exits_tool_name">exits</span>
 				</label>
 
-				<input type="checkbox" value="endingsPanel" id="endingsCheck" onclick="togglePanelAnimated(event);" />
-				<label title="show / hide endings window" for="endingsCheck" class="notMobile">
-					<i class="material-icons">place</i>
-					<span class="localize endings_tool_name">endings</span>
-				</label>
-				
 				<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide paint window" for="paintCheck">
 					<i class="material-icons">brush</i>
@@ -481,10 +475,6 @@
 									<i class="material-icons">open_in_new</i>
 									<span class="localize room_add_exits">add exits</span>
 								</button>
-								<button title="add endings" class="color0" onclick="showPanel('endingsPanel');">
-									<i class="material-icons">open_in_new</i>
-									<span class="localize room_add_endings">add endings</span>
-								</button>
 							</div>
 
 							<div id="roomColor" class="buttonGroup">
@@ -576,48 +566,6 @@
 								</button>
 							</div>
 						</div>
-					</div>
-				</div>
-
-				<div id="endingsPanel" class="panel color3" style="display:none;">
-					<div class="bar color3">
-
-						<button title="minimize endings window" class="light panelBarClose" onclick="hidePanel('endingsPanel');">
-							<i class="material-icons">close</i>
-						</button>
-
-						<div title="endings window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<i class="material-icons">place</i>
-							<span class="localize endings_tool_name">endings</span>
-						</div>
-					</div>
-					<textarea title="text displayed on player reaching this ending" id="endingText" class="dialogTextArea gameTextDir" onkeydown="on_change_ending();" onkeyup="on_change_ending();" onchange="on_change_ending();"></textarea>
-					<div id="endingNav">
-						<div class="buttonGroup">
-							<span class="localize ending_label">ending</span> <span id="endingId">0</span>
-							<button title="previous ending" class="color0" onclick="prevEnding();">
-								<i class="navigate_before material-icons"><span>navigate_before</span></i>
-							</button>
-							<button title="next ending" class="color0" onclick="nextEnding();">
-								<i class="navigate_next material-icons"><span>navigate_next</span></i>
-							</button>
-							<button title="add new ending" class="color0" onclick="newEnding();">
-								<i class="material-icons">add</i>
-							</button>
-						</div>
-						<!-- <button onclick="deleteEnding();"> x delete x </button> -->
-					</div>
-					<div class="buttonGroup">
-						<button title="click to place ending in current room" class="color0" id="addEndingButton" onclick="addEnding();">
-							<i class="material-icons">location_searching</i>
-							<span class="localize ending_place">place ending</span>
-						</button>
-						<span id="addingEndingHelpText" class="localize ending_place_help" style="display:none;">click space in room to add ending</span>
-					<!-- todo needs a cancel button -->
-						<button title="remove selected ending from room" class="color0" id="removeEndingButton" onclick="removeSelectedEnding();" style="display:none;">
-							<i class="material-icons">location_disabled</i>
-							<span class="localize ending_remove">remove selected ending</span>
-						</button>
 					</div>
 				</div>
 

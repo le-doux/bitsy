@@ -70,6 +70,10 @@ function nextPaletteId() {
 }
 
 function nextObjectId(idList) {
+	if (idList.length <= 0) {
+		return "0";
+	}
+
 	var lastId = idList[ idList.length - 1 ];
 	var idInt = parseInt( lastId, 36 );
 	idInt++;

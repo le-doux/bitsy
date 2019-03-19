@@ -1,13 +1,14 @@
 /*
 TODO:
 - add endings and "triggers"
-- rename tool?
-	- rename everything that is so exit specific
 - effects or EFF
 - don't forget localization!!!
 - remove ending tool
+	- how does this effect settings?
 - rename exit tool (and exit.js)
 - need to re-render exits on palette change
+- update panel prefs for v6.0
+- rename the exits panel
 
 TODO:
 - advanced exit TODO:
