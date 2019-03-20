@@ -368,14 +368,14 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		UpdatePlacementButtons();
 	}
 
-	SelectMarkerRoom1 = function() {
+	this.SelectMarkerRoom1 = function() {
 		// hacky global method!!
 		if (curMarker != null && curMarker.MarkerCount() >= 1) {
 			selectRoom(curMarker.GetMarkerPos(0).room);
 		}
 	}
 
-	SelectMarkerRoom2 = function() {
+	this.SelectMarkerRoom2 = function() {
 		// hacky global method!!
 		if (curMarker != null && curMarker.MarkerCount() >= 2) {
 			selectRoom(curMarker.GetMarkerPos(1).room);
