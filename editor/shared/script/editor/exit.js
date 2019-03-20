@@ -623,14 +623,19 @@ function RoomMarkerBase(parentRoom) {
 
 	this.Draw = function(ctx,x,y,w,selected) {
 		ctx.fillStyle = getContrastingColor();
+		ctx.strokeStyle = getContrastingColor();
+
 		ctx.globalAlpha = 0.5;
 		ctx.fillRect(x * w, y * w, w, w);
 
+		ctx.globalAlpha = 1.0;
+		ctx.lineWidth = 2.0;
+		ctx.strokeRect(x * w, y * w, w, w);
+
 		if (selected) {
-			ctx.strokeStyle = getContrastingColor();
-			ctx.globalAlpha = 1.0;
-			ctx.lineWidth = 2.0;
-			ctx.strokeRect((x * w) - (w/4), (y * w) - (w/4), w * 1.5, w * 1.5);
+			ctx.lineWidth = 4;
+			var offset = 3;
+			ctx.strokeRect((x * w) - offset, (y * w) - offset, w + (offset*2), w + (offset*2));
 		}
 	}
 
