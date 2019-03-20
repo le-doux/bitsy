@@ -133,7 +133,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	function SelectMarker(marker) {
 		curMarker = marker;
+
 		// TODO.. on marker select actions (if not null)
+
+		RenderMarkerSelection();
 	}
 
 	this.AddExit = function() { // TODO : make destination select smarter
@@ -162,8 +165,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Exit && m.exit == newExit; }));
-
-		RenderMarkerSelection();
 		refreshGameData();
 	};
 
@@ -178,8 +179,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; }));
-
-		RenderMarkerSelection();
 		refreshGameData();
 	}
 
@@ -212,8 +211,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				SelectMarker(markerList[0]);
 			}
 		}
-
-		RenderMarkerSelection();
 	}
 
 	function RenderMarkerSelection() {
@@ -305,8 +302,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.length > 0 ? markerList[0] : null);
-
-		RenderMarkerSelection();
 		refreshGameData();
 	}
 
@@ -324,11 +319,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 
 		var foundMarker = FindMarkerAtLocation(x,y);
-		console.log(foundMarker);
 		if (foundMarker != null) {
 			SelectMarker(foundMarker);
 		}
-		RenderMarkerSelection();
 
 		return foundMarker != null;
 	}
@@ -449,7 +442,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		else {
 			SelectMarker(null);
 		}
-		RenderMarkerSelection();
 	}
 
 	this.NextMarker = function() {
@@ -475,7 +467,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		else {
 			SelectMarker(null);
 		}
-		RenderMarkerSelection();
 	}
 
 	function GatherMarkerList()
