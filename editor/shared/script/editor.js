@@ -2202,6 +2202,10 @@ function changeExitDirection() {
 	roomTool.drawEditMap();
 }
 
+function onEndingTextChange(event) {
+	console.log(event.target.value);
+}
+
 function showMarkers() {
 	markerTool.Refresh();
 	roomTool.areMarkersVisible = true;

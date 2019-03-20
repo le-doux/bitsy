@@ -134,7 +134,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	function SelectMarker(marker) {
 		curMarker = marker;
 
-		// TODO.. on marker select actions (if not null)
+		if (curMarker != null) {
+			curMarker.OnSelect(); // TODO : on-deselect also???
+		}
 
 		RenderMarkerSelection();
 	}
@@ -673,6 +675,8 @@ function RoomMarkerBase(parentRoom) {
 	this.Match = function(otherMarker) {
 		return false;
 	}
+
+	this.OnSelect = function() {} // TODO
 }
 
 // NOTE: the "link state" is a UI time concept -- it is not stored in the game data
@@ -972,6 +976,8 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 		}
 		return false;
 	}
+
+	this.OnSelect = function() {} // TODO
 }
 
 function EndingMarker(parentRoom, ending) {
@@ -1060,4 +1066,6 @@ function EndingMarker(parentRoom, ending) {
 	this.Match = function(otherMarker) {
 		return this.type == otherMarker.type && this.ending == otherMarker.ending;
 	}
+
+	this.OnSelect = function() {} // TODO
 }
