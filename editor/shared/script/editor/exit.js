@@ -1,7 +1,7 @@
 /*
 TODO:
 X customize "marker 1" and "marker 2" names
-- add ending dialog
+X add ending dialog
 - add effects
 - add PRG
 - add exit options
@@ -13,6 +13,7 @@ X customize "marker 1" and "marker 2" names
 - need to re-render exits on palette change
 - update panel prefs for v6.0
 - localization
+- rename dialog -> dialogue?
 
 TODO:
 - advanced exit TODO:
@@ -134,9 +135,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	function SelectMarker(marker) {
 		curMarker = marker;
 
-		if (curMarker != null) {
-			curMarker.OnSelect(); // TODO : on-deselect also???
-		}
+		// if (curMarker != null) {
+		// 	curMarker.OnSelect(); // TODO : on-deselect also???
+		// }
 
 		RenderMarkerSelection();
 	}
@@ -177,7 +178,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			id : nextEndingId(),
 		};
 		room[selectedRoom].endings.push( newEnding );
-		ending[ newEnding.id ] = ""; // TODO : required for now -- remove later
+		ending[ newEnding.id ] = "the end"; // TODO : scriptify
 
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; }));
@@ -215,7 +216,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
-	function RenderMarkerSelection() {
+	function RenderMarkerSelection() { // TODO - break this up???
 		var markerControl1 = document.getElementById("markerControl1");
 		var markerControl2 = document.getElementById("markerControl2");
 		var markerLinkControl = document.getElementById("markerLinkControl");
@@ -266,6 +267,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 
 			UpdateMarkerNames();
+
+			UpdateMarkerOptions();
 		}
 		else {
 			noMarkerMessage.style.display = "inline-block";
@@ -292,6 +295,23 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 		else if (curMarker.type == MarkerType.Ending) {
 			markerName1.innerText = "ending"; // TODO localize
+		}
+	}
+
+	function UpdateMarkerOptions() {
+		var endingOptions = document.getElementById("endingOptions");
+		endingOptions.style.display = "none";
+
+		if (curMarker != null) {
+			if (curMarker.type == MarkerType.Exit) {
+
+			}
+			else if (curMarker.type == MarkerType.Ending) {
+				endingOptions.style.display = "block";
+				var endingText = document.getElementById("endingText");
+				console.log(curMarker.ending);
+				endingText.value = ending[curMarker.ending.id]; // TODO : script-ify
+			}
 		}
 	}
 
@@ -607,6 +627,13 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 		}
 	}
+
+	this.ChangeEndingText = function(text) {
+		if (curMarker != null && curMarker.type == MarkerType.Ending) {
+			ending[curMarker.ending.id] = text; // TODO : scriptify
+			refreshGameData();
+		}
+	}
 } // ExitTool
 
 // required if I'm using inheritance?
@@ -676,7 +703,7 @@ function RoomMarkerBase(parentRoom) {
 		return false;
 	}
 
-	this.OnSelect = function() {} // TODO
+	// this.OnSelect = function() {} // TODO
 }
 
 // NOTE: the "link state" is a UI time concept -- it is not stored in the game data
@@ -725,14 +752,20 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 
 	function DrawExit(ctx,x,y,w) {
 		ctx.fillStyle = getContrastingColor();
+		ctx.strokeStyle = getContrastingColor();
+		ctx.lineWidth = 2.0;
 		ctx.globalAlpha = 1.0;
 		var centerX = (x * w) + (w/2);
 		var centerY = (y * w) + (w/2);
 		ctx.beginPath();
 		ctx.moveTo(centerX, centerY - (w/4));
-		ctx.lineTo(centerX + (w/4), centerY + (w/4));
-		ctx.lineTo(centerX - (w/4), centerY + (w/4));
+		ctx.lineTo(centerX + (w/6), centerY + (w/12));
+		ctx.lineTo(centerX - (w/6), centerY + (w/12));
 		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(centerX, centerY + (w/12));
+		ctx.lineTo(centerX, centerY + (w/4));
+		ctx.stroke();
 	}
 
 	function DrawEntrance(ctx,x,y,w) {
@@ -743,9 +776,13 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 		var centerY = (y * w) + (w/2);
 		ctx.beginPath();
 		ctx.moveTo(centerX, centerY + (w/4));
-		ctx.lineTo(centerX + (w/4), centerY - (w/4));
-		ctx.lineTo(centerX - (w/4), centerY - (w/4));
+		ctx.lineTo(centerX + (w/6), centerY - (w/12));
+		ctx.lineTo(centerX - (w/6), centerY - (w/12));
 		ctx.lineTo(centerX, centerY + (w/4));
+		ctx.stroke();
+		ctx.beginPath();
+		ctx.moveTo(centerX, centerY - (w/12));
+		ctx.lineTo(centerX, centerY - (w/4));
 		ctx.stroke();
 	}
 
@@ -758,13 +795,13 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 		var centerY = (y * w) + (w/2);
 		ctx.beginPath();
 		ctx.moveTo(centerX, centerY - (w/4));
-		ctx.lineTo(centerX + (w/4), centerY - (w * 0.1));
-		ctx.lineTo(centerX - (w/4), centerY - (w * 0.1));
+		ctx.lineTo(centerX + (w/6), centerY - (w * 0.1));
+		ctx.lineTo(centerX - (w/6), centerY - (w * 0.1));
 		ctx.fill();
 		ctx.beginPath();
 		ctx.moveTo(centerX, centerY + (w/4));
-		ctx.lineTo(centerX + (w/4), centerY + (w * 0.1));
-		ctx.lineTo(centerX - (w/4), centerY + (w * 0.1));
+		ctx.lineTo(centerX + (w/6), centerY + (w * 0.1));
+		ctx.lineTo(centerX - (w/6), centerY + (w * 0.1));
 		ctx.fill();
 		ctx.beginPath();
 		ctx.moveTo(centerX, centerY - (w * 0.2));
@@ -977,7 +1014,7 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 		return false;
 	}
 
-	this.OnSelect = function() {} // TODO
+	// this.OnSelect = function() {} // TODO
 }
 
 function EndingMarker(parentRoom, ending) {
@@ -1000,13 +1037,13 @@ function EndingMarker(parentRoom, ending) {
 		ctx.globalAlpha = 1.0;
 
 		ctx.beginPath();
-		ctx.moveTo((x * w) + (w * 0.2), (y * w) + (w * 0.2));
-		ctx.lineTo((x * w) + (w * 0.8), (y * w) + (w * 0.8));
+		ctx.moveTo((x * w) + (w * 0.3), (y * w) + (w * 0.3));
+		ctx.lineTo((x * w) + (w * 0.7), (y * w) + (w * 0.7));
 		ctx.stroke();
 
 		ctx.beginPath();
-		ctx.moveTo((x * w) + (w * 0.2), (y * w) + (w * 0.8));
-		ctx.lineTo((x * w) + (w * 0.8), (y * w) + (w * 0.2));
+		ctx.moveTo((x * w) + (w * 0.3), (y * w) + (w * 0.7));
+		ctx.lineTo((x * w) + (w * 0.7), (y * w) + (w * 0.3));
 		ctx.stroke();
 	}
 
@@ -1067,5 +1104,5 @@ function EndingMarker(parentRoom, ending) {
 		return this.type == otherMarker.type && this.ending == otherMarker.ending;
 	}
 
-	this.OnSelect = function() {} // TODO
+	// this.OnSelect = function() {} // TODO
 }

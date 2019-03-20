@@ -2203,7 +2203,7 @@ function changeExitDirection() {
 }
 
 function onEndingTextChange(event) {
-	console.log(event.target.value);
+	markerTool.ChangeEndingText(event.target.value);
 }
 
 function showMarkers() {

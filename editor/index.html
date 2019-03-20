@@ -567,7 +567,11 @@
 							</div>
 						</div>
 						<div id="markerOptions">
-							<textarea id="endingText" onchange="onEndingTextChange(event);"></textarea>
+							<div id="endingOptions" class="controlBox">
+								<span>ending dialog</span>
+								<br/>
+								<textarea id="endingText" onchange="onEndingTextChange(event);" onkeydown="onEndingTextChange(event);" onkeyup="onEndingTextChange(event);" style="resize: vertical; width: 32ch;"></textarea>
+							</div>
 						</div>
 					</div>
 				</div>
