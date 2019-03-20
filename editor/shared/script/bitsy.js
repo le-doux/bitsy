@@ -8,11 +8,10 @@ var room = {};
 var tile = {};
 var sprite = {};
 var item = {};
-var dialog = {};
+var script = {};
 var palette = {
 	"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
 };
-var ending = {};
 var variable = {}; // these are starting variable values -- they don't update (or I don't think they will)
 var playerId = "A";
 
@@ -1161,6 +1160,9 @@ function parseWorld(file) {
 		else if (getType(curLine) === "END") {
 			i = parseEnding(lines, i);
 		}
+		else if (getType(curLine) === "SCRIPT") {
+			i = parseScript(lines, i);
+		}
 		else if (getType(curLine) === "VAR") {
 			i = parseVariable(lines, i);
 		}
@@ -1875,25 +1877,36 @@ function parseDrawingCore(lines, i, drwId) {
 	return i;
 }
 
-function parseDialog(lines, i) {
+var ScriptType = {
+	Script : 0,
+	Dialogue : 1, // TODO : move everything to this spelling?
+	Ending : 2,
+};
+
+function parseScript(lines, i, scriptType) {
+	if (scriptType === undefined || scriptType === null) {
+		scriptType = ScriptType.Script;
+	}
+
 	var id = getId(lines[i]);
 	i++;
 
-	// TODO : use this for titles & endings too
 	var results = scriptInterpreter.ReadDialogScript(lines,i);
-	dialog[id] = results.script;
+	script[id] = {
+		source: results.script,
+		type: scriptType,
+	};
 	i = results.index;
 
 	return i;
 }
 
+function parseDialog(lines, i) {
+	return parseScript(lines, i, ScriptType.Dialogue);
+}
+
 function parseEnding(lines, i) {
-	var id = getId(lines[i]);
-	i++;
-	var text = lines[i];
-	i++;
-	ending[id] = text;
-	return i;
+	return parseScript(lines, i, ScriptType.Ending);
 }
 
 function parseVariable(lines, i) {

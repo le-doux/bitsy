@@ -2,8 +2,10 @@
 TODO:
 X customize "marker 1" and "marker 2" names
 X add ending dialog
+- add script data type
+	- possible names: PRG, CMD, SCPT, SCRIPT, RUN, ACT, BZS (bitsy script)
+		PRG vs SCRIPT seems like the best two options (short vs descriptive)
 - add effects
-- add PRG
 - add exit options
 	- transition effect
 	- lock
