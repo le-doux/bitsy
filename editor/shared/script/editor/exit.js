@@ -274,8 +274,26 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	function UpdateMarkerNames() {
-		// TODO
-		// document.getElementById("markerName1");
+		var markerName1 = document.getElementById("markerName1");
+		var markerName2 = document.getElementById("markerName2");
+
+		if (curMarker.type == MarkerType.Exit) {
+			if (curMarker.linkState == LinkState.TwoWay) {
+				markerName1.innerText = "exit 1"; // TODO localize
+				markerName2.innerText = "exit 2";
+			}
+			else if (curMarker.linkState == LinkState.OneWayOriginal) {
+				markerName1.innerText = "exit"; // TODO localize
+				markerName2.innerText = "destination";
+			}
+			else if (curMarker.linkState == LinkState.OneWaySwapped) {
+				markerName1.innerText = "destination"; // TODO localize
+				markerName2.innerText = "exit";
+			}
+		}
+		else if (curMarker.type == MarkerType.Ending) {
+			markerName1.innerText = "ending"; // TODO localize
+		}
 	}
 
 	this.RemoveMarker = function() {
