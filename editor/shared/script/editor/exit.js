@@ -1,6 +1,6 @@
 /*
 TODO:
-- customize "marker 1" and "marker 2" names
+X customize "marker 1" and "marker 2" names
 - add ending dialog
 - add effects
 - add PRG
@@ -232,19 +232,16 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 				drawRoom( room[startPos.room], markerCtx1 );
 
+				markerCtx1.globalAlpha = 1.0;
 				markerCtx1.fillStyle = getContrastingColor(room[startPos.room].pal);
-				markerCtx1.strokeStyle = getContrastingColor(room[startPos.room].pal);
-				markerCtx1.lineWidth = 4;
-				markerCtx1.fillRect(startPos.x * w, startPos.y * w, w, w);
-				markerCtx1.strokeRect((startPos.x * w) - (w/2), (startPos.y * w) - (w/2), w * 2, w * 2);
+				markerCtx1.fillRect((startPos.x * w) - (w * 0.5), (startPos.y * w) - (w * 0.5), w * 2, w * 2);
 
 				drawRoom( room[endPos.room], markerCtx2 );
 
+				markerCtx2.globalAlpha = 1.0;
 				markerCtx2.fillStyle = getContrastingColor(room[endPos.room].pal);
-				markerCtx2.strokeStyle = getContrastingColor(room[endPos.room].pal);
-				markerCtx2.lineWidth = 4;
 				markerCtx2.fillRect(endPos.x * w, endPos.y * w, w, w);
-				markerCtx2.strokeRect((endPos.x * w) - (w/2), (endPos.y * w) - (w/2), w * 2, w * 2);
+				markerCtx2.fillRect((endPos.x * w) - (w * 0.5), (endPos.y * w) - (w * 0.5), w * 2, w * 2);
 			}
 			else if (curMarker.MarkerCount() == 1) {
 				markerControl1.style.display = "flex";
@@ -253,11 +250,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 				drawRoom( room[markerPos.room], markerCtx1 );
 
+				markerCtx1.globalAlpha = 1.0;
 				markerCtx1.fillStyle = getContrastingColor(room[markerPos.room].pal);
-				markerCtx1.strokeStyle = getContrastingColor(room[markerPos.room].pal);
-				markerCtx1.lineWidth = 4;
-				markerCtx1.fillRect(markerPos.x * w, markerPos.y * w, w, w);
-				markerCtx1.strokeRect((markerPos.x * w) - (w/2), (markerPos.y * w) - (w/2), w * 2, w * 2);
+				markerCtx1.fillRect((markerPos.x * w) - (w * 0.5), (markerPos.y * w) - (w * 0.5), w * 2, w * 2);
 			}
 
 			if (curMarker.type == MarkerType.Exit) {
