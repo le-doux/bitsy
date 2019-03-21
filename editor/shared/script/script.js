@@ -984,6 +984,8 @@ var Parser = function(env) {
 		return { script:scriptStr, index:i };
 	}
 
+	// TODO this.ReadCodeScript (reads through code open and close symbols), and this.ReadScript
+
 	var ParserState = function( rootNode, str ) {
 		this.rootNode = rootNode;
 		this.curNode = this.rootNode;

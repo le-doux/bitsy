@@ -2,9 +2,9 @@
 TODO:
 X customize "marker 1" and "marker 2" names
 X add ending dialog
-- add script data type
-	- possible names: PRG, CMD, SCPT, SCRIPT, RUN, ACT, BZS (bitsy script)
-		PRG vs SCRIPT seems like the best two options (short vs descriptive)
+X add script data type
+	- name is PRG (possible alternates are SC and SCR)
+- handle multi-line scripts in endings
 - add effects
 - add exit options
 	- transition effect
@@ -180,7 +180,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			id : nextEndingId(),
 		};
 		room[selectedRoom].endings.push( newEnding );
-		ending[ newEnding.id ] = "the end"; // TODO : scriptify
+		script[ newEnding.id ] = { type: ScriptType.Ending, source: "the end" };
 
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; }));
@@ -312,7 +312,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				endingOptions.style.display = "block";
 				var endingText = document.getElementById("endingText");
 				console.log(curMarker.ending);
-				endingText.value = ending[curMarker.ending.id]; // TODO : script-ify
+				endingText.value = script[curMarker.ending.id].source;
 			}
 		}
 	}
@@ -632,7 +632,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	this.ChangeEndingText = function(text) {
 		if (curMarker != null && curMarker.type == MarkerType.Ending) {
-			ending[curMarker.ending.id] = text; // TODO : scriptify
+			script[curMarker.ending.id].source = text;
 			refreshGameData();
 		}
 	}

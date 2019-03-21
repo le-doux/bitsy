@@ -653,7 +653,7 @@ function moveSprites() {
 				var itmIndex = getItemIndex( spr.room, spr.x, spr.y );
 				if (end) { //if the sprite hits an ending
 					if (id === playerId) { // only the player can end the game
-						startNarrating( ending[end.id], true /*isEnding*/ );
+						startNarrating( script[end.id].source, true /*isEnding*/ );
 					}
 				}
 				else if (ext) { //if the sprite hits an exit
@@ -955,7 +955,7 @@ function movePlayer(direction) {
 	}
 
 	if (end) {
-		startNarrating( ending[end.id], true /*isEnding*/ );
+		startNarrating( script[end.id].source, true /*isEnding*/ );
 	}
 	else if (ext) {
 		movePlayerThroughExit(ext);
@@ -979,9 +979,9 @@ function movePlayerThroughExit(ext) {
 		curRoom = ext.dest.room;
 	};
 
-	if(ext.dlg != null && dialog[ext.dlg]){
+	if(ext.dlg != null && script[ext.dlg]){
 		isNarrating = true; // hack test -- should this be the way this works?
-		var dialogStr = dialog[ext.dlg];
+		var dialogStr = script[ext.dlg].source;
 		startDialog(dialogStr, ext.dlg, function(isExitUnlocked) {
 			isNarrating = false;
 			if (isExitUnlocked == true) {
@@ -1160,7 +1160,7 @@ function parseWorld(file) {
 		else if (getType(curLine) === "END") {
 			i = parseEnding(lines, i);
 		}
-		else if (getType(curLine) === "SCRIPT") {
+		else if (getType(curLine) === "PRG") {
 			i = parseScript(lines, i);
 		}
 		else if (getType(curLine) === "VAR") {
@@ -1373,16 +1373,18 @@ function serializeWorld(skipFonts) {
 		}
 		worldStr += "\n";
 	}
-	/* DIALOG */
-	for (id in dialog) {
-		worldStr += "DLG " + id + "\n";
-		worldStr += dialog[id] + "\n";
-		worldStr += "\n";
-	}
-	/* ENDINGS */
-	for (id in ending) {
-		worldStr += "END " + id + "\n";
-		worldStr += ending[id] + "\n";
+	/* SCRIPTS */
+	for (id in script) {
+		if (script[id].type == ScriptType.Dialogue) {
+			worldStr += "DLG " + id + "\n";
+		}
+		else if (script[id].type == ScriptType.Ending) {
+			worldStr += "END " + id + "\n";
+		}
+		else {
+			worldStr += "PRG " + id + "\n";
+		}
+		worldStr += script[id].source + "\n";
 		worldStr += "\n";
 	}
 	/* VARIABLES */
@@ -2092,8 +2094,8 @@ function startNarrating(dialogStr,end) {
 function startItemDialog(itemId) {
 	var dialogId = item[itemId].dlg;
 	// console.log("START ITEM DIALOG " + dialogId);
-	if(dialog[dialogId]){
-		var dialogStr = dialog[dialogId];
+	if(script[dialogId]){
+		var dialogStr = script[dialogId].source;
 		startDialog(dialogStr,dialogId);
 	}
 }
@@ -2102,8 +2104,8 @@ function startSpriteDialog(spriteId) {
 	var spr = sprite[spriteId];
 	var dialogId = spr.dlg ? spr.dlg : spriteId;
 	// console.log("START SPRITE DIALOG " + dialogId);
-	if(dialog[dialogId]){
-		var dialogStr = dialog[dialogId];
+	if(script[dialogId]){
+		var dialogStr = script[dialogId].source;
 		startDialog(dialogStr,dialogId);
 	}
 }

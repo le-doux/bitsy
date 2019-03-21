@@ -792,17 +792,15 @@ function on_drawing_name_change() {
 		if(newName != oldName) {
 			for(dlgId in dialog) {
 				// console.log("DLG " + dlgId);
-				var dialogScript = scriptInterpreter.Parse( dialog[dlgId] );
+				var dialogScript = scriptInterpreter.Parse( script[dlgId].source );
 				var visitor = new ItemNameSwapVisitor();
 				dialogScript.VisitAll( visitor );
 				if( visitor.DidSwap() ) {
-					// console.log("SWAP!");
-					// console.log(dialog[dlgId]);
 					var newDialog = dialogScript.Serialize();
-					if(newDialog.indexOf("\n") > -1)
+					if(newDialog.indexOf("\n") > -1) {
 						newDialog = '"""\n' + newDialog + '\n"""';
-					dialog[dlgId] = newDialog;
-					// console.log(dialog[dlgId]);
+					}
+					script[dlgId].source = newDialog;
 				}
 			}
 		}
@@ -1923,18 +1921,15 @@ function convertGameDataToCurVersion(importVersion) {
 		};
 
 		for(dlgId in dialog) {
-			console.log("DLG " + dlgId);
-			var dialogScript = scriptInterpreter.Parse( dialog[dlgId] );
+			var dialogScript = scriptInterpreter.Parse( script[dlgId].source );
 			var visitor = new PrintFunctionVisitor();
 			dialogScript.VisitAll( visitor );
 			if( visitor.DidChange() ) {
-				console.log("CHANGE!");
-				console.log(dialog[dlgId]);
 				var newDialog = dialogScript.Serialize();
-				if(newDialog.indexOf("\n") > -1)
+				if(newDialog.indexOf("\n") > -1) {
 					newDialog = '"""\n' + newDialog + '\n"""';
-				dialog[dlgId] = newDialog;
-				console.log(dialog[dlgId]);
+				}
+				script[dlgId].source = newDialog;
 			}
 		}
 
@@ -3830,7 +3825,7 @@ function serializeAdvDialog() {
 	if( dialogStr.length <= 0 )
 	{
 		paintTool.getCurObject().dlg = null;
-		delete dialog[dialogId];
+		delete script[dialogId];
 	}
 	else
 	{
@@ -3845,7 +3840,7 @@ function serializeAdvDialog() {
 			paintTool.getCurObject().dlg = dialogId;
 		}
 
-		dialog[dialogId] = dialogStr; //TODO: do I need to do more here?
+		script[dialogId] = { type:ScriptType.Dialogue, source:dialogStr }; //TODO: do I need to do more here?
 	}
 
 	reloadDialogUICore();
@@ -4169,16 +4164,6 @@ function showInventoryVariable() {
 	document.getElementById("inventoryVariable").style.display = "block";
 }
 
-// function previewDialog() {
-// 	console.log("PREVIEW!");
-// 	var dialogId = getCurDialogId();
-// 	var dialogStr = dialog[dialogId];
-// 	on_play_mode();
-// 	updatePlayModeButton();
-// 	startNarrating( dialogStr );
-// 	// load_game(document.getElementById("game_data").value);
-// }
-
 var isPreviewDialogMode = false;
 var previewDialogScriptTree = null;
 function togglePreviewDialog(event) {
@@ -4242,16 +4227,16 @@ function on_change_language_inner(language) {
 	}
 
 	// update default sprite
-	var defaultSpriteDlgExists = dialog["SPR_0"] != null && localization.LocalizationContains("default_sprite_dlg", dialog["SPR_0"]);
+	var defaultSpriteDlgExists = script["SPR_0"] != null && localization.LocalizationContains("default_sprite_dlg", script["SPR_0"].source);
 	if (defaultSpriteDlgExists) {
-		dialog["SPR_0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
+		script["SPR_0"].source = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
 		paintTool.reloadDrawing();
 	}
 
 	// update default item
-	var defaultItemDlgExists = dialog["ITM_0"] != null && localization.LocalizationContains("default_item_dlg", dialog["ITM_0"]);
+	var defaultItemDlgExists = script["ITM_0"] != null && localization.LocalizationContains("default_item_dlg", script["ITM_0"].source);
 	if (defaultItemDlgExists) {
-		dialog["ITM_0"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
+		script["ITM_0"].source = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
 		paintTool.reloadDrawing(); // hacky to do this twice
 	}
 
