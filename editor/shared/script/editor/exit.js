@@ -4,7 +4,7 @@ X customize "marker 1" and "marker 2" names
 X add ending dialog
 X add script data type
 	- name is PRG (possible alternates are SC and SCR)
-- handle multi-line scripts in endings
+X handle multi-line scripts in endings
 - add effects
 - add exit options
 	- transition effect
@@ -311,8 +311,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			else if (curMarker.type == MarkerType.Ending) {
 				endingOptions.style.display = "block";
 				var endingText = document.getElementById("endingText");
-				console.log(curMarker.ending);
-				endingText.value = script[curMarker.ending.id].source;
+				var endingSource = script[curMarker.ending.id].source;
+				var endingStr = scriptUtils.RemoveDialogBlockFormat(endingSource);
+				endingText.value = endingStr;
 			}
 		}
 	}
@@ -632,7 +633,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	this.ChangeEndingText = function(text) {
 		if (curMarker != null && curMarker.type == MarkerType.Ending) {
-			script[curMarker.ending.id].source = text;
+			script[curMarker.ending.id].source = scriptUtils.EnsureDialogBlockFormat(text);
 			refreshGameData();
 		}
 	}

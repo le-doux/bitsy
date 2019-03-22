@@ -112,7 +112,7 @@ function nextAvailableDialogId(prefix) {
 	if(prefix === undefined || prefix === null) prefix = "";
 	var i = 0;
 	var id = prefix + i.toString(36);
-	while( dialog[id] != null ) {
+	while( script[id] != null ) {
 		i++;
 		id = prefix + i.toString(36);
 	}
@@ -282,26 +282,14 @@ function reloadDialogUI() {
 function reloadDialogUICore() { // TODO: name is terrible
 	var dialogId = getCurDialogId(); // hacky
 
-	if (dialogId in dialog) {
-		var dialogLines = dialog[dialogId].split("\n");
-		if(dialogLines[0] === '"""') {
-			// multi line
-			var dialogStr = "";
-			var i = 1;
-			while (i < dialogLines.length && dialogLines[i] != '"""') {
-				dialogStr += dialogLines[i] + (dialogLines[i+1] != '"""' ? '\n' : '');
-				i++;
-			}
-			document.getElementById("dialogText").value = dialogStr;
-		}
-		else {
-			// single line
-			document.getElementById("dialogText").value = dialog[dialogId];
-		}
+	if (dialogId in script) {
+		var dialogSource = script[dialogId].source;
+		var dialogStr = scriptUtils.RemoveDialogBlockFormat(dialogSource);
+		document.getElementById("dialogText").value = dialogStr;
 	}
 	else {
 		document.getElementById("dialogText").value = "";
-	}	
+	}
 }
 
 // hacky - assumes global paintTool object
@@ -322,7 +310,7 @@ function on_change_dialog() {
 	if(dialogStr.length <= 0){
 		if(dialogId) {
 			paintTool.getCurObject().dlg = null;
-			delete dialog[dialogId];
+			delete script[dialogId];
 		}
 	}
 	else {
@@ -331,8 +319,7 @@ function on_change_dialog() {
 			dialogId = nextAvailableDialogId( prefix );
 			paintTool.getCurObject().dlg = dialogId;
 		}
-		if( dialogStr.indexOf('\n') > -1 ) dialogStr = '"""\n' + dialogStr + '\n"""';
-		dialog[dialogId] = dialogStr;
+		script[dialogId].source = scriptUtils.EnsureDialogBlockFormat(dialogStr);
 	}
 
 	if( Ed().platform == PlatformType.Desktop )
@@ -463,8 +450,8 @@ function resetGameData() {
 
 	// TODO : localize default_title
 	title = localization.GetStringOrFallback("default_title", "Write your game's title here");
-	dialog["SPR_0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"); // hacky to do this in two places :(
-	dialog["ITM_0"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
+	script["SPR_0"].source = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"); // hacky to do this in two places :(
+	script["ITM_0"].source = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
 
 	pickDefaultFontForLanguage(localization.GetLanguage());
 

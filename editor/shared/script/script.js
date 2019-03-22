@@ -41,12 +41,6 @@ var Interpreter = function() {
 		parser = new Parser( env );
 	}
 
-	// TODO : move to utils?
-	// for reading in dialog from the larger file format
-	this.ReadDialogScript = function(lines, i) {
-		return parser.ReadDialogScript(lines,i);
-	}
-
 	this.Parse = function(scriptStr) { // parses a script but doesn't save it
 		return parser.Parse( scriptStr );
 	}
@@ -139,6 +133,52 @@ var Utils = function() {
 		var block = new BlockNode( BlockMode.Code );
 		block.AddChild( ifNode );
 		return block;
+	}
+
+	this.ReadDialogScript = function(lines, i) {
+		var scriptStr = "";
+		if (lines[i] === Sym.DialogOpen) {
+			scriptStr += lines[i] + "\n";
+			i++;
+			while(lines[i] != Sym.DialogClose) {
+				scriptStr += lines[i] + "\n";
+				i++;
+			}
+			scriptStr += lines[i];
+			i++;
+		}
+		else {
+			scriptStr += lines[i];
+		}
+		return { script:scriptStr, index:i };
+	}
+
+	// TODO this.ReadCodeScript (reads through code open and close symbols), and this.ReadScript
+
+	this.EnsureDialogBlockFormat = function(dialogStr) {
+		// TODO -- what if it's already enclosed in dialog symbols??
+		if(dialogStr.indexOf('\n') > -1) {
+			dialogStr = Sym.DialogOpen + "\n" + dialogStr + "\n" + Sym.DialogClose;
+		}
+		return dialogStr;
+	}
+
+	this.RemoveDialogBlockFormat = function(source) {
+		var sourceLines = source.split("\n");
+		var dialogStr = "";
+		if(sourceLines[0] === Sym.DialogOpen) {
+			// multi line
+			var i = 1;
+			while (i < sourceLines.length && sourceLines[i] != Sym.DialogClose) {
+				dialogStr += sourceLines[i] + (sourceLines[i+1] != Sym.DialogClose ? '\n' : '');
+				i++;
+			}
+		}
+		else {
+			// single line
+			dialogStr = source;
+		}
+		return dialogStr;
 	}
 }
 
@@ -965,26 +1005,6 @@ var Parser = function(env) {
 		// console.log( state.rootNode );
 		return state.rootNode;
 	};
-
-	this.ReadDialogScript = function(lines, i) {
-		var scriptStr = "";
-		if (lines[i] === Sym.DialogOpen) {
-			scriptStr += lines[i] + "\n";
-			i++;
-			while(lines[i] != Sym.DialogClose) {
-				scriptStr += lines[i] + "\n";
-				i++;
-			}
-			scriptStr += lines[i];
-			i++;
-		}
-		else {
-			scriptStr += lines[i];
-		}
-		return { script:scriptStr, index:i };
-	}
-
-	// TODO this.ReadCodeScript (reads through code open and close symbols), and this.ReadScript
 
 	var ParserState = function( rootNode, str ) {
 		this.rootNode = rootNode;

@@ -1893,7 +1893,7 @@ function parseScript(lines, i, scriptType) {
 	var id = getId(lines[i]);
 	i++;
 
-	var results = scriptInterpreter.ReadDialogScript(lines,i);
+	var results = scriptUtils.ReadDialogScript(lines,i);
 	script[id] = {
 		source: results.script,
 		type: scriptType,
