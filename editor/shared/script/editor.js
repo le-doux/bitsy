@@ -981,6 +981,7 @@ function newRoom() {
 		walls : [],
 		exits : [],
 		endings : [],
+		effects : [],
 		pal : "0",
 		items : []
 	};

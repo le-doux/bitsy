@@ -931,6 +931,7 @@ function movePlayer(direction) {
 	
 	var ext = getExit( player().room, player().x, player().y );
 	var end = getEnding( player().room, player().x, player().y );
+	var eff = getEffect( player().room, player().x, player().y );
 	var itmIndex = getItemIndex( player().room, player().x, player().y );
 
 	// do items first, because you can pick up an item AND go through a door
@@ -959,6 +960,9 @@ function movePlayer(direction) {
 	}
 	else if (ext) {
 		movePlayerThroughExit(ext);
+	}
+	else if (eff) {
+		startDialog( script[eff.id].source, eff.id );
 	}
 	else if (spr) {
 		startSpriteDialog( spr /*spriteId*/ );
@@ -1077,6 +1081,16 @@ function getExit(roomId,x,y) {
 function getEnding(roomId,x,y) {
 	for (i in room[roomId].endings) {
 		var e = room[roomId].endings[i];
+		if (x == e.x && y == e.y) {
+			return e;
+		}
+	}
+	return null;
+}
+
+function getEffect(roomId,x,y) {
+	for (i in room[roomId].effects) {
+		var e = room[roomId].effects[i];
 		if (x == e.x && y == e.y) {
 			return e;
 		}
@@ -1306,6 +1320,14 @@ function serializeWorld(skipFonts) {
 				worldStr += "\n";
 			}
 		}
+		if (room[id].effects.length > 0) {
+			/* EFFECTS */
+			for (j in room[id].effects) {
+				var e = room[id].effects[j];
+				worldStr += "EFF " + e.id + " " + e.x + "," + e.y;
+				worldStr += "\n";
+			}
+		}
 		if (room[id].pal != null) {
 			/* PALETTE */
 			worldStr += "PAL " + room[id].pal + "\n";
@@ -1468,6 +1490,7 @@ function parseRoom(lines, i) {
 		walls : [],
 		exits : [],
 		endings : [],
+		effects : [],
 		items : [],
 		pal : null,
 		name : null
@@ -1596,6 +1619,17 @@ function parseRoom(lines, i) {
 				y : parseInt( endCoords[1] )
 			};
 			room[id].endings.push(end);
+		}
+		else if (getType(lines[i]) === "EFF") {
+			/* ADD EFFECT */
+			var effectId = getId( lines[i] );
+			var effectCoords = getCoord( lines[i], 2 );
+			var effect = {
+				id : effectId,
+				x : parseInt( effectCoords[0] ),
+				y : parseInt( effectCoords[1] ),
+			};
+			room[id].effects.push(effect);
 		}
 		else if (getType(lines[i]) === "PAL") {
 			/* CHOOSE PALETTE (that's not default) */
