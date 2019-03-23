@@ -119,6 +119,47 @@ function nextAvailableDialogId(prefix) {
 	return id;
 }
 
+/* NEW HEX ID SYSTEM HELPERS */
+function nextScriptHexId() {
+	return nextObjectHexId( sortedScriptHexIdList() );
+}
+
+function sortedScriptHexIdList() {
+	return sortedHexIdList( script );
+}
+
+function nextObjectHexId(idList) {
+	if (idList.length <= 0) {
+		return "0";
+	}
+
+	var lastId = idList[ idList.length - 1 ];
+	var idInt = safeParseHex(lastId);
+	idInt++;
+	return idInt.toString(16);
+}
+
+function sortedHexIdList(objHolder) {
+	var objectKeys = Object.keys(objHolder);
+
+	var hexSortFunc = function(key1,key2) {
+		return safeParseHex(key1,16) - safeParseHex(key2,16);
+	};
+	var hexSortedIds = objectKeys.sort(hexSortFunc);
+
+	return hexSortedIds;
+}
+
+function safeParseHex(str) {
+	var hexInt = parseInt(str,16);
+	if (hexInt == undefined || hexInt == null || isNaN(hexInt)) {
+		return -1;
+	}
+	else {
+		return hexInt;
+	}
+}
+
 /* UTILS */
 function getContrastingColor(palId) {
 	if (!palId) palId = curPal();
@@ -482,8 +523,9 @@ function resetGameData() {
 }
 
 function refreshGameData() {
-	if( Ed().platform == PlatformType.Desktop )
+	if( Ed().platform == PlatformType.Desktop ) {
 		if (isPlayMode) return; //never store game data while in playmode (TODO: wouldn't be necessary if the game data was decoupled form editor data)
+	}
 
 	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
 

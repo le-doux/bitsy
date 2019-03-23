@@ -85,14 +85,13 @@ function clearGameData() {
 	tile = {};
 	sprite = {};
 	item = {};
-	dialog = {};
+	script = {};
 	palette = { //start off with a default palette (can be overriden)
 		"0" : {
 			name : null,
 			colors : [[0,0,0],[255,0,0],[255,255,255]]
 		}
 	};
-	ending = {};
 	isEnding = false; //todo - correct place for this?
 	variable = {};
 

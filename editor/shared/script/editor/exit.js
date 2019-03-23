@@ -6,8 +6,10 @@ X add script data type
 	- name is PRG (possible alternates are SC and SCR)
 X handle multi-line scripts in endings
 X add effects
-- new ID system for scripts (then everything else)
-- bug: delete associated scripts when you delete the marker!
+X new ID system for scripts (then everything else)
+X bug: delete associated scripts when you delete the marker!
+	- also do endings!
+- bug: markers don't clear when game is reset (what about game data? I don't think so!)
 - update "moving" text?
 - add exit options
 	- transition effect
@@ -180,7 +182,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var newEnding = {
 			x : 0,
 			y : 0,
-			id : nextEndingId(),
+			id : nextScriptHexId(),
 		};
 		room[selectedRoom].endings.push( newEnding );
 		script[ newEnding.id ] = { type: ScriptType.Ending, source: "the end" };
@@ -194,7 +196,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var newEffect = {
 			x : 0,
 			y : 0,
-			id : nextEndingId(), // TODO : need nextScriptId()
+			id : nextScriptHexId(),
 		};
 		room[selectedRoom].effects.push( newEffect );
 		script[ newEffect.id ] = { type: ScriptType.Script, source: "" }; // TODO : default effect?
@@ -1140,6 +1142,7 @@ function EndingMarker(parentRoom, ending) {
 	}
 
 	this.Remove = function() {
+		delete script[this.ending.id];
 		var endingIndex = room[this.parentRoom].endings.indexOf(this.ending);
 		room[this.parentRoom].endings.splice(endingIndex,1);
 	}
@@ -1197,6 +1200,7 @@ function EffectMarker(parentRoom, effect) {
 	}
 
 	this.Remove = function() {
+		delete script[this.effect.id];
 		var effectIndex = room[this.parentRoom].effects.indexOf(this.effect);
 		room[this.parentRoom].effects.splice(effectIndex,1);
 	}
