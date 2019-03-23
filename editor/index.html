@@ -106,7 +106,8 @@
 				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanelAnimated(event);" />
 				<label title="show / hide exits window" for="exitsCheck" class="notMobile">
 					<i class="material-icons">directions</i>
-					<span class="localize exits_tool_name">exits</span>
+					<!-- <span class="localize exits_tool_name">exits</span> -->
+					<span>room effects</span> <!-- TODO localize -->
 				</label>
 
 				<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanelAnimated(event);"  checked/>
@@ -454,6 +455,16 @@
 									<i class="material-icons">remove_circle</i>
 								</button>
 							</div>
+
+							<div id="roomColor" class="buttonGroup">
+								<span class="localize palette_tool_name">colors</span>: 
+								<select title="select color palette for room" id="roomPaletteSelect" onchange="roomPaletteChange(event);">
+									<option value="0">palette 0</option> <!-- other options are added dynamically -->
+								</select>
+							</div>
+
+							<br>
+
 							<div id="roomVisibility" class="buttonGroup">
 								<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
 								<label title="show / hide grid" for="roomGridCheck">
@@ -466,22 +477,20 @@
 									<i class="material-icons" id="roomWallsIcon">visibility_off</i> 
 									<span class="localize walls_toggle_visible">walls</span>
 								</label>
-							</div>
 
-							<br>
+								<input type="checkbox" id="roomEffectsCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
+								<label title="show / hide effects" for="roomEffectsCheck">
+									<i class="material-icons" id="roomEffectsIcon">visibility</i> 
+									<span>effects</span> <!-- TODO localize -->
+								</label>
+							</div>
 
 							<div id="roomExits" class="buttonGroup">
-								<button title="add exits from this room to other rooms" class="color0" onclick="showPanel('exitsPanel');">
+								<button title="add room effects" class="color0" onclick="showPanel('exitsPanel');">
 									<i class="material-icons">open_in_new</i>
-									<span class="localize room_add_exits">add exits</span>
+									<!-- <span class="localize room_add_exits">add exits</span> -->
+									<span>add exits, endings, and effects</span> <!-- TODO localize -->
 								</button>
-							</div>
-
-							<div id="roomColor" class="buttonGroup">
-								<span class="localize palette_tool_name">colors</span>: 
-								<select title="select color palette for room" id="roomPaletteSelect" onchange="roomPaletteChange(event);">
-									<option value="0">palette 0</option> <!-- other options are added dynamically -->
-								</select>
 							</div>
 						</div>
 
@@ -499,7 +508,8 @@
 
 						<div title="exits window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<i class="material-icons">directions</i> 
-							<span class="localize exits_tool_name">exits</span>
+							<!-- <span class="localize exits_tool_name">exits</span> -->
+							<span>room effects</span> <!-- TODO localize -->
 						</div>
 					</div>
 					<div id="exitsPanelContent">
@@ -571,7 +581,7 @@
 									<i class="material-icons">add</i> exit
 								</button>
 								<button title="add ending" class="color0" onclick="newEnding();">
-									<i class="material-icons">add</i> end
+									<i class="material-icons">add</i> ending
 								</button>
 								<button title="add scripted effect" class="color0" onclick="newEffect();">
 									<i class="material-icons">add</i> effect

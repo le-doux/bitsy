@@ -1659,6 +1659,7 @@ function roomPaletteChange(event) {
 	var palId = event.target.value;
 	room[curRoom].pal = palId;
 	refreshGameData();
+	markerTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
@@ -2220,14 +2221,22 @@ function onEffectTextChange(event) {
 }
 
 function showMarkers() {
-	markerTool.Refresh();
-	roomTool.areMarkersVisible = true;
-	roomTool.drawEditMap();
+	toggleRoomMarkers(true);
 }
 
 function hideMarkers() {
-	roomTool.areMarkersVisible = false;
+	toggleRoomMarkers(false);
+}
+
+function toggleRoomMarkers(visible) {
+	console.log(visible);
+	if (visible) {
+		markerTool.Refresh();
+	}
+	roomTool.areMarkersVisible = visible;
 	roomTool.drawEditMap();
+	document.getElementById("roomEffectsCheck").checked = visible;
+	document.getElementById("roomEffectsIcon").innerHTML = visible ? "visibility" : "visibility_off";
 }
 
 function togglePanelAnimated(e) {
@@ -2282,8 +2291,9 @@ function togglePanelCore(id,visible,doUpdatePrefs=true) {
 	afterTogglePanel( id, visible );
 	//save panel preferences
 	// savePanelPref( id, visible );
-	if(doUpdatePrefs)
+	if(doUpdatePrefs) {
 		updatePanelPrefs();
+	}
 }
 
 function togglePanelUI(id,visible) {

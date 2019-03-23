@@ -11,7 +11,8 @@ X bug: delete associated scripts when you delete the marker!
 	- also do endings!
 X bug: markers don't clear when game is reset (what about game data? I don't think so!)
 X better exit placement
-- update "moving" text + add dropdowns?
+X update "moving" text
+X show / hide effects
 - add exit options
 	- transition effect
 	- lock
