@@ -10,6 +10,7 @@ X new ID system for scripts (then everything else)
 X bug: delete associated scripts when you delete the marker!
 	- also do endings!
 X bug: markers don't clear when game is reset (what about game data? I don't think so!)
+X better exit placement
 - update "moving" text?
 - add exit options
 	- transition effect
@@ -152,14 +153,24 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	this.AddExit = function() { // TODO : make destination select smarter
+		var roomIds = Object.keys(room);
+		var roomIndex = roomIds.indexOf(selectedRoom);
+		if (roomIds.length > 1) {
+			roomIndex++;
+			if (roomIndex >= roomIds.length) {
+				roomIndex = 0;
+			}
+		}
+		var nextRoomId = roomIds[roomIndex];
+
 		// console.log(room);
 		var newExit = {
-			x : 0,
-			y : 0,
+			x : 2,
+			y : 2,
 			dest : { // start with valid destination so you can't accidentally uncreate exits
-				room : "0",
-				x : 15,
-				y : 15
+				room : nextRoomId,
+				x : 13,
+				y : 13
 			}
 		}
 		room[selectedRoom].exits.push( newExit );
@@ -182,8 +193,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	this.AddEnding = function() {
 		var newEnding = {
-			x : 0,
-			y : 0,
+			x : 2,
+			y : 2,
 			id : nextScriptHexId(),
 		};
 		room[selectedRoom].endings.push( newEnding );
@@ -196,8 +207,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	this.AddEffect = function() {
 		var newEffect = {
-			x : 0,
-			y : 0,
+			x : 2,
+			y : 2,
 			id : nextScriptHexId(),
 		};
 		room[selectedRoom].effects.push( newEffect );
