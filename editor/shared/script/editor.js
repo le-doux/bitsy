@@ -515,8 +515,9 @@ function start() {
 		head.appendChild(link);
 	}
 
-	if(Ed().platform === PlatformType.Desktop)
+	if(Ed().platform === PlatformType.Desktop) {
 		detectBrowserFeatures();
+	}
 
 	readUrlFlags();
 
@@ -549,6 +550,8 @@ function start() {
 	// //exit events
 	// exit_canvas.addEventListener("mousedown", exit_onMouseDown);
 	markerTool = new RoomMarkerTool(document.getElementById("markerCanvas1"), document.getElementById("markerCanvas2") );
+	console.log("MARKER TOOL " + markerTool);
+
 	roomTool.markers = markerTool;
 
 	//
@@ -556,7 +559,6 @@ function start() {
 	drawingThumbnailCanvas.width = 8 * scale;
 	drawingThumbnailCanvas.height = 8 * scale;
 	drawingThumbnailCtx = drawingThumbnailCanvas.getContext("2d");
-
 
 	//load last auto-save
 	if (localStorage.game_data) {
@@ -724,19 +726,23 @@ function updateRoomName() {
 	// document.getElementById("roomId").innerHTML = curRoom;
 	var roomLabel = localization.GetStringOrFallback("room_label", "room");
 	document.getElementById("roomName").placeholder = roomLabel + " " + curRoom;
-	if(room[curRoom].name != null)
+	if(room[curRoom].name != null) {
 		document.getElementById("roomName").value = room[curRoom].name;
-	else
+	}
+	else {
 		document.getElementById("roomName").value = "";
+	}
 }
 
 // TODO : consolidate these function and rename them something nicer
 function on_room_name_change() {
 	var str = document.getElementById("roomName").value;
-	if(str.length > 0)
+	if(str.length > 0) {
 		room[curRoom].name = str;
-	else
+	}
+	else {
 		room[curRoom].name = null;
+	}
 
 	updateNamesFromCurData()
 

@@ -11,7 +11,7 @@ X bug: delete associated scripts when you delete the marker!
 	- also do endings!
 X bug: markers don't clear when game is reset (what about game data? I don't think so!)
 X better exit placement
-- update "moving" text?
+- update "moving" text + add dropdowns?
 - add exit options
 	- transition effect
 	- lock
@@ -138,7 +138,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	var placementMode = PlacementMode.None;
 
-	UpdatePlacementButtons();
+	// UpdatePlacementButtons();
 
 	function SelectMarker(marker) {
 		console.log("SELECT MARKER!!! " + marker);
@@ -148,6 +148,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// if (curMarker != null) {
 		// 	curMarker.OnSelect(); // TODO : on-deselect also???
 		// }
+
+		placementMode = PlacementMode.None;
 
 		RenderMarkerSelection();
 	}
@@ -253,20 +255,22 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	function RenderMarkerSelection() { // TODO - break this up???
-		var markerControl1 = document.getElementById("markerControl1");
-		var markerControl2 = document.getElementById("markerControl2");
-		var markerLinkControl = document.getElementById("markerLinkControl");
+		var markersSelect = document.getElementById("markersSelect");
 		var noMarkerMessage = document.getElementById("noMarkerMessage");
-		markerControl1.style.display = "none";
-		markerControl2.style.display = "none";
-		markerLinkControl.style.display = "none";
+		markersSelect.style.display = "none";
 		noMarkerMessage.style.display = "none";
 
+		var markerControl1 = document.getElementById("markerControl1");
+		var markerControl2 = document.getElementById("markerControl2");
+		markerControl1.style.visibility = "hidden";
+		markerControl2.style.visibility = "hidden";
+
 		if (curMarker != null) {
+			markersSelect.style.display = "flex";
 			var w = tilesize * scale;
 			if (curMarker.MarkerCount() == 2) {
-				markerControl1.style.display = "flex";
-				markerControl2.style.display = "flex";
+				markerControl1.style.visibility = "visible";
+				markerControl2.style.visibility = "visible";
 
 				var startPos = curMarker.GetMarkerPos(0);
 				var endPos = curMarker.GetMarkerPos(1);
@@ -285,7 +289,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				markerCtx2.fillRect((endPos.x * w) - (w * 0.5), (endPos.y * w) - (w * 0.5), w * 2, w * 2);
 			}
 			else if (curMarker.MarkerCount() == 1) {
-				markerControl1.style.display = "flex";
+				markerControl1.style.visibility = "visible";
 
 				var markerPos = curMarker.GetMarkerPos(0);
 
@@ -296,12 +300,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				markerCtx1.fillRect((markerPos.x * w) - (w * 0.5), (markerPos.y * w) - (w * 0.5), w * 2, w * 2);
 			}
 
-			if (curMarker.type == MarkerType.Exit) {
-				markerLinkControl.style.display = "inline-block";
-				// just tacking this on here to make sure it updates
-				UpdateExitDirectionUI();
-			}
-
 			UpdateMarkerNames();
 		}
 		else {
@@ -309,6 +307,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 
 		UpdateMarkerOptions();
+		UpdatePlacementButtons();
+		UpdateExitDirectionUI();
 	}
 
 	function UpdateMarkerNames() {
@@ -447,29 +447,56 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
+	function GetPosString(markerPos) {
+		var roomName = room[markerPos.room].name;
+		if (roomName == undefined || roomName == null) {
+			roomName = "room " + markerPos.room; // TODO localize
+		}
+		return roomName + " (" + markerPos.x + "," + markerPos.y + ")";
+	}
+
 	function UpdatePlacementButtons() {
+		if (curMarker == null) {
+			return;
+		}
+
+		var markerPos1 = curMarker.GetMarkerPos(0);
+		var markerPos2 = curMarker.GetMarkerPos(1);
+
 		// hackily relies on global UI names oh well D:
 		if (placementMode == PlacementMode.FirstMarker) {
 			document.getElementById("toggleMoveMarker1").checked = true;
 			document.getElementById("textMoveMarker1").innerText = "moving"; // TODO localize
 			document.getElementById("cancelMoveMarker1").style.display = "inline";
+			document.getElementById("textMoveMessage1").style.display = "inline";
+			document.getElementById("textMarkerPos1").style.display = "none";
 		}
 		else {
+			// var markerPos1 = curMarker.GetMarkerPos(0);
 			document.getElementById("toggleMoveMarker1").checked = false;
-			document.getElementById("textMoveMarker1").innerText = "move"; // TODO localize
+			document.getElementById("textMoveMarker1").innerText = "move"; // TODO localize// GetPosString(markerPos1);
 			document.getElementById("cancelMoveMarker1").style.display = "none";
+			document.getElementById("textMoveMessage1").style.display = "none";
+			document.getElementById("textMarkerPos1").style.display = "inline";
 		}
 
 		if (placementMode == PlacementMode.SecondMarker) {
 			document.getElementById("toggleMoveMarker2").checked = true;
 			document.getElementById("textMoveMarker2").innerText = "moving"; // TODO localize
 			document.getElementById("cancelMoveMarker2").style.display = "inline";
+			document.getElementById("textMoveMessage2").style.display = "inline";
+			document.getElementById("textMarkerPos2").style.display = "none";
 		}
 		else {
 			document.getElementById("toggleMoveMarker2").checked = false;
-			document.getElementById("textMoveMarker2").innerText = "move"; // TODO localize
+			document.getElementById("textMoveMarker2").innerText = "move"; // TODO localize // GetPosString(markerPos2);
 			document.getElementById("cancelMoveMarker2").style.display = "none";
+			document.getElementById("textMoveMessage2").style.display = "none";
+			document.getElementById("textMarkerPos2").style.display = "inline";
 		}
+
+		document.getElementById("textMarkerPos1").innerText = GetPosString(markerPos1);
+		document.getElementById("textMarkerPos2").innerText = GetPosString(markerPos2);
 
 		// TODO : this behaves oddly... change??
 		// if (placementMode == PlacementMode.None) {
@@ -672,7 +699,13 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	function UpdateExitDirectionUI() {
 		//hacky globals again
-		if (curMarker != null) {
+		if (curMarker == null || curMarker.type != MarkerType.Exit) {
+			document.getElementById("markerLinkControl").style.visibility = "hidden";
+			document.getElementById("exitDirectionBackIcon").style.visibility = "hidden";
+			document.getElementById("exitDirectionForwardIcon").style.visibility = "hidden";
+		}
+		else {
+			document.getElementById("markerLinkControl").style.visibility = "visible";
 			if (curMarker.linkState == LinkState.TwoWay) {
 				document.getElementById("exitDirectionBackIcon").style.visibility = "visible";
 				document.getElementById("exitDirectionForwardIcon").style.visibility = "visible";
@@ -1146,14 +1179,11 @@ function EndingMarker(parentRoom, ending) {
 	}
 
 	this.GetMarkerPos = function(markerIndex) {
-		if (markerIndex == 0) {
-			return {
-				room : this.parentRoom,
-				x : this.ending.x,
-				y : this.ending.y,
-			};
-		}
-		return null;
+		return {
+			room : this.parentRoom,
+			x : this.ending.x,
+			y : this.ending.y,
+		};
 	}
 
 	this.Remove = function() {

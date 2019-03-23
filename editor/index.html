@@ -509,7 +509,7 @@
 						<div id="markersSelect" style="display: flex;">
 							<div id="markerControl1" class="controlBox" style="display: flex; flex-direction: column;">
 								<span id="markerName1" style="font-size: 14px; line-height: 12px;">marker 1</span>
-								<canvas id="markerCanvas1" style="width:100px; height:100px;" onclick="selectMarkerRoom1();"></canvas>
+								<canvas id="markerCanvas1" style="width:114px; height:114px;" onclick="selectMarkerRoom1();"></canvas>
 								<div style="margin-top: 4px;">
 									<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
 									<label for="toggleMoveMarker1">
@@ -519,17 +519,23 @@
 									<button id="cancelMoveMarker1" onclick="cancelMoveMarker1();">
 										<i class="material-icons">cancel</i>
 									</button>
+									<div>
+										<span id="textMarkerPos1" style="font-size: 12px;">room 0 (0,0)</span>
+									</div>
+									<div>
+										<span id="textMoveMessage1" style="font-size: 12px;"><i>click in room</i></span>
+									</div>
 								</div>
 							</div>
 							<div id="markerLinkControl" style="padding-left: 5px; padding-right: 5px; display:inline-block;">
-								<button title="change direction" onclick="changeExitDirection();" style="margin-top: 50px;">
+								<button title="change direction" onclick="changeExitDirection();" style="margin-top: 70px;">
 									<i class="material-icons" id="exitDirectionBackIcon">arrow_back</i>
 									<i class="material-icons" id="exitDirectionForwardIcon">arrow_forward</i>
 								</button>
 							</div>
 							<div id="markerControl2" class="controlBox" style="display: flex; flex-direction: column;">
 								<span id="markerName2" style="font-size: 14px; line-height: 12px;">marker 2</span>
-								<canvas id="markerCanvas2" style="width:100px; height:100px;" onclick="selectMarkerRoom2();"></canvas>
+								<canvas id="markerCanvas2" style="width:114px; height:114px;" onclick="selectMarkerRoom2();"></canvas>
 								<div style="margin-top: 4px;">
 									<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" />
 									<label for="toggleMoveMarker2">
@@ -539,6 +545,12 @@
 									<button id="cancelMoveMarker2" onclick="cancelMoveMarker2();">
 										<i class="material-icons">cancel</i>
 									</button>
+									<div>
+										<span id="textMarkerPos2" style="font-size: 12px;">room 0 (0,0)</span>
+									</div>
+									<div>
+										<span id="textMoveMessage2" style="font-size: 12px;"><i>click in room</i></span>
+									</div>
 								</div>
 							</div>
 						</div>
