@@ -5,9 +5,10 @@ X add ending dialog
 X add script data type
 	- name is PRG (possible alternates are SC and SCR)
 X handle multi-line scripts in endings
-- add effects
+X add effects
 - new ID system for scripts (then everything else)
 - bug: delete associated scripts when you delete the marker!
+- update "moving" text?
 - add exit options
 	- transition effect
 	- lock
@@ -314,6 +315,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		else if (curMarker.type == MarkerType.Ending) {
 			markerName1.innerText = "ending"; // TODO localize
 		}
+		else if (curMarker.type == MarkerType.Effect) {
+			markerName1.innerText = "effect"; // TODO localize
+		}
 	}
 
 	function UpdateMarkerOptions() {
@@ -325,7 +329,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		if (curMarker != null) {
 			if (curMarker.type == MarkerType.Exit) {
-
+				// TODO
 			}
 			else if (curMarker.type == MarkerType.Ending) {
 				endingOptions.style.display = "block";
