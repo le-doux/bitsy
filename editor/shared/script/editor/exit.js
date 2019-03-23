@@ -9,7 +9,7 @@ X add effects
 X new ID system for scripts (then everything else)
 X bug: delete associated scripts when you delete the marker!
 	- also do endings!
-- bug: markers don't clear when game is reset (what about game data? I don't think so!)
+X bug: markers don't clear when game is reset (what about game data? I don't think so!)
 - update "moving" text?
 - add exit options
 	- transition effect
@@ -17,7 +17,7 @@ X bug: delete associated scripts when you delete the marker!
 	- dialog
 	- customize?
 - rename exit tool and exit.js
-- need to re-render exits on palette change
+X need to re-render exits on palette change
 - update panel prefs for v6.0
 - localization
 - rename dialog -> dialogue?
@@ -140,6 +140,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	UpdatePlacementButtons();
 
 	function SelectMarker(marker) {
+		console.log("SELECT MARKER!!! " + marker);
+
 		curMarker = marker;
 
 		// if (curMarker != null) {
@@ -212,11 +214,12 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	this.Refresh = function() { // TODO: rename "Reset"???
+		console.log("REFRESH MARKER");
 		SelectMarker(null);
 		ResetMarkerList();
 	}
 
-	function ResetMarkerList() {
+	function ResetMarkerList() { // TODO : account for when it doesn't exist in parent room either!
 		markerList = GatherMarkerList();
 
 		if (curMarker != null) {
@@ -228,6 +231,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				// if there is a duplicate.. replace it with the carry-over marker
 				markerList[markerList.indexOf(duplicate)] = curMarker;
 			}
+			SelectMarker(curMarker); // refresh UI and so on
 		}
 		else {
 			if (markerList.length > 0) {

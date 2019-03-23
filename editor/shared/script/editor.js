@@ -598,6 +598,7 @@ function start() {
 	//draw everything
 	on_paint_avatar();
 	paintTool.updateCanvas();
+	markerTool.Refresh();
 	roomTool.drawEditMap();
 
 	updateRoomPaletteSelect(); //dumb to have to specify this here --- wrap up room UI method?
@@ -1577,6 +1578,7 @@ function onPaletteChange() {
 	renderer.SetPalettes(palette);
 
 	paintTool.updateCanvas();
+	markerTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 	if( paintTool.isCurDrawingAnimated )
@@ -2034,7 +2036,7 @@ function on_game_data_change_core() {
 
 	updateFontSelectUI();
 
-	// updateExitOptionsFromGameData();
+	markerTool.SetRoom(curRoom);
 
 	document.getElementById("titleText").value = title;
 }
