@@ -2154,6 +2154,11 @@ function newEnding() {
 	roomTool.drawEditMap();
 }
 
+function newEffect() {
+	markerTool.AddEffect();
+	roomTool.drawEditMap();
+}
+
 function deleteMarker() {
 	markerTool.RemoveMarker();
 	roomTool.drawEditMap();
@@ -2200,6 +2205,10 @@ function changeExitDirection() {
 
 function onEndingTextChange(event) {
 	markerTool.ChangeEndingText(event.target.value);
+}
+
+function onEffectTextChange(event) {
+	markerTool.ChangeEffectText(event.target.value);
 }
 
 function showMarkers() {

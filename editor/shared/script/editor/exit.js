@@ -6,6 +6,8 @@ X add script data type
 	- name is PRG (possible alternates are SC and SCR)
 X handle multi-line scripts in endings
 - add effects
+- new ID system for scripts (then everything else)
+- bug: delete associated scripts when you delete the marker!
 - add exit options
 	- transition effect
 	- lock
@@ -187,6 +189,20 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		refreshGameData();
 	}
 
+	this.AddEffect = function() {
+		var newEffect = {
+			x : 0,
+			y : 0,
+			id : nextEndingId(), // TODO : need nextScriptId()
+		};
+		room[selectedRoom].effects.push( newEffect );
+		script[ newEffect.id ] = { type: ScriptType.Script, source: "" }; // TODO : default effect?
+
+		markerList = GatherMarkerList();
+		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Effect && m.effect == newEffect; }));
+		refreshGameData();
+	}
+
 	this.SetRoom = function(roomId) {
 		selectedRoom = roomId;
 		ResetMarkerList();
@@ -269,12 +285,12 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 
 			UpdateMarkerNames();
-
-			UpdateMarkerOptions();
 		}
 		else {
 			noMarkerMessage.style.display = "inline-block";
 		}
+
+		UpdateMarkerOptions();
 	}
 
 	function UpdateMarkerNames() {
@@ -304,6 +320,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var endingOptions = document.getElementById("endingOptions");
 		endingOptions.style.display = "none";
 
+		var effectOptions = document.getElementById("effectOptions");
+		effectOptions.style.display = "none";
+
 		if (curMarker != null) {
 			if (curMarker.type == MarkerType.Exit) {
 
@@ -314,6 +333,13 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				var endingSource = script[curMarker.ending.id].source;
 				var endingStr = scriptUtils.RemoveDialogBlockFormat(endingSource);
 				endingText.value = endingStr;
+			}
+			else if (curMarker.type == MarkerType.Effect) {
+				effectOptions.style.display = "block";
+				var effectText = document.getElementById("effectText");
+				var effectSource = script[curMarker.effect.id].source;
+				var effectStr = scriptUtils.RemoveDialogBlockFormat(effectSource);
+				effectText.value = effectStr;
 			}
 		}
 	}
@@ -562,6 +588,16 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				);
 		}
 
+		for (var e in room[selectedRoom].effects) {
+			var effect = room[selectedRoom].effects[e];
+
+			markerList.push(
+				new EffectMarker(
+					selectedRoom,
+					effect)
+				);
+		}
+
 		return markerList;
 	}
 
@@ -637,13 +673,19 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			refreshGameData();
 		}
 	}
+
+	this.ChangeEffectText = function(text) {
+		if (curMarker != null && curMarker.type == MarkerType.Effect) {
+			script[curMarker.effect.id].source = scriptUtils.EnsureDialogBlockFormat(text);
+			refreshGameData();
+		}
+	}
 } // ExitTool
 
-// required if I'm using inheritance?
-var MarkerType = {
+var MarkerType = { // TODO : I should probably find a way to get rid of this
 	Exit : 0,
 	Ending : 1,
-	Effect: 2, // TODO : implement this
+	Effect: 2,
 };
 
 var PlacementMode = {
@@ -653,7 +695,7 @@ var PlacementMode = {
 };
 
 // TODO if this proves useful.. move into a shared file
-function InitObj(obj, parent) {
+function InitMarkerObj(obj, parent) {
 	Object.assign(obj, parent);
 	obj.self = obj;
 	obj.base = parent;
@@ -662,7 +704,7 @@ function InitObj(obj, parent) {
 function RoomMarkerBase(parentRoom) {
 	this.parentRoom = parentRoom;
 
-	this.Draw = function(ctx,x,y,w,selected) {
+	this.DrawMarker = function(ctx,x,y,w,selected) {
 		ctx.fillStyle = getContrastingColor();
 		ctx.strokeStyle = getContrastingColor();
 
@@ -680,6 +722,8 @@ function RoomMarkerBase(parentRoom) {
 		}
 	}
 
+	this.Draw = function(ctx,roomId,w,selected) {}
+
 	this.IsAtLocation = function(roomId,x,y) {
 		return false;
 	}
@@ -693,10 +737,10 @@ function RoomMarkerBase(parentRoom) {
 	this.PlaceMarker = function(placementMode,roomId,x,y) {}
 
 	this.MarkerCount = function() {
-		return 0;
+		return 1;
 	}
 
-	this.GetMarkerPos = function(markerIndex) { // TODO : use this to make the base Draw() smarter??
+	this.GetMarkerPos = function(markerIndex) {
 		return null;
 	}
 
@@ -717,7 +761,7 @@ var LinkState = {
 };
 
 function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
-	InitObj( this, new RoomMarkerBase(parentRoom) );
+	InitMarkerObj( this, new RoomMarkerBase(parentRoom) );
 
 	this.type = MarkerType.Exit;
 
@@ -727,11 +771,8 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 	this.linkState = linkState;
 
 	this.Draw = function(ctx,roomId,w,selected) {
-		console.log("TEST CHILD");
-		// this.base.Draw(ctx, this.exit.x, this.exit.y, w, selected);
-
 		if (this.parentRoom === roomId) {
-			this.base.Draw(ctx, this.exit.x, this.exit.y, w, selected);
+			this.base.DrawMarker(ctx, this.exit.x, this.exit.y, w, selected);
 
 			if (this.hasReturn) {
 				DrawTwoWayExit(ctx, this.exit.x, this.exit.y, w);
@@ -742,7 +783,7 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 		}
 
 		if (this.exit.dest.room === roomId) {
-			this.base.Draw(ctx, this.exit.dest.x, this.exit.dest.y, w, selected);
+			this.base.DrawMarker(ctx, this.exit.dest.x, this.exit.dest.y, w, selected);
 
 			if (this.hasReturn) {
 				DrawTwoWayExit(ctx, this.exit.dest.x, this.exit.dest.y, w);
@@ -1021,7 +1062,7 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 }
 
 function EndingMarker(parentRoom, ending) {
-	InitObj( this, new RoomMarkerBase(parentRoom) );
+	InitMarkerObj( this, new RoomMarkerBase(parentRoom) );
 
 	this.type = MarkerType.Ending;
 
@@ -1029,7 +1070,7 @@ function EndingMarker(parentRoom, ending) {
 
 	this.Draw = function(ctx,roomId,w,selected) {
 		if (this.parentRoom === roomId) {
-			this.base.Draw(ctx, this.ending.x, this.ending.y, w, selected);
+			this.base.DrawMarker(ctx, this.ending.x, this.ending.y, w, selected);
 			DrawEnding(ctx, this.ending.x, this.ending.y, w);
 		}
 	}
@@ -1083,10 +1124,6 @@ function EndingMarker(parentRoom, ending) {
 		}
 	}
 
-	this.MarkerCount = function() {
-		return 1;
-	}
-
 	this.GetMarkerPos = function(markerIndex) {
 		if (markerIndex == 0) {
 			return {
@@ -1108,4 +1145,71 @@ function EndingMarker(parentRoom, ending) {
 	}
 
 	// this.OnSelect = function() {} // TODO
+}
+
+
+// TODO : feels like I can find a way to share more logic with EndingMarker
+function EffectMarker(parentRoom, effect) {
+	InitMarkerObj( this, new RoomMarkerBase(parentRoom) );
+
+	this.type = MarkerType.Effect;
+
+	this.effect = effect;
+
+	this.Draw = function(ctx,roomId,w,selected) {
+		if (this.parentRoom === roomId) {
+			this.base.DrawMarker(ctx, this.effect.x, this.effect.y, w, selected);
+			// TODO - specialize??
+		}
+	}
+
+	this.GetMarkerPos = function(markerIndex) {
+		return {
+			room: this.parentRoom,
+			x: this.effect.x,
+			y: this.effect.y,
+		};
+	}
+
+	this.IsAtLocation = function(roomId,x,y) {
+		return this.parentRoom === roomId && this.effect.x == x && this.effect.y == y;
+	}
+
+	var isDragging = false;
+
+	this.StartDrag = function(roomId,x,y) {
+		isDragging = this.IsAtLocation(roomId,x,y);
+	}
+
+	this.ContinueDrag = function(roomId,x,y) {
+		if (isDragging) {
+			this.effect.x = x;
+			this.effect.y = y;
+		}
+	}
+
+	this.EndDrag = function() {
+		isDragging = false;
+	}
+
+	this.Remove = function() {
+		var effectIndex = room[this.parentRoom].effects.indexOf(this.effect);
+		room[this.parentRoom].effects.splice(effectIndex,1);
+	}
+
+	this.PlaceMarker = function(placementMode,roomId,x,y) {
+		if (placementMode != PlacementMode.None) {
+			this.effect.x = x;
+			this.effect.y = y;
+			if (roomId != this.parentRoom) {
+				this.Remove();
+				room[roomId].effects.push(this.effect);
+				this.parentRoom = roomId;
+			}
+		}
+	}
+
+	this.Match = function(otherMarker) {
+		return this.type == otherMarker.type && this.effect == otherMarker.effect;
+	}
 }
