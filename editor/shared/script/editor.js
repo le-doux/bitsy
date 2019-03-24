@@ -699,6 +699,19 @@ function start() {
 		export_settings = JSON.parse( localStorage.export_settings );
 		document.getElementById("pageColor").value = export_settings.page_color;
 	}
+
+	// TODO : interesting idea but needs work!
+	// // try to honor state of all checkboxes from previous session
+	// var inputElements = document.getElementsByTagName("input");
+	// for (var i in inputElements) {
+	// 	if (inputElements[i].type === "checkbox") {
+	// 		var checkbox = inputElements[i];
+	// 		if (checkbox.checked) {
+	// 			console.log(checkbox);
+	// 			checkbox.dispatchEvent(new Event("click"));
+	// 		}
+	// 	}
+	// }
 }
 
 function newDrawing() {
