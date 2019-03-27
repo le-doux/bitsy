@@ -23,6 +23,7 @@ X need to re-render exits on palette change
 - update panel prefs for v6.0
 - localization
 - rename dialog -> dialogue?
+- one thing I really need is a universal script editor component (but maybe it's not worth it just yet?)
 
 TODO:
 - advanced exit TODO:

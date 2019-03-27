@@ -599,6 +599,37 @@
 								<br/>
 								<textarea id="effectText" onchange="onEffectTextChange(event);" onkeydown="onEffectTextChange(event);" onkeyup="onEffectTextChange(event);" style="resize: vertical; width: 32ch;"></textarea>
 							</div>
+							<div id="exitOptions1" class="controlBox">
+								<span>exit 1 options</span> <!-- TODO : make collapsible -->
+								<br/>
+								transition effect: 
+								<select>
+									<option>none</option>
+									<option>fade (black)</option>
+									<option>fade (white)</option>
+									<option>wave</option>
+									<option>tunnel</option>
+								</select>
+								<div class="controlBox">
+									<input type="checkbox" id="exitLockCheck1"/>
+									<label for="exitLockCheck1">lock</label>
+									<br/>
+									dialog:
+									<br/>
+									<textarea style="resize: vertical; width: 32ch;"></textarea>
+									<br/>
+									<input type="checkbox" id="exitChangeAvatarCheck1"/>
+									<label for="exitChangeAvatarCheck1">change avatar</label>
+									<select>
+										<option>sprite A</option>
+										<option>sprite a</option>
+									</select>
+									<br/>
+								</div>
+							</div>
+							<div id="exitOptions2" class="controlBox">
+								<span>exit 2 options</span> <!-- TODO : make collapsible -->
+							</div>
 						</div>
 					</div>
 				</div>
