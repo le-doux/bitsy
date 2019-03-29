@@ -13,6 +13,7 @@ X bug: markers don't clear when game is reset (what about game data? I don't thi
 X better exit placement
 X update "moving" text
 X show / hide effects
+- BUG: exits in exit tool don't update when game data changes!!!
 - add exit options
 	- transition effect
 	- lock
@@ -340,6 +341,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	function UpdateMarkerOptions() {
+		var exitOptions = document.getElementById("exitOptions");
+		exitOptions.style.display = "none";
+
 		var endingOptions = document.getElementById("endingOptions");
 		endingOptions.style.display = "none";
 
@@ -348,7 +352,17 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		if (curMarker != null) {
 			if (curMarker.type == MarkerType.Exit) {
-				// TODO
+				exitOptions.style.display = "block";
+
+				var exitOptionsSelect = document.getElementsByName("exit options select");
+				var exitOptionsSelectValue = null;
+				for(var i = 0; i < exitOptionsSelect.length; i++){
+					if(exitOptionsSelect[i].checked){
+						exitOptionsSelectValue = exitOptionsSelect[i].value;
+					}
+				}
+
+				UpdateExitOptions(exitOptionsSelectValue);
 			}
 			else if (curMarker.type == MarkerType.Ending) {
 				endingOptions.style.display = "block";
@@ -366,6 +380,24 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 		}
 	}
+
+	this.SetExitOptionsVisibility = function(visible) {
+		document.getElementById("exitOptionsInner").style.display = visible ? "block" : "none";
+		document.getElementById("showExitOptionsCheckIcon").innerText = visible ? "expand_more" : "expand_less";
+	}
+
+	function UpdateExitOptions(exitSelectId) {
+		// console.log("EXIT OPTIONS " + exitSelectId);
+		var transitionId = exitSelectId === "exit1" ? curMarker.exit.transition_effect : curMarker.return.transition_effect;
+		if (transitionId == null) {
+			transitionId = "none";
+		}
+		var transitionSelect = document.getElementById("exitTransitionEffectSelect");
+		for (var i = 0; i < transitionSelect.options.length; i++) {
+			transitionSelect.options[i].selected = (transitionSelect.options[i].value === transitionId);
+		}
+	}
+	this.UpdateExitOptions = UpdateExitOptions;
 
 	this.RemoveMarker = function() {
 		if (curMarker == null) {

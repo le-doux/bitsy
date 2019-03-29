@@ -124,7 +124,7 @@ var TransitionManager = function() {
 	});
 
 	// TODO -- shorter effect names?
-	this.RegisterTransitionEffect("fade_white", { // TODO : have it linger on full white briefly?
+	this.RegisterTransitionEffect("fade_w", { // TODO : have it linger on full white briefly?
 		showPlayerStart : false,
 		showPlayerEnd : true,
 		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
@@ -139,7 +139,7 @@ var TransitionManager = function() {
 		}
 	});
 
-	this.RegisterTransitionEffect("fade_black", {
+	this.RegisterTransitionEffect("fade_b", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
 		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
@@ -154,18 +154,18 @@ var TransitionManager = function() {
 		}
 	});
 
-	this.RegisterTransitionEffect("cross_fade", {
-		showPlayerStart : true,
-		showPlayerEnd : true,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			var pixelDelta = step / maxStep;
+	// this.RegisterTransitionEffect("cross_fade", {
+	// 	showPlayerStart : true,
+	// 	showPlayerEnd : true,
+	// 	pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
+	// 		var pixelDelta = step / maxStep;
 
-			var pixelColorA = start.Image.GetPixel(pixelX,pixelY);
-			var pixelColorB = end.Image.GetPixel(pixelX,pixelY);
+	// 		var pixelColorA = start.Image.GetPixel(pixelX,pixelY);
+	// 		var pixelColorB = end.Image.GetPixel(pixelX,pixelY);
 
-			return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, pixelDelta);
-		}
-	});
+	// 		return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, pixelDelta);
+	// 	}
+	// });
 
 	this.RegisterTransitionEffect("slide_from_right", {
 		showPlayerStart : false,

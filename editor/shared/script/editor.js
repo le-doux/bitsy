@@ -760,7 +760,6 @@ function on_room_name_change() {
 	updateNamesFromCurData()
 
 	refreshGameData();
-	// updateExitOptionsFromGameData();
 }
 
 function on_drawing_name_change() {
@@ -2250,6 +2249,14 @@ function toggleRoomMarkers(visible) {
 	roomTool.drawEditMap();
 	document.getElementById("roomEffectsCheck").checked = visible;
 	document.getElementById("roomEffectsIcon").innerHTML = visible ? "visibility" : "visibility_off";
+}
+
+function onToggleExitOptions() {
+	markerTool.SetExitOptionsVisibility(document.getElementById("showExitOptionsCheck").checked);
+}
+
+function onChangeExitOptionsSelect(exitSelectId) {
+	markerTool.UpdateExitOptions(exitSelectId);
 }
 
 function togglePanelAnimated(e) {
