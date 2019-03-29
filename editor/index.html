@@ -601,31 +601,68 @@
 							</div>
 							<div id="exitOptions1" class="controlBox">
 								<span>exit 1 options</span> <!-- TODO : make collapsible -->
-								<br/>
-								transition effect: 
-								<select>
-									<option>none</option>
-									<option>fade (black)</option>
-									<option>fade (white)</option>
-									<option>wave</option>
-									<option>tunnel</option>
-								</select>
+								
 								<div class="controlBox">
-									<input type="checkbox" id="exitLockCheck1"/>
-									<label for="exitLockCheck1">lock</label>
+									transition effect: 
+									<select>
+										<option>none</option>
+										<option>fade (black)</option>
+										<option>fade (white)</option>
+										<option>wave</option>
+										<option>tunnel</option>
+									</select>
+								</div>
+
+								<div style="margin-bottom: 5px;">
+									<span id="exitScriptOptions1">
+										<input type="checkbox" id="exitDialogCheck1"/>
+										<label for="exitDialogCheck1">
+											<i class="material-icons">chat</i>
+											dialog
+										</label>
+
+										<input type="checkbox" id="exitLockCheck1"/>
+										<label for="exitLockCheck1">
+											<i class="material-icons">vpn_key</i>
+											lock
+										</label>
+
+										<input type="checkbox" id="exitChangeAvatarCheck1"/>
+										<label for="exitChangeAvatarCheck1">
+											<i class="material-icons">nature_people</i>
+											change avatar
+										</label>
+
+										<!-- <input type="checkbox" id="exitCodeCheck1"/>
+										<label for="exitCodeCheck1">
+											<i class="material-icons">code</i>
+										</label> -->
+									</span>
+								</div>
+
+								<div class="controlBox">
+									<span>unlock door if:</span>
 									<br/>
-									dialog:
+
+									<span>dialog when door is locked:</span>
 									<br/>
 									<textarea style="resize: vertical; width: 32ch;"></textarea>
 									<br/>
-									<input type="checkbox" id="exitChangeAvatarCheck1"/>
-									<label for="exitChangeAvatarCheck1">change avatar</label>
+
+									<span>dialog when door is unlocked:</span>
+									<br/>
+									<textarea style="resize: vertical; width: 32ch;"></textarea>
+									<br/>
+
+									<span>on enter, change avatar sprite to:</span>
+									<br/>
 									<select>
 										<option>sprite A</option>
 										<option>sprite a</option>
 									</select>
-									<br/>
 								</div>
+
+								<!-- <button><i class="material-icons">code</i> custom script</button> -->
 							</div>
 							<div id="exitOptions2" class="controlBox">
 								<span>exit 2 options</span> <!-- TODO : make collapsible -->
