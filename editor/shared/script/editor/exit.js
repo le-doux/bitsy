@@ -258,6 +258,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	function RenderMarkerSelection() { // TODO - break this up???
+		console.log('render marker');
+
 		var markersSelect = document.getElementById("markersSelect");
 		var noMarkerMessage = document.getElementById("noMarkerMessage");
 		markersSelect.style.display = "none";
@@ -386,18 +388,31 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		document.getElementById("showExitOptionsCheckIcon").innerText = visible ? "expand_more" : "expand_less";
 	}
 
+	var curExitOptionsSelectId = null; // hacky but don't judge me
 	function UpdateExitOptions(exitSelectId) {
-		// console.log("EXIT OPTIONS " + exitSelectId);
-		var transitionId = exitSelectId === "exit1" ? curMarker.exit.transition_effect : curMarker.return.transition_effect;
+		curExitOptionsSelectId = exitSelectId;
+
+		// TODO : handle one-way exits!!!
+		console.log("EXIT OPTIONS " + curExitOptionsSelectId);
+		var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
+		var transitionId = exit.transition_effect;
 		if (transitionId == null) {
 			transitionId = "none";
 		}
+		console.log("transitionId " + transitionId);
+
 		var transitionSelect = document.getElementById("exitTransitionEffectSelect");
 		for (var i = 0; i < transitionSelect.options.length; i++) {
 			transitionSelect.options[i].selected = (transitionSelect.options[i].value === transitionId);
 		}
 	}
 	this.UpdateExitOptions = UpdateExitOptions;
+
+	this.ChangeExitTransitionEffect = function(effectId) {
+		var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
+		exit.transition_effect = effectId === "none" ? null : effectId;
+		refreshGameData();
+	}
 
 	this.RemoveMarker = function() {
 		if (curMarker == null) {

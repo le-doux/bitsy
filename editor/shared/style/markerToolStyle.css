@@ -1,0 +1,48 @@
+#exitScriptControls {
+	display: none;
+}
+
+#exitScriptControls.exitLockActive {
+	display: block;
+}
+
+#exitScriptControls.exitDialogActive {
+	display: block;
+}
+
+#exitScriptControls.exitAvatarActive {
+	display: block;
+}
+
+.exitLockControl {
+	display: none;
+}
+
+.exitLockActive .exitLockControl {
+	display: inline-block;
+}
+
+.exitDialogControl {
+	display: none;
+}
+
+.exitDialogActive .exitDialogControl {
+	display: inline-block;
+}
+
+.exitDialogAndLockControl {
+	display: none;
+}
+
+.exitDialogActive.exitLockActive .exitDialogAndLockControl {
+	display: inline-block;
+}
+
+
+.exitAvatarControl {
+	display: none;
+}
+
+.exitAvatarActive .exitAvatarControl {
+	display: inline-block;
+}

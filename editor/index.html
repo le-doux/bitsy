@@ -12,6 +12,7 @@
 		<link rel="stylesheet" type="text/css" href="shared/style/editorLanguageStyles.css">
 		<link rel="stylesheet" type="text/css" href="shared/style/editorAnimations.css">
 		<link rel="stylesheet" type="text/css" href="shared/style/colorPickerStyle.css">
+		<link rel="stylesheet" type="text/css" href="shared/style/markerToolStyle.css">
 
 		<!-- UTIL SCRIPTS -->
 		<script src="shared/script/color_util.js"></script>
@@ -607,71 +608,73 @@
 								</label>
 
 								<div id="exitOptionsInner" style="display: none;">
-									<form id="exitOptionsRadio" style="margin-top:5px; margin-bottom: 5px;">
+									<form id="exitOptionsRadio" style="display: flex; flex-direction: row; margin-top:5px; margin-bottom: 5px;">
 										<input type="radio" name="exit options select" value="exit1" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions1" checked>
-										<label for="exitOptions1" class="left">
+										<label for="exitOptions1" class="left" style="flex: 1; font-size: 16px;">
 											<span>exit 1</span>
 										</label>
 
 										<input type="radio" name="exit options select" value="exit2" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions2">
-										<label for="exitOptions2" class="right">
+										<label for="exitOptions2" class="right" style="flex: 1; font-size: 16px;">
 											<span>exit 2</span>
 										</label>
 									</form>
 
-									<div class="controlBox">
-										transition effect: 
-										<select id="exitTransitionEffectSelect">
-											<option value="none">none</option>
-											<option value="fade_b">fade (black)</option>
-											<option value="fade_w">fade (white)</option>
-											<option value="wave">wave</option>
-											<option value="tunnel">tunnel</option>
-										</select>
-									</div>
+									<div style="padding:4px;">
+										<div class="controlBox" style="font-size:14px;">
+											transition effect: 
+											<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value);">
+												<option value="none">none</option>
+												<option value="fade_b">fade (black)</option>
+												<option value="fade_w">fade (white)</option>
+												<option value="wave">wave</option>
+												<option value="tunnel">tunnel</option>
+											</select>
+										</div>
 
-									<div style="margin-bottom: 5px;">
-										<span id="exitScriptOptions">
-											<input type="checkbox" id="exitDialogCheck"/>
-											<label for="exitDialogCheck">
-												<i class="material-icons">chat</i>
-												dialog
-											</label>
+										<div style="margin-bottom: 5px; margin-top: 12px;">
+											<span id="exitScriptOptions">
+												<input type="checkbox" id="exitDialogCheck" onchange="setElementClass('exitScriptControls','exitDialogActive',event.target.checked);"/>
+												<label for="exitDialogCheck">
+													<i class="material-icons">chat</i>
+													dialog
+												</label>
 
-											<input type="checkbox" id="exitLockCheck"/>
-											<label for="exitLockCheck">
-												<i class="material-icons">vpn_key</i>
-												lock
-											</label>
+												<input type="checkbox" id="exitChangeAvatarCheck" onchange="setElementClass('exitScriptControls','exitAvatarActive',event.target.checked);"/>
+												<label for="exitChangeAvatarCheck">
+													<i class="material-icons">nature_people</i>
+													change avatar
+												</label>
 
-											<input type="checkbox" id="exitChangeAvatarCheck"/>
-											<label for="exitChangeAvatarCheck">
-												<i class="material-icons">nature_people</i>
-												change avatar
-											</label>
-										</span>
-									</div>
+												<input type="checkbox" id="exitLockCheck" onchange="setElementClass('exitScriptControls','exitLockActive',event.target.checked);"/>
+												<label for="exitLockCheck">
+													<i class="material-icons">vpn_key</i>
+													lock
+												</label>
+											</span>
+										</div>
 
-									<div class="controlBox">
-										<span>unlock door if:</span>
-										<br/>
+										<div id="exitScriptControls" class="controlBox">
+											<span class="exitLockControl">unlock door if:</span>
+											<br class="exitLockControl"/>
 
-										<span>dialog when door is locked:</span>
-										<br/>
-										<textarea style="resize: vertical; width: 32ch;"></textarea>
-										<br/>
+											<span class="exitDialogAndLockControl">dialog when door is locked:</span>
+											<br class="exitDialogAndLockControl"/>
+											<textarea class="exitDialogAndLockControl" style="resize: vertical; width: 32ch;"></textarea>
+											<br class="exitDialogAndLockControl"/>
 
-										<span>dialog when door is unlocked:</span>
-										<br/>
-										<textarea style="resize: vertical; width: 32ch;"></textarea>
-										<br/>
+											<span class="exitDialogControl">dialog</span><span class="exitDialogAndLockControl"> when door is unlocked</span><span class="exitDialogControl">:</span>
+											<br class="exitDialogControl"/>
+											<textarea class="exitDialogControl" style="resize: vertical; width: 32ch;"></textarea>
+											<br class="exitDialogControl"/>
 
-										<span>on enter, change avatar sprite to:</span>
-										<br/>
-										<select>
-											<option>sprite A</option>
-											<option>sprite a</option>
-										</select>
+											<span class="exitAvatarControl">on enter, change avatar sprite to:</span>
+											<br class="exitAvatarControl"/>
+											<select class="exitAvatarControl">
+												<option>sprite A</option>
+												<option>sprite a</option>
+											</select>
+										</div>
 									</div>
 								</div>
 

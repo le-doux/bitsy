@@ -1917,6 +1917,7 @@ function on_game_data_change() {
 	refreshGameData();
 
 	// ui stuff
+	markerTool.Refresh(); // wow I hope this doesn't cause bugs
 	updateRoomName();
 	refreshGameData();
 }
@@ -2257,6 +2258,22 @@ function onToggleExitOptions() {
 
 function onChangeExitOptionsSelect(exitSelectId) {
 	markerTool.UpdateExitOptions(exitSelectId);
+}
+
+function onChangeExitTransitionEffect(effectId) {
+	markerTool.ChangeExitTransitionEffect(effectId);
+}
+
+// TODO : put helper method somewhere more.. helpful
+function setElementClass(elementId, classId, addClass) {
+	var el = document.getElementById(elementId);
+	if (addClass) {
+		el.classList.add(classId);
+	}
+	else {
+		el.classList.remove(classId);
+	}
+	console.log(el.classList);
 }
 
 function togglePanelAnimated(e) {
