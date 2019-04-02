@@ -167,32 +167,53 @@ var TransitionManager = function() {
 	// 	}
 	// });
 
-	this.RegisterTransitionEffect("slide_from_right", {
+	this.RegisterTransitionEffect("slide_u", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
 		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			var pixelOffset = Math.floor(start.Image.Width * (step / maxStep));
-			var slidePixelX = pixelX + pixelOffset;
+			var pixelOffset = -1 * Math.floor(start.Image.Height * (step / maxStep));
+			var slidePixelY = pixelY + pixelOffset;
 
-			if (slidePixelX < start.Image.Width) {
-				var colorA = start.Image.GetPixel(slidePixelX,pixelY);
+			if (slidePixelY >= 0) {
+				var colorA = start.Image.GetPixel(pixelX,slidePixelY);
 				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
 				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
 				return colorLerped;
-				// return startImage.GetPixel(slidePixelX,pixelY);
 			}
 			else {
-				slidePixelX -= start.Image.Width;
-				var colorB = end.Image.GetPixel(slidePixelX,pixelY);
+				slidePixelY += start.Image.Height;
+				var colorB = end.Image.GetPixel(pixelX,slidePixelY);
 				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
 				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
 				return colorLerped;
-				// return endImage.GetPixel(slidePixelX,pixelY);
 			}
 		}
 	});
 
-	this.RegisterTransitionEffect("slide_from_left", {
+	this.RegisterTransitionEffect("slide_d", {
+		showPlayerStart : false,
+		showPlayerEnd : true,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
+			var pixelOffset = Math.floor(start.Image.Height * (step / maxStep));
+			var slidePixelY = pixelY + pixelOffset;
+
+			if (slidePixelY < start.Image.Height) {
+				var colorA = start.Image.GetPixel(pixelX,slidePixelY);
+				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				return colorLerped;
+			}
+			else {
+				slidePixelY -= start.Image.Height;
+				var colorB = end.Image.GetPixel(pixelX,slidePixelY);
+				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				return colorLerped;
+			}
+		}
+	});
+
+	this.RegisterTransitionEffect("slide_l", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
 		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
@@ -204,7 +225,6 @@ var TransitionManager = function() {
 				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
 				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
 				return colorLerped;
-				// return startImage.GetPixel(slidePixelX,pixelY);
 			}
 			else {
 				slidePixelX += start.Image.Width;
@@ -212,7 +232,29 @@ var TransitionManager = function() {
 				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
 				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
 				return colorLerped;
-				// return endImage.GetPixel(slidePixelX,pixelY);
+			}
+		}
+	});
+
+	this.RegisterTransitionEffect("slide_r", {
+		showPlayerStart : false,
+		showPlayerEnd : true,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
+			var pixelOffset = Math.floor(start.Image.Width * (step / maxStep));
+			var slidePixelX = pixelX + pixelOffset;
+
+			if (slidePixelX < start.Image.Width) {
+				var colorA = start.Image.GetPixel(slidePixelX,pixelY);
+				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				return colorLerped;
+			}
+			else {
+				slidePixelX -= start.Image.Width;
+				var colorB = end.Image.GetPixel(slidePixelX,pixelY);
+				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				return colorLerped;
 			}
 		}
 	});
