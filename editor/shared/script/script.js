@@ -790,7 +790,7 @@ var SequenceBase = function() {
 		return str;
 	}
 
-	this.VisitAll = function(visitor) {
+	this.VisitAll = function(visitor, depth) {
 		if (depth == undefined || depth == null) {
 			depth = 0;
 		}
@@ -928,7 +928,7 @@ var IfNode = function(conditions, results, isSingleLine) {
 		return isSingleLine;
 	}
 
-	this.VisitAll = function(visitor) {
+	this.VisitAll = function(visitor, depth) {
 		if (depth == undefined || depth == null) {
 			depth = 0;
 		}

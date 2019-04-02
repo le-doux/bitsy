@@ -986,11 +986,9 @@ function movePlayerThroughExit(ext) {
 		curRoom = ext.dest.room;
 	};
 
-	if(ext.dlg != null && script[ext.dlg]){
-		isNarrating = true; // hack test -- should this be the way this works?
-		var dialogStr = script[ext.dlg].source;
-		startDialog(dialogStr, ext.dlg, function(isExitUnlocked) {
-			isNarrating = false;
+	if(ext.script_id != null && script[ext.script_id]){
+		var scriptSourceStr = script[ext.script_id].source;
+		startDialog(scriptSourceStr, ext.script_id, function(isExitUnlocked) {
 			if (isExitUnlocked == true) {
 				GoToDest();
 			}
@@ -1307,8 +1305,8 @@ function serializeWorld(skipFonts) {
 					if (e.transition_effect != undefined && e.transition_effect != null) {
 						worldStr += " FX " + e.transition_effect;
 					}
-					if (e.dlg != undefined && e.dlg != null) {
-						worldStr += " DLG " + e.dlg;
+					if (e.script_id != undefined && e.script_id != null) {
+						worldStr += " PRG " + e.script_id;
 					}
 					worldStr += "\n";
 				}
@@ -1590,15 +1588,15 @@ function parseRoom(lines, i) {
 					x : parseInt(destCoords[0]),
 					y : parseInt(destCoords[1])
 				},
-				dlg : null,
+				script_id : null,
 				transition_effect : null,
 			};
 
 			// optional arguments
 			var exitArgIndex = 4;
 			while (exitArgIndex < exitArgs.length) {
-				if (exitArgs[exitArgIndex] == "DLG") { // TODO : temp naming?
-					ext.dlg = exitArgs[exitArgIndex+1];
+				if (exitArgs[exitArgIndex] == "PRG") {
+					ext.script_id = exitArgs[exitArgIndex+1];
 					exitArgIndex += 2;
 				}
 				else if (exitArgs[exitArgIndex] == "FX") {

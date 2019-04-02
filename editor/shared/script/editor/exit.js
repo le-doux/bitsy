@@ -13,7 +13,7 @@ X bug: markers don't clear when game is reset (what about game data? I don't thi
 X better exit placement
 X update "moving" text
 X show / hide effects
-- BUG: exits in exit tool don't update when game data changes!!!
+X BUG: exits in exit tool don't update when game data changes!!!
 - add exit options
 	- transition effect
 	- lock
@@ -25,6 +25,15 @@ X need to re-render exits on palette change
 - localization
 - rename dialog -> dialogue?
 - one thing I really need is a universal script editor component (but maybe it's not worth it just yet?)
+- thoughts to consider after looking at borksy:
+	- should avatar be set by room, instead of by exit / script? (or both?)
+	- how should {end} and {exit} functions work - end immediately or not? contain ending dialog or not?
+		- if I have {narrate} does that solve my problems or create more? what about controlling dialog position (top, middle, bottom)?
+	- should I stop stripping out un-identified functions?
+- don't forget to add some more helper functions: {setItem}, other??
+- adding official plugin support would be super cool
+- need to make it so the exit tool doesn't refresh all the time and lose your selection state SO easily (catalogue when this happens)
+- should I add {return value}?
 
 TODO:
 - advanced exit TODO:
@@ -486,6 +495,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// hacky global method!!
 		if (curMarker != null && curMarker.MarkerCount() >= 1) {
 			selectRoom(curMarker.GetMarkerPos(0).room);
+
+			// if (curMarker.type == MarkerType.Exit) {
+			// 	UpdateExitOptions("exit1");
+			// }
 		}
 	}
 
@@ -493,6 +506,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// hacky global method!!
 		if (curMarker != null && curMarker.MarkerCount() >= 2) {
 			selectRoom(curMarker.GetMarkerPos(1).room);
+
+			// if (curMarker.type == MarkerType.Exit) {
+			// 	UpdateExitOptions("exit2");
+			// }
 		}
 	}
 
