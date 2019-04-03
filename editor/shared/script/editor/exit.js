@@ -1134,15 +1134,16 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 		this.exit.dest.y = tempDestY;
 	}
 
-	// TODO : implement this maybe?? if it makes sense still?
-	// hacky way to store the options of each exit as you flip between link states
-	// var tempExitOptions = null;
-	// var tempReturnOptions = null;
+	// hacky way to store the options of each exit as you cycle between link states
+	var tempExitOptions = null;
+	var tempReturnOptions = null;
 
 	this.ChangeLink = function() {
 		if (this.linkState == LinkState.TwoWay) {
 			// -- get rid of return exit --
 			if (this.hasReturn) {
+				tempReturnOptions = { script_id : this.return.script_id, transition_effect: this.return.transition_effect };
+
 				var returnIndex = room[this.exit.dest.room].exits.indexOf(this.return);
 				room[this.exit.dest.room].exits.splice(returnIndex,1);
 
@@ -1153,14 +1154,26 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 			this.linkState = LinkState.OneWayOriginal;
 		}
 		else if (this.linkState == LinkState.OneWayOriginal) {
+			tempExitOptions = { script_id : this.exit.script_id, transition_effect: this.exit.transition_effect };
+
 			// -- swap the exit & entrance --
 			this.SwapExitAndEntrance();
+
+			if (tempReturnOptions != null) {
+				this.exit.script_id = tempReturnOptions.script_id;
+				this.exit.transition_effect = tempReturnOptions.transition_effect;
+			}
 
 			this.linkState = LinkState.OneWaySwapped;
 		}
 		else if (this.linkState == LinkState.OneWaySwapped) {
 			// -- create a return exit --
 			this.SwapExitAndEntrance(); // swap first
+
+			if (tempExitOptions != null) {
+				this.exit.script_id = tempExitOptions.script_id;
+				this.exit.transition_effect = tempExitOptions.transition_effect;
+			}
 
 			var newReturn = {
 				x : this.exit.dest.x,
@@ -1173,12 +1186,21 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 				script_id : null,
 				transition_effect : null,
 			}
+
+			if (tempReturnOptions != null) {
+				newReturn.script_id = tempReturnOptions.script_id;
+				newReturn.transition_effect = tempReturnOptions.transition_effect;
+			}
+
 			room[this.exit.dest.room].exits.push( newReturn );
 
 			this.return = newReturn;
 			this.hasReturn = true;
 
 			this.linkState = LinkState.TwoWay;
+
+			tempExitOptions = null;
+			tempReturnOptions = null;
 		}
 	}
 
