@@ -189,6 +189,16 @@ function deprecatedFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
+function returnFunc(environment,parameters,onReturn) {
+	var ret = { isReturn: true, result: null };
+
+	if (parameters.length > 0 && parameters[0] != undefined && parameters[0] != null) {
+		ret.result = parameters[0];
+	}
+
+	onReturn(ret);
+}
+
 // TODO : this is kind of hacky
 // - needs to work with names too
 // - should it work only on the drawing? or other things too??
@@ -419,6 +429,7 @@ var Environment = function() {
 	functionMap.set("printItem", printItemFunc);
 	functionMap.set("changeAvatar", changeAvatarFunc);
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
+	functionMap.set("return", returnFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn) {
@@ -508,6 +519,12 @@ var TreeRelationship = function() {
 	};
 }
 
+function isReturnObject(val) {
+	return typeof val === "object" && val != null
+				&& val.isReturn != undefined && val.isReturn != null
+				&& val.isReturn;
+}
+
 var BlockMode = {
 	Code : "code",
 	Dialog : "dialog"
@@ -522,27 +539,43 @@ var BlockNode = function(mode, doIndentFirstLine) {
 	this.Eval = function(environment,onReturn) {
 		// console.log("EVAL BLOCK " + this.children.length);
 
-		if( this.onEnter != null ) this.onEnter();
+		if( this.onEnter != null ) {
+			this.onEnter();
+		}
 
 		var lastVal = null;
 		var i = 0;
+
 		function evalChildren(children,done) {
-			if(i < children.length) {
+			if (i < children.length) {
 				// console.log(">> CHILD " + i);
 				children[i].Eval( environment, function(val) {
 					// console.log("<< CHILD " + i);
-					lastVal = val;
-					i++;
-					evalChildren(children,done);
+
+					// TODO : handle early return here
+					if (isReturnObject(val)) {
+						console.log("RETURN EARLY " + val.result);
+						lastVal = val;
+						done();
+					}
+					else {
+						lastVal = val;
+						i++;
+						evalChildren(children,done);
+					}
 				} );
 			}
 			else {
 				done();
 			}
 		};
+
 		var self = this;
 		evalChildren( this.children, function() {
-			if( self.onExit != null ) self.onExit();
+			if( self.onExit != null ) {
+				self.onExit();
+			}
+			console.log("RETURN " + lastVal);
 			onReturn(lastVal);
 		} );
 	}

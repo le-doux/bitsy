@@ -33,7 +33,7 @@ X need to re-render exits on palette change
 - adding official plugin support would be super cool
 - need to make it so the exit tool doesn't refresh all the time and lose your selection state SO easily (catalogue when this happens)
 - should I add {return value}?
-- TODO : maintain state of return exit, so it doesn't get lost as you toggle stuff?
+X TODO : maintain state of return exit, so it doesn't get lost as you toggle stuff?
 - SOMEDAY.. rename dialog -> dialogue?
 
 TODO:
