@@ -23,7 +23,6 @@ X BUG: exits in exit tool don't update when game data changes!!!
 X need to re-render exits on palette change
 - update panel prefs for v6.0
 - localization
-- rename dialog -> dialogue?
 - one thing I really need is a universal script editor component (but maybe it's not worth it just yet?)
 - thoughts to consider after looking at borksy:
 	- should avatar be set by room, instead of by exit / script? (or both?)
@@ -34,6 +33,8 @@ X need to re-render exits on palette change
 - adding official plugin support would be super cool
 - need to make it so the exit tool doesn't refresh all the time and lose your selection state SO easily (catalogue when this happens)
 - should I add {return value}?
+- TODO : maintain state of return exit, so it doesn't get lost as you toggle stuff?
+- SOMEDAY.. rename dialog -> dialogue?
 
 TODO:
 - advanced exit TODO:
@@ -185,7 +186,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				room : nextRoomId,
 				x : 13,
 				y : 13
-			}
+			},
+			script_id : null,
+			transition_effect : null,
 		}
 		room[selectedRoom].exits.push( newExit );
 
@@ -196,7 +199,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				room : selectedRoom,
 				x : newExit.x,
 				y : newExit.y
-			}
+			},
+			script_id : null,
+			transition_effect : null,
 		}
 		room[newExit.dest.room].exits.push( newReturn );
 
@@ -401,14 +406,16 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	function UpdateExitOptions(exitSelectId) {
 		curExitOptionsSelectId = exitSelectId;
 
-		// TODO : handle one-way exits!!!
-		console.log("EXIT OPTIONS " + curExitOptionsSelectId);
+		document.getElementById("exitOptionsRadio").style.display = curMarker.hasReturn ? "flex" : "none";
+
+		// console.log("EXIT OPTIONS " + curExitOptionsSelectId);
 		var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
+
 		var transitionId = exit.transition_effect;
 		if (transitionId == null) {
 			transitionId = "none";
 		}
-		console.log("transitionId " + transitionId);
+		// console.log("transitionId " + transitionId);
 
 		var transitionSelect = document.getElementById("exitTransitionEffectSelect");
 		for (var i = 0; i < transitionSelect.options.length; i++) {
@@ -1127,6 +1134,11 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 		this.exit.dest.y = tempDestY;
 	}
 
+	// TODO : implement this maybe?? if it makes sense still?
+	// hacky way to store the options of each exit as you flip between link states
+	// var tempExitOptions = null;
+	// var tempReturnOptions = null;
+
 	this.ChangeLink = function() {
 		if (this.linkState == LinkState.TwoWay) {
 			// -- get rid of return exit --
@@ -1157,7 +1169,9 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 					room : this.parentRoom,
 					x : this.exit.x,
 					y : this.exit.y
-				}
+				},
+				script_id : null,
+				transition_effect : null,
 			}
 			room[this.exit.dest.room].exits.push( newReturn );
 
