@@ -36,6 +36,39 @@ X need to re-render exits on palette change
 X TODO : maintain state of return exit, so it doesn't get lost as you toggle stuff?
 - SOMEDAY.. rename dialog -> dialogue?
 
+THOUGHTS ON {return}:
+- what should it break out of? the whole script? the nearest code block? what about dialog blocks? functions?
+- should code blocks REALLY be able to contain multiple statements within them???
+	when thinking about functions should it look like:
+		{func name : param1 param2 => {
+			{a}
+			{b}
+			{c}
+		}}
+	OR
+		{func name : param1 param2 =>
+			{a}
+			{b}
+			{c}
+		} // in this case --- is un-bracketed text dialog? ALSO: should I have used an explicit {dialog} block from the get-go?
+
+{dialog
+	SOME DIALOG
+	GOES HERE
+}
+
+{
+	- bool ?
+		{dialog
+			SAY THIS {doInDialog}
+		}
+	- else
+		{dialog
+			SAY THAT
+		}
+		{doTheOther}
+}
+
 TODO:
 - advanced exit TODO:
 	X play dialog on (before?) exit

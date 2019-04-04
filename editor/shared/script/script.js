@@ -24,7 +24,7 @@ var Interpreter = function() {
 		// console.log("RUN");
 		// console.log(env.GetScript( scriptName ));
 		env.GetScript( scriptName )
-			.Eval( env, function(result) { if(exitHandler!=null) exitHandler(result); } );
+			.Eval( env, function(result) { OnScriptReturn(result, exitHandler); } );
 
 		// console.log("SERIALIZE!!!!");
 		// console.log( env.GetScript( scriptName ).Serialize() );
@@ -32,7 +32,7 @@ var Interpreter = function() {
 	this.Interpret = function(scriptStr, exitHandler) { // Compiles and runs code immediately
 		// console.log("INTERPRET");
 		var script = parser.Parse( scriptStr );
-		script.Eval( env, function(result) { if(exitHandler!=null) exitHandler(result); } );
+		script.Eval( env, function(result) { OnScriptReturn(result, exitHandler); } );
 	}
 	this.HasScript = function(name) { return env.HasScript(name); };
 
@@ -45,7 +45,19 @@ var Interpreter = function() {
 		return parser.Parse( scriptStr );
 	}
 	this.Eval = function(scriptTree, exitHandler) { // runs a script stored externally
-		scriptTree.Eval( env, function(result) { if(exitHandler!=null) exitHandler(result); } );
+		scriptTree.Eval( env, function(result) { OnScriptReturn(result, exitHandler); } );
+	}
+
+	function OnScriptReturn(result, exitHandler) {
+		if (isReturnObject(result)) {
+			result = result.result; // pull out the contained result
+		}
+
+		console.log("RESULT " + result);
+
+		if (exitHandler != null) {
+			exitHandler(result);
+		}
 	}
 
 	this.CreateExpression = function(expStr) {
@@ -552,9 +564,7 @@ var BlockNode = function(mode, doIndentFirstLine) {
 				children[i].Eval( environment, function(val) {
 					// console.log("<< CHILD " + i);
 
-					// TODO : handle early return here
-					if (isReturnObject(val)) {
-						console.log("RETURN EARLY " + val.result);
+					if (isReturnObject(val)) { // early return
 						lastVal = val;
 						done();
 					}
@@ -575,7 +585,6 @@ var BlockNode = function(mode, doIndentFirstLine) {
 			if( self.onExit != null ) {
 				self.onExit();
 			}
-			console.log("RETURN " + lastVal);
 			onReturn(lastVal);
 		} );
 	}
