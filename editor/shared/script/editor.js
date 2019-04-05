@@ -1,6 +1,6 @@
 /*
 TODO for v6:
-- rename exit.js
+X rename exit.js
 - update panel prefs
 - update version number
 - update version notes
@@ -14,6 +14,8 @@ TODO for v6:
 	- new functions
 	- exit options
 	- effects
+- move marker panel style into css file
+- finalize transition time and fps
 */
 
 /*
@@ -1918,14 +1920,13 @@ function hideMarkers() {
 }
 
 function toggleRoomMarkers(visible) {
-	console.log(visible);
 	if (visible) {
 		markerTool.Refresh();
 	}
 	roomTool.areMarkersVisible = visible;
 	roomTool.drawEditMap();
-	document.getElementById("roomEffectsCheck").checked = visible;
-	document.getElementById("roomEffectsIcon").innerHTML = visible ? "visibility" : "visibility_off";
+	document.getElementById("roomMarkersCheck").checked = visible;
+	document.getElementById("roomMarkersIcon").innerHTML = visible ? "visibility" : "visibility_off";
 }
 
 function onToggleExitOptions() {

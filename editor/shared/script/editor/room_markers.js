@@ -226,8 +226,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var endingOptions = document.getElementById("endingOptions");
 		endingOptions.style.display = "none";
 
-		var effectOptions = document.getElementById("effectOptions");
-		effectOptions.style.display = "none";
+		// var effectOptions = document.getElementById("effectOptions");
+		// effectOptions.style.display = "none";
 
 		if (curMarker != null) {
 			if (curMarker.type == MarkerType.Exit) {
@@ -250,13 +250,13 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				var endingStr = scriptUtils.RemoveDialogBlockFormat(endingSource);
 				endingText.value = endingStr;
 			}
-			else if (curMarker.type == MarkerType.Effect) {
-				effectOptions.style.display = "block";
-				var effectText = document.getElementById("effectText");
-				var effectSource = script[curMarker.effect.id].source;
-				var effectStr = scriptUtils.RemoveDialogBlockFormat(effectSource);
-				effectText.value = effectStr;
-			}
+			// else if (curMarker.type == MarkerType.Effect) {
+			// 	effectOptions.style.display = "block";
+			// 	var effectText = document.getElementById("effectText");
+			// 	var effectSource = script[curMarker.effect.id].source;
+			// 	var effectStr = scriptUtils.RemoveDialogBlockFormat(effectSource);
+			// 	effectText.value = effectStr;
+			// }
 		}
 	}
 

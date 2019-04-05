@@ -105,10 +105,9 @@
 				</label>
 
 				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanelAnimated(event);" />
-				<label title="show / hide exits window" for="exitsCheck" class="notMobile">
+				<label title="show / hide exits & endings window" for="exitsCheck" class="notMobile">
 					<i class="material-icons">directions</i>
-					<!-- <span class="localize exits_tool_name">exits</span> -->
-					<span>room effects</span> <!-- TODO localize -->
+					<span class="localize marker_tool_name">exits & endings</span>
 				</label>
 
 				<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanelAnimated(event);"  checked/>
@@ -479,18 +478,17 @@
 									<span class="localize walls_toggle_visible">walls</span>
 								</label>
 
-								<input type="checkbox" id="roomEffectsCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
-								<label title="show / hide effects" for="roomEffectsCheck">
-									<i class="material-icons" id="roomEffectsIcon">visibility</i> 
-									<span>effects</span> <!-- TODO localize -->
+								<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
+								<label title="show / hide markers" for="roomMarkersCheck">
+									<i class="material-icons" id="roomMarkersIcon">visibility</i> 
+									<span class="localize marker_tool_name">exits & endings</span>
 								</label>
 							</div>
 
-							<div id="roomExits" class="buttonGroup">
-								<button title="add room effects" class="color0" onclick="showPanel('exitsPanel');">
+							<div id="roomMarkers" class="buttonGroup">
+								<button title="add exits and endings" class="color0" onclick="showPanel('exitsPanel');">
 									<i class="material-icons">open_in_new</i>
-									<!-- <span class="localize room_add_exits">add exits</span> -->
-									<span>add exits, endings, and effects</span> <!-- TODO localize -->
+									<span class="localize room_add_markers">add exits & endings</span>
 								</button>
 							</div>
 						</div>
@@ -503,64 +501,67 @@
 				<div id="exitsPanel" class="panel color3" style="display:none;">
 					<div class="bar color3">
 
-						<button title="minimize exits window" class="light panelBarClose" onclick="hidePanel('exitsPanel');">
+						<button title="minimize exits & endings window" class="light panelBarClose" onclick="hidePanel('exitsPanel');">
 							<i class="material-icons">close</i>
 						</button>
 
-						<div title="exits window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<i class="material-icons">directions</i> 
-							<!-- <span class="localize exits_tool_name">exits</span> -->
-							<span>room effects</span> <!-- TODO localize -->
+						<div title="exits & endings window" class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">directions</i>
+							<span class="localize marker_tool_name">exits & endings</span>
 						</div>
 					</div>
 					<div id="exitsPanelContent">
 						<div id="noMarkerMessage" class="controlBox" style="width:300px;">
-							<span style="white-space: pre-wrap; word-wrap: break-word;">There are no exits, endings, or effects in this room yet! You can add one with this tool. :)</span>
+							<span style="white-space: pre-wrap; word-wrap: break-word;" class="localize marker_tool_empty">There are no exits or endings in this room yet! You can add one with this tool. :)</span>
 						</div>
 						<div id="markersSelect" style="display: flex;">
 							<div id="markerControl1" class="controlBox" style="display: flex; flex-direction: column;">
 								<span id="markerName1" style="font-size: 14px; line-height: 12px;">marker 1</span>
-								<canvas id="markerCanvas1" style="width:114px; height:114px;" onclick="selectMarkerRoom1();"></canvas>
+								<canvas id="markerCanvas1" title="location of marker (click to go to room)" style="width:114px; height:114px;" onclick="selectMarkerRoom1();"></canvas>
 								<div style="margin-top: 4px;">
 									<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
-									<label for="toggleMoveMarker1">
+									<label for="toggleMoveMarker1" title="click to move marker">
 										<i class="material-icons">location_searching</i>
-										<span id="textMoveMarker1">move</span>
+										<span id="textMoveMarker1" class="localize marker_move">move</span>
 									</label>
-									<button id="cancelMoveMarker1" onclick="cancelMoveMarker1();">
+									<button id="cancelMoveMarker1" title="cancel move" onclick="cancelMoveMarker1();">
 										<i class="material-icons">cancel</i>
 									</button>
-									<div>
+									<div title="marker coordinates">
 										<span id="textMarkerPos1" style="font-size: 12px;">room 0 (0,0)</span>
 									</div>
 									<div>
-										<span id="textMoveMessage1" style="font-size: 12px;"><i>click in room</i></span>
+										<span id="textMoveMessage1" style="font-size: 12px;">
+											<i class="localize marker_move_click">click in room</i>
+										</span>
 									</div>
 								</div>
 							</div>
 							<div id="markerLinkControl" style="padding-left: 5px; padding-right: 5px; display:inline-block;">
-								<button title="change direction" onclick="changeExitDirection();" style="margin-top: 70px;">
+								<button title="toggle exit direction" onclick="changeExitDirection();" style="margin-top: 70px;">
 									<i class="material-icons" id="exitDirectionBackIcon">arrow_back</i>
 									<i class="material-icons" id="exitDirectionForwardIcon">arrow_forward</i>
 								</button>
 							</div>
 							<div id="markerControl2" class="controlBox" style="display: flex; flex-direction: column;">
 								<span id="markerName2" style="font-size: 14px; line-height: 12px;">marker 2</span>
-								<canvas id="markerCanvas2" style="width:114px; height:114px;" onclick="selectMarkerRoom2();"></canvas>
+								<canvas id="markerCanvas2" title="location of marker (click to go to room)" style="width:114px; height:114px;" onclick="selectMarkerRoom2();"></canvas>
 								<div style="margin-top: 4px;">
 									<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" />
-									<label for="toggleMoveMarker2">
+									<label for="toggleMoveMarker2" title="click to move marker">
 										<i class="material-icons">location_searching</i>
-										<span id="textMoveMarker2">move</span>
+										<span id="textMoveMarker2"class="localize marker_move">move</span>
 									</label>
-									<button id="cancelMoveMarker2" onclick="cancelMoveMarker2();">
+									<button id="cancelMoveMarker2" title="cancel move" onclick="cancelMoveMarker2();">
 										<i class="material-icons">cancel</i>
 									</button>
-									<div>
+									<div title="marker coordinates">
 										<span id="textMarkerPos2" style="font-size: 12px;">room 0 (0,0)</span>
 									</div>
 									<div>
-										<span id="textMoveMessage2" style="font-size: 12px;"><i>click in room</i></span>
+										<span id="textMoveMessage2" style="font-size: 12px;">
+											<i class="localize marker_move_click">click in room</i>
+										</span>
 									</div>
 								</div>
 							</div>
@@ -579,50 +580,50 @@
 							</div>
 							<div id="markersAddCommands" class="buttonGroup">
 								<button title="add exit" class="color0" onclick="newExit();">
-									<i class="material-icons">add</i> exit
+									<i class="material-icons">add</i> <span class="localize exit_label">exit</span>
 								</button>
 								<button title="add ending" class="color0" onclick="newEnding();">
-									<i class="material-icons">add</i> ending
+									<i class="material-icons">add</i> <span class="localize ending_label">ending</span>
 								</button>
-								<button title="add scripted effect" class="color0" onclick="newEffect();">
+								<!-- <button title="add scripted effect" class="color0" onclick="newEffect();">
 									<i class="material-icons">add</i> effect
-								</button>
+								</button> -->
 							</div>
 						</div>
 						<div id="markerOptions">
 							<div id="endingOptions" class="controlBox">
-								<span>ending dialog</span>
+								<span class="localize ending_dialog">ending dialog</span>
 								<br/>
-								<textarea id="endingText" onchange="onEndingTextChange(event);" onkeydown="onEndingTextChange(event);" onkeyup="onEndingTextChange(event);" style="resize: vertical; width: 32ch;"></textarea>
+								<textarea title="text to show on ending" id="endingText" onchange="onEndingTextChange(event);" onkeydown="onEndingTextChange(event);" onkeyup="onEndingTextChange(event);" style="resize: vertical; width: 32ch;"></textarea>
 							</div>
-							<div id="effectOptions" class="controlBox">
+							<!-- <div id="effectOptions" class="controlBox">
 								<span>effect script</span>
 								<br/>
 								<textarea id="effectText" onchange="onEffectTextChange(event);" onkeydown="onEffectTextChange(event);" onkeyup="onEffectTextChange(event);" style="resize: vertical; width: 32ch;"></textarea>
-							</div>
+							</div> -->
 							<div id="exitOptions" class="controlBox">
 								<input type="checkbox" id="showExitOptionsCheck" onclick="onToggleExitOptions();" />
-								<label for="showExitOptionsCheck">
-									exit options
+								<label title="show / hide exit options" for="showExitOptionsCheck">
+									<span class="localize exit_options">exit options</span>
 									<i class="material-icons" id="showExitOptionsCheckIcon">expand_less</i>
 								</label>
 
 								<div id="exitOptionsInner" style="display: none;">
 									<form id="exitOptionsRadio" style="display: flex; flex-direction: row; margin-top:5px; margin-bottom: 5px;">
 										<input type="radio" name="exit options select" value="exit1" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions1" checked>
-										<label for="exitOptions1" class="left" style="flex: 1; font-size: 16px;">
-											<span>exit 1</span>
+										<label title="show exit 1 options" for="exitOptions1" class="left" style="flex: 1; font-size: 16px;">
+											<span class="localize exit_label">exit</span> 1
 										</label>
 
 										<input type="radio" name="exit options select" value="exit2" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions2">
-										<label for="exitOptions2" class="right" style="flex: 1; font-size: 16px;">
-											<span>exit 2</span>
+										<label title="show exit 2 options" for="exitOptions2" class="right" style="flex: 1; font-size: 16px;">
+											<span class="localize exit_label">exit</span> 2
 										</label>
 									</form>
 
 									<div style="padding:4px;">
-										<div class="controlBox" style="font-size:14px;">
-											transition effect: 
+										<div title="select transition effect" class="controlBox" style="font-size:14px;">
+											<span class="localize exit_transition_label">transition effect</span>: 
 											<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value);">
 												<option value="none">none</option>
 												<option value="fade_b">fade (black)</option>
@@ -636,7 +637,7 @@
 											</select>
 										</div>
 
-										<div style="margin-bottom: 5px; margin-top: 12px;">
+										<!-- <div style="margin-bottom: 5px; margin-top: 12px;">
 											<span id="exitScriptOptions">
 												<input type="checkbox" id="exitDialogCheck" onchange="setElementClass('exitScriptControls','exitDialogActive',event.target.checked);"/>
 												<label for="exitDialogCheck">
@@ -656,9 +657,9 @@
 													lock
 												</label>
 											</span>
-										</div>
+										</div> -->
 
-										<div id="exitScriptControls" class="controlBox">
+										<!-- <div id="exitScriptControls" class="controlBox">
 											<span class="exitLockControl">unlock door if:</span>
 											<br class="exitLockControl"/>
 
@@ -678,7 +679,7 @@
 												<option>sprite A</option>
 												<option>sprite a</option>
 											</select>
-										</div>
+										</div> -->
 									</div>
 								</div>
 
