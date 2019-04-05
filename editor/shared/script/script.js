@@ -53,7 +53,7 @@ var Interpreter = function() {
 			result = result.result; // pull out the contained result
 		}
 
-		console.log("RESULT " + result);
+		// console.log("RESULT " + result);
 
 		if (exitHandler != null) {
 			exitHandler(result);
