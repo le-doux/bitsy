@@ -8,6 +8,7 @@ X update panel prefs
 - update localization files
 - add localization for new strings
 - make sure exit tool doesn't refresh all the time and lose state (e.g. on enter edit mode)
+	- also: double click on exits to show them in tool?
 - hide / disable in-progress work
 	- IDs switch over
 	- script tag

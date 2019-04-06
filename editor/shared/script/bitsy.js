@@ -8,7 +8,7 @@ var room = {};
 var tile = {};
 var sprite = {};
 var item = {};
-var script = {};
+var script = {}; // TODO : decide if vNext??
 var palette = {
 	"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
 };
@@ -89,7 +89,7 @@ function clearGameData() {
 	tile = {};
 	sprite = {};
 	item = {};
-	script = {};
+	script = {}; // TODO : decide if vNext ??
 	palette = { //start off with a default palette (can be overriden)
 		"0" : {
 			name : null,
@@ -934,7 +934,8 @@ function movePlayer(direction) {
 	
 	var ext = getExit( player().room, player().x, player().y );
 	var end = getEnding( player().room, player().x, player().y );
-	var eff = getEffect( player().room, player().x, player().y );
+	// TODO : vNext
+	// var eff = getEffect( player().room, player().x, player().y );
 	var itmIndex = getItemIndex( player().room, player().x, player().y );
 
 	// do items first, because you can pick up an item AND go through a door
@@ -964,9 +965,10 @@ function movePlayer(direction) {
 	else if (ext) {
 		movePlayerThroughExit(ext);
 	}
-	else if (eff) {
-		startDialog( script[eff.id].source, eff.id );
-	}
+	// TODO : vNext
+	// else if (eff) {
+	// 	startDialog( script[eff.id].source, eff.id );
+	// }
 	else if (spr) {
 		startSpriteDialog( spr /*spriteId*/ );
 	}
@@ -986,17 +988,20 @@ function movePlayerThroughExit(ext) {
 		curRoom = ext.dest.room;
 	};
 
-	if(ext.script_id != null && script[ext.script_id]){
-		var scriptSourceStr = script[ext.script_id].source;
-		startDialog(scriptSourceStr, ext.script_id, function(isExitUnlocked) {
-			if (isExitUnlocked == true) {
-				GoToDest();
-			}
-		});
-	}
-	else {
-		GoToDest();
-	}
+	// TODO : vNext
+	// if(ext.script_id != null && script[ext.script_id]){
+	// 	var scriptSourceStr = script[ext.script_id].source;
+	// 	startDialog(scriptSourceStr, ext.script_id, function(isExitUnlocked) {
+	// 		if (isExitUnlocked == true) {
+	// 			GoToDest();
+	// 		}
+	// 	});
+	// }
+	// else {
+	// 	GoToDest();
+	// }
+
+	GoToDest();
 }
 
 function getItemIndex( roomId, x, y ) {
@@ -1089,15 +1094,16 @@ function getEnding(roomId,x,y) {
 	return null;
 }
 
-function getEffect(roomId,x,y) {
-	for (i in room[roomId].effects) {
-		var e = room[roomId].effects[i];
-		if (x == e.x && y == e.y) {
-			return e;
-		}
-	}
-	return null;
-}
+// TODO : vNext
+// function getEffect(roomId,x,y) {
+// 	for (i in room[roomId].effects) {
+// 		var e = room[roomId].effects[i];
+// 		if (x == e.x && y == e.y) {
+// 			return e;
+// 		}
+// 	}
+// 	return null;
+// }
 
 function getTile(x,y) {
 	// console.log(x + " " + y);
@@ -1175,9 +1181,10 @@ function parseWorld(file) {
 		else if (getType(curLine) === "END") {
 			i = parseEnding(lines, i);
 		}
-		else if (getType(curLine) === "PRG") {
-			i = parseScript(lines, i);
-		}
+		// TODO: vNext
+		// else if (getType(curLine) === "PRG") {
+		// 	i = parseScript(lines, i);
+		// }
 		else if (getType(curLine) === "VAR") {
 			i = parseVariable(lines, i);
 		}
@@ -1305,9 +1312,10 @@ function serializeWorld(skipFonts) {
 					if (e.transition_effect != undefined && e.transition_effect != null) {
 						worldStr += " FX " + e.transition_effect;
 					}
-					if (e.script_id != undefined && e.script_id != null) {
-						worldStr += " PRG " + e.script_id;
-					}
+					// TODO : vNext
+					// if (e.script_id != undefined && e.script_id != null) {
+					// 	worldStr += " PRG " + e.script_id;
+					// }
 					worldStr += "\n";
 				}
 			}
@@ -1321,14 +1329,15 @@ function serializeWorld(skipFonts) {
 				worldStr += "\n";
 			}
 		}
-		if (room[id].effects.length > 0) {
-			/* EFFECTS */
-			for (j in room[id].effects) {
-				var e = room[id].effects[j];
-				worldStr += "EFF " + e.id + " " + e.x + "," + e.y;
-				worldStr += "\n";
-			}
-		}
+		// TODO : vNext
+		// if (room[id].effects.length > 0) {
+		// 	/* EFFECTS */
+		// 	for (j in room[id].effects) {
+		// 		var e = room[id].effects[j];
+		// 		worldStr += "EFF " + e.id + " " + e.x + "," + e.y;
+		// 		worldStr += "\n";
+		// 	}
+		// }
 		if (room[id].pal != null) {
 			/* PALETTE */
 			worldStr += "PAL " + room[id].pal + "\n";
@@ -1491,7 +1500,7 @@ function parseRoom(lines, i) {
 		walls : [],
 		exits : [],
 		endings : [],
-		effects : [],
+		// effects : [], // TODO vNext
 		items : [],
 		pal : null,
 		name : null
@@ -1588,21 +1597,23 @@ function parseRoom(lines, i) {
 					x : parseInt(destCoords[0]),
 					y : parseInt(destCoords[1])
 				},
-				script_id : null,
 				transition_effect : null,
+				// TODO : vNext
+				// script_id : null,
 			};
 
 			// optional arguments
 			var exitArgIndex = 4;
 			while (exitArgIndex < exitArgs.length) {
-				if (exitArgs[exitArgIndex] == "PRG") {
-					ext.script_id = exitArgs[exitArgIndex+1];
-					exitArgIndex += 2;
-				}
-				else if (exitArgs[exitArgIndex] == "FX") {
+				if (exitArgs[exitArgIndex] == "FX") {
 					ext.transition_effect = exitArgs[exitArgIndex+1];
 					exitArgIndex += 2;
 				}
+				// TODO : vNext
+				// else if (exitArgs[exitArgIndex] == "PRG") {
+				// 	ext.script_id = exitArgs[exitArgIndex+1];
+				// 	exitArgIndex += 2;
+				// }
 				else {
 					exitArgIndex += 1;
 				}
@@ -1621,17 +1632,18 @@ function parseRoom(lines, i) {
 			};
 			room[id].endings.push(end);
 		}
-		else if (getType(lines[i]) === "EFF") {
-			/* ADD EFFECT */
-			var effectId = getId( lines[i] );
-			var effectCoords = getCoord( lines[i], 2 );
-			var effect = {
-				id : effectId,
-				x : parseInt( effectCoords[0] ),
-				y : parseInt( effectCoords[1] ),
-			};
-			room[id].effects.push(effect);
-		}
+		// TODO : vNext
+		// else if (getType(lines[i]) === "EFF") {
+		// 	/* ADD EFFECT */
+		// 	var effectId = getId( lines[i] );
+		// 	var effectCoords = getCoord( lines[i], 2 );
+		// 	var effect = {
+		// 		id : effectId,
+		// 		x : parseInt( effectCoords[0] ),
+		// 		y : parseInt( effectCoords[1] ),
+		// 	};
+		// 	room[id].effects.push(effect);
+		// }
 		else if (getType(lines[i]) === "PAL") {
 			/* CHOOSE PALETTE (that's not default) */
 			room[id].pal = getId(lines[i]);
