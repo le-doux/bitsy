@@ -1,7 +1,7 @@
 /*
 TODO for v6:
 X rename exit.js
-- update panel prefs
+X update panel prefs
 - update version number
 - update version notes
 - merge w/ main repository
@@ -133,7 +133,7 @@ var defaultPanelPrefs = {
 		{ id:"paintExplorerPanel",	visible:false,	position:9  },
 		{ id:"dialogPanel",			visible:false,	position:10 },
 		{ id:"inventoryPanel",		visible:false,	position:11 },
-		{ id:"settingsPanel",		visible:false,	position:11 }
+		{ id:"settingsPanel",		visible:false,	position:12 },
 	]
 };
 // console.log(defaultPanelPrefs);
@@ -142,10 +142,11 @@ function getPanelPrefs() {
 	// (TODO: weird that engine version and editor version are the same??)
 	var useDefaultPrefs = ( localStorage.engine_version == null ) ||
 							( localStorage.panel_prefs == null ) ||
-							( JSON.parse(localStorage.engine_version).major < 5 ) ||
+							( JSON.parse(localStorage.engine_version).major < 6 ) ||
 							( JSON.parse(localStorage.engine_version).minor < 0 );
-	console.log("USE DEFAULT?? " + useDefaultPrefs);
+
 	var prefs = useDefaultPrefs ? defaultPanelPrefs : JSON.parse( localStorage.panel_prefs );
+
 	// add missing panel prefs (if any)
 	// console.log(defaultPanelPrefs);
 	for( var i = 0; i < defaultPanelPrefs.workspace.length; i++ ) {
@@ -153,15 +154,16 @@ function getPanelPrefs() {
 		var panelPref = defaultPanelPrefs.workspace[i];
 		for( var j = 0; j < prefs.workspace.length; j++ )
 		{
-			if( prefs.workspace[j].id === panelPref.id )
+			if( prefs.workspace[j].id === panelPref.id ) {
 				isMissing = false;
+			}
 		}
+
 		if( isMissing ) {
-			console.log( "MISSING PREF " + panelPref.id );
 			prefs.workspace.push( panelPref );
 		}
 	}
-	console.log(prefs);
+
 	return prefs;
 }
 
