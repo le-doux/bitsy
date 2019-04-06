@@ -11,10 +11,10 @@ X update panel prefs
 	- also: double click on exits to show them in tool?
 - hide / disable in-progress work
 	- IDs switch over
-	- script tag
+	X script tag
 	- new functions
-	- exit options
-	- effects
+	X exit options
+	X effects
 - move marker panel style into css file
 - finalize transition time and fps
 */

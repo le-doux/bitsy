@@ -50,8 +50,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				x : 13,
 				y : 13
 			},
-			script_id : null,
 			transition_effect : null,
+			// TODO : vNext
+			// script_id : null,
 		}
 		room[selectedRoom].exits.push( newExit );
 
@@ -63,8 +64,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				x : newExit.x,
 				y : newExit.y
 			},
-			script_id : null,
 			transition_effect : null,
+			// TODO : vNext
+			// script_id : null,
 		}
 		room[newExit.dest.room].exits.push( newReturn );
 
@@ -87,19 +89,20 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		refreshGameData();
 	}
 
-	this.AddEffect = function() {
-		var newEffect = {
-			x : 2,
-			y : 2,
-			id : nextScriptHexId(),
-		};
-		room[selectedRoom].effects.push( newEffect );
-		script[ newEffect.id ] = { type: ScriptType.Script, source: "" }; // TODO : default effect?
+	// TODO : vNext
+	// this.AddEffect = function() {
+	// 	var newEffect = {
+	// 		x : 2,
+	// 		y : 2,
+	// 		id : nextScriptHexId(),
+	// 	};
+	// 	room[selectedRoom].effects.push( newEffect );
+	// 	script[ newEffect.id ] = { type: ScriptType.Script, source: "" }; // TODO : default effect?
 
-		markerList = GatherMarkerList();
-		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Effect && m.effect == newEffect; }));
-		refreshGameData();
-	}
+	// 	markerList = GatherMarkerList();
+	// 	SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Effect && m.effect == newEffect; }));
+	// 	refreshGameData();
+	// }
 
 	this.SetRoom = function(roomId) {
 		selectedRoom = roomId;
@@ -214,9 +217,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		else if (curMarker.type == MarkerType.Ending) {
 			markerName1.innerText = "ending"; // TODO localize
 		}
-		else if (curMarker.type == MarkerType.Effect) {
-			markerName1.innerText = "effect"; // TODO localize
-		}
+		// TODO : vNext
+		// else if (curMarker.type == MarkerType.Effect) {
+		// 	markerName1.innerText = "effect"; // TODO localize
+		// }
 	}
 
 	function UpdateMarkerOptions() {
@@ -250,6 +254,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				var endingStr = scriptUtils.RemoveDialogBlockFormat(endingSource);
 				endingText.value = endingStr;
 			}
+			// TODO : vNext
 			// else if (curMarker.type == MarkerType.Effect) {
 			// 	effectOptions.style.display = "block";
 			// 	var effectText = document.getElementById("effectText");
@@ -572,15 +577,16 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				);
 		}
 
-		for (var e in room[selectedRoom].effects) {
-			var effect = room[selectedRoom].effects[e];
+		// TODO : vNext
+		// for (var e in room[selectedRoom].effects) {
+		// 	var effect = room[selectedRoom].effects[e];
 
-			markerList.push(
-				new EffectMarker(
-					selectedRoom,
-					effect)
-				);
-		}
+		// 	markerList.push(
+		// 		new EffectMarker(
+		// 			selectedRoom,
+		// 			effect)
+		// 		);
+		// }
 
 		return markerList;
 	}
@@ -664,18 +670,20 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
-	this.ChangeEffectText = function(text) {
-		if (curMarker != null && curMarker.type == MarkerType.Effect) {
-			script[curMarker.effect.id].source = scriptUtils.EnsureDialogBlockFormat(text);
-			refreshGameData();
-		}
-	}
+	// TDODO : vNext
+	// this.ChangeEffectText = function(text) {
+	// 	if (curMarker != null && curMarker.type == MarkerType.Effect) {
+	// 		script[curMarker.effect.id].source = scriptUtils.EnsureDialogBlockFormat(text);
+	// 		refreshGameData();
+	// 	}
+	// }
 } // ExitTool
 
 var MarkerType = { // TODO : I should probably find a way to get rid of this
 	Exit : 0,
 	Ending : 1,
-	Effect: 2,
+	// TODO : vNext
+	// Effect: 2,
 };
 
 var PlacementMode = {
@@ -1005,7 +1013,7 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 		if (this.linkState == LinkState.TwoWay) {
 			// -- get rid of return exit --
 			if (this.hasReturn) {
-				tempReturnOptions = { script_id : this.return.script_id, transition_effect: this.return.transition_effect };
+				tempReturnOptions = { /*script_id : this.return.script_id,*/ transition_effect: this.return.transition_effect };
 
 				var returnIndex = room[this.exit.dest.room].exits.indexOf(this.return);
 				room[this.exit.dest.room].exits.splice(returnIndex,1);
@@ -1017,13 +1025,14 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 			this.linkState = LinkState.OneWayOriginal;
 		}
 		else if (this.linkState == LinkState.OneWayOriginal) {
-			tempExitOptions = { script_id : this.exit.script_id, transition_effect: this.exit.transition_effect };
+			tempExitOptions = { /*script_id : this.exit.script_id,*/ transition_effect: this.exit.transition_effect };
 
 			// -- swap the exit & entrance --
 			this.SwapExitAndEntrance();
 
 			if (tempReturnOptions != null) {
-				this.exit.script_id = tempReturnOptions.script_id;
+				// TODO : vNext
+				// this.exit.script_id = tempReturnOptions.script_id;
 				this.exit.transition_effect = tempReturnOptions.transition_effect;
 			}
 
@@ -1034,7 +1043,8 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 			this.SwapExitAndEntrance(); // swap first
 
 			if (tempExitOptions != null) {
-				this.exit.script_id = tempExitOptions.script_id;
+				// TODO : vNext
+				// this.exit.script_id = tempExitOptions.script_id;
 				this.exit.transition_effect = tempExitOptions.transition_effect;
 			}
 
@@ -1046,12 +1056,14 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 					x : this.exit.x,
 					y : this.exit.y
 				},
-				script_id : null,
 				transition_effect : null,
+				// TODO : vNext
+				// script_id : null,
 			}
 
 			if (tempReturnOptions != null) {
-				newReturn.script_id = tempReturnOptions.script_id;
+				// TODO : vNext
+				// newReturn.script_id = tempReturnOptions.script_id;
 				newReturn.transition_effect = tempReturnOptions.transition_effect;
 			}
 
@@ -1165,69 +1177,70 @@ function EndingMarker(parentRoom, ending) {
 }
 
 
-// TODO : feels like I can find a way to share more logic with EndingMarker
-function EffectMarker(parentRoom, effect) {
-	InitMarkerObj( this, new RoomMarkerBase(parentRoom) );
+// TODO : vNext
+// // TODO : feels like I can find a way to share more logic with EndingMarker
+// function EffectMarker(parentRoom, effect) {
+// 	InitMarkerObj( this, new RoomMarkerBase(parentRoom) );
 
-	this.type = MarkerType.Effect;
+// 	this.type = MarkerType.Effect;
 
-	this.effect = effect;
+// 	this.effect = effect;
 
-	this.Draw = function(ctx,roomId,w,selected) {
-		if (this.parentRoom === roomId) {
-			this.base.DrawMarker(ctx, this.effect.x, this.effect.y, w, selected);
-			// TODO - specialize??
-		}
-	}
+// 	this.Draw = function(ctx,roomId,w,selected) {
+// 		if (this.parentRoom === roomId) {
+// 			this.base.DrawMarker(ctx, this.effect.x, this.effect.y, w, selected);
+// 			// TODO - specialize??
+// 		}
+// 	}
 
-	this.GetMarkerPos = function(markerIndex) {
-		return {
-			room: this.parentRoom,
-			x: this.effect.x,
-			y: this.effect.y,
-		};
-	}
+// 	this.GetMarkerPos = function(markerIndex) {
+// 		return {
+// 			room: this.parentRoom,
+// 			x: this.effect.x,
+// 			y: this.effect.y,
+// 		};
+// 	}
 
-	this.IsAtLocation = function(roomId,x,y) {
-		return this.parentRoom === roomId && this.effect.x == x && this.effect.y == y;
-	}
+// 	this.IsAtLocation = function(roomId,x,y) {
+// 		return this.parentRoom === roomId && this.effect.x == x && this.effect.y == y;
+// 	}
 
-	var isDragging = false;
+// 	var isDragging = false;
 
-	this.StartDrag = function(roomId,x,y) {
-		isDragging = this.IsAtLocation(roomId,x,y);
-	}
+// 	this.StartDrag = function(roomId,x,y) {
+// 		isDragging = this.IsAtLocation(roomId,x,y);
+// 	}
 
-	this.ContinueDrag = function(roomId,x,y) {
-		if (isDragging) {
-			this.effect.x = x;
-			this.effect.y = y;
-		}
-	}
+// 	this.ContinueDrag = function(roomId,x,y) {
+// 		if (isDragging) {
+// 			this.effect.x = x;
+// 			this.effect.y = y;
+// 		}
+// 	}
 
-	this.EndDrag = function() {
-		isDragging = false;
-	}
+// 	this.EndDrag = function() {
+// 		isDragging = false;
+// 	}
 
-	this.Remove = function() {
-		delete script[this.effect.id];
-		var effectIndex = room[this.parentRoom].effects.indexOf(this.effect);
-		room[this.parentRoom].effects.splice(effectIndex,1);
-	}
+// 	this.Remove = function() {
+// 		delete script[this.effect.id];
+// 		var effectIndex = room[this.parentRoom].effects.indexOf(this.effect);
+// 		room[this.parentRoom].effects.splice(effectIndex,1);
+// 	}
 
-	this.PlaceMarker = function(placementMode,roomId,x,y) {
-		if (placementMode != PlacementMode.None) {
-			this.effect.x = x;
-			this.effect.y = y;
-			if (roomId != this.parentRoom) {
-				this.Remove();
-				room[roomId].effects.push(this.effect);
-				this.parentRoom = roomId;
-			}
-		}
-	}
+// 	this.PlaceMarker = function(placementMode,roomId,x,y) {
+// 		if (placementMode != PlacementMode.None) {
+// 			this.effect.x = x;
+// 			this.effect.y = y;
+// 			if (roomId != this.parentRoom) {
+// 				this.Remove();
+// 				room[roomId].effects.push(this.effect);
+// 				this.parentRoom = roomId;
+// 			}
+// 		}
+// 	}
 
-	this.Match = function(otherMarker) {
-		return this.type == otherMarker.type && this.effect == otherMarker.effect;
-	}
-}
+// 	this.Match = function(otherMarker) {
+// 		return this.type == otherMarker.type && this.effect == otherMarker.effect;
+// 	}
+// }
