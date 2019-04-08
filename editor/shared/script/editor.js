@@ -8,7 +8,7 @@ X hide / disable in-progress work
 	X new functions
 	X exit options
 	X effects
-- add localization for new strings
+X add localization for new strings
 - make sure exit tool doesn't refresh all the time and lose state (e.g. on enter edit mode)
 	- also: double click on exits to show them in tool?
 - move marker panel style into css file

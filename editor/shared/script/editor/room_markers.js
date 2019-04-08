@@ -82,7 +82,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			id : nextEndingId(),
 		};
 		room[selectedRoom].endings.push( newEnding );
-		ending[ newEnding.id ] = "the end";
+		ending[ newEnding.id ] = localization.GetStringOrFallback("default_end_dlg", "The end");
 
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; }));
@@ -202,20 +202,20 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		if (curMarker.type == MarkerType.Exit) {
 			if (curMarker.linkState == LinkState.TwoWay) {
-				markerName1.innerText = "exit 1"; // TODO localize
-				markerName2.innerText = "exit 2";
+				markerName1.innerText = localization.GetStringOrFallback("exit_label", "exit") + " 1";
+				markerName2.innerText = localization.GetStringOrFallback("exit_label", "exit") + " 2";
 			}
 			else if (curMarker.linkState == LinkState.OneWayOriginal) {
-				markerName1.innerText = "exit"; // TODO localize
-				markerName2.innerText = "destination";
+				markerName1.innerText = localization.GetStringOrFallback("exit_label", "exit");
+				markerName2.innerText = localization.GetStringOrFallback("destination_label", "destination");
 			}
 			else if (curMarker.linkState == LinkState.OneWaySwapped) {
-				markerName1.innerText = "destination"; // TODO localize
-				markerName2.innerText = "exit";
+				markerName1.innerText = localization.GetStringOrFallback("destination_label", "destination");
+				markerName2.innerText = localization.GetStringOrFallback("exit_label", "exit");
 			}
 		}
 		else if (curMarker.type == MarkerType.Ending) {
-			markerName1.innerText = "ending"; // TODO localize
+			markerName1.innerText = localization.GetStringOrFallback("ending_label", "ending");
 		}
 		// TODO : vNext
 		// else if (curMarker.type == MarkerType.Effect) {
@@ -391,7 +391,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	function GetPosString(markerPos) {
 		var roomName = room[markerPos.room].name;
 		if (roomName == undefined || roomName == null) {
-			roomName = "room " + markerPos.room; // TODO localize
+			roomName = localization.GetStringOrFallback("room_tool_name", "room") + " " + markerPos.room;
 		}
 		return roomName + " (" + markerPos.x + "," + markerPos.y + ")";
 	}
@@ -407,7 +407,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// hackily relies on global UI names oh well D:
 		if (placementMode == PlacementMode.FirstMarker) {
 			document.getElementById("toggleMoveMarker1").checked = true;
-			document.getElementById("textMoveMarker1").innerText = "moving"; // TODO localize
+			document.getElementById("textMoveMarker1").innerText = localization.GetStringOrFallback("marker_moving", "moving");
 			document.getElementById("cancelMoveMarker1").style.display = "inline";
 			document.getElementById("textMoveMessage1").style.display = "inline";
 			document.getElementById("textMarkerPos1").style.display = "none";
@@ -415,7 +415,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		else {
 			// var markerPos1 = curMarker.GetMarkerPos(0);
 			document.getElementById("toggleMoveMarker1").checked = false;
-			document.getElementById("textMoveMarker1").innerText = "move"; // TODO localize// GetPosString(markerPos1);
+			document.getElementById("textMoveMarker1").innerText = localization.GetStringOrFallback("marker_move", "move");
 			document.getElementById("cancelMoveMarker1").style.display = "none";
 			document.getElementById("textMoveMessage1").style.display = "none";
 			document.getElementById("textMarkerPos1").style.display = "inline";
@@ -423,14 +423,14 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		if (placementMode == PlacementMode.SecondMarker) {
 			document.getElementById("toggleMoveMarker2").checked = true;
-			document.getElementById("textMoveMarker2").innerText = "moving"; // TODO localize
+			document.getElementById("textMoveMarker2").innerText = localization.GetStringOrFallback("marker_moving", "moving");
 			document.getElementById("cancelMoveMarker2").style.display = "inline";
 			document.getElementById("textMoveMessage2").style.display = "inline";
 			document.getElementById("textMarkerPos2").style.display = "none";
 		}
 		else {
 			document.getElementById("toggleMoveMarker2").checked = false;
-			document.getElementById("textMoveMarker2").innerText = "move"; // TODO localize // GetPosString(markerPos2);
+			document.getElementById("textMoveMarker2").innerText = localization.GetStringOrFallback("marker_move", "move");
 			document.getElementById("cancelMoveMarker2").style.display = "none";
 			document.getElementById("textMoveMessage2").style.display = "none";
 			document.getElementById("textMarkerPos2").style.display = "inline";
