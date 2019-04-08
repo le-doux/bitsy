@@ -1,3 +1,50 @@
+#noMarkerMessage {
+	width:300px;
+}
+
+#noMarkerMessage span {
+	white-space: pre-wrap; word-wrap: break-word;
+}
+
+#markersSelect {
+	display: flex;
+}
+
+#markerControl1 {
+	display: flex; flex-direction: column;
+}
+
+#markerName1 {
+	font-size: 14px; line-height: 12px;
+}
+
+#markerCanvas1 {
+	width:114px; height:114px;
+}
+
+.markerPosControl {
+	margin-top: 4px;
+}
+
+#textMarkerPos1 {
+	font-size: 12px;
+}
+
+#textMoveMessage1 {
+	font-size: 12px;
+}
+
+#markerLinkControl {
+	padding-left: 5px; padding-right: 5px; display:inline-block;
+}
+
+#markerLinkControl button {
+	margin-top: 70px;
+}
+
+/* TODO : continue on to marker control 2 etc */
+
+/* TODO : vNext */
 #exitScriptControls {
 	display: none;
 }

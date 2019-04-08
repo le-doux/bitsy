@@ -511,14 +511,14 @@
 						</div>
 					</div>
 					<div id="exitsPanelContent">
-						<div id="noMarkerMessage" class="controlBox" style="width:300px;">
-							<span style="white-space: pre-wrap; word-wrap: break-word;" class="localize marker_tool_empty">There are no exits or endings in this room yet! You can add one with this tool. :)</span>
+						<div id="noMarkerMessage" class="controlBox">
+							<span class="localize marker_tool_empty">There are no exits or endings in this room yet! You can add one with this tool. :)</span>
 						</div>
-						<div id="markersSelect" style="display: flex;">
-							<div id="markerControl1" class="controlBox" style="display: flex; flex-direction: column;">
-								<span id="markerName1" style="font-size: 14px; line-height: 12px;">marker 1</span>
-								<canvas id="markerCanvas1" title="location of marker (click to go to room)" style="width:114px; height:114px;" onclick="selectMarkerRoom1();"></canvas>
-								<div style="margin-top: 4px;">
+						<div id="markersSelect">
+							<div id="markerControl1" class="controlBox">
+								<span id="markerName1">marker 1</span>
+								<canvas id="markerCanvas1" title="location of marker (click to go to room)" onclick="selectMarkerRoom1();"></canvas>
+								<div class="markerPosControl">
 									<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
 									<label for="toggleMoveMarker1" title="click to move marker">
 										<i class="material-icons">location_searching</i>
@@ -528,17 +528,17 @@
 										<i class="material-icons">cancel</i>
 									</button>
 									<div title="marker coordinates">
-										<span id="textMarkerPos1" style="font-size: 12px;">room 0 (0,0)</span>
+										<span id="textMarkerPos1">room 0 (0,0)</span>
 									</div>
 									<div>
-										<span id="textMoveMessage1" style="font-size: 12px;">
+										<span id="textMoveMessage1">
 											<i class="localize marker_move_click">click in room</i>
 										</span>
 									</div>
 								</div>
 							</div>
-							<div id="markerLinkControl" style="padding-left: 5px; padding-right: 5px; display:inline-block;">
-								<button title="toggle exit direction" onclick="changeExitDirection();" style="margin-top: 70px;">
+							<div id="markerLinkControl">
+								<button title="toggle exit direction" onclick="changeExitDirection();">
 									<i class="material-icons" id="exitDirectionBackIcon">arrow_back</i>
 									<i class="material-icons" id="exitDirectionForwardIcon">arrow_forward</i>
 								</button>
