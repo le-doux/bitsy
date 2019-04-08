@@ -2,21 +2,23 @@
 TODO for v6:
 X rename exit.js
 X update panel prefs
-- hide / disable in-progress work
-	- IDs switch over
+X hide / disable in-progress work
+	X IDs switch over
 	X script tag
 	X new functions
 	X exit options
 	X effects
-- merge w/ main repository
-- update localization files
 - add localization for new strings
 - make sure exit tool doesn't refresh all the time and lose state (e.g. on enter edit mode)
 	- also: double click on exits to show them in tool?
 - move marker panel style into css file
 - finalize transition time and fps
+- TEST EVERYTHING
+- merge w/ main repository
+- update localization files
 - update version number
 - update version notes
+- TEST EVERYTHING
 */
 
 /*
@@ -492,7 +494,7 @@ function on_drawing_name_change() {
 		if(newName != oldName) {
 			for(dlgId in dialog) {
 				// console.log("DLG " + dlgId);
-				var dialogScript = scriptInterpreter.Parse( script[dlgId].source );
+				var dialogScript = scriptInterpreter.Parse( dialog[dlgId] );
 				var visitor = new ItemNameSwapVisitor();
 				dialogScript.VisitAll( visitor );
 				if( visitor.DidSwap() ) {
@@ -500,7 +502,7 @@ function on_drawing_name_change() {
 					if(newDialog.indexOf("\n") > -1) {
 						newDialog = '"""\n' + newDialog + '\n"""';
 					}
-					script[dlgId].source = newDialog;
+					dialog[dlgId] = newDialog;
 				}
 			}
 		}
@@ -1625,7 +1627,7 @@ function convertGameDataToCurVersion(importVersion) {
 		};
 
 		for(dlgId in dialog) {
-			var dialogScript = scriptInterpreter.Parse( script[dlgId].source );
+			var dialogScript = scriptInterpreter.Parse( dialog[dlgId] );
 			var visitor = new PrintFunctionVisitor();
 			dialogScript.VisitAll( visitor );
 			if( visitor.DidChange() ) {
@@ -1633,7 +1635,7 @@ function convertGameDataToCurVersion(importVersion) {
 				if(newDialog.indexOf("\n") > -1) {
 					newDialog = '"""\n' + newDialog + '\n"""';
 				}
-				script[dlgId].source = newDialog;
+				dialog[dlgId] = newDialog;
 			}
 		}
 
@@ -3570,7 +3572,7 @@ function serializeAdvDialog() {
 	if( dialogStr.length <= 0 )
 	{
 		paintTool.getCurObject().dlg = null;
-		delete script[dialogId];
+		delete dialog[dialogId];
 	}
 	else
 	{
@@ -3585,7 +3587,7 @@ function serializeAdvDialog() {
 			paintTool.getCurObject().dlg = dialogId;
 		}
 
-		script[dialogId] = { type:ScriptType.Dialogue, source:dialogStr }; //TODO: do I need to do more here?
+		dialog[dialogId] = dialogStr;
 	}
 
 	reloadDialogUICore();
@@ -3972,16 +3974,16 @@ function on_change_language_inner(language) {
 	}
 
 	// update default sprite
-	var defaultSpriteDlgExists = script["SPR_0"] != null && localization.LocalizationContains("default_sprite_dlg", script["SPR_0"].source);
+	var defaultSpriteDlgExists = dialog["SPR_0"] != null && localization.LocalizationContains("default_sprite_dlg", dialog["SPR_0"]);
 	if (defaultSpriteDlgExists) {
-		script["SPR_0"].source = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
+		dialog["SPR_0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
 		paintTool.reloadDrawing();
 	}
 
 	// update default item
-	var defaultItemDlgExists = script["ITM_0"] != null && localization.LocalizationContains("default_item_dlg", script["ITM_0"].source);
+	var defaultItemDlgExists = dialog["ITM_0"] != null && localization.LocalizationContains("default_item_dlg", dialog["ITM_0"]);
 	if (defaultItemDlgExists) {
-		script["ITM_0"].source = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
+		dialog["ITM_0"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
 		paintTool.reloadDrawing(); // hacky to do this twice
 	}
 

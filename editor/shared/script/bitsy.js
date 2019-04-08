@@ -8,10 +8,11 @@ var room = {};
 var tile = {};
 var sprite = {};
 var item = {};
-var script = {}; // TODO : decide if vNext??
+var dialog = {};
 var palette = {
 	"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
 };
+var ending = {};
 var variable = {}; // these are starting variable values -- they don't update (or I don't think they will)
 var playerId = "A";
 
@@ -89,13 +90,14 @@ function clearGameData() {
 	tile = {};
 	sprite = {};
 	item = {};
-	script = {}; // TODO : decide if vNext ??
+	dialog = {};
 	palette = { //start off with a default palette (can be overriden)
 		"0" : {
 			name : null,
 			colors : [[0,0,0],[255,0,0],[255,255,255]]
 		}
 	};
+	ending = {};
 	isEnding = false; //todo - correct place for this?
 	variable = {};
 
@@ -656,7 +658,7 @@ function moveSprites() {
 				var itmIndex = getItemIndex( spr.room, spr.x, spr.y );
 				if (end) { //if the sprite hits an ending
 					if (id === playerId) { // only the player can end the game
-						startNarrating( script[end.id].source, true /*isEnding*/ );
+						startNarrating( ending[end.id], true /*isEnding*/ );
 					}
 				}
 				else if (ext) { //if the sprite hits an exit
@@ -960,7 +962,7 @@ function movePlayer(direction) {
 	}
 
 	if (end) {
-		startNarrating( script[end.id].source, true /*isEnding*/ );
+		startNarrating( ending[end.id], true /*isEnding*/ );
 	}
 	else if (ext) {
 		movePlayerThroughExit(ext);
@@ -1405,20 +1407,33 @@ function serializeWorld(skipFonts) {
 		}
 		worldStr += "\n";
 	}
-	/* SCRIPTS */
-	for (id in script) {
-		if (script[id].type == ScriptType.Dialogue) {
-			worldStr += "DLG " + id + "\n";
-		}
-		else if (script[id].type == ScriptType.Ending) {
-			worldStr += "END " + id + "\n";
-		}
-		else {
-			worldStr += "PRG " + id + "\n";
-		}
-		worldStr += script[id].source + "\n";
+	/* DIALOG */
+	for (id in dialog) {
+		worldStr += "DLG " + id + "\n";
+		worldStr += dialog[id] + "\n";
 		worldStr += "\n";
 	}
+	/* ENDINGS */
+	for (id in ending) {
+		worldStr += "END " + id + "\n";
+		worldStr += ending[id] + "\n";
+		worldStr += "\n";
+	}
+	// TODO : vNext
+	// /* SCRIPTS */
+	// for (id in script) {
+	// 	if (script[id].type == ScriptType.Dialogue) {
+	// 		worldStr += "DLG " + id + "\n";
+	// 	}
+	// 	else if (script[id].type == ScriptType.Ending) {
+	// 		worldStr += "END " + id + "\n";
+	// 	}
+	// 	else {
+	// 		worldStr += "PRG " + id + "\n";
+	// 	}
+	// 	worldStr += script[id].source + "\n";
+	// 	worldStr += "\n";
+	// }
 	/* VARIABLES */
 	for (id in variable) {
 		worldStr += "VAR " + id + "\n";
@@ -1926,36 +1941,43 @@ function parseDrawingCore(lines, i, drwId) {
 	return i;
 }
 
-var ScriptType = {
-	Script : 0,
-	Dialogue : 1, // TODO : move everything to this spelling?
-	Ending : 2,
-};
+// TODO : vNext
+// var ScriptType = {
+// 	Script : 0,
+// 	Dialogue : 1, // TODO : move everything to this spelling?
+// 	Ending : 2,
+// };
 
-function parseScript(lines, i, scriptType) {
-	if (scriptType === undefined || scriptType === null) {
-		scriptType = ScriptType.Script;
-	}
+function parseScript(lines, i, objectStore) {
+	// TODO : vNext
+	// if (scriptType === undefined || scriptType === null) {
+	// 	scriptType = ScriptType.Script;
+	// }
 
 	var id = getId(lines[i]);
 	i++;
 
 	var results = scriptUtils.ReadDialogScript(lines,i);
-	script[id] = {
-		source: results.script,
-		type: scriptType,
-	};
+
+	// TODO : vNext
+	// script[id] = {
+	// 	source: results.script,
+	// 	type: scriptType,
+	// };
+
+	objectStore[id] = results.script;
+
 	i = results.index;
 
 	return i;
 }
 
 function parseDialog(lines, i) {
-	return parseScript(lines, i, ScriptType.Dialogue);
+	return parseScript(lines, i, dialog);
 }
 
 function parseEnding(lines, i) {
-	return parseScript(lines, i, ScriptType.Ending);
+	return parseScript(lines, i, ending);
 }
 
 function parseVariable(lines, i) {
@@ -2141,8 +2163,8 @@ function startNarrating(dialogStr,end) {
 function startItemDialog(itemId) {
 	var dialogId = item[itemId].dlg;
 	// console.log("START ITEM DIALOG " + dialogId);
-	if(script[dialogId]){
-		var dialogStr = script[dialogId].source;
+	if(dialog[dialogId]){
+		var dialogStr = dialog[dialogId];
 		startDialog(dialogStr,dialogId);
 	}
 }
@@ -2151,8 +2173,8 @@ function startSpriteDialog(spriteId) {
 	var spr = sprite[spriteId];
 	var dialogId = spr.dlg ? spr.dlg : spriteId;
 	// console.log("START SPRITE DIALOG " + dialogId);
-	if(script[dialogId]){
-		var dialogStr = script[dialogId].source;
+	if(dialog[dialogId]){
+		var dialogStr = dialog[dialogId];
 		startDialog(dialogStr,dialogId);
 	}
 }
