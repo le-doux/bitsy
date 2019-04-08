@@ -2,21 +2,21 @@
 TODO for v6:
 X rename exit.js
 X update panel prefs
-- update version number
-- update version notes
+- hide / disable in-progress work
+	- IDs switch over
+	X script tag
+	X new functions
+	X exit options
+	X effects
 - merge w/ main repository
 - update localization files
 - add localization for new strings
 - make sure exit tool doesn't refresh all the time and lose state (e.g. on enter edit mode)
 	- also: double click on exits to show them in tool?
-- hide / disable in-progress work
-	- IDs switch over
-	X script tag
-	- new functions
-	X exit options
-	X effects
 - move marker panel style into css file
 - finalize transition time and fps
+- update version number
+- update version notes
 */
 
 /*

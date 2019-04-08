@@ -201,28 +201,24 @@ function deprecatedFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
-function returnFunc(environment,parameters,onReturn) {
-	var ret = { isReturn: true, result: null };
+// TODO : vNext
+// function returnFunc(environment,parameters,onReturn) {
+// 	var ret = { isReturn: true, result: null };
+// 	if (parameters.length > 0 && parameters[0] != undefined && parameters[0] != null) {
+// 		ret.result = parameters[0];
+// 	}
+// 	onReturn(ret);
+// }
 
-	if (parameters.length > 0 && parameters[0] != undefined && parameters[0] != null) {
-		ret.result = parameters[0];
-	}
-
-	onReturn(ret);
-}
-
-// TODO : this is kind of hacky
-// - needs to work with names too
-// - should it work only on the drawing? or other things too??
-// - need to think about how the sprite model should work (multiple sprites?)
-// 		- will avatars still need to be unique in a multi sprite world?
-// - need a way to detect the sprite ID / name in code {avatarName} (or something???)
-function changeAvatarFunc(environment,parameters,onReturn) {
-	if( parameters[0] != undefined && parameters[0] != null ) {
-		sprite["A"].drw = "SPR_" + parameters[0];
-	}
-	onReturn(null);
-}
+// TODO : vNext
+// // TODO : this is kind of hacky
+// // - needs to work with names too
+// function changeAvatarFunc(environment,parameters,onReturn) {
+// 	if( parameters[0] != undefined && parameters[0] != null ) {
+// 		sprite["A"].drw = "SPR_" + parameters[0];
+// 	}
+// 	onReturn(null);
+// }
 
 function printFunc(environment,parameters,onReturn) {
 	// console.log("PRINT FUNC");
@@ -439,9 +435,11 @@ var Environment = function() {
 	functionMap.set("printSprite", printSpriteFunc);
 	functionMap.set("printTile", printTileFunc);
 	functionMap.set("printItem", printItemFunc);
-	functionMap.set("changeAvatar", changeAvatarFunc);
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
-	functionMap.set("return", returnFunc);
+
+	// TODO : vNext
+	// functionMap.set("changeAvatar", changeAvatarFunc);
+	// functionMap.set("return", returnFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn) {
