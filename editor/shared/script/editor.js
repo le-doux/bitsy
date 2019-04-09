@@ -9,7 +9,7 @@ X hide / disable in-progress work
 	X exit options
 	X effects
 X add localization for new strings
-- make sure exit tool doesn't refresh all the time and lose state (e.g. on enter edit mode)
+X make sure exit tool doesn't refresh all the time and lose state (e.g. on enter edit mode)
 X move marker panel style into css file
 - finalize transition time and fps *
 - TEST EVERYTHING
@@ -1146,8 +1146,6 @@ function on_edit_mode() {
 	roomTool.drawEditMap();
 
 	roomTool.listenEditEvents();
-
-	markerTool.Refresh();
 
 	updateInventoryUI();
 
