@@ -115,6 +115,18 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		ResetMarkerList();
 	}
 
+	this.RefreshKeepSelection = function() {
+		var tempMarker = curMarker;
+		SelectMarker(null);
+		ResetMarkerList();
+
+		// TODO : this is looking for object match.. not value match
+		var matchMarker = markerList.find(function(marker) { return tempMarker.Match(marker); });
+		if (matchMarker != null) {
+			SelectMarker(matchMarker);
+		}
+	}
+
 	function ResetMarkerList() { // TODO : account for when it doesn't exist in parent room either!
 		markerList = GatherMarkerList();
 
