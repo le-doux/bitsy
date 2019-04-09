@@ -1,14 +1,7 @@
 /*
 TODO:
-X make multiple transitions choose-able
-X test fancy transitions (wave, etc)
-X make wrapper objects for image data
-X only run pixel func on frame step
-X in sliding transition.. lerp colors (that would be cool!)
-- tunnel transition
-	- in progress : transition info object that stores start & end position
-		- is storing the palette in the image a good idea?? or is there something better?
-		- what about storing the player position?
+- finalize FPS and duration
+- make sure fades always hit full black and white
 */
 
 var TransitionManager = function() {
@@ -22,7 +15,7 @@ var TransitionManager = function() {
 	var transitionTime = 0; // milliseconds
 	var maxTransitionTime = 1000; // milliseconds // TODO : pick final speed
 
-	var maxStep = 10; // TODO : pick final "chunkiness", move this to timePerFrame or something more precise
+	var maxStep = 9;
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
@@ -290,8 +283,8 @@ var TransitionManager = function() {
 		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
 			var delta = (step / maxStep);
 
-			if (delta <= 0.33) {
-				var tunnelDelta = 1 - (delta / 0.33);
+			if (delta <= 0.4) {
+				var tunnelDelta = 1 - (delta / 0.4);
 
 				var xDist = start.PlayerCenter.x - pixelX;
 				var yDist = start.PlayerCenter.y - pixelY;
@@ -304,12 +297,12 @@ var TransitionManager = function() {
 					return start.Image.GetPixel(pixelX,pixelY);
 				}
 			}
-			else if (delta <= 0.66)
+			else if (delta <= 0.6)
 			{
 				return {r:0,g:0,b:0,a:255};
 			}
 			else {
-				var tunnelDelta = (delta - 0.66) / 0.33;
+				var tunnelDelta = (delta - 0.6) / 0.4;
 
 				var xDist = end.PlayerCenter.x - pixelX;
 				var yDist = end.PlayerCenter.y - pixelY;

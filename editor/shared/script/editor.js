@@ -11,10 +11,10 @@ X hide / disable in-progress work
 X add localization for new strings
 - make sure exit tool doesn't refresh all the time and lose state (e.g. on enter edit mode)
 - move marker panel style into css file
-- finalize transition time and fps
+- finalize transition time and fps *
 - TEST EVERYTHING
 - merge w/ main repository
-- update localization files
+- update localization files *
 - update version number
 - update version notes
 - TEST EVERYTHING
