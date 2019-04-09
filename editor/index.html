@@ -544,9 +544,9 @@
 								</button>
 							</div>
 							<div id="markerControl2" class="controlBox" style="display: flex; flex-direction: column;">
-								<span id="markerName2" style="font-size: 14px; line-height: 12px;">marker 2</span>
-								<canvas id="markerCanvas2" title="location of marker (click to go to room)" style="width:114px; height:114px;" onclick="selectMarkerRoom2();"></canvas>
-								<div style="margin-top: 4px;">
+								<span id="markerName2">marker 2</span>
+								<canvas id="markerCanvas2" title="location of marker (click to go to room)" onclick="selectMarkerRoom2();"></canvas>
+								<div class="markerPosControl">
 									<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" />
 									<label for="toggleMoveMarker2" title="click to move marker">
 										<i class="material-icons">location_searching</i>
@@ -556,10 +556,10 @@
 										<i class="material-icons">cancel</i>
 									</button>
 									<div title="marker coordinates">
-										<span id="textMarkerPos2" style="font-size: 12px;">room 0 (0,0)</span>
+										<span id="textMarkerPos2">room 0 (0,0)</span>
 									</div>
 									<div>
-										<span id="textMoveMessage2" style="font-size: 12px;">
+										<span id="textMoveMessage2">
 											<i class="localize marker_move_click">click in room</i>
 										</span>
 									</div>
@@ -594,7 +594,7 @@
 							<div id="endingOptions" class="controlBox">
 								<span class="localize ending_dialog">ending dialog</span>
 								<br/>
-								<textarea title="text to show on ending" id="endingText" onchange="onEndingTextChange(event);" onkeydown="onEndingTextChange(event);" onkeyup="onEndingTextChange(event);" style="resize: vertical; width: 32ch;"></textarea>
+								<textarea title="text to show on ending" id="endingText" onchange="onEndingTextChange(event);" onkeydown="onEndingTextChange(event);" onkeyup="onEndingTextChange(event);"></textarea>
 							</div>
 							<!-- <div id="effectOptions" class="controlBox">
 								<span>effect script</span>
@@ -608,15 +608,15 @@
 									<i class="material-icons" id="showExitOptionsCheckIcon">expand_less</i>
 								</label>
 
-								<div id="exitOptionsInner" style="display: none;">
-									<form id="exitOptionsRadio" style="display: flex; flex-direction: row; margin-top:5px; margin-bottom: 5px;">
+								<div id="exitOptionsInner">
+									<form id="exitOptionsRadio">
 										<input type="radio" name="exit options select" value="exit1" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions1" checked>
-										<label title="show exit 1 options" for="exitOptions1" class="left" style="flex: 1; font-size: 16px;">
+										<label title="show exit 1 options" for="exitOptions1" class="left">
 											<span class="localize exit_label">exit</span> 1
 										</label>
 
 										<input type="radio" name="exit options select" value="exit2" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions2">
-										<label title="show exit 2 options" for="exitOptions2" class="right" style="flex: 1; font-size: 16px;">
+										<label title="show exit 2 options" for="exitOptions2" class="right">
 											<span class="localize exit_label">exit</span> 2
 										</label>
 									</form>

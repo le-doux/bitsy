@@ -250,7 +250,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			else if (curMarker.type == MarkerType.Ending) {
 				endingOptions.style.display = "block";
 				var endingText = document.getElementById("endingText");
-				var endingSource = dialog[curMarker.ending.id];
+				var endingSource = ending[curMarker.ending.id];
 				var endingStr = scriptUtils.RemoveDialogBlockFormat(endingSource);
 				endingText.value = endingStr;
 			}
@@ -665,7 +665,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	this.ChangeEndingText = function(text) {
 		if (curMarker != null && curMarker.type == MarkerType.Ending) {
-			dialog[curMarker.ending.id] = scriptUtils.EnsureDialogBlockFormat(text);
+			ending[curMarker.ending.id] = scriptUtils.EnsureDialogBlockFormat(text);
 			refreshGameData();
 		}
 	}

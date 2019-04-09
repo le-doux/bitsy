@@ -10,7 +10,7 @@ X hide / disable in-progress work
 	X effects
 X add localization for new strings
 - make sure exit tool doesn't refresh all the time and lose state (e.g. on enter edit mode)
-- move marker panel style into css file
+X move marker panel style into css file
 - finalize transition time and fps *
 - TEST EVERYTHING
 - merge w/ main repository

@@ -1,3 +1,5 @@
+/* TODO : simplify -> less IDs, more classes */
+
 #noMarkerMessage {
 	width:300px;
 }
@@ -40,6 +42,38 @@
 
 #markerLinkControl button {
 	margin-top: 70px;
+}
+
+#markerName2 {
+	font-size: 14px; line-height: 12px;
+}
+
+#markerCanvas2 {
+	width:114px; height:114px;
+}
+
+#textMarkerPos2 {
+	font-size: 12px;
+}
+
+#textMoveMessage2 {
+	font-size: 12px;
+}
+
+#endingText {
+	resize: vertical; width: 32ch;
+}
+
+#exitOptionsInner {
+	display: none;
+}
+
+#exitOptionsRadio {
+	display: flex; flex-direction: row; margin-top:5px; margin-bottom: 5px;
+}
+
+#exitOptionsRadio label {
+	flex: 1; font-size: 16px;
 }
 
 /* TODO : continue on to marker control 2 etc */
