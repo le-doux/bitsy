@@ -116,14 +116,15 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	this.RefreshKeepSelection = function() {
-		var tempMarker = curMarker;
+		// ok this is hacky but if we assume marker ordering hasn't changed... this works
+		// !!! be careful only to use this when that will be true
+		var tempMarkerIndex = markerList.indexOf(curMarker);
+
 		SelectMarker(null);
 		ResetMarkerList();
 
-		// TODO : this is looking for object match.. not value match
-		var matchMarker = markerList.find(function(marker) { return tempMarker.Match(marker); });
-		if (matchMarker != null) {
-			SelectMarker(matchMarker);
+		if (tempMarkerIndex >= 0 && tempMarkerIndex < markerList.length) {
+			SelectMarker(markerList[tempMarkerIndex]);
 		}
 	}
 
