@@ -11,7 +11,7 @@ X hide / disable in-progress work
 X add localization for new strings
 X make sure exit tool doesn't refresh all the time and lose state (e.g. on enter edit mode)
 X move marker panel style into css file
-- bug: why do we always start on "exit 2" in the exit options select button
+X bug: why do we always start on "exit 2" in the exit options select button
 - finalize transition time and fps *
 - TEST EVERYTHING
 - merge w/ main repository

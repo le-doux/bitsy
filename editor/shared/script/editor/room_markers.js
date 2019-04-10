@@ -281,6 +281,15 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	this.SetExitOptionsVisibility = function(visible) {
 		document.getElementById("exitOptionsInner").style.display = visible ? "block" : "none";
 		document.getElementById("showExitOptionsCheckIcon").innerText = visible ? "expand_more" : "expand_less";
+
+		if (visible) {
+			var exitOptionsSelect = document.getElementsByName("exit options select");
+			var exitOptionsSelectValue = null;
+			for(var i = 0; i < exitOptionsSelect.length; i++){
+				exitOptionsSelect[i].checked = exitOptionsSelect[i].value === "exit1";
+			}
+			UpdateExitOptions("exit1");
+		}
 	}
 
 	var curExitOptionsSelectId = null; // hacky but don't judge me
@@ -690,7 +699,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	// 		refreshGameData();
 	// 	}
 	// }
-} // ExitTool
+}
 
 var MarkerType = { // TODO : I should probably find a way to get rid of this
 	Exit : 0,
