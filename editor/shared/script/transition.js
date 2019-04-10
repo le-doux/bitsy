@@ -5,17 +5,15 @@ TODO:
 */
 
 var TransitionManager = function() {
-	// var startImage = null;
-	// var endImage = null;
 	var transitionStart = null;
 	var transitionEnd = null;
 	var effectImage = null;
 
 	var isTransitioning = false;
 	var transitionTime = 0; // milliseconds
-	var maxTransitionTime = 1000; // milliseconds // TODO : pick final speed
+	var maxTransitionTime = 1000; // milliseconds
 
-	var maxStep = 9;
+	var maxStep = 8;
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
@@ -253,7 +251,7 @@ var TransitionManager = function() {
 	});
 
 	this.RegisterTransitionEffect("wave", { // name? wave? distort? shiver?
-		showPlayerStart : false,
+		showPlayerStart : true,
 		showPlayerEnd : true,
 		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
 			var delta = (step / maxStep);
@@ -319,26 +317,45 @@ var TransitionManager = function() {
 	});
 
 	this.RegisterTransitionEffect("fuzz", {
-		showPlayerStart : false,
+		showPlayerStart : true,
 		showPlayerEnd : true,
 		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			// TODO: actually implement by getting average color?... this just caused a zoom effect oops
-			// var delta = (step / maxStep);
+			var delta = (step / maxStep);
+			var curImage = delta <= 0.5 ? start : end;
+			var sampleSize = delta <= 0.5 ? (1 + Math.floor(15 * (delta/0.5))) : (16 - Math.floor(15 * ((delta-0.5)/0.5)));
 
-			// if (delta <= 0.5) {
-			// 	delta = delta / 0.5;
-			// 	var fuzziness = 1 / (1 + (3 * delta));
-			// 	pixelX = Math.floor( pixelX  * fuzziness );
-			// 	pixelY = Math.floor( pixelY * fuzziness );
-			// 	return start.Image.GetPixel(pixelX,pixelY);
-			// }
-			// else {
-			// 	delta = 1 - ((delta - 0.5) / 0.5)
-			// 	var fuzziness = 1 / (1 + (3 * delta));
-			// 	pixelX = Math.floor( pixelX  * fuzziness );
-			// 	pixelY = Math.floor( pixelY * fuzziness );
-			// 	return end.Image.GetPixel(pixelX,pixelY);
-			// }
+			if (pixelX == 0 && pixelY == 0) {
+				console.log("FUZZ SAMPLE " + sampleSize);
+			}
+
+			var paletteCount = {};
+			var sampleX = Math.floor(pixelX / sampleSize) * sampleSize;
+			var sampleY = Math.floor(pixelY / sampleSize) * sampleSize;
+			for (var y = sampleY; y < sampleY + sampleSize; y++) {
+				for (var x = sampleX; x < sampleX + sampleSize; x++) {
+					var color = curImage.Image.GetPixel(x,y)
+					var palIndex = PostProcessUtilities.GetColorPalIndex(color,curImage.Palette);
+					if (palIndex != -1) {
+						if (paletteCount[palIndex]) {
+							paletteCount[palIndex] += (palIndex != 0) ? 1 : 0.4;
+						}
+						else {
+							paletteCount[palIndex] = (palIndex != 0) ? 1 : 0.4;
+						}
+					}
+				}
+			}
+
+			var palIndex = 0;
+			var maxCount = 0;
+			for (var i in paletteCount) {
+				if (paletteCount[i] > maxCount) {
+					palIndex = i;
+					maxCount = paletteCount[i];
+				}
+			}
+
+			return PostProcessUtilities.GetPalColor(curImage.Palette,palIndex);
 		}
 	});
 }; // TransitionManager()
@@ -374,7 +391,7 @@ var PostProcessUtilities = {
 			a : colorA.a + ((colorB.a - colorA.a) * t),
 		};
 	},
-	GetCorrespondingColorFromPal : function(colorIn,curPal,otherPal) { // this is kind of hacky!
+	GetColorPalIndex : function(colorIn,curPal) {
 		var colorIndex = -1;
 
 		for (var i = 0; i < curPal.length; i++) {
@@ -383,8 +400,16 @@ var PostProcessUtilities = {
 			}
 		}
 
+		return colorIndex;
+	},
+	GetPalColor : function(palette,index) {
+		return { r: palette[index][0], g: palette[index][1], b: palette[index][2], a: 255 }
+	},
+	GetCorrespondingColorFromPal : function(colorIn,curPal,otherPal) { // this is kind of hacky!
+		var colorIndex = PostProcessUtilities.GetColorPalIndex(colorIn,curPal);
+
 		if (colorIndex >= 0 && colorIndex <= otherPal.length) {
-			return { r: otherPal[colorIndex][0], g: otherPal[colorIndex][1], b: otherPal[colorIndex][2], a: 255 };
+			return PostProcessUtilities.GetPalColor(otherPal,colorIndex);
 		}
 		else {
 			return colorIn;

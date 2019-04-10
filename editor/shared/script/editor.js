@@ -19,6 +19,7 @@ X bug: why do we always start on "exit 2" in the exit options select button
 - update version number
 - update version notes
 - TEST EVERYTHING
+- update github page
 */
 
 /*
