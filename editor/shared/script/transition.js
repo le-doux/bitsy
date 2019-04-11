@@ -13,7 +13,7 @@ var TransitionManager = function() {
 	var transitionTime = 0; // milliseconds
 	var maxTransitionTime = 1000; // milliseconds
 
-	var maxStep = 8;
+	var maxStep = 7;
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
@@ -328,34 +328,56 @@ var TransitionManager = function() {
 				console.log("FUZZ SAMPLE " + sampleSize);
 			}
 
-			var paletteCount = {};
+			var palIndex = 0;
+
 			var sampleX = Math.floor(pixelX / sampleSize) * sampleSize;
 			var sampleY = Math.floor(pixelY / sampleSize) * sampleSize;
-			for (var y = sampleY; y < sampleY + sampleSize; y++) {
-				for (var x = sampleX; x < sampleX + sampleSize; x++) {
-					var color = curImage.Image.GetPixel(x,y)
-					var palIndex = PostProcessUtilities.GetColorPalIndex(color,curImage.Palette);
-					if (palIndex != -1) {
-						if (paletteCount[palIndex]) {
-							paletteCount[palIndex] += (palIndex != 0) ? 1 : 0.4;
-						}
-						else {
-							paletteCount[palIndex] = (palIndex != 0) ? 1 : 0.4;
+
+			var frameState = transitionEffects["fuzz"].frameState;
+
+			if (frameState.step != step) {
+				frameState.step = step;
+				frameState.preCalcSampleValues = {};
+			}
+
+			if (frameState.preCalcSampleValues[[sampleX,sampleY]]) {
+				palIndex = frameState.preCalcSampleValues[[sampleX,sampleY]];
+			}
+			else {
+				var paletteCount = {};
+				var foregroundValue = 1.0;
+				var backgroundValue = 0.4; // 0.6 - (0.2 * (sampleSize / 16));
+				for (var y = sampleY; y < sampleY + sampleSize; y++) {
+					for (var x = sampleX; x < sampleX + sampleSize; x++) {
+						var color = curImage.Image.GetPixel(x,y)
+						var palIndex = PostProcessUtilities.GetColorPalIndex(color,curImage.Palette);
+						if (palIndex != -1) {
+							if (paletteCount[palIndex]) {
+								paletteCount[palIndex] += (palIndex != 0) ? foregroundValue : backgroundValue;
+							}
+							else {
+								paletteCount[palIndex] = (palIndex != 0) ? foregroundValue : backgroundValue;
+							}
 						}
 					}
 				}
-			}
 
-			var palIndex = 0;
-			var maxCount = 0;
-			for (var i in paletteCount) {
-				if (paletteCount[i] > maxCount) {
-					palIndex = i;
-					maxCount = paletteCount[i];
+				var maxCount = 0;
+				for (var i in paletteCount) {
+					if (paletteCount[i] > maxCount) {
+						palIndex = i;
+						maxCount = paletteCount[i];
+					}
 				}
+
+				frameState.preCalcSampleValues[[sampleX,sampleY]] = palIndex;
 			}
 
 			return PostProcessUtilities.GetPalColor(curImage.Palette,palIndex);
+		},
+		frameState : { // ok this is hacky but it's for performance ok
+			step : -1,
+			preCalcSampleValues : {}
 		}
 	});
 }; // TransitionManager()

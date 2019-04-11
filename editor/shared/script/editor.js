@@ -12,6 +12,10 @@ X add localization for new strings
 X make sure exit tool doesn't refresh all the time and lose state (e.g. on enter edit mode)
 X move marker panel style into css file
 X bug: why do we always start on "exit 2" in the exit options select button
+X fuzz transition
+	- re-name it?
+- decide whether to keep tunnel transition
+- two-way exits REALLY need a consistent direction (based on room order? what about when you move an exit or entrance?)
 - finalize transition time and fps *
 - TEST EVERYTHING
 - merge w/ main repository
