@@ -11,15 +11,18 @@ var TransitionManager = function() {
 
 	var isTransitioning = false;
 	var transitionTime = 0; // milliseconds
-	var maxTransitionTime = 750; // milliseconds
+	// var maxTransitionTime = 750; // milliseconds
 
-	var maxStep = 8;
+	var frameRate = 8; // cap the FPS
+
+	// var maxStep = 8;
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
+		console.log("--- START ROOM TRANSITION ---");
+
 		curEffect = effectName;
 
-		// var tmpRoom = curRoom;
 		var tmpRoom = player().room;
 		var tmpX = player().x;
 		var tmpY = player().y;
@@ -70,14 +73,15 @@ var TransitionManager = function() {
 
 		transitionTime += dt;
 
-		var transitionDelta = transitionTime / maxTransitionTime;
+		var transitionDelta = transitionTime / transitionEffects[curEffect].duration;
+		var maxStep = Math.floor(frameRate * (transitionEffects[curEffect].duration / 1000));
+		var step = Math.floor(transitionDelta * maxStep);
 
-		var step = Math.floor(transitionDelta * maxStep); // TODO : only update on step change!
 		if (step != prevStep) {
-			// console.log("step! " + step);
+			console.log("step! " + step);
 			for (var y = 0; y < effectImage.Height; y++) {
 				for (var x = 0; x < effectImage.Width; x++) {
-					var color = transitionEffects[curEffect].pixelEffectFunc(transitionStart,transitionEnd,x,y,step,maxStep);
+					var color = transitionEffects[curEffect].pixelEffectFunc(transitionStart,transitionEnd,x,y,(step / maxStep));
 					effectImage.SetPixel(x,y,color);
 				}
 			}
@@ -86,11 +90,9 @@ var TransitionManager = function() {
 
 		ctx.putImageData(effectImage.GetData(), 0, 0);
 
-		if (transitionTime >= maxTransitionTime) {
+		if (transitionTime >= transitionEffects[curEffect].duration) {
 			isTransitioning = false;
 			transitionTime = 0;
-			// startImage = null;
-			// endImage = null;
 			transitionStart = null;
 			transitionEnd = null;
 			effectImage = null;
@@ -118,64 +120,50 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("fade_w", { // TODO : have it linger on full white briefly?
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			var pixelDelta = step / maxStep;
+		duration : 750,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
+			var pixelColorA = delta < 0.5 ? start.Image.GetPixel(pixelX,pixelY) : {r:255,g:255,b:255,a:255};
+			var pixelColorB = delta < 0.5 ? {r:255,g:255,b:255,a:255} : end.Image.GetPixel(pixelX,pixelY);
 
-			var pixelColorA = pixelDelta < 0.5 ? start.Image.GetPixel(pixelX,pixelY) : {r:255,g:255,b:255,a:255};
-			var pixelColorB = pixelDelta < 0.5 ? {r:255,g:255,b:255,a:255} : end.Image.GetPixel(pixelX,pixelY);
+			delta = delta < 0.5 ? (delta / 0.5) : ((delta - 0.5) / 0.5); // hacky
 
-			pixelDelta = pixelDelta < 0.5 ? (pixelDelta / 0.5) : ((pixelDelta - 0.5) / 0.5); // hacky
-
-			return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, pixelDelta);
+			return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, delta);
 		}
 	});
 
 	this.RegisterTransitionEffect("fade_b", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			var pixelDelta = step / maxStep;
+		duration : 750,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
+			var pixelColorA = delta < 0.5 ? start.Image.GetPixel(pixelX,pixelY) : {r:0,g:0,b:0,a:255};
+			var pixelColorB = delta < 0.5 ? {r:0,g:0,b:0,a:255} : end.Image.GetPixel(pixelX,pixelY);
 
-			var pixelColorA = pixelDelta < 0.5 ? start.Image.GetPixel(pixelX,pixelY) : {r:0,g:0,b:0,a:255};
-			var pixelColorB = pixelDelta < 0.5 ? {r:0,g:0,b:0,a:255} : end.Image.GetPixel(pixelX,pixelY);
+			delta = delta < 0.5 ? (delta / 0.5) : ((delta - 0.5) / 0.5); // hacky
 
-			pixelDelta = pixelDelta < 0.5 ? (pixelDelta / 0.5) : ((pixelDelta - 0.5) / 0.5); // hacky
-
-			return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, pixelDelta);
+			return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, delta);
 		}
 	});
-
-	// this.RegisterTransitionEffect("cross_fade", {
-	// 	showPlayerStart : true,
-	// 	showPlayerEnd : true,
-	// 	pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-	// 		var pixelDelta = step / maxStep;
-
-	// 		var pixelColorA = start.Image.GetPixel(pixelX,pixelY);
-	// 		var pixelColorB = end.Image.GetPixel(pixelX,pixelY);
-
-	// 		return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, pixelDelta);
-	// 	}
-	// });
 
 	this.RegisterTransitionEffect("slide_u", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			var pixelOffset = -1 * Math.floor(start.Image.Height * (step / maxStep));
+		duration : 1000,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
+			var pixelOffset = -1 * Math.floor(start.Image.Height * delta);
 			var slidePixelY = pixelY + pixelOffset;
 
 			if (slidePixelY >= 0) {
 				var colorA = start.Image.GetPixel(pixelX,slidePixelY);
 				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
 				return colorLerped;
 			}
 			else {
 				slidePixelY += start.Image.Height;
 				var colorB = end.Image.GetPixel(pixelX,slidePixelY);
 				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
 				return colorLerped;
 			}
 		}
@@ -184,21 +172,22 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("slide_d", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			var pixelOffset = Math.floor(start.Image.Height * (step / maxStep));
+		duration : 1000,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
+			var pixelOffset = Math.floor(start.Image.Height * delta);
 			var slidePixelY = pixelY + pixelOffset;
 
 			if (slidePixelY < start.Image.Height) {
 				var colorA = start.Image.GetPixel(pixelX,slidePixelY);
 				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
 				return colorLerped;
 			}
 			else {
 				slidePixelY -= start.Image.Height;
 				var colorB = end.Image.GetPixel(pixelX,slidePixelY);
 				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
 				return colorLerped;
 			}
 		}
@@ -207,21 +196,22 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("slide_l", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			var pixelOffset = -1 * Math.floor(start.Image.Width * (step / maxStep));
+		duration : 1000,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
+			var pixelOffset = -1 * Math.floor(start.Image.Width * delta);
 			var slidePixelX = pixelX + pixelOffset;
 
 			if (slidePixelX >= 0) {
 				var colorA = start.Image.GetPixel(slidePixelX,pixelY);
 				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
 				return colorLerped;
 			}
 			else {
 				slidePixelX += start.Image.Width;
 				var colorB = end.Image.GetPixel(slidePixelX,pixelY);
 				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
 				return colorLerped;
 			}
 		}
@@ -230,21 +220,22 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("slide_r", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			var pixelOffset = Math.floor(start.Image.Width * (step / maxStep));
+		duration : 1000,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
+			var pixelOffset = Math.floor(start.Image.Width * delta);
 			var slidePixelX = pixelX + pixelOffset;
 
 			if (slidePixelX < start.Image.Width) {
 				var colorA = start.Image.GetPixel(slidePixelX,pixelY);
 				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
 				return colorLerped;
 			}
 			else {
 				slidePixelX -= start.Image.Width;
 				var colorB = end.Image.GetPixel(slidePixelX,pixelY);
 				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, step / maxStep);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
 				return colorLerped;
 			}
 		}
@@ -253,8 +244,8 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("wave", { // name? wave? distort? shiver?
 		showPlayerStart : true,
 		showPlayerEnd : true,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			var delta = (step / maxStep);
+		duration : 1500,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
 			var waveDelta = delta < 0.5 ? delta / 0.5 : 1 - ((delta - 0.5) / 0.5);
 
 			var offset = (pixelY + (waveDelta * waveDelta * 0.2 * start.Image.Height));
@@ -278,9 +269,8 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("tunnel", {
 		showPlayerStart : true,
 		showPlayerEnd : true,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			var delta = (step / maxStep);
-
+		duration : 1500,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
 			if (delta <= 0.4) {
 				var tunnelDelta = 1 - (delta / 0.4);
 
@@ -319,10 +309,10 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("fuzz", {
 		showPlayerStart : true,
 		showPlayerEnd : true,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,step,maxStep) {
-			var delta = (step / maxStep);
+		duration : 1500,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
 			var curImage = delta <= 0.5 ? start : end;
-			var sampleSize = delta <= 0.5 ? (1 + Math.floor(15 * (delta/0.5))) : (16 - Math.floor(15 * ((delta-0.5)/0.5)));
+			var sampleSize = delta <= 0.5 ? (2 + Math.floor(14 * (delta/0.5))) : (16 - Math.floor(14 * ((delta-0.5)/0.5)));
 
 			var palIndex = 0;
 
@@ -331,8 +321,8 @@ var TransitionManager = function() {
 
 			var frameState = transitionEffects["fuzz"].frameState;
 
-			if (frameState.step != step) {
-				frameState.step = step;
+			if (frameState.time != delta) {
+				frameState.time = delta;
 				frameState.preCalcSampleValues = {};
 			}
 
@@ -342,7 +332,7 @@ var TransitionManager = function() {
 			else {
 				var paletteCount = {};
 				var foregroundValue = 1.0;
-				var backgroundValue = 0.4; // 0.6 - (0.2 * (sampleSize / 16));
+				var backgroundValue = 0.4;
 				for (var y = sampleY; y < sampleY + sampleSize; y++) {
 					for (var x = sampleX; x < sampleX + sampleSize; x++) {
 						var color = curImage.Image.GetPixel(x,y)
@@ -372,7 +362,7 @@ var TransitionManager = function() {
 			return PostProcessUtilities.GetPalColor(curImage.Palette,palIndex);
 		},
 		frameState : { // ok this is hacky but it's for performance ok
-			step : -1,
+			time : -1,
 			preCalcSampleValues : {}
 		}
 	});
