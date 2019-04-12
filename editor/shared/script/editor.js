@@ -17,6 +17,7 @@ X fuzz transition
 - decide whether to keep tunnel transition
 - two-way exits REALLY need a consistent direction (based on room order? what about when you move an exit or entrance?)
 - finalize transition time and fps *
+	- experiment w/ varied times / frame-counts per transition
 - TEST EVERYTHING
 - merge w/ main repository
 - update localization files *
