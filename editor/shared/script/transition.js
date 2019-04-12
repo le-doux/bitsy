@@ -324,10 +324,6 @@ var TransitionManager = function() {
 			var curImage = delta <= 0.5 ? start : end;
 			var sampleSize = delta <= 0.5 ? (1 + Math.floor(15 * (delta/0.5))) : (16 - Math.floor(15 * ((delta-0.5)/0.5)));
 
-			if (pixelX == 0 && pixelY == 0) {
-				console.log("FUZZ SAMPLE " + sampleSize);
-			}
-
 			var palIndex = 0;
 
 			var sampleX = Math.floor(pixelX / sampleSize) * sampleSize;
