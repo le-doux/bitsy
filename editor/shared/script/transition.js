@@ -1,9 +1,3 @@
-/*
-TODO:
-- finalize FPS and duration
-- make sure fades always hit full black and white
-*/
-
 var TransitionManager = function() {
 	var transitionStart = null;
 	var transitionEnd = null;
@@ -11,15 +5,11 @@ var TransitionManager = function() {
 
 	var isTransitioning = false;
 	var transitionTime = 0; // milliseconds
-	// var maxTransitionTime = 750; // milliseconds
-
 	var frameRate = 8; // cap the FPS
-
-	// var maxStep = 8;
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
-		console.log("--- START ROOM TRANSITION ---");
+		// console.log("--- START ROOM TRANSITION ---");
 
 		curEffect = effectName;
 
@@ -78,7 +68,7 @@ var TransitionManager = function() {
 		var step = Math.floor(transitionDelta * maxStep);
 
 		if (step != prevStep) {
-			console.log("step! " + step);
+			// console.log("step! " + step);
 			for (var y = 0; y < effectImage.Height; y++) {
 				for (var x = 0; x < effectImage.Width; x++) {
 					var color = transitionEffects[curEffect].pixelEffectFunc(transitionStart,transitionEnd,x,y,(step / maxStep));

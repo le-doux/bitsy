@@ -495,13 +495,13 @@ function update() {
 	var curTime = Date.now();
 	deltaTime = curTime - prevTime;
 
-	updateInput();
-
 	if (transition.IsTransitionActive()) {
 		// transition animation takes over everything!
 		transition.UpdateTransition(deltaTime);
 	}
 	else {
+		updateInput();
+
 		if (!isNarrating && !isEnding) {
 			updateAnimation();
 			drawRoom( room[curRoom] ); // draw world if game has begun

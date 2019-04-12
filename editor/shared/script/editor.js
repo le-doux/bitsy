@@ -14,10 +14,12 @@ X move marker panel style into css file
 X bug: why do we always start on "exit 2" in the exit options select button
 X fuzz transition
 	- re-name it?
-- decide whether to keep tunnel transition
+X decide whether to keep tunnel transition (keep, I think)
 - two-way exits REALLY need a consistent direction (based on room order? what about when you move an exit or entrance?)
-- finalize transition time and fps *
-	- experiment w/ varied times / frame-counts per transition
+X finalize transition time and fps
+	X experiment w/ varied times / frame-counts per transition
+X bug: keyboard inputs seem to still register during transition
+- flicker of next screen sometimes plays before transition
 - TEST EVERYTHING
 - merge w/ main repository
 - update localization files *
