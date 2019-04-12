@@ -11,9 +11,9 @@ var TransitionManager = function() {
 
 	var isTransitioning = false;
 	var transitionTime = 0; // milliseconds
-	var maxTransitionTime = 1000; // milliseconds
+	var maxTransitionTime = 750; // milliseconds
 
-	var maxStep = 7;
+	var maxStep = 8;
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
