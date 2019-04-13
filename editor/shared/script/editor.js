@@ -15,12 +15,11 @@ X bug: why do we always start on "exit 2" in the exit options select button
 X fuzz transition
 	- re-name it?
 X decide whether to keep tunnel transition (keep, I think)
-- two-way exits REALLY need a consistent direction (based on room order? what about when you move an exit or entrance?)
 X finalize transition time and fps
 	X experiment w/ varied times / frame-counts per transition
 X bug: keyboard inputs seem to still register during transition
 X flicker of next screen sometimes plays before transition
-- thoughts on color slerping: cool but use sparingly, consider hsl colors, try not to break 3-color (+ b&w) rule
+- two-way exits REALLY need a consistent direction (based on room order? what about when you move an exit or entrance?)
 - need to make markers stand out better on complicated backgrounds!
 - TEST EVERYTHING
 - merge w/ main repository
@@ -263,6 +262,8 @@ function start() {
 	else {
 		setDefaultGameState();
 	}
+
+	roomIndex = sortedRoomIdList().indexOf(curRoom);
 
 	markerTool.SetRoom(curRoom);
 
@@ -1153,9 +1154,10 @@ function on_edit_mode() {
 	stopGame();
 	// TODO I should really do more to separate the editor's game-data from the engine's game-data
 	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
-	curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
-	roomTool.drawEditMap();
 
+	curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
+
+	roomTool.drawEditMap();
 	roomTool.listenEditEvents();
 
 	markerTool.RefreshKeepSelection();
