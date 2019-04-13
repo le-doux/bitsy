@@ -19,8 +19,8 @@ X finalize transition time and fps
 	X experiment w/ varied times / frame-counts per transition
 X bug: keyboard inputs seem to still register during transition
 X flicker of next screen sometimes plays before transition
-- two-way exits REALLY need a consistent direction (based on room order? what about when you move an exit or entrance?)
-- need to make markers stand out better on complicated backgrounds!
+X need to make markers stand out better on complicated backgrounds!
+X two-way exit names need to better reflect what they are
 - TEST EVERYTHING
 - merge w/ main repository
 - update localization files *

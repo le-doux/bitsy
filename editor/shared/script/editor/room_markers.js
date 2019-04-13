@@ -215,8 +215,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		if (curMarker.type == MarkerType.Exit) {
 			if (curMarker.linkState == LinkState.TwoWay) {
-				markerName1.innerText = localization.GetStringOrFallback("exit_label", "exit") + " 1";
-				markerName2.innerText = localization.GetStringOrFallback("exit_label", "exit") + " 2";
+				markerName1.innerText = localization.GetStringOrFallback("exit_label", "exit");
+				markerName2.innerText = localization.GetStringOrFallback("exit_return_label", "return exit");
 			}
 			else if (curMarker.linkState == LinkState.OneWayOriginal) {
 				markerName1.innerText = localization.GetStringOrFallback("exit_label", "exit");
