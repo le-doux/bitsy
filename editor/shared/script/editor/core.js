@@ -518,6 +518,7 @@ function resetGameData() {
 	}
 
 	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
+	markerTool.SetRoom("0");
 	markerTool.Refresh();
 	roomTool.drawEditMap();
 

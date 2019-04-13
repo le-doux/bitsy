@@ -110,7 +110,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	this.Refresh = function() { // TODO: rename "Reset"???
-		console.log("REFRESH MARKER");
 		SelectMarker(null);
 		ResetMarkerList();
 	}
