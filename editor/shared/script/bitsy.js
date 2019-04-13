@@ -982,6 +982,7 @@ function movePlayerThroughExit(ext) {
 	var GoToDest = function() {
 		if (ext.transition_effect != null) {
 			transition.BeginTransition(player().room, player().x, player().y, ext.dest.room, ext.dest.x, ext.dest.y, ext.transition_effect);
+			transition.UpdateTransition(0);
 		}
 
 		player().room = ext.dest.room;
@@ -2044,10 +2045,17 @@ function drawItem(img,x,y,context) {
 	drawTile(img,x,y,context); //TODO these methods are dumb and repetitive
 }
 
+// var debugLastRoomDrawn = "0";
+
 function drawRoom(room,context,frameIndex) { // context & frameIndex are optional
 	if (!context) { //optional pass in context; otherwise, use default (ok this is REAL hacky isn't it)
 		context = ctx;
 	}
+
+	// if (room.id != debugLastRoomDrawn) {
+	// 	debugLastRoomDrawn = room.id;
+	// 	console.log("DRAW ROOM " + debugLastRoomDrawn);
+	// }
 
 	//clear screen
 	context.fillStyle = "rgb(" + getPal(room.pal)[0][0] + "," + getPal(room.pal)[0][1] + "," + getPal(room.pal)[0][2] + ")";

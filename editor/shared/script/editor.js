@@ -20,6 +20,7 @@ X finalize transition time and fps
 	X experiment w/ varied times / frame-counts per transition
 X bug: keyboard inputs seem to still register during transition
 - flicker of next screen sometimes plays before transition
+	- do I need a second buffer to avoid this?
 - TEST EVERYTHING
 - merge w/ main repository
 - update localization files *

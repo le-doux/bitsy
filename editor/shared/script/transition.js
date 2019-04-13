@@ -68,7 +68,7 @@ var TransitionManager = function() {
 		var step = Math.floor(transitionDelta * maxStep);
 
 		if (step != prevStep) {
-			// console.log("step! " + step);
+			// console.log("step! " + step + " " + transitionDelta);
 			for (var y = 0; y < effectImage.Height; y++) {
 				for (var x = 0; x < effectImage.Width; x++) {
 					var color = transitionEffects[curEffect].pixelEffectFunc(transitionStart,transitionEnd,x,y,(step / maxStep));
