@@ -12,12 +12,14 @@
 		<link rel="stylesheet" type="text/css" href="shared/style/editorLanguageStyles.css">
 		<link rel="stylesheet" type="text/css" href="shared/style/editorAnimations.css">
 		<link rel="stylesheet" type="text/css" href="shared/style/colorPickerStyle.css">
+		<link rel="stylesheet" type="text/css" href="shared/style/markerToolStyle.css">
 
 		<!-- UTIL SCRIPTS -->
 		<script src="shared/script/color_util.js"></script>
 
 		<!-- ENGINE SCRIPTS -->
 		<script src="shared/script/font.js"></script>
+		<script src="shared/script/transition.js"></script>
 		<script src="shared/script/script.js"></script>
 		<script src="shared/script/dialog.js"></script>
 		<script src="shared/script/parser.js"></script>
@@ -28,6 +30,7 @@
 		<script src="shared/script/editor/core.js"></script>
 		<script src="shared/script/editor/paint.js"></script>
 		<script src="shared/script/editor/room.js"></script>
+		<script src="shared/script/editor/room_markers.js"></script>
 		<script src="shared/script/editor/explorer.js"></script>
 		<script src="shared/script/editor/localization.js"></script>
 
@@ -102,17 +105,11 @@
 				</label>
 
 				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanelAnimated(event);" />
-				<label title="show / hide exits window" for="exitsCheck" class="notMobile">
+				<label title="show / hide exits & endings window" for="exitsCheck" class="notMobile">
 					<i class="material-icons">directions</i>
-					<span class="localize exits_tool_name">exits</span>
+					<span class="localize marker_tool_name">exits & endings</span>
 				</label>
 
-				<input type="checkbox" value="endingsPanel" id="endingsCheck" onclick="togglePanelAnimated(event);" />
-				<label title="show / hide endings window" for="endingsCheck" class="notMobile">
-					<i class="material-icons">place</i>
-					<span class="localize endings_tool_name">endings</span>
-				</label>
-				
 				<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide paint window" for="paintCheck">
 					<i class="material-icons">brush</i>
@@ -469,6 +466,16 @@
 									<i class="material-icons">remove_circle</i>
 								</button>
 							</div>
+
+							<div id="roomColor" class="buttonGroup">
+								<span class="localize palette_tool_name">colors</span>: 
+								<select title="select color palette for room" id="roomPaletteSelect" onchange="roomPaletteChange(event);">
+									<option value="0">palette 0</option> <!-- other options are added dynamically -->
+								</select>
+							</div>
+
+							<br>
+
 							<div id="roomVisibility" class="buttonGroup">
 								<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
 								<label title="show / hide grid" for="roomGridCheck">
@@ -481,26 +488,19 @@
 									<i class="material-icons" id="roomWallsIcon">visibility_off</i> 
 									<span class="localize walls_toggle_visible">walls</span>
 								</label>
+
+								<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
+								<label title="show / hide exits & endings" for="roomMarkersCheck">
+									<i class="material-icons" id="roomMarkersIcon">visibility</i> 
+									<span class="localize marker_tool_name">exits & endings</span>
+								</label>
 							</div>
 
-							<br>
-
-							<div id="roomExits" class="buttonGroup">
-								<button title="add exits from this room to other rooms" class="color0" onclick="showPanel('exitsPanel');">
+							<div id="roomMarkers" class="buttonGroup">
+								<button title="add exits and endings" class="color0" onclick="showPanel('exitsPanel');">
 									<i class="material-icons">open_in_new</i>
-									<span class="localize room_add_exits">add exits</span>
+									<span class="localize room_add_markers">add exits & endings</span>
 								</button>
-								<button title="add endings" class="color0" onclick="showPanel('endingsPanel');">
-									<i class="material-icons">open_in_new</i>
-									<span class="localize room_add_endings">add endings</span>
-								</button>
-							</div>
-
-							<div id="roomColor" class="buttonGroup">
-								<span class="localize palette_tool_name">colors</span>: 
-								<select title="select color palette for room" id="roomPaletteSelect" onchange="roomPaletteChange(event);">
-									<option value="0">palette 0</option> <!-- other options are added dynamically -->
-								</select>
 							</div>
 						</div>
 
@@ -512,81 +512,190 @@
 				<div id="exitsPanel" class="panel color3" style="display:none;">
 					<div class="bar color3">
 
-						<button title="minimize exits window" class="light panelBarClose" onclick="hidePanel('exitsPanel');">
+						<button title="minimize exits & endings window" class="light panelBarClose" onclick="hidePanel('exitsPanel');">
 							<i class="material-icons">close</i>
 						</button>
 
-						<div title="exits window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<i class="material-icons">directions</i> 
-							<span class="localize exits_tool_name">exits</span>
+						<div title="exits & endings window" class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">directions</i>
+							<span class="localize marker_tool_name">exits & endings</span>
 						</div>
 					</div>
-					<button title="create new exit and place it in the current room" class="color0" onclick="addExit();" id="addExitButton">
-						<i class="material-icons">location_searching</i>
-						<span class="localize exit_new">place new exit</span>
-					</button>
-					<span id="addingExitHelpText" style="display:none;"><i class="localize exit_click_add">click space in room to add exit</i></span>
-					<!-- todo needs a cancel button -->
-					<div title="edit selected exit" id="editSelectedExit" class="controlBox">
-						<u><span class="localize exit_selected">selected exit</span></u><br>
-						<div id="noExitSelected">
-							<i><span class="localize exit_selected_none">no exit selected</span></i>
+					<div id="exitsPanelContent">
+						<div id="noMarkerMessage" class="controlBox">
+							<span class="localize marker_tool_empty">There are no exits or endings in this room yet! You can add one with this tool. :)</span>
 						</div>
-						<div id="exitSelected" style="display:none;">
-							<span class="localize exit_destination">this exit goes to</span>: 
-							<select title="choose which room the selected exit goes to" id="exitDestinationSelect" onchange="exitDestinationRoomChange(event);">
-								<option value="0">room 0</option> <!-- other options are added dynamically -->
-							</select>
-							<br>
-							<canvas title="click to place exit destination in selected room" id="exitCanvas"></canvas>
-							<br>
-							<button title="delete selected exit" class="color0" onclick="deleteSelectedExit();">
-								<i class="material-icons">remove</i>
-								<span class="localize exit_delete">delete selected exit</span>
-							</button>
+						<div id="markersSelect">
+							<div id="markerControl1" class="controlBox">
+								<span id="markerName1">marker 1</span>
+								<canvas id="markerCanvas1" title="location of marker (click to go to room)" onclick="selectMarkerRoom1();"></canvas>
+								<div class="markerPosControl">
+									<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
+									<label for="toggleMoveMarker1" title="click to move marker">
+										<i class="material-icons">location_searching</i>
+										<span id="textMoveMarker1" class="localize marker_move">move</span>
+									</label>
+									<button id="cancelMoveMarker1" title="cancel move" onclick="cancelMoveMarker1();">
+										<i class="material-icons">cancel</i>
+									</button>
+									<div title="marker coordinates">
+										<span id="textMarkerPos1">room 0 (0,0)</span>
+									</div>
+									<div>
+										<span id="textMoveMessage1">
+											<i class="localize marker_move_click">click in room</i>
+										</span>
+									</div>
+								</div>
+							</div>
+							<div id="markerLinkControl">
+								<button title="change exit direction" onclick="changeExitDirection();">
+									<i class="material-icons" id="exitDirectionBackIcon">arrow_back</i>
+									<i class="material-icons" id="exitDirectionForwardIcon">arrow_forward</i>
+								</button>
+							</div>
+							<div id="markerControl2" class="controlBox" style="display: flex; flex-direction: column;">
+								<span id="markerName2">marker 2</span>
+								<canvas id="markerCanvas2" title="location of marker (click to go to room)" onclick="selectMarkerRoom2();"></canvas>
+								<div class="markerPosControl">
+									<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" />
+									<label for="toggleMoveMarker2" title="click to move marker">
+										<i class="material-icons">location_searching</i>
+										<span id="textMoveMarker2"class="localize marker_move">move</span>
+									</label>
+									<button id="cancelMoveMarker2" title="cancel move" onclick="cancelMoveMarker2();">
+										<i class="material-icons">cancel</i>
+									</button>
+									<div title="marker coordinates">
+										<span id="textMarkerPos2">room 0 (0,0)</span>
+									</div>
+									<div>
+										<span id="textMoveMessage2">
+											<i class="localize marker_move_click">click in room</i>
+										</span>
+									</div>
+								</div>
+							</div>
 						</div>
-					</div>
-				</div>
+						<div id="markersControls" class="controlBox">
+							<div id="markersNav" class="buttonGroup">
+								<button title="previous" class="color0" onclick="prevMarker();">
+									<i class="navigate_before material-icons"><span>navigate_before</span></i>
+								</button>
+								<button title="next" class="color0" onclick="nextMarker();" style="margin-left:-5px;">
+									<i class="navigate_next material-icons"><span>navigate_next</span></i>
+								</button>
+								<button title="delete" class="color0" onclick="deleteMarker();">
+									<i class="material-icons">remove_circle</i>
+								</button>
+							</div>
+							<div id="markersAddCommands" class="buttonGroup">
+								<button title="add exit" class="color0" onclick="newExit();">
+									<i class="material-icons">add</i> <span class="localize exit_label">exit</span>
+								</button>
+								<button title="add ending" class="color0" onclick="newEnding();">
+									<i class="material-icons">add</i> <span class="localize ending_label">ending</span>
+								</button>
+								<!-- <button title="add scripted effect" class="color0" onclick="newEffect();">
+									<i class="material-icons">add</i> effect
+								</button> -->
+							</div>
+						</div>
+						<div id="markerOptions">
+							<div id="endingOptions" class="controlBox">
+								<span class="localize ending_dialog">ending dialog</span>
+								<br/>
+								<textarea title="text to show on ending" id="endingText" onchange="onEndingTextChange(event);" onkeydown="onEndingTextChange(event);" onkeyup="onEndingTextChange(event);"></textarea>
+							</div>
+							<!-- <div id="effectOptions" class="controlBox">
+								<span>effect script</span>
+								<br/>
+								<textarea id="effectText" onchange="onEffectTextChange(event);" onkeydown="onEffectTextChange(event);" onkeyup="onEffectTextChange(event);" style="resize: vertical; width: 32ch;"></textarea>
+							</div> -->
+							<div id="exitOptions" class="controlBox">
+								<input type="checkbox" id="showExitOptionsCheck" onclick="onToggleExitOptions();" />
+								<label title="show / hide exit options" for="showExitOptionsCheck">
+									<span class="localize exit_options">exit options</span>
+									<i class="material-icons" id="showExitOptionsCheckIcon">expand_less</i>
+								</label>
 
-				<div id="endingsPanel" class="panel color3" style="display:none;">
-					<div class="bar color3">
+								<div id="exitOptionsInner">
+									<form id="exitOptionsRadio">
+										<input type="radio" name="exit options select" value="exit1" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions1" checked>
+										<label title="show exit 1 options" for="exitOptions1" class="left">
+											<span class="localize exit_label">exit</span> 1
+										</label>
 
-						<button title="minimize endings window" class="light panelBarClose" onclick="hidePanel('endingsPanel');">
-							<i class="material-icons">close</i>
-						</button>
+										<input type="radio" name="exit options select" value="exit2" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions2">
+										<label title="show exit 2 options" for="exitOptions2" class="right">
+											<span class="localize exit_label">exit</span> 2
+										</label>
+									</form>
 
-						<div title="endings window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<i class="material-icons">place</i>
-							<span class="localize endings_tool_name">endings</span>
+									<div style="padding:4px;">
+										<div title="select transition effect" class="controlBox" style="font-size:14px;">
+											<span class="localize exit_transition_label">transition effect</span>: 
+											<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value);">
+												<option value="none">none</option>
+												<option value="fade_w">fade (white)</option>
+												<option value="fade_b">fade (black)</option>
+												<option value="wave">wave</option>
+												<option value="tunnel">tunnel</option>
+												<option value="slide_u">slide up</option>
+												<option value="slide_d">slide down</option>
+												<option value="slide_l">slide left</option>
+												<option value="slide_r">slide right</option>
+											</select>
+										</div>
+
+										<!-- <div style="margin-bottom: 5px; margin-top: 12px;">
+											<span id="exitScriptOptions">
+												<input type="checkbox" id="exitDialogCheck" onchange="setElementClass('exitScriptControls','exitDialogActive',event.target.checked);"/>
+												<label for="exitDialogCheck">
+													<i class="material-icons">chat</i>
+													dialog
+												</label>
+
+												<input type="checkbox" id="exitChangeAvatarCheck" onchange="setElementClass('exitScriptControls','exitAvatarActive',event.target.checked);"/>
+												<label for="exitChangeAvatarCheck">
+													<i class="material-icons">nature_people</i>
+													change avatar
+												</label>
+
+												<input type="checkbox" id="exitLockCheck" onchange="setElementClass('exitScriptControls','exitLockActive',event.target.checked);"/>
+												<label for="exitLockCheck">
+													<i class="material-icons">vpn_key</i>
+													lock
+												</label>
+											</span>
+										</div> -->
+
+										<!-- <div id="exitScriptControls" class="controlBox">
+											<span class="exitLockControl">unlock door if:</span>
+											<br class="exitLockControl"/>
+
+											<span class="exitDialogAndLockControl">dialog when door is locked:</span>
+											<br class="exitDialogAndLockControl"/>
+											<textarea class="exitDialogAndLockControl" style="resize: vertical; width: 32ch;"></textarea>
+											<br class="exitDialogAndLockControl"/>
+
+											<span class="exitDialogControl">dialog</span><span class="exitDialogAndLockControl"> when door is unlocked</span><span class="exitDialogControl">:</span>
+											<br class="exitDialogControl"/>
+											<textarea class="exitDialogControl" style="resize: vertical; width: 32ch;"></textarea>
+											<br class="exitDialogControl"/>
+
+											<span class="exitAvatarControl">on enter, change avatar sprite to:</span>
+											<br class="exitAvatarControl"/>
+											<select class="exitAvatarControl">
+												<option>sprite A</option>
+												<option>sprite a</option>
+											</select>
+										</div> -->
+									</div>
+								</div>
+
+							</div>
 						</div>
-					</div>
-					<textarea title="text displayed on player reaching this ending" id="endingText" class="dialogTextArea gameTextDir" onkeydown="on_change_ending();" onkeyup="on_change_ending();" onchange="on_change_ending();"></textarea>
-					<div id="endingNav">
-						<div class="buttonGroup">
-							<span class="localize ending_label">ending</span> <span id="endingId">0</span>
-							<button title="previous ending" class="color0" onclick="prevEnding();">
-								<i class="navigate_before material-icons"><span>navigate_before</span></i>
-							</button>
-							<button title="next ending" class="color0" onclick="nextEnding();">
-								<i class="navigate_next material-icons"><span>navigate_next</span></i>
-							</button>
-							<button title="add new ending" class="color0" onclick="newEnding();">
-								<i class="material-icons">add</i>
-							</button>
-						</div>
-						<!-- <button onclick="deleteEnding();"> x delete x </button> -->
-					</div>
-					<div class="buttonGroup">
-						<button title="click to place ending in current room" class="color0" id="addEndingButton" onclick="addEnding();">
-							<i class="material-icons">location_searching</i>
-							<span class="localize ending_place">place ending</span>
-						</button>
-						<span id="addingEndingHelpText" class="localize ending_place_help" style="display:none;">click space in room to add ending</span>
-					<!-- todo needs a cancel button -->
-						<button title="remove selected ending from room" class="color0" id="removeEndingButton" onclick="removeSelectedEnding();" style="display:none;">
-							<i class="material-icons">location_disabled</i>
-							<span class="localize ending_remove">remove selected ending</span>
-						</button>
 					</div>
 				</div>
 

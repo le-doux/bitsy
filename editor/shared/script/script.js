@@ -22,8 +22,9 @@ var Interpreter = function() {
 	}
 	this.Run = function(scriptName, exitHandler) { // Runs pre-compiled script
 		// console.log("RUN");
+		// console.log(env.GetScript( scriptName ));
 		env.GetScript( scriptName )
-			.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
+			.Eval( env, function(result) { OnScriptReturn(result, exitHandler); } );
 
 		// console.log("SERIALIZE!!!!");
 		// console.log( env.GetScript( scriptName ).Serialize() );
@@ -31,7 +32,7 @@ var Interpreter = function() {
 	this.Interpret = function(scriptStr, exitHandler) { // Compiles and runs code immediately
 		// console.log("INTERPRET");
 		var script = parser.Parse( scriptStr );
-		script.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
+		script.Eval( env, function(result) { OnScriptReturn(result, exitHandler); } );
 	}
 	this.HasScript = function(name) { return env.HasScript(name); };
 
@@ -40,17 +41,23 @@ var Interpreter = function() {
 		parser = new Parser( env );
 	}
 
-	// TODO : move to utils?
-	// for reading in dialog from the larger file format
-	this.ReadDialogScript = function(lines, i) {
-		return parser.ReadDialogScript(lines,i);
-	}
-
 	this.Parse = function(scriptStr) { // parses a script but doesn't save it
 		return parser.Parse( scriptStr );
 	}
-	this.Eval = function(scripTree, exitHandler) { // runs a script stored externally
-		scripTree.Eval( env, function() { if(exitHandler!=null) exitHandler(); } );
+	this.Eval = function(scriptTree, exitHandler) { // runs a script stored externally
+		scriptTree.Eval( env, function(result) { OnScriptReturn(result, exitHandler); } );
+	}
+
+	function OnScriptReturn(result, exitHandler) {
+		if (isReturnObject(result)) {
+			result = result.result; // pull out the contained result
+		}
+
+		// console.log("RESULT " + result);
+
+		if (exitHandler != null) {
+			exitHandler(result);
+		}
 	}
 
 	this.CreateExpression = function(expStr) {
@@ -76,6 +83,16 @@ var Interpreter = function() {
 	}
 	this.GetVariable = function(name) {
 		return env.GetVariable(name);
+	}
+
+	this.DebugVisualizeScriptTree = function(scriptName) {
+		var printVisitor = {
+			Visit : function(node,depth) {
+				console.log("-".repeat(depth) + "- " + node.ToString());
+			},
+		};
+
+		env.GetScript( scriptName ).VisitAll( printVisitor );
 	}
 }
 
@@ -129,6 +146,52 @@ var Utils = function() {
 		block.AddChild( ifNode );
 		return block;
 	}
+
+	this.ReadDialogScript = function(lines, i) {
+		var scriptStr = "";
+		if (lines[i] === Sym.DialogOpen) {
+			scriptStr += lines[i] + "\n";
+			i++;
+			while(lines[i] != Sym.DialogClose) {
+				scriptStr += lines[i] + "\n";
+				i++;
+			}
+			scriptStr += lines[i];
+			i++;
+		}
+		else {
+			scriptStr += lines[i];
+		}
+		return { script:scriptStr, index:i };
+	}
+
+	// TODO this.ReadCodeScript (reads through code open and close symbols), and this.ReadScript
+
+	this.EnsureDialogBlockFormat = function(dialogStr) {
+		// TODO -- what if it's already enclosed in dialog symbols??
+		if(dialogStr.indexOf('\n') > -1) {
+			dialogStr = Sym.DialogOpen + "\n" + dialogStr + "\n" + Sym.DialogClose;
+		}
+		return dialogStr;
+	}
+
+	this.RemoveDialogBlockFormat = function(source) {
+		var sourceLines = source.split("\n");
+		var dialogStr = "";
+		if(sourceLines[0] === Sym.DialogOpen) {
+			// multi line
+			var i = 1;
+			while (i < sourceLines.length && sourceLines[i] != Sym.DialogClose) {
+				dialogStr += sourceLines[i] + (sourceLines[i+1] != Sym.DialogClose ? '\n' : '');
+				i++;
+			}
+		}
+		else {
+			// single line
+			dialogStr = source;
+		}
+		return dialogStr;
+	}
 }
 
 
@@ -137,6 +200,25 @@ function deprecatedFunc(environment,parameters,onReturn) {
 	console.log("BITSY SCRIPT WARNING: Tried to use deprecated function");
 	onReturn(null);
 }
+
+// TODO : vNext
+// function returnFunc(environment,parameters,onReturn) {
+// 	var ret = { isReturn: true, result: null };
+// 	if (parameters.length > 0 && parameters[0] != undefined && parameters[0] != null) {
+// 		ret.result = parameters[0];
+// 	}
+// 	onReturn(ret);
+// }
+
+// TODO : vNext
+// // TODO : this is kind of hacky
+// // - needs to work with names too
+// function changeAvatarFunc(environment,parameters,onReturn) {
+// 	if( parameters[0] != undefined && parameters[0] != null ) {
+// 		sprite["A"].drw = "SPR_" + parameters[0];
+// 	}
+// 	onReturn(null);
+// }
 
 function printFunc(environment,parameters,onReturn) {
 	// console.log("PRINT FUNC");
@@ -355,6 +437,10 @@ var Environment = function() {
 	functionMap.set("printItem", printItemFunc);
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
 
+	// TODO : vNext
+	// functionMap.set("changeAvatar", changeAvatarFunc);
+	// functionMap.set("return", returnFunc);
+
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn) {
 		// console.log(functionMap);
@@ -431,12 +517,22 @@ var TreeRelationship = function() {
 		node.parent = this;
 	};
 
-	this.VisitAll = function(visitor) {
-		visitor.Visit( this );
+	this.VisitAll = function(visitor, depth) {
+		if (depth == undefined || depth == null) {
+			depth = 0;
+		}
+
+		visitor.Visit( this, depth );
 		for( var i = 0; i < this.children.length; i++ ) {
-			this.children[i].VisitAll( visitor );
+			this.children[i].VisitAll( visitor, depth + 1 );
 		}
 	};
+}
+
+function isReturnObject(val) {
+	return typeof val === "object" && val != null
+				&& val.isReturn != undefined && val.isReturn != null
+				&& val.isReturn;
 }
 
 var BlockMode = {
@@ -453,27 +549,40 @@ var BlockNode = function(mode, doIndentFirstLine) {
 	this.Eval = function(environment,onReturn) {
 		// console.log("EVAL BLOCK " + this.children.length);
 
-		if( this.onEnter != null ) this.onEnter();
+		if( this.onEnter != null ) {
+			this.onEnter();
+		}
 
 		var lastVal = null;
 		var i = 0;
+
 		function evalChildren(children,done) {
-			if(i < children.length) {
+			if (i < children.length) {
 				// console.log(">> CHILD " + i);
 				children[i].Eval( environment, function(val) {
 					// console.log("<< CHILD " + i);
-					lastVal = val;
-					i++;
-					evalChildren(children,done);
+
+					if (isReturnObject(val)) { // early return
+						lastVal = val;
+						done();
+					}
+					else {
+						lastVal = val;
+						i++;
+						evalChildren(children,done);
+					}
 				} );
 			}
 			else {
 				done();
 			}
 		};
+
 		var self = this;
 		evalChildren( this.children, function() {
-			if( self.onExit != null ) self.onExit();
+			if( self.onExit != null ) {
+				self.onExit();
+			}
 			onReturn(lastVal);
 		} );
 	}
@@ -507,6 +616,10 @@ var BlockNode = function(mode, doIndentFirstLine) {
 		if (this.mode === BlockMode.Code) str += "}";
 		return str;
 	}
+
+	this.ToString = function() {
+		return this.type + " " + this.mode;
+	};
 }
 
 function isBlockWithNoNewline(node) {
@@ -596,6 +709,10 @@ var FuncNode = function(name,arguments) {
 			return str;
 		}
 	}
+
+	this.ToString = function() {
+		return this.type + " " + this.name;
+	};
 }
 
 var LiteralNode = function(value) {
@@ -620,6 +737,10 @@ var LiteralNode = function(value) {
 
 		return str;
 	}
+
+	this.ToString = function() {
+		return this.type + " " + this.value;
+	};
 }
 
 var VarNode = function(name) {
@@ -640,6 +761,10 @@ var VarNode = function(name) {
 		var str = "" + this.name;
 		return str;
 	}
+
+	this.ToString = function() {
+		return this.type + " " + this.name;
+	};
 }
 
 var ExpNode = function(operator, left, right) {
@@ -675,12 +800,20 @@ var ExpNode = function(operator, left, right) {
 		}
 	}
 
-	this.VisitAll = function(visitor) {
-		visitor.Visit( this );
+	this.VisitAll = function(visitor, depth) {
+		if (depth == undefined || depth == null) {
+			depth = 0;
+		}
+
+		visitor.Visit( this, depth );
 		if(this.left != null)
-			this.left.VisitAll( visitor );
+			this.left.VisitAll( visitor, depth + 1 );
 		if(this.right != null)
-			this.right.VisitAll( visitor );
+			this.right.VisitAll( visitor, depth + 1 );
+	};
+
+	this.ToString = function() {
+		return this.type + " " + this.operator;
 	};
 }
 
@@ -697,11 +830,19 @@ var SequenceBase = function() {
 		return str;
 	}
 
-	this.VisitAll = function(visitor) {
-		visitor.Visit( this );
-		for( var i = 0; i < this.options.length; i++ ) {
-			this.options[i].VisitAll( visitor );
+	this.VisitAll = function(visitor, depth) {
+		if (depth == undefined || depth == null) {
+			depth = 0;
 		}
+
+		visitor.Visit( this, depth );
+		for( var i = 0; i < this.options.length; i++ ) {
+			this.options[i].VisitAll( visitor, depth + 1 );
+		}
+	};
+
+	this.ToString = function() {
+		return this.type;
 	};
 }
 
@@ -827,14 +968,22 @@ var IfNode = function(conditions, results, isSingleLine) {
 		return isSingleLine;
 	}
 
-	this.VisitAll = function(visitor) {
-		visitor.Visit( this );
+	this.VisitAll = function(visitor, depth) {
+		if (depth == undefined || depth == null) {
+			depth = 0;
+		}
+
+		visitor.Visit( this, depth );
 		for( var i = 0; i < this.conditions.length; i++ ) {
-			this.conditions[i].VisitAll( visitor );
+			this.conditions[i].VisitAll( visitor, depth + 1 );
 		}
 		for( var i = 0; i < this.results.length; i++ ) {
-			this.results[i].VisitAll( visitor );
+			this.results[i].VisitAll( visitor, depth + 1 );
 		}
+	};
+
+	this.ToString = function() {
+		return this.type + " " + this.mode;
 	};
 }
 
@@ -849,6 +998,10 @@ var ElseNode = function() {
 	this.Serialize = function() {
 		return "else";
 	}
+
+	this.ToString = function() {
+		return this.type + " " + this.mode;
+	};
 }
 
 var Sym = {
@@ -892,24 +1045,6 @@ var Parser = function(env) {
 		// console.log( state.rootNode );
 		return state.rootNode;
 	};
-
-	this.ReadDialogScript = function(lines, i) {
-		var scriptStr = "";
-		if (lines[i] === Sym.DialogOpen) {
-			scriptStr += lines[i] + "\n";
-			i++;
-			while(lines[i] != Sym.DialogClose) {
-				scriptStr += lines[i] + "\n";
-				i++;
-			}
-			scriptStr += lines[i];
-			i++;
-		}
-		else {
-			scriptStr += lines[i];
-		}
-		return { script:scriptStr, index:i };
-	}
 
 	var ParserState = function( rootNode, str ) {
 		this.rootNode = rootNode;
@@ -973,7 +1108,8 @@ var Parser = function(env) {
 
 			return sourceStr.slice( startIndex + open.length, i - close.length );
 		}
-		this.Print = function() { /*console.log(sourceStr);*/ };
+		this.Print = function() { console.log(sourceStr); };
+		this.Source = function() { return sourceStr; };
 	};
 
 	function ParseDialog(state) {
@@ -1233,6 +1369,8 @@ var Parser = function(env) {
 	}
 
 	function ParseFunction(state, funcName) {
+		console.log("~~~ PARSE FUNCTION " + funcName);
+
 		var args = [];
 
 		var curSymbol = "";
@@ -1331,9 +1469,10 @@ var Parser = function(env) {
 	var setSymbol = "=";
 	var ifSymbol = "?";
 	var elseSymbol = ":";
-	// var operatorSymbols = ["==", ">", "<", ">=", "<=", "*", "/", "+", "-"];
-	var operatorSymbols = ["-", "+", "/", "*", "<=", ">=", "<", ">", "=="]; // operators need to be in reverse order
+	var operatorSymbols = ["==", ">", "<", ">=", "<=", "-", "+", "/", "*"]; // operators need to be in reverse order of precedence
 	function CreateExpression(expStr) {
+		console.log("CREATE EXPRESSION --- " + expStr);
+
 		expStr = expStr.trim();
 
 		function IsInsideString(index) {
@@ -1361,7 +1500,7 @@ var Parser = function(env) {
 			}
 			return false;
 		}
-	
+
 		var operator = null;
 
 		// set is special because other operator can look like it, and it has to go first in the order of operations
@@ -1429,8 +1568,33 @@ var Parser = function(env) {
 	}
 	this.CreateExpression = CreateExpression;
 
+	function IsWhitespace(str) {
+		return ( str === " " || str === "\t" || str === "\n" );
+	}
+
+	function IsExpression(str) {
+		var tempState = new ParserState(null, str); // hacky
+		var nonWhitespaceCount = 0;
+
+		while (!tempState.Done()) {
+			if( IsWhitespace(tempState.Char()) ) {
+				tempState.Step(); // consume whitespace
+			}
+			else if( tempState.MatchAhead(Sym.CodeOpen) ) {
+				tempState.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose );
+			}
+			else {
+				nonWhitespaceCount++;
+				tempState.Step();
+			}
+		}
+
+		var isExpression = nonWhitespaceCount > 0;
+		return isExpression;
+	}
+
 	function ParseExpression(state) {
-		var line = state.Peak( [Sym.Linebreak] );
+		var line = state.Source(); // state.Peak( [Sym.Linebreak] ); // TODO : remove the linebreak thing
 		// console.log("EXPRESSION " + line);
 		var exp = CreateExpression( line );
 		// console.log(exp);
@@ -1440,36 +1604,45 @@ var Parser = function(env) {
 	}
 
 	function ParseCode(state) {
-		// TODO : how do I do this parsing??? one expression per block? or per line?
-		while ( !state.Done() ) {
+		console.log("PARSE CODE --- " + state.Source());
 
-			if( state.Char() === " " || state.Char() === "\t" || state.Char() === "\n" ) { // TODO: symbols? IsWhitespace func?
-				state.Step(); // consume whitespace
+		// skip leading whitespace
+		while (IsWhitespace(state.Char())) {
+			state.Step();
+		}
+
+		if( state.Char() === Sym.List && (state.Peak([]).indexOf("?") > -1) ) { // TODO : symbols? matchahead?
+			// console.log("PEAK IF " + state.Peak( ["?"] ));
+			state = ParseIf( state );
+		}
+		else if( environment.HasFunction( state.Peak( [" "] ) ) ) { // TODO --- what about newlines???
+			var funcName = state.Peak( [" "] );
+			state.Step( funcName.length );
+			state = ParseFunction( state, funcName );
+		}
+		else if( IsSequence( state.Peak( [" ", Sym.Linebreak] ) ) ) {
+			var sequenceType = state.Peak( [" ", Sym.Linebreak] );
+			state.Step( sequenceType.length );
+			state = ParseSequence( state, sequenceType );
+		}
+		else if (IsExpression(state.Source())) {
+			state = ParseExpression(state);
+		}
+		else {
+			// multi-line code block
+			while (!state.Done()) {
+				if( state.MatchAhead(Sym.CodeOpen) ) {
+					state = ParseCodeBlock( state );
+				}
+				else {
+					state.Step();
+				}
 			}
-			else if( state.MatchAhead(Sym.CodeOpen) ) {
-				state = ParseCodeBlock( state );
-			}
-			// NOTE: nested dialog blocks disabled for now
-			// else if( state.MatchAhead(Sym.DialogOpen) ) {
-			// 	state = ParseDialogBlock( state ); // These can be nested (should they though???)
-			// }
-			else if( state.Char() === Sym.List && (state.Peak([]).indexOf("?") > -1) ) { // TODO : symbols? matchahead?
-				// console.log("PEAK IF " + state.Peak( ["?"] ));
-				state = ParseIf( state );
-			}
-			else if( environment.HasFunction( state.Peak( [" "] ) ) ) { // TODO --- what about newlines???
-				var funcName = state.Peak( [" "] );
-				state.Step( funcName.length );
-				state = ParseFunction( state, funcName );
-			}
-			else if( IsSequence( state.Peak( [" ", Sym.Linebreak] ) ) ) {
-				var sequenceType = state.Peak( [" ", Sym.Linebreak] );
-				state.Step( sequenceType.length );
-				state = ParseSequence( state, sequenceType );
-			}
-			else {
-				state = ParseExpression( state );
-			}
+		}
+
+		// just go to the end now
+		while (!state.Done()) {
+			state.Step();
 		}
 
 		return state;

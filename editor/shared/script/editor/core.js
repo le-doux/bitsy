@@ -70,6 +70,10 @@ function nextPaletteId() {
 }
 
 function nextObjectId(idList) {
+	if (idList.length <= 0) {
+		return "0";
+	}
+
 	var lastId = idList[ idList.length - 1 ];
 	var idInt = parseInt( lastId, 36 );
 	idInt++;
@@ -113,6 +117,48 @@ function nextAvailableDialogId(prefix) {
 		id = prefix + i.toString(36);
 	}
 	return id;
+}
+
+/* NEW HEX ID SYSTEM HELPERS */
+// TODO : vNext
+// function nextScriptHexId() {
+// 	return nextObjectHexId( sortedScriptHexIdList() );
+// }
+
+// function sortedScriptHexIdList() {
+// 	return sortedHexIdList( script );
+// }
+
+function nextObjectHexId(idList) {
+	if (idList.length <= 0) {
+		return "0";
+	}
+
+	var lastId = idList[ idList.length - 1 ];
+	var idInt = safeParseHex(lastId);
+	idInt++;
+	return idInt.toString(16);
+}
+
+function sortedHexIdList(objHolder) {
+	var objectKeys = Object.keys(objHolder);
+
+	var hexSortFunc = function(key1,key2) {
+		return safeParseHex(key1,16) - safeParseHex(key2,16);
+	};
+	var hexSortedIds = objectKeys.sort(hexSortFunc);
+
+	return hexSortedIds;
+}
+
+function safeParseHex(str) {
+	var hexInt = parseInt(str,16);
+	if (hexInt == undefined || hexInt == null || isNaN(hexInt)) {
+		return -1;
+	}
+	else {
+		return hexInt;
+	}
 }
 
 /* UTILS */
@@ -279,25 +325,13 @@ function reloadDialogUICore() { // TODO: name is terrible
 	var dialogId = getCurDialogId(); // hacky
 
 	if (dialogId in dialog) {
-		var dialogLines = dialog[dialogId].split("\n");
-		if(dialogLines[0] === '"""') {
-			// multi line
-			var dialogStr = "";
-			var i = 1;
-			while (i < dialogLines.length && dialogLines[i] != '"""') {
-				dialogStr += dialogLines[i] + (dialogLines[i+1] != '"""' ? '\n' : '');
-				i++;
-			}
-			document.getElementById("dialogText").value = dialogStr;
-		}
-		else {
-			// single line
-			document.getElementById("dialogText").value = dialog[dialogId];
-		}
+		var dialogSource = dialog[dialogId];
+		var dialogStr = scriptUtils.RemoveDialogBlockFormat(dialogSource);
+		document.getElementById("dialogText").value = dialogStr;
 	}
 	else {
 		document.getElementById("dialogText").value = "";
-	}	
+	}
 }
 
 // hacky - assumes global paintTool object
@@ -327,8 +361,7 @@ function on_change_dialog() {
 			dialogId = nextAvailableDialogId( prefix );
 			paintTool.getCurObject().dlg = dialogId;
 		}
-		if( dialogStr.indexOf('\n') > -1 ) dialogStr = '"""\n' + dialogStr + '\n"""';
-		dialog[dialogId] = dialogStr;
+		dialog[dialogId] = scriptUtils.EnsureDialogBlockFormat(dialogStr);
 	}
 
 	if( Ed().platform == PlatformType.Desktop )
@@ -485,14 +518,17 @@ function resetGameData() {
 	}
 
 	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
+	markerTool.SetRoom("0");
+	markerTool.Refresh();
 	roomTool.drawEditMap();
 
 	document.getElementById("titleText").value = title;
 }
 
 function refreshGameData() {
-	if( Ed().platform == PlatformType.Desktop )
+	if( Ed().platform == PlatformType.Desktop ) {
 		if (isPlayMode) return; //never store game data while in playmode (TODO: wouldn't be necessary if the game data was decoupled form editor data)
+	}
 
 	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
 

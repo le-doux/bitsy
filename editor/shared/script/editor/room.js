@@ -21,14 +21,13 @@ function RoomTool(canvas) {
 	// edit flags
 	var isDragAddingTiles = false;
 	var isDragDeletingTiles = false;
-	var isDragMovingExit = false;
-	var isDragMovingEnding = false;
 
 	// render flags
 	this.drawMapGrid = true;
 	this.drawCollisionMap = false;
-	this.areExitsVisible = false;
-	this.areEndingsVisible = false;
+	this.areMarkersVisible = false;
+
+	this.markers = null;
 
 	function onMouseDown(e) {
 		var off = getOffset(e);
@@ -37,37 +36,30 @@ function RoomTool(canvas) {
 		var y = Math.floor( off.y / (tilesize*scale) );
 		// console.log(x + " " + y);
 
-		console.log(e);
 		if( self.editDrawingAtCoordinateCallback != null && e.altKey ) {
 			self.editDrawingAtCoordinateCallback(x,y); // "eye dropper"
 			return;
 		}
 
-		if( Ed().platform == PlatformType.Desktop ) {
-			var didSelectedExitChange = self.areExitsVisible ? setSelectedExit( getExit(curRoom,x,y) ) : false;
-			var didSelectedEndingChange = self.areEndingsVisible ? setSelectedEnding( getEnding(curRoom,x,y) ) : false;	
+		var isEditingMarker = false;
+
+		if (self.areMarkersVisible) {
+			if (self.markers.IsPlacingMarker()) {
+				if (!self.markers.IsMarkerAtLocation(x,y)) {
+					self.markers.PlaceMarker(x,y);
+					self.drawEditMap();
+				}
+				isEditingMarker = true;
+			}
+			else if (self.markers.TrySelectMarkerAtLocation(x,y)) {
+				self.markers.StartDrag(x,y);
+				self.drawEditMap();
+				isEditingMarker = true;
+			}
 		}
 
-		if ( Ed().platform == PlatformType.Desktop && (didSelectedExitChange || didSelectedEndingChange) ) {
-			//don't do anything else
-			if( selectedExit != null ) isDragMovingExit = true;
-			if( selectedEndingTile != null ) isDragMovingEnding = true;
-		}
-		else if ( Ed().platform == PlatformType.Desktop && isAddingExit) { //todo - mutually exclusive with adding an ending?
-			//add exit
-			if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
-				addExitToCurRoom(x,y);
-			}
-		}
-		else if ( Ed().platform == PlatformType.Desktop && isAddingEnding ) {
-			//add ending
-			if ( getEnding(curRoom,x,y) == null && getExit(curRoom,x,y) == null ) {
-				addEndingToCurRoom(x,y);
-			}
-		}
-		else if (self.drawing.id != null) {
+		if (!isEditingMarker && self.drawing.id != null) {
 			//add tiles/sprites to map
-			console.log("DRAWING");
 			if (self.drawing.type == TileType.Tile) {
 				if ( room[curRoom].tilemap[y][x] === "0" ) {
 					console.log("ADD");
@@ -112,7 +104,7 @@ function RoomTool(canvas) {
 					sprite[self.drawing.id].y = -1;
 				}
 			}
-			else if( Ed().platform == PlatformType.Desktop && self.drawing.type == TileType.Item ) {
+			else if(self.drawing.type == TileType.Item ) {
 				// TODO : is this the final behavior I want?
 
 				var otherItem = getItem(curRoom,x,y);
@@ -132,45 +124,26 @@ function RoomTool(canvas) {
 	}
 
 	function onMouseMove(e) {
-		if( Ed().platform == PlatformType.Desktop && selectedExit != null && isDragMovingExit )
-		{
-			// drag exit around
+		if( self.markers.GetSelectedMarker() != null && self.markers.IsDraggingMarker() ) {
+			// drag marker around
 			var off = getOffset(e);
 			var x = Math.floor(off.x / (tilesize*scale));
 			var y = Math.floor(off.y / (tilesize*scale));
-			if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
-			{
-				selectedExit.x = x;
-				selectedExit.y = y;
-				refreshGameData();
-				self.drawEditMap();
-			}
+
+			self.markers.ContinueDrag(x,y);
+			self.drawEditMap();
 		}
-		else if( Ed().platform == PlatformType.Desktop && selectedEndingTile != null && isDragMovingEnding )
-		{
-			// drag ending around
-			var off = getOffset(e);
-			var x = Math.floor(off.x / (tilesize*scale));
-			var y = Math.floor(off.y / (tilesize*scale));
-			var y = Math.floor(off.y / (tilesize*scale));
-			if( !getExit(curRoom,x,y) && !getEnding(curRoom,x,y) )
-			{
-				selectedEndingTile.x = x;
-				selectedEndingTile.y = y;
-				refreshGameData();
-				self.drawEditMap();
-			}
-		}
-		else
+		else {
 			editTilesOnDrag(e);
+		}
 	}
 
 	function onMouseUp(e) {
 		editTilesOnDrag(e);
 		isDragAddingTiles = false;
 		isDragDeletingTiles = false;
-		isDragMovingExit = false;
-		isDragMovingEnding = false;
+
+		self.markers.EndDrag();
 	}
 
 	function editTilesOnDrag(e) {
@@ -301,79 +274,16 @@ function RoomTool(canvas) {
 			}
 		}
 
-		//draw exits (and entrances)
-		if (self.areExitsVisible) {
-			for( r in room ) {
-				if( r === curRoom ) {
-					for (i in room[curRoom].exits) {
-						var e = room[curRoom].exits[i];
-						if( !room[e.dest.room] )
-							continue;
+		//draw exits (and entrances) and endings
+		if (self.areMarkersVisible) {
+			var w = tilesize * scale;
+			var markerList = self.markers.GetMarkerList();
 
-						if (e == selectedExit) {
-							ctx.fillStyle = "#ff0";
-							ctx.globalAlpha = 0.9;
-						}
-						else {
-							ctx.fillStyle = getContrastingColor();
-							ctx.globalAlpha = 0.5;
-						}
-						ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
-						ctx.strokeStyle = getComplimentingColor();
-						ctx.globalAlpha = 1.0;
-						ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-
-						ctx.font = '14px sans-serif';
-						var roomStr = "To " + ( (room[e.dest.room].name != null) ? room[e.dest.room].name : ("room " + e.dest.room) );
-						ctx.fillText( roomStr, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
-
-						//todo (tilesize*scale) should be a function
-					}
-				}
-				else {
-					for (i in room[r].exits) {
-						var e = room[r].exits[i];
-						if( !room[e.dest.room] )
-							continue;
-
-						if (e.dest.room === curRoom){
-							ctx.fillStyle = getContrastingColor();
-							ctx.globalAlpha = 0.3;
-							ctx.fillRect(e.dest.x * tilesize * scale, e.dest.y * tilesize * scale, tilesize * scale, tilesize * scale);
-							ctx.strokeStyle = getComplimentingColor();
-							ctx.globalAlpha = 0.6;
-							ctx.strokeRect( (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-		
-							ctx.font = '14px sans-serif';
-							var roomStr = "From " + ( (room[r].name != null) ? room[r].name : ("room " + r) );
-							ctx.fillText( roomStr, (e.dest.x * tilesize * scale) - 1, (e.dest.y * tilesize * scale) - 5 );
-						}
-					}
-				}
+			for (var i = 0; i < markerList.length; i++) {
+				var marker = markerList[i]; // todo name
+				marker.Draw(ctx,curRoom,w,self.markers.GetSelectedMarker() == marker);
 			}
-			ctx.globalAlpha = 1;
-		}
 
-		//draw endings
-		if (self.areEndingsVisible) {
-			for (i in room[curRoom].endings) {
-				var e = room[curRoom].endings[i];
-				if (e == selectedEndingTile) {
-					ctx.fillStyle = "#ff0";
-					ctx.globalAlpha = 0.9;
-				}
-				else {
-					ctx.fillStyle = getContrastingColor();
-					ctx.globalAlpha = 0.5;
-				}
-				ctx.fillRect(e.x * tilesize * scale, e.y * tilesize * scale, tilesize * scale, tilesize * scale);
-				ctx.strokeStyle = getComplimentingColor();
-				ctx.globalAlpha = 1.0;
-				ctx.strokeRect( (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 1, (tilesize * scale) + 2, (tilesize * scale) + 2 );
-
-				ctx.font = '14px sans-serif';
-				ctx.fillText( "To ending " + e.id, (e.x * tilesize * scale) - 1, (e.y * tilesize * scale) - 5 );
-			}
 			ctx.globalAlpha = 1;
 		}
 	}

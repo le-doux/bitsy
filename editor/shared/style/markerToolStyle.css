@@ -1,0 +1,129 @@
+/* TODO : simplify -> less IDs, more classes */
+
+#noMarkerMessage {
+	width:300px;
+}
+
+#noMarkerMessage span {
+	white-space: pre-wrap; word-wrap: break-word;
+}
+
+#markersSelect {
+	display: flex;
+}
+
+#markerControl1 {
+	display: flex; flex-direction: column;
+}
+
+#markerName1 {
+	font-size: 14px; line-height: 12px;
+}
+
+#markerCanvas1 {
+	width:114px; height:114px;
+}
+
+.markerPosControl {
+	margin-top: 4px;
+}
+
+#textMarkerPos1 {
+	font-size: 12px;
+}
+
+#textMoveMessage1 {
+	font-size: 12px;
+}
+
+#markerLinkControl {
+	padding-left: 5px; padding-right: 5px; display:inline-block;
+}
+
+#markerLinkControl button {
+	margin-top: 70px;
+}
+
+#markerName2 {
+	font-size: 14px; line-height: 12px;
+}
+
+#markerCanvas2 {
+	width:114px; height:114px;
+}
+
+#textMarkerPos2 {
+	font-size: 12px;
+}
+
+#textMoveMessage2 {
+	font-size: 12px;
+}
+
+#endingText {
+	resize: vertical; width: 32ch;
+}
+
+#exitOptionsInner {
+	display: none;
+}
+
+#exitOptionsRadio {
+	display: flex; flex-direction: row; margin-top:5px; margin-bottom: 5px;
+}
+
+#exitOptionsRadio label {
+	flex: 1; font-size: 16px;
+}
+
+/* TODO : continue on to marker control 2 etc */
+
+/* TODO : vNext */
+#exitScriptControls {
+	display: none;
+}
+
+#exitScriptControls.exitLockActive {
+	display: block;
+}
+
+#exitScriptControls.exitDialogActive {
+	display: block;
+}
+
+#exitScriptControls.exitAvatarActive {
+	display: block;
+}
+
+.exitLockControl {
+	display: none;
+}
+
+.exitLockActive .exitLockControl {
+	display: inline-block;
+}
+
+.exitDialogControl {
+	display: none;
+}
+
+.exitDialogActive .exitDialogControl {
+	display: inline-block;
+}
+
+.exitDialogAndLockControl {
+	display: none;
+}
+
+.exitDialogActive.exitLockActive .exitDialogAndLockControl {
+	display: inline-block;
+}
+
+
+.exitAvatarControl {
+	display: none;
+}
+
+.exitAvatarActive .exitAvatarControl {
+	display: inline-block;
+}

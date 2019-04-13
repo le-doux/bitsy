@@ -218,6 +218,7 @@ var DialogBuffer = function() {
 	var activeTextEffects = [];
 	var font = null;
 	var arabicHandler = new ArabicHandler();
+	var onDialogEndCallbacks = [];
 
 	this.SetFont = function(f) {
 		font = f;
@@ -269,6 +270,8 @@ var DialogBuffer = function() {
 		isDialogReadyToContinue = false;
 
 		activeTextEffects = [];
+
+		onDialogEndCallbacks = [];
 
 		isActive = false;
 	};
@@ -343,8 +346,11 @@ var DialogBuffer = function() {
 	}
 
 	this.EndDialog = function() {
-		console.log("END!!!!");
 		isActive = false; // no more text to show... this should be a sign to stop rendering dialog
+
+		for (var i = 0; i < onDialogEndCallbacks.length; i++) {
+			onDialogEndCallbacks[i]();
+		}
 	}
 
 	this.Continue = function() {
@@ -363,6 +369,15 @@ var DialogBuffer = function() {
 
 	var isActive = false;
 	this.IsActive = function() { return isActive; };
+
+	this.OnDialogEnd = function(callback) {
+		if (!isActive) {
+			callback();
+		}
+		else {
+			onDialogEndCallbacks.push(callback);
+		}
+	}
 
 	this.CanContinue = function() { return isDialogReadyToContinue; };
 
