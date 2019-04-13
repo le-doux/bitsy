@@ -1,26 +1,5 @@
 /*
 TODO for v6:
-X rename exit.js
-X update panel prefs
-X hide / disable in-progress work
-	X IDs switch over
-	X script tag
-	X new functions
-	X exit options
-	X effects
-X add localization for new strings
-X make sure exit tool doesn't refresh all the time and lose state (e.g. on enter edit mode)
-X move marker panel style into css file
-X bug: why do we always start on "exit 2" in the exit options select button
-X fuzz transition
-	- re-name it?
-X decide whether to keep tunnel transition (keep, I think)
-X finalize transition time and fps
-	X experiment w/ varied times / frame-counts per transition
-X bug: keyboard inputs seem to still register during transition
-X flicker of next screen sometimes plays before transition
-X need to make markers stand out better on complicated backgrounds!
-X two-way exit names need to better reflect what they are
 - TEST EVERYTHING
 - merge w/ main repository
 - update localization files *
