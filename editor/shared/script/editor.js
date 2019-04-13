@@ -19,9 +19,9 @@ X decide whether to keep tunnel transition (keep, I think)
 X finalize transition time and fps
 	X experiment w/ varied times / frame-counts per transition
 X bug: keyboard inputs seem to still register during transition
-- flicker of next screen sometimes plays before transition
-	- do I need a second buffer to avoid this?
+X flicker of next screen sometimes plays before transition
 - thoughts on color slerping: cool but use sparingly, consider hsl colors, try not to break 3-color (+ b&w) rule
+- need to make markers stand out better on complicated backgrounds!
 - TEST EVERYTHING
 - merge w/ main repository
 - update localization files *

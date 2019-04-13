@@ -495,13 +495,15 @@ function update() {
 	var curTime = Date.now();
 	deltaTime = curTime - prevTime;
 
+	if (!transition.IsTransitionActive()) {
+		updateInput();
+	}
+
 	if (transition.IsTransitionActive()) {
 		// transition animation takes over everything!
 		transition.UpdateTransition(deltaTime);
 	}
 	else {
-		updateInput();
-
 		if (!isNarrating && !isEnding) {
 			updateAnimation();
 			drawRoom( room[curRoom] ); // draw world if game has begun
@@ -539,13 +541,15 @@ function update() {
 	prevTime = curTime;
 
 	//for gif recording
-	if (didPlayerMoveThisFrame && onPlayerMoved != null) onPlayerMoved();
+	if (didPlayerMoveThisFrame && onPlayerMoved != null) {
+		onPlayerMoved();
+	}
 	didPlayerMoveThisFrame = false;
-	// if (didDialogUpdateThisFrame && onDialogUpdate != null) onDialogUpdate();
-	// didDialogUpdateThisFrame = false;
+
 	/* hacky replacement */
-	if (onDialogUpdate != null)
+	if (onDialogUpdate != null) {
 		dialogRenderer.SetPageFinishHandler( onDialogUpdate );
+	}
 
 	input.resetKeyPressed();
 	input.resetTapReleased();
