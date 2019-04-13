@@ -1,7 +1,7 @@
 /*
 TODO for v6:
 X TEST EVERYTHING
-- merge w/ main repository
+X merge w/ main repository
 - update localization files *
 - update version number
 - update version notes
