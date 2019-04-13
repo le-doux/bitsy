@@ -21,6 +21,7 @@ X finalize transition time and fps
 X bug: keyboard inputs seem to still register during transition
 - flicker of next screen sometimes plays before transition
 	- do I need a second buffer to avoid this?
+- thoughts on color slerping: cool but use sparingly, consider hsl colors, try not to break 3-color (+ b&w) rule
 - TEST EVERYTHING
 - merge w/ main repository
 - update localization files *

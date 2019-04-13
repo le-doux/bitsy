@@ -106,7 +106,6 @@ var TransitionManager = function() {
 		pixelEffectFunc : function() {},
 	});
 
-	// TODO -- shorter effect names?
 	this.RegisterTransitionEffect("fade_w", { // TODO : have it linger on full white briefly?
 		showPlayerStart : false,
 		showPlayerEnd : true,
@@ -132,6 +131,70 @@ var TransitionManager = function() {
 			delta = delta < 0.5 ? (delta / 0.5) : ((delta - 0.5) / 0.5); // hacky
 
 			return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, delta);
+		}
+	});
+
+	this.RegisterTransitionEffect("wave", {
+		showPlayerStart : true,
+		showPlayerEnd : true,
+		duration : 1500,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
+			var waveDelta = delta < 0.5 ? delta / 0.5 : 1 - ((delta - 0.5) / 0.5);
+
+			var offset = (pixelY + (waveDelta * waveDelta * 0.2 * start.Image.Height));
+			var freq = 4;
+			var size = 2 + (14 * waveDelta);
+			pixelX += Math.floor(Math.sin(offset / freq) * size);
+
+			if (pixelX < 0) {
+				pixelX += start.Image.Width;
+			}
+			else if (pixelX >= start.Image.Width) {
+				pixelX -= start.Image.Width;
+			}
+
+			var curImage = delta < 0.5 ? start.Image : end.Image;
+			return curImage.GetPixel(pixelX,pixelY);
+		}
+	});
+
+	this.RegisterTransitionEffect("tunnel", {
+		showPlayerStart : true,
+		showPlayerEnd : true,
+		duration : 1500,
+		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
+			if (delta <= 0.4) {
+				var tunnelDelta = 1 - (delta / 0.4);
+
+				var xDist = start.PlayerCenter.x - pixelX;
+				var yDist = start.PlayerCenter.y - pixelY;
+				var dist = Math.sqrt((xDist * xDist) + (yDist * yDist));
+
+				if (dist > start.Image.Width * tunnelDelta) {
+					return {r:0,g:0,b:0,a:255};
+				}
+				else {
+					return start.Image.GetPixel(pixelX,pixelY);
+				}
+			}
+			else if (delta <= 0.6)
+			{
+				return {r:0,g:0,b:0,a:255};
+			}
+			else {
+				var tunnelDelta = (delta - 0.6) / 0.4;
+
+				var xDist = end.PlayerCenter.x - pixelX;
+				var yDist = end.PlayerCenter.y - pixelY;
+				var dist = Math.sqrt((xDist * xDist) + (yDist * yDist));
+
+				if (dist > end.Image.Width * tunnelDelta) {
+					return {r:0,g:0,b:0,a:255};
+				}
+				else {
+					return end.Image.GetPixel(pixelX,pixelY);
+				}
+			}
 		}
 	});
 
@@ -231,131 +294,67 @@ var TransitionManager = function() {
 		}
 	});
 
-	this.RegisterTransitionEffect("wave", { // name? wave? distort? shiver?
-		showPlayerStart : true,
-		showPlayerEnd : true,
-		duration : 1500,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
-			var waveDelta = delta < 0.5 ? delta / 0.5 : 1 - ((delta - 0.5) / 0.5);
+	// TODO : WIP
+	// this.RegisterTransitionEffect("fuzz", {
+	// 	showPlayerStart : true,
+	// 	showPlayerEnd : true,
+	// 	duration : 1500,
+	// 	pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
+	// 		var curImage = delta <= 0.5 ? start : end;
+	// 		var sampleSize = delta <= 0.5 ? (2 + Math.floor(14 * (delta/0.5))) : (16 - Math.floor(14 * ((delta-0.5)/0.5)));
 
-			var offset = (pixelY + (waveDelta * waveDelta * 0.2 * start.Image.Height));
-			var freq = 4;
-			var size = 2 + (14 * waveDelta);
-			pixelX += Math.floor(Math.sin(offset / freq) * size);
+	// 		var palIndex = 0;
 
-			if (pixelX < 0) {
-				pixelX += start.Image.Width;
-			}
-			else if (pixelX >= start.Image.Width) {
-				pixelX -= start.Image.Width;
-			}
+	// 		var sampleX = Math.floor(pixelX / sampleSize) * sampleSize;
+	// 		var sampleY = Math.floor(pixelY / sampleSize) * sampleSize;
 
-			var curImage = delta < 0.5 ? start.Image : end.Image;
-			return curImage.GetPixel(pixelX,pixelY);
-		}
-	});
+	// 		var frameState = transitionEffects["fuzz"].frameState;
 
-	// TODO : try dithering?
-	this.RegisterTransitionEffect("tunnel", {
-		showPlayerStart : true,
-		showPlayerEnd : true,
-		duration : 1500,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
-			if (delta <= 0.4) {
-				var tunnelDelta = 1 - (delta / 0.4);
+	// 		if (frameState.time != delta) {
+	// 			frameState.time = delta;
+	// 			frameState.preCalcSampleValues = {};
+	// 		}
 
-				var xDist = start.PlayerCenter.x - pixelX;
-				var yDist = start.PlayerCenter.y - pixelY;
-				var dist = Math.sqrt((xDist * xDist) + (yDist * yDist));
+	// 		if (frameState.preCalcSampleValues[[sampleX,sampleY]]) {
+	// 			palIndex = frameState.preCalcSampleValues[[sampleX,sampleY]];
+	// 		}
+	// 		else {
+	// 			var paletteCount = {};
+	// 			var foregroundValue = 1.0;
+	// 			var backgroundValue = 0.4;
+	// 			for (var y = sampleY; y < sampleY + sampleSize; y++) {
+	// 				for (var x = sampleX; x < sampleX + sampleSize; x++) {
+	// 					var color = curImage.Image.GetPixel(x,y)
+	// 					var palIndex = PostProcessUtilities.GetColorPalIndex(color,curImage.Palette);
+	// 					if (palIndex != -1) {
+	// 						if (paletteCount[palIndex]) {
+	// 							paletteCount[palIndex] += (palIndex != 0) ? foregroundValue : backgroundValue;
+	// 						}
+	// 						else {
+	// 							paletteCount[palIndex] = (palIndex != 0) ? foregroundValue : backgroundValue;
+	// 						}
+	// 					}
+	// 				}
+	// 			}
 
-				if (dist > start.Image.Width * tunnelDelta) {
-					return {r:0,g:0,b:0,a:255};
-				}
-				else {
-					return start.Image.GetPixel(pixelX,pixelY);
-				}
-			}
-			else if (delta <= 0.6)
-			{
-				return {r:0,g:0,b:0,a:255};
-			}
-			else {
-				var tunnelDelta = (delta - 0.6) / 0.4;
+	// 			var maxCount = 0;
+	// 			for (var i in paletteCount) {
+	// 				if (paletteCount[i] > maxCount) {
+	// 					palIndex = i;
+	// 					maxCount = paletteCount[i];
+	// 				}
+	// 			}
 
-				var xDist = end.PlayerCenter.x - pixelX;
-				var yDist = end.PlayerCenter.y - pixelY;
-				var dist = Math.sqrt((xDist * xDist) + (yDist * yDist));
+	// 			frameState.preCalcSampleValues[[sampleX,sampleY]] = palIndex;
+	// 		}
 
-				if (dist > end.Image.Width * tunnelDelta) {
-					return {r:0,g:0,b:0,a:255};
-				}
-				else {
-					return end.Image.GetPixel(pixelX,pixelY);
-				}
-			}
-		}
-	});
-
-	this.RegisterTransitionEffect("fuzz", {
-		showPlayerStart : true,
-		showPlayerEnd : true,
-		duration : 1500,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
-			var curImage = delta <= 0.5 ? start : end;
-			var sampleSize = delta <= 0.5 ? (2 + Math.floor(14 * (delta/0.5))) : (16 - Math.floor(14 * ((delta-0.5)/0.5)));
-
-			var palIndex = 0;
-
-			var sampleX = Math.floor(pixelX / sampleSize) * sampleSize;
-			var sampleY = Math.floor(pixelY / sampleSize) * sampleSize;
-
-			var frameState = transitionEffects["fuzz"].frameState;
-
-			if (frameState.time != delta) {
-				frameState.time = delta;
-				frameState.preCalcSampleValues = {};
-			}
-
-			if (frameState.preCalcSampleValues[[sampleX,sampleY]]) {
-				palIndex = frameState.preCalcSampleValues[[sampleX,sampleY]];
-			}
-			else {
-				var paletteCount = {};
-				var foregroundValue = 1.0;
-				var backgroundValue = 0.4;
-				for (var y = sampleY; y < sampleY + sampleSize; y++) {
-					for (var x = sampleX; x < sampleX + sampleSize; x++) {
-						var color = curImage.Image.GetPixel(x,y)
-						var palIndex = PostProcessUtilities.GetColorPalIndex(color,curImage.Palette);
-						if (palIndex != -1) {
-							if (paletteCount[palIndex]) {
-								paletteCount[palIndex] += (palIndex != 0) ? foregroundValue : backgroundValue;
-							}
-							else {
-								paletteCount[palIndex] = (palIndex != 0) ? foregroundValue : backgroundValue;
-							}
-						}
-					}
-				}
-
-				var maxCount = 0;
-				for (var i in paletteCount) {
-					if (paletteCount[i] > maxCount) {
-						palIndex = i;
-						maxCount = paletteCount[i];
-					}
-				}
-
-				frameState.preCalcSampleValues[[sampleX,sampleY]] = palIndex;
-			}
-
-			return PostProcessUtilities.GetPalColor(curImage.Palette,palIndex);
-		},
-		frameState : { // ok this is hacky but it's for performance ok
-			time : -1,
-			preCalcSampleValues : {}
-		}
-	});
+	// 		return PostProcessUtilities.GetPalColor(curImage.Palette,palIndex);
+	// 	},
+	// 	frameState : { // ok this is hacky but it's for performance ok
+	// 		time : -1,
+	// 		preCalcSampleValues : {}
+	// 	}
+	// });
 }; // TransitionManager()
 
 
