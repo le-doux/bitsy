@@ -206,17 +206,19 @@ var TransitionManager = function() {
 			var pixelOffset = -1 * Math.floor(start.Image.Height * delta);
 			var slidePixelY = pixelY + pixelOffset;
 
+			var colorDelta = clampLerp(delta, 0.4);
+
 			if (slidePixelY >= 0) {
 				var colorA = start.Image.GetPixel(pixelX,slidePixelY);
 				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, colorDelta);
 				return colorLerped;
 			}
 			else {
 				slidePixelY += start.Image.Height;
 				var colorB = end.Image.GetPixel(pixelX,slidePixelY);
 				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, colorDelta);
 				return colorLerped;
 			}
 		}
@@ -230,17 +232,19 @@ var TransitionManager = function() {
 			var pixelOffset = Math.floor(start.Image.Height * delta);
 			var slidePixelY = pixelY + pixelOffset;
 
+			var colorDelta = clampLerp(delta, 0.4);
+
 			if (slidePixelY < start.Image.Height) {
 				var colorA = start.Image.GetPixel(pixelX,slidePixelY);
 				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, colorDelta);
 				return colorLerped;
 			}
 			else {
 				slidePixelY -= start.Image.Height;
 				var colorB = end.Image.GetPixel(pixelX,slidePixelY);
 				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, colorDelta);
 				return colorLerped;
 			}
 		}
@@ -254,17 +258,19 @@ var TransitionManager = function() {
 			var pixelOffset = -1 * Math.floor(start.Image.Width * delta);
 			var slidePixelX = pixelX + pixelOffset;
 
+			var colorDelta = clampLerp(delta, 0.4);
+
 			if (slidePixelX >= 0) {
 				var colorA = start.Image.GetPixel(slidePixelX,pixelY);
 				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, colorDelta);
 				return colorLerped;
 			}
 			else {
 				slidePixelX += start.Image.Width;
 				var colorB = end.Image.GetPixel(slidePixelX,pixelY);
 				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, colorDelta);
 				return colorLerped;
 			}
 		}
@@ -278,21 +284,29 @@ var TransitionManager = function() {
 			var pixelOffset = Math.floor(start.Image.Width * delta);
 			var slidePixelX = pixelX + pixelOffset;
 
+			var colorDelta = clampLerp(delta, 0.4);
+
 			if (slidePixelX < start.Image.Width) {
 				var colorA = start.Image.GetPixel(slidePixelX,pixelY);
 				var colorB = PostProcessUtilities.GetCorrespondingColorFromPal(colorA,start.Palette,end.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, colorDelta);
 				return colorLerped;
 			}
 			else {
 				slidePixelX -= start.Image.Width;
 				var colorB = end.Image.GetPixel(slidePixelX,pixelY);
 				var colorA = PostProcessUtilities.GetCorrespondingColorFromPal(colorB,end.Palette,start.Palette);
-				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, delta);
+				var colorLerped = PostProcessUtilities.LerpColor(colorA, colorB, colorDelta);
 				return colorLerped;
 			}
 		}
 	});
+
+	function clampLerp(deltaIn, clampDuration) {
+		var clampOffset = (1.0 - clampDuration) / 2;
+		var deltaOut = Math.min(clampDuration, Math.max(0.0, deltaIn - clampOffset)) / clampDuration;
+		return deltaOut;
+	}
 
 	// TODO : WIP
 	// this.RegisterTransitionEffect("fuzz", {
