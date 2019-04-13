@@ -176,6 +176,12 @@ function start() {
 
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
+	var versionLabelElements = document.getElementsByClassName("curVersionLabel");
+	for (var labelIndex in versionLabelElements) {
+		var versionLabel = versionLabelElements[labelIndex];
+		versionLabel.innerText = "v" + version.major + "." + version.minor;
+	}
+
 	// test
 	if(Ed().platform === PlatformType.Mobile) {
 		var head = document.getElementsByTagName("head")[0];
