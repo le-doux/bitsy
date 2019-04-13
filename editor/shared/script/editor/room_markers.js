@@ -725,10 +725,10 @@ function RoomMarkerBase(parentRoom) {
 	this.parentRoom = parentRoom;
 
 	this.DrawMarker = function(ctx,x,y,w,selected) {
-		ctx.fillStyle = getContrastingColor();
+		ctx.fillStyle = getComplimentingColor();
 		ctx.strokeStyle = getContrastingColor();
 
-		ctx.globalAlpha = 0.5;
+		ctx.globalAlpha = 0.7;
 		ctx.fillRect(x * w, y * w, w, w);
 
 		ctx.globalAlpha = 1.0;
