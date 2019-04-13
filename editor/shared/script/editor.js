@@ -3,8 +3,8 @@ TODO for v6:
 X TEST EVERYTHING
 X merge w/ main repository
 X update localization files
-- update version number
-- update version notes
+X update version number
+X update version notes
 - TEST EVERYTHING
 - update github page
 */

@@ -1,3 +1,16 @@
+6.0:
+- new combined exits & endings tool!
+- exits are two-way by default
+- change exit direction with one button
+- new exit transition animations!
+- exit thumbnails are shortcut to rooms
+- toggle exits & endings visibility
+- move exits & endings in room without tool open
+- move exits & endings in two ways:
+-- click and drag in the room
+-- OR use the "move" button
+- updated translations for several languages
+
 5.5:
 - editor translated into Arabic, Chinese, and Polish
 ***** shout outs to the translators! *****
