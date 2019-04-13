@@ -2,7 +2,7 @@
 TODO for v6:
 X TEST EVERYTHING
 X merge w/ main repository
-- update localization files *
+X update localization files
 - update version number
 - update version notes
 - TEST EVERYTHING
