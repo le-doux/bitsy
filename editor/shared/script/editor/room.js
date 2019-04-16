@@ -199,14 +199,14 @@ function RoomTool(canvas) {
 	var mapEditAnimationLoop;
 
 	this.listenEditEvents = function() {
-		if( Ed().platform == PlatformType.Desktop ) {
+		if(true) {
 			canvas.addEventListener("mousedown", onMouseDown);
 			canvas.addEventListener("mousemove", onMouseMove);
 			canvas.addEventListener("mouseup", onMouseUp);
 			canvas.addEventListener("mouseleave", onMouseUp);
 		}
-
-		if( Ed().platform == PlatformType.Mobile ) {
+		else if(false) {
+			// TODO : port over touch vs mouse detection from "scrolly experiment"
 			canvas.addEventListener("touchstart", onTouchStart);
 			canvas.addEventListener("touchmove", onTouchMove);
 			canvas.addEventListener("touchend", onTouchEnd);
@@ -227,14 +227,14 @@ function RoomTool(canvas) {
 	}
 
 	this.unlistenEditEvents = function() {
-		if( Ed().platform == PlatformType.Desktop ) {
+		if(true) {
 			canvas.removeEventListener("mousedown", onMouseDown);
 			canvas.removeEventListener("mousemove", onMouseMove);
 			canvas.removeEventListener("mouseup", onMouseUp);
 			canvas.removeEventListener("mouseleave", onMouseUp);
 		}
-
-		if( Ed().platform == PlatformType.Mobile ) {
+		else if(false) {
+			// TODO : port touch detection
 			canvas.removeEventListener("touchstart", onTouchStart);
 			canvas.removeEventListener("touchmove", onTouchMove);
 			canvas.removeEventListener("touchend", onTouchEnd);
@@ -297,8 +297,8 @@ function togglePlayMode(e) {
 	else {
 		on_edit_mode();
 	}
-	if( Ed().platform == PlatformType.Desktop ) // hack for mobile
-		updatePlayModeButton();
+
+	updatePlayModeButton();
 }
 /* TODO 
 - make a PlayModeController objec?

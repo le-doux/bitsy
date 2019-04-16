@@ -11,8 +11,11 @@ TODO:
 responsive mode TODOs:
 X put adv dialog in its own file
 X put inventory stuff in its own file
-- get rid of core.js
-- get rid of mobile and desktop flags
+X get rid of core.js
+X get rid of mobile and desktop flags
+- add touch vs mouse event detection
+- create editor event system
+	- mouse vs touch detection can be the first globally listen-able event (room & paint will subscribe to it)
 - encapsulate adv dialog logic and inventory logic
 */
 
@@ -34,32 +37,13 @@ var EditMode = {
 	Play : 1
 };
 
-// TODO : use this to specialize code
-var PlatformType = {
-	Desktop : 0,
-	Mobile : 1
-};
-
-/* GLOBAL editor state */
-// I'd like to remove as much as possible from this
-function EditorState() {
-	this.paletteIndex = 0;
-	this.platform = PlatformType.Desktop; // default to desktop
-}
-
-var defaultEditorState = new EditorState();
-function Ed() {
-	return defaultEditorState;
-};
-
 function defParam(param,value) {
 	return (param == undefined || param == null) ? value : param;
 };
 
 /* PALETTES */
-function selectedColorPal(editor) {
-	editor = defParam( editor, Ed() );
-	return sortedPaletteIdList()[ editor.paletteIndex ];
+function selectedColorPal() {
+	return sortedPaletteIdList()[ paletteIndex ];
 };
 
 /* UNIQUE ID METHODS */
@@ -334,9 +318,7 @@ function tileTypeToIdPrefix(type) {
 */
 function reloadDialogUI() {
 	reloadDialogUICore();
-
-	if( Ed().platform == PlatformType.Desktop )
-		reloadAdvDialogUI();
+	reloadAdvDialogUI();
 }
 
 // TODO : default paint and room tools tied to editor state object??? (or is that bad?)
@@ -383,8 +365,7 @@ function on_change_dialog() {
 		dialog[dialogId] = scriptUtils.EnsureDialogBlockFormat(dialogStr);
 	}
 
-	if( Ed().platform == PlatformType.Desktop )
-		reloadAdvDialogUI();
+	reloadAdvDialogUI();
 
 	refreshGameData();
 }
@@ -451,7 +432,7 @@ function PaletteTool(colorPicker,labelIds) {
 function ResourceLoader() {
 	var resources = {};
 
-	var pathRoot = Ed().platform == PlatformType.Desktop ? "shared" : "./../editor/shared";
+	var pathRoot = "shared";
 
 	this.load = function(folder, filename, onready) {
 		var client = new XMLHttpRequest();
@@ -500,8 +481,7 @@ function setDefaultGameState() {
 
 function newGameDialog() {
 	var resetMessage = localization.GetStringOrFallback("reset_game_message", "Starting a new game will erase your old data. Consider exporting your work first! Are you sure you want to start over?");
-	if ( Ed().platform == PlatformType.Mobile || confirm(resetMessage) )
-	{
+	if (confirm(resetMessage)) {
 		resetGameData();
 	}
 }
@@ -524,17 +504,15 @@ function resetGameData() {
 
 	// TODO RENDERER : refresh images
 
-	if ( Ed().platform == PlatformType.Desktop ) {
-		updatePaletteUI();
-		// updatePaletteControlsFromGameData();
-		updateExitOptionsFromGameData();
-		updateRoomName();
-		updateInventoryUI();
-		updateFontSelectUI(); // hmm is this really the place for this?
+	updatePaletteUI();
+	// updatePaletteControlsFromGameData();
+	updateExitOptionsFromGameData();
+	updateRoomName();
+	updateInventoryUI();
+	updateFontSelectUI(); // hmm is this really the place for this?
 
-		on_paint_avatar();
-		document.getElementById('paintOptionAvatar').checked = true;
-	}
+	on_paint_avatar();
+	document.getElementById('paintOptionAvatar').checked = true;
 
 	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
 	markerTool.SetRoom("0");
@@ -545,8 +523,8 @@ function resetGameData() {
 }
 
 function refreshGameData() {
-	if( Ed().platform == PlatformType.Desktop ) {
-		if (isPlayMode) return; //never store game data while in playmode (TODO: wouldn't be necessary if the game data was decoupled form editor data)
+	if (isPlayMode) {
+		return; //never store game data while in playmode (TODO: wouldn't be necessary if the game data was decoupled form editor data)
 	}
 
 	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
@@ -734,8 +712,6 @@ function readUrlFlags() {
 }
 
 function start() {
-	// Ed().platform = PlatformType.Mobile;
-
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
 	var versionLabelElements = document.getElementsByClassName("curVersionLabel");
@@ -744,19 +720,7 @@ function start() {
 		versionLabel.innerText = "v" + version.major + "." + version.minor;
 	}
 
-	// test
-	if(Ed().platform === PlatformType.Mobile) {
-		var head = document.getElementsByTagName("head")[0];
-		var link = document.createElement("link");
-		link.rel = "stylesheet";
-		link.type = "text/css";
-		link.href = "shared/style/mobileEditorStyle.css";
-		head.appendChild(link);
-	}
-
-	if(Ed().platform === PlatformType.Desktop) {
-		detectBrowserFeatures();
-	}
+	detectBrowserFeatures();
 
 	readUrlFlags();
 
@@ -861,16 +825,14 @@ function start() {
 	paintExplorer.Refresh(TileType.Avatar);
 	paintExplorer.ChangeSelection("A");
 	paintTool.explorer = paintExplorer;
-	paintExplorer.SetDisplayCaptions( Ed().platform === PlatformType.Desktop );
+	paintExplorer.SetDisplayCaptions( true );
 
 	//unsupported feature stuff
-	if(Ed().platform === PlatformType.Desktop) {
-		if (hasUnsupportedFeatures()) {
-			showUnsupportedFeatureWarning();
-		}
-		if (!browserFeatures.fileDownload) {
-			document.getElementById("downloadHelp").style.display = "block";
-		}
+	if (hasUnsupportedFeatures()) {
+		showUnsupportedFeatureWarning();
+	}
+	if (!browserFeatures.fileDownload) {
+		document.getElementById("downloadHelp").style.display = "block";
 	}
 
 	// gif recording init (should this go in its own file?)
@@ -1874,10 +1836,14 @@ function updatePaletteControlsFromGameData() {
 		paletteTool.updateColorPickerUI();
 }
 
+var paletteIndex = 0; // TODO : make an encapsulated non-global palette tool someday
+
 function prevPalette() {
 	// update index
-	Ed().paletteIndex = (Ed().paletteIndex - 1);
-	if (Ed().paletteIndex < 0) Ed().paletteIndex = Object.keys(palette).length - 1;
+	paletteIndex = (paletteIndex - 1);
+	if (paletteIndex < 0) {
+		paletteIndex = Object.keys(palette).length - 1;
+	}
 
 	// change the UI
 	updatePaletteUI();
@@ -1885,8 +1851,10 @@ function prevPalette() {
 
 function nextPalette() {
 	// update index
-	Ed().paletteIndex = (Ed().paletteIndex + 1);
-	if (Ed().paletteIndex >= Object.keys(palette).length) Ed().paletteIndex = 0;
+	paletteIndex = (paletteIndex + 1);
+	if (paletteIndex >= Object.keys(palette).length) {
+		paletteIndex = 0;
+	}
 
 	// change the UI
 	updatePaletteUI();
@@ -1905,7 +1873,7 @@ function newPalette() {
 	refreshGameData();
 
 	// change the UI
-	Ed().paletteIndex = Object.keys(palette).length - 1;
+	paletteIndex = Object.keys(palette).length - 1;
 	updatePaletteUI();
 }
 
@@ -3118,9 +3086,6 @@ var grabbedPanel = {
 };
 
 function grabCard(e) {
-	if(Ed().platform === PlatformType.Mobile)
-		return; // This doesn't work on mobile
-
 	// e.preventDefault();
 
 	console.log("--- GRAB START");

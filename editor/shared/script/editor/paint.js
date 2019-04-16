@@ -125,13 +125,14 @@ function PaintTool(canvas, roomTool) {
 	canvas.height = tilesize * paint_scale;
 	var ctx = canvas.getContext("2d");
 	//paint events
-	if( Ed().platform == PlatformType.Desktop ) {
+	if (true) {
 		canvas.addEventListener("mousedown", onMouseDown);
 		canvas.addEventListener("mousemove", onMouseMove);
 		canvas.addEventListener("mouseup", onMouseUp);
 		canvas.addEventListener("mouseleave", onMouseUp);
 	}
-	if( Ed().platform == PlatformType.Mobile ) {
+	if (false) {
+		// TODO : port over touch vs mouse event detection from "scrolly experiment"
 		canvas.addEventListener("touchstart", onTouchStart);
 		canvas.addEventListener("touchmove", onTouchMove);
 		canvas.addEventListener("touchend", onTouchEnd);
@@ -139,8 +140,9 @@ function PaintTool(canvas, roomTool) {
 
 	// TODO : 
 	function onMouseDown(e) {
-		// if( Ed().platform == PlatformType.Desktop ) // hack
-			if (isPlayMode) return; //can't paint during play mode
+		if (isPlayMode) {
+			return; //can't paint during play mode
+		}
 
 		console.log("PAINT TOOL!!!");
 		console.log(e);
@@ -188,13 +190,12 @@ function PaintTool(canvas, roomTool) {
 			refreshGameData();
 			roomTool.drawEditMap(); // TODO : events instead of direct coupling
 
-			// if( Ed().platform == PlatformType.Desktop ) {
-				if(self.explorer != null) {
-					self.explorer.RenderThumbnail( self.drawing.id );
-				}
-				if( self.isCurDrawingAnimated )
-					renderAnimationPreview( roomTool.drawing.id );
-			// }
+			if(self.explorer != null) {
+				self.explorer.RenderThumbnail( self.drawing.id );
+			}
+			if( self.isCurDrawingAnimated ) {
+				renderAnimationPreview( roomTool.drawing.id );
+			}
 		}
 	}
 
@@ -338,13 +339,11 @@ function PaintTool(canvas, roomTool) {
 			newItem();
 		}
 
-		// update paint explorer - only on desktop (TODO: should be separate object with events)
-		// if( Ed().platform == PlatformType.Desktop && self.explorer != null ) {
-			self.explorer.AddThumbnail( self.drawing.id );
-			self.explorer.ChangeSelection( self.drawing.id );
-			document.getElementById("paintExplorerFilterInput").value = ""; // super hacky
-			self.explorer.Refresh( self.drawing.type, true /*doKeepOldThumbnails*/, document.getElementById("paintExplorerFilterInput").value /*filterString*/, true /*skipRenderStep*/ ); // this is a bit hacky feeling
-		// }
+		// update paint explorer
+		self.explorer.AddThumbnail( self.drawing.id );
+		self.explorer.ChangeSelection( self.drawing.id );
+		document.getElementById("paintExplorerFilterInput").value = ""; // super hacky
+		self.explorer.Refresh( self.drawing.type, true /*doKeepOldThumbnails*/, document.getElementById("paintExplorerFilterInput").value /*filterString*/, true /*skipRenderStep*/ ); // this is a bit hacky feeling
 	}
 
 	// TODO -- sould these newDrawing methods be internal to PaintTool?
@@ -397,15 +396,10 @@ function PaintTool(canvas, roomTool) {
 	// TODO - may need to extract this for different tools beyond the paint tool (put it in core.js?)
 	this.deleteDrawing = function() {
 		var shouldDelete = true;
-		if ( Ed().platform == PlatformType.Desktop )
-			shouldDelete = confirm("Are you sure you want to delete this drawing?");
+		shouldDelete = confirm("Are you sure you want to delete this drawing?");
 
 		if ( shouldDelete ) {
-			console.log("PAINT TOOLLLL");
-			// if ( Ed().platform == PlatformType.Desktop && self.explorer != null ) {
-				console.log("PAINT TOOL DELETE THUMB");
-				self.explorer.DeleteThumbnail( self.drawing.id );
-			// }
+			self.explorer.DeleteThumbnail( self.drawing.id );
 
 			if (self.drawing.type == TileType.Tile) {
 				if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
@@ -447,9 +441,8 @@ function PaintTool(canvas, roomTool) {
 				nextItem();
 				updateInventoryItemUI();
 			}
-			// if(Ed().platform == PlatformType.Desktop && self.explorer != null) {
-				self.explorer.ChangeSelection( self.drawing.id );
-			// }
+
+			self.explorer.ChangeSelection( self.drawing.id );
 		}
 	}
 }
