@@ -1,7 +1,17 @@
 /*
 TODO:
 - need to update the instructions panel
-- ???
+- add responsive mode
+- gather bugs / feedback on v6.0 (and earlier)
+- get feedback on bitsy script
+- 24 games
+- jam
+- start vNext branch
+
+responsive mode TODOs:
+- put adv dialog in its own file
+- get rid of core.js
+- get rid of mobile and desktop flags
 */
 
 /*
