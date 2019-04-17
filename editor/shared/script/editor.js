@@ -917,6 +917,20 @@ function start() {
 	// }
 }
 
+function resize() {
+	// console.log(window.innerWidth);
+	if (window.innerHeight > window.innerWidth) {
+		if (!document.body.classList.contains("responsive_vertical")) {
+			document.body.classList.add("responsive_vertical");
+		}
+	}
+	else {
+		if (document.body.classList.contains("responsive_vertical")) {
+			document.body.classList.remove("responsive_vertical");
+		}
+	}
+}
+
 function newDrawing() {
 	paintTool.newDrawing();
 }
