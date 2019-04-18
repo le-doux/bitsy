@@ -29,3 +29,11 @@
 	float: right;
 	margin-top: 4px; /* hacky */
 }
+
+#titlePanel {
+	display: none;
+}
+
+.responsive_vertical #titlePanel {
+	display: block;
+}

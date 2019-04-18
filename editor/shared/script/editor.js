@@ -269,10 +269,15 @@ function makeDrawing(id,imageData) {
 
 /* EVENTS */
 function on_change_title(e) {
-	// title = document.getElementById("titleText").value;
 	title = e.target.value;
 	refreshGameData();
 	tryWarnAboutMissingCharacters(title);
+
+	// hacky way to make sure ALL title textboxes remain up-to-date
+	var titleTextBoxes = document.getElementsByClassName("titleTextBox");
+	for (var i = 0; i < titleTextBoxes.length; i++) {
+		titleTextBoxes[i].value = title;
+	}
 }
 
 /* MOBILE */
@@ -522,7 +527,10 @@ function resetGameData() {
 	markerTool.Refresh();
 	roomTool.drawEditMap();
 
-	document.getElementById("titleText").value = title;
+	var titleTextBoxes = document.getElementsByClassName("titleTextBox");
+	for (var i = 0; i < titleTextBoxes.length; i++) {
+		titleTextBoxes[i].value = title;
+	}
 }
 
 function refreshGameData() {
@@ -2287,7 +2295,10 @@ function on_game_data_change_core() {
 
 	markerTool.SetRoom(curRoom);
 
-	document.getElementById("titleText").value = title;
+	var titleTextBoxes = document.getElementsByClassName("titleTextBox");
+	for (var i = 0; i < titleTextBoxes.length; i++) {
+		titleTextBoxes[i].value = title;
+	}
 }
 
 function updateFontSelectUI() {
@@ -3369,9 +3380,12 @@ function on_change_language_inner(language) {
 
 	// update title in new language IF the user hasn't made any changes to the default title
 	if (localization.LocalizationContains("default_title", title)) {
-		// TODO : localize default_title
 		title = localization.GetStringOrFallback("default_title", "Write your game's title here");
-		document.getElementById("titleText").value = title;
+
+		var titleTextBoxes = document.getElementsByClassName("titleTextBox");
+		for (var i = 0; i < titleTextBoxes.length; i++) {
+			titleTextBoxes[i].value = title;
+		}
 	}
 
 	// update default sprite
@@ -3394,7 +3408,11 @@ function on_change_language_inner(language) {
 // TODO : create a system for placeholder text like I have for innerText
 function hackyUpdatePlaceholderText() {
 	var titlePlaceholder = localization.GetStringOrFallback("title_placeholder", "Title");
-	document.getElementById("titleText").placeholder = titlePlaceholder;
+	var titleTextBoxes = document.getElementsByClassName("titleTextBox");
+	for (var i = 0; i < titleTextBoxes.length; i++) {
+		titleTextBoxes[i].placeholder = titlePlaceholder;
+	}
+
 	var filterPlaceholder = localization.GetStringOrFallback("filter_placeholder", "filter drawings");
 	document.getElementById("paintExplorerFilterInput").placeholder = filterPlaceholder;
 }

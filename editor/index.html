@@ -67,7 +67,7 @@
 					</div>
 
 					<div id="titleFlexItem">
-						<input title="title text for your game" type="text" id="titleText" class="gameTextDir" onchange="on_change_title(event);" value="Write your game's title here" placeholder="Title" style="width:100%;">
+						<input title="title text for your game" type="text" id="titleText" class="gameTextDir titleTextBox" onchange="on_change_title(event);" value="Write your game's title here" placeholder="Title" style="width:100%;">
 					</div>
 
 					<div id="toolsCheckFlexItem">
@@ -205,6 +205,18 @@
 
 		<div id="editorWindow" onmousewheel="blockScrollBackpage(event);">
 			<div id="editorContent">
+
+				<div id="titlePanel" class="panel color0">
+					<div class="bar color0">
+						<div title="title window" class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">edit</i>
+							<span class="localize title_tool_title">title</span>
+						</div>
+					</div>
+					<div id="titlePanelInner">
+						<input title="title text for your game" type="text" id="titleTextPanel" class="gameTextDir titleTextBox" onchange="on_change_title(event);" value="Write your game's title here" placeholder="Title" style="width:calc(100% - 16px);">
+					</div>
+				</div>
 
 				<div id="aboutPanel" class="panel color0">
 					<div class="bar color0">

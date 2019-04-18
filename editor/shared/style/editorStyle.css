@@ -133,6 +133,8 @@ input {
 }
 #titleText {
 	width: 400px;
+}
+.titleTextBox {
 	font-size: 16px;
 }
 #bitsyEditorName {
