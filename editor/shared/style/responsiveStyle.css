@@ -12,3 +12,20 @@
 	max-width: calc(100vw - 28px);
 	margin: 4px;
 }
+
+.responsive_vertical #bylineFlexItem {
+	display: none;
+}
+
+.responsive_vertical #topbarSpaceFlexItem {
+	display: none;
+}
+
+.responsive_vertical #titleFlexItem {
+	display: none;
+}
+
+.responsive_vertical #toolsCheckLabel {
+	float: right;
+	margin-top: 4px; /* hacky */
+}

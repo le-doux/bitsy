@@ -16,6 +16,9 @@ X get rid of mobile and desktop flags
 - add touch vs mouse event detection
 - create editor event system
 	- mouse vs touch detection can be the first globally listen-able event (room & paint will subscribe to it)
+- should top bar go away on scroll down? (like some web apps do)
+- make key tools fit w/ responsive width
+- how do I make responsvie text?
 - encapsulate adv dialog logic and inventory logic
 */
 
