@@ -17,8 +17,18 @@ X get rid of mobile and desktop flags
 - create editor event system
 	- mouse vs touch detection can be the first globally listen-able event (room & paint will subscribe to it)
 - should top bar go away on scroll down? (like some web apps do)
-- make key tools fit w/ responsive width
-- how do I make responsvie text?
+X make key tools fit w/ responsive width
+- how do I make responsive text? (test out em)
+- test on my phone
+- make all tool layouts responsive
+- encapsulate editor.js and bitsy.js
+	- create separate runtime game data and editor game data
+- events
+	- touch vs mouse
+	- game data change
+	- try to sever most direct connections between modules
+	- cur palette change
+	- other UI events?
 - encapsulate adv dialog logic and inventory logic
 */
 
