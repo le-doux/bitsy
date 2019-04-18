@@ -274,9 +274,13 @@ function on_change_title(e) {
 	tryWarnAboutMissingCharacters(title);
 
 	// hacky way to make sure ALL title textboxes remain up-to-date
+	updateTitleTextBox(title);
+}
+
+function updateTitleTextBox(titleString) {
 	var titleTextBoxes = document.getElementsByClassName("titleTextBox");
 	for (var i = 0; i < titleTextBoxes.length; i++) {
-		titleTextBoxes[i].value = title;
+		titleTextBoxes[i].value = titleString;
 	}
 }
 
@@ -527,10 +531,7 @@ function resetGameData() {
 	markerTool.Refresh();
 	roomTool.drawEditMap();
 
-	var titleTextBoxes = document.getElementsByClassName("titleTextBox");
-	for (var i = 0; i < titleTextBoxes.length; i++) {
-		titleTextBoxes[i].value = title;
-	}
+	updateTitleTextBox(title);
 }
 
 function refreshGameData() {
@@ -2295,10 +2296,7 @@ function on_game_data_change_core() {
 
 	markerTool.SetRoom(curRoom);
 
-	var titleTextBoxes = document.getElementsByClassName("titleTextBox");
-	for (var i = 0; i < titleTextBoxes.length; i++) {
-		titleTextBoxes[i].value = title;
-	}
+	updateTitleTextBox(title);
 }
 
 function updateFontSelectUI() {
@@ -3381,11 +3379,7 @@ function on_change_language_inner(language) {
 	// update title in new language IF the user hasn't made any changes to the default title
 	if (localization.LocalizationContains("default_title", title)) {
 		title = localization.GetStringOrFallback("default_title", "Write your game's title here");
-
-		var titleTextBoxes = document.getElementsByClassName("titleTextBox");
-		for (var i = 0; i < titleTextBoxes.length; i++) {
-			titleTextBoxes[i].value = title;
-		}
+		updateTitleTextBox(title);
 	}
 
 	// update default sprite
