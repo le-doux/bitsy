@@ -712,6 +712,8 @@ function readUrlFlags() {
 }
 
 function start() {
+	resize();
+
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
 	var versionLabelElements = document.getElementsByClassName("curVersionLabel");

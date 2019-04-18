@@ -82,7 +82,7 @@
 					<div id="topbarSpaceFlexItem">
 					</div>
 
-					<div id="bylineFlexItem" class="notMobile">
+					<div id="bylineFlexItem">
 						<span class="localize author_by">by</span>
 						<a href="https://www.twitter.com/adamledoux" target="_blank">
 							<span class="localize author_twitter" style="direction:ltr; unicode-bidi:bidi-override;">@adamledoux</span>
@@ -108,7 +108,7 @@
 				</label>
 
 				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanelAnimated(event);" />
-				<label title="show / hide exits & endings window" for="exitsCheck" class="notMobile">
+				<label title="show / hide exits & endings window" for="exitsCheck">
 					<i class="material-icons">directions</i>
 					<span class="localize marker_tool_name">exits & endings</span>
 				</label>
@@ -132,13 +132,13 @@
 				</label>
 
 				<input type="checkbox" value="dialogPanel" id="dialogCheck" onclick="togglePanelAnimated(event);"  checked/>
-				<label title="show / hide dialog window" for="dialogCheck" class="notMobile">
+				<label title="show / hide dialog window" for="dialogCheck">
 					<i class="material-icons">chat</i>
 					<span class="localize dialog_tool_name">dialog</span>
 				</label>
 
 				<input type="checkbox" value="inventoryPanel" id="inventoryCheck" onclick="togglePanelAnimated(event);"  checked/>
-				<label title="show / hide inventory window" for="inventoryCheck" class="notMobile">
+				<label title="show / hide inventory window" for="inventoryCheck">
 					<i class="material-icons">vpn_key</i>
 					<span class="localize inventory_tool_name">inventory</span>
 				</label>
@@ -150,19 +150,19 @@
 				</label>
 				
 				<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanelAnimated(event);" />
-				<label title="show / hide gif recording window" for="gifCheck" class="notMobile">
+				<label title="show / hide gif recording window" for="gifCheck">
 					<i class="material-icons">videocam</i>
 					<span class="localize gif_tool_name">record gif</span>
 				</label>
 				
 				<input type="checkbox" value="dataPanel" onclick="togglePanelAnimated(event);" id="dataCheck"/>
-				<label title="show / hide game data window" for="dataCheck" class="notMobile">
+				<label title="show / hide game data window" for="dataCheck">
 					<i class="material-icons">save</i>
 					<span class="localize data_tool_name">game data</span>
 				</label>
 
 				<input type="checkbox" value="settingsPanel" onclick="togglePanelAnimated(event);" id="settingsCheck"/>
-				<label title="show / hide settings window" for="settingsCheck" class="notMobile">
+				<label title="show / hide settings window" for="settingsCheck">
 					<i class="material-icons">settings</i>
 					<span class="localize settings_tool_name">settings</span>
 				</label>
@@ -381,9 +381,7 @@
 
 					<canvas id="game"></canvas>
 
-					<br class="notMobile">
-
-					<div id="roomToolsOuter" class="controlBox notMobile">
+					<div id="roomToolsOuter" class="controlBox">
 
 						<input type="checkbox" id="roomToolsCheck" onclick="toggleRoomTools(event);" />
 						<label title="show / hide additional room tools" for="roomToolsCheck">
@@ -686,7 +684,7 @@
 						</label>
 
 						<input type="radio" name="paint mode" value="item" onclick="on_paint_item();" id="paintOptionItem">
-						<label title="edit items: things the player can pick up" for="paintOptionItem" class="right notMobile">
+						<label title="edit items: things the player can pick up" for="paintOptionItem" class="right">
 							<i class="material-icons">vpn_key</i>
 							<span class="localize item_label">item</span>
 						</label>
@@ -717,14 +715,14 @@
 								<i class="material-icons">remove_circle</i>
 							</button>
 						</div>
-						<div class="buttonGroup notMobile">
+						<div class="buttonGroup">
 							<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" checked/>
 							<label title="show / hide grid" for="paintGridCheck">
 								<i class="material-icons" id="paintGridIcon">visibility</i> 
 								<span class="localize grid_toggle_visible">grid</span>
 							</label>
 						</div>
-						<div style="margin-bottom: 5px;" class="notMobile">
+						<div style="margin-bottom: 5px;">
 							
 							<span id="drawingNameUI" title="a name to refer to this drawing" class="controlSpan">
 								<span class="localize name_label">name</span>
@@ -750,7 +748,7 @@
 						<span style="float:left;">
 							<span class="localize dialog_tool_name">dialog</span>
 						</span>
-						<button title="open in advanced dialog editor" style="float:right;" onclick="showPanel('dialogPanel');" class="notMobile">
+						<button title="open in advanced dialog editor" style="float:right;" onclick="showPanel('dialogPanel');">
 							<i class="material-icons">open_in_new</i>
 						</button>
 						<br>
@@ -824,7 +822,7 @@
 						</label>
 
 						<input type="radio" name="paint explorer mode" value="item" onclick="on_paint_item();" id="paintExplorerOptionItem">
-						<label title="find items: things the player can pick up" for="paintExplorerOptionItem" class="right notMobile">
+						<label title="find items: things the player can pick up" for="paintExplorerOptionItem" class="right">
 							<i class="material-icons">vpn_key</i>
 							<span class="localize item_label">item</span>
 						</label>
@@ -845,7 +843,7 @@
 						</div>
 					</div>
 
-					<div class="controlBox notMobile" id="paintExplorerFilter">
+					<div class="controlBox" id="paintExplorerFilter">
 						<span id="paintExplorerFilterIcon">
 							<i class="material-icons">search</i>
 						</span>
@@ -895,7 +893,7 @@
 						<input id="colorPickerHexText" title="color picker hex code" type="text" />
 					</div>
 
-					<div id="paletteToolsOuter" class="controlBox notMobile">
+					<div id="paletteToolsOuter" class="controlBox">
 
 						<input type="checkbox" id="paletteToolsCheck" onclick="togglePaletteTools(event);" />
 						<label title="show / hide additional palette tools" for="paletteToolsCheck">
@@ -1102,7 +1100,7 @@
 						</button>
 					</div>
 
-					<div class="notMobile">
+					<div>
 						<span class="localize import_html">import game from html file:</span>
 						<br>
 						<label for="importGamePicker" class="filePickerLabel" title="import game from html file on your computer">
