@@ -199,18 +199,8 @@ function RoomTool(canvas) {
 	var mapEditAnimationLoop;
 
 	this.listenEditEvents = function() {
-		if(true) {
-			canvas.addEventListener("mousedown", onMouseDown);
-			canvas.addEventListener("mousemove", onMouseMove);
-			canvas.addEventListener("mouseup", onMouseUp);
-			canvas.addEventListener("mouseleave", onMouseUp);
-		}
-		else if(false) {
-			// TODO : port over touch vs mouse detection from "scrolly experiment"
-			canvas.addEventListener("touchstart", onTouchStart);
-			canvas.addEventListener("touchmove", onTouchMove);
-			canvas.addEventListener("touchend", onTouchEnd);
-		}
+		clearAllListeners();
+		addListeners(curEditorInputMode);
 
 		mapEditAnimationLoop =
 			setInterval( function() {
@@ -227,21 +217,38 @@ function RoomTool(canvas) {
 	}
 
 	this.unlistenEditEvents = function() {
-		if(true) {
-			canvas.removeEventListener("mousedown", onMouseDown);
-			canvas.removeEventListener("mousemove", onMouseMove);
-			canvas.removeEventListener("mouseup", onMouseUp);
-			canvas.removeEventListener("mouseleave", onMouseUp);
-		}
-		else if(false) {
-			// TODO : port touch detection
-			canvas.removeEventListener("touchstart", onTouchStart);
-			canvas.removeEventListener("touchmove", onTouchMove);
-			canvas.removeEventListener("touchend", onTouchEnd);
-		}
-
+		clearAllListeners();
 		clearInterval( mapEditAnimationLoop );
 	}
+
+	function addListeners(inputMode) {
+		if (inputMode == EditorInputMode.Mouse) {
+			canvas.addEventListener("mousedown", onMouseDown);
+			canvas.addEventListener("mousemove", onMouseMove);
+			canvas.addEventListener("mouseup", onMouseUp);
+			canvas.addEventListener("mouseleave", onMouseUp);
+		}
+		else {
+			canvas.addEventListener("touchstart", onTouchStart);
+			canvas.addEventListener("touchmove", onTouchMove);
+			canvas.addEventListener("touchend", onTouchEnd);
+		}
+	}
+
+	function clearAllListeners() {
+		canvas.removeEventListener("mousedown", onMouseDown);
+		canvas.removeEventListener("mousemove", onMouseMove);
+		canvas.removeEventListener("mouseup", onMouseUp);
+		canvas.removeEventListener("mouseleave", onMouseUp);
+		canvas.removeEventListener("touchstart", onTouchStart);
+		canvas.removeEventListener("touchmove", onTouchMove);
+		canvas.removeEventListener("touchend", onTouchEnd);
+	}
+
+	events.Listen("input_changed", function(newInputMode) {
+		clearAllListeners();
+		addListeners(newInputMode);
+	});
 
 	this.drawEditMap = function() {
 		//clear screen

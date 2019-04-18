@@ -14,6 +14,7 @@ X put inventory stuff in its own file
 X get rid of core.js
 X get rid of mobile and desktop flags
 - scroll down to new tools
+- figure out how stop mouse event from firing all the time!
 - add touch vs mouse event detection
 - create editor event system
 	- mouse vs touch detection can be the first globally listen-able event (room & paint will subscribe to it)
@@ -54,6 +55,16 @@ var EditMode = {
 	Play : 1
 };
 
+var EditorInputMode = {
+	Mouse : 0,
+	Touch : 1
+};
+var curEditorInputMode = EditorInputMode.Mouse;
+
+/* EVENTS */
+var events = new EventManager();
+
+// TODO: what the heck is this helper function for?
 function defParam(param,value) {
 	return (param == undefined || param == null) ? value : param;
 };
@@ -773,13 +784,6 @@ function start() {
 	paintTool.onReloadSprite = function(){ reloadSprite() };
 	paintTool.onReloadItem = function(){ reloadItem() };
 
-	// //exit destination canvas & context
-	// exit_canvas = document.getElementById("exitCanvas");
-	// exit_canvas.width = width * scale;
-	// exit_canvas.height = width * scale;
-	// exit_ctx = exit_canvas.getContext("2d");
-	// //exit events
-	// exit_canvas.addEventListener("mousedown", exit_onMouseDown);
 	markerTool = new RoomMarkerTool(document.getElementById("markerCanvas1"), document.getElementById("markerCanvas2") );
 	console.log("MARKER TOOL " + markerTool);
 
@@ -943,6 +947,23 @@ function start() {
 	// 		}
 	// 	}
 	// }
+
+	// TODO : kind of hacky that you can't switch back to mouse mode right now
+	// document.addEventListener('mousedown', function() {
+	// 	if (curEditorInputMode != EditorInputMode.Mouse) {
+	// 		curEditorInputMode = EditorInputMode.Mouse;
+	// 		console.log("INPUT MOUSE");
+	// 		events.Raise("input_changed", curEditorInputMode);
+	// 	}
+	// })
+
+	document.addEventListener('touchstart', function() {
+		if (curEditorInputMode != EditorInputMode.Touch) {
+			curEditorInputMode = EditorInputMode.Touch;
+			console.log("INPUT TOUCH");
+			events.Raise("input_changed", curEditorInputMode);
+		}
+	});
 }
 
 function resize() {

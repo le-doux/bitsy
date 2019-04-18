@@ -124,6 +124,7 @@ function PaintTool(canvas, roomTool) {
 	canvas.width = tilesize * paint_scale;
 	canvas.height = tilesize * paint_scale;
 	var ctx = canvas.getContext("2d");
+
 	//paint events
 	if (true) {
 		canvas.addEventListener("mousedown", onMouseDown);
