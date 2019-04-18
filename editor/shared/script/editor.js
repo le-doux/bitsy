@@ -13,12 +13,15 @@ X put adv dialog in its own file
 X put inventory stuff in its own file
 X get rid of core.js
 X get rid of mobile and desktop flags
+- scroll down to new tools
 - add touch vs mouse event detection
 - create editor event system
 	- mouse vs touch detection can be the first globally listen-able event (room & paint will subscribe to it)
 - should top bar go away on scroll down? (like some web apps do)
+- should tools toggles go in a side-bar?
 X make key tools fit w/ responsive width
 - how do I make responsive text? (test out em)
+	- make sure all font-size attributes are updated
 - test on my phone
 - make all tool layouts responsive
 - encapsulate editor.js and bitsy.js
@@ -30,6 +33,7 @@ X make key tools fit w/ responsive width
 	- cur palette change
 	- other UI events?
 - encapsulate adv dialog logic and inventory logic
+- tool positioning (up and down buttons)
 */
 
 /*
