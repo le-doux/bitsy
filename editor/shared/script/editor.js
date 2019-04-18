@@ -3114,6 +3114,11 @@ var grabbedPanel = {
 };
 
 function grabCard(e) {
+	// can't grab cards in vertical mode right now
+	if (document.body.classList.contains("responsive_vertical")) {
+		return;
+	}
+
 	// e.preventDefault();
 
 	console.log("--- GRAB START");
