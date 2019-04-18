@@ -37,3 +37,39 @@
 .responsive_vertical #titlePanel {
 	display: block;
 }
+
+.responsive_vertical #game {
+	width: 100%;
+}
+
+.responsive_vertical #paint {
+	width: 100%;
+}
+
+.responsive_vertical #colorPickerWheel, .responsive_vertical #colorPickerSelect {
+	width: 70%;
+	margin-left: 15%;
+}
+
+.responsive_vertical #colorPickerSelect {
+	margin-top: -70%;
+}
+
+.responsive_vertical #colorPickerSliderBg {
+	width: 80%;
+	margin-left: 10%;
+}
+
+.responsive_vertical #colorPickerHexText {
+	width: 80%;
+	margin-left: 10%;
+}
+
+.responsive_vertical #aboutPanel {
+	width: 100%;
+}
+
+.responsive_vertical #paintExplorerViewport {
+	width: 92%;
+	margin-left: 0%;
+}
