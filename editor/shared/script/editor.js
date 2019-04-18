@@ -2571,27 +2571,38 @@ function togglePanelCore(id,visible,doUpdatePrefs=true) {
 }
 
 function togglePanelUI(id,visible) {
-	// move panel to the left of the left-most visible panel
+	
 	if( visible ) {
-		var editorContent = document.getElementById("editorContent");
-		var otherCards = Array.prototype.slice.call( editorContent.getElementsByClassName("panel") );
-		console.log(otherCards.length);
-		otherCards = otherCards.filter(
-						function(card) {
-							var pos = getElementPosition( card );
-							return card.style.display != "none" && pos.x >= 0;
-						});
-		otherCards = otherCards.sort(
-						function(card1,card2) {
-							return getElementPosition( card1 ).x - getElementPosition( card2 ).x;
-						});
-		editorContent.insertBefore( document.getElementById(id), otherCards[0] );
+		if (document.body.classList.contains("responsive_vertical")) {
+			// vertical mode (phone optimized)
+			// just insert at the end for now while I think about the correct way to move cards in this mode
+			var editorContent = document.getElementById("editorContent");
+			editorContent.appendChild(document.getElementById(id));
+		}
+		else {
+			// horizontal mode (desktop optimized)
+			// move panel to the left of the left-most visible panel
+			var editorContent = document.getElementById("editorContent");
+			var otherCards = Array.prototype.slice.call( editorContent.getElementsByClassName("panel") );
+			console.log(otherCards.length);
+			otherCards = otherCards.filter(
+							function(card) {
+								var pos = getElementPosition( card );
+								return card.style.display != "none" && pos.x >= 0;
+							});
+			otherCards = otherCards.sort(
+							function(card1,card2) {
+								return getElementPosition( card1 ).x - getElementPosition( card2 ).x;
+							});
+			editorContent.insertBefore( document.getElementById(id), otherCards[0] );
+		}
 	}
 	// update panel
 	document.getElementById(id).style.display = visible ? "inline-block" : "none";
 	// update checkbox
-	if (id != "toolsPanel")
+	if (id != "toolsPanel") {
 		document.getElementById(id.replace("Panel","Check")).checked = visible;
+	}
 }
 
 function afterTogglePanel(id,visible) {
