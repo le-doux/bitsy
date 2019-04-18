@@ -47,6 +47,8 @@ canvas {
 	/*height:750px;*/
 
 	overflow:scroll;
+	-webkit-overflow-scrolling: touch;
+
 	box-sizing: border-box;
 
 	flex: 1 1 auto;
