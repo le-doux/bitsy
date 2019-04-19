@@ -125,19 +125,37 @@ function PaintTool(canvas, roomTool) {
 	canvas.height = tilesize * paint_scale;
 	var ctx = canvas.getContext("2d");
 
-	//paint events
-	if (true) {
-		canvas.addEventListener("mousedown", onMouseDown);
-		canvas.addEventListener("mousemove", onMouseMove);
-		canvas.addEventListener("mouseup", onMouseUp);
-		canvas.addEventListener("mouseleave", onMouseUp);
+	// paint events
+	function addListeners(inputMode) {
+		if (inputMode == EditorInputMode.Mouse) {
+			canvas.addEventListener("mousedown", onMouseDown);
+			canvas.addEventListener("mousemove", onMouseMove);
+			canvas.addEventListener("mouseup", onMouseUp);
+			canvas.addEventListener("mouseleave", onMouseUp);
+		}
+		else {
+			canvas.addEventListener("touchstart", onTouchStart);
+			canvas.addEventListener("touchmove", onTouchMove);
+			canvas.addEventListener("touchend", onTouchEnd);
+		}
 	}
-	if (false) {
-		// TODO : port over touch vs mouse event detection from "scrolly experiment"
-		canvas.addEventListener("touchstart", onTouchStart);
-		canvas.addEventListener("touchmove", onTouchMove);
-		canvas.addEventListener("touchend", onTouchEnd);
+
+	function clearAllListeners() {
+		canvas.removeEventListener("mousedown", onMouseDown);
+		canvas.removeEventListener("mousemove", onMouseMove);
+		canvas.removeEventListener("mouseup", onMouseUp);
+		canvas.removeEventListener("mouseleave", onMouseUp);
+		canvas.removeEventListener("touchstart", onTouchStart);
+		canvas.removeEventListener("touchmove", onTouchMove);
+		canvas.removeEventListener("touchend", onTouchEnd);
 	}
+
+	events.Listen("input_changed", function(newInputMode) {
+		clearAllListeners();
+		addListeners(newInputMode);
+	});
+
+	addListeners(curEditorInputMode);
 
 	// TODO : 
 	function onMouseDown(e) {
