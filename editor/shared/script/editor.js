@@ -14,10 +14,9 @@ X put inventory stuff in its own file
 X get rid of core.js
 X get rid of mobile and desktop flags
 - scroll down to new tools
-- figure out how stop mouse event from firing all the time!
-- add touch vs mouse event detection
-- create editor event system
-	- mouse vs touch detection can be the first globally listen-able event (room & paint will subscribe to it)
+X figure out how stop mouse event from firing all the time!
+X add touch vs mouse event detection
+X create editor event system
 - should top bar go away on scroll down? (like some web apps do)
 - should tools toggles go in a side-bar?
 X make key tools fit w/ responsive width
@@ -28,13 +27,15 @@ X make key tools fit w/ responsive width
 - encapsulate editor.js and bitsy.js
 	- create separate runtime game data and editor game data
 - events
-	- touch vs mouse
+	X touch vs mouse [not necessary so far?]
 	- game data change
 	- try to sever most direct connections between modules
 	- cur palette change
 	- other UI events?
 - encapsulate adv dialog logic and inventory logic
 - tool positioning (up and down buttons)
+- bug: during exit drag, they move too far and go off screen
+- new color slider that works on mobile
 */
 
 /*
@@ -947,23 +948,6 @@ function start() {
 	// 		}
 	// 	}
 	// }
-
-	// TODO : kind of hacky that you can't switch back to mouse mode right now
-	// document.addEventListener('mousedown', function() {
-	// 	if (curEditorInputMode != EditorInputMode.Mouse) {
-	// 		curEditorInputMode = EditorInputMode.Mouse;
-	// 		console.log("INPUT MOUSE");
-	// 		events.Raise("input_changed", curEditorInputMode);
-	// 	}
-	// })
-
-	document.addEventListener('touchstart', function() {
-		if (curEditorInputMode != EditorInputMode.Touch) {
-			curEditorInputMode = EditorInputMode.Touch;
-			console.log("INPUT TOUCH");
-			events.Raise("input_changed", curEditorInputMode);
-		}
-	});
 }
 
 function resize() {

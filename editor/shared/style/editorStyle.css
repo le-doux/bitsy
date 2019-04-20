@@ -7,13 +7,18 @@ body {
 	padding: 0 !important;
 	line-height: 170%;
 	font-family: "Nunito", Helvetica, Arial, sans-serif;
-	font-size: 1em;
+
+	font-size: 16px;
 
 	height: 100%;
 }
 canvas {
 	background: black;
 	margin-top: 4px;
+}
+
+input[type=text] {
+	font-size: 80%;
 }
 
 #appRoot {
@@ -31,7 +36,7 @@ canvas {
 	padding-left: 20px;
 	padding-right: 20px;
 	box-sizing: border-box;
-	font-size: 1.25em;
+	font-size: 125%;
 
 	flex: 0 1 auto;
 }
@@ -68,7 +73,7 @@ canvas {
 	margin: 10px;
 	margin-right: 0px;
 	padding: 10px;
-	font-size: 16px;
+	font-size: 100%;
 	border-radius: 4px;
 }
 .panel .bar {
@@ -78,14 +83,14 @@ canvas {
 	padding-bottom: 2px;
 	margin: -10px;
 	margin-bottom: 10px;
-	font-size: 20px;
+	font-size: 125%;
 	line-height: 150%;
 	border-radius: 4px 4px 0px 0px;
 }
 .panel .bar .material-icons {
 	line-height: 150%;
 	vertical-align: middle;
-	font-size: 24px;
+	font-size: 150%;
 }
 .panelShadow {
 	display: inline-block;
@@ -108,11 +113,11 @@ input {
 .helpMessage {
 	padding: 5px;
 	margin: 2px;
-	font-size: 13px;
+	font-size: 80%;
 	line-height: 130%;
 }
 #aboutInner {
-	font-size: 13px;
+	font-size: 80%;
 	line-height: 130%;
 }
 #exitCanvas {
@@ -124,7 +129,7 @@ input {
 	margin: 2px;
 	width: 256px;
 	height: 350px;
-	font-size: 13px;
+	font-size: 80%;
 }
 .minimize {
 	float:right;
@@ -137,10 +142,10 @@ input {
 	width: 400px;
 }
 .titleTextBox {
-	font-size: 16px;
+	font-size: 100%;
 }
 #bitsyEditorName {
-	font-size: 14px;
+	font-size: 90%;
 	float: right;
 }
 .toggleText {
@@ -156,12 +161,12 @@ input {
 	margin-top: 2px;
 	margin-bottom: 2px;
 	color: #333;
-	font-size: 13px;
+	font-size: 80%;
 	line-height: 150%;
 }
 .dialogTextArea {
 	resize: vertical;
-	font-size: 12px;
+	font-size: 80%;
 	width: 32ch;
 	margin-top: 5px;
 }
@@ -199,7 +204,7 @@ input {
 /*toolbar*/
 #toolsPanel {
 	padding-top: 5px;
-	font-size: 14px;
+	font-size: 80%;
 	width:100%;
 	overflow:auto;
 	display:none;
@@ -219,7 +224,7 @@ input {
 #gifDownload .material-icons {
 	line-height: 100%;
 	vertical-align: middle;
-	font-size: 18px;
+	font-size: 110%;
 }
 
 #gifRecordingText {
@@ -228,7 +233,7 @@ input {
 #gifRecordingText .material-icons {
 	line-height: 100%;
 	vertical-align: middle;
-	font-size: 18px;
+	font-size: 110%;
 }
 
 #gifEncodingText {
@@ -237,7 +242,7 @@ input {
 #gifEncodingText .material-icons {
 	line-height: 100%;
 	vertical-align: middle;
-	font-size: 18px;
+	font-size: 110%;
 }
 
 #paintExplorerViewport {
@@ -387,7 +392,7 @@ input {
 }
 
 .advDialogOptionDiv button .material-icons {
-	font-size: 12px;
+	font-size: 80%;
 }
 
 .advDialogConditionDiv {
@@ -418,7 +423,7 @@ input {
 }
 
 .advDialogConditionDiv button .material-icons {
-	font-size: 12px;
+	font-size: 80%;
 }
 
 /*.advDialogOptionDiv .light:hover {
@@ -480,7 +485,7 @@ input {
 .advDialogIcon {
 	line-height: 150%;
 	vertical-align: middle;
-	font-size: 24px;
+	font-size: 150%;
 	margin-right: 10px;
 }
 
@@ -510,7 +515,7 @@ input {
 }
 
 .inventoryVariableBox button .material-icons {
-	font-size: 12px;
+	font-size: 80%;
 }
 
 .niceHr {
@@ -553,11 +558,11 @@ input {
 
 #bylineFlexItem {
 	flex: 1 0 auto;
-	font-size:12px;
+	font-size: 80%;
 }
 
 #bitsyLogoTitle {
-	font-size: 1.25em;
+	font-size: 125%;
 }
 
 #paintExplorerFilter {
@@ -569,7 +574,7 @@ input {
 	float:left;
 }
 #paintExplorerFilterIcon .material-icons {
-	font-size: 18px;
+	font-size: 110%;
 }
 
 #paintExplorerFilterInput {

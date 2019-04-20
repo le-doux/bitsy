@@ -73,3 +73,43 @@
 	width: 92%;
 	margin-left: 0%;
 }
+
+/* high dpi */
+@media 
+(-webkit-device-pixel-ratio: 3), 
+(min-resolution: 288dpi) {
+	body {
+		font-size: 96px;
+	}
+
+	#bitsyLogo {
+		width: 148px;
+		height: 148px;
+	}
+}
+
+@media 
+(-webkit-device-pixel-ratio: 2), 
+(min-resolution: 192dpi) {
+	body {
+		font-size: 48px;
+	}
+
+	#bitsyLogo {
+		width: 72px;
+		height: 72px;
+	}
+}
+
+@media 
+(-webkit-device-pixel-ratio: 1.5), 
+(min-resolution: 144dpi) {
+	body {
+		font-size: 24px;
+	}
+
+	#bitsyLogo {
+		width: 36px;
+		height: 36px;
+	}
+}

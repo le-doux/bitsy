@@ -126,36 +126,13 @@ function PaintTool(canvas, roomTool) {
 	var ctx = canvas.getContext("2d");
 
 	// paint events
-	function addListeners(inputMode) {
-		if (inputMode == EditorInputMode.Mouse) {
-			canvas.addEventListener("mousedown", onMouseDown);
-			canvas.addEventListener("mousemove", onMouseMove);
-			canvas.addEventListener("mouseup", onMouseUp);
-			canvas.addEventListener("mouseleave", onMouseUp);
-		}
-		else {
-			canvas.addEventListener("touchstart", onTouchStart);
-			canvas.addEventListener("touchmove", onTouchMove);
-			canvas.addEventListener("touchend", onTouchEnd);
-		}
-	}
-
-	function clearAllListeners() {
-		canvas.removeEventListener("mousedown", onMouseDown);
-		canvas.removeEventListener("mousemove", onMouseMove);
-		canvas.removeEventListener("mouseup", onMouseUp);
-		canvas.removeEventListener("mouseleave", onMouseUp);
-		canvas.removeEventListener("touchstart", onTouchStart);
-		canvas.removeEventListener("touchmove", onTouchMove);
-		canvas.removeEventListener("touchend", onTouchEnd);
-	}
-
-	events.Listen("input_changed", function(newInputMode) {
-		clearAllListeners();
-		addListeners(newInputMode);
-	});
-
-	addListeners(curEditorInputMode);
+	canvas.addEventListener("mousedown", onMouseDown);
+	canvas.addEventListener("mousemove", onMouseMove);
+	canvas.addEventListener("mouseup", onMouseUp);
+	canvas.addEventListener("mouseleave", onMouseUp);
+	canvas.addEventListener("touchstart", onTouchStart);
+	canvas.addEventListener("touchmove", onTouchMove);
+	canvas.addEventListener("touchend", onTouchEnd);
 
 	// TODO : 
 	function onMouseDown(e) {
@@ -219,19 +196,19 @@ function PaintTool(canvas, roomTool) {
 	}
 
 	function onTouchStart(e) {
-		// e.preventDefault();
+		e.preventDefault();
 		var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		onMouseDown(fakeEvent);
 	}
 
 	function onTouchMove(e) {
-		// e.preventDefault();
+		e.preventDefault();
 		var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		onMouseMove(fakeEvent);
 	}
 
 	function onTouchEnd(e) {
-		// e.preventDefault();
+		e.preventDefault();
 		onMouseUp();
 	}
 

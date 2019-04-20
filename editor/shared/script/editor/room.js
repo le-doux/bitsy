@@ -173,7 +173,7 @@ function RoomTool(canvas) {
 	}
 
 	function onTouchStart(e) {
-		// e.preventDefault();
+		e.preventDefault();
 		// console.log(e.touches[0]);
 		var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		// console.log(fakeEvent);
@@ -181,13 +181,13 @@ function RoomTool(canvas) {
 	}
 
 	function onTouchMove(e) {
-		// e.preventDefault();
+		e.preventDefault();
 		var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		onMouseMove( fakeEvent );
 	}
 
 	function onTouchEnd(e) {
-		// e.preventDefault();
+		e.preventDefault();
 		// var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		// map_onMouseUp( fakeEvent );
 		isDragAddingTiles = false;
@@ -199,8 +199,13 @@ function RoomTool(canvas) {
 	var mapEditAnimationLoop;
 
 	this.listenEditEvents = function() {
-		clearAllListeners();
-		addListeners(curEditorInputMode);
+		canvas.addEventListener("mousedown", onMouseDown);
+		canvas.addEventListener("mousemove", onMouseMove);
+		canvas.addEventListener("mouseup", onMouseUp);
+		canvas.addEventListener("mouseleave", onMouseUp);
+		canvas.addEventListener("touchstart", onTouchStart);
+		canvas.addEventListener("touchmove", onTouchMove);
+		canvas.addEventListener("touchend", onTouchEnd);
 
 		mapEditAnimationLoop =
 			setInterval( function() {
@@ -217,25 +222,6 @@ function RoomTool(canvas) {
 	}
 
 	this.unlistenEditEvents = function() {
-		clearAllListeners();
-		clearInterval( mapEditAnimationLoop );
-	}
-
-	function addListeners(inputMode) {
-		if (inputMode == EditorInputMode.Mouse) {
-			canvas.addEventListener("mousedown", onMouseDown);
-			canvas.addEventListener("mousemove", onMouseMove);
-			canvas.addEventListener("mouseup", onMouseUp);
-			canvas.addEventListener("mouseleave", onMouseUp);
-		}
-		else {
-			canvas.addEventListener("touchstart", onTouchStart);
-			canvas.addEventListener("touchmove", onTouchMove);
-			canvas.addEventListener("touchend", onTouchEnd);
-		}
-	}
-
-	function clearAllListeners() {
 		canvas.removeEventListener("mousedown", onMouseDown);
 		canvas.removeEventListener("mousemove", onMouseMove);
 		canvas.removeEventListener("mouseup", onMouseUp);
@@ -243,12 +229,9 @@ function RoomTool(canvas) {
 		canvas.removeEventListener("touchstart", onTouchStart);
 		canvas.removeEventListener("touchmove", onTouchMove);
 		canvas.removeEventListener("touchend", onTouchEnd);
-	}
 
-	events.Listen("input_changed", function(newInputMode) {
-		clearAllListeners();
-		addListeners(newInputMode);
-	});
+		clearInterval( mapEditAnimationLoop );
+	}
 
 	this.drawEditMap = function() {
 		//clear screen
