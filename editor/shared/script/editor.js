@@ -2574,13 +2574,17 @@ function togglePanelCore(id,visible,doUpdatePrefs=true) {
 }
 
 function togglePanelUI(id,visible) {
-	
 	if( visible ) {
 		if (window.innerHeight > window.innerWidth) {
 			// vertical mode (phone optimized)
 			// just insert at the end for now while I think about the correct way to move cards in this mode
 			var editorContent = document.getElementById("editorContent");
-			editorContent.appendChild(document.getElementById(id));
+			var cardElement = document.getElementById(id);
+			editorContent.appendChild(cardElement);
+
+			// // TODO 
+			// console.log(cardElement.offsetTop);
+			// editorContent.scrollTop = cardElement.offsetTop;
 		}
 		else {
 			// horizontal mode (desktop optimized)
