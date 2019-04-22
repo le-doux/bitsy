@@ -1,83 +1,85 @@
-.responsive_vertical #editorContent {
-	white-space: normal;
-	padding: 0px;
-	width: 100%;
-	overflow-x: hidden;
-	overflow-y: scroll;
-}
-
-.responsive_vertical .panel {
-	display: block;
-	width: calc(100vw - 28px);
-	max-width: calc(100vw - 28px);
-	margin: 4px;
-}
-
-.responsive_vertical #bylineFlexItem {
-	display: none;
-}
-
-.responsive_vertical #topbarSpaceFlexItem {
-	display: none;
-}
-
-.responsive_vertical #titleFlexItem {
-	display: none;
-}
-
-.responsive_vertical #toolsCheckLabel {
-	float: right;
-	margin-top: 4px; /* hacky */
-}
-
 #titlePanel {
 	display: none;
 }
 
-.responsive_vertical #titlePanel {
-	display: block;
-}
+@media (orientation: portrait) {
+	#editorContent {
+		white-space: normal;
+		padding: 0px;
+		width: 100%;
+		overflow-x: hidden;
+		overflow-y: scroll;
+	}
 
-.responsive_vertical #game {
-	width: 100%;
-}
+	.panel {
+		display: block;
+		width: calc(100vw - 28px);
+		max-width: calc(100vw - 28px);
+		margin: 4px;
+	}
 
-.responsive_vertical #paint {
-	width: 100%;
-}
+	#bylineFlexItem {
+		display: none;
+	}
 
-.responsive_vertical #colorPickerWheel, .responsive_vertical #colorPickerSelect {
-	width: 70%;
-	margin-left: 15%;
-}
+	#topbarSpaceFlexItem {
+		display: none;
+	}
 
-.responsive_vertical #colorPickerSelect {
-	margin-top: -70%;
-}
+	#titleFlexItem {
+		display: none;
+	}
 
-.responsive_vertical #colorPickerSliderBg {
-	width: 80%;
-	margin-left: 10%;
-}
+	#toolsCheckLabel {
+		float: right;
+		margin-top: 4px; /* hacky */
+	}
 
-.responsive_vertical #colorPickerHexText {
-	width: 80%;
-	margin-left: 10%;
-}
+	#titlePanel {
+		display: block;
+	}
 
-.responsive_vertical #aboutPanel {
-	width: 100%;
-}
+	#game {
+		width: 100%;
+	}
 
-.responsive_vertical #paintExplorerViewport {
-	width: 92%;
-	margin-left: 0%;
+	#paint {
+		width: 100%;
+	}
+
+	#colorPickerWheel, #colorPickerSelect {
+		width: 70%;
+		margin-left: 15%;
+	}
+
+	#colorPickerSelect {
+		margin-top: -70%;
+	}
+
+	#colorPickerSliderBg {
+		width: 80%;
+		margin-left: 10%;
+	}
+
+	#colorPickerHexText {
+		width: 80%;
+		margin-left: 10%;
+	}
+
+	#aboutPanel {
+		width: 100%;
+	}
+
+	#paintExplorerViewport {
+		width: 92%;
+		margin-left: 0%;
+	}
 }
 
 /* high dpi */
 @media 
-(-webkit-device-pixel-ratio: 3), 
-(min-resolution: 288dpi) {
+(-webkit-device-pixel-ratio: 3) and (orientation: portrait), 
+(min-resolution: 288dpi) and (orientation: portrait) {
 	body {
 		font-size: 96px;
 	}
@@ -89,8 +91,8 @@
 }
 
 @media 
-(-webkit-device-pixel-ratio: 2), 
-(min-resolution: 192dpi) {
+(-webkit-device-pixel-ratio: 2) and (orientation: portrait), 
+(min-resolution: 192dpi) and (max-resolution: 287dpi) and (orientation: portrait) {
 	body {
 		font-size: 48px;
 	}
@@ -102,8 +104,8 @@
 }
 
 @media 
-(-webkit-device-pixel-ratio: 1.5), 
-(min-resolution: 144dpi) {
+(-webkit-device-pixel-ratio: 1) and (orientation: portrait), 
+(min-resolution: 96dpi) and (max-resolution: 191dpi) and (orientation: portrait) {
 	body {
 		font-size: 24px;
 	}

@@ -3,9 +3,9 @@ TODO:
 - need to update the instructions panel
 - add responsive mode
 - gather bugs / feedback on v6.0 (and earlier)
-- get feedback on bitsy script
+X get feedback on bitsy script
 - 24 games
-- jam
+- jam (in progress)
 - start vNext branch
 
 responsive mode TODOs:
@@ -750,8 +750,6 @@ function readUrlFlags() {
 }
 
 function start() {
-	resize();
-
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
 	var versionLabelElements = document.getElementsByClassName("curVersionLabel");
@@ -948,20 +946,6 @@ function start() {
 	// 		}
 	// 	}
 	// }
-}
-
-function resize() {
-	// console.log(window.innerWidth);
-	if (window.innerHeight > window.innerWidth) {
-		if (!document.body.classList.contains("responsive_vertical")) {
-			document.body.classList.add("responsive_vertical");
-		}
-	}
-	else {
-		if (document.body.classList.contains("responsive_vertical")) {
-			document.body.classList.remove("responsive_vertical");
-		}
-	}
 }
 
 function newDrawing() {
@@ -2592,7 +2576,7 @@ function togglePanelCore(id,visible,doUpdatePrefs=true) {
 function togglePanelUI(id,visible) {
 	
 	if( visible ) {
-		if (document.body.classList.contains("responsive_vertical")) {
+		if (window.innerHeight > window.innerWidth) {
 			// vertical mode (phone optimized)
 			// just insert at the end for now while I think about the correct way to move cards in this mode
 			var editorContent = document.getElementById("editorContent");
@@ -3145,7 +3129,7 @@ var grabbedPanel = {
 
 function grabCard(e) {
 	// can't grab cards in vertical mode right now
-	if (document.body.classList.contains("responsive_vertical")) {
+	if (window.innerHeight > window.innerWidth) {
 		return;
 	}
 
