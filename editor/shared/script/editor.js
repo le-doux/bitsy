@@ -20,9 +20,9 @@ X create editor event system
 - should top bar go away on scroll down? (like some web apps do)
 - should tools toggles go in a side-bar?
 X make key tools fit w/ responsive width
-- how do I make responsive text? (test out em)
-	- make sure all font-size attributes are updated
-- test on my phone
+X how do I make responsive text? (test out em)
+	X make sure all font-size attributes are updated
+X test on my phone
 - make all tool layouts responsive
 - encapsulate editor.js and bitsy.js
 	- create separate runtime game data and editor game data

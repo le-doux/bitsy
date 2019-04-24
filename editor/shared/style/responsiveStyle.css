@@ -13,9 +13,54 @@
 
 	.panel {
 		display: block;
-		width: calc(100vw - 28px);
-		max-width: calc(100vw - 28px);
-		margin: 4px;
+		width: 92vw;
+		max-width: 92vw;
+		margin: 2vw;
+		border-radius: 2vw;
+	}
+
+	.panel .bar {
+		border-radius: 2vw 2vw 0px 0px;
+	}
+
+	.panelShadow {
+		border-radius: 2vw;
+	}
+
+	.controlBox {
+		border-radius: 1vw;
+	}
+
+	.controlSpan {
+		border-radius: 1vw;
+	}
+
+	#paintExplorerViewport {
+		border-radius: 1vw;
+	}
+
+	.left {
+		border-radius: 1vw 0px 0px 1vw;
+	}
+
+	.right {
+		border-radius: 0px 1vw 1vw 0px;
+	}
+
+	.advDialogOptionDiv {
+		border-radius: 1vw;
+	}
+
+	.advDialogConditionDiv {
+		border-radius: 1vw;
+	}
+
+	#advDialogViewport {
+		border-radius: 1vw;
+	}
+
+	.inventoryViewport {
+		border-radius: 1vw;
 	}
 
 	#bylineFlexItem {
