@@ -130,6 +130,11 @@
 	#titleTextPanel {
 		width: calc(100% - 8vw);
 	}
+
+	input[type=text] {
+		font-size: 80%;
+		line-height: 80%;
+	}
 }
 
 /* high dpi */

@@ -139,3 +139,7 @@ input[type=radio] + label.right {
 	vertical-align: middle;
 	line-height: 100%;
 }
+
+select {
+	font-size: 90%;
+}
