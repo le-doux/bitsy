@@ -133,7 +133,11 @@
 
 	input[type=text] {
 		font-size: 80%;
-		line-height: 80%;
+		line-height: 100%;
+	}
+
+	input[type=text].nameTextbox {
+		font-size: 50%;
 	}
 }
 
