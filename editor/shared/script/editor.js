@@ -5,7 +5,7 @@ TODO:
 - gather bugs / feedback on v6.0 (and earlier)
 X get feedback on bitsy script
 - 24 games
-- jam (in progress)
+X jam
 - start vNext branch
 
 responsive mode TODOs:
@@ -36,6 +36,11 @@ X test on my phone
 - tool positioning (up and down buttons)
 - bug: during exit drag, they move too far and go off screen
 - new color slider that works on mobile
+
+new notes from forum
+- new game+
+- process tags in "say" function
+- go through candle's list of UI annoyances https://itch.io/t/152890/some-bugs-ux-annoyances
 */
 
 /*

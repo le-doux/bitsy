@@ -17,9 +17,16 @@
 		max-width: 92vw;
 		margin: 2vw;
 		border-radius: 2vw;
+		padding: 2vw;
 	}
 
 	.panel .bar {
+		padding: 1vw;
+		padding-left: 2vw;
+		padding-right: 2vw;
+		padding-bottom: 2px;
+		margin: -2vw;
+		margin-bottom: 2vw;
 		border-radius: 2vw 2vw 0px 0px;
 	}
 
@@ -77,7 +84,7 @@
 
 	#toolsCheckLabel {
 		float: right;
-		margin-top: 4px; /* hacky */
+		margin-top: 2vw; /* hacky */
 	}
 
 	#titlePanel {
@@ -118,6 +125,10 @@
 	#paintExplorerViewport {
 		width: 92%;
 		margin-left: 0%;
+	}
+
+	#titleTextPanel {
+		width: calc(100% - 8vw);
 	}
 }
 
