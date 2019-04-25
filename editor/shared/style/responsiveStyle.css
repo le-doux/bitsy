@@ -149,6 +149,10 @@
 		width: 12vh;
 		height: 12vh;
 	}
+	
+	.panelBarClose {
+		line-height: 200%; /*hacky*/
+	}
 }
 
 /* high dpi */
