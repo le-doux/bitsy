@@ -144,6 +144,11 @@
 		width: 100%;
 		height: 50vh;
 	}
+
+	#animation img {
+		width: 15vh;
+		height: 15vh;
+	}
 }
 
 /* high dpi */
