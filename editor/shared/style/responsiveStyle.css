@@ -139,6 +139,11 @@
 	input[type=text].nameTextbox {
 		font-size: 50%;
 	}
+
+	#game_data {
+		width: 100%;
+		height: 50vh;
+	}
 }
 
 /* high dpi */

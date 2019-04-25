@@ -101,6 +101,7 @@ input[type=text] {
 }
 textarea {
 	font-family: monospace;
+	font-size: 80%;
 }
 input {
 	font-family: monospace;
@@ -590,4 +591,9 @@ input {
 
 #aboutPanel {
 	width:350px;white-space:normal;
+}
+
+#game_data {
+	width: 300px;
+	height: 300px;
 }
