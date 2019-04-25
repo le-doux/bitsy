@@ -196,9 +196,11 @@ input {
 /* random hacks */
 #instructionsOuter {
 	padding-top: 10px; /*why*/
+	padding-bottom: 12px;
 }
 #versionNotesOuter {
 	padding-top: 10px;
+	padding-bottom: 12px;
 }
 
 /*toolbar*/
