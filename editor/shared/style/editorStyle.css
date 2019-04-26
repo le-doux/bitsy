@@ -597,3 +597,11 @@ input {
 	width: 300px;
 	height: 300px;
 }
+
+#gifPreview {
+	width: 300px;
+}
+
+#gifPlaceholder {
+	display:block;background:#eee;width:300px;height:300px;
+}

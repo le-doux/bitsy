@@ -184,6 +184,18 @@
 	#markerLinkControl button {
 		margin-top: 10vh;
 	}
+
+	#gifPreview {
+		width: 80vw;
+		max-width: 100%;
+	}
+
+	#gifPlaceholder {
+		width: 80vw;
+		max-width: 100%;
+		height: 80vw;
+		max-height: 100%;
+	}
 }
 
 /* high dpi */
