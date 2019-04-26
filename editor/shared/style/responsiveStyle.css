@@ -180,6 +180,10 @@
 	#markerName2 {
 		line-height: 90%;
 	}
+
+	#markerLinkControl button {
+		margin-top: 10vh;
+	}
 }
 
 /* high dpi */
