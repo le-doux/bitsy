@@ -859,7 +859,7 @@
 						<span id="paintExplorerFilterIcon">
 							<i class="material-icons">search</i>
 						</span>
-						<input id="paintExplorerFilterInput" type="text" onkeyup="paintExplorerFilterChange(event);" onchange="paintExplorerFilterChange(event);" placeholder="filter drawings" title="filter drawings by name" size="20">
+						<input id="paintExplorerFilterInput" type="text" onkeyup="paintExplorerFilterChange(event);" onchange="paintExplorerFilterChange(event);" placeholder="filter drawings" title="filter drawings by name" size="30">
 					</div>
 				</div>
 
@@ -951,102 +951,84 @@
 					</div>
 
 					<div id="dialogEditorHasContent">
-						<div style="float:left;">
-							<div id="dialogTop" style="height: 30px; margin-bottom: 5px;">
-								<span style="float:left">
-									<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
-									<label title="preview dialog" for="previewDialogCheck">
-										<i class="material-icons" id="previewDialogIcon">play_arrow</i>
-										<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
-									</label>
-								</span>
+						<div id="dialogTop">
+							<span style="float:left">
+								<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
+								<label title="preview dialog" for="previewDialogCheck">
+									<i class="material-icons" id="previewDialogIcon">play_arrow</i>
+									<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
+								</label>
+							</span>
 
-								<span style="float:right">
-									<!-- <input type="checkbox" id="dialogShowDocsCheck" onclick="toggleDialogDocs(event);"/>
-									<label title="show / hide the code for this dialog" for="dialogShowDocsCheck">
-										<i class="material-icons">info</i>
-										<span id="dialogToggleDocsShowText" class="localize dialog_show_docs">show docs</span> 
-										<span id="dialogToggleDocsHideText" class="localize dialog_hide_docs" style="display:none;">hide docs</span>
-									</label> -->
+							<span style="float:right">
+								<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);" />
+								<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
+									<i class="material-icons">code</i> 
+									<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
+									<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
+								</label>
+							</span>
+						</div>
 
-									<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);" />
-									<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
-										<i class="material-icons">code</i> 
-										<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
-										<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
-									</label>
-								</span>
+						<div id="dialogTools" class="controlBox">
+							<form style="display:inline;">
+								<input type="radio" name="dialogTools" value="section" id="dialogToolsOptionSection" onclick="showDialogToolsSection();" checked>
+								<label for="dialogToolsOptionSection" class="left" onmousedown="preventTextDeselectAndClick(event);" title="add new dialog sections">
+									<i class="material-icons">add_circle</i> 
+									<span class="localize dialog_block_new">new section</span>
+								</label>
+								<input type="radio" name="dialogTools" value="format" id="dialogToolsOptionEffects" onclick="showDialogToolsEffects();">
+								<label for="dialogToolsOptionEffects" class="right" onmousedown="preventTextDeselectAndClick(event);" title="add special effects to selected text">
+									<i class="material-icons">text_format</i> 
+									<span class="localize dialog_effect_new">text effects</span>
+								</label>
+							</form>
+
+							<hr style="background:#6767b2;border:0px;height:1px;margin:4px;margin-left:0px;margin-right:0px;">
+							<div id="dialogToolsSection">
+								<button onclick="addDialogBlockUI();" title="add new dialog: the same line is said each time">
+									<i class="material-icons">subject</i>
+									<span class="localize dialog_block_basic">dialog</span>
+								</button>
+								<button onclick="addSeqBlockUI();" title="add new dialog list: different lines said each time, in the order you choose">
+									<i class="material-icons">list</i>
+									<span class="localize dialog_block_list">list</span>
+								</button>
+								<button onclick="addIfBlockUI();" title="add new conditional dialog: what option is said is determined by conditions you define">
+									<i class="material-icons">call_split</i>
+									<span class="localize dialog_block_conditional">conditional</span>
+								</button>
 							</div>
-
-							<div id="dialogTools" class="controlBox">
-								<form style="display:inline;">
-									<input type="radio" name="dialogTools" value="section" id="dialogToolsOptionSection" onclick="showDialogToolsSection();" checked>
-									<label for="dialogToolsOptionSection" class="left" onmousedown="preventTextDeselectAndClick(event);" title="add new dialog sections">
-										<i class="material-icons">add_circle</i> 
-										<span class="localize dialog_block_new">new section</span>
-									</label>
-									<input type="radio" name="dialogTools" value="format" id="dialogToolsOptionEffects" onclick="showDialogToolsEffects();">
-									<label for="dialogToolsOptionEffects" class="right" onmousedown="preventTextDeselectAndClick(event);" title="add special effects to selected text">
-										<i class="material-icons">text_format</i> 
-										<span class="localize dialog_effect_new">text effects</span>
-									</label>
-								</form>
-
-								<hr style="background:#6767b2;border:0px;height:1px;margin:4px;margin-left:0px;margin-right:0px;">
-								<div id="dialogToolsSection">
-									<button onclick="addDialogBlockUI();" title="add new dialog: the same line is said each time">
-										<i class="material-icons">subject</i>
-										<span class="localize dialog_block_basic">dialog</span>
-									</button>
-									<button onclick="addSeqBlockUI();" title="add new dialog list: different lines said each time, in the order you choose">
-										<i class="material-icons">list</i>
-										<span class="localize dialog_block_list">list</span>
-									</button>
-									<button onclick="addIfBlockUI();" title="add new conditional dialog: what option is said is determined by conditions you define">
-										<i class="material-icons">call_split</i>
-										<span class="localize dialog_block_conditional">conditional</span>
-									</button>
-								</div>
-								<div id="dialogToolsEffects" style="display:none;">
-									<button onclick="wrapTextSelection('{clr1}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 1st color in the palette">
-										<span class="localize dialog_effect_color1">color 1</span>
-									</button>
-									<button onclick="wrapTextSelection('{clr2}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 2nd color in the palette">
-										<span class="localize dialog_effect_color2">color 2</span>
-									</button>
-									<button onclick="wrapTextSelection('{clr3}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 3rd color in the palette">
-										<span class="localize dialog_effect_color3">color 3</span>
-									</button>
-									<button onclick="wrapTextSelection('{wvy}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags waves up and down">
-										<span class="localize dialog_effect_wavy">wavy</span>
-									</button>
-									<button onclick="wrapTextSelection('{shk}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags shakes constantly">
-										<span class="localize dialog_effect_shaky">shaky</span>
-									</button>
-									<button onclick="wrapTextSelection('{rbw}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags is rainbow colored">
-										<span class="localize dialog_effect_rainbow">rainbow</span>
-									</button>
-								</div>
-							</div>
-
-							<div id="dialogCode" style="display:none;">
-								<textarea id="dialogCodeText" onkeydown="on_change_adv_dialog();" onkeyup="on_change_adv_dialog();" onchange="on_change_adv_dialog();"></textarea>
-							</div>
-
-							<div id="dialogEditor">
-								<div id="advDialogViewport">
-								</div>
+							<div id="dialogToolsEffects" style="display:none;">
+								<button onclick="wrapTextSelection('{clr1}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 1st color in the palette">
+									<span class="localize dialog_effect_color1">color 1</span>
+								</button>
+								<button onclick="wrapTextSelection('{clr2}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 2nd color in the palette">
+									<span class="localize dialog_effect_color2">color 2</span>
+								</button>
+								<button onclick="wrapTextSelection('{clr3}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 3rd color in the palette">
+									<span class="localize dialog_effect_color3">color 3</span>
+								</button>
+								<button onclick="wrapTextSelection('{wvy}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags waves up and down">
+									<span class="localize dialog_effect_wavy">wavy</span>
+								</button>
+								<button onclick="wrapTextSelection('{shk}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags shakes constantly">
+									<span class="localize dialog_effect_shaky">shaky</span>
+								</button>
+								<button onclick="wrapTextSelection('{rbw}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags is rainbow colored">
+									<span class="localize dialog_effect_rainbow">rainbow</span>
+								</button>
 							</div>
 						</div>
 
-						<!-- <div id="dialogDocs" style="float:right; padding-left: 5px; display:none;">
-							<div class="controlBox">
-								<i class="material-icons" style="font-size:20px;vertical-align: middle;line-height: 100%;">info</i>
-								<span class="localize documentation_label">documentation</span>
+						<div id="dialogCode" style="display:none;">
+							<textarea id="dialogCodeText" onkeydown="on_change_adv_dialog();" onkeyup="on_change_adv_dialog();" onchange="on_change_adv_dialog();"></textarea>
+						</div>
+
+						<div id="dialogEditor">
+							<div id="advDialogViewport">
 							</div>
-							<iframe src="docs/index.html" style="width:300px;height:450px;">
-							</iframe>
-						</div> -->
+						</div>
 					</div>
 
 					<div id="dialogEditorNoContent" class="controlBox" style="display:none;">
@@ -1225,7 +1207,7 @@
 							<span class="localize settings_tool_name">settings</span>
 						</div>
 					</div>
-					<div id="settingsInner" style="max-width:300px; white-space: normal;">
+					<div id="settingsInner">
 						<div>
 							<span class="localize editor_settings">editor settings</span>
 						</div>

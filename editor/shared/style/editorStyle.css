@@ -605,3 +605,11 @@ input {
 #gifPlaceholder {
 	display:block;background:#eee;width:300px;height:300px;
 }
+
+#settingsInner {
+	max-width:300px; white-space: normal;
+}
+
+#dialogTop {
+	height: 30px; margin-bottom: 5px;
+}

@@ -218,6 +218,30 @@
 		height: 90%;
 		margin: 5%;
 	}
+
+	#settingsInner {
+		max-width: 100%;
+	}
+
+	#dialogEditorNoContent {
+		width: 95%;
+		height: 60vh;
+	}
+
+	#advDialogViewport {
+		width: 90%;
+		min-width: 90%;
+		height: 60vh;
+	}
+
+	#dialogCodeText {
+		width: 90%;
+		height: 60vh;
+	}
+
+	#dialogTop {
+		height: 10vh;
+	}
 }
 
 /* high dpi */
