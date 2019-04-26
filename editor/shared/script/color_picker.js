@@ -96,8 +96,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		// console.log(e.target.value);
 		curColor.v = 1 - (e.target.value / 100);
 
-		if( self.onColorChange != null )
+		if( self.onColorChange != null ) {
 			self.onColorChange( HSVtoRGB( curColor ), true );
+		}
 
 		drawColorPickerWheel();
 		drawColorPickerSelect();
@@ -115,8 +116,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		if( rgbColor != null ) {
 			self.setColor( rgbColor.r, rgbColor.g, rgbColor.b );
 
-			if( self.onColorChange != null )
+			if( self.onColorChange != null ) {
 				self.onColorChange( rgbColor, true );
+			}
 		}
 		else {
 			updateHexCode(); // change back to the current color if it's nonsense input
@@ -198,8 +200,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 				var rgbColorStr = "rgb(" + hueRgbColor.r + "," + hueRgbColor.g + "," + hueRgbColor.b + ")";
 				sliderBg.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
 
-				if( self.onColorChange != null )
+				if( self.onColorChange != null ) {
 					self.onColorChange( rgbColor, isMouseUp );
+				}
 			}
 
 			drawColorPickerSelect();
@@ -213,7 +216,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 	}
 
 	function pickColorEnd(e) {
-		// console.log("mouseup");
+		console.log("color picker end");
 		pickColor(e, true);
 		isMouseDown = false;
 	}
@@ -239,6 +242,11 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 		if (isMouseDown) {
 			e.preventDefault();
+
+			if( self.onColorChange != null ) {
+				self.onColorChange( HSVtoRGB( curColor ), true );
+			}
+
 			isMouseDown = false;
 		}
 	}

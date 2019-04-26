@@ -451,8 +451,9 @@ function PaletteTool(colorPicker,labelIds) {
 		updateColorPickerLabel(colorPickerIndex, rgbColor.r, rgbColor.g, rgbColor.b );
 
 		if( isMouseUp ) {
-			if(self.onPaletteChange != null)
+			if(self.onPaletteChange != null) {
 				self.onPaletteChange();
+			}
 		}
 	}
 
