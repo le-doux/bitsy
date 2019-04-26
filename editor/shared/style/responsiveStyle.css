@@ -122,11 +122,6 @@
 		width: 100%;
 	}
 
-	#paintExplorerViewport {
-		width: 92%;
-		margin-left: 0%;
-	}
-
 	#titleTextPanel {
 		width: calc(100% - 8vw);
 	}
@@ -195,6 +190,33 @@
 		max-width: 100%;
 		height: 80vw;
 		max-height: 100%;
+	}
+
+	#paintExplorerViewport {
+		width: 92%;
+		height: 60vw;
+		margin-left: 0%;
+	}
+
+	#paintExplorerContent img {
+		width: 20vw;
+		height: 20vw;
+	}
+
+	#paintExplorerContent figcaption {
+		max-width: 20vw;
+	}
+
+	#paintExplorerAdd {
+		width: 20vw;
+		height: 20vw;
+		margin: 0px;
+	}
+
+	#paintExplorerAdd button {
+		width: 90%;
+		height: 90%;
+		margin: 5%;
 	}
 }
 
