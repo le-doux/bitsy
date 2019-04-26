@@ -125,8 +125,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 	var isMouseDown = false;
 	function pickColor(e, isMouseUp) {
-		if( isMouseUp == null || isMouseUp == undefined )
+		if( isMouseUp == null || isMouseUp == undefined ) {
 			isMouseUp = false;
+		}
 
 		// console.log(isMouseDown);
 
@@ -219,21 +220,27 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 	function pickColorTouchMove(e) {
 		// console.log(e.touches[0]);
-		// e.preventDefault();
-		pickColor(e.touches[0], true);
+
+		if (isMouseDown) {
+			e.preventDefault();
+			pickColor(e.touches[0], true);
+		}
 	}
 
 	function pickColorTouchStart(e) {
 		// console.log(e.touches[0]);
-		// e.preventDefault();
+		e.preventDefault();
 		pickColorStart(e.touches[0]);
 	}
 
 	function pickColorTouchEnd(e) {
 		// console.log(e.touches[0]);
 		// pickColorEnd(e.touches[0]);
-		// e.preventDefault();
-		isMouseDown = false;
+
+		if (isMouseDown) {
+			e.preventDefault();
+			isMouseDown = false;
+		}
 	}
 
 	var wheelCanvas;
