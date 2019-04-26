@@ -2,41 +2,30 @@
 TODO:
 - need to update the instructions panel
 - add responsive mode
-- gather bugs / feedback on v6.0 (and earlier)
+X gather bugs / feedback on v6.0 (and earlier)
 X get feedback on bitsy script
 - 24 games
 X jam
 - start vNext branch
 
 responsive mode TODOs:
-X put adv dialog in its own file
-X put inventory stuff in its own file
-X get rid of core.js
-X get rid of mobile and desktop flags
-- scroll down to new tools
-X figure out how stop mouse event from firing all the time!
-X add touch vs mouse event detection
-X create editor event system
-- should top bar go away on scroll down? (like some web apps do)
-- should tools toggles go in a side-bar?
-X make key tools fit w/ responsive width
-X how do I make responsive text? (test out em)
-	X make sure all font-size attributes are updated
-X test on my phone
 - make all tool layouts responsive
+- bug: during exit drag, they move too far and go off screen
+- saving and loading games in mobile
+	- downloading blobs is not supported
+	- thought: create "cartridges" out of GIFs (multiple frames means no limit on size even if dimensions are static)
+	- store game data text in one byte per RGB pixel (reserve last 85 values in each color value: 85 * 3 = 255)
+	- require implementation of lzw decompression and GIF decoding
+	- should I create a standalone "bitsy player" page too that takes in the carts?
+
+leftover todos:
+- use the new event manager?
+- tool positioning in portrait mode
+- encapsulate adv dialog logic and inventory logic
 - encapsulate editor.js and bitsy.js
 	- create separate runtime game data and editor game data
-- events
-	X touch vs mouse [not necessary so far?]
-	- game data change
-	- try to sever most direct connections between modules
-	- cur palette change
-	- other UI events?
-	- play mode and edit mode events might be useful, based on some bugs I've seen
-- encapsulate adv dialog logic and inventory logic
-- tool positioning (up and down buttons)
-- bug: during exit drag, they move too far and go off screen
-X new color slider that works on mobile
+- should top bar go away on scroll down? (like some web apps do)
+- should tools toggles go in a side-bar?
 
 new notes from forum
 - new game+
