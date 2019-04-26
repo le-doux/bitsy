@@ -153,6 +153,11 @@
 	.panelBarClose {
 		line-height: 200%; /*hacky*/
 	}
+
+	#colorPickerSliderThumb {
+		height: 4.5vh;
+		width: 1.5vh;
+	}
 }
 
 /* high dpi */

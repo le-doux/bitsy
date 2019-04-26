@@ -24,7 +24,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		var hueRgbColor = HSVtoRGB( hueHsvColor );
 		var rgbColorStr = "rgb(" + hueRgbColor.r + "," + hueRgbColor.g + "," + hueRgbColor.b + ")";
 		sliderBg.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
-		slider.value = (1 - curColor.v) * 100;
+		slider.style.marginLeft = "calc(" + (100 * (1.0 - curColor.v)) + "% - 8px)";
 
 		drawColorPickerWheel();
 		drawColorPickerSelect();
@@ -251,6 +251,69 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		}
 	}
 
+	var isSliderMouseDown = false;
+	function pickValue(e) {
+		if (isSliderMouseDown) {
+			// console.log("VALUE");
+			var bounds = sliderBg.getBoundingClientRect();
+			var containerX = e.clientX - bounds.left;
+			var xPercent = containerX / (bounds.width);
+			// console.log(xPercent);
+
+			curColor.v = 1.0 - xPercent;
+			if (curColor.v < 0) {
+				curColor.v = 0;
+			}
+			else if (curColor.v > 1.0) {
+				curColor.v = 1.0;
+			}
+
+			slider.style.marginLeft = "calc((100% - 8px) * " + (1.0 - curColor.v) + ")";
+
+			drawColorPickerWheel();
+			drawColorPickerSelect();
+			updateHexCode();
+		}
+	}
+
+	function pickValueStart(e) {
+		// console.log("VALUE START");
+		isSliderMouseDown = true;
+		pickValue(e);
+	}
+
+	function pickValueEnd(e) {
+		if (isSliderMouseDown) {
+			// console.log("VALUE END");
+			pickValue(e);
+			isSliderMouseDown = false;
+		}
+	}
+
+	function pickValueTouchMove(e) {
+		if (isSliderMouseDown) {
+			e.preventDefault();
+			pickValue(e.touches[0], true);
+		}
+	}
+
+	function pickValueTouchStart(e) {
+		e.preventDefault();
+		pickValueStart(e.touches[0]);
+	}
+
+	function pickValueTouchEnd(e) {
+		if (isSliderMouseDown) {
+			e.preventDefault();
+
+			if( self.onColorChange != null ) {
+				self.onColorChange( HSVtoRGB( curColor ), true );
+			}
+
+			isSliderMouseDown = false;
+		}
+	}
+
 	var wheelCanvas;
 	var wheelContext;
 	var selectCanvas;
@@ -278,10 +341,14 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		document.addEventListener('touchend', pickColorTouchEnd);
 
 		slider = document.getElementById(sliderId);
-		// slider.addEventListener("input", updateValue); // perf in safari isn't good enough for live update during slider
-		slider.addEventListener("change", updateValue);
 
 		sliderBg = document.getElementById(sliderBgId);
+		sliderBg.addEventListener("mousedown", pickValueStart);
+		document.addEventListener("mousemove", pickValue);
+		document.addEventListener("mouseup", pickValueEnd);
+		sliderBg.addEventListener("touchstart", pickValueTouchStart);
+		document.addEventListener("touchmove", pickValueTouchMove);
+		document.addEventListener("touchend", pickValueTouchEnd);
 
 		hexText = document.getElementById(hexTextId);
 		hexText.addEventListener( "change", changeHexCode );

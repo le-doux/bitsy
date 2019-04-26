@@ -852,7 +852,7 @@ function start() {
 	updateInventoryUI();
 
 	// init color picker
-	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSlider', 'colorPickerSliderBg', 'colorPickerHexText');
+	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSliderThumb', 'colorPickerSliderBg', 'colorPickerHexText');
 	document.getElementById("colorPaletteOptionBackground").checked = true;
 	paletteTool = new PaletteTool(colorPicker,["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"]);
 	paletteTool.onPaletteChange = onPaletteChange;
