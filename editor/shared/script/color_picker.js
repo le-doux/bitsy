@@ -24,7 +24,14 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		var hueRgbColor = HSVtoRGB( hueHsvColor );
 		var rgbColorStr = "rgb(" + hueRgbColor.r + "," + hueRgbColor.g + "," + hueRgbColor.b + ")";
 		sliderBg.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
-		slider.style.marginLeft = "calc(" + (100 * (1.0 - curColor.v)) + "% - 8px)";
+
+		var sliderBounds = sliderBg.getBoundingClientRect();
+		var thumbBounds = slider.getBoundingClientRect();
+		var sliderCenterPos = ((1.0 - curColor.v) * sliderBounds.width);
+		var sliderThumbCenterOffset = (thumbBounds.width / 2) + 4; /* + extra for border */
+		var sliderLeftPos = sliderCenterPos - sliderThumbCenterOffset;
+		var sliderLeftStyle = sliderLeftPos + "px";
+		slider.style.marginLeft = sliderLeftStyle;
 
 		drawColorPickerWheel();
 		drawColorPickerSelect();
@@ -259,9 +266,11 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 		if (isSliderMouseDown) {
 			// console.log("VALUE");
-			var bounds = sliderBg.getBoundingClientRect();
-			var containerX = e.clientX - bounds.left;
-			var xPercent = containerX / (bounds.width);
+			var sliderBounds = sliderBg.getBoundingClientRect();
+			var thumbBounds = slider.getBoundingClientRect();
+
+			var containerX = e.clientX - sliderBounds.left;
+			var xPercent = containerX / (sliderBounds.width);
 			// console.log(xPercent);
 
 			curColor.v = 1.0 - xPercent;
@@ -272,7 +281,11 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 				curColor.v = 1.0;
 			}
 
-			slider.style.marginLeft = "calc((100% - 8px) * " + (1.0 - curColor.v) + ")";
+			var sliderCenterPos = ((1.0 - curColor.v) * sliderBounds.width);
+			var sliderThumbCenterOffset = (thumbBounds.width / 2) + 4; /* + extra for border */
+			var sliderLeftPos = sliderCenterPos - sliderThumbCenterOffset;
+			var sliderLeftStyle = sliderLeftPos + "px";
+			slider.style.marginLeft = sliderLeftStyle;
 
 			if (isMouseUp) {
 				drawColorPickerWheel();
