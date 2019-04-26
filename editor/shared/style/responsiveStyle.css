@@ -158,6 +158,28 @@
 		height: 4.5vh;
 		width: 1.5vh;
 	}
+
+	#noMarkerMessage {
+		width: 96%;
+	}
+
+	#markerCanvas1 {
+		width: 20vh;
+		height: 20vh;
+	}
+
+	#markerCanvas2 {
+		width: 20vh;
+		height: 20vh;
+	}
+
+	#markerName1 {
+		line-height: 90%;
+	}
+
+	#markerName2 {
+		line-height: 90%;
+	}
 }
 
 /* high dpi */
