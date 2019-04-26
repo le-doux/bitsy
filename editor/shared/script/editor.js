@@ -36,7 +36,7 @@ X test on my phone
 - encapsulate adv dialog logic and inventory logic
 - tool positioning (up and down buttons)
 - bug: during exit drag, they move too far and go off screen
-- new color slider that works on mobile
+X new color slider that works on mobile
 
 new notes from forum
 - new game+
