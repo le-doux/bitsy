@@ -127,6 +127,7 @@ function RoomTool(canvas) {
 		if( self.markers.GetSelectedMarker() != null && self.markers.IsDraggingMarker() ) {
 			// drag marker around
 			var off = getOffset(e);
+			off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
 			var x = Math.floor(off.x / (tilesize*scale));
 			var y = Math.floor(off.y / (tilesize*scale));
 
