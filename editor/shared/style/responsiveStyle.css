@@ -2,7 +2,7 @@
 	display: none;
 }
 
-@media (orientation: portrait) {
+@media screen and (max-device-aspect-ratio: 1/1) and (orientation: portrait) {
 	#editorContent {
 		white-space: normal;
 		padding: 0px;

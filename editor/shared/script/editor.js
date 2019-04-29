@@ -12,14 +12,10 @@ responsive mode TODOs:
 - make all tool layouts responsive
 	what's left?
 		- adv dialog
-		- inventory
-- bug: during exit drag, they move too far and go off screen
-- saving and loading games in mobile
-	- downloading blobs is not supported
-	- thought: create "cartridges" out of GIFs (multiple frames means no limit on size even if dimensions are static)
-	- store game data text in one byte per RGB pixel (reserve last 85 values in each color value: 85 * 3 = 255)
-	- require implementation of lzw decompression and GIF decoding
-	- should I create a standalone "bitsy player" page too that takes in the carts?
+		X inventory
+X bug: during exit drag, they move too far and go off screen
+- android bug: when keyboard comes up, it forces layout into landscape mode [maybe fixed -- needs to test]
+- bugs I assigned myself
 
 leftover todos:
 - use the new event manager?
@@ -29,6 +25,12 @@ leftover todos:
 	- create separate runtime game data and editor game data
 - should top bar go away on scroll down? (like some web apps do)
 - should tools toggles go in a side-bar?
+- saving and loading games in mobile
+	- downloading blobs is not supported
+	- thought: create "cartridges" out of GIFs (multiple frames means no limit on size even if dimensions are static)
+	- store game data text in one byte per RGB pixel (reserve last 85 values in each color value: 85 * 3 = 255)
+	- require implementation of lzw decompression and GIF decoding
+	- should I create a standalone "bitsy player" page too that takes in the carts?
 
 new notes from forum
 - new game+
