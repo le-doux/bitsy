@@ -10,6 +10,9 @@ X jam
 
 responsive mode TODOs:
 - make all tool layouts responsive
+	what's left?
+		- adv dialog
+		- inventory
 - bug: during exit drag, they move too far and go off screen
 - saving and loading games in mobile
 	- downloading blobs is not supported

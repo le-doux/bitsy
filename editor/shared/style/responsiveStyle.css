@@ -141,8 +141,8 @@
 	}
 
 	#animation img {
-		width: 12vh;
-		height: 12vh;
+		width: 20vw;
+		height: 20vw;
 	}
 	
 	.panelBarClose {
@@ -159,13 +159,13 @@
 	}
 
 	#markerCanvas1 {
-		width: 20vh;
-		height: 20vh;
+		width: 30vw;
+		height: 30vw;
 	}
 
 	#markerCanvas2 {
-		width: 20vh;
-		height: 20vh;
+		width: 30vw;
+		height: 30vw;
 	}
 
 	#markerName1 {
@@ -177,7 +177,7 @@
 	}
 
 	#markerLinkControl button {
-		margin-top: 10vh;
+		margin-top: 15vw;
 	}
 
 	#gifPreview {
