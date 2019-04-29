@@ -53,7 +53,8 @@ function updateInventoryItemUI(){
 		itemValueInput.type = "number";
 		itemValueInput.min = 0;
 		itemValueInput.value = itemCount;
-		itemValueInput.style.width = "60px";
+		itemValueInput.style.fontSize = "100%";
+		itemValueInput.style.width = "30%";
 		itemValueInput.addEventListener('change', createOnItemValueChange(id));
 		itemDiv.appendChild( itemValueInput );
 	}
@@ -145,7 +146,7 @@ function updateInventoryVariableUI(){
 		var varNameInput = document.createElement("input");
 		varNameInput.type = "text";
 		varNameInput.value = varName;
-		varNameInput.style.width = "30px";
+		varNameInput.style.width = "20%";
 		varNameInput.addEventListener('change', createOnVariableNameChange(varInfo,varDiv));
 		varDiv.appendChild( varNameInput );
 
@@ -156,7 +157,7 @@ function updateInventoryVariableUI(){
 		var varValueInput = document.createElement("input");
 		varValueInput.type = "text";
 		varValueInput.value = varValue;
-		varValueInput.style.width = "60px";
+		varValueInput.style.width = "30%";
 		var onVariableValueChange = createOnVariableValueChange(varInfo);
 		varValueInput.addEventListener('change', onVariableValueChange);
 		varValueInput.addEventListener('keyup', onVariableValueChange);

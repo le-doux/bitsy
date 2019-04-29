@@ -242,6 +242,10 @@
 	#dialogTop {
 		height: 10vh;
 	}
+
+	.inventoryViewport {
+		width: 90%;
+	}
 }
 
 /* high dpi */

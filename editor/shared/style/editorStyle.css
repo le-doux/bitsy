@@ -494,7 +494,7 @@ input {
 
 .inventoryViewport {
 	padding: 6px;
-	/*width:140px;*/
+	width:200px;
 	height:400px;
 	overflow:scroll;
 	display:block;
@@ -505,8 +505,8 @@ input {
 }
 
 .inventoryVariableBox button {
-	height: 30px;
-	/*float: right;*/
+	/*height: 30px;*/
+	float: right;
 	margin-left: 5px;
 	/*background: #e8e8ff;*/
 }
