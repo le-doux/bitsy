@@ -474,7 +474,7 @@ input {
 
 .advDialogTop {
 	margin-bottom: 10px;
-	height: 30px;
+	overflow: auto;
 }
 
 .advDialogBlockName {

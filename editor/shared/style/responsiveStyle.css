@@ -54,18 +54,6 @@
 		border-radius: 0px 1vw 1vw 0px;
 	}
 
-	.advDialogOptionDiv {
-		border-radius: 1vw;
-	}
-
-	.advDialogConditionDiv {
-		border-radius: 1vw;
-	}
-
-	#advDialogViewport {
-		border-radius: 1vw;
-	}
-
 	.inventoryViewport {
 		border-radius: 1vw;
 	}
@@ -228,10 +216,12 @@
 		height: 60vh;
 	}
 
-	#advDialogViewport {
+	.inventoryViewport {
 		width: 90%;
-		min-width: 90%;
-		height: 60vh;
+	}
+
+	#dialogTop {
+		height: 10vw;
 	}
 
 	#dialogCodeText {
@@ -239,12 +229,50 @@
 		height: 60vh;
 	}
 
-	#dialogTop {
-		height: 10vh;
+	.advDialogOptionDiv {
+		border-radius: 1vw;
 	}
 
-	.inventoryViewport {
+	.advDialogConditionDiv {
+		border-radius: 1vw;
+	}
+
+	#advDialogViewport {
+		border-radius: 1vw;
+	}
+
+	#advDialogViewport {
+		width: 95%;
+		min-width: 95%;
+		height: 60vh;
+	}
+
+	.advDialogTextBlock {
+		width: 100%;
+		height: 15vw;
+	}
+
+	.advDialogOptionDiv {
+		width: 100%;
+	}
+
+	.advDialogTextOption {
 		width: 90%;
+		height: 15vw;
+	}
+
+	.advDialogOptionDiv button {
+		height: 100%;
+		float: right;
+	}
+
+	.advDialogConditionDiv {
+		width: 100%;
+	}
+
+	.advDialogConditionDiv button {
+		height: 100%;
+		float: right;
 	}
 }
 

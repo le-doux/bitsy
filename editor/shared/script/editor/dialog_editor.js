@@ -458,7 +458,7 @@ var IfBlockUI = function(node, num) {
 
 
 		var condSpan = document.createElement("span");
-		condSpan.innerText = localization.GetStringOrFallback("dialog_conditional_when", "when ");
+		condSpan.innerText = localization.GetStringOrFallback("dialog_conditional_when", "when") + " ";
 		condSpan.title = "define the condition for which this dialog option is said";
 		condInnerDiv.appendChild(condSpan);
 		var condTypeSelect = document.createElement("select");
@@ -505,7 +505,8 @@ var IfBlockUI = function(node, num) {
 		condValueInput.type = "number";
 		condValueInput.title = "choose number to compare";
 		condValueInput.value = 1;
-		condValueInput.style.width = "35px";
+		condValueInput.style.width = "15%";
+		condValueInput.style.fontSize = "100%";
 		condInnerDiv.appendChild(condValueInput);
 		var condCustomTextInput = document.createElement("input");
 		condCustomTextInput.type = "text";
@@ -654,7 +655,7 @@ var SeqBlockUI = function(node, num) {
 	// div.appendChild( document.createElement("br") );
 
 	var orderEl = document.createElement("span");
-	orderEl.innerText = localization.GetStringOrFallback("dialog_list_order", "order: ");
+	orderEl.innerText = localization.GetStringOrFallback("dialog_list_order", "order:") + " ";
 	orderEl.title = "select the order in which lines are said";
 	div.appendChild( orderEl );
 
@@ -793,7 +794,7 @@ function addDownArrowToDialogFlow() {
 		// iconDiv.style.margin = "0px";
 
 		var iconEl = createIconElement("arrow_downward");
-		iconEl.style.fontSize = "16px";
+		iconEl.style.fontSize = "100%";
 		iconEl.style.marginBottom = "5px";
 		// iconEl.classList.add("downArrowDialog");
 		iconDiv.appendChild(iconEl);

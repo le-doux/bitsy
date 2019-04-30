@@ -9,12 +9,16 @@ X jam
 - start vNext branch
 
 responsive mode TODOs:
-- make all tool layouts responsive
+X make all tool layouts responsive
 	what's left?
-		- adv dialog
+		X adv dialog
 		X inventory
 X bug: during exit drag, they move too far and go off screen
-- android bug: when keyboard comes up, it forces layout into landscape mode [maybe fixed -- needs to test]
+X android bug: when keyboard comes up, it forces layout into landscape mode
+	- fixed but now iOS and desktop feel a bit weird to me
+	- thought: instead of using css media queries.. use javascript to apply styles
+		- orientationchange event (screen.orientation) for orientation
+		- window.devicePixelRatio for dpi
 - bugs I assigned myself
 
 leftover todos:
