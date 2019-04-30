@@ -250,8 +250,8 @@
 
 /* high dpi */
 @media 
-(-webkit-device-pixel-ratio: 3) and (orientation: portrait), 
-(min-resolution: 288dpi) and (orientation: portrait) {
+screen and (max-device-aspect-ratio: 1/1) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait), 
+screen and (max-device-aspect-ratio: 1/1) and (min-resolution: 288dpi) and (orientation: portrait) {
 	body {
 		font-size: 96px;
 	}
@@ -263,8 +263,8 @@
 }
 
 @media 
-(-webkit-device-pixel-ratio: 2) and (orientation: portrait), 
-(min-resolution: 192dpi) and (max-resolution: 287dpi) and (orientation: portrait) {
+screen and (max-device-aspect-ratio: 1/1) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait), 
+screen and (max-device-aspect-ratio: 1/1) and (min-resolution: 192dpi) and (max-resolution: 287dpi) and (orientation: portrait) {
 	body {
 		font-size: 48px;
 	}
@@ -276,8 +276,8 @@
 }
 
 @media 
-(-webkit-device-pixel-ratio: 1) and (orientation: portrait), 
-(min-resolution: 96dpi) and (max-resolution: 191dpi) and (orientation: portrait) {
+screen and (max-device-aspect-ratio: 1/1) and (-webkit-device-pixel-ratio: 1) and (orientation: portrait), 
+screen and (max-device-aspect-ratio: 1/1) and (min-resolution: 96dpi) and (max-resolution: 191dpi) and (orientation: portrait) {
 	body {
 		font-size: 24px;
 	}
