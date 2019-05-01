@@ -2,24 +2,24 @@
 TODO:
 - need to update the instructions panel
 - add responsive mode
-X gather bugs / feedback on v6.0 (and earlier)
-X get feedback on bitsy script
 - 24 games
-X jam
 - start vNext branch
 
 responsive mode TODOs:
-X make all tool layouts responsive
-	what's left?
-		X adv dialog
-		X inventory
-X bug: during exit drag, they move too far and go off screen
 X android bug: when keyboard comes up, it forces layout into landscape mode
 	- fixed but now iOS and desktop feel a bit weird to me
 	- thought: instead of using css media queries.. use javascript to apply styles
 		- orientationchange event (screen.orientation) for orientation
 		- window.devicePixelRatio for dpi
+- remove browser compatibility warning on mobile
+- try another orientation on android fix
 - bugs I assigned myself
+	- room 0
+	- import html
+	- chrome slow
+- update version
+	- update number
+	- update version notes
 
 leftover todos:
 - use the new event manager?
@@ -864,7 +864,8 @@ function start() {
 	paintExplorer.SetDisplayCaptions( true );
 
 	//unsupported feature stuff
-	if (hasUnsupportedFeatures()) {
+	var isPortrait = window.screen.orientation.type === "portrait-primary";
+	if (hasUnsupportedFeatures() && !isPortrait) {
 		showUnsupportedFeatureWarning();
 	}
 	if (!browserFeatures.fileDownload) {
