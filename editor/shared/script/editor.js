@@ -864,7 +864,7 @@ function start() {
 	paintExplorer.SetDisplayCaptions( true );
 
 	//unsupported feature stuff
-	var isPortrait = window.screen.orientation.type === "portrait-primary";
+	var isPortrait = window.screen.orientation.type.includes("portrait");
 	if (hasUnsupportedFeatures() && !isPortrait) {
 		showUnsupportedFeatureWarning();
 	}
@@ -3119,7 +3119,7 @@ var grabbedPanel = {
 
 function grabCard(e) {
 	// can't grab cards in vertical mode right now
-	if (window.innerHeight > window.innerWidth) {
+	if (window.innerHeight > window.innerWidth) { // TODO : change to portrait orientation check??
 		return;
 	}
 
