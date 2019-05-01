@@ -558,7 +558,7 @@ function resetGameData() {
 	document.getElementById('paintOptionAvatar').checked = true;
 
 	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
-	markerTool.SetRoom("0");
+	markerTool.SetRoom(curRoom);
 	markerTool.Refresh();
 	roomTool.drawEditMap();
 

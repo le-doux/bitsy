@@ -919,6 +919,10 @@ var InputManager = function() {
 var input = null;
 
 function movePlayer(direction) {
+	if (player().room == null || !Object.keys(room).includes(player().room)) {
+		return; // player room is missing or invalid.. can't move them!
+	}
+
 	var spr = null;
 
 	if ( curPlayerDirection == Direction.Left && !(spr = getSpriteLeft()) && !isWallLeft()) {
@@ -1211,10 +1215,24 @@ function parseWorld(file) {
 			i++;
 		}
 	}
+
 	placeSprites();
-	if (player().room != null) {
+
+	var roomIds = Object.keys(room);
+	if (player().room != null && roomIds.includes(player().room)) {
+		// player has valid room
 		curRoom = player().room;
 	}
+	else if (roomIds.length > 0) {
+		// player not in any room! what the heck
+		curRoom = roomIds[0];
+	}
+	else {
+		// uh oh there are no rooms I guess???
+		curRoom = null;
+	}
+
+	console.log("START ROOM " + curRoom);
 
 	renderer.SetPalettes(palette);
 
