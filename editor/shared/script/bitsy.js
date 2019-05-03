@@ -1145,6 +1145,8 @@ function parseWorld(file) {
 
 	// var parseTimer = new Timer();
 
+	spriteStartLocations = {};
+
 	resetFlags();
 
 	var versionNumber = 0;

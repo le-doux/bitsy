@@ -1,27 +1,32 @@
 /*
-TODO:
-- need to update the instructions panel
-- add responsive mode
-- 24 games
-- start vNext branch
-
 responsive mode TODOs:
 X android bug: when keyboard comes up, it forces layout into landscape mode
 	- fixed but now iOS and desktop feel a bit weird to me
 	- thought: instead of using css media queries.. use javascript to apply styles
 		- orientationchange event (screen.orientation) for orientation
 		- window.devicePixelRatio for dpi
-- remove browser compatibility warning on mobile
+X remove browser compatibility warning on mobile
 - try another orientation on android fix
 - bugs I assigned myself
-	- room 0
+	- room 0 (doesn't seem to repro anymore)
 	- import html
 	- chrome slow
 - update version
 	- update number
 	- update version notes
+X bug: can't remove avatar? unless you delete the room it was in
+
+what the notes will look like
+v6.1
+- made editor more mobile-friendly
+-- new portrait mode layout
+-- enabled touch controls for room and paint tools
+-- font sizes for high dpi displays
+- bugs
+-- fixed bug where you can't remove sprites from rooms
 
 leftover todos:
+- need to update the instructions panel
 - use the new event manager?
 - tool positioning in portrait mode
 - encapsulate adv dialog logic and inventory logic
