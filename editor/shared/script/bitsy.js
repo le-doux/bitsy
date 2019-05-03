@@ -495,6 +495,11 @@ function update() {
 	var curTime = Date.now();
 	deltaTime = curTime - prevTime;
 
+	if (curRoom == null) {
+		// in the special case where there is no valid room, end the game
+		startNarrating( "", true /*isEnding*/ );
+	}
+
 	if (!transition.IsTransitionActive()) {
 		updateInput();
 	}
@@ -1221,7 +1226,7 @@ function parseWorld(file) {
 	placeSprites();
 
 	var roomIds = Object.keys(room);
-	if (player().room != null && roomIds.includes(player().room)) {
+	if (player() != undefined && player().room != null && roomIds.includes(player().room)) {
 		// player has valid room
 		curRoom = player().room;
 	}
@@ -2081,6 +2086,13 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	// 	console.log("DRAW ROOM " + debugLastRoomDrawn);
 	// }
 
+	if (room === undefined) {
+		// protect against invalid rooms -- but it assumes there is a "0" pal
+		context.fillStyle = "rgb(" + getPal("0")[0][0] + "," + getPal("0")[0][1] + "," + getPal("0")[0][2] + ")";
+		context.fillRect(0,0,canvas.width,canvas.height);
+		return;
+	}
+
 	//clear screen
 	context.fillStyle = "rgb(" + getPal(room.pal)[0][0] + "," + getPal(room.pal)[0][1] + "," + getPal(room.pal)[0][2] + ")";
 	context.fillRect(0,0,canvas.width,canvas.height);
@@ -2136,7 +2148,10 @@ function curPal() {
 }
 
 function getRoomPal(roomId) {
-	if (room[roomId].pal != null) {
+	if (roomId == null) {
+		return "0";
+	}
+	else if (room[roomId].pal != null) {
 		//a specific palette was chosen
 		return room[roomId].pal;
 	}
