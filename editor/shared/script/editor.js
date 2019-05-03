@@ -9,7 +9,7 @@ X remove browser compatibility warning on mobile
 - try another orientation on android fix
 - bugs I assigned myself
 	- room 0 (doesn't seem to repro anymore)
-	- import html
+	X import html
 	- chrome slow
 - update version
 	- update number
@@ -25,6 +25,7 @@ v6.1
 - bugs
 -- fixed bug where you can't remove sprites from rooms
 -- fixed crashes when there are no rooms
+-- fix html import
 
 leftover todos:
 - need to update the instructions panel
@@ -564,6 +565,7 @@ function resetGameData() {
 	document.getElementById('paintOptionAvatar').checked = true;
 
 	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
+	markerTool.Clear(); // hacky -- should combine more of this stuff together
 	markerTool.SetRoom(curRoom);
 	markerTool.Refresh();
 	roomTool.drawEditMap();

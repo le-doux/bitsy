@@ -104,6 +104,12 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	// 	refreshGameData();
 	// }
 
+	this.Clear = function() {
+		selectedRoom = null;
+		markerList = [];
+		curMarker = null;
+	}
+
 	this.SetRoom = function(roomId) {
 		selectedRoom = roomId;
 		ResetMarkerList();
