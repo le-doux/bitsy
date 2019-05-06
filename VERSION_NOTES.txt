@@ -1,3 +1,14 @@
+v6.1:
+- editor is more mobile-friendly:
+-- new portrait mode layout
+-- enabled touch controls for room and paint tools
+-- font sizes for high dpi displays
+- bugs:
+-- fixed bug where you can't remove sprites from rooms
+-- fixed crashes when there are no rooms
+-- fixed html import bug
+- improved rendering performance in chrome
+
 6.0:
 - new combined exits & endings tool!
 - exits are two-way by default

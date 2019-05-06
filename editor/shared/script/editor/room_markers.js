@@ -104,6 +104,12 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	// 	refreshGameData();
 	// }
 
+	this.Clear = function() {
+		selectedRoom = null;
+		markerList = [];
+		curMarker = null;
+	}
+
 	this.SetRoom = function(roomId) {
 		selectedRoom = roomId;
 		ResetMarkerList();
@@ -536,78 +542,80 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		var markerList = [];
 
-		var findReturnExit = function(parentRoom, startExit) {
-			var returnExit = null;
-			for (var j in room[startExit.dest.room].exits) {
-				var otherExit = room[startExit.dest.room].exits[j];
-				if (otherExit.dest.room === parentRoom &&
-					otherExit.dest.x == startExit.x && otherExit.dest.y == startExit.y) {
-						returnExit = otherExit;
+		if (selectedRoom != null) {
+			var findReturnExit = function(parentRoom, startExit) {
+				var returnExit = null;
+				for (var j in room[startExit.dest.room].exits) {
+					var otherExit = room[startExit.dest.room].exits[j];
+					if (otherExit.dest.room === parentRoom &&
+						otherExit.dest.x == startExit.x && otherExit.dest.y == startExit.y) {
+							returnExit = otherExit;
+					}
 				}
-			}
-			return returnExit;
-		}
-
-		for (var i in room[selectedRoom].exits) {
-			var localExit = room[selectedRoom].exits[i];
-			var returnExit = findReturnExit(selectedRoom, localExit);
-
-			if (returnExit != null) {
-				var alreadyExistingExitInfo = markerList.find(function(e) { return e.exit == returnExit; });
-				if (alreadyExistingExitInfo != null && alreadyExistingExitInfo != undefined) {
-					continue; // avoid duplicates when both parts of a paired exit are in the same room
-				}
+				return returnExit;
 			}
 
-			markerList.push(
-				new ExitMarker(
-					selectedRoom,
-					room[selectedRoom].exits[i],
-					returnExit != null,
-					returnExit,
-					returnExit ? LinkState.TwoWay : LinkState.OneWayOriginal)
-				);
-		}
+			for (var i in room[selectedRoom].exits) {
+				var localExit = room[selectedRoom].exits[i];
+				var returnExit = findReturnExit(selectedRoom, localExit);
 
-		for (var r in room) {
-			if (r != selectedRoom) {
-				for (var i in room[r].exits) {
-					var exit = room[r].exits[i];
-					if (exit.dest.room === selectedRoom && findReturnExit(r,exit) == null) {
+				if (returnExit != null) {
+					var alreadyExistingExitInfo = markerList.find(function(e) { return e.exit == returnExit; });
+					if (alreadyExistingExitInfo != null && alreadyExistingExitInfo != undefined) {
+						continue; // avoid duplicates when both parts of a paired exit are in the same room
+					}
+				}
 
-						markerList.push(
-							new ExitMarker(
-								r,
-								exit,
-								false,
-								null,
-								LinkState.OneWayOriginal)
-							);
+				markerList.push(
+					new ExitMarker(
+						selectedRoom,
+						room[selectedRoom].exits[i],
+						returnExit != null,
+						returnExit,
+						returnExit ? LinkState.TwoWay : LinkState.OneWayOriginal)
+					);
+			}
+
+			for (var r in room) {
+				if (r != selectedRoom) {
+					for (var i in room[r].exits) {
+						var exit = room[r].exits[i];
+						if (exit.dest.room === selectedRoom && findReturnExit(r,exit) == null) {
+
+							markerList.push(
+								new ExitMarker(
+									r,
+									exit,
+									false,
+									null,
+									LinkState.OneWayOriginal)
+								);
+						}
 					}
 				}
 			}
+
+			for (var e in room[selectedRoom].endings) {
+				var ending = room[selectedRoom].endings[e];
+
+				markerList.push(
+					new EndingMarker(
+						selectedRoom,
+						ending)
+					);
+			}
+
+			// TODO : vNext
+			// for (var e in room[selectedRoom].effects) {
+			// 	var effect = room[selectedRoom].effects[e];
+
+			// 	markerList.push(
+			// 		new EffectMarker(
+			// 			selectedRoom,
+			// 			effect)
+			// 		);
+			// }
 		}
-
-		for (var e in room[selectedRoom].endings) {
-			var ending = room[selectedRoom].endings[e];
-
-			markerList.push(
-				new EndingMarker(
-					selectedRoom,
-					ending)
-				);
-		}
-
-		// TODO : vNext
-		// for (var e in room[selectedRoom].effects) {
-		// 	var effect = room[selectedRoom].effects[e];
-
-		// 	markerList.push(
-		// 		new EffectMarker(
-		// 			selectedRoom,
-		// 			effect)
-		// 		);
-		// }
 
 		return markerList;
 	}

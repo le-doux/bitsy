@@ -17,7 +17,7 @@
 }
 
 #markerName1 {
-	font-size: 14px; line-height: 12px;
+	font-size: 90%; line-height: 12px;
 }
 
 #markerCanvas1 {
@@ -29,11 +29,11 @@
 }
 
 #textMarkerPos1 {
-	font-size: 12px;
+	font-size: 80%;
 }
 
 #textMoveMessage1 {
-	font-size: 12px;
+	font-size: 80%;
 }
 
 #markerLinkControl {
@@ -45,7 +45,7 @@
 }
 
 #markerName2 {
-	font-size: 14px; line-height: 12px;
+	font-size: 90%; line-height: 12px;
 }
 
 #markerCanvas2 {
@@ -53,11 +53,11 @@
 }
 
 #textMarkerPos2 {
-	font-size: 12px;
+	font-size: 80%;
 }
 
 #textMoveMessage2 {
-	font-size: 12px;
+	font-size: 80%;
 }
 
 #endingText {
@@ -73,7 +73,7 @@
 }
 
 #exitOptionsRadio label {
-	flex: 1; font-size: 16px;
+	flex: 1; font-size: 100%;
 }
 
 /* TODO : continue on to marker control 2 etc */

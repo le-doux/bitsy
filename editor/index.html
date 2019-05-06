@@ -13,6 +13,7 @@
 		<link rel="stylesheet" type="text/css" href="shared/style/editorAnimations.css">
 		<link rel="stylesheet" type="text/css" href="shared/style/colorPickerStyle.css">
 		<link rel="stylesheet" type="text/css" href="shared/style/markerToolStyle.css">
+		<link rel="stylesheet" type="text/css" href="shared/style/responsiveStyle.css">
 
 		<!-- UTIL SCRIPTS -->
 		<script src="shared/script/color_util.js"></script>
@@ -27,18 +28,20 @@
 		<script src="shared/script/bitsy.js"></script>
 
 		<!-- NEW EDITOR SCRIPTS (WIP) -->
-		<script src="shared/script/editor/core.js"></script>
 		<script src="shared/script/editor/paint.js"></script>
 		<script src="shared/script/editor/room.js"></script>
 		<script src="shared/script/editor/room_markers.js"></script>
 		<script src="shared/script/editor/explorer.js"></script>
 		<script src="shared/script/editor/localization.js"></script>
+		<script src="shared/script/editor/event_manager.js"></script>
 
 		<!-- EDITOR SCRIPTS -->
 		<script src="shared/script/color_picker.js"></script>
 		<script src="shared/script/gif.js"></script>
 		<script src="shared/script/exporter.js"></script>
 		<script src="shared/script/editor.js"></script>
+		<script src="shared/script/editor/dialog_editor.js"></script>
+		<script src="shared/script/editor/inventory.js"></script>
 
 		<!-- FONTS -->
 		<link href="shared/style/googleNunito.css" rel="stylesheet">
@@ -64,7 +67,7 @@
 					</div>
 
 					<div id="titleFlexItem">
-						<input title="title text for your game" type="text" id="titleText" class="gameTextDir" onchange="on_change_title(event);" value="Write your game's title here" placeholder="Title" style="width:100%;">
+						<input title="title text for your game" type="text" id="titleText" class="gameTextDir titleTextBox" onchange="on_change_title(event);" value="Write your game's title here" placeholder="Title" style="width:100%;">
 					</div>
 
 					<div id="toolsCheckFlexItem">
@@ -79,7 +82,7 @@
 					<div id="topbarSpaceFlexItem">
 					</div>
 
-					<div id="bylineFlexItem" class="notMobile">
+					<div id="bylineFlexItem">
 						<span class="localize author_by">by</span>
 						<a href="https://www.twitter.com/adamledoux" target="_blank">
 							<span class="localize author_twitter" style="direction:ltr; unicode-bidi:bidi-override;">@adamledoux</span>
@@ -105,7 +108,7 @@
 				</label>
 
 				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanelAnimated(event);" />
-				<label title="show / hide exits & endings window" for="exitsCheck" class="notMobile">
+				<label title="show / hide exits & endings window" for="exitsCheck">
 					<i class="material-icons">directions</i>
 					<span class="localize marker_tool_name">exits & endings</span>
 				</label>
@@ -129,13 +132,13 @@
 				</label>
 
 				<input type="checkbox" value="dialogPanel" id="dialogCheck" onclick="togglePanelAnimated(event);"  checked/>
-				<label title="show / hide dialog window" for="dialogCheck" class="notMobile">
+				<label title="show / hide dialog window" for="dialogCheck">
 					<i class="material-icons">chat</i>
 					<span class="localize dialog_tool_name">dialog</span>
 				</label>
 
 				<input type="checkbox" value="inventoryPanel" id="inventoryCheck" onclick="togglePanelAnimated(event);"  checked/>
-				<label title="show / hide inventory window" for="inventoryCheck" class="notMobile">
+				<label title="show / hide inventory window" for="inventoryCheck">
 					<i class="material-icons">vpn_key</i>
 					<span class="localize inventory_tool_name">inventory</span>
 				</label>
@@ -147,19 +150,19 @@
 				</label>
 				
 				<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanelAnimated(event);" />
-				<label title="show / hide gif recording window" for="gifCheck" class="notMobile">
+				<label title="show / hide gif recording window" for="gifCheck">
 					<i class="material-icons">videocam</i>
 					<span class="localize gif_tool_name">record gif</span>
 				</label>
 				
 				<input type="checkbox" value="dataPanel" onclick="togglePanelAnimated(event);" id="dataCheck"/>
-				<label title="show / hide game data window" for="dataCheck" class="notMobile">
+				<label title="show / hide game data window" for="dataCheck">
 					<i class="material-icons">save</i>
 					<span class="localize data_tool_name">game data</span>
 				</label>
 
 				<input type="checkbox" value="settingsPanel" onclick="togglePanelAnimated(event);" id="settingsCheck"/>
-				<label title="show / hide settings window" for="settingsCheck" class="notMobile">
+				<label title="show / hide settings window" for="settingsCheck">
 					<i class="material-icons">settings</i>
 					<span class="localize settings_tool_name">settings</span>
 				</label>
@@ -202,6 +205,18 @@
 
 		<div id="editorWindow" onmousewheel="blockScrollBackpage(event);">
 			<div id="editorContent">
+
+				<div id="titlePanel" class="panel color0">
+					<div class="bar color0">
+						<div title="title window" class="panelBarTitle" onmousedown="grabCard(event);">
+							<i class="material-icons">edit</i>
+							<span class="localize title_tool_title">title</span>
+						</div>
+					</div>
+					<div id="titlePanelInner">
+						<input title="title text for your game" type="text" id="titleTextPanel" class="gameTextDir titleTextBox" onchange="on_change_title(event);" value="Write your game's title here" placeholder="Title">
+					</div>
+				</div>
 
 				<div id="aboutPanel" class="panel color0">
 					<div class="bar color0">
@@ -339,6 +354,17 @@
 
 							<div id="versionNotes" style="display:none; direction:ltr">
 								<br>
+								v6.1:<br>
+								- editor is more mobile-friendly:<br>
+								-- new portrait mode layout<br>
+								-- enabled touch controls for room and paint tools<br>
+								-- font sizes for high dpi displays<br>
+								- bugs:<br>
+								-- fixed bug where you can't remove sprites from rooms<br>
+								-- fixed crashes when there are no rooms<br>
+								-- fixed html import bug<br>
+								- improved rendering performance in chrome<br>
+								<br>
 								6.0:<br>
 								- new combined exits & endings tool!<br>
 								- exits are two-way by default<br>
@@ -378,9 +404,7 @@
 
 					<canvas id="game"></canvas>
 
-					<br class="notMobile">
-
-					<div id="roomToolsOuter" class="controlBox notMobile">
+					<div id="roomToolsOuter" class="controlBox">
 
 						<input type="checkbox" id="roomToolsCheck" onclick="toggleRoomTools(event);" />
 						<label title="show / hide additional room tools" for="roomToolsCheck">
@@ -396,7 +420,7 @@
 									<span class="localize name_label">name</span>
 									<!-- <span id="roomId">0</span> -->
 									
-									<input type="text" id="roomName" onchange="on_room_name_change();" style="width:100px;"></input>
+									<input type="text" id="roomName" class="nameTextbox" onchange="on_room_name_change();" size="10"></input>
 									
 								</span>
 								<button title="previous room" class="color0" onclick="prevRoom();">
@@ -585,7 +609,7 @@
 									</form>
 
 									<div style="padding:4px;">
-										<div title="select transition effect" class="controlBox" style="font-size:14px;">
+										<div title="select transition effect" class="controlBox" style="font-size:80%;">
 											<span class="localize exit_transition_label">transition effect</span>: 
 											<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value);">
 												<option value="none">none</option>
@@ -683,7 +707,7 @@
 						</label>
 
 						<input type="radio" name="paint mode" value="item" onclick="on_paint_item();" id="paintOptionItem">
-						<label title="edit items: things the player can pick up" for="paintOptionItem" class="right notMobile">
+						<label title="edit items: things the player can pick up" for="paintOptionItem" class="right">
 							<i class="material-icons">vpn_key</i>
 							<span class="localize item_label">item</span>
 						</label>
@@ -714,18 +738,18 @@
 								<i class="material-icons">remove_circle</i>
 							</button>
 						</div>
-						<div class="buttonGroup notMobile">
+						<div class="buttonGroup">
 							<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" checked/>
 							<label title="show / hide grid" for="paintGridCheck">
 								<i class="material-icons" id="paintGridIcon">visibility</i> 
 								<span class="localize grid_toggle_visible">grid</span>
 							</label>
 						</div>
-						<div style="margin-bottom: 5px;" class="notMobile">
+						<div style="margin-bottom: 5px;">
 							
 							<span id="drawingNameUI" title="a name to refer to this drawing" class="controlSpan">
 								<span class="localize name_label">name</span>
-								<input type="text" id="drawingName" onchange="on_drawing_name_change();" style="width:100px;"></input>
+								<input type="text" id="drawingName" class="nameTextbox" onchange="on_drawing_name_change();" size="10"></input>
 							</span>
 
 							<button id="showInventoryButton" title="show inventory" onclick="showPanel('inventoryPanel');">
@@ -747,7 +771,7 @@
 						<span style="float:left;">
 							<span class="localize dialog_tool_name">dialog</span>
 						</span>
-						<button title="open in advanced dialog editor" style="float:right;" onclick="showPanel('dialogPanel');" class="notMobile">
+						<button title="open in advanced dialog editor" style="float:right;" onclick="showPanel('dialogPanel');">
 							<i class="material-icons">open_in_new</i>
 						</button>
 						<br>
@@ -821,7 +845,7 @@
 						</label>
 
 						<input type="radio" name="paint explorer mode" value="item" onclick="on_paint_item();" id="paintExplorerOptionItem">
-						<label title="find items: things the player can pick up" for="paintExplorerOptionItem" class="right notMobile">
+						<label title="find items: things the player can pick up" for="paintExplorerOptionItem" class="right">
 							<i class="material-icons">vpn_key</i>
 							<span class="localize item_label">item</span>
 						</label>
@@ -842,11 +866,11 @@
 						</div>
 					</div>
 
-					<div class="controlBox notMobile" id="paintExplorerFilter">
+					<div class="controlBox" id="paintExplorerFilter">
 						<span id="paintExplorerFilterIcon">
 							<i class="material-icons">search</i>
 						</span>
-						<input id="paintExplorerFilterInput" type="text" onkeyup="paintExplorerFilterChange(event);" onchange="paintExplorerFilterChange(event);" placeholder="filter drawings" title="filter drawings by name">
+						<input id="paintExplorerFilterInput" type="text" onkeyup="paintExplorerFilterChange(event);" onchange="paintExplorerFilterChange(event);" placeholder="filter drawings" title="filter drawings by name" size="30">
 					</div>
 				</div>
 
@@ -887,12 +911,12 @@
 						<canvas id="colorPickerWheel"></canvas>
 						<canvas id="colorPickerSelect" title="color picker wheel"></canvas>
 						<div id="colorPickerSliderBg" title="color picker darkness / lightness slider">
-							<input type="range" id="colorPickerSlider" value="0" />
+							<div id="colorPickerSliderThumb"></div>
 						</div>
 						<input id="colorPickerHexText" title="color picker hex code" type="text" />
 					</div>
 
-					<div id="paletteToolsOuter" class="controlBox notMobile">
+					<div id="paletteToolsOuter" class="controlBox">
 
 						<input type="checkbox" id="paletteToolsCheck" onclick="togglePaletteTools(event);" />
 						<label title="show / hide additional palette tools" for="paletteToolsCheck">
@@ -905,7 +929,7 @@
 						<div id="paletteTools" style="display:none;">
 							<span id="paletteNameUI" title="a name to refer to this drawing" class="controlSpan">
 								<span class="localize name_label">name</span>
-								<input type="text" id="paletteName" onchange="on_palette_name_change();" style="width:80px;"></input>
+								<input type="text" id="paletteName" class="nameTextbox" onchange="on_palette_name_change();" size="10"></input>
 							</span>
 							<br>
 							
@@ -938,102 +962,84 @@
 					</div>
 
 					<div id="dialogEditorHasContent">
-						<div style="float:left;">
-							<div id="dialogTop" style="height: 30px; margin-bottom: 5px;">
-								<span style="float:left">
-									<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
-									<label title="preview dialog" for="previewDialogCheck">
-										<i class="material-icons" id="previewDialogIcon">play_arrow</i>
-										<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
-									</label>
-								</span>
+						<div id="dialogTop">
+							<span style="float:left">
+								<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
+								<label title="preview dialog" for="previewDialogCheck">
+									<i class="material-icons" id="previewDialogIcon">play_arrow</i>
+									<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
+								</label>
+							</span>
 
-								<span style="float:right">
-									<!-- <input type="checkbox" id="dialogShowDocsCheck" onclick="toggleDialogDocs(event);"/>
-									<label title="show / hide the code for this dialog" for="dialogShowDocsCheck">
-										<i class="material-icons">info</i>
-										<span id="dialogToggleDocsShowText" class="localize dialog_show_docs">show docs</span> 
-										<span id="dialogToggleDocsHideText" class="localize dialog_hide_docs" style="display:none;">hide docs</span>
-									</label> -->
+							<span style="float:right">
+								<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);" />
+								<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
+									<i class="material-icons">code</i> 
+									<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
+									<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
+								</label>
+							</span>
+						</div>
 
-									<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);" />
-									<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
-										<i class="material-icons">code</i> 
-										<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
-										<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
-									</label>
-								</span>
+						<div id="dialogTools" class="controlBox">
+							<form style="display:inline;">
+								<input type="radio" name="dialogTools" value="section" id="dialogToolsOptionSection" onclick="showDialogToolsSection();" checked>
+								<label for="dialogToolsOptionSection" class="left" onmousedown="preventTextDeselectAndClick(event);" title="add new dialog sections">
+									<i class="material-icons">add_circle</i> 
+									<span class="localize dialog_block_new">new section</span>
+								</label>
+								<input type="radio" name="dialogTools" value="format" id="dialogToolsOptionEffects" onclick="showDialogToolsEffects();">
+								<label for="dialogToolsOptionEffects" class="right" onmousedown="preventTextDeselectAndClick(event);" title="add special effects to selected text">
+									<i class="material-icons">text_format</i> 
+									<span class="localize dialog_effect_new">text effects</span>
+								</label>
+							</form>
+
+							<hr style="background:#6767b2;border:0px;height:1px;margin:4px;margin-left:0px;margin-right:0px;">
+							<div id="dialogToolsSection">
+								<button onclick="addDialogBlockUI();" title="add new dialog: the same line is said each time">
+									<i class="material-icons">subject</i>
+									<span class="localize dialog_block_basic">dialog</span>
+								</button>
+								<button onclick="addSeqBlockUI();" title="add new dialog list: different lines said each time, in the order you choose">
+									<i class="material-icons">list</i>
+									<span class="localize dialog_block_list">list</span>
+								</button>
+								<button onclick="addIfBlockUI();" title="add new conditional dialog: what option is said is determined by conditions you define">
+									<i class="material-icons">call_split</i>
+									<span class="localize dialog_block_conditional">conditional</span>
+								</button>
 							</div>
-
-							<div id="dialogTools" class="controlBox">
-								<form style="display:inline;">
-									<input type="radio" name="dialogTools" value="section" id="dialogToolsOptionSection" onclick="showDialogToolsSection();" checked>
-									<label for="dialogToolsOptionSection" class="left" onmousedown="preventTextDeselectAndClick(event);" title="add new dialog sections">
-										<i class="material-icons">add_circle</i> 
-										<span class="localize dialog_block_new">new section</span>
-									</label>
-									<input type="radio" name="dialogTools" value="format" id="dialogToolsOptionEffects" onclick="showDialogToolsEffects();">
-									<label for="dialogToolsOptionEffects" class="right" onmousedown="preventTextDeselectAndClick(event);" title="add special effects to selected text">
-										<i class="material-icons">text_format</i> 
-										<span class="localize dialog_effect_new">text effects</span>
-									</label>
-								</form>
-
-								<hr style="background:#6767b2;border:0px;height:1px;margin:4px;margin-left:0px;margin-right:0px;">
-								<div id="dialogToolsSection">
-									<button onclick="addDialogBlockUI();" title="add new dialog: the same line is said each time">
-										<i class="material-icons">subject</i>
-										<span class="localize dialog_block_basic">dialog</span>
-									</button>
-									<button onclick="addSeqBlockUI();" title="add new dialog list: different lines said each time, in the order you choose">
-										<i class="material-icons">list</i>
-										<span class="localize dialog_block_list">list</span>
-									</button>
-									<button onclick="addIfBlockUI();" title="add new conditional dialog: what option is said is determined by conditions you define">
-										<i class="material-icons">call_split</i>
-										<span class="localize dialog_block_conditional">conditional</span>
-									</button>
-								</div>
-								<div id="dialogToolsEffects" style="display:none;">
-									<button onclick="wrapTextSelection('{clr1}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 1st color in the palette">
-										<span class="localize dialog_effect_color1">color 1</span>
-									</button>
-									<button onclick="wrapTextSelection('{clr2}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 2nd color in the palette">
-										<span class="localize dialog_effect_color2">color 2</span>
-									</button>
-									<button onclick="wrapTextSelection('{clr3}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 3rd color in the palette">
-										<span class="localize dialog_effect_color3">color 3</span>
-									</button>
-									<button onclick="wrapTextSelection('{wvy}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags waves up and down">
-										<span class="localize dialog_effect_wavy">wavy</span>
-									</button>
-									<button onclick="wrapTextSelection('{shk}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags shakes constantly">
-										<span class="localize dialog_effect_shaky">shaky</span>
-									</button>
-									<button onclick="wrapTextSelection('{rbw}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags is rainbow colored">
-										<span class="localize dialog_effect_rainbow">rainbow</span>
-									</button>
-								</div>
-							</div>
-
-							<div id="dialogCode" style="display:none;">
-								<textarea id="dialogCodeText" onkeydown="on_change_adv_dialog();" onkeyup="on_change_adv_dialog();" onchange="on_change_adv_dialog();"></textarea>
-							</div>
-
-							<div id="dialogEditor">
-								<div id="advDialogViewport">
-								</div>
+							<div id="dialogToolsEffects" style="display:none;">
+								<button onclick="wrapTextSelection('{clr1}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 1st color in the palette">
+									<span class="localize dialog_effect_color1">color 1</span>
+								</button>
+								<button onclick="wrapTextSelection('{clr2}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 2nd color in the palette">
+									<span class="localize dialog_effect_color2">color 2</span>
+								</button>
+								<button onclick="wrapTextSelection('{clr3}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 3rd color in the palette">
+									<span class="localize dialog_effect_color3">color 3</span>
+								</button>
+								<button onclick="wrapTextSelection('{wvy}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags waves up and down">
+									<span class="localize dialog_effect_wavy">wavy</span>
+								</button>
+								<button onclick="wrapTextSelection('{shk}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags shakes constantly">
+									<span class="localize dialog_effect_shaky">shaky</span>
+								</button>
+								<button onclick="wrapTextSelection('{rbw}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags is rainbow colored">
+									<span class="localize dialog_effect_rainbow">rainbow</span>
+								</button>
 							</div>
 						</div>
 
-						<!-- <div id="dialogDocs" style="float:right; padding-left: 5px; display:none;">
-							<div class="controlBox">
-								<i class="material-icons" style="font-size:20px;vertical-align: middle;line-height: 100%;">info</i>
-								<span class="localize documentation_label">documentation</span>
+						<div id="dialogCode" style="display:none;">
+							<textarea id="dialogCodeText" onkeydown="on_change_adv_dialog();" onkeyup="on_change_adv_dialog();" onchange="on_change_adv_dialog();"></textarea>
+						</div>
+
+						<div id="dialogEditor">
+							<div id="advDialogViewport">
 							</div>
-							<iframe src="docs/index.html" style="width:300px;height:450px;">
-							</iframe>
-						</div> -->
+						</div>
 					</div>
 
 					<div id="dialogEditorNoContent" class="controlBox" style="display:none;">
@@ -1099,7 +1105,7 @@
 						</button>
 					</div>
 
-					<div class="notMobile">
+					<div>
 						<span class="localize import_html">import game from html file:</span>
 						<br>
 						<label for="importGamePicker" class="filePickerLabel" title="import game from html file on your computer">
@@ -1159,8 +1165,8 @@
 					
 					<br/>
 					
-					<img width="300" id="gifPreview" style="display:none;" />
-					<div id="gifPlaceholder" style="display:block;background:#eee;width:300px;height:300px;"></div>
+					<img id="gifPreview" style="display:none;" />
+					<div id="gifPlaceholder"></div>
 					
 					<br/>
 					
@@ -1182,7 +1188,7 @@
 							<span class="localize data_tool_name">game data</span>
 						</div>
 					</div>
-					<textarea title="raw text of the bitsy game data file (be careful when editing)" id="game_data" style="width:300px;height:300px;" onchange="on_game_data_change();"></textarea>
+					<textarea title="raw text of the bitsy game data file (be careful when editing)" id="game_data" onchange="on_game_data_change();"></textarea>
 					<br>
 					<button title="reset everything and start new game" class="color0" onclick="newGameDialog();">
 						<i class="material-icons">restore_page</i>
@@ -1192,6 +1198,7 @@
 						<i class="material-icons">file_download</i>
 						<span class="localize download_data">download data</span>
 					</button>
+					<br/>
 					<input type="checkbox" id="fontDataCheck" onclick="toggleFontDataVisibility(event);" />
 					<label title="show / hide font data (WARNING: can be very slow for large fonts)" for="fontDataCheck">
 						<i class="material-icons" id="fontDataIcon">visibility_off</i> 
@@ -1211,7 +1218,7 @@
 							<span class="localize settings_tool_name">settings</span>
 						</div>
 					</div>
-					<div id="settingsInner" style="max-width:300px; white-space: normal;">
+					<div id="settingsInner">
 						<div>
 							<span class="localize editor_settings">editor settings</span>
 						</div>
@@ -1219,7 +1226,7 @@
 							<span class="localize language_label">language</span>:
 							<select id="languageSelect" onchange="on_change_language(event);"></select>
 							<br/>
-							<span class="localize language_translator_credit" style="font-size: 14px;">English text by Adam Le Doux</span>
+							<span class="localize language_translator_credit" style="font-size: 80%;">English text by Adam Le Doux</span>
 						</div>
 						<div>
 							<span class="localize game_settings">game settings</span>
@@ -1262,22 +1269,22 @@
 								<option value="arabic" class="localize font_arabic">Arabic</option>
 								<option value="custom">Custom Font - none</option> <!-- TODO : localize -->
 							</select>
-							<div id="ascii_small_description" style="font-size: 14px;">
+							<div id="ascii_small_description" style="font-size: 80%">
 								<span class="localize font_ascii_small_description">Small font limited to ASCII, which includes English characters and some symbols.</span>
 							</div>
-							<div id="unicode_european_small_description" style="font-size: 14px;">
+							<div id="unicode_european_small_description" style="font-size: 80%">
 								<span class="localize font_unicode_european_small_description">Small font with some unicode support. Includes characters for most European languages.</span>
 							</div>
-							<div id="unicode_european_large_description" style="font-size: 14px;">
+							<div id="unicode_european_large_description" style="font-size: 80%">
 								<span class="localize font_unicode_european_large_description">Large font with more unicode support. Includes characters for all European languages.</span>
 							</div>
-							<div id="unicode_asian_description" style="font-size: 14px;">
+							<div id="unicode_asian_description" style="font-size: 80%">
 								<span class="localize font_unicode_asian_description">Large font which includes characters for Asian languages such as Chinese, Japanese, and Korean.</span>
 							</div>
-							<div id="arabic_description" style="font-size: 14px;">
+							<div id="arabic_description" style="font-size: 80%">
 								<span class="localize font_arabic_description">Pixel font with Arabic characters</span>
 							</div>
-							<div id="custom_description" style="font-size: 14px;">
+							<div id="custom_description" style="font-size: 80%">
 								<span class="localize font_custom_description">Upload your own custom font in the ".bitsyfont" format!</span>
 								<br/>
 								<label for="importFontPicker" class="filePickerLabel" title="import font from bitsyfont file on your computer">
@@ -1299,7 +1306,7 @@
 									<option value="RTL" class="localize text_direction_rtl">Right to Left</option>
 								</select>
 							</div>
-							<div style="font-size: 14px">
+							<div style="font-size: 80%">
 								<span class="localize text_direction_description">Option for languages that read right to left</span>
 							</div>
 						</div>

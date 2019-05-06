@@ -64,7 +64,7 @@ var spriteStartLocations = {};
 /* VERSION */
 var version = {
 	major: 6, // major changes
-	minor: 0 // smaller changes
+	minor: 1 // smaller changes
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
@@ -230,11 +230,11 @@ function onready(startWithTitle) {
 
 	window.onblur = input.onblur;
 
-	update_interval = setInterval(update,-1);
+	update_interval = setInterval(update,16);
 
-	console.log("TITLE ??? " + startWithTitle);
-	if(startWithTitle) // used by editor
+	if(startWithTitle) { // used by editor 
 		startNarrating(title);
+	}
 }
 
 function setInitialVariables() {
@@ -494,6 +494,11 @@ function updateLoadingScreen() {
 function update() {
 	var curTime = Date.now();
 	deltaTime = curTime - prevTime;
+
+	if (curRoom == null) {
+		// in the special case where there is no valid room, end the game
+		startNarrating( "", true /*isEnding*/ );
+	}
 
 	if (!transition.IsTransitionActive()) {
 		updateInput();
@@ -919,6 +924,10 @@ var InputManager = function() {
 var input = null;
 
 function movePlayer(direction) {
+	if (player().room == null || !Object.keys(room).includes(player().room)) {
+		return; // player room is missing or invalid.. can't move them!
+	}
+
 	var spr = null;
 
 	if ( curPlayerDirection == Direction.Left && !(spr = getSpriteLeft()) && !isWallLeft()) {
@@ -1141,6 +1150,8 @@ function parseWorld(file) {
 
 	// var parseTimer = new Timer();
 
+	spriteStartLocations = {};
+
 	resetFlags();
 
 	var versionNumber = 0;
@@ -1211,10 +1222,24 @@ function parseWorld(file) {
 			i++;
 		}
 	}
+
 	placeSprites();
-	if (player().room != null) {
+
+	var roomIds = Object.keys(room);
+	if (player() != undefined && player().room != null && roomIds.includes(player().room)) {
+		// player has valid room
 		curRoom = player().room;
 	}
+	else if (roomIds.length > 0) {
+		// player not in any room! what the heck
+		curRoom = roomIds[0];
+	}
+	else {
+		// uh oh there are no rooms I guess???
+		curRoom = null;
+	}
+
+	console.log("START ROOM " + curRoom);
 
 	renderer.SetPalettes(palette);
 
@@ -2038,7 +2063,8 @@ function drawTile(img,x,y,context) {
 	if (!context) { //optional pass in context; otherwise, use default
 		context = ctx;
 	}
-	context.putImageData(img,x*tilesize*scale,y*tilesize*scale);
+	// NOTE: images are now canvases, instead of raw image data (for chrome performance reasons)
+	context.drawImage(img,x*tilesize*scale,y*tilesize*scale,tilesize*scale,tilesize*scale);
 }
 
 function drawSprite(img,x,y,context) { //this may differ later (or not haha)
@@ -2060,6 +2086,13 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	// 	debugLastRoomDrawn = room.id;
 	// 	console.log("DRAW ROOM " + debugLastRoomDrawn);
 	// }
+
+	if (room === undefined) {
+		// protect against invalid rooms -- but it assumes there is a "0" pal
+		context.fillStyle = "rgb(" + getPal("0")[0][0] + "," + getPal("0")[0][1] + "," + getPal("0")[0][2] + ")";
+		context.fillRect(0,0,canvas.width,canvas.height);
+		return;
+	}
 
 	//clear screen
 	context.fillStyle = "rgb(" + getPal(room.pal)[0][0] + "," + getPal(room.pal)[0][1] + "," + getPal(room.pal)[0][2] + ")";
@@ -2116,7 +2149,10 @@ function curPal() {
 }
 
 function getRoomPal(roomId) {
-	if (room[roomId].pal != null) {
+	if (roomId == null) {
+		return "0";
+	}
+	else if (room[roomId].pal != null) {
 		//a specific palette was chosen
 		return room[roomId].pal;
 	}

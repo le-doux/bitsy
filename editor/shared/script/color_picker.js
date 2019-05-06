@@ -24,7 +24,14 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		var hueRgbColor = HSVtoRGB( hueHsvColor );
 		var rgbColorStr = "rgb(" + hueRgbColor.r + "," + hueRgbColor.g + "," + hueRgbColor.b + ")";
 		sliderBg.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
-		slider.value = (1 - curColor.v) * 100;
+
+		var sliderBounds = sliderBg.getBoundingClientRect();
+		var thumbBounds = slider.getBoundingClientRect();
+		var sliderCenterPos = ((1.0 - curColor.v) * sliderBounds.width);
+		var sliderThumbCenterOffset = (thumbBounds.width / 2) + 4; /* + extra for border */
+		var sliderLeftPos = sliderCenterPos - sliderThumbCenterOffset;
+		var sliderLeftStyle = sliderLeftPos + "px";
+		slider.style.marginLeft = sliderLeftStyle;
 
 		drawColorPickerWheel();
 		drawColorPickerSelect();
@@ -96,8 +103,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		// console.log(e.target.value);
 		curColor.v = 1 - (e.target.value / 100);
 
-		if( self.onColorChange != null )
+		if( self.onColorChange != null ) {
 			self.onColorChange( HSVtoRGB( curColor ), true );
+		}
 
 		drawColorPickerWheel();
 		drawColorPickerSelect();
@@ -115,8 +123,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		if( rgbColor != null ) {
 			self.setColor( rgbColor.r, rgbColor.g, rgbColor.b );
 
-			if( self.onColorChange != null )
+			if( self.onColorChange != null ) {
 				self.onColorChange( rgbColor, true );
+			}
 		}
 		else {
 			updateHexCode(); // change back to the current color if it's nonsense input
@@ -125,8 +134,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 	var isMouseDown = false;
 	function pickColor(e, isMouseUp) {
-		if( isMouseUp == null || isMouseUp == undefined )
+		if( isMouseUp == null || isMouseUp == undefined ) {
 			isMouseUp = false;
+		}
 
 		// console.log(isMouseDown);
 
@@ -197,8 +207,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 				var rgbColorStr = "rgb(" + hueRgbColor.r + "," + hueRgbColor.g + "," + hueRgbColor.b + ")";
 				sliderBg.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
 
-				if( self.onColorChange != null )
+				if( self.onColorChange != null ) {
 					self.onColorChange( rgbColor, isMouseUp );
+				}
 			}
 
 			drawColorPickerSelect();
@@ -212,28 +223,117 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 	}
 
 	function pickColorEnd(e) {
-		// console.log("mouseup");
+		console.log("color picker end");
 		pickColor(e, true);
 		isMouseDown = false;
 	}
 
 	function pickColorTouchMove(e) {
 		// console.log(e.touches[0]);
-		// e.preventDefault();
-		pickColor(e.touches[0], true);
+
+		if (isMouseDown) {
+			e.preventDefault();
+			pickColor(e.touches[0], true);
+		}
 	}
 
 	function pickColorTouchStart(e) {
 		// console.log(e.touches[0]);
-		// e.preventDefault();
+		e.preventDefault();
 		pickColorStart(e.touches[0]);
 	}
 
 	function pickColorTouchEnd(e) {
 		// console.log(e.touches[0]);
 		// pickColorEnd(e.touches[0]);
-		// e.preventDefault();
-		isMouseDown = false;
+
+		if (isMouseDown) {
+			e.preventDefault();
+
+			if( self.onColorChange != null ) {
+				self.onColorChange( HSVtoRGB( curColor ), true );
+			}
+
+			isMouseDown = false;
+		}
+	}
+
+	var isSliderMouseDown = false;
+	function pickValue(e, isMouseUp) {
+		if( isMouseUp == null || isMouseUp == undefined ) {
+			isMouseUp = false;
+		}
+
+		if (isSliderMouseDown) {
+			// console.log("VALUE");
+			var sliderBounds = sliderBg.getBoundingClientRect();
+			var thumbBounds = slider.getBoundingClientRect();
+
+			var containerX = e.clientX - sliderBounds.left;
+			var xPercent = containerX / (sliderBounds.width);
+			// console.log(xPercent);
+
+			curColor.v = 1.0 - xPercent;
+			if (curColor.v < 0) {
+				curColor.v = 0;
+			}
+			else if (curColor.v > 1.0) {
+				curColor.v = 1.0;
+			}
+
+			var sliderCenterPos = ((1.0 - curColor.v) * sliderBounds.width);
+			var sliderThumbCenterOffset = (thumbBounds.width / 2) + 4; /* + extra for border */
+			var sliderLeftPos = sliderCenterPos - sliderThumbCenterOffset;
+			var sliderLeftStyle = sliderLeftPos + "px";
+			slider.style.marginLeft = sliderLeftStyle;
+
+			if (isMouseUp) {
+				drawColorPickerWheel();
+				drawColorPickerSelect();
+			}
+			updateHexCode();
+		}
+	}
+
+	function pickValueStart(e) {
+		// console.log("VALUE START");
+		isSliderMouseDown = true;
+		pickValue(e,false);
+	}
+
+	function pickValueEnd(e) {
+		if (isSliderMouseDown) {
+			// console.log("VALUE END");
+			pickValue(e,true);
+			isSliderMouseDown = false;
+		}
+	}
+
+	function pickValueTouchMove(e) {
+		if (isSliderMouseDown) {
+			e.preventDefault();
+			pickValue(e.touches[0], false);
+		}
+	}
+
+	function pickValueTouchStart(e) {
+		e.preventDefault();
+		pickValueStart(e.touches[0]);
+	}
+
+	function pickValueTouchEnd(e) {
+		if (isSliderMouseDown) {
+			e.preventDefault();
+
+			drawColorPickerWheel();
+			drawColorPickerSelect();
+			updateHexCode();
+			if( self.onColorChange != null ) {
+				self.onColorChange( HSVtoRGB( curColor ), true );
+			}
+
+			isSliderMouseDown = false;
+		}
 	}
 
 	var wheelCanvas;
@@ -263,10 +363,14 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		document.addEventListener('touchend', pickColorTouchEnd);
 
 		slider = document.getElementById(sliderId);
-		// slider.addEventListener("input", updateValue); // perf in safari isn't good enough for live update during slider
-		slider.addEventListener("change", updateValue);
 
 		sliderBg = document.getElementById(sliderBgId);
+		sliderBg.addEventListener("mousedown", pickValueStart);
+		document.addEventListener("mousemove", pickValue);
+		document.addEventListener("mouseup", pickValueEnd);
+		sliderBg.addEventListener("touchstart", pickValueTouchStart);
+		document.addEventListener("touchmove", pickValueTouchMove);
+		document.addEventListener("touchend", pickValueTouchEnd);
 
 		hexText = document.getElementById(hexTextId);
 		hexText.addEventListener( "change", changeHexCode );

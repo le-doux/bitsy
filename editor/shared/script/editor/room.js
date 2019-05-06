@@ -127,6 +127,7 @@ function RoomTool(canvas) {
 		if( self.markers.GetSelectedMarker() != null && self.markers.IsDraggingMarker() ) {
 			// drag marker around
 			var off = getOffset(e);
+			off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
 			var x = Math.floor(off.x / (tilesize*scale));
 			var y = Math.floor(off.y / (tilesize*scale));
 
@@ -173,7 +174,7 @@ function RoomTool(canvas) {
 	}
 
 	function onTouchStart(e) {
-		// e.preventDefault();
+		e.preventDefault();
 		// console.log(e.touches[0]);
 		var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		// console.log(fakeEvent);
@@ -181,13 +182,13 @@ function RoomTool(canvas) {
 	}
 
 	function onTouchMove(e) {
-		// e.preventDefault();
+		e.preventDefault();
 		var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		onMouseMove( fakeEvent );
 	}
 
 	function onTouchEnd(e) {
-		// e.preventDefault();
+		e.preventDefault();
 		// var fakeEvent = { target:e.target, clientX:e.touches[0].clientX, clientY:e.touches[0].clientY };
 		// map_onMouseUp( fakeEvent );
 		isDragAddingTiles = false;
@@ -199,18 +200,13 @@ function RoomTool(canvas) {
 	var mapEditAnimationLoop;
 
 	this.listenEditEvents = function() {
-		if( Ed().platform == PlatformType.Desktop ) {
-			canvas.addEventListener("mousedown", onMouseDown);
-			canvas.addEventListener("mousemove", onMouseMove);
-			canvas.addEventListener("mouseup", onMouseUp);
-			canvas.addEventListener("mouseleave", onMouseUp);
-		}
-
-		if( Ed().platform == PlatformType.Mobile ) {
-			canvas.addEventListener("touchstart", onTouchStart);
-			canvas.addEventListener("touchmove", onTouchMove);
-			canvas.addEventListener("touchend", onTouchEnd);
-		}
+		canvas.addEventListener("mousedown", onMouseDown);
+		canvas.addEventListener("mousemove", onMouseMove);
+		canvas.addEventListener("mouseup", onMouseUp);
+		canvas.addEventListener("mouseleave", onMouseUp);
+		canvas.addEventListener("touchstart", onTouchStart);
+		canvas.addEventListener("touchmove", onTouchMove);
+		canvas.addEventListener("touchend", onTouchEnd);
 
 		mapEditAnimationLoop =
 			setInterval( function() {
@@ -227,18 +223,13 @@ function RoomTool(canvas) {
 	}
 
 	this.unlistenEditEvents = function() {
-		if( Ed().platform == PlatformType.Desktop ) {
-			canvas.removeEventListener("mousedown", onMouseDown);
-			canvas.removeEventListener("mousemove", onMouseMove);
-			canvas.removeEventListener("mouseup", onMouseUp);
-			canvas.removeEventListener("mouseleave", onMouseUp);
-		}
-
-		if( Ed().platform == PlatformType.Mobile ) {
-			canvas.removeEventListener("touchstart", onTouchStart);
-			canvas.removeEventListener("touchmove", onTouchMove);
-			canvas.removeEventListener("touchend", onTouchEnd);
-		}
+		canvas.removeEventListener("mousedown", onMouseDown);
+		canvas.removeEventListener("mousemove", onMouseMove);
+		canvas.removeEventListener("mouseup", onMouseUp);
+		canvas.removeEventListener("mouseleave", onMouseUp);
+		canvas.removeEventListener("touchstart", onTouchStart);
+		canvas.removeEventListener("touchmove", onTouchMove);
+		canvas.removeEventListener("touchend", onTouchEnd);
 
 		clearInterval( mapEditAnimationLoop );
 	}
@@ -297,8 +288,8 @@ function togglePlayMode(e) {
 	else {
 		on_edit_mode();
 	}
-	if( Ed().platform == PlatformType.Desktop ) // hack for mobile
-		updatePlayModeButton();
+
+	updatePlayModeButton();
 }
 /* TODO 
 - make a PlayModeController objec?
