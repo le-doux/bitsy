@@ -230,11 +230,11 @@ function onready(startWithTitle) {
 
 	window.onblur = input.onblur;
 
-	update_interval = setInterval(update,-1);
+	update_interval = setInterval(update,16);
 
-	console.log("TITLE ??? " + startWithTitle);
-	if(startWithTitle) // used by editor
+	if(startWithTitle) { // used by editor 
 		startNarrating(title);
+	}
 }
 
 function setInitialVariables() {
@@ -2063,7 +2063,8 @@ function drawTile(img,x,y,context) {
 	if (!context) { //optional pass in context; otherwise, use default
 		context = ctx;
 	}
-	context.putImageData(img,x*tilesize*scale,y*tilesize*scale);
+	// NOTE: images are now canvases, instead of raw image data (for chrome performance reasons)
+	context.drawImage(img,x*tilesize*scale,y*tilesize*scale,tilesize*scale,tilesize*scale);
 }
 
 function drawSprite(img,x,y,context) { //this may differ later (or not haha)

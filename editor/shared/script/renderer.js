@@ -107,7 +107,14 @@ function imageDataFromImageSource(imageSource, pal, col) {
 		}
 	}
 
-	return img;
+	// convert to canvas: chrome has poor performance when working directly with image data
+	var imageCanvas = document.createElement("canvas");
+	imageCanvas.width = img.width;
+	imageCanvas.height = img.height;
+	var imageContext = imageCanvas.getContext("2d");
+	imageContext.putImageData(img,0,0);
+
+	return imageCanvas;
 }
 
 // TODO : move into core

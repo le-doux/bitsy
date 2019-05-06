@@ -6,11 +6,10 @@ X android bug: when keyboard comes up, it forces layout into landscape mode
 		- orientationchange event (screen.orientation) for orientation
 		- window.devicePixelRatio for dpi
 X remove browser compatibility warning on mobile
-- try another orientation on android fix
-- bugs I assigned myself
-	- room 0 (doesn't seem to repro anymore)
+X bugs I assigned myself
+	X room 0 (doesn't seem to repro anymore)
 	X import html
-	- chrome slow
+	X chrome slow
 - update version
 	- update number
 	- update version notes
@@ -18,16 +17,19 @@ X bug: can't remove avatar? unless you delete the room it was in
 
 what the notes will look like
 v6.1
-- made editor more mobile-friendly
+- made editor more mobile-friendly:
 -- new portrait mode layout
 -- enabled touch controls for room and paint tools
 -- font sizes for high dpi displays
-- bugs
+- bugs:
 -- fixed bug where you can't remove sprites from rooms
 -- fixed crashes when there are no rooms
--- fix html import
+-- fixed html import bug
+- improved rendering performance in chrome
 
 leftover todos:
+- add "direct edit" dropdowns for exits when in "move" mode
+- try another orientation on android fix
 - need to update the instructions panel
 - use the new event manager?
 - tool positioning in portrait mode
