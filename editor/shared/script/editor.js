@@ -736,6 +736,21 @@ function readUrlFlags() {
 	console.log(urlFlags);
 }
 
+function isPortraitOrientation() {
+	var isPortrait = false;
+
+	if (window.screen.orientation != undefined) {
+		// most browsers
+		isPortrait = window.screen.orientation.type.includes("portrait");
+	}
+	else if (window.orientation != undefined) {
+		// iOS safari
+		isPortrait = window.orientation == 0 || window.orientation == 180;
+	}
+
+	return isPortrait;
+}
+
 function start() {
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
@@ -846,8 +861,7 @@ function start() {
 	paintExplorer.SetDisplayCaptions( true );
 
 	//unsupported feature stuff
-	var isPortrait = window.screen.orientation.type.includes("portrait");
-	if (hasUnsupportedFeatures() && !isPortrait) {
+	if (hasUnsupportedFeatures() && !isPortraitOrientation()) {
 		showUnsupportedFeatureWarning();
 	}
 	if (!browserFeatures.fileDownload) {
