@@ -1469,7 +1469,7 @@ var Parser = function(env) {
 	var setSymbol = "=";
 	var ifSymbol = "?";
 	var elseSymbol = ":";
-	var operatorSymbols = ["==", ">", "<", ">=", "<=", "-", "+", "/", "*"]; // operators need to be in reverse order of precedence
+	var operatorSymbols = ["==", ">=", "<=", ">", "<", "-", "+", "/", "*"]; // operators need to be in reverse order of precedence
 	function CreateExpression(expStr) {
 		console.log("CREATE EXPRESSION --- " + expStr);
 

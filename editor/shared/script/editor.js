@@ -1,6 +1,7 @@
 /*
 v6.2
 - bugfix: animations stay in sync when you add them
+- bugfix: >= and <= not detected in scripts
 
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
