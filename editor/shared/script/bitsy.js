@@ -646,6 +646,29 @@ function updateAnimation() {
 	}
 }
 
+function resetAllAnimations() {
+	for (id in sprite) {
+		var spr = sprite[id];
+		if (spr.animation.isAnimated) {
+			spr.animation.frameIndex = 0;
+		}
+	}
+
+	for (id in tile) {
+		var til = tile[id];
+		if (til.animation.isAnimated) {
+			til.animation.frameIndex = 0;
+		}
+	}
+
+	for (id in item) {
+		var itm = item[id];
+		if (itm.animation.isAnimated) {
+			itm.animation.frameIndex = 0;
+		}
+	}
+}
+
 var moveCounter = 0;
 var moveTime = 200;
 function moveSprites() {

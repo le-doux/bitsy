@@ -1,4 +1,7 @@
 /*
+v6.2
+- bugfix: animations stay in sync when you add them
+
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
 - try another orientation on android fix
@@ -2915,16 +2918,21 @@ function addSpriteAnimation() {
 
 	//add blank frame to sprite (or restore removed animation)
 	var spriteImageId = "SPR_" + drawing.id;
-	if (sprite[drawing.id].cachedAnimation != null)
+	if (sprite[drawing.id].cachedAnimation != null) {
 		restoreDrawingAnimation( spriteImageId, sprite[drawing.id].cachedAnimation )
-	else
+	}
+	else {
 		addNewFrameToDrawing( spriteImageId );
+	}
 
 	// TODO RENDERER : refresh images
 
 	//refresh data model
 	refreshGameData();
 	paintTool.reloadDrawing();
+
+	// reset animations
+	resetAllAnimations();
 }
 
 function removeSpriteAnimation() {
@@ -2946,6 +2954,9 @@ function removeSpriteAnimation() {
 	//refresh data model
 	refreshGameData();
 	paintTool.reloadDrawing();
+
+	// reset animations
+	resetAllAnimations();
 }
 
 function addTileAnimation() {
@@ -2960,16 +2971,21 @@ function addTileAnimation() {
 
 	//add blank frame to tile (or restore removed animation)
 	var tileImageId = "TIL_" + drawing.id;
-	if (tile[drawing.id].cachedAnimation != null)
+	if (tile[drawing.id].cachedAnimation != null) {
 		restoreDrawingAnimation( tileImageId, tile[drawing.id].cachedAnimation )
-	else
+	}
+	else {
 		addNewFrameToDrawing( tileImageId );
+	}
 
 	// TODO RENDERER : refresh images
 
 	//refresh data model
 	refreshGameData();
 	paintTool.reloadDrawing();
+
+	// reset animations
+	resetAllAnimations();
 }
 
 function removeTileAnimation() {
@@ -2991,6 +3007,9 @@ function removeTileAnimation() {
 	//refresh data model
 	refreshGameData();
 	paintTool.reloadDrawing();
+
+	// reset animations
+	resetAllAnimations();
 }
 
 // TODO : so much duplication it makes me sad :(
@@ -3006,16 +3025,21 @@ function addItemAnimation() {
 
 	//add blank frame to item (or restore removed animation)
 	var itemImageId = "ITM_" + drawing.id;
-	if (item[drawing.id].cachedAnimation != null)
+	if (item[drawing.id].cachedAnimation != null) {
 		restoreDrawingAnimation( itemImageId, item[drawing.id].cachedAnimation )
-	else
+	}
+	else {
 		addNewFrameToDrawing( itemImageId );
+	}
 
 	// TODO RENDERER : refresh images
 
 	//refresh data model
 	refreshGameData();
 	paintTool.reloadDrawing();
+
+	// reset animations
+	resetAllAnimations();
 }
 
 function removeItemAnimation() {
@@ -3037,6 +3061,9 @@ function removeItemAnimation() {
 	//refresh data model (TODO : these should really be a shared method)
 	refreshGameData();
 	paintTool.reloadDrawing();
+
+	// reset animations
+	resetAllAnimations();
 }
 
 function addNewFrameToDrawing(drwId) {
