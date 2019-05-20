@@ -16,7 +16,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 	var self = this;
 
-	this.setColor = function(r,g,b) {
+	this.setColor = function(r,g,b) { // TODO : can this be combined with the change color event better somehow??
 		var rgbColor = { r:r, g:g, b:b };
 		curColor = RGBtoHSV( rgbColor.r, rgbColor.g, rgbColor.b );
 
@@ -33,12 +33,8 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		var sliderLeftStyle = sliderLeftPos + "px";
 		slider.style.marginLeft = sliderLeftStyle;
 
-		drawColorPickerWheel();
-		drawColorPickerSelect();
-		updateHexCode();
+		events.Raise("color_picker_change", { rgbColor: HSVtoRGB(curColor), isMouseUp: true });
 	}
-
-	this.onColorChange = null;
 
 	function drawColorPickerWheel() {
 
@@ -103,13 +99,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		// console.log(e.target.value);
 		curColor.v = 1 - (e.target.value / 100);
 
-		if( self.onColorChange != null ) {
-			self.onColorChange( HSVtoRGB( curColor ), true );
-		}
-
-		drawColorPickerWheel();
-		drawColorPickerSelect();
-		updateHexCode();
+		events.Raise("color_picker_change", { rgbColor: HSVtoRGB(curColor), isMouseUp: true });
 	}
 
 	function updateHexCode() {
@@ -122,10 +112,6 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		var rgbColor = hexToRgb( e.target.value );
 		if( rgbColor != null ) {
 			self.setColor( rgbColor.r, rgbColor.g, rgbColor.b );
-
-			if( self.onColorChange != null ) {
-				self.onColorChange( rgbColor, true );
-			}
 		}
 		else {
 			updateHexCode(); // change back to the current color if it's nonsense input
@@ -207,13 +193,8 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 				var rgbColorStr = "rgb(" + hueRgbColor.r + "," + hueRgbColor.g + "," + hueRgbColor.b + ")";
 				sliderBg.style.background = "linear-gradient( to right, " + rgbColorStr + ", black )";
 
-				if( self.onColorChange != null ) {
-					self.onColorChange( rgbColor, isMouseUp );
-				}
+				events.Raise("color_picker_change", { rgbColor: HSVtoRGB(curColor), isMouseUp: isMouseUp });
 			}
-
-			drawColorPickerSelect();
-			updateHexCode();
 		}
 	}
 
@@ -250,9 +231,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		if (isMouseDown) {
 			e.preventDefault();
 
-			if( self.onColorChange != null ) {
-				self.onColorChange( HSVtoRGB( curColor ), true );
-			}
+			events.Raise("color_picker_change", { rgbColor: HSVtoRGB(curColor), isMouseUp: true });
 
 			isMouseDown = false;
 		}
@@ -287,11 +266,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 			var sliderLeftStyle = sliderLeftPos + "px";
 			slider.style.marginLeft = sliderLeftStyle;
 
-			if (isMouseUp) {
-				drawColorPickerWheel();
-				drawColorPickerSelect();
-			}
-			updateHexCode();
+			events.Raise("color_picker_change", { rgbColor: HSVtoRGB(curColor), isMouseUp: isMouseUp });
 		}
 	}
 
@@ -325,12 +300,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 		if (isSliderMouseDown) {
 			e.preventDefault();
 
-			drawColorPickerWheel();
-			drawColorPickerSelect();
-			updateHexCode();
-			if( self.onColorChange != null ) {
-				self.onColorChange( HSVtoRGB( curColor ), true );
-			}
+			events.Raise("color_picker_change", { rgbColor: HSVtoRGB(curColor), isMouseUp: true });
 
 			isSliderMouseDown = false;
 		}
@@ -374,6 +344,15 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 		hexText = document.getElementById(hexTextId);
 		hexText.addEventListener( "change", changeHexCode );
+
+		events.Listen("color_picker_change", function(event) {
+			if (event.isMouseUp) {
+				// TODO - can I update this live for desktop layouts?
+				drawColorPickerWheel();
+			}
+			drawColorPickerSelect();
+			updateHexCode();
+		});
 
 		self.setColor(255,0,0);
 	}
