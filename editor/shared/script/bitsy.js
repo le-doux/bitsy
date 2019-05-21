@@ -1156,6 +1156,10 @@ function player() {
 
 // Sort of a hack for legacy palette code (when it was just an array)
 function getPal(id) {
+	if (palette[id] === undefined) {
+		id = "0"; // assumes default palette always exists
+	}
+
 	return palette[ id ].colors;
 }
 
@@ -2110,15 +2114,20 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	// 	console.log("DRAW ROOM " + debugLastRoomDrawn);
 	// }
 
+	var paletteId = "0"; // default to "0" (currently there is always a palette 0)
+
 	if (room === undefined) {
 		// protect against invalid rooms -- but it assumes there is a "0" pal
-		context.fillStyle = "rgb(" + getPal("0")[0][0] + "," + getPal("0")[0][1] + "," + getPal("0")[0][2] + ")";
+		context.fillStyle = "rgb(" + getPal(paletteId)[0][0] + "," + getPal(paletteId)[0][1] + "," + getPal(paletteId)[0][2] + ")";
 		context.fillRect(0,0,canvas.width,canvas.height);
 		return;
 	}
 
 	//clear screen
-	context.fillStyle = "rgb(" + getPal(room.pal)[0][0] + "," + getPal(room.pal)[0][1] + "," + getPal(room.pal)[0][2] + ")";
+	if (room.pal != null && palette[paletteId] != undefined) {
+		paletteId = room.pal;
+	}
+	context.fillStyle = "rgb(" + getPal(paletteId)[0][0] + "," + getPal(paletteId)[0][1] + "," + getPal(paletteId)[0][2] + ")";
 	context.fillRect(0,0,canvas.width,canvas.height);
 
 	//draw tiles

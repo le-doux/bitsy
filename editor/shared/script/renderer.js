@@ -29,6 +29,10 @@ function setPalettes(paletteObj) {
 }
 
 function getPaletteColor(paletteId, colorIndex) {
+	if (palettes[paletteId] === undefined) {
+		paletteId = "0"; // assumes "0" palette always exists
+	}
+
 	var palette = palettes[paletteId];
 
 	if (colorIndex > palette.colors.length) { // do I need this failure case? (seems un-reliable)

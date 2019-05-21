@@ -1,8 +1,13 @@
 /*
 v6.2
+- added duplicate and delete palette buttons
 - bugfix: animations stay in sync when you add them
 - bugfix: >= and <= not detected in scripts
 - bugfix: drawings update when you use the color picker
+- bugfix: rooms without a defined palette break
+TODO
+- fix deleting palettes
+	- make it possible to delete palette 0 (need the default palette to only come into play if there are no palettes??)
 
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
@@ -1863,6 +1868,46 @@ function newPalette() {
 	// change the UI
 	paletteIndex = Object.keys(palette).length - 1;
 	updatePaletteUI();
+}
+
+function duplicatePalette() {
+	var curColors = palette[paletteIndex].colors;
+
+	var id = nextPaletteId();
+	palette[ id ] = {
+		name : null,
+		colors : []
+	};
+
+	for (var i = 0; i < curColors.length; i++) {
+		palette[id].colors.push(curColors[i].slice());
+	}
+
+	refreshGameData();
+
+	// change the UI
+	paletteIndex = Object.keys(palette).length - 1;
+	updatePaletteUI();
+}
+
+function deletePalette() {
+	if ( Object.keys(palette).length <= 1 ) {
+		alert("You can't delete your only palette!");
+	}
+	else {
+		delete palette[paletteIndex];
+
+		paletteIndex = paletteIndex - 1;
+		if (paletteIndex < 0) {
+			paletteIndex = Object.keys(palette).length - 1;
+		}
+
+		refreshGameData();
+
+		// change the UI
+		paletteIndex = Object.keys(palette).length - 1;
+		updatePaletteUI();
+	}
 }
 
 function roomPaletteChange(event) {
