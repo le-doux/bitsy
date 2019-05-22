@@ -8,6 +8,7 @@ v6.2
 TODO
 - fix deleting palettes
 	- make it possible to delete palette 0 (need the default palette to only come into play if there are no palettes??)
+		- TODO : fix the "0" then "default" logic?, remove "default" from dropdown palette picker
 
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
@@ -67,7 +68,13 @@ function defParam(param,value) {
 
 /* PALETTES */
 function selectedColorPal() {
-	return sortedPaletteIdList()[ paletteIndex ];
+	var idList = sortedPaletteIdList();
+	if (idList.length <= 0) {
+		return "default";
+	}
+	else {
+		return idList[ paletteIndex ];
+	}
 };
 
 /* UNIQUE ID METHODS */
@@ -128,7 +135,14 @@ function sortedEndingIdList() {
 }
 
 function sortedPaletteIdList() {
-	return sortedBase36IdList( palette );
+	var keyList = Object.keys(palette);
+	keyList.splice(keyList.indexOf("default"),1);
+	var keyObj = {};
+	for (var i = 0; i < keyList.length; i++) {
+		keyObj[keyList[i]] = {};
+	}
+
+	return sortedBase36IdList( keyObj );
 }
 
 function sortedBase36IdList( objHolder ) {
@@ -1753,10 +1767,12 @@ function updatePaletteUI() {
 	var palettePlaceholderName = localization.GetStringOrFallback("palette_label", "palette");
 	document.getElementById("paletteName").placeholder = palettePlaceholderName + " " + selectedColorPal();
 	var name = palette[ selectedColorPal() ].name;
-	if( name )
+	if( name ) {
 		document.getElementById("paletteName").value = name;
-	else
+	}
+	else {
 		document.getElementById("paletteName").value = "";
+	}
 
 
 	updatePaletteOptionsFromGameData();
@@ -1832,25 +1848,41 @@ function updatePaletteControlsFromGameData() {
 var paletteIndex = 0; // TODO : make an encapsulated non-global palette tool someday
 
 function prevPalette() {
+	var keys = Object.keys(palette);
+
 	// update index
 	paletteIndex = (paletteIndex - 1);
 	if (paletteIndex < 0) {
-		paletteIndex = Object.keys(palette).length - 1;
+		paletteIndex = keys.length - 1;
 	}
 
-	// change the UI
-	updatePaletteUI();
+	// skip the default palette (TODO : use the sorted keys list instead)
+	if (keys.length > 1 && keys[paletteIndex] === "default") {
+		prevPalette();
+	}
+	else {
+		// change the UI
+		updatePaletteUI();
+	}
 }
 
 function nextPalette() {
+	var keys = Object.keys(palette);
+
 	// update index
 	paletteIndex = (paletteIndex + 1);
-	if (paletteIndex >= Object.keys(palette).length) {
+	if (paletteIndex >= keys.length) {
 		paletteIndex = 0;
 	}
 
-	// change the UI
-	updatePaletteUI();
+	// skip the default palette
+	if (keys.length > 1 && keys[paletteIndex] === "default") {
+		nextPalette();
+	}
+	else {
+		// change the UI
+		updatePaletteUI();
+	}
 }
 
 function newPalette() {
@@ -1866,12 +1898,13 @@ function newPalette() {
 	refreshGameData();
 
 	// change the UI
-	paletteIndex = Object.keys(palette).length - 1;
+	paletteIndex = Object.keys(palette).indexOf(id);
 	updatePaletteUI();
 }
 
 function duplicatePalette() {
-	var curColors = palette[paletteIndex].colors;
+	var sourcePalette = palette[paletteIndex] === undefined ? palette["default"] : palette[paletteIndex];
+	var curColors = sourcePalette.colors;
 
 	var id = nextPaletteId();
 	palette[ id ] = {
@@ -1886,27 +1919,18 @@ function duplicatePalette() {
 	refreshGameData();
 
 	// change the UI
-	paletteIndex = Object.keys(palette).length - 1;
+	paletteIndex = Object.keys(palette).indexOf(id);
 	updatePaletteUI();
 }
 
 function deletePalette() {
-	if ( Object.keys(palette).length <= 1 ) {
+	if ( Object.keys(palette).length <= 2 ) { // 2 because there is also the default palette
 		alert("You can't delete your only palette!");
 	}
 	else {
 		delete palette[paletteIndex];
 
-		paletteIndex = paletteIndex - 1;
-		if (paletteIndex < 0) {
-			paletteIndex = Object.keys(palette).length - 1;
-		}
-
-		refreshGameData();
-
-		// change the UI
-		paletteIndex = Object.keys(palette).length - 1;
-		updatePaletteUI();
+		prevPalette();
 	}
 }
 

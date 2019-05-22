@@ -9,9 +9,12 @@ var tile = {};
 var sprite = {};
 var item = {};
 var dialog = {};
-var palette = {
-	"0" : [[0,0,0],[255,0,0],[255,255,255]] //start off with a default palette (can be overriden)
-};
+var palette = { //start off with a default palette
+		"default" : {
+			name : "default",
+			colors : [[0,0,0],[255,255,255],[255,255,255]]
+		}
+	};
 var ending = {};
 var variable = {}; // these are starting variable values -- they don't update (or I don't think they will)
 var playerId = "A";
@@ -91,10 +94,10 @@ function clearGameData() {
 	sprite = {};
 	item = {};
 	dialog = {};
-	palette = { //start off with a default palette (can be overriden)
-		"0" : {
-			name : null,
-			colors : [[0,0,0],[255,0,0],[255,255,255]]
+	palette = { //start off with a default palette
+		"default" : {
+			name : "default",
+			colors : [[0,0,0],[255,255,255],[255,255,255]]
 		}
 	};
 	ending = {};
@@ -1157,7 +1160,7 @@ function player() {
 // Sort of a hack for legacy palette code (when it was just an array)
 function getPal(id) {
 	if (palette[id] === undefined) {
-		id = "0"; // assumes default palette always exists
+		id = "default";
 	}
 
 	return palette[ id ].colors;
@@ -1305,17 +1308,19 @@ function serializeWorld(skipFonts) {
 	}
 	/* PALETTE */
 	for (id in palette) {
-		worldStr += "PAL " + id + "\n";
-		if( palette[id].name != null )
-			worldStr += "NAME " + palette[id].name + "\n";
-		for (i in getPal(id)) {
-			for (j in getPal(id)[i]) {
-				worldStr += getPal(id)[i][j];
-				if (j < 2) worldStr += ",";
+		if (id != "default") {
+			worldStr += "PAL " + id + "\n";
+			if( palette[id].name != null )
+				worldStr += "NAME " + palette[id].name + "\n";
+			for (i in getPal(id)) {
+				for (j in getPal(id)[i]) {
+					worldStr += getPal(id)[i][j];
+					if (j < 2) worldStr += ",";
+				}
+				worldStr += "\n";
 			}
 			worldStr += "\n";
 		}
-		worldStr += "\n";
 	}
 	/* ROOM */
 	for (id in room) {
@@ -2114,10 +2119,10 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	// 	console.log("DRAW ROOM " + debugLastRoomDrawn);
 	// }
 
-	var paletteId = "0"; // default to "0" (currently there is always a palette 0)
+	var paletteId = palette["0"] === undefined ? "default" : "0";
 
 	if (room === undefined) {
-		// protect against invalid rooms -- but it assumes there is a "0" pal
+		// protect against invalid rooms
 		context.fillStyle = "rgb(" + getPal(paletteId)[0][0] + "," + getPal(paletteId)[0][1] + "," + getPal(paletteId)[0][2] + ")";
 		context.fillRect(0,0,canvas.width,canvas.height);
 		return;
@@ -2181,8 +2186,10 @@ function curPal() {
 }
 
 function getRoomPal(roomId) {
+	var defaultId = palette["0"] === undefined ? "default" : "0";
+
 	if (roomId == null) {
-		return "0";
+		return defaultId;
 	}
 	else if (room[roomId].pal != null) {
 		//a specific palette was chosen
@@ -2195,10 +2202,10 @@ function getRoomPal(roomId) {
 		}
 		else {
 			//use the default palette
-			return "0";
+			return defaultId;
 		}
 	}
-	return "0";	
+	return defaultId;
 }
 
 var isDialogMode = false;

@@ -30,7 +30,7 @@ function setPalettes(paletteObj) {
 
 function getPaletteColor(paletteId, colorIndex) {
 	if (palettes[paletteId] === undefined) {
-		paletteId = "0"; // assumes "0" palette always exists
+		paletteId = "default";
 	}
 
 	var palette = palettes[paletteId];
