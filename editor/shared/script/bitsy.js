@@ -2119,7 +2119,7 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	// 	console.log("DRAW ROOM " + debugLastRoomDrawn);
 	// }
 
-	var paletteId = palette["0"] === undefined ? "default" : "0";
+	var paletteId = "default";
 
 	if (room === undefined) {
 		// protect against invalid rooms
@@ -2147,7 +2147,7 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 				}
 				else {
 					// console.log(id);
-					drawTile( getTileImage(tile[id],getRoomPal(room.id),frameIndex), j, i, context );
+					drawTile( getTileImage(tile[id],paletteId,frameIndex), j, i, context );
 				}
 			}
 		}
@@ -2156,14 +2156,14 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	//draw items
 	for (var i = 0; i < room.items.length; i++) {
 		var itm = room.items[i];
-		drawItem( getItemImage(item[itm.id],getRoomPal(room.id),frameIndex), itm.x, itm.y, context );
+		drawItem( getItemImage(item[itm.id],paletteId,frameIndex), itm.x, itm.y, context );
 	}
 
 	//draw sprites
 	for (id in sprite) {
 		var spr = sprite[id];
 		if (spr.room === room.id) {
-			drawSprite( getSpriteImage(spr,getRoomPal(room.id),frameIndex), spr.x, spr.y, context );
+			drawSprite( getSpriteImage(spr,paletteId,frameIndex), spr.x, spr.y, context );
 		}
 	}
 }
@@ -2186,7 +2186,7 @@ function curPal() {
 }
 
 function getRoomPal(roomId) {
-	var defaultId = palette["0"] === undefined ? "default" : "0";
+	var defaultId = "default";
 
 	if (roomId == null) {
 		return defaultId;
