@@ -11,6 +11,7 @@ TODO
 	- make it possible to delete palette 0 (need the default palette to only come into play if there are no palettes??)
 		- TODO : fix the "0" then "default" logic?, remove "default" from dropdown palette picker
 		- also, find a replacement palette for rooms whose palette has been removed
+		- bug where you can't make any new palettes past "pal d"
 
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
@@ -1933,6 +1934,8 @@ function deletePalette() {
 	}
 	else {
 		delete palette[paletteIndex];
+
+		// TODO -- replace palettes for impacted rooms
 
 		prevPalette();
 	}
