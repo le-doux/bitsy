@@ -1,6 +1,7 @@
 /*
 v6.2
-- added duplicate and delete palette buttons
+- duplicate palettes
+- delete palettes
 - bugfix: animations stay in sync when you add them
 - bugfix: >= and <= not detected in scripts
 - bugfix: drawings update when you use the color picker
@@ -9,6 +10,7 @@ TODO
 - fix deleting palettes
 	- make it possible to delete palette 0 (need the default palette to only come into play if there are no palettes??)
 		- TODO : fix the "0" then "default" logic?, remove "default" from dropdown palette picker
+		- also, find a replacement palette for rooms whose palette has been removed
 
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
@@ -1828,11 +1830,13 @@ function updatePaletteOptionsFromGameData() {
 	// then, add an option for each room
 	var paletteLabel = localization.GetStringOrFallback("palette_label", "palette");
 	for (palId in palette) {
-		var option = document.createElement("option");
-		option.text = palette[palId].name ? palette[palId].name : paletteLabel + " " + palId;
-		option.value = palId;
-		option.selected = ( palId === room[ curRoom ].pal );
-		select.add(option);
+		if (palId != "default") {
+			var option = document.createElement("option");
+			option.text = palette[palId].name ? palette[palId].name : paletteLabel + " " + palId;
+			option.value = palId;
+			option.selected = ( palId === room[ curRoom ].pal );
+			select.add(option);
+		}
 	}
 }
 
