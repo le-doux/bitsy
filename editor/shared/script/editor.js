@@ -6,10 +6,10 @@ v6.2
 - bugfix: >= and <= not detected in scripts
 - bugfix: drawings update when you use the color picker
 - bugfix: rooms without a defined palette break
+- bugfix: it's possible to remove all palettes without breaking the game
 TODO
 - fix deleting palettes
 	- make it possible to delete palette 0 (need the default palette to only come into play if there are no palettes??)
-		- TODO : fix the "0" then "default" logic?, remove "default" from dropdown palette picker
 		- also, find a replacement palette for rooms whose palette has been removed
 		- bug where you can't make any new palettes past "pal d"
 
@@ -71,13 +71,7 @@ function defParam(param,value) {
 
 /* PALETTES */
 function selectedColorPal() {
-	var idList = sortedPaletteIdList();
-	if (idList.length <= 0) {
-		return "default";
-	}
-	else {
-		return idList[ paletteIndex ];
-	}
+	return paletteTool.GetSelectedId();
 };
 
 /* UNIQUE ID METHODS */
@@ -495,9 +489,6 @@ function resetGameData() {
 	refreshGameData();
 
 	// TODO RENDERER : refresh images
-
-	updatePaletteUI();
-	// updatePaletteControlsFromGameData();
 	updateExitOptionsFromGameData();
 	updateRoomName();
 	updateInventoryUI();
@@ -513,6 +504,8 @@ function resetGameData() {
 	roomTool.drawEditMap();
 
 	updateTitleTextBox(title);
+
+	events.Raise("game_data_change"); // TODO -- does this need to have a specific reset event or flag?
 }
 
 function refreshGameData() {
@@ -720,6 +713,13 @@ function isPortraitOrientation() {
 }
 
 function start() {
+	events.Listen("game_data_change", function(event) {
+		updatePaletteOptionsFromGameData();
+
+		// TODO -- over time I can move more things in here
+		// on the other hand this is still sort of global thing that we don't want TOO much of
+	});
+
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
 	var versionLabelElements = document.getElementsByClassName("curVersionLabel");
@@ -817,9 +817,12 @@ function start() {
 	// init color picker
 	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSliderThumb', 'colorPickerSliderBg', 'colorPickerHexText');
 	document.getElementById("colorPaletteOptionBackground").checked = true;
-	paletteTool = new PaletteTool(colorPicker,["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"]);
-	paletteTool.updateColorPickerUI();
+	paletteTool = new PaletteTool(colorPicker,["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"],"paletteName");
 	events.Listen("palette_change", onPaletteChange);
+	events.Listen("palette_list_change", function(event) {
+		refreshGameData();
+		updatePaletteOptionsFromGameData();
+	});
 
 	// init paint explorer
 	paintExplorer = new PaintExplorer("paintExplorer",selectPaint);
@@ -1041,18 +1044,8 @@ function on_drawing_name_change() {
 	console.log(names);
 }
 
-function on_palette_name_change() {
-	var str = document.getElementById("paletteName").value;
-	var obj = palette[ selectedColorPal() ];
-	if(str.length > 0)
-		obj.name = str;
-	else
-		obj.name = null;
-
-	updateNamesFromCurData()
-
-	refreshGameData();
-	updatePaletteOptionsFromGameData();
+function on_palette_name_change(event) {
+	paletteTool.ChangeSelectedPaletteName(event.target.value);
 }
 
 function selectRoom(roomId) {
@@ -1754,33 +1747,9 @@ function toggleFontDataVisibility(e) {
 }
 
 /* PALETTE STUFF */
-function updatePaletteUI() {
-	// document.getElementById("paletteId").innerHTML = selectedColorPal();
-
-	// NOTE: TURNING ON THIS BLOCK BREAKS THINGS - CAN I DELETE IT????
-	// if ( Object.keys(palette).length > 1 ) {
-	// 	document.getElementById("paletteIdContainer").style.display = "block";
-	// 	document.getElementById("paletteNav").style.display = "block";
-	// }
-	// else {
-	// 	document.getElementById("paletteIdContainer").style.display = "none";
-	// 	document.getElementById("paletteNav").style.display = "none";
-	// }
-
-	var palettePlaceholderName = localization.GetStringOrFallback("palette_label", "palette");
-	document.getElementById("paletteName").placeholder = palettePlaceholderName + " " + selectedColorPal();
-	var name = palette[ selectedColorPal() ].name;
-	if( name ) {
-		document.getElementById("paletteName").value = name;
-	}
-	else {
-		document.getElementById("paletteName").value = "";
-	}
-
-
-	updatePaletteOptionsFromGameData();
-	updatePaletteControlsFromGameData();
-}
+var colorPicker = null;
+var paletteTool = null;
+var paintExplorer = null;
 
 function updateRoomPaletteSelect() {
 	var palOptions = document.getElementById("roomPaletteSelect").options;
@@ -1792,10 +1761,6 @@ function updateRoomPaletteSelect() {
 		}
 	}
 }
-
-var colorPicker = null; // new color picker
-var paletteTool = null;
-var paintExplorer = null;
 
 function changeColorPickerIndex(index) {
 	paletteTool.changeColorPickerIndex(index);
@@ -1841,104 +1806,24 @@ function updatePaletteOptionsFromGameData() {
 	}
 }
 
-function updatePaletteControlsFromGameData() {
-	// document.getElementById("backgroundColor").value = rgbToHex(getPal(selectedColorPal())[0][0], getPal(selectedColorPal())[0][1], getPal(selectedColorPal())[0][2]);
-	// document.getElementById("tileColor").value = rgbToHex(getPal(selectedColorPal())[1][0], getPal(selectedColorPal())[1][1], getPal(selectedColorPal())[1][2]);
-	// document.getElementById("spriteColor").value = rgbToHex(getPal(selectedColorPal())[2][0], getPal(selectedColorPal())[2][1], getPal(selectedColorPal())[2][2]);
-
-	if( colorPicker != null )
-		paletteTool.updateColorPickerUI();
-}
-
-var paletteIndex = 0; // TODO : make an encapsulated non-global palette tool someday
-
 function prevPalette() {
-	var keys = Object.keys(palette);
-
-	// update index
-	paletteIndex = (paletteIndex - 1);
-	if (paletteIndex < 0) {
-		paletteIndex = keys.length - 1;
-	}
-
-	// skip the default palette (TODO : use the sorted keys list instead)
-	if (keys.length > 1 && keys[paletteIndex] === "default") {
-		prevPalette();
-	}
-	else {
-		// change the UI
-		updatePaletteUI();
-	}
+	paletteTool.SelectPrev();
 }
 
 function nextPalette() {
-	var keys = Object.keys(palette);
-
-	// update index
-	paletteIndex = (paletteIndex + 1);
-	if (paletteIndex >= keys.length) {
-		paletteIndex = 0;
-	}
-
-	// skip the default palette
-	if (keys.length > 1 && keys[paletteIndex] === "default") {
-		nextPalette();
-	}
-	else {
-		// change the UI
-		updatePaletteUI();
-	}
+	paletteTool.SelectNext();
 }
 
 function newPalette() {
-	// create new palette and save the data
-	var id = nextPaletteId();
-	palette[ id ] = {
-		name : null,
-		colors : [
-		[255,255,255],
-		[255,255,255],
-		[255,255,255] ]
-	};
-	refreshGameData();
-
-	// change the UI
-	paletteIndex = Object.keys(palette).indexOf(id);
-	updatePaletteUI();
+	paletteTool.AddNew();
 }
 
 function duplicatePalette() {
-	var sourcePalette = palette[paletteIndex] === undefined ? palette["default"] : palette[paletteIndex];
-	var curColors = sourcePalette.colors;
-
-	var id = nextPaletteId();
-	palette[ id ] = {
-		name : null,
-		colors : []
-	};
-
-	for (var i = 0; i < curColors.length; i++) {
-		palette[id].colors.push(curColors[i].slice());
-	}
-
-	refreshGameData();
-
-	// change the UI
-	paletteIndex = Object.keys(palette).indexOf(id);
-	updatePaletteUI();
+	paletteTool.AddDuplicate();
 }
 
 function deletePalette() {
-	if ( Object.keys(palette).length <= 2 ) { // 2 because there is also the default palette
-		alert("You can't delete your only palette!");
-	}
-	else {
-		delete palette[paletteIndex];
-
-		// TODO -- replace palettes for impacted rooms
-
-		prevPalette();
-	}
+	paletteTool.DeleteSelected();
 }
 
 function roomPaletteChange(event) {
@@ -2324,8 +2209,6 @@ function on_game_data_change_core() {
 		editorFontManager.AddResource(fontName + editorFontManager.GetExtension(), fontManager.GetData(fontName));
 	}
 
-	updatePaletteUI();
-
 	updateInventoryUI();
 
 	updateFontSelectUI();
@@ -2333,6 +2216,9 @@ function on_game_data_change_core() {
 	markerTool.SetRoom(curRoom);
 
 	updateTitleTextBox(title);
+
+	// TODO -- start using this for more things
+	events.Raise("game_data_change");
 }
 
 function updateFontSelectUI() {
