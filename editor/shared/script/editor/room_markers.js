@@ -31,6 +31,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	this.AddExit = function() { // TODO : make destination select smarter
+		if (selectedRoom == null) {
+			return;
+		}
+
 		var roomIds = Object.keys(room);
 		var roomIndex = roomIds.indexOf(selectedRoom);
 		if (roomIds.length > 1) {
@@ -76,6 +80,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	};
 
 	this.AddEnding = function() {
+		if (selectedRoom == null) {
+			return;
+		}
+
 		var newEnding = {
 			x : 2,
 			y : 2,
@@ -112,6 +120,11 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	this.SetRoom = function(roomId) {
 		selectedRoom = roomId;
+
+		if (selectedRoom === null) {
+			SelectMarker(null); // no markers in non-existent rooms
+		}
+
 		ResetMarkerList();
 	}
 

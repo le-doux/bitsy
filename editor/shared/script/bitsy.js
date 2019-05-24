@@ -1402,7 +1402,7 @@ function serializeWorld(skipFonts) {
 		// 		worldStr += "\n";
 		// 	}
 		// }
-		if (room[id].pal != null) {
+		if (room[id].pal != null && room[id].pal != "default") {
 			/* PALETTE */
 			worldStr += "PAL " + room[id].pal + "\n";
 		}
