@@ -1177,6 +1177,9 @@ function newRoom() {
 	roomIndex = Object.keys( room ).length;
 	var roomId = nextRoomId();
 
+	var palIdList = sortedPaletteIdList();
+	var palId = palIdList.length > 0 ? palIdList[0] : "default";
+
 	console.log(roomId);
 	room[roomId] = {
 		id : roomId,
@@ -1202,7 +1205,7 @@ function newRoom() {
 		exits : [],
 		endings : [],
 		effects : [],
-		pal : "0",
+		pal : palId,
 		items : []
 	};
 	refreshGameData();

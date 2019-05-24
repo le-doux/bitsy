@@ -156,7 +156,15 @@ function PaletteTool(colorPicker,labelIds,nameFieldId) {
 		else {
 			delete palette[curPaletteId];
 
-			// TODO -- replace palettes for impacted rooms
+			// replace palettes for rooms using the current palette
+			var replacementPalId = sortedPaletteIdList()[0];
+			var roomIdList = sortedRoomIdList();
+			for (var i = 0; i < roomIdList.length; i++) {
+				var roomId = roomIdList[i];
+				if (room[roomId].pal === curPaletteId) {
+					room[roomId].pal = replacementPalId;
+				}
+			}
 
 			SelectPrev();
 
