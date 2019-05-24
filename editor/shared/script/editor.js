@@ -1,18 +1,4 @@
 /*
-v6.2
-- duplicate palettes
-- delete palettes
-- bugfix: animations stay in sync when you add them
-- bugfix: >= and <= not detected in scripts
-- bugfix: drawings update when you use the color picker
-- bugfix: rooms without a defined palette break
-- bugfix: it's possible to remove all palettes without breaking the game
-TODO
-- fix deleting palettes
-	- make it possible to delete palette 0 (need the default palette to only come into play if there are no palettes??)
-		- also, find a replacement palette for rooms whose palette has been removed
-		- bug where you can't make any new palettes past "pal d"
-
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
 - try another orientation on android fix

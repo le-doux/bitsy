@@ -1,3 +1,12 @@
+v6.2:
+- duplicate and delete palettes in the color tool!
+- bugfixes:
+-- >= and <= work correctly again
+-- drawing colors update when you use the color picker
+-- animations stay in time with each other when you change them
+-- rooms without a defined palette don't break the game
+-- deleting all palettes from game data won't break the game
+
 v6.1:
 - editor is more mobile-friendly:
 -- new portrait mode layout
