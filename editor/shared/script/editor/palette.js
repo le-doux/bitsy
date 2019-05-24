@@ -75,6 +75,7 @@ function PaletteTool(colorPicker,labelIds,nameFieldId) {
 		getPal(GetSelectedId())[ colorPickerIndex ][ 0 ] = event.rgbColor.r;
 		getPal(GetSelectedId())[ colorPickerIndex ][ 1 ] = event.rgbColor.g;
 		getPal(GetSelectedId())[ colorPickerIndex ][ 2 ] = event.rgbColor.b;
+		renderer.SetPalettes(palette); // TODO: having to directly interface w/ the renderer is probably bad
 
 		updateColorPickerLabel(colorPickerIndex, event.rgbColor.r, event.rgbColor.g, event.rgbColor.b );
 

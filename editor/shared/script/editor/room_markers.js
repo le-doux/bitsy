@@ -706,7 +706,12 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	// 		refreshGameData();
 	// 	}
 	// }
-}
+
+	events.Listen("palette_change", function(event) {
+		RenderMarkerSelection();
+	});
+
+} // RoomMarkerTool()
 
 var MarkerType = { // TODO : I should probably find a way to get rid of this
 	Exit : 0,
@@ -778,7 +783,7 @@ function RoomMarkerBase(parentRoom) {
 	}
 
 	// this.OnSelect = function() {} // TODO
-}
+} // RoomMarkerBase()
 
 // NOTE: the "link state" is a UI time concept -- it is not stored in the game data
 var LinkState = {
@@ -1119,7 +1124,7 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 	}
 
 	// this.OnSelect = function() {} // TODO
-}
+} // ExitMarker()
 
 function EndingMarker(parentRoom, ending) {
 	InitMarkerObj( this, new RoomMarkerBase(parentRoom) );
@@ -1203,7 +1208,7 @@ function EndingMarker(parentRoom, ending) {
 	}
 
 	// this.OnSelect = function() {} // TODO
-}
+} // EndingMarker()
 
 
 // TODO : vNext

@@ -441,5 +441,14 @@ function PaintTool(canvas, roomTool) {
 			self.explorer.ChangeSelection( self.drawing.id );
 		}
 	}
+
+	events.Listen("palette_change", function(event) {
+		self.updateCanvas();
+
+		if( self.isCurDrawingAnimated ) {
+			// TODO -- this animation stuff needs to be moved in here I think?
+			renderAnimationPreview( drawing.id );
+		}
+	});
 }
 

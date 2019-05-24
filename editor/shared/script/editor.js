@@ -804,7 +804,9 @@ function start() {
 	colorPicker = new ColorPicker('colorPickerWheel', 'colorPickerSelect', 'colorPickerSliderThumb', 'colorPickerSliderBg', 'colorPickerHexText');
 	document.getElementById("colorPaletteOptionBackground").checked = true;
 	paletteTool = new PaletteTool(colorPicker,["colorPaletteLabelBackground", "colorPaletteLabelTile", "colorPaletteLabelSprite"],"paletteName");
-	events.Listen("palette_change", onPaletteChange);
+	events.Listen("palette_change", function(event) {
+		refreshGameData();
+	});
 	events.Listen("palette_list_change", function(event) {
 		refreshGameData();
 		updatePaletteOptionsFromGameData();
@@ -1753,20 +1755,6 @@ function updateRoomPaletteSelect() {
 
 function changeColorPickerIndex(index) {
 	paletteTool.changeColorPickerIndex(index);
-}
-
-function onPaletteChange() {
-	refreshGameData();
-
-	renderer.SetPalettes(palette);
-
-	paintTool.updateCanvas();
-	markerTool.SetRoom(curRoom);
-	roomTool.drawEditMap();
-	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
-	if( paintTool.isCurDrawingAnimated ) {
-		renderAnimationPreview( drawing.id );
-	}
 }
 
 function updatePaletteOptionsFromGameData() {

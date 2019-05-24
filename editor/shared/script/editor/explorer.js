@@ -330,7 +330,11 @@ function PaintExplorer(idPrefix,selectCallback) {
 	this.ChangeThumbnailCaption = function(id,captionText) {
 		changeThumbnailCaption(id,captionText);
 	}
-}
+
+	events.Listen("palette_change", function(event) {
+		refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
+	});
+} // PaintExplorer()
 
 // TODO : should this really live in this file?
 function ThumbnailRenderer() {
@@ -418,4 +422,4 @@ function ThumbnailRenderer() {
 		}
 		return cache[imgId];
 	}
-}
+} // ThumbnailRenderer()

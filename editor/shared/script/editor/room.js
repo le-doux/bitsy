@@ -278,7 +278,11 @@ function RoomTool(canvas) {
 			ctx.globalAlpha = 1;
 		}
 	}
-}
+
+	events.Listen("palette_change", function(event) {
+		self.drawEditMap();
+	});
+} // RoomTool()
 
 /* METHODS */
 function togglePlayMode(e) {
