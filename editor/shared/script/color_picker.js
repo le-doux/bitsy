@@ -37,6 +37,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 	}
 
 	function drawColorPickerWheel() {
+		// console.log("DRAW COLOR PICKER");
 
 		wheelCanvas.width = width;
 		wheelCanvas.height = height;
@@ -214,7 +215,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 		if (isMouseDown) {
 			e.preventDefault();
-			pickColor(e.touches[0], true);
+			pickColor(e.touches[0], false);
 		}
 	}
 
