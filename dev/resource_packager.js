@@ -1,6 +1,8 @@
 var fs = require("fs");
 
 var resourceFiles = [
+	/* localization */
+	"resources/localization.tsv",
 	/* bitsy game data */
 	"resources/defaultGameData.bitsy",
 	/* bitsy fonts */
@@ -14,8 +16,13 @@ var resourceFiles = [
 	"resources/export/exportStyleFixed.css",
 	"resources/export/exportStyleFull.css",
 	/* engine scripts */
-	/* localization */
-	"resources/localization.tsv",
+	"../editor/script/engine/bitsy.js",
+	"../editor/script/engine/font.js",
+	"../editor/script/engine/dialog.js",
+	"../editor/script/engine/script.js",
+	"../editor/script/engine/color_util.js",
+	"../editor/script/engine/renderer.js",
+	"../editor/script/engine/transition.js",
 ];
 
 var resourcePackage = {};
