@@ -1,8 +1,10 @@
 /*
 v6.3:
-- all resources are packaged to get rid of cross-origin bugs
+- all resources are packaged locally to avoid cross-origin errors
 - bugfixes
 	- exit tool resets when you delete a room
+	- invalid exits don't break the editor
+	- downloaded games pass w3c validation test
 
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode

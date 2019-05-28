@@ -191,29 +191,35 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				var startPos = curMarker.GetMarkerPos(0);
 				var endPos = curMarker.GetMarkerPos(1);
 
-				drawRoom( room[startPos.room], markerCtx1 );
+				if (room[startPos.room] != undefined) {
+					drawRoom( room[startPos.room], markerCtx1 );
 
-				markerCtx1.globalAlpha = 1.0;
-				markerCtx1.fillStyle = getContrastingColor(room[startPos.room].pal);
-				markerCtx1.fillRect((startPos.x * w) - (w * 0.5), (startPos.y * w) - (w * 0.5), w * 2, w * 2);
+					markerCtx1.globalAlpha = 1.0;
+					markerCtx1.fillStyle = getContrastingColor(room[startPos.room].pal);
+					markerCtx1.fillRect((startPos.x * w) - (w * 0.5), (startPos.y * w) - (w * 0.5), w * 2, w * 2);
+				}
 
-				drawRoom( room[endPos.room], markerCtx2 );
+				if (room[endPos.room] != undefined) {
+					drawRoom( room[endPos.room], markerCtx2 );
 
-				markerCtx2.globalAlpha = 1.0;
-				markerCtx2.fillStyle = getContrastingColor(room[endPos.room].pal);
-				markerCtx2.fillRect(endPos.x * w, endPos.y * w, w, w);
-				markerCtx2.fillRect((endPos.x * w) - (w * 0.5), (endPos.y * w) - (w * 0.5), w * 2, w * 2);
+					markerCtx2.globalAlpha = 1.0;
+					markerCtx2.fillStyle = getContrastingColor(room[endPos.room].pal);
+					markerCtx2.fillRect(endPos.x * w, endPos.y * w, w, w);
+					markerCtx2.fillRect((endPos.x * w) - (w * 0.5), (endPos.y * w) - (w * 0.5), w * 2, w * 2);
+				}
 			}
 			else if (curMarker.MarkerCount() == 1) {
 				markerControl1.style.visibility = "visible";
 
 				var markerPos = curMarker.GetMarkerPos(0);
 
-				drawRoom( room[markerPos.room], markerCtx1 );
+				if (room[markerPos.room] != undefined) {
+					drawRoom( room[markerPos.room], markerCtx1 );
 
-				markerCtx1.globalAlpha = 1.0;
-				markerCtx1.fillStyle = getContrastingColor(room[markerPos.room].pal);
-				markerCtx1.fillRect((markerPos.x * w) - (w * 0.5), (markerPos.y * w) - (w * 0.5), w * 2, w * 2);
+					markerCtx1.globalAlpha = 1.0;
+					markerCtx1.fillStyle = getContrastingColor(room[markerPos.room].pal);
+					markerCtx1.fillRect((markerPos.x * w) - (w * 0.5), (markerPos.y * w) - (w * 0.5), w * 2, w * 2);
+				}
 			}
 
 			UpdateMarkerNames();
@@ -429,7 +435,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	function GetPosString(markerPos) {
-		var roomName = room[markerPos.room].name;
+		var roomName = room[markerPos.room] != undefined ? room[markerPos.room].name : undefined;
 		if (roomName == undefined || roomName == null) {
 			roomName = localization.GetStringOrFallback("room_tool_name", "room") + " " + markerPos.room;
 		}
@@ -558,11 +564,13 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		if (selectedRoom != null) {
 			var findReturnExit = function(parentRoom, startExit) {
 				var returnExit = null;
-				for (var j in room[startExit.dest.room].exits) {
-					var otherExit = room[startExit.dest.room].exits[j];
-					if (otherExit.dest.room === parentRoom &&
-						otherExit.dest.x == startExit.x && otherExit.dest.y == startExit.y) {
-							returnExit = otherExit;
+				if (room[startExit.dest.room] != undefined) {
+					for (var j in room[startExit.dest.room].exits) {
+						var otherExit = room[startExit.dest.room].exits[j];
+						if (otherExit.dest.room === parentRoom &&
+							otherExit.dest.x == startExit.x && otherExit.dest.y == startExit.y) {
+								returnExit = otherExit;
+						}
 					}
 				}
 				return returnExit;
