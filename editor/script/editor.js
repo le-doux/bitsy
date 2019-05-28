@@ -722,7 +722,7 @@ function start() {
 	if (urlFlags["lang"] != null) {
 		localStorage.editor_language = urlFlags["lang"]; // need to verify this is real language?
 	}
-	localization = new Localization( initLanguageOptions );
+	localization = new Localization();
 
 	//game canvas & context (also the map editor)
 	attachCanvas( document.getElementById("game") );
@@ -907,6 +907,8 @@ function start() {
 	// 		}
 	// 	}
 	// }
+
+	initLanguageOptions();
 }
 
 function newDrawing() {

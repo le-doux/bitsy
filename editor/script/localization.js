@@ -15,24 +15,22 @@ X find instances of dynamic text
 - dynamic text like "I'm a cat" "tea" and "Write your game's title here"
 */
 
-function Localization(initCallback) {
+function Localization() {
 
 var self = this;
 
-var resources = new ResourceLoader();
-
 var localizationStrings = null;
 
-resources.load("other", "localization.tsv", function() { // why does this happen multiple times?
-	var csv = resources.get("localization.tsv");
-	if(csv.length <= 0) // hack to avoid weird double loading (there's got to be a *real* way)
-		return;
+var initialize = function() { // why does this happen multiple times?
+	var csv = Resources["localization.tsv"];
+	// console.log(csv);
 
 	localizationStrings = {};
 
 	csv = csv.replace(/\r/g,""); // weird sanitization bug required
 	// console.log(csv);
 	var lines = csv.split("\n");
+	// console.log(lines);
 
 	var columnHeaders = lines[0].split("\t");
 	// console.log(columnHeaders);
@@ -54,10 +52,7 @@ resources.load("other", "localization.tsv", function() { // why does this happen
 
 	// console.log(localizationStrings);
 	// localize( getEditorLanguage() );
-
-	if(initCallback != undefined && initCallback != null)
-		initCallback();
-});
+};
 
 var localizationClass = "localize";
 
@@ -217,5 +212,7 @@ this.ExportDynamicEnglishStrings = function() {
 this.GetStringCount = function(langId) {
 	return Object.keys(localizationStrings[langId]).length;
 }
+
+initialize();
 
 } // Localization()
