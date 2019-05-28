@@ -1126,7 +1126,7 @@
 							<i class="material-icons">file_upload</i>
 							<span class="localize upload_game">upload game</span>
 						</label>
-						<input type="file" id="importGamePicker" style="visibility:hidden;width:0px;" onchange="importGameFromFile(event);"/>
+						<input type="file" id="importGamePicker" style="display:none;" onchange="importGameFromFile(event);"/>
 					</div>
 
 					<!-- TODO LOCALIZE - word wrap -->
@@ -1305,7 +1305,7 @@
 									<i class="material-icons">file_upload</i>
 									<span class="localize upload_font">upload font</span>
 								</label>
-								<input title="import font from bitsyfont file on your computer" type="file" id="importFontPicker" style="visibility:hidden;width:0px;" onchange="importFontFromFile(event);"/>
+								<input title="import font from bitsyfont file on your computer" type="file" id="importFontPicker" style="display:none;" onchange="importFontFromFile(event);"/>
 							</div>
 							<div style="margin-top:3px;">
 								<button title="download font file" class="color0" onclick="exportFont();">
