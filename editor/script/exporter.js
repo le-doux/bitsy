@@ -1,19 +1,5 @@
 function Exporter() {
 
-var resources = new ResourceLoader();
-
-resources.load("other", "exportTemplate.html");
-resources.load("style", "exportStyleFixed.css");
-resources.load("style", "exportStyleFull.css");
-resources.load("script", "bitsy.js");
-resources.load("script", "font.js");
-resources.load("script", "dialog.js");
-resources.load("script", "script.js");
-resources.load("script", "color_util.js");
-resources.load("script", "renderer.js");
-resources.load("script", "transition.js");
-
-
 /* exporting */
 function escapeSpecialCharacters(str) {
 	str = str.replace(/\\/g, '\\\\');
@@ -27,28 +13,28 @@ function replaceTemplateMarker(template, marker, text) {
 }
 
 this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, size) {
-	var html = resources.get("exportTemplate.html").substr(); //copy template
+	var html = Resources["exportTemplate.html"].substr(); //copy template
 	// console.log(html);
 
 	html = replaceTemplateMarker( html, "@@T", title );
 
 	if( isFixedSize ) {
-		html = replaceTemplateMarker( html, "@@C", resources.get("exportStyleFixed.css") );
+		html = replaceTemplateMarker( html, "@@C", Resources["exportStyleFixed.css"] );
 		html = replaceTemplateMarker( html, "@@Z", size + "px" );
 	}
 	else {
-		html = replaceTemplateMarker( html, "@@C", resources.get("exportStyleFull.css") );
+		html = replaceTemplateMarker( html, "@@C", Resources["exportStyleFull.css"] );
 	}
 
 	html = replaceTemplateMarker( html, "@@B", pageColor );
 
-	html = replaceTemplateMarker( html, "@@U", resources.get("color_util.js") );
-	html = replaceTemplateMarker( html, "@@X", resources.get("transition.js") );
-	html = replaceTemplateMarker( html, "@@F", resources.get("font.js") );
-	html = replaceTemplateMarker( html, "@@S", resources.get("script.js") );
-	html = replaceTemplateMarker( html, "@@L", resources.get("dialog.js") );
-	html = replaceTemplateMarker( html, "@@R", resources.get("renderer.js") );
-	html = replaceTemplateMarker( html, "@@E", resources.get("bitsy.js") );
+	html = replaceTemplateMarker( html, "@@U", Resources["color_util.js"] );
+	html = replaceTemplateMarker( html, "@@X", Resources["transition.js"] );
+	html = replaceTemplateMarker( html, "@@F", Resources["font.js"] );
+	html = replaceTemplateMarker( html, "@@S", Resources["script.js"] );
+	html = replaceTemplateMarker( html, "@@L", Resources["dialog.js"] );
+	html = replaceTemplateMarker( html, "@@R", Resources["renderer.js"] );
+	html = replaceTemplateMarker( html, "@@E", Resources["bitsy.js"] );
 
 	// export the default font in its own script tag (TODO : remove if unused)
 	html = replaceTemplateMarker( html, "@@N", "ascii_small" );
