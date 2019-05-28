@@ -1,13 +1,9 @@
 /*
 TODO:
-- untangle local & external resource use in font manager (still more to do here)
+- can I simplify this more now that I've removed the external resources stuff?
 */
 
-function FontManager(useExternalResources) {
-
-if (useExternalResources === undefined || useExternalResources === null) {
-	useExternalResources = false;
-}
+function FontManager(packagedFontNames) {
 
 var self = this;
 
@@ -16,59 +12,30 @@ this.GetExtension = function() {
 	return fontExtension;
 }
 
-// place to store font data that is part of the local game data
-var localResources = {};
+// place to store font data
+var fontResources = {};
 
-// place to store font data fetched from a server (only used in editor)
-var externalResources = null;
-if (useExternalResources) {
-	externalResources = new ResourceLoader();// NOTE : this class doesn't exist in exported game
-}
+// load fonts from the editor
+if (packagedFontNames != undefined && packagedFontNames != null && packagedFontNames.length > 0
+		&& Resources != undefined && Resources != null) {
 
-this.LoadResources = function(filenames, onLoadAll) {
-	if (!useExternalResources)
-		return;
-
-	// TODO : is this being called too many times?
-	var onLoad = function() {
-		var count = externalResources.getResourceLoadedCount();
-
-		if (count >= filenames.length && onLoadAll != null) {
-			onLoadAll();
-		}
-	}
-
-	for (var i = 0; i < filenames.length; i++) {
-		externalResources.load("bitsyfont", filenames[i], onLoad);
+	for (var i = 0; i < packagedFontNames.length; i++) {
+		var filename = packagedFontNames[i];
+		fontResources[filename] = Resources[filename];
 	}
 }
 
 // manually add resource
 this.AddResource = function(filename, fontdata) {
-	if (useExternalResources) {
-		externalResources.set(filename, fontdata);
-	}
-	else {
-		localResources[filename] = fontdata;
-	}
+	fontResources[filename] = fontdata;
 }
 
 this.ContainsResource = function(filename) {
-	if (useExternalResources) {
-		return externalResources.contains(filename);
-	}
-	else {
-		return localResources[filename] != null;
-	}
+	return fontResources[filename] != null;
 }
 
 function GetData(fontName) {
-	if (useExternalResources) {
-		return externalResources.get(fontName + fontExtension);
-	}
-	else {
-		return localResources[fontName + fontExtension];
-	}
+	return fontResources[fontName + fontExtension];
 }
 this.GetData = GetData;
 

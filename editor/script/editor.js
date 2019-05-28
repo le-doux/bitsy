@@ -524,8 +524,14 @@ var makeURL = null;
 var exporter = new Exporter();
 
 /* FONT MANAGER */
-var editorFontManager = new FontManager( true /*useExternalResources*/ );
-var areAllFontsLoaded = false;
+var defaultFonts = [
+		"ascii_small.bitsyfont",
+		"unicode_european_small.bitsyfont",
+		"unicode_european_large.bitsyfont",
+		"unicode_asian.bitsyfont",
+		"arabic.bitsyfont",
+	];
+fontManager = new FontManager(defaultFonts); // replaces font manager in the engine with one containing all fonts loaded in the editor
 
 function detectBrowserFeatures() {
 	console.log("BROWSER FEATURES");
@@ -711,6 +717,13 @@ function start() {
 	drawingThumbnailCanvas.height = 8 * scale;
 	drawingThumbnailCtx = drawingThumbnailCanvas.getContext("2d");
 
+	// load custom font
+	if (localStorage.custom_font != null) {
+		var fontStorage = JSON.parse(localStorage.custom_font);
+		fontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
+	}
+	resetMissingCharacterWarning();
+
 	//load last auto-save
 	if (localStorage.game_data) {
 		//console.log("~~~ found old save data! ~~~");
@@ -821,26 +834,6 @@ function start() {
 			400
 		);
 	};
-
-	// load custom font first, since it is synchronous
-	if (localStorage.custom_font != null) {
-		var fontStorage = JSON.parse(localStorage.custom_font);
-		editorFontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
-	}
-
-	// load built-in bitmap fonts from servery (async)
-	editorFontManager.LoadResources([
-		"ascii_small.bitsyfont",
-		"unicode_european_small.bitsyfont",
-		"unicode_european_large.bitsyfont",
-		"unicode_asian.bitsyfont",
-		"arabic.bitsyfont",
-	], function() {
-		console.log("ALL FONTS LOADED"); // TODO : happens multiple times because of hacky implementation :(
-		switchFont(fontName); // hack - make sure the engine font manager is setup too
-		resetMissingCharacterWarning();
-		areAllFontsLoaded = true; // hack
-	});
 
 	//color testing
 	// on_change_color_bg();
@@ -2067,6 +2060,8 @@ function convertGameDataToCurVersion(importVersion) {
 }
 
 function on_game_data_change_core() {
+	console.log(document.getElementById("game_data").value);
+
 	clearGameData();
 	var version = parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
 
@@ -2140,13 +2135,12 @@ function on_game_data_change_core() {
 	}
 
 	// if user pasted in a custom font into game data - update the stored custom font
-	if (areAllFontsLoaded && !editorFontManager.ContainsResource(fontName + editorFontManager.GetExtension())) {
+	if (defaultFonts.indexOf(fontName + fontManager.GetExtension()) == -1) {
 		var fontStorage = {
 			name : fontName,
 			fontdata : fontManager.GetData(fontName)
 		};
 		localStorage.custom_font = JSON.stringify(fontStorage);
-		editorFontManager.AddResource(fontName + editorFontManager.GetExtension(), fontManager.GetData(fontName));
 	}
 
 	updateInventoryUI();
@@ -2232,7 +2226,7 @@ function exportGameData() {
 }
 
 function exportFont() {
-	var fontData = editorFontManager.GetData(fontName);
+	var fontData = fontManager.GetData(fontName);
 	ExporterUtils.DownloadFile( fontName + ".bitsyfont", fontData );
 }
 
@@ -2695,9 +2689,9 @@ function importFontFromFile(e) {
 		var fileText = reader.result;
 		console.log(fileText);
 
-		var customFontName = (editorFontManager.Create(fileText)).getName();
+		var customFontName = (fontManager.Create(fileText)).getName();
 
-		editorFontManager.AddResource(customFontName + editorFontManager.GetExtension(), fileText);
+		fontManager.AddResource(customFontName + fontManager.GetExtension(), fileText);
 		switchFont(customFontName); // bitsy engine setting
 
 		var fontStorage = {
@@ -3348,9 +3342,6 @@ function switchFont(newFontName, doPickTextDirection) {
 
 	fontName = newFontName;
 
-	// hacky - move the font data from the editor to the engine
-	fontManager.AddResource(fontName + fontManager.GetExtension(), editorFontManager.GetData(fontName));
-
 	if (doPickTextDirection) {
 		console.log("PICK TEXT DIR");
 		pickDefaultTextDirectionForFont(newFontName);
@@ -3438,7 +3429,7 @@ var missingCharacterWarningState = {
 
 function resetMissingCharacterWarning() {
 	// missingCharacterWarningState.showedWarning = false; // should I really do this every time?
-	missingCharacterWarningState.curFont = editorFontManager.Get( fontName );
+	missingCharacterWarningState.curFont = fontManager.Get( fontName );
 }
 
 function tryWarnAboutMissingCharacters(text) {

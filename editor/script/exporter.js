@@ -38,7 +38,7 @@ this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, si
 
 	// export the default font in its own script tag (TODO : remove if unused)
 	html = replaceTemplateMarker( html, "@@N", "ascii_small" );
-	html = replaceTemplateMarker( html, "@@M", editorFontManager.GetData("ascii_small") );
+	html = replaceTemplateMarker( html, "@@M", fontManager.GetData("ascii_small") );
 
 	html = replaceTemplateMarker( html, "@@D", gameData );
 
