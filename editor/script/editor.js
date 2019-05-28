@@ -1,6 +1,7 @@
 /*
 v6.3:
 - all resources are packaged locally to avoid cross-origin errors
+	- you can download bitsy games from local copies of bitsy
 - bugfixes
 	- exit tool resets when you delete a room
 	- invalid exits don't break the editor
