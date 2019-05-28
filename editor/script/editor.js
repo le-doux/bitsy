@@ -400,45 +400,6 @@ function on_change_dialog() {
 	refreshGameData();
 }
 
-/* RESOURCE LOADER */
-function ResourceLoader() {
-	var resources = {};
-
-	var pathRoot = "shared";
-
-	this.load = function(folder, filename, onready) {
-		var client = new XMLHttpRequest();
-		client.open('GET', pathRoot + '/' + folder + '/' + filename);
-		client.onreadystatechange = function() {
-			resources[filename] = client.responseText;
-			if(onready) onready();
-		}
-		client.send();
-	}
-
-	this.get = function(filename) {
-		return resources[filename];
-	}
-
-	// for manually adding stuff to the resources that doesn't ACTUALLY have to be loaded from an external file
-	this.set = function(filename,data) {
-		resources[filename] = data;
-	}
-
-	this.contains = function(filename) {
-		return resources[filename] != null;
-	}
-
-	this.getResourceLoadedCount = function() {
-		// feels hacky
-		var count = 0;
-		for (var r in resources) {
-			count++;
-		}
-		return count;
-	}
-}
-
 function setDefaultGameState() {
 	var defaultData = document.getElementById("defaultGameData").text;
 	// console.log("DEFAULT DATA \n" + defaultData);
