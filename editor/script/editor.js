@@ -401,7 +401,7 @@ function on_change_dialog() {
 }
 
 function setDefaultGameState() {
-	var defaultData = document.getElementById("defaultGameData").text;
+	var defaultData = Resources["defaultGameData.bitsy"];
 	// console.log("DEFAULT DATA \n" + defaultData);
 	document.getElementById("game_data").value = defaultData;
 	localStorage.game_data = document.getElementById("game_data").value; // save game
