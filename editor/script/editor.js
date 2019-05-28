@@ -1,6 +1,8 @@
 /*
 v6.3:
 - all resources are packaged to get rid of cross-origin bugs
+- bugfixes
+	- exit tool resets when you delete a room
 
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
@@ -1199,10 +1201,13 @@ function deleteRoom() {
 		delete room[roomId];
 
 		refreshGameData();
+
+		markerTool.Clear();
 		nextRoom();
 		roomTool.drawEditMap();
 		paintTool.updateCanvas();
 		updateRoomPaletteSelect();
+		markerTool.Refresh();
 		// updateExitOptionsFromGameData();
 		//recreate exit options
 	}
