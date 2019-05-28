@@ -1,4 +1,7 @@
 /*
+v6.3:
+- all resources are packaged to get rid of cross-origin bugs
+
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
 - try another orientation on android fix
