@@ -1,8 +1,21 @@
 var fs = require("fs");
 
 var resourceFiles = [
-	"../editor/index.html",
-	"../editor/shared/script/font.js",
+	/* bitsy game data */
+	"resources/defaultGameData.bitsy",
+	/* bitsy fonts */
+	"resources/bitsyfont/ascii_small.bitsyfont",
+	"resources/bitsyfont/unicode_european_small.bitsyfont",
+	"resources/bitsyfont/unicode_european_large.bitsyfont",
+	"resources/bitsyfont/unicode_asian.bitsyfont",
+	"resources/bitsyfont/arabic.bitsyfont",
+	/* export */
+	"resources/export/exportTemplate.html",
+	"resources/export/exportStyleFixed.css",
+	"resources/export/exportStyleFull.css",
+	/* engine scripts */
+	/* localization */
+	"resources/localization.tsv",
 ];
 
 var resourcePackage = {};
