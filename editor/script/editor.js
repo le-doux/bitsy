@@ -2,17 +2,16 @@
 v6.3:
 - all resources are packaged locally to avoid cross-origin errors
 	- you can download bitsy games from local copies of bitsy
-- bugfixes
-	- exit tool resets when you delete a room
-	- invalid exits don't break the editor
-	- downloaded games pass w3c validation test
-	- download panel is sized correctly on chrome
+- exit tool resets when you delete a room
+- invalid exits don't break the editor
+- downloaded games pass w3c validation test
+- download panel is sized correctly on chrome
+- you can drag tool panels past the rightmost tool
 
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
 - try another orientation on android fix
 - need to update the instructions panel
-- use the new event manager?
 - tool positioning in portrait mode
 - encapsulate adv dialog logic and inventory logic
 - encapsulate editor.js and bitsy.js
@@ -3097,6 +3096,10 @@ function panel_onMouseMove(e) {
 			console.log(other);
 
 			editorContent.insertBefore( grabbedPanel.shadow, other );
+			break;
+		}
+		else if (j == otherCards.length - 1 && cardCenter.x > otherCenter.x) {
+			editorContent.appendChild( grabbedPanel.shadow );
 			break;
 		}
 	}
