@@ -278,16 +278,19 @@ function PaintTool(canvas, roomTool) {
 		self.drawing.reloadImageSource();
 
 		if ( self.drawing.type === TileType.Tile) {
-			if(self.onReloadTile)
+			if(self.onReloadTile) {
 				self.onReloadTile();
+			}
 		}
 		else if( self.drawing.type === TileType.Avatar || self.drawing.type === TileType.Sprite ) {
-			if(self.onReloadSprite)
+			if(self.onReloadSprite) {
 				self.onReloadSprite();
+			}
 		}
 		else if( self.drawing.type === TileType.Item ) {
-			if(self.onReloadItem)
+			if(self.onReloadItem) {
 				self.onReloadItem();
+			}
 		}
 	}
 

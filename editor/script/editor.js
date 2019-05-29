@@ -8,6 +8,7 @@ v6.3:
 - download panel is sized correctly on chrome
 - you can drag tool panels past the rightmost tool
 - paint explorer updates when you paste new game data in
+	- paint explorer selects valid sprites when you change game data
 - inventory UI resets when game restarts
 
 leftover todos:
@@ -2136,18 +2137,19 @@ function on_game_data_change_core() {
 	roomTool.drawEditMap();
 
 	drawing.type = curPaintMode;
-	if ( drawing.type == TileType.Tile ) {
+	if (drawing.type == TileType.Tile) {
 		drawing.id = sortedTileIdList()[0];
-		paintTool.reloadDrawing();
 	}
-	else if( drawing.type === TileType.Item ) {
+	else if (drawing.type === TileType.Item) {
 		drawing.id = sortedItemIdList()[0];
-		paintTool.reloadDrawing();
 	}
-	else {
-		drawing.id = sortedSpriteIdList()[0];
-		paintTool.reloadDrawing();
+	else if (drawing.type === TileType.Avatar) {
+		drawing.id = "A";
 	}
+	else if (drawing.type === TileType.Sprite) {
+		drawing.id = sortedSpriteIdList().filter(function (id) { return id != "A"; })[0];
+	}
+	paintTool.reloadDrawing();
 
 	// if user pasted in a custom font into game data - update the stored custom font
 	if (defaultFonts.indexOf(fontName + fontManager.GetExtension()) == -1) {

@@ -295,10 +295,12 @@ function PaintExplorer(idPrefix,selectCallback) {
 		for( var i = 0; i < paintExplorerForm.childNodes.length; i++ ) {
 			var child = paintExplorerForm.childNodes[i];
 			if( child.type && child.type === "radio" ) {
-				if( child.id === idPrefix + "Radio_" + id )
+				if( child.id === idPrefix + "Radio_" + id ) {
 					child.checked = true;
-				else
+				}
+				else {
 					child.checked = false;
+				}
 			}
 		}
 	}
@@ -333,13 +335,15 @@ function PaintExplorer(idPrefix,selectCallback) {
 		var caption = document.getElementById(idPrefix + "Caption_" + id);
 		caption.innerText = captionText;
 		var obj = (new DrawingId(drawingCategory,id)).getEngineObject();
-		if( obj.name ) {
-			if( caption.classList.contains("thumbnailDefaultName") )
+		if (obj.name) {
+			if(caption.classList.contains("thumbnailDefaultName")) {
 				caption.classList.remove("thumbnailDefaultName");
+			}
 		}
 		else {
-			if( !caption.classList.contains("thumbnailDefaultName") )
+			if (!caption.classList.contains("thumbnailDefaultName")) {
 				caption.classList.add("thumbnailDefaultName");
+			}
 		}
 	}
 	this.ChangeThumbnailCaption = function(id,captionText) {
@@ -351,6 +355,8 @@ function PaintExplorer(idPrefix,selectCallback) {
 	});
 
 	events.Listen("game_data_change", function(event) {
+		// the code in the paint and find drawing tools is so messy it hurts :(
+		changeSelection( paintTool.drawing.id );
 		refresh( paintTool.drawing.type, false /*doKeepOldThumbnails*/ );
 	});
 } // PaintExplorer()
