@@ -7,6 +7,7 @@ v6.3:
 - downloaded games pass w3c validation test
 - download panel is sized correctly on chrome
 - you can drag tool panels past the rightmost tool
+- paint explorer updates when you paste new game data in
 
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
@@ -1022,8 +1023,9 @@ function selectRoom(roomId) {
 		updateRoomPaletteSelect();
 		paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 
-		if (drawing.type === TileType.Tile)
+		if (drawing.type === TileType.Tile) {
 			updateWallCheckboxOnCurrentTile();
+		}
 
 		updateRoomName();
 	}
@@ -1039,8 +1041,9 @@ function nextRoom() {
 	updateRoomPaletteSelect();
 	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 
-	if (drawing.type === TileType.Tile)
+	if (drawing.type === TileType.Tile) {
 		updateWallCheckboxOnCurrentTile();
+	}
 
 	updateRoomName();
 }
@@ -1056,8 +1059,9 @@ function prevRoom() {
 	updateRoomPaletteSelect();
 	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 
-	if (drawing.type === TileType.Tile)
+	if (drawing.type === TileType.Tile) {
 		updateWallCheckboxOnCurrentTile();
+	}
 
 	updateRoomName();
 }
@@ -1920,22 +1924,16 @@ function paintExplorerFilterChange( e ) {
 	paintExplorer.Refresh( paintTool.drawing.type, true, e.target.value );
 }
 
-// ok to split up per-app functionality this way?
 function editDrawingAtCoordinate(x,y) {
-	// if(self.paintTool === null || self.paintExplorer === null)
-	// 	return;
-
-	// console.log("!!!");
-
-	console.log("ALT " + x + " " + y);
-
 	var spriteId = getSpriteAt(x,y); // todo: need more consistency with these methods
-	console.log(spriteId);
+	// console.log(spriteId);
 	if(spriteId) {
-		if(spriteId === "A")
+		if(spriteId === "A") {
 			on_paint_avatar_ui_update();
-		else
+		}
+		else {
 			on_paint_sprite_ui_update();
+		}
 
 		var drawing = new DrawingId( spriteId === "A" ? TileType.Avatar : TileType.Sprite, spriteId );
 		paintTool.selectDrawing( drawing );
@@ -1944,7 +1942,7 @@ function editDrawingAtCoordinate(x,y) {
 	}
 
 	var item = getItem(curRoom,x,y);
-	console.log(item);
+	// console.log(item);
 	if(item) {
 		on_paint_item_ui_update();
 		var drawing = new DrawingId( TileType.Item, item.id );
@@ -1954,7 +1952,7 @@ function editDrawingAtCoordinate(x,y) {
 	}
 
 	var tileId = getTile(x,y);
-	console.log(tileId);
+	// console.log(tileId);
 	if(tileId != 0) {
 		on_paint_tile_ui_update(); // really wasteful probably
 		var drawing = new DrawingId( TileType.Tile, tileId );

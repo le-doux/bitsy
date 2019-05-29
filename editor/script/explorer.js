@@ -10,8 +10,6 @@ X move code out of editor.js
 - make it support multiple instances
 - how to handle selected drawing?? (type + id)
 - rename methods to be less verbose
-- test in mobile
-- use in editor
 - method to update thumbnail caption text
 */
 
@@ -75,16 +73,19 @@ function PaintExplorer(idPrefix,selectCallback) {
 	function refresh( type, doKeepOldThumbnails, filterString, skipRenderStep ) {
 		drawingCategory = type;
 
-		if( drawingCategory == null )
+		if(drawingCategory == null) {
 			return;
+		}
 
-		if( doKeepOldThumbnails == null || doKeepOldThumbnails == undefined )
+		if(doKeepOldThumbnails == null || doKeepOldThumbnails == undefined) {
 			doKeepOldThumbnails = false;
+		}
 
 		var doFilter = filterString != null && filterString != undefined && filterString.length > 0;
 
-		if( skipRenderStep == null || skipRenderStep == undefined )
+		if(skipRenderStep == null || skipRenderStep == undefined) {
 			skipRenderStep = false;
+		}
 
 		var idList = getIdList();
 
@@ -97,24 +98,31 @@ function PaintExplorer(idPrefix,selectCallback) {
 		}
 
 		var paintExplorerForm = document.getElementById(idPrefix + "FormInner");
-		if( !doKeepOldThumbnails )
+		if (!doKeepOldThumbnails) {
 			paintExplorerForm.innerHTML = "";
-		
-		for(var i = 0; i < idList.length; i++) {
+		}
+
+		for (var i = 0; i < idList.length; i++) {
 			var id = idList[i];
-			if(id != "A" || drawingCategory == TileType.Avatar)
+			// console.log("ADD?? " + id);
+			if (id != "A" || drawingCategory == TileType.Avatar)
 			{
 				if(!skipRenderStep) {
-					if( !doKeepOldThumbnails )
+					if(!doKeepOldThumbnails) {
 						addThumbnail( id ); // create thumbnail element and render thumbnail
-					else
+					}
+					else {
 						updateThumbnail( id ); // just re-render the thumbnail
+					}
 				}
 
-				if( doFilter )
+				if(doFilter) {
 					filterThumbnail( id, filterString );
-				else
+				}
+				else {
+					// console.log(idPrefix + "Label_" + id);
 					document.getElementById(idPrefix + "Label_" + id).style.display = "inline-block"; // make it visible otherwise
+				}
 			}
 		}
 
@@ -125,8 +133,11 @@ function PaintExplorer(idPrefix,selectCallback) {
 	};
 
 	function addThumbnail(id) {
-		if( drawingCategory == null ) // TODO: used combined id + type instead?
+		if( drawingCategory == null ) { // TODO: used combined id + type instead?
 			return;
+		}
+
+		// console.log("ADD THUMB " + id);
 
 		var paintExplorerForm = document.getElementById(idPrefix + "FormInner");
 
@@ -153,14 +164,18 @@ function PaintExplorer(idPrefix,selectCallback) {
 		// TODO : this localization global variable breaks mobile
 
 		// TODO : make image title not show up while loading image? or style the size?
-		if( drawingCategory === TileType.Tile )
+		if( drawingCategory === TileType.Tile ) {
 			img.title = tile[id].name ? tile[id].name : localization.GetStringOrFallback("tile_label", "tile") + " " + id;
-		else if( drawingCategory === TileType.Sprite )
+		}
+		else if( drawingCategory === TileType.Sprite ) {
 			img.title = sprite[id].name ? sprite[id].name : localization.GetStringOrFallback("sprite_label", "sprite") + " " + id;
-		else if( drawingCategory === TileType.Avatar )
+		}
+		else if( drawingCategory === TileType.Avatar ) {
 			img.title = localization.GetStringOrFallback("avatar_label", "avatar");
-		else if( drawingCategory === TileType.Item )
+		}
+		else if( drawingCategory === TileType.Item ) {
 			img.title = item[id].name ? item[id].name : localization.GetStringOrFallback("item_label", "item") + " " + id;
+		}
 
 		img.classList.add("explorerThumbnail"); // NEW
 
@@ -175,7 +190,7 @@ function PaintExplorer(idPrefix,selectCallback) {
 			var drawingId = new DrawingId( curPaintMode, id );
 			var obj = drawingId.getEngineObject();
 			if( obj.name === undefined || obj.name === null ) {
-				console.log("default name!!!!");
+				// console.log("default name!!!!");
 				nameCaption.classList.add( "thumbnailDefaultName" );
 			}
 
@@ -333,6 +348,10 @@ function PaintExplorer(idPrefix,selectCallback) {
 
 	events.Listen("palette_change", function(event) {
 		refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
+	});
+
+	events.Listen("game_data_change", function(event) {
+		refresh( paintTool.drawing.type, false /*doKeepOldThumbnails*/ );
 	});
 } // PaintExplorer()
 
