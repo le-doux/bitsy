@@ -157,6 +157,7 @@ var onDialogUpdate = null;
 //inventory update UI handles
 var onInventoryChanged = null;
 var onVariableChanged = null;
+var onGameReset = null;
 
 var isPlayerEmbeddedInEditor = false;
 
@@ -203,10 +204,17 @@ function load_game(game_data, startWithTitle) {
 }
 
 function reset_cur_game() {
-	if (curGameData == null) return; //can't reset if we don't have the game data
+	if (curGameData == null) {
+		return; //can't reset if we don't have the game data
+	}
+
 	stopGame();
 	clearGameData();
 	load_game(curGameData);
+
+	if (isPlayerEmbeddedInEditor && onGameReset != null) {
+		onGameReset();
+	}
 }
 
 var update_interval = null;
@@ -709,16 +717,20 @@ function moveSprites() {
 				else if(itmIndex > -1) {
 					var itm = room[ spr.room ].items[ itmIndex ];
 					room[ spr.room ].items.splice( itmIndex, 1 );
-					if( spr.inventory[ itm.id ] )
+					if( spr.inventory[ itm.id ] ) {
 						spr.inventory[ itm.id ] += 1;
-					else
+					}
+					else {
 						spr.inventory[ itm.id ] = 1;
+					}
 
-					if(onInventoryChanged != null)
+					if (onInventoryChanged != null) {
 						onInventoryChanged( itm.id );
+					}
 
-					if(id === playerId)
+					if (id === playerId) {
 						startItemDialog( itm.id  /*itemId*/ );
+					}
 
 					// stop moving : is this a good idea?
 					spr.walkingPath = [];
@@ -987,13 +999,16 @@ function movePlayer(direction) {
 		var itm = room[ player().room ].items[ itmIndex ];
 		// console.log(itm);
 		room[ player().room ].items.splice( itmIndex, 1 );
-		if( player().inventory[ itm.id ] )
+		if( player().inventory[ itm.id ] ) {
 			player().inventory[ itm.id ] += 1;
-		else
+		}
+		else {
 			player().inventory[ itm.id ] = 1;
+		}
 
-		if(onInventoryChanged != null)
+		if(onInventoryChanged != null) {
 			onInventoryChanged( itm.id );
+		}
 
 		startItemDialog( itm.id  /*itemId*/ );
 

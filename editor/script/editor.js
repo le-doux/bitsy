@@ -8,6 +8,7 @@ v6.3:
 - download panel is sized correctly on chrome
 - you can drag tool panels past the rightmost tool
 - paint explorer updates when you paste new game data in
+- inventory UI resets when game restarts
 
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
@@ -781,6 +782,7 @@ function start() {
 	updateRoomPaletteSelect(); //dumb to have to specify this here --- wrap up room UI method?
 	updateRoomName(); // init the room UI
 
+	document.getElementById("inventoryOptionItem").checked = true; // a bit hacky
 	updateInventoryUI();
 
 	// init color picker
@@ -843,6 +845,10 @@ function start() {
 			400
 		);
 	};
+
+	onGameReset = function() {
+		updateInventoryUI();
+	}
 
 	//color testing
 	// on_change_color_bg();
