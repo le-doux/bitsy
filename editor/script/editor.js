@@ -31,7 +31,6 @@ leftover todos:
 new notes from forum
 - new game+
 - process tags in "say" function
-- go through candle's list of UI annoyances https://itch.io/t/152890/some-bugs-ux-annoyances
 */
 
 /*
