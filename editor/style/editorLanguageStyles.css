@@ -1,0 +1,80 @@
+/* language styles */
+.lang_ar {
+	direction: rtl;
+}
+
+.lang_ar input[type=radio] + label.left {
+	border-radius: 0px 2px 2px 0px;
+}
+.lang_ar input[type=radio] + label.right {
+	border-radius: 2px 0px 0px 2px;
+}
+
+.lang_ar input[type=radio] + label.left {
+	border-right: none;
+}
+.lang_ar input[type=radio] + label.right {
+	border-right: solid 1px #6767b2;
+}
+.lang_ar input[type=radio] + label.middle {
+	border-right: solid 1px #6767b2;
+}
+
+/* sort of hacky css way to reverse these arrow icons */
+.lang_ar .navigate_before span {
+	display: none;
+}
+.lang_ar .navigate_before:after {
+	content: 'navigate_next';
+}
+
+.lang_ar .navigate_next span {
+	display: none;
+}
+.lang_ar .navigate_next:after {
+	content: 'navigate_before';
+}
+
+.lang_ar .panelBarClose {
+	float: left;
+}
+
+.lang_ar .advDialogBlockName {
+	float: right;
+}
+
+.lang_ar .advDialogBlockDelete {
+	float: left;
+}
+
+.lang_ar .panel {
+	direction: ltr;
+}
+
+.lang_ar .panel {
+	direction: rtl;
+}
+
+/* text direction styles */
+.dir_ltr .gameTextDir {
+	direction: ltr;
+	unicode-bidi: bidi-override;
+}
+
+.dir_rtl .gameTextDir {
+	direction: rtl;
+	unicode-bidi: bidi-override;
+}
+
+#editorWindow {
+	direction: ltr;
+}
+
+/* LTR overrides */
+#game_data {
+	direction: ltr;
+}
+
+#dialogCodeText {
+	direction: ltr;
+}

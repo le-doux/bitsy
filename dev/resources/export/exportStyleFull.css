@@ -1,0 +1,19 @@
+html {
+	margin:0px;
+	padding:0px;
+}
+
+body {
+	margin:0px;
+	padding:0px;
+	overflow:hidden;
+	background:@@B;
+}
+
+#game {
+	background:black;
+	width:100vw;
+	max-width:100vh;
+	margin:auto;
+	display:block;
+}

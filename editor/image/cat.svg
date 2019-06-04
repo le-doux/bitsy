@@ -1,0 +1,6 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="80" height="80" xmlns="http://www.w3.org/2000/svg" xmlns:xlink= "http://www.w3.org/1999/xlink">
+	<path fill="#6767b2" d="M10,20 20,20 20,30 30,30 30,20 40,20 40,50 60,50 60,80 50,80 50,70 30,70 30,80 20,80 20,60 10,60z" />
+	<path fill="#6767b2" d="M60,40 70,40 70,50 60,50z" />
+	<path fill="#6767b2" d="M70,20 80,20 80,40 70,40z" />
+</svg>

@@ -1,0 +1,40 @@
+@keyframes flashAnim {
+	50% {
+		background: #6767b2;
+		color: white;
+	}
+}
+
+.flash {
+	animation-name: flashAnim;
+	animation-duration: 0.4s;
+}
+
+@keyframes closeAnim {
+	80% {
+		transform: translate(0px,-50px);
+		opacity: 0;
+	}
+}
+
+.close {
+	animation-name: closeAnim;
+	animation-duration: 0.5s;
+}
+
+@keyframes dropAnim {
+	0% {
+		transform: translate(0px,-30px) scale(1,1);
+	}
+	50% {
+		transform: translate(0px,0px) scale(1.03,0.97);
+	}
+	100% {
+		transform: scale(1,1);
+	}
+}
+
+.drop {
+	animation-name: dropAnim;
+	animation-duration: 0.3s;
+}
