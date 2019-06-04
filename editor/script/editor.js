@@ -1,16 +1,4 @@
 /*
-v6.3:
-- all resources are packaged locally to avoid cross-origin errors
-	- you can download bitsy games from local copies of bitsy
-- exit tool resets when you delete a room
-- invalid exits don't break the editor
-- downloaded games pass w3c validation test
-- download panel is sized correctly on chrome
-- you can drag tool panels past the rightmost tool
-- paint explorer updates when you paste new game data in
-	- paint explorer selects valid sprites when you change game data
-- inventory UI resets when game restarts
-
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
 - try another orientation on android fix
@@ -31,11 +19,6 @@ leftover todos:
 new notes from forum
 - new game+
 - process tags in "say" function
-*/
-
-/*
-NOTES
-- remember to run chrome like this to test "open /Applications/Google\ Chrome.app --args --allow-file-access-from-files"
 */
 
 /* MODES */
