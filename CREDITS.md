@@ -1,0 +1,1 @@
+Adam Le Doux - developer, bitsy engine and editor
