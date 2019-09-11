@@ -4,8 +4,8 @@
 - fix some bugs?
 - license
 - credits page
-- version notes page
-- update about
+X version notes page
+X update about panel
 
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
