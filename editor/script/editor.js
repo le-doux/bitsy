@@ -1,4 +1,12 @@
 /*
+6.4 todos
+- update version
+- fix some bugs?
+- license
+- credits page
+- version notes page
+- update about
+
 leftover todos:
 - add "direct edit" dropdowns for exits when in "move" mode
 - try another orientation on android fix
