@@ -1,40 +1,40 @@
-**Maintainers**
+**Engine and Editor Development**
 
-Adam Le Doux - Developer, Bitsy engine and editor
+Adam Le Doux - Maintainer
 
 
-**Translators**
+**Localization**
 
-Ahmed Khalifa - Arabic
+Ahmed Khalifa - Arabic translation
 
-Ariel Bonkorpa - Esperanto
+Ariel Bonkorpa - Esperanto translation
 
-Bruno Silva - Portuguese
+Bruno Silva - Portuguese translation
 
-Dorian Beaugendre - French
+Dorian Beaugendre - French translation
 
-Elkie - Russian
+Elkie - Russian translation
 
-Em - Swedish
+Em - Swedish translation
 
-Game Makers Iceland - Icelandic
+Game Makers Iceland - Icelandic translation
 
-Kai Werder - German
+Kai Werder - German translation
 
-Marina Díez - Spanish and Italian
+Marina Díez - Spanish and Italian translation
 
-Mateusz Teklak - Polish
+Mateusz Teklak - Polish translation
 
-Matthias Löwe - German
+Matthias Löwe - German translation
 
-Onion - Russian
+Onion - Russian translation
 
-Peter Februar - French
+Peter Februar - French translation
 
-Ray Song - Chinese
+Ray Song - Chinese translation
 
-@scumslug - Estonian
+@scumslug - Estonian translation
 
-Tokoro - Japanese
+Tokoro - Japanese translation
 
-Török Ádám - Hungarian
+Török Ádám - Hungarian translation
