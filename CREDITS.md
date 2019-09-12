@@ -13,7 +13,7 @@ Bruno Silva - Portuguese
 
 Dorian Beaugendre - French
 
-Elkie Nova - Russian
+Elkie - Russian
 
 Em - Swedish
 
