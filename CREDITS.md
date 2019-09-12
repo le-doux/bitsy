@@ -1,6 +1,6 @@
 **Maintainers**
 
-Adam Le Doux - developer, bitsy engine and editor
+Adam Le Doux - Developer, Bitsy engine and editor
 
 
 **Translators**
