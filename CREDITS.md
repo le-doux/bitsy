@@ -1,6 +1,6 @@
 **Engine and Editor Development**
 
-Adam Le Doux 
+Adam Le Doux
 
 
 **Localization**
