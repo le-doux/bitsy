@@ -1,3 +1,7 @@
+v6.4:
+- added open source license (MIT)!
+- importing games from HTML works again
+
 v6.3:
 - all resources are packaged locally to avoid cross-origin errors
 -- you can download bitsy games from local copies of bitsy!

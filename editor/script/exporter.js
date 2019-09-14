@@ -87,12 +87,17 @@ this.importGame = function( html ) {
 
 	// IMPORT : new style
 	var scriptStart = '<script type="bitsyGameData" id="exportedGameData">\n';
+	var scriptStartW3C = '<script type="text/bitsyGameData" id="exportedGameData">\n';
 	var scriptEnd = '</script>';
-	i = html.indexOf( scriptStart );
-	console.log(i);
-	if(i > -1) {
-		console.log("NEW STYLE");
 
+	// this is kind of embarassing, but I broke import by making the export template pass w3c validation
+	// so we have to check for two slightly different versions of the script start line :(
+	i = html.indexOf( scriptStart );
+	if (i === -1) {
+		i = html.indexOf( scriptStartW3C );
+	}
+
+	if(i > -1) {
 		i = i + scriptStart.length;
 		var gameStr = "";
 		var lineStr = "";
