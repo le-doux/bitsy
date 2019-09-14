@@ -35,6 +35,4 @@ Ray Song - Chinese translation
 
 @scumslug - Estonian translation
 
-Tokoro - Japanese translation
-
 Török Ádám - Hungarian translation
