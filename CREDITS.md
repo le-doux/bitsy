@@ -7,6 +7,8 @@ Adam Le Doux
 
 Ahmed Khalifa - Arabic translation
 
+Alexis Clay - Arabic font and Arabic translation
+
 Ariel Bonkorpa - Esperanto translation
 
 Bruno Silva - Portuguese translation
