@@ -78,14 +78,7 @@
 						</label>
 					</div>
 
-					<div id="topbarSpaceFlexItem">
-					</div>
-
-					<div id="bylineFlexItem">
-						<span class="localize author_by">by</span>
-						<a href="https://www.twitter.com/adamledoux" target="_blank">
-							<span class="localize author_twitter" style="direction:ltr; unicode-bidi:bidi-override;">@adamledoux</span>
-						</a>
+					<div id="topbarSpaceFlexItem"> <!-- TODO : do I still want this? -->
 					</div>
 
 				</div>
@@ -234,27 +227,9 @@
 						</p>
 
 						<p>
-							<span class="localize about2">not sure where to start? try this helpful </span>
-							<a target="_blank" href="https://www.shimmerwitch.space/bitsyTutorial.html">
-								<span class="localize about3_link_tutorial">bitsy tutorial!</span>
-							</a>
-						</p>
-
-						<p>
-							<span class="localize about4">if you need inspiration, you can </span>
-							<a target="_blank" href="https://itch.io/games/made-with-bitsy">
-								<span class="localize about5_link_games">play other bitsy games.</span>
-							</a>
-							<span class="localize about6">you can find many on </span>
-							<a target="_blank" href="https://itch.io">
-								<span class="localize about7_link_itchio">itch.io</span>
-							</a>
-							<span class="localize about8">, which is a great place to share games!</span>
-						</p>
-
-						<p>
 							<span class="localize about9">have fun making things with bitsy!</span>
 						</p>
+
 						<p>
 							- 
 							<a target="_blank" href="https://www.twitter.com/adamledoux">
@@ -262,143 +237,25 @@
 							</a>
 						</p>
 
-						<!-- <span class="toggleText" onclick="toggleInstructions();">instructions</span> <br> -->
+						<p>
+							getting started: <br/>
+							<a target="_blank" href="https://www.shimmerwitch.space/bitsyTutorial.html">tutorial</a>
+						</p>
 
-						<div id="instructionsOuter" class="controlBox">
-							<input type="checkbox" id="instructionsCheck" onclick="toggleInstructions(event);"/>
-							<label title="show / hide instructions" for="instructionsCheck">
-								<span class="localize instructions_title">instructions</span>
-								<i id="instructionsCheckIcon" class="material-icons">expand_less</i>
-							</label>
+						<p>
+							community: <br/>
+							<a target="_blank" href="https://itch.io/games/made-with-bitsy">made with bitsy</a> |
+							<a target="_blank" href="https://discordapp.com/invite/9rAjhtr">discord server</a> |
+							<a target="_blank" href="https://ledoux.itch.io/bitsy/community">itch.io forum</a>
+						</p>
 
-							<div id="instructions" style="display:none;">
-								<p>
-									<span class="localize instructions1">you can draw things in the paint panel, then place them in your world in the room panel. you can write dialog for your characters (aka sprites) too. you can also animate your drawings if you want to!</span>
-								</p>
-
-								<p>
-									<span class="localize instructions2">some words:</span>
-									<ul>
-										<li>
-											<span class="localize instructions3">room - a place in your game world</span>
-										</li>
-										<li>
-											<span class="localize instructions4">avatar - the player's character</span>
-										</li>
-										<li>
-											<span class="localize instructions5">tile - a piece of the scenery</span>
-										</li>
-										<li>
-											<span class="localize instructions6">sprite - interactive characters or things</span>
-										</li>
-									</ul>
-								</p>
-
-								<p>
-									<span class="localize instructions7">to try your game, switch the room to play mode:</span>
-									<ul>
-										<li>
-											<span class="localize instructions8">walk around with the arrow keys</span>
-										</li>
-										<li>
-											<span class="localize instructions9">talk to sprites by walking up to them</span>
-										</li>
-									</ul>
-								</p>
-
-								<p>
-									<span class="localize instructions10">you can make multiple rooms, but make sure you add some exits to connect them to each other!</span>
-								</p>
-
-								<p>
-									<span class="localize instructions11">use "share game" to download the game as an html file. you can email the file to a friend, or host it online!</span>
-								</p>
-
-								<p>
-									<span class="localize instructions12">if you want to talk about bitsy, report a bug, or share a game you made, i'm on twitter </span>
-									<a href="https://www.twitter.com/adamledoux" target="_blank">
-										<span class="localize instructions13_link_twitter" style="direction:ltr; unicode-bidi:bidi-override;">@adamledoux</span>
-									</a>
-									<span class="localize instructions14"> or you can post in the </span>
-									<a href="https://ledoux.itch.io/bitsy/community" target="_blank">
-										<span class="localize instructions15_link_forum">community forum</span>
-									</a>
-								</p>
-
-								<p>
-									<span class="localize instructions16">special thanks to:</span>
-									<ul>
-										<li>
-											<span class="localize instructions17">mary-margaret</span>
-										</li>
-										<li>
-											<span class="localize instructions18">seattle game meetup folks</span>
-										</li>
-										<li>
-											<span class="localize instructions19">everyone in the bitsy community!</span>
-										</li>
-									</ul>
-								</p>
-							</div>
-						</div>
-
-						<div id="versionNotesOuter" class="controlBox">
-
-							<input type="checkbox" id="versionNotesCheck" onclick="toggleVersionNotes(event);"/>
-							<label title="show / hide version notes" for="versionNotesCheck">
-								<span class="localize version_notes_title">what's new in</span>
-								 <span class="curVersionLabel"></span>
-								<i id="versionNotesCheckIcon" class="material-icons">expand_less</i>
-							</label>
-
-							<div id="versionNotes" style="display:none; direction:ltr">
-								<br>
-								v6.3:<br>
-								- all resources are packaged locally to avoid cross-origin errors<br>
-								-- you can download bitsy games from local copies of bitsy!<br>
-								- exit tool resets when you delete a room<br>
-								- invalid exits don't break the editor<br>
-								- downloaded games pass w3c validation test<br>
-								- download panel is sized correctly on chrome<br>
-								- you can drag tool panels past the rightmost tool<br>
-								- paint explorer updates when you paste new game data in<br>
-								-- also it selects valid sprites when you change game data<br>
-								- inventory UI resets when game restarts<br>
-								<br>
-								v6.2:<br>
-								- duplicate and delete palettes in the color tool!<br>
-								- bugfixes:<br>
-								-- >= and <= work correctly again<br>
-								-- drawing colors update when you use the color picker<br>
-								-- animations stay in time with each other when you change them<br>
-								-- rooms without a defined palette don't break the game<br>
-								-- deleting all palettes from game data won't break the game<br>
-								<br>
-								v6.1:<br>
-								- editor is more mobile-friendly:<br>
-								-- new portrait mode layout<br>
-								-- enabled touch controls for room and paint tools<br>
-								-- font sizes for high dpi displays<br>
-								- bugs:<br>
-								-- fixed bug where you can't remove sprites from rooms<br>
-								-- fixed crashes when there are no rooms<br>
-								-- fixed html import bug<br>
-								- improved rendering performance in chrome<br>
-								<br>
-								6.0:<br>
-								- new combined exits & endings tool!<br>
-								- exits are two-way by default<br>
-								- change exit direction with one button<br>
-								- new exit transition animations!<br>
-								- exit thumbnails are shortcut to rooms<br>
-								- toggle exits & endings visibility<br>
-								- move exits & endings in room without tool open<br>
-								- move exits & endings in two ways:<br>
-								-- click and drag in the room<br>
-								-- OR use the "move" button<br>
-								- updated translations for several languages<br>
-							</div>
-						</div>
+						<p>
+							development: <br/>
+							<a target="_blank" href="https://github.com/le-doux/bitsy/blob/master/CREDITS.md">contributors</a> |
+							<a target="_blank" href="https://github.com/le-doux/bitsy/blob/master/VERSION_NOTES.txt">version notes</a> |
+							<a target="_blank" href="https://github.com/le-doux/bitsy/issues">report a bug</a> |
+							<a target="_blank" href="https://github.com/le-doux/bitsy">source code</a>
+						</p>
 					</div>
 				</div>
 
