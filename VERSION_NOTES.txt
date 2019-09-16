@@ -1,6 +1,7 @@
 v6.4:
-- added open source license (MIT)!
 - importing games from HTML works again
+- updated about panel
+- added open source license (MIT)!
 
 v6.3:
 - all resources are packaged locally to avoid cross-origin errors
