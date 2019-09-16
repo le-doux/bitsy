@@ -164,16 +164,16 @@ upload_font	upload font	charger une police d'écriture	carregar uma fonte para u
 default_item_dlg	You found a nice warm cup of tea	Vous avez trouvé une bonne tasse de thé chaud	Encontraste um copo com chá quentinho			вы нашли чашку тёплого чая		Du hast einen schönen warmen Tee gefunden	لقد وجدت كوب دافئ من الشاي	Þú fannst heitann bolla af te	Találtál egy bögre forró teát	Vi trovis belan, varman tason da teo		你找到了一杯暖心的茶	Znajdujesz kubek ciepłej herbaty
 room_label	room	salle	sala	room	room	пространство	rum	Räume	غرفة	rými	szoba	ĉambro	tuba	房间	pomieszczenie
 palette_label	palette	palette	palete de cores			палитра		Palette	لوحة الألوان	litaval	színpaletta	paletro		调色板	paleta
-marker_tool_name	exits & endings		saídas e finais			точки выхода и концовки					kijáratok és befejezések			退出&结局	
-room_add_markers	add exits & endings		adicionar saídas e finais			добавить точки выхода и концовки					kijárat vagy befejezés hozzáadása			加入退出&结局	
-marker_tool_empty	There are no exits or endings in this room yet! You can add one with this tool. :)		Não existem saídas ou finais nesta sala! Podes adicioná-los com esta ferramenta :)			в этом пространстве ещё нет точек выхода или концовок! вы можете добавить их в этой панели :)					Még nincs kijárat vagy befejezés ebben a szobában. Ezzel az eszközzel adhatod hozzá :)			这个房间中还没有出口或者结局！你可以用这个工具添加。 :)	
-marker_move	move		mover			переместить					mozgatás			移动	
-marker_move_click	click in room		clicar numa sala			кликните в панели пространства					kattints a szobába			点击房间中的一格	
-exit_label	exit		saída			точка выхода					kijárat			退出	
-ending_dialog	ending dialog		diálogo de final			текст концовки					befejező párbeszéd			结局对话	
-exit_options	exit options		opções de saída			опции точки выхода					kijárat beállítások			对出选项	
-exit_transition_label	transition effect		efeito de transição			эффект перехода					áttűnések			转场效果	
-exit_return_label	return exit		saída de retorno			точка возвращения					visszaút			返回退出	
-marker_moving	moving		movendo			перемещаю					ezt mozgatod			移动	
-default_end_dlg	The end		Fim			конец					Itt a vége, fuss el véle!			结束	
-destination_label	destination		destino			точка прибытия					érkezés			目的地	
+marker_tool_name	exits & endings		saídas e finais			точки выхода и концовки				útgönguleiðir og endalok	kijáratok és befejezések			退出&结局	wyjścia i zakończenia
+room_add_markers	add exits & endings		adicionar saídas e finais			добавить точки выхода и концовки				bæta við útgönguleiðum og endalokum	kijárat vagy befejezés hozzáadása			加入退出&结局	dodaj wyjścia i zakończenia
+marker_tool_empty	There are no exits or endings in this room yet! You can add one with this tool. :)		Não existem saídas ou finais nesta sala! Podes adicioná-los com esta ferramenta :)			в этом пространстве ещё нет точек выхода или концовок! вы можете добавить их в этой панели :)				Það er engar útgönguleiðir né endalok	Még nincs kijárat vagy befejezés ebben a szobában. Ezzel az eszközzel adhatod hozzá :)			这个房间中还没有出口或者结局！你可以用这个工具添加。 :)	W tym pomieszczeniu nie ma jeszcze wyjść ani zakończeń! Możesz je dodać tym narzędziem. :)
+marker_move	move		mover			переместить				hreyfa	mozgatás			移动	zmień pozycję
+marker_move_click	click in room		clicar numa sala			кликните в панели пространства				smelltu innan svæðis	kattints a szobába			点击房间中的一格	kliknij wewnątrz pomieszczenia
+exit_label	exit		saída			точка выхода				útgönguleið	kijárat			退出	wyjście
+ending_dialog	ending dialog		diálogo de final			текст концовки				enda samtal	befejező párbeszéd			结局对话	dialog zakończenia
+exit_options	exit options		opções de saída			опции точки выхода				útgöngu valmöguleikar	kijárat beállítások			对出选项	opcje wyjścia
+exit_transition_label	transition effect		efeito de transição			эффект перехода				umskipti	áttűnések			转场效果	efekt przejścia
+exit_return_label	return exit		saída de retorno			точка возвращения				baka til útgangs	visszaút			返回退出	przejście powrotne
+marker_moving	moving		movendo			перемещаю				hreyfing	ezt mozgatod			移动	przesuwanie...
+default_end_dlg	The end		Fim			конец				Endir	Itt a vége, fuss el véle!			结束	Koniec
+destination_label	destination		destino			точка прибытия				ákvörðunarstaður	érkezés			目的地	cel wyjścia
