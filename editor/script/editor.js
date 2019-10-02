@@ -1450,26 +1450,43 @@ function updateWallCheckboxOnCurrentTile() {
 	}
 }
 
+// todo : hack place to create this
+var dialogTool = new DialogTool();
+
 // TODO : better name?
 function reloadAdvDialogUI() {
-	// var dialogId = getCurDialogId(); // necessary?
-	if( drawing.type === TileType.Sprite || drawing.type === TileType.Item ) {
+	// TODO : old code, remove once new dialog editor is in place
 
-		document.getElementById("dialogEditorHasContent").style.display = "block";
-		document.getElementById("dialogEditorNoContent").style.display = "none";
+	// // var dialogId = getCurDialogId(); // necessary?
+	// if( drawing.type === TileType.Sprite || drawing.type === TileType.Item ) {
 
-		var dialogStr = document.getElementById("dialogText").value;
-		document.getElementById("dialogCodeText").value = dialogStr;
-		var scriptTree = scriptInterpreter.Parse( dialogStr );
-		console.log("~~~~ RELOAD ADV DIALOG UI ~~~~~");
-		console.log(scriptTree);
-		createAdvDialogEditor(scriptTree);
-		previewDialogScriptTree = scriptTree;
-	}
-	else {
-		document.getElementById("dialogEditorHasContent").style.display = "none";
-		document.getElementById("dialogEditorNoContent").style.display = "block";
-	}
+	// 	document.getElementById("dialogEditorHasContent").style.display = "block";
+	// 	document.getElementById("dialogEditorNoContent").style.display = "none";
+
+	// 	var dialogStr = document.getElementById("dialogText").value;
+	// 	document.getElementById("dialogCodeText").value = dialogStr;
+	// 	var scriptTree = scriptInterpreter.Parse( dialogStr );
+	// 	console.log("~~~~ RELOAD ADV DIALOG UI ~~~~~");
+	// 	console.log(scriptTree);
+	// 	createAdvDialogEditor(scriptTree);
+	// 	previewDialogScriptTree = scriptTree;
+	// }
+	// else {
+	// 	document.getElementById("dialogEditorHasContent").style.display = "none";
+	// 	document.getElementById("dialogEditorNoContent").style.display = "block";
+	// }
+}
+
+function openDialogTool(dialogId) {
+	dialogTool.CreateEditor(dialogId);
+	// TODO
+
+	showPanel('dialogPanel');
+}
+
+// TODO ... this should probably be temporary
+function openCurDialogInDialogTool() {
+	openDialogTool(getCurDialogId());
 }
 
 function reloadSprite() {
