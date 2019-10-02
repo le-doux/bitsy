@@ -1478,8 +1478,11 @@ function reloadAdvDialogUI() {
 }
 
 function openDialogTool(dialogId) {
-	dialogTool.CreateEditor(dialogId);
+	var dialogEditorRoot = dialogTool.CreateEditor(dialogId);
+
 	// TODO
+	var dialogEditorViewport = document.getElementById("advDialogViewport");
+	dialogEditorViewport.appendChild(dialogEditorRoot.GetElement());
 
 	showPanel('dialogPanel');
 }

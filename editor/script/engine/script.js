@@ -85,14 +85,20 @@ var Interpreter = function() {
 		return env.GetVariable(name);
 	}
 
-	this.DebugVisualizeScriptTree = function(scriptName) {
+	function DebugVisualizeScriptTree(scriptTree) {
 		var printVisitor = {
 			Visit : function(node,depth) {
 				console.log("-".repeat(depth) + "- " + node.ToString());
 			},
 		};
 
-		env.GetScript( scriptName ).VisitAll( printVisitor );
+		scriptTree.VisitAll( printVisitor );
+	}
+
+	this.DebugVisualizeScriptTree = DebugVisualizeScriptTree;
+
+	this.DebugVisualizeScript = function(scriptName) {
+		DebugVisualizeScriptTree(env.GetScript(scriptName));
 	}
 }
 
@@ -1627,17 +1633,6 @@ var Parser = function(env) {
 		}
 		else if (IsExpression(state.Source())) {
 			state = ParseExpression(state);
-		}
-		else {
-			// multi-line code block
-			while (!state.Done()) {
-				if( state.MatchAhead(Sym.CodeOpen) ) {
-					state = ParseCodeBlock( state );
-				}
-				else {
-					state.Step();
-				}
-			}
 		}
 
 		// just go to the end now
