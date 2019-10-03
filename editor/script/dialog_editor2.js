@@ -25,12 +25,7 @@ function DialogTool() {
 
 	function BlockEditor(blockNode) {
 		var div = document.createElement("div");
-		// hack
-		div.style.padding = "5px";
-
-		var span = document.createElement("span");
-		span.innerText = "block";
-		div.appendChild(span);
+		div.classList.add("blockEditor");
 
 		this.GetElement = function() {
 			return div;
@@ -91,19 +86,31 @@ function DialogTool() {
 	}
 
 	function DialogEditor(dialogNodeList) {
+		// this hack is still annoying as heck
+		var dialogNode = scriptUtils.CreateDialogBlock(dialogNodeList);
+
 		var div = document.createElement("div");
+		div.classList.add("dialogEditor");
 
 		var span = document.createElement("span");
 		span.innerText = "dialog";
 		div.appendChild(span);
+
+		var textArea = document.createElement("textarea");
+		textArea.value = dialogNode.Serialize();
+		div.appendChild(textArea);
 
 		this.GetElement = function() {
 			return div;
 		}
 	}
 
-	function SequenceEditor(sequenceNode) {
+	function SequenceEditor(node) {
+		// this hack is terrible
+		var sequenceNode = node.children[0];
+
 		var div = document.createElement("div");
+		div.classList.add("sequenceEditor");
 
 		var span = document.createElement("span");
 		span.innerText = "sequence";
@@ -114,27 +121,32 @@ function DialogTool() {
 		}
 
 		function CreateOptionEditors() {
-			var options = sequenceNode.children[0].options;
-
 			var optionEditors = []
 
-			for (var i = 0; i < options.length; i++) {
-				var optionBlockNode = options[i];
+			for (var i = 0; i < sequenceNode.options.length; i++) {
+				var optionBlockNode = sequenceNode.options[i];
 				var editor = new BlockEditor(optionBlockNode);
 				optionEditors.push(editor);
 			}
 
 			//
 			for (var i = 0; i < optionEditors.length; i++) {
-				div.appendChild(optionEditors[i].GetElement());
+				var optionDiv = document.createElement("div");
+				optionDiv.classList.add("sequenceOption");
+				div.appendChild(optionDiv);
+
+				optionDiv.appendChild(optionEditors[i].GetElement());
 			}
 		}
 
 		CreateOptionEditors();
 	}
 
-	function ConditionalEditor(conditionalNode) {
+	function ConditionalEditor(node) {
+		var conditionalNode = node.children[0];
+
 		var div = document.createElement("div");
+		div.classList.add("conditionalEditor");
 
 		var span = document.createElement("span");
 		span.innerText = "conditional";
@@ -143,6 +155,30 @@ function DialogTool() {
 		this.GetElement = function() {
 			return div;
 		}
+
+		function CreateOptionEditors() {
+			var resultEditors = []
+
+			for (var i = 0; i < conditionalNode.conditions.length; i++) {
+				// option
+				var optionDiv = document.createElement("div");
+				optionDiv.classList.add("conditionOption");
+				div.appendChild(optionDiv);
+
+				// condition
+				var textArea = document.createElement("textarea");
+				textArea.value = conditionalNode.conditions[i].Serialize();
+				optionDiv.appendChild(textArea);
+
+				// result
+				var resultBlockNode = conditionalNode.results[i];
+				var editor = new BlockEditor(resultBlockNode);
+				resultEditors.push(editor);
+				optionDiv.appendChild(resultEditors[i].GetElement());
+			}
+		}
+
+		CreateOptionEditors();
 	}
 
 	function FunctionEditor(functionNode) {
