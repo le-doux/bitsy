@@ -60,6 +60,10 @@ function DialogTool() {
 			return div;
 		}
 
+		this.NotifyUpdate = function() {
+			parentEditor.NotifyUpdate();
+		}
+
 		var childEditors = [];
 		function CreateChildEditors() {
 			// build the editors
@@ -171,6 +175,8 @@ function DialogTool() {
 	}
 
 	function SequenceEditor(node, parentEditor) {
+		var self = this;
+
 		// this hack is terrible
 		var sequenceNode = node.children[0];
 
@@ -192,12 +198,16 @@ function DialogTool() {
 			return [node];
 		}
 
+		this.NotifyUpdate = function() {
+			parentEditor.NotifyUpdate();
+		}
+
 		function CreateOptionEditors() {
 			var optionEditors = []
 
 			for (var i = 0; i < sequenceNode.options.length; i++) {
 				var optionBlockNode = sequenceNode.options[i];
-				var editor = new BlockEditor(optionBlockNode, null /*TODO*/);
+				var editor = new BlockEditor(optionBlockNode, self);
 				optionEditors.push(editor);
 			}
 
@@ -215,6 +225,8 @@ function DialogTool() {
 	}
 
 	function ConditionalEditor(node, parentEditor) {
+		var self = this;
+
 		var conditionalNode = node.children[0];
 
 		var div = document.createElement("div");
@@ -235,6 +247,10 @@ function DialogTool() {
 			return [node];
 		}
 
+		this.NotifyUpdate = function() {
+			parentEditor.NotifyUpdate();
+		}
+
 		function CreateOptionEditors() {
 			var resultEditors = []
 
@@ -251,7 +267,7 @@ function DialogTool() {
 
 				// result
 				var resultBlockNode = conditionalNode.results[i];
-				var editor = new BlockEditor(resultBlockNode, null /*TODO*/);
+				var editor = new BlockEditor(resultBlockNode, self);
 				resultEditors.push(editor);
 				optionDiv.appendChild(resultEditors[i].GetElement());
 			}
