@@ -329,6 +329,19 @@ function DialogTool() {
 		var optionRootDiv = document.createElement("div");
 		div.appendChild(optionRootDiv);
 
+		var addOptionButton = document.createElement("button");
+		addOptionButton.innerText = "add option";
+		addOptionButton.onclick = function() {
+			var conditionNode = scriptUtils.CreateCodeBlock();
+			var resultNode = scriptUtils.CreateOptionBlock();
+			var optionEditor = new ConditionalOptionEditor(conditionNode, resultNode, self);
+			optionRootDiv.appendChild(optionEditor.GetElement());
+			optionEditors.push(optionEditor);
+
+			parentEditor.NotifyUpdate();
+		}
+		div.appendChild(addOptionButton);
+
 		this.GetElement = function() {
 			return div;
 		}
