@@ -1482,6 +1482,7 @@ function openDialogTool(dialogId) {
 
 	// TODO
 	var dialogEditorViewport = document.getElementById("advDialogViewport");
+	dialogEditorViewport.innerHTML = "";
 	dialogEditorViewport.appendChild(dialogEditorRoot.GetElement());
 
 	showPanel('dialogPanel');

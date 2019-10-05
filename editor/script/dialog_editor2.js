@@ -143,6 +143,21 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
+		this.IndexOfChild = function(childEditor) {
+			return childEditors.indexOf(childEditor);
+		}
+
+		this.InsertChild = function(childEditor, index) {
+			// index = Math.max(index, 0);
+
+			childEditors.splice(index, 0, childEditor);
+			RefreshChildUI();
+
+			UpdateNodeChildren();
+
+			parentEditor.NotifyUpdate();
+		}
+
 		CreateChildEditors();
 		RefreshChildUI();
 	}
@@ -298,10 +313,22 @@ function DialogTool() {
 
 		var moveUpButton = document.createElement("button");
 		moveUpButton.innerText = "up";
+		moveUpButton.onclick = function() {
+			var insertIndex = parentEditor.IndexOfChild(editor);
+			parentEditor.RemoveChild(editor);
+			insertIndex -= 1;
+			parentEditor.InsertChild(editor,insertIndex);
+		}
 		div.appendChild(moveUpButton);
 
 		var moveDownButton = document.createElement("button");
 		moveDownButton.innerText = "down";
+		moveDownButton.onclick = function() {
+			var insertIndex = parentEditor.IndexOfChild(editor);
+			parentEditor.RemoveChild(editor);
+			insertIndex += 1;
+			parentEditor.InsertChild(editor,insertIndex);
+		}
 		div.appendChild(moveDownButton);
 
 		var deleteButton = document.createElement("button");
