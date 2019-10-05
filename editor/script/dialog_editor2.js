@@ -13,10 +13,13 @@
 	todo
 	- use new editor in multiple places!
 	- better formatting
+		- button clutter
+		- nesting (colors?)
 	X add actions
 	X delete blocks
 	X move blocks
 	X save changes
+	- see where I can re-use more code
 */
 
 function DialogTool() {
@@ -558,7 +561,8 @@ function DialogTool() {
 		var div = document.createElement("div");
 
 		var moveUpButton = document.createElement("button");
-		moveUpButton.innerText = "up";
+		// moveUpButton.innerText = "up";
+		moveUpButton.innerHTML = '<i class="material-icons">expand_less</i>';
 		moveUpButton.onclick = function() {
 			var insertIndex = parentEditor.IndexOfChild(editor);
 			parentEditor.RemoveChild(editor);
@@ -568,7 +572,8 @@ function DialogTool() {
 		div.appendChild(moveUpButton);
 
 		var moveDownButton = document.createElement("button");
-		moveDownButton.innerText = "down";
+		// moveDownButton.innerText = "down";
+		moveDownButton.innerHTML = '<i class="material-icons">expand_more</i>';
 		moveDownButton.onclick = function() {
 			var insertIndex = parentEditor.IndexOfChild(editor);
 			parentEditor.RemoveChild(editor);
@@ -578,7 +583,9 @@ function DialogTool() {
 		div.appendChild(moveDownButton);
 
 		var deleteButton = document.createElement("button");
-		deleteButton.innerText = "delete";
+		// deleteButton.innerText = "delete";
+		deleteButton.innerHTML = '<i class="material-icons">clear</i>';
+		deleteButton.style.float = "right";
 		deleteButton.onclick = function() {
 			parentEditor.RemoveChild(editor);
 		}
