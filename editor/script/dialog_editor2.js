@@ -13,7 +13,7 @@
 	todo
 	- use new editor in multiple places!
 	- better formatting
-	- add actions
+	X add actions
 	X delete blocks
 	X move blocks
 	X save changes
@@ -209,6 +209,24 @@ function DialogTool() {
 				"sequence",
 				function() {
 					var node = scriptUtils.CreateSequenceBlock();
+					var editor = new SequenceEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"cycle",
+				function() {
+					var node = scriptUtils.CreateCycleBlock();
+					var editor = new SequenceEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"shuffle",
+				function() {
+					var node = scriptUtils.CreateShuffleBlock();
 					var editor = new SequenceEditor(node, parentEditor);
 					return editor;
 				}));

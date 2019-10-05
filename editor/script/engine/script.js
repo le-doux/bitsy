@@ -155,6 +155,32 @@ var Utils = function() {
 		return block;
 	}
 
+	this.CreateCycleBlock = function() {
+		var option1 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		option1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+
+		var option2 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		option2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+
+		var sequence = new CycleNode( [ option1, option2 ] );
+		var block = new BlockNode( BlockMode.Code );
+		block.AddChild( sequence );
+		return block;
+	}
+
+	this.CreateShuffleBlock = function() {
+		var option1 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		option1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+
+		var option2 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		option2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+
+		var sequence = new ShuffleNode( [ option1, option2 ] );
+		var block = new BlockNode( BlockMode.Code );
+		block.AddChild( sequence );
+		return block;
+	}
+
 	this.CreateIfBlock = function() {
 		var leftNode = new BlockNode( BlockMode.Code );
 		leftNode.AddChild( new FuncNode("item", [new LiteralNode("0")] ) );
