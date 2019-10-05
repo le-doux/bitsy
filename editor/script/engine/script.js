@@ -144,7 +144,11 @@ var Utils = function() {
 
 	this.CreateSequenceBlock = function() {
 		var option1 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		option1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+
 		var option2 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		option2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+
 		var sequence = new SequenceNode( [ option1, option2 ] );
 		var block = new BlockNode( BlockMode.Code );
 		block.AddChild( sequence );
@@ -160,7 +164,10 @@ var Utils = function() {
 		var condition2 = new ElseNode();
 
 		var result1 = new BlockNode( BlockMode.Dialog );
+		result1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+
 		var result2 = new BlockNode( BlockMode.Dialog );
+		result2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 
 		var ifNode = new IfNode( [ condition1, condition2 ], [ result1, result2 ] );
 		var block = new BlockNode( BlockMode.Code );
