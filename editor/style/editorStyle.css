@@ -360,109 +360,6 @@ input {
 	/*background: red;*/
 }
 
-/* ADVANCED DIALOG */
-.advDialogTextBlock {
-	width: 300px;
-	height: 60px;
-	resize: vertical;
-}
-
-.advDialogOptionDiv {
-	width: 300px;
-	/*height: 40px;*/
-	padding: 5px;
-	margin: 5px;
-	margin-left: 0px;
-	/*border: 1px solid #6767b2;*/
-	background: #ccccff;
-	border-radius: 2px;
-}
-
-.advDialogOptionDiv button {
-	height: 35px;
-	/*margin-top: -12px;*/
-	margin-left: 5px;
-	/*border: solid 1px black;*/
-	/*float: right;*/
-	display: inline-block;
-	vertical-align: top;
-}
-
-.advDialogOptionDiv button:hover {
-	background: #6767b2;
-	color: white;
-	opacity: 0.5;
-}
-
-.advDialogOptionDiv button .material-icons {
-	font-size: 80%;
-}
-
-.advDialogConditionDiv {
-	width: 300px;
-	/*height: 100px;*/
-	padding: 5px;
-	margin: 5px;
-	margin-left: 0px;
-	/*border: 1px solid #6767b2;*/
-	background: #ccccff;
-	border-radius: 2px;
-}
-
-.advDialogConditionDiv button {
-	height: 35px;
-	/*margin-top: -12px;*/
-	margin-left: 5px;
-	/*border: solid 1px black;*/
-	/*float: right;*/
-	display: inline-block;
-	vertical-align: top;
-}
-
-.advDialogConditionDiv button:hover {
-	background: #6767b2;
-	color: white;
-	opacity: 0.5;
-}
-
-.advDialogConditionDiv button .material-icons {
-	font-size: 80%;
-}
-
-/*.advDialogOptionDiv .light:hover {
-	background: #6767b2;
-}*/
-
-.advDialogTextOption {
-	width: 270px;
-	/*width: 290px;*/
-
-	/*width: 250px;*/
-	height: 30px;
-	resize: vertical;
-	/*margin-right: 0px;*/
-}
-
-#advDialogViewport {
-	padding: 12px;
-	/*width:340px;*/
-	min-width: 340px;
-	height:450px;
-	overflow:scroll;
-	display:block;
-	border: solid 1px #ccccff;
-	border-radius: 2px;
-	margin-bottom: 10px;
-	line-height: 1;
-}
-
-#advDialogViewport .controlBox {
-	margin-bottom: 5px;
-	border: solid 1px #6767b2;
-	padding: 10px;
-	line-height: 170%;
-}
-
 #dialogCodeText {
 	width: 340px;
 	height: 530px;
@@ -470,26 +367,6 @@ input {
 	resize: none;
 	background: black;
 	color: white;
-}
-
-.advDialogTop {
-	margin-bottom: 10px;
-	overflow: auto;
-}
-
-.advDialogBlockName {
-	float: left;
-}
-
-.advDialogBlockDelete {
-	float: right;
-}
-
-.advDialogIcon {
-	line-height: 150%;
-	vertical-align: middle;
-	font-size: 150%;
-	margin-right: 10px;
 }
 
 .inventoryViewport {
