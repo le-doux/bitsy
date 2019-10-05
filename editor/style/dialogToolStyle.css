@@ -22,8 +22,17 @@
 	margin-bottom: 2%;
 }
 
-.sequenceOption {
+.sequenceOptionEditor {
+	background: #e8e8ff;
 	margin-bottom: 2%;
+}
+
+.sequenceOptionControls {
+	padding: 2%;
+}
+
+.sequenceOptionControls button {
+	background: #ccccff;
 }
 
 .conditionalEditor {

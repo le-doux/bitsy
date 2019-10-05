@@ -172,7 +172,7 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
 
-		var span = document.createElement("span");
+		var span = document.createElement("div");
 		span.innerText = "dialog";
 		div.appendChild(span);
 
@@ -205,6 +205,9 @@ function DialogTool() {
 		span.innerText = "sequence";
 		div.appendChild(span);
 
+		var optionRootDiv = document.createElement("div");
+		div.appendChild(optionRootDiv);
+
 		this.GetElement = function() {
 			return div;
 		}
@@ -217,26 +220,83 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
+		this.RemoveChild = function(childEditor) {
+			optionEditors.splice(optionEditors.indexOf(childEditor),1);
+			RefreshOptionsUI();
+
+			UpdateNodeOptions();
+
+			parentEditor.NotifyUpdate();
+		}
+
+		this.IndexOfChild = function(childEditor) {
+			return optionEditors.indexOf(childEditor);
+		}
+
+		this.InsertChild = function(childEditor, index) {
+			optionEditors.splice(index, 0, childEditor);
+			RefreshOptionsUI();
+
+			UpdateNodeOptions();
+
+			parentEditor.NotifyUpdate();
+		}
+
+		var optionEditors = [];
 		function CreateOptionEditors() {
-			var optionEditors = []
+			optionEditors = [];
 
 			for (var i = 0; i < sequenceNode.options.length; i++) {
-				var optionBlockNode = sequenceNode.options[i];
-				var editor = new BlockEditor(optionBlockNode, self);
-				optionEditors.push(editor);
-			}
-
-			//
-			for (var i = 0; i < optionEditors.length; i++) {
-				var optionDiv = document.createElement("div");
-				optionDiv.classList.add("sequenceOption");
-				div.appendChild(optionDiv);
-
-				optionDiv.appendChild(optionEditors[i].GetElement());
+				var optionNode = sequenceNode.options[i];
+				var optionEditor = new SequenceOptionEditor(optionNode, self);
+				optionRootDiv.appendChild(optionEditor.GetElement());
+				optionEditors.push(optionEditor);
 			}
 		}
 
+		function RefreshOptionsUI() {
+			optionRootDiv.innerHTML = "";
+			for (var i = 0; i < optionEditors.length; i++) {
+				var editor = optionEditors[i];
+				optionRootDiv.appendChild(editor.GetElement());
+			}
+		}
+
+		function UpdateNodeOptions() {
+			var updatedOptions = [];
+
+			for (var i = 0; i < optionEditors.length; i++) {
+				var editor = optionEditors[i];
+				updatedOptions = updatedOptions.concat(editor.GetNodes());
+			}
+
+			sequenceNode.options = updatedOptions;
+		}
+
 		CreateOptionEditors();
+	}
+
+	function SequenceOptionEditor(optionNode, parentEditor) {
+		var div = document.createElement("div");
+		div.classList.add("sequenceOptionEditor");
+
+		var topControlsDiv = document.createElement("div");
+		topControlsDiv.classList.add("sequenceOptionControls");
+		div.appendChild(topControlsDiv);
+
+		var orderControls = new OrderControls(this, parentEditor);
+		topControlsDiv.appendChild(orderControls.GetElement());
+
+		var blockEditor = new BlockEditor(optionNode, parentEditor);
+		div.appendChild(blockEditor.GetElement());
+
+		this.GetElement = function() {
+			return div;
+		}
+
+		this.GetNodes = function() {
+			return [optionNode];
+		}
 	}
 
 	function ConditionalEditor(node, parentEditor) {
