@@ -120,6 +120,10 @@ var Utils = function() {
 		return block;
 	}
 
+	this.CreateEmptyPrintFunc = function() {
+		return new FuncNode("print", [new LiteralNode(" ")]);
+	}
+
 	// TODO : need to split up code & dialog blocks :|
 	this.CreateCodeBlock = function() {
 		return new BlockNode(BlockMode.Code);

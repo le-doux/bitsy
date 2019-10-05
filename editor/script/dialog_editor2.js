@@ -56,6 +56,12 @@ function DialogTool() {
 		var div = document.createElement("div");
 		div.classList.add("blockEditor");
 
+		var childEditorRootDiv = document.createElement("div");
+		div.appendChild(childEditorRootDiv);
+
+		var actionBuilder = new ActionBuilder(this);
+		div.appendChild(actionBuilder.GetElement());
+
 		this.GetElement = function() {
 			return div;
 		}
@@ -110,12 +116,11 @@ function DialogTool() {
 		}
 
 		function RefreshChildUI() {
-			div.innerHTML = "";
+			childEditorRootDiv.innerHTML = "";
 
 			for (var i = 0; i < childEditors.length; i++) {
 				var editor = childEditors[i];
-
-				div.appendChild(editor.GetElement());
+				childEditorRootDiv.appendChild(editor.GetElement());
 			}
 		}
 
@@ -158,8 +163,76 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
+		this.AppendChild = function(childEditor) {
+			self.InsertChild(childEditor, childEditors.length);
+		}
+
 		CreateChildEditors();
 		RefreshChildUI();
+	}
+
+	function ActionBuilder(parentEditor) {
+		var div = document.createElement("div");
+		div.classList.add("actionBuilder");
+
+		var addButton = document.createElement("button");
+		addButton.classList.add("actionBuilderAdd");
+		addButton.innerText = "add action";
+		addButton.onclick = function() {
+			div.classList.add("actionBuilderActive");
+		}
+		div.appendChild(addButton);
+
+		function makeActionBuilderButton(text, createEditorFunc) {
+			var actionBuilderButton = document.createElement("button");
+			actionBuilderButton.classList.add("actionBuilderButton");
+			actionBuilderButton.innerText = text;
+			actionBuilderButton.onclick = function() {
+				var editor = createEditorFunc();
+				parentEditor.AppendChild(editor);
+				div.classList.remove("actionBuilderActive");
+			}
+			return actionBuilderButton;
+		}
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"dialog",
+				function() {
+					var printFunc = scriptUtils.CreateEmptyPrintFunc();
+					var editor = new DialogEditor([printFunc], parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"sequence",
+				function() {
+					var node = scriptUtils.CreateSequenceBlock();
+					var editor = new SequenceEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"conditional",
+				function() {
+					var node = scriptUtils.CreateIfBlock();
+					var editor = new ConditionalEditor(node, parentEditor);
+					return editor;
+				}));
+
+		var cancelButton = document.createElement("button");
+		cancelButton.classList.add("actionBuilderButton");
+		cancelButton.innerText = "cancel";
+		cancelButton.onclick = function() {
+			div.classList.remove("actionBuilderActive");
+		}
+		div.appendChild(cancelButton);
+
+		this.GetElement = function() {
+			return div;
+		}
 	}
 
 	function DialogEditor(dialogNodeList, parentEditor) {

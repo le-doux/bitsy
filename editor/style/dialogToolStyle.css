@@ -57,3 +57,25 @@
 .optionControls button {
 	background: #ccccff;
 }
+
+.actionBuilder {
+	display: flex;
+	flex-direction: column;
+}
+
+.actionBuilder button {
+	background: #ccccff;
+	flex-grow: 1;
+}
+
+.actionBuilderActive .actionBuilderAdd {
+	display: none;
+}
+
+.actionBuilderButton {
+	display: none;
+}
+
+.actionBuilderActive .actionBuilderButton {
+	display: block;
+}
