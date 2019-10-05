@@ -202,11 +202,23 @@ function DialogTool() {
 		div.appendChild(orderControls.GetElement());
 
 		var span = document.createElement("span");
-		span.innerText = "sequence";
+		span.innerText = sequenceNode.type; // "sequence";
 		div.appendChild(span);
 
 		var optionRootDiv = document.createElement("div");
 		div.appendChild(optionRootDiv);
+
+		var addOptionButton = document.createElement("button");
+		addOptionButton.innerText = "add option";
+		addOptionButton.onclick = function() {
+			var optionNode = scriptUtils.CreateOptionBlock();
+			var optionEditor = new SequenceOptionEditor(optionNode, self);
+			optionRootDiv.appendChild(optionEditor.GetElement());
+			optionEditors.push(optionEditor);
+
+			parentEditor.NotifyUpdate();
+		}
+		div.appendChild(addOptionButton);
 
 		this.GetElement = function() {
 			return div;

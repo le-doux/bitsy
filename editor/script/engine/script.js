@@ -114,6 +114,17 @@ var Utils = function() {
 		return block;
 	}
 
+	this.CreateOptionBlock = function() {
+		var block = new BlockNode( BlockMode.Dialog, false );
+		block.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		return block;
+	}
+
+	// TODO : need to split up code & dialog blocks :|
+	this.CreateCodeBlock = function() {
+		return new BlockNode(BlockMode.Code);
+	}
+
 	this.ChangeSequenceType = function(oldSequence,type) {
 		if(type === "sequence") {
 			return new SequenceNode( oldSequence.options );
