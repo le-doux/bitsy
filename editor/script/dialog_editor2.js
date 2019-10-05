@@ -14,9 +14,9 @@
 	- use new editor in multiple places!
 	- better formatting
 	- add actions
-	- delete blocks
-	- move blocks
-	- save changes
+	X delete blocks
+	X move blocks
+	X save changes
 */
 
 function DialogTool() {
@@ -278,10 +278,10 @@ function DialogTool() {
 
 	function SequenceOptionEditor(optionNode, parentEditor) {
 		var div = document.createElement("div");
-		div.classList.add("sequenceOptionEditor");
+		div.classList.add("optionEditor");
 
 		var topControlsDiv = document.createElement("div");
-		topControlsDiv.classList.add("sequenceOptionControls");
+		topControlsDiv.classList.add("optionControls");
 		div.appendChild(topControlsDiv);
 
 		var orderControls = new OrderControls(this, parentEditor);
@@ -314,6 +314,9 @@ function DialogTool() {
 		span.innerText = "conditional";
 		div.appendChild(span);
 
+		var optionRootDiv = document.createElement("div");
+		div.appendChild(optionRootDiv);
+
 		this.GetElement = function() {
 			return div;
 		}
@@ -326,29 +329,95 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
+		this.RemoveChild = function(childEditor) {
+			optionEditors.splice(optionEditors.indexOf(childEditor),1);
+			RefreshOptionsUI();
+
+			UpdateNodeOptions();
+
+			parentEditor.NotifyUpdate();
+		}
+
+		this.IndexOfChild = function(childEditor) {
+			return optionEditors.indexOf(childEditor);
+		}
+
+		this.InsertChild = function(childEditor, index) {
+			optionEditors.splice(index, 0, childEditor);
+			RefreshOptionsUI();
+
+			UpdateNodeOptions();
+
+			parentEditor.NotifyUpdate();
+		}
+
+		var optionEditors = [];
 		function CreateOptionEditors() {
-			var resultEditors = []
+			optionEditors = [];
 
 			for (var i = 0; i < conditionalNode.conditions.length; i++) {
-				// option
-				var optionDiv = document.createElement("div");
-				optionDiv.classList.add("conditionOption");
-				div.appendChild(optionDiv);
-
-				// condition
-				var textArea = document.createElement("textarea");
-				textArea.value = conditionalNode.conditions[i].Serialize();
-				optionDiv.appendChild(textArea);
-
-				// result
-				var resultBlockNode = conditionalNode.results[i];
-				var editor = new BlockEditor(resultBlockNode, self);
-				resultEditors.push(editor);
-				optionDiv.appendChild(resultEditors[i].GetElement());
+				var conditionNode = conditionalNode.conditions[i];
+				var resultNode = conditionalNode.results[i];
+				var optionEditor = new ConditionalOptionEditor(conditionNode, resultNode, self);
+				optionRootDiv.appendChild(optionEditor.GetElement());
+				optionEditors.push(optionEditor);
 			}
 		}
 
+		function RefreshOptionsUI() {
+			optionRootDiv.innerHTML = "";
+			for (var i = 0; i < optionEditors.length; i++) {
+				var editor = optionEditors[i];
+				optionRootDiv.appendChild(editor.GetElement());
+			}
+		}
+
+		function UpdateNodeOptions() {
+			var updatedConditions = [];
+			var updatedResults = [];
+
+			for (var i = 0; i < optionEditors.length; i++) {
+				var editor = optionEditors[i];
+				var nodes = editor.GetNodes();
+				updatedConditions = updatedConditions.concat(nodes[0]);
+				updatedResults = updatedResults.concat(nodes[1]);
+			}
+
+			conditionalNode.conditions = updatedConditions;
+			conditionalNode.results = updatedResults;
+		}
+
 		CreateOptionEditors();
+	}
+
+	function ConditionalOptionEditor(conditionNode, resultNode, parentEditor) {
+		var div = document.createElement("div");
+		div.classList.add("optionEditor");
+
+		var topControlsDiv = document.createElement("div");
+		topControlsDiv.classList.add("optionControls");
+		div.appendChild(topControlsDiv);
+
+		var orderControls = new OrderControls(this, parentEditor);
+		topControlsDiv.appendChild(orderControls.GetElement());
+
+		// condition - WIP
+		var textArea = document.createElement("textarea");
+		textArea.value = conditionNode.Serialize();
+		div.appendChild(textArea);
+
+		// result
+		var resultBlockEditor = new BlockEditor(resultNode, parentEditor);
+		div.appendChild(resultBlockEditor.GetElement());
+
+		this.GetElement = function() {
+			return div;
+		}
+
+		this.GetNodes = function() {
+			// this is kind of hacky...
+			return [conditionNode, resultNode];
+		}
 	}
 
 	// TODO
