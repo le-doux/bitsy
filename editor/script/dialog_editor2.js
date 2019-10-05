@@ -403,6 +403,7 @@ function DialogTool() {
 
 		// condition - WIP
 		var textArea = document.createElement("textarea");
+		textArea.classList.add("conditionEditor");
 		textArea.value = conditionNode.Serialize();
 		div.appendChild(textArea);
 
