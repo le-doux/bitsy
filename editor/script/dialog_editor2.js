@@ -266,9 +266,9 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
 
-		var span = document.createElement("div");
-		span.innerText = "dialog";
-		div.appendChild(span);
+		// var span = document.createElement("div");
+		// span.innerText = "dialog";
+		// div.appendChild(span);
 
 		var textArea = document.createElement("textarea");
 		textArea.value = dialogNode.Serialize();
