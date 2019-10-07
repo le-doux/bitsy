@@ -12,14 +12,22 @@
 
 	todo
 	- use new editor in multiple places!
-	- better formatting
-		- button clutter
-		- nesting (colors?)
-	X add actions
-	X delete blocks
-	X move blocks
-	X save changes
 	- see where I can re-use more code
+	- deal w/ clutter of control buttons
+		- hover?
+		- selection?
+	- different colors for different types of blocks?
+		- tried it: not sure how useful it is
+	- light / dark alternating colors for options?
+	- arrows connecting blocks at same level
+	- better descriptions of actions
+	X save changes to dialog
+	- save changes to conditions
+	- function editor
+	- new functions
+		- stop default, exit, end, narrate, give / take items
+	- combine DLG and END
+	- add DLG to EXT
 */
 
 function DialogTool() {
@@ -69,7 +77,11 @@ function DialogTool() {
 			return div;
 		}
 
-		this.NotifyUpdate = function() {
+		this.NotifyUpdate = function(hasNewChildren) {
+			if (hasNewChildren) {
+				UpdateNodeChildren();
+			}
+
 			parentEditor.NotifyUpdate();
 		}
 
@@ -245,6 +257,7 @@ function DialogTool() {
 
 		var cancelButton = document.createElement("button");
 		cancelButton.classList.add("actionBuilderButton");
+		cancelButton.classList.add("actionBuilderCancel");
 		cancelButton.innerText = "cancel";
 		cancelButton.onclick = function() {
 			div.classList.remove("actionBuilderActive");
@@ -272,6 +285,11 @@ function DialogTool() {
 
 		var textArea = document.createElement("textarea");
 		textArea.value = dialogNode.Serialize();
+		textArea.onchange = function() {
+			console.log("dialog changed!!!");
+			dialogNode = scriptInterpreter.Parse( '"""\n' +  textArea.value + '\n"""' );
+			parentEditor.NotifyUpdate(true);
+		}
 		div.appendChild(textArea);
 
 		this.GetElement = function() {

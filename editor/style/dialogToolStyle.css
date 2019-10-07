@@ -17,15 +17,18 @@
 }
 
 .dialogEditor {
-	background: white;
 	padding: 2%;
 	margin-bottom: 2%;
+	background: white;
+	border: solid 1px #6767b2;
+/*	background: #3d3d3d;
+	border: solid 1px black;*/
 }
 
 .dialogEditor textarea {
 	background: black;
 	color: white;
-	/*width: 96%;*/
+	width: 96%;
 	border: none;
 }
 
@@ -33,12 +36,15 @@
 	background: white;
 	padding: 2%;
 	margin-bottom: 2%;
+	border: solid 1px #6767b2;
+	/*background: #d0f7ef;*/
 }
 
 .conditionalEditor {
 	background: white;
 	padding: 2%;
 	margin-bottom: 2%;
+	border: solid 1px #6767b2;
 }
 
 .conditionEditor {
@@ -64,7 +70,6 @@
 }
 
 .actionBuilder button {
-	background: #ccccff;
 	flex-grow: 1;
 }
 
@@ -73,9 +78,19 @@
 }
 
 .actionBuilderButton {
+	background: #ccccff;
 	display: none;
 }
 
 .actionBuilderActive .actionBuilderButton {
 	display: block;
+}
+
+.actionBuilderAdd {
+	background: #ccccff;
+}
+
+.actionBuilderCancel {
+	background: #6767b2;
+	color: white;
 }
