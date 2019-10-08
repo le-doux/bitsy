@@ -25,6 +25,10 @@
 	border: solid 1px black;*/
 }
 
+.selectedEditor.dialogEditor {
+	border: solid 2px #6767b2;
+}
+
 .dialogEditor textarea {
 	background: black;
 	color: white;
@@ -40,11 +44,19 @@
 	/*background: #d0f7ef;*/
 }
 
+.selectedEditor.sequenceEditor {
+	border: solid 2px #6767b2;
+}
+
 .conditionalEditor {
 	background: white;
 	padding: 2%;
 	margin-bottom: 2%;
 	border: solid 1px #6767b2;
+}
+
+.selectedEditor.conditionalEditor {
+	border: solid 2px #6767b2;
 }
 
 .conditionEditor {
@@ -65,8 +77,17 @@
 }
 
 .actionBuilder {
-	display: flex;
+	/*display: flex;*/
+	display: none;
 	flex-direction: column;
+}
+
+.selectedEditor > .blockEditor > .actionBuilder {
+	display: flex;
+}
+
+.selectedEditor > .optionRoot > .optionEditor > .blockEditor > .actionBuilder {
+	display: flex;
 }
 
 .actionBuilder button {
@@ -93,4 +114,29 @@
 .actionBuilderCancel {
 	background: #6767b2;
 	color: white;
+}
+
+.orderControls {
+	display: none;
+}
+
+.selectedEditor > .orderControls {
+	display: block;
+}
+
+.selectedEditor > .optionRoot > .optionEditor > .optionControls .orderControls {
+	display: block;
+}
+
+.addOption {
+	display: flex;
+}
+
+.addOption button {
+	display: none;
+	flex-grow: 1;
+}
+
+.selectedEditor > .addOption button {
+	display: block;
 }

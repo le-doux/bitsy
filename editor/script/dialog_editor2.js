@@ -41,10 +41,14 @@ function DialogTool() {
 
 		scriptInterpreter.DebugVisualizeScriptTree(scriptRootNode);
 
+		var div = document.createElement("div");
+		div.classList.add("selectedEditor"); // always selected so we can add actions to the root
+
 		var rootEditor = new BlockEditor(scriptRootNode, this);
+		div.appendChild(rootEditor.GetElement());
 
 		this.GetElement = function() {
-			return rootEditor.GetElement();
+			return div; //rootEditor.GetElement();
 		}
 
 		this.NotifyUpdate = function() {
@@ -296,6 +300,8 @@ function DialogTool() {
 			return div;
 		}
 
+		AddSelectionBehavior(this);
+
 		this.GetNodes = function() {
 			return dialogNode.children;
 		}
@@ -318,7 +324,12 @@ function DialogTool() {
 		div.appendChild(span);
 
 		var optionRootDiv = document.createElement("div");
+		optionRootDiv.classList.add("optionRoot");
 		div.appendChild(optionRootDiv);
+
+		var addOptionRootDiv = document.createElement("div");
+		addOptionRootDiv.classList.add("addOption");
+		div.appendChild(addOptionRootDiv);
 
 		var addOptionButton = document.createElement("button");
 		addOptionButton.innerText = "add option";
@@ -330,11 +341,13 @@ function DialogTool() {
 
 			parentEditor.NotifyUpdate();
 		}
-		div.appendChild(addOptionButton);
+		addOptionRootDiv.appendChild(addOptionButton);
 
 		this.GetElement = function() {
 			return div;
 		}
+
+		AddSelectionBehavior(this);
 
 		this.GetNodes = function() {
 			return [node];
@@ -439,7 +452,12 @@ function DialogTool() {
 		div.appendChild(span);
 
 		var optionRootDiv = document.createElement("div");
+		optionRootDiv.classList.add("optionRoot");
 		div.appendChild(optionRootDiv);
+
+		var addOptionRootDiv = document.createElement("div");
+		addOptionRootDiv.classList.add("addOption");
+		div.appendChild(addOptionRootDiv);
 
 		var addOptionButton = document.createElement("button");
 		addOptionButton.innerText = "add option";
@@ -452,11 +470,13 @@ function DialogTool() {
 
 			parentEditor.NotifyUpdate();
 		}
-		div.appendChild(addOptionButton);
+		addOptionRootDiv.appendChild(addOptionButton);
 
 		this.GetElement = function() {
 			return div;
 		}
+
+		AddSelectionBehavior(this);
 
 		this.GetNodes = function() {
 			return [node];
@@ -577,6 +597,7 @@ function DialogTool() {
 
 	function OrderControls(editor, parentEditor) {
 		var div = document.createElement("div");
+		div.classList.add("orderControls");
 
 		var moveUpButton = document.createElement("button");
 		// moveUpButton.innerText = "up";
@@ -611,6 +632,28 @@ function DialogTool() {
 
 		this.GetElement = function() {
 			return div;
+		}
+	}
+
+	var curSelectedEditor = null;
+	function AddSelectionBehavior(editor) {
+		editor.Select = function() {
+			editor.GetElement().classList.add("selectedEditor");
+		}
+
+		editor.Deselect = function() {
+			editor.GetElement().classList.remove("selectedEditor");
+		}
+
+		editor.GetElement().onclick = function(event) {
+			event.stopPropagation();
+
+			if (curSelectedEditor != null) {
+				curSelectedEditor.Deselect();
+			}
+
+			editor.Select();
+			curSelectedEditor = editor;
 		}
 	}
 }
