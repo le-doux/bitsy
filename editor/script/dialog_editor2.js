@@ -287,13 +287,19 @@ function DialogTool() {
 		// span.innerText = "dialog";
 		// div.appendChild(span);
 
-		var textArea = document.createElement("textarea");
-		textArea.value = dialogNode.Serialize();
-		textArea.onchange = function() {
+		function OnDialogTextChange() {
 			console.log("dialog changed!!!");
 			dialogNode = scriptInterpreter.Parse( '"""\n' +  textArea.value + '\n"""' );
 			parentEditor.NotifyUpdate(true);
 		}
+		var textSelectionChangeHandler = createOnTextSelectionChange(OnDialogTextChange);
+
+		var textArea = document.createElement("textarea");
+		textArea.value = dialogNode.Serialize();
+		textArea.onchange = OnDialogTextChange;
+		textArea.addEventListener('click', textSelectionChangeHandler);
+		textArea.addEventListener('select', textSelectionChangeHandler);
+		textArea.addEventListener('blur', textSelectionChangeHandler);
 		div.appendChild(textArea);
 
 		this.GetElement = function() {

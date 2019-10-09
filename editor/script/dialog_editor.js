@@ -78,8 +78,9 @@ function wrapTextSelection(effect) {
 			var newText = curText.slice(0, dialogSel.start) + effectlessText + curText.slice(dialogSel.end);
 			dialogSel.target.value = newText;
 			dialogSel.target.setSelectionRange(dialogSel.start,dialogSel.start + effectlessText.length);
-			if(dialogSel.onchange != null)
+			if(dialogSel.onchange != null) {
 				dialogSel.onchange( dialogSel ); // dialogSel needs to mimic the event the onchange would usually receive
+			}
 		}
 		else {
 			// add effect
@@ -87,8 +88,9 @@ function wrapTextSelection(effect) {
 			var newText = curText.slice(0, dialogSel.start) + effectText + curText.slice(dialogSel.end);
 			dialogSel.target.value = newText;
 			dialogSel.target.setSelectionRange(dialogSel.start,dialogSel.start + effectText.length);
-			if(dialogSel.onchange != null)
+			if(dialogSel.onchange != null) {
 				dialogSel.onchange( dialogSel ); // dialogSel needs to mimic the event the onchange would usually receive
+			}
 		}
 	}
 }
