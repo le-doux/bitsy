@@ -805,45 +805,6 @@ function addDownArrowToDialogFlow() {
 	}
 }
 
-function addDialogBlockUI() {
-	var dialogFormDiv = document.getElementById("advDialogViewport");
-
-	addDownArrowToDialogFlow();
-
-	var block = new DialogBlockUI( [], advDialogUIComponents.length+1 );
-	dialogFormDiv.appendChild( block.GetEl() );
-
-	advDialogUIComponents.push( block );
-
-	serializeAdvDialog();
-}
-
-function addSeqBlockUI() {
-	var dialogFormDiv = document.getElementById("advDialogViewport");
-
-	addDownArrowToDialogFlow();
-
-	var block = new SeqBlockUI( scriptUtils.CreateSequenceBlock(), advDialogUIComponents.length+1 );
-	dialogFormDiv.appendChild( block.GetEl() );
-
-	advDialogUIComponents.push( block );
-
-	serializeAdvDialog();
-}
-
-function addIfBlockUI() {
-	var dialogFormDiv = document.getElementById("advDialogViewport");
-
-	addDownArrowToDialogFlow();
-
-	var block = new IfBlockUI( scriptUtils.CreateIfBlock(), advDialogUIComponents.length+1 );
-	dialogFormDiv.appendChild( block.GetEl() );
-
-	advDialogUIComponents.push( block );
-
-	serializeAdvDialog();
-}
-
 function serializeAdvDialog() {
 	console.log("SERIALIZE ADVANCED DIALOG");
 

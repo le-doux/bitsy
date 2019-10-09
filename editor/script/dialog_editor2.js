@@ -51,7 +51,7 @@ function DialogTool() {
 			return div; //rootEditor.GetElement();
 		}
 
-		this.NotifyUpdate = function() {
+		function OnUpdate() {
 			var dialogStr = rootEditor.Serialize();
 
 			if (dialogStr.indexOf("\n") > -1) {
@@ -62,6 +62,32 @@ function DialogTool() {
 			dialog[dialogId] = dialogStr;
 
 			refreshGameData();
+		}
+
+		this.NotifyUpdate = function() {
+			OnUpdate();
+		}
+
+		/* root level creation functions for the dialog editor top-bar UI */
+		this.AddDialog = function() {
+			var printFunc = scriptUtils.CreateEmptyPrintFunc();
+			var editor = new DialogEditor([printFunc], rootEditor);
+			rootEditor.AppendChild(editor);
+			OnUpdate();
+		}
+
+		this.AddSequence = function() {
+			var node = scriptUtils.CreateSequenceBlock();
+			var editor = new SequenceEditor(node, rootEditor);
+			rootEditor.AppendChild(editor);
+			OnUpdate();
+		}
+
+		this.AddConditional = function() {
+			var node = scriptUtils.CreateIfBlock();
+			var editor = new ConditionalEditor(node, rootEditor);
+			rootEditor.AppendChild(editor);
+			OnUpdate();
 		}
 	}
 
@@ -661,5 +687,24 @@ function DialogTool() {
 			editor.Select();
 			curSelectedEditor = editor;
 		}
+	}
+}
+
+/* OLD UN-WRAPPED FUNCTIONS */
+function addDialogBlockUI() {
+	if (curDialogEditor != null) {
+		curDialogEditor.AddDialog();
+	}
+}
+
+function addSeqBlockUI() {
+	if (curDialogEditor != null) {
+		curDialogEditor.AddSequence();
+	}
+}
+
+function addIfBlockUI() {
+	if (curDialogEditor != null) {
+		curDialogEditor.AddConditional();
 	}
 }

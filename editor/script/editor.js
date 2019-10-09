@@ -1477,13 +1477,13 @@ function reloadAdvDialogUI() {
 	// }
 }
 
+var curDialogEditor = null;
 function openDialogTool(dialogId) {
-	var dialogEditorRoot = dialogTool.CreateEditor(dialogId);
+	curDialogEditor = dialogTool.CreateEditor(dialogId);
 
-	// TODO
 	var dialogEditorViewport = document.getElementById("advDialogViewport");
 	dialogEditorViewport.innerHTML = "";
-	dialogEditorViewport.appendChild(dialogEditorRoot.GetElement());
+	dialogEditorViewport.appendChild(curDialogEditor.GetElement());
 
 	showPanel('dialogPanel');
 }
