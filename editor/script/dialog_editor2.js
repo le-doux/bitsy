@@ -13,9 +13,7 @@
 	todo
 	- use new editor in multiple places!
 	- see where I can re-use more code
-	- deal w/ clutter of control buttons
-		- hover?
-		- selection?
+	X deal w/ clutter of control buttons
 	- different colors for different types of blocks?
 		- tried it: not sure how useful it is
 	- light / dark alternating colors for options?
