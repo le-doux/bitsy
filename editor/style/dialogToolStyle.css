@@ -21,8 +21,6 @@
 	margin-bottom: 2%;
 	background: white;
 	border: solid 1px #6767b2;
-/*	background: #3d3d3d;
-	border: solid 1px black;*/
 }
 
 .selectedEditor.dialogEditor {
@@ -41,11 +39,14 @@
 	padding: 2%;
 	margin-bottom: 2%;
 	border: solid 1px #6767b2;
-	/*background: #d0f7ef;*/
 }
 
 .selectedEditor.sequenceEditor {
 	border: solid 2px #6767b2;
+}
+
+.sequenceDescription {
+	margin-bottom: 2%;
 }
 
 .conditionalEditor {
@@ -66,10 +67,10 @@
 .optionEditor {
 	background: #e8e8ff;
 	margin-bottom: 2%;
+	padding: 2%;
 }
 
 .optionControls {
-	padding: 2%;
 }
 
 .optionControls button {
@@ -118,6 +119,7 @@
 
 .orderControls {
 	display: none;
+	margin-bottom: 2%;
 }
 
 .selectedEditor > .orderControls {

@@ -337,6 +337,12 @@ function DialogTool() {
 		}
 	}
 
+	var sequenceDescriptions = {
+		"sequence" : "do each item once in sequence:",
+		"cycle" : "repeat each item in a cycle:",
+		"shuffle" : "shuffle these items in a random order:",
+	};
+
 	function SequenceEditor(node, parentEditor) {
 		var self = this;
 
@@ -349,9 +355,10 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
 
-		var span = document.createElement("span");
-		span.innerText = sequenceNode.type; // "sequence";
-		div.appendChild(span);
+		var description = document.createElement("div");
+		description.classList.add("sequenceDescription");
+		description.innerText = sequenceDescriptions[sequenceNode.type];
+		div.appendChild(description);
 
 		var optionRootDiv = document.createElement("div");
 		optionRootDiv.classList.add("optionRoot");
@@ -366,9 +373,10 @@ function DialogTool() {
 		addOptionButton.onclick = function() {
 			var optionNode = scriptUtils.CreateOptionBlock();
 			var optionEditor = new SequenceOptionEditor(optionNode, self);
-			optionRootDiv.appendChild(optionEditor.GetElement());
 			optionEditors.push(optionEditor);
 
+			RefreshOptionsUI();
+			UpdateNodeOptions();
 			parentEditor.NotifyUpdate();
 		}
 		addOptionRootDiv.appendChild(addOptionButton);
@@ -389,10 +397,9 @@ function DialogTool() {
 
 		this.RemoveChild = function(childEditor) {
 			optionEditors.splice(optionEditors.indexOf(childEditor),1);
+
 			RefreshOptionsUI();
-
 			UpdateNodeOptions();
-
 			parentEditor.NotifyUpdate();
 		}
 
@@ -402,10 +409,9 @@ function DialogTool() {
 
 		this.InsertChild = function(childEditor, index) {
 			optionEditors.splice(index, 0, childEditor);
+
 			RefreshOptionsUI();
-
 			UpdateNodeOptions();
-
 			parentEditor.NotifyUpdate();
 		}
 
@@ -416,6 +422,7 @@ function DialogTool() {
 			for (var i = 0; i < sequenceNode.options.length; i++) {
 				var optionNode = sequenceNode.options[i];
 				var optionEditor = new SequenceOptionEditor(optionNode, self);
+				optionEditor.SetOrderNumber(i+1);
 				optionRootDiv.appendChild(optionEditor.GetElement());
 				optionEditors.push(optionEditor);
 			}
@@ -425,6 +432,7 @@ function DialogTool() {
 			optionRootDiv.innerHTML = "";
 			for (var i = 0; i < optionEditors.length; i++) {
 				var editor = optionEditors[i];
+				editor.SetOrderNumber(i+1);
 				optionRootDiv.appendChild(editor.GetElement());
 			}
 		}
@@ -454,6 +462,10 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		topControlsDiv.appendChild(orderControls.GetElement());
 
+		var orderLabel = document.createElement("span");
+		orderLabel.innerText = "#)";
+		div.appendChild(orderLabel);
+
 		var blockEditor = new BlockEditor(optionNode, parentEditor);
 		div.appendChild(blockEditor.GetElement());
 
@@ -463,6 +475,10 @@ function DialogTool() {
 
 		this.GetNodes = function() {
 			return [optionNode];
+		}
+
+		this.SetOrderNumber = function(num) {
+			orderLabel.innerText = num + ")";
 		}
 	}
 
@@ -495,9 +511,10 @@ function DialogTool() {
 			var conditionNode = scriptUtils.CreateCodeBlock();
 			var resultNode = scriptUtils.CreateOptionBlock();
 			var optionEditor = new ConditionalOptionEditor(conditionNode, resultNode, self);
-			optionRootDiv.appendChild(optionEditor.GetElement());
 			optionEditors.push(optionEditor);
 
+			RefreshOptionsUI();
+			UpdateNodeOptions();
 			parentEditor.NotifyUpdate();
 		}
 		addOptionRootDiv.appendChild(addOptionButton);
@@ -518,10 +535,9 @@ function DialogTool() {
 
 		this.RemoveChild = function(childEditor) {
 			optionEditors.splice(optionEditors.indexOf(childEditor),1);
+
 			RefreshOptionsUI();
-
 			UpdateNodeOptions();
-
 			parentEditor.NotifyUpdate();
 		}
 
@@ -531,10 +547,9 @@ function DialogTool() {
 
 		this.InsertChild = function(childEditor, index) {
 			optionEditors.splice(index, 0, childEditor);
+
 			RefreshOptionsUI();
-
 			UpdateNodeOptions();
-
 			parentEditor.NotifyUpdate();
 		}
 
