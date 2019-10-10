@@ -337,10 +337,10 @@ function DialogTool() {
 		}
 	}
 
-	var sequenceDescriptions = {
-		"sequence" : "do each item once in sequence:",
-		"cycle" : "repeat each item in a cycle:",
-		"shuffle" : "shuffle these items in a random order:",
+	var sequenceTypeDescriptionMap = {
+		"sequence" : "do items once in _:",
+		"cycle" : "repeat items in a _:",
+		"shuffle" : "_ items in a random order:",
 	};
 
 	function SequenceEditor(node, parentEditor) {
@@ -355,10 +355,42 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
 
-		var description = document.createElement("div");
-		description.classList.add("sequenceDescription");
-		description.innerText = sequenceDescriptions[sequenceNode.type];
-		div.appendChild(description);
+		var descriptionDiv = document.createElement("div");
+		descriptionDiv.classList.add("sequenceDescription");
+		div.appendChild(descriptionDiv);
+
+		function CreateSequenceDescription() {
+			descriptionDiv.innerHTML = "";
+
+			var descriptionText = sequenceTypeDescriptionMap[sequenceNode.type];
+			var descriptionTextSplit = descriptionText.split("_");
+
+			var descSpan1 = document.createElement("span");
+			descSpan1.innerText = descriptionTextSplit[0];
+			descriptionDiv.appendChild(descSpan1);
+
+			var sequenceTypeSelect = document.createElement("select");
+			for (var type in sequenceTypeDescriptionMap) {
+				var sequenceTypeOption = document.createElement("option");
+				sequenceTypeOption.value = type;
+				sequenceTypeOption.innerText = type;
+				sequenceTypeOption.selected = (type === sequenceNode.type);
+				sequenceTypeSelect.appendChild(sequenceTypeOption);
+			}
+			sequenceTypeSelect.onchange = function() {
+				sequenceNode = scriptUtils.ChangeSequenceType(sequenceNode, sequenceTypeSelect.value);
+				node.children = [sequenceNode];
+				CreateSequenceDescription();
+				parentEditor.NotifyUpdate();
+			}
+			descriptionDiv.appendChild(sequenceTypeSelect);
+
+			var descSpan2 = document.createElement("span");
+			descSpan2.innerText = descriptionTextSplit[1];
+			descriptionDiv.appendChild(descSpan2);
+		}
+
+		CreateSequenceDescription();
 
 		var optionRootDiv = document.createElement("div");
 		optionRootDiv.classList.add("optionRoot");
@@ -462,6 +494,7 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		topControlsDiv.appendChild(orderControls.GetElement());
 
+		// TODO : don't forget arabic
 		var orderLabel = document.createElement("span");
 		orderLabel.innerText = "#)";
 		div.appendChild(orderLabel);
