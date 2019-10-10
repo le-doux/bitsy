@@ -494,7 +494,6 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		topControlsDiv.appendChild(orderControls.GetElement());
 
-		// TODO : don't forget arabic
 		var orderLabel = document.createElement("span");
 		orderLabel.innerText = "#)";
 		div.appendChild(orderLabel);
@@ -511,7 +510,11 @@ function DialogTool() {
 		}
 
 		this.SetOrderNumber = function(num) {
-			orderLabel.innerText = num + ")";
+			var numString = "" + num;
+			if (localization.GetLanguage() === "ar") { // arabic
+				numString = ConvertNumberStringToArabic(numString);
+			}
+			orderLabel.innerText = numString + ")";
 		}
 	}
 
@@ -753,4 +756,17 @@ function addIfBlockUI() {
 	if (curDialogEditor != null) {
 		curDialogEditor.AddConditional();
 	}
+}
+
+function ConvertNumberStringToArabic(numberString) {
+	var arabicNumerals = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+
+	var arabicNumberString = "";
+
+	for (var i = 0; i < numberString.length; i++)
+	{
+		arabicNumberString += arabicNumerals[parseInt(numberString[i])];
+	}
+
+	return arabicNumberString;
 }

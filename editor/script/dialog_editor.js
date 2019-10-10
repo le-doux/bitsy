@@ -95,19 +95,6 @@ function wrapTextSelection(effect) {
 	}
 }
 
-function ConvertNumberStringToArabic(numberString) {
-	var arabicNumerals = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
-
-	var arabicNumberString = "";
-
-	for (var i = 0; i < numberString.length; i++)
-	{
-		arabicNumberString += arabicNumerals[parseInt(numberString[i])];
-	}
-
-	return arabicNumberString;
-}
-
 var DialogBlockUI = function(nodes, num) {
 	var dialogNode = scriptUtils.CreateDialogBlock( nodes );
 
