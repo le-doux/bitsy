@@ -544,7 +544,7 @@ function DialogTool() {
 		var addOptionButton = document.createElement("button");
 		addOptionButton.innerText = "add option";
 		addOptionButton.onclick = function() {
-			var conditionNode = scriptUtils.CreateCodeBlock();
+			var conditionNode = scriptInterpreter.CreateExpression('{item "0"} == 1');
 			var resultNode = scriptUtils.CreateOptionBlock();
 			var optionEditor = new ConditionalOptionEditor(conditionNode, resultNode, self);
 			optionEditors.push(optionEditor);
@@ -566,6 +566,7 @@ function DialogTool() {
 		}
 
 		this.NotifyUpdate = function() {
+			UpdateNodeOptions();
 			parentEditor.NotifyUpdate();
 		}
 
@@ -643,6 +644,10 @@ function DialogTool() {
 		var textArea = document.createElement("textarea");
 		textArea.classList.add("conditionEditor");
 		textArea.value = conditionNode.Serialize();
+		textArea.onchange = function() {
+			conditionNode = scriptInterpreter.CreateExpression(textArea.value);
+			parentEditor.NotifyUpdate();
+		}
 		div.appendChild(textArea);
 
 		// result
