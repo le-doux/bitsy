@@ -1,5 +1,4 @@
-/* TODO : RENAME */
-#advDialogViewport {
+#dialogContentViewport {
 	min-width: 340px;
 	height:450px;
 	overflow:scroll;
@@ -9,6 +8,7 @@
 	margin-bottom: 10px;
 	line-height: 1;
 	resize: both;
+	background: #e8e8ff;
 }
 
 .blockEditor {

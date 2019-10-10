@@ -1481,7 +1481,7 @@ var curDialogEditor = null;
 function openDialogTool(dialogId) {
 	curDialogEditor = dialogTool.CreateEditor(dialogId);
 
-	var dialogEditorViewport = document.getElementById("advDialogViewport");
+	var dialogEditorViewport = document.getElementById("dialogContentViewport");
 	dialogEditorViewport.innerHTML = "";
 	dialogEditorViewport.appendChild(curDialogEditor.GetElement());
 
