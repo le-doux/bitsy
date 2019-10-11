@@ -458,9 +458,14 @@
 						</div>
 						<div id="markerOptions">
 							<div id="endingOptions" class="controlBox">
-								<span class="localize ending_dialog">ending dialog</span>
-								<br/>
-								<textarea title="text to show on ending" id="endingText" onchange="onEndingTextChange(event);" onkeydown="onEndingTextChange(event);" onkeyup="onEndingTextChange(event);"></textarea>
+								<div style="display: flex;">
+									<span class="localize ending_dialog" style="flex-grow:1;">ending dialog</span>
+									<button title="open in dialog editor" style="" onclick="openEndingDialogInDialogTool();">
+										<i class="material-icons">open_in_new</i>
+									</button>
+								</div>
+								<div id="endingDialogContent" class="dialogContentMiniViewport">
+								</div>
 							</div>
 							<!-- <div id="effectOptions" class="controlBox">
 								<span>effect script</span>
@@ -651,7 +656,7 @@
 							<span style="flex-grow: 1">
 								<span class="localize dialog_tool_name">dialog</span>
 							</span>
-							<button title="open in advanced dialog editor" style="" onclick="openCurDialogInDialogTool();">
+							<button title="open in dialog editor" style="" onclick="openCurDialogInDialogTool();">
 								<i class="material-icons">open_in_new</i>
 							</button>
 						</div>

@@ -286,10 +286,11 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 			else if (curMarker.type == MarkerType.Ending) {
 				endingOptions.style.display = "block";
-				var endingText = document.getElementById("endingText");
-				var endingSource = dialog[curMarker.ending.id];
-				var endingStr = scriptUtils.RemoveDialogBlockFormat(endingSource);
-				endingText.value = endingStr;
+
+				var dialogContent = document.getElementById("endingDialogContent");
+				dialogContent.innerHTML = "";
+				var dialogEditor = dialogTool.CreateEditor(curMarker.ending.id);
+				dialogContent.appendChild(dialogEditor.GetElement());
 			}
 			// TODO : vNext
 			// else if (curMarker.type == MarkerType.Effect) {
@@ -713,10 +714,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
-	this.ChangeEndingText = function(text) {
+	this.OpenEndingDialogInDialogTool = function() {
 		if (curMarker != null && curMarker.type == MarkerType.Ending) {
-			dialog[curMarker.ending.id] = scriptUtils.EnsureDialogBlockFormat(text);
-			refreshGameData();
+			openDialogTool(curMarker.ending.id);
 		}
 	}
 

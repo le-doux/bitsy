@@ -347,6 +347,10 @@ function openCurDialogInDialogTool() {
 	openDialogTool(getCurDialogId());
 }
 
+function openEndingDialogInDialogTool() {
+	markerTool.OpenEndingDialogInDialogTool();
+}
+
 
 function reloadDialogUI() {
 	var dialogContent = document.getElementById("paintDialogContent");
@@ -2256,10 +2260,6 @@ function selectMarkerRoom2() {
 function changeExitDirection() {
 	markerTool.ChangeExitLink();
 	roomTool.drawEditMap();
-}
-
-function onEndingTextChange(event) {
-	markerTool.ChangeEndingText(event.target.value);
 }
 
 function onEffectTextChange(event) {
