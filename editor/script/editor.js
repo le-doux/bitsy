@@ -335,62 +335,42 @@ function tileTypeToIdPrefix(type) {
 }
 
 /* DIALOG UI 
-- needs a better home
-	- into paint object?
-	- needs its own controller?
+- hacky to make this all global
+- some of this should be folded into paint tool later
 */
-function reloadDialogUI() {
-	reloadDialogUICore();
-	reloadAdvDialogUI();
+var dialogTool = new DialogTool();
+var curDialogEditor = null;
+function openDialogTool(dialogId) {
+	curDialogEditor = dialogTool.CreateEditor(dialogId);
+
+	var dialogEditorViewport = document.getElementById("dialogContentViewport");
+	dialogEditorViewport.innerHTML = "";
+	dialogEditorViewport.appendChild(curDialogEditor.GetElement());
+
+	showPanel('dialogPanel');
 }
 
-// TODO : default paint and room tools tied to editor state object??? (or is that bad?)
-function reloadDialogUICore() { // TODO: name is terrible
+// TODO ... this should probably be temporary
+function openCurDialogInDialogTool() {
+	openDialogTool(getCurDialogId());
+}
+
+
+function reloadDialogUI() {
+	var dialogContent = document.getElementById("paintDialogContent");
+	dialogContent.innerHTML = "";
+
 	var dialogId = getCurDialogId(); // hacky
 
 	if (dialogId in dialog) {
-		var dialogSource = dialog[dialogId];
-		var dialogStr = scriptUtils.RemoveDialogBlockFormat(dialogSource);
-		document.getElementById("dialogText").value = dialogStr;
-	}
-	else {
-		document.getElementById("dialogText").value = "";
+		var dialogEditor = dialogTool.CreateEditor(dialogId);
+		dialogContent.appendChild(dialogEditor.GetElement());
 	}
 }
 
 // hacky - assumes global paintTool object
 function getCurDialogId() {
 	return paintTool.drawing.getDialogId();
-}
-
-function on_change_dialog_finished() {
-	on_change_dialog();
-	tryWarnAboutMissingCharacters( document.getElementById("dialogText").value );
-}
-
-// hacky - assumes global paintTool object
-function on_change_dialog() {
-	var dialogId = getCurDialogId();
-
-	var dialogStr = document.getElementById("dialogText").value;
-	if(dialogStr.length <= 0){
-		if(dialogId) {
-			paintTool.getCurObject().dlg = null;
-			delete dialog[dialogId];
-		}
-	}
-	else {
-		if(!dialogId) {
-			var prefix = (paintTool.drawing.type == TileType.Item) ? "ITM_" : "SPR_";
-			dialogId = nextAvailableDialogId( prefix );
-			paintTool.getCurObject().dlg = dialogId;
-		}
-		dialog[dialogId] = scriptUtils.EnsureDialogBlockFormat(dialogStr);
-	}
-
-	reloadAdvDialogUI();
-
-	refreshGameData();
 }
 
 function setDefaultGameState() {
@@ -1450,49 +1430,6 @@ function updateWallCheckboxOnCurrentTile() {
 	}
 }
 
-// todo : hack place to create this
-var dialogTool = new DialogTool();
-
-// TODO : better name?
-function reloadAdvDialogUI() {
-	// TODO : old code, remove once new dialog editor is in place
-
-	// // var dialogId = getCurDialogId(); // necessary?
-	// if( drawing.type === TileType.Sprite || drawing.type === TileType.Item ) {
-
-	// 	document.getElementById("dialogEditorHasContent").style.display = "block";
-	// 	document.getElementById("dialogEditorNoContent").style.display = "none";
-
-	// 	var dialogStr = document.getElementById("dialogText").value;
-	// 	document.getElementById("dialogCodeText").value = dialogStr;
-	// 	var scriptTree = scriptInterpreter.Parse( dialogStr );
-	// 	console.log("~~~~ RELOAD ADV DIALOG UI ~~~~~");
-	// 	console.log(scriptTree);
-	// 	createAdvDialogEditor(scriptTree);
-	// 	previewDialogScriptTree = scriptTree;
-	// }
-	// else {
-	// 	document.getElementById("dialogEditorHasContent").style.display = "none";
-	// 	document.getElementById("dialogEditorNoContent").style.display = "block";
-	// }
-}
-
-var curDialogEditor = null;
-function openDialogTool(dialogId) {
-	curDialogEditor = dialogTool.CreateEditor(dialogId);
-
-	var dialogEditorViewport = document.getElementById("dialogContentViewport");
-	dialogEditorViewport.innerHTML = "";
-	dialogEditorViewport.appendChild(curDialogEditor.GetElement());
-
-	showPanel('dialogPanel');
-}
-
-// TODO ... this should probably be temporary
-function openCurDialogInDialogTool() {
-	openDialogTool(getCurDialogId());
-}
-
 function reloadSprite() {
 	// animation UI
 	if ( sprite[drawing.id] && sprite[drawing.id].animation.isAnimated ) {
@@ -1647,9 +1584,10 @@ function on_edit_mode() {
 		isPreviewDialogMode = false;
 		updatePreviewDialogButton();
 
-		for(var i = 0; i < advDialogUIComponents.length; i++) {
-			advDialogUIComponents[i].GetEl().classList.remove("highlighted");
-		}
+		// TODO : rework dialog highlighting
+		// for(var i = 0; i < advDialogUIComponents.length; i++) {
+		// 	advDialogUIComponents[i].GetEl().classList.remove("highlighted");
+		// }
 	}
 	document.getElementById("previewDialogCheck").disabled = false;
 }
@@ -1831,8 +1769,6 @@ function on_paint_avatar_ui_update() {
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerFilterInput").value = "";
-
-	reloadAdvDialogUI();
 }
 
 function on_paint_tile() {
@@ -1859,8 +1795,6 @@ function on_paint_tile_ui_update() {
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerFilterInput").value = "";
-
-	reloadAdvDialogUI();
 }
 
 function on_paint_sprite() {
@@ -1894,8 +1828,6 @@ function on_paint_sprite_ui_update() {
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerFilterInput").value = "";
-
-	reloadAdvDialogUI();
 }
 
 function on_paint_item() {
@@ -1925,8 +1857,6 @@ function on_paint_item_ui_update() {
 	document.getElementById("showInventoryButton").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerFilterInput").value = "";
-
-	reloadAdvDialogUI();
 }
 
 function paintExplorerFilterChange( e ) {

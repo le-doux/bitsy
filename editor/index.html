@@ -647,14 +647,16 @@
 						</label>
 					</div>
 					<div id="dialog" class="controlBox" style="display:none;">
-						<span style="float:left;">
-							<span class="localize dialog_tool_name">dialog</span>
-						</span>
-						<button title="open in advanced dialog editor" style="float:right;" onclick="openCurDialogInDialogTool();">
-							<i class="material-icons">open_in_new</i>
-						</button>
-						<br>
-						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea gameTextDir" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog_finished();"></textarea> <!-- rows="2" cols="32" -->
+						<div style="display: flex;">
+							<span style="flex-grow: 1">
+								<span class="localize dialog_tool_name">dialog</span>
+							</span>
+							<button title="open in advanced dialog editor" style="" onclick="openCurDialogInDialogTool();">
+								<i class="material-icons">open_in_new</i>
+							</button>
+						</div>
+						<div id="paintDialogContent">
+						</div>
 					</div>
 
 					<div id="animationOuter" class="controlBox">
