@@ -321,6 +321,8 @@ function DialogTool() {
 		var textArea = document.createElement("textarea");
 		textArea.value = dialogNode.Serialize();
 		textArea.onchange = OnDialogTextChange;
+		textArea.rows = 2;
+		textArea.cols = 32;
 		textArea.addEventListener('click', textSelectionChangeHandler);
 		textArea.addEventListener('select', textSelectionChangeHandler);
 		textArea.addEventListener('blur', textSelectionChangeHandler);

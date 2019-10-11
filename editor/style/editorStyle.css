@@ -360,6 +360,18 @@ input {
 	/*background: red;*/
 }
 
+#paintModeRadio {
+	display: flex;
+}
+
+#paintModeRadio label {
+	flex-grow: 1;
+}
+
+#paint {
+	width: 285px;
+}
+
 #dialogCodeText {
 	width: 340px;
 	height: 530px;

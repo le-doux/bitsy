@@ -11,9 +11,11 @@
 	background: #e8e8ff;
 }
 
-#paintDialogContent {
-	height: 50px;
+.dialogContentMiniViewport {
+	height: 100px;
 	overflow: scroll;
+	border-top: solid 1px #ccccff;
+	min-width: 275px;
 }
 
 .blockEditor {
@@ -35,8 +37,9 @@
 .dialogEditor textarea {
 	background: black;
 	color: white;
-	width: 96%;
+	/*width: 96%;*/
 	border: none;
+	resize: vertical;
 }
 
 .sequenceEditor {

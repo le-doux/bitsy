@@ -566,7 +566,7 @@
 							<span class="localize paint_tool_name">paint</span>
 						</div>
 					</div>
-					<form>
+					<form id="paintModeRadio">
 						<input type="radio" name="paint mode" value="avatar" onclick="on_paint_avatar();" id="paintOptionAvatar" checked>
 						<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
 							<i class="material-icons">perm_identity</i>
@@ -655,7 +655,7 @@
 								<i class="material-icons">open_in_new</i>
 							</button>
 						</div>
-						<div id="paintDialogContent">
+						<div id="paintDialogContent" class="dialogContentMiniViewport">
 						</div>
 					</div>
 
