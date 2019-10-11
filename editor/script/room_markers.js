@@ -87,10 +87,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var newEnding = {
 			x : 2,
 			y : 2,
-			id : nextEndingId(),
+			id : nextAvailableDialogId(),
 		};
 		room[selectedRoom].endings.push( newEnding );
-		ending[ newEnding.id ] = localization.GetStringOrFallback("default_end_dlg", "The end");
+		dialog[ newEnding.id ] = localization.GetStringOrFallback("default_end_dlg", "The end");
 
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; }));
@@ -287,7 +287,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			else if (curMarker.type == MarkerType.Ending) {
 				endingOptions.style.display = "block";
 				var endingText = document.getElementById("endingText");
-				var endingSource = ending[curMarker.ending.id];
+				var endingSource = dialog[curMarker.ending.id];
 				var endingStr = scriptUtils.RemoveDialogBlockFormat(endingSource);
 				endingText.value = endingStr;
 			}
@@ -715,7 +715,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	this.ChangeEndingText = function(text) {
 		if (curMarker != null && curMarker.type == MarkerType.Ending) {
-			ending[curMarker.ending.id] = scriptUtils.EnsureDialogBlockFormat(text);
+			dialog[curMarker.ending.id] = scriptUtils.EnsureDialogBlockFormat(text);
 			refreshGameData();
 		}
 	}

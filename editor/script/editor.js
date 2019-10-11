@@ -71,10 +71,6 @@ function nextRoomId() {
 	return nextObjectId( sortedRoomIdList() );
 }
 
-function nextEndingId() {
-	return nextObjectId( sortedEndingIdList() );
-}
-
 function nextPaletteId() {
 	return nextObjectId( sortedPaletteIdList() );
 }
@@ -104,10 +100,6 @@ function sortedItemIdList() {
 
 function sortedRoomIdList() {
 	return sortedBase36IdList( room );
-}
-
-function sortedEndingIdList() {
-	return sortedBase36IdList( ending );
 }
 
 function sortedPaletteIdList() {
@@ -475,9 +467,6 @@ var itemIndex = 0;
 
 /* ROOM */
 var roomIndex = 0;
-
-/* ENDINGS */
-var endingIndex = 0;
 
 /* BROWSER COMPATIBILITY */
 var browserFeatures = {

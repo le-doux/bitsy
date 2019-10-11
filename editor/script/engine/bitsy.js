@@ -15,7 +15,6 @@ var palette = { //start off with a default palette
 			colors : [[0,0,0],[255,255,255],[255,255,255]]
 		}
 	};
-var ending = {};
 var variable = {}; // these are starting variable values -- they don't update (or I don't think they will)
 var playerId = "A";
 
@@ -33,7 +32,6 @@ var names = {
 	sprite : new Map(),
 	item : new Map(),
 	/*dialog : new Map()*/ // TODO
-	/*ending : new Map()*/ // TODO
 };
 function updateNamesFromCurData() {
 	names.room = new Map();
@@ -66,8 +64,8 @@ var spriteStartLocations = {};
 
 /* VERSION */
 var version = {
-	major: 6, // major changes
-	minor: 4 // smaller changes
+	major: 7, // major changes
+	minor: 0 // smaller changes
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
@@ -100,7 +98,6 @@ function clearGameData() {
 			colors : [[0,0,0],[255,255,255],[255,255,255]]
 		}
 	};
-	ending = {};
 	isEnding = false; //todo - correct place for this?
 	variable = {};
 
@@ -701,7 +698,7 @@ function moveSprites() {
 				var itmIndex = getItemIndex( spr.room, spr.x, spr.y );
 				if (end) { //if the sprite hits an ending
 					if (id === playerId) { // only the player can end the game
-						startNarrating( ending[end.id], true /*isEnding*/ );
+						startNarrating( dialog[end.id], true /*isEnding*/ );
 					}
 				}
 				else if (ext) { //if the sprite hits an exit
@@ -1016,7 +1013,7 @@ function movePlayer(direction) {
 	}
 
 	if (end) {
-		startNarrating( ending[end.id], true /*isEnding*/ );
+		startNarrating( dialog[end.id], true /*isEnding*/ );
 	}
 	else if (ext) {
 		movePlayerThroughExit(ext);
@@ -1224,7 +1221,7 @@ function parseWorld(file) {
 			i = parsePalette(lines, i);
 		}
 		else if (getType(curLine) === "ROOM" || getType(curLine) === "SET") { //SET for back compat
-			i = parseRoom(lines, i);
+			i = parseRoom(lines, i, versionNumber);
 		}
 		else if (getType(curLine) === "TIL") {
 			i = parseTile(lines, i);
@@ -1241,7 +1238,8 @@ function parseWorld(file) {
 		else if (getType(curLine) === "DLG") {
 			i = parseDialog(lines, i);
 		}
-		else if (getType(curLine) === "END") {
+		else if (getType(curLine) === "END" && versionNumber < 7) {
+			// parse endings for back compat
 			i = parseEnding(lines, i);
 		}
 		// TODO: vNext
@@ -1490,12 +1488,6 @@ function serializeWorld(skipFonts) {
 		worldStr += dialog[id] + "\n";
 		worldStr += "\n";
 	}
-	/* ENDINGS */
-	for (id in ending) {
-		worldStr += "END " + id + "\n";
-		worldStr += ending[id] + "\n";
-		worldStr += "\n";
-	}
 	// TODO : vNext
 	// /* SCRIPTS */
 	// for (id in script) {
@@ -1584,7 +1576,7 @@ function parseTitle(lines, i) {
 	return i;
 }
 
-function parseRoom(lines, i) {
+function parseRoom(lines, i, versionNumber) {
 	var id = getId(lines[i]);
 	room[id] = {
 		id : id,
@@ -1716,6 +1708,12 @@ function parseRoom(lines, i) {
 		else if (getType(lines[i]) === "END") {
 			/* ADD ENDING */
 			var endId = getId( lines[i] );
+
+			// back compat for when endings were stored separate from other dialog
+			if (versionNumber < 7) {
+				endId = "_end_" + endId;
+			}
+
 			var endCoords = getCoord( lines[i], 2 );
 			var end = {
 				id : endId,
@@ -2025,13 +2023,14 @@ function parseDrawingCore(lines, i, drwId) {
 // 	Ending : 2,
 // };
 
-function parseScript(lines, i, objectStore) {
+function parseScript(lines, i, backCompatPrefix) {
 	// TODO : vNext
 	// if (scriptType === undefined || scriptType === null) {
 	// 	scriptType = ScriptType.Script;
 	// }
 
 	var id = getId(lines[i]);
+	id = backCompatPrefix + id;
 	i++;
 
 	var results = scriptUtils.ReadDialogScript(lines,i);
@@ -2042,7 +2041,7 @@ function parseScript(lines, i, objectStore) {
 	// 	type: scriptType,
 	// };
 
-	objectStore[id] = results.script;
+	dialog[id] = results.script;
 
 	i = results.index;
 
@@ -2050,11 +2049,11 @@ function parseScript(lines, i, objectStore) {
 }
 
 function parseDialog(lines, i) {
-	return parseScript(lines, i, dialog);
+	return parseScript(lines, i, "");
 }
 
 function parseEnding(lines, i) {
-	return parseScript(lines, i, ending);
+	return parseScript(lines, i, "_end_");
 }
 
 function parseVariable(lines, i) {
