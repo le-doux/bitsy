@@ -1355,6 +1355,9 @@ function serializeWorld(skipFonts) {
 					if (e.transition_effect != undefined && e.transition_effect != null) {
 						worldStr += " FX " + e.transition_effect;
 					}
+					if (e.dlg != undefined && e.dlg != null) {
+						worldStr += " DLG " + e.dlg;
+					}
 					worldStr += "\n";
 				}
 			}
@@ -1619,8 +1622,7 @@ function parseRoom(lines, i, versionNumber) {
 					y : parseInt(destCoords[1])
 				},
 				transition_effect : null,
-				// TODO : vNext
-				// script_id : null,
+				dlg: null,
 			};
 
 			// optional arguments
@@ -1630,11 +1632,10 @@ function parseRoom(lines, i, versionNumber) {
 					ext.transition_effect = exitArgs[exitArgIndex+1];
 					exitArgIndex += 2;
 				}
-				// TODO : vNext
-				// else if (exitArgs[exitArgIndex] == "PRG") {
-				// 	ext.script_id = exitArgs[exitArgIndex+1];
-				// 	exitArgIndex += 2;
-				// }
+				else if (exitArgs[exitArgIndex] == "DLG") {
+					ext.dlg = exitArgs[exitArgIndex+1];
+					exitArgIndex += 2;
+				}
 				else {
 					exitArgIndex += 1;
 				}
