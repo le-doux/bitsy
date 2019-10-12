@@ -55,8 +55,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				y : 13
 			},
 			transition_effect : null,
-			// TODO : vNext
-			// script_id : null,
 		}
 		room[selectedRoom].exits.push( newExit );
 
@@ -69,8 +67,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				y : newExit.y
 			},
 			transition_effect : null,
-			// TODO : vNext
-			// script_id : null,
 		}
 		room[newExit.dest.room].exits.push( newReturn );
 
@@ -96,21 +92,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; }));
 		refreshGameData();
 	}
-
-	// TODO : vNext
-	// this.AddEffect = function() {
-	// 	var newEffect = {
-	// 		x : 2,
-	// 		y : 2,
-	// 		id : nextScriptHexId(),
-	// 	};
-	// 	room[selectedRoom].effects.push( newEffect );
-	// 	script[ newEffect.id ] = { type: ScriptType.Script, source: "" }; // TODO : default effect?
-
-	// 	markerList = GatherMarkerList();
-	// 	SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Effect && m.effect == newEffect; }));
-	// 	refreshGameData();
-	// }
 
 	this.Clear = function() {
 		selectedRoom = null;
@@ -254,10 +235,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		else if (curMarker.type == MarkerType.Ending) {
 			markerName1.innerText = localization.GetStringOrFallback("ending_label", "ending");
 		}
-		// TODO : vNext
-		// else if (curMarker.type == MarkerType.Effect) {
-		// 	markerName1.innerText = "effect"; // TODO localize
-		// }
 	}
 
 	function UpdateMarkerOptions() {
@@ -292,14 +269,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				var dialogEditor = dialogTool.CreateEditor(curMarker.ending.id);
 				dialogContent.appendChild(dialogEditor.GetElement());
 			}
-			// TODO : vNext
-			// else if (curMarker.type == MarkerType.Effect) {
-			// 	effectOptions.style.display = "block";
-			// 	var effectText = document.getElementById("effectText");
-			// 	var effectSource = script[curMarker.effect.id].source;
-			// 	var effectStr = scriptUtils.RemoveDialogBlockFormat(effectSource);
-			// 	effectText.value = effectStr;
-			// }
 		}
 	}
 
@@ -626,17 +595,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 						ending)
 					);
 			}
-
-			// TODO : vNext
-			// for (var e in room[selectedRoom].effects) {
-			// 	var effect = room[selectedRoom].effects[e];
-
-			// 	markerList.push(
-			// 		new EffectMarker(
-			// 			selectedRoom,
-			// 			effect)
-			// 		);
-			// }
 		}
 
 		return markerList;
@@ -720,14 +678,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
-	// TDODO : vNext
-	// this.ChangeEffectText = function(text) {
-	// 	if (curMarker != null && curMarker.type == MarkerType.Effect) {
-	// 		script[curMarker.effect.id].source = scriptUtils.EnsureDialogBlockFormat(text);
-	// 		refreshGameData();
-	// 	}
-	// }
-
 	events.Listen("palette_change", function(event) {
 		RenderMarkerSelection();
 	});
@@ -737,8 +687,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 var MarkerType = { // TODO : I should probably find a way to get rid of this
 	Exit : 0,
 	Ending : 1,
-	// TODO : vNext
-	// Effect: 2,
 };
 
 var PlacementMode = {
@@ -1086,8 +1034,6 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 			this.SwapExitAndEntrance();
 
 			if (tempReturnOptions != null) {
-				// TODO : vNext
-				// this.exit.script_id = tempReturnOptions.script_id;
 				this.exit.transition_effect = tempReturnOptions.transition_effect;
 			}
 
@@ -1098,8 +1044,6 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 			this.SwapExitAndEntrance(); // swap first
 
 			if (tempExitOptions != null) {
-				// TODO : vNext
-				// this.exit.script_id = tempExitOptions.script_id;
 				this.exit.transition_effect = tempExitOptions.transition_effect;
 			}
 
@@ -1112,13 +1056,9 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 					y : this.exit.y
 				},
 				transition_effect : null,
-				// TODO : vNext
-				// script_id : null,
 			}
 
 			if (tempReturnOptions != null) {
-				// TODO : vNext
-				// newReturn.script_id = tempReturnOptions.script_id;
 				newReturn.transition_effect = tempReturnOptions.transition_effect;
 			}
 
@@ -1230,72 +1170,3 @@ function EndingMarker(parentRoom, ending) {
 
 	// this.OnSelect = function() {} // TODO
 } // EndingMarker()
-
-
-// TODO : vNext
-// // TODO : feels like I can find a way to share more logic with EndingMarker
-// function EffectMarker(parentRoom, effect) {
-// 	InitMarkerObj( this, new RoomMarkerBase(parentRoom) );
-
-// 	this.type = MarkerType.Effect;
-
-// 	this.effect = effect;
-
-// 	this.Draw = function(ctx,roomId,w,selected) {
-// 		if (this.parentRoom === roomId) {
-// 			this.base.DrawMarker(ctx, this.effect.x, this.effect.y, w, selected);
-// 			// TODO - specialize??
-// 		}
-// 	}
-
-// 	this.GetMarkerPos = function(markerIndex) {
-// 		return {
-// 			room: this.parentRoom,
-// 			x: this.effect.x,
-// 			y: this.effect.y,
-// 		};
-// 	}
-
-// 	this.IsAtLocation = function(roomId,x,y) {
-// 		return this.parentRoom === roomId && this.effect.x == x && this.effect.y == y;
-// 	}
-
-// 	var isDragging = false;
-
-// 	this.StartDrag = function(roomId,x,y) {
-// 		isDragging = this.IsAtLocation(roomId,x,y);
-// 	}
-
-// 	this.ContinueDrag = function(roomId,x,y) {
-// 		if (isDragging) {
-// 			this.effect.x = x;
-// 			this.effect.y = y;
-// 		}
-// 	}
-
-// 	this.EndDrag = function() {
-// 		isDragging = false;
-// 	}
-
-// 	this.Remove = function() {
-// 		delete script[this.effect.id];
-// 		var effectIndex = room[this.parentRoom].effects.indexOf(this.effect);
-// 		room[this.parentRoom].effects.splice(effectIndex,1);
-// 	}
-
-// 	this.PlaceMarker = function(placementMode,roomId,x,y) {
-// 		if (placementMode != PlacementMode.None) {
-// 			this.effect.x = x;
-// 			this.effect.y = y;
-// 			if (roomId != this.parentRoom) {
-// 				this.Remove();
-// 				room[roomId].effects.push(this.effect);
-// 				this.parentRoom = roomId;
-// 			}
-// 		}
-// 	}
-
-// 	this.Match = function(otherMarker) {
-// 		return this.type == otherMarker.type && this.effect == otherMarker.effect;
-// 	}
-// }

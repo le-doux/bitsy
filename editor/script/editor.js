@@ -128,16 +128,6 @@ function nextAvailableDialogId(prefix) {
 	return id;
 }
 
-/* NEW HEX ID SYSTEM HELPERS */
-// TODO : vNext
-// function nextScriptHexId() {
-// 	return nextObjectHexId( sortedScriptHexIdList() );
-// }
-
-// function sortedScriptHexIdList() {
-// 	return sortedHexIdList( script );
-// }
-
 function nextObjectHexId(idList) {
 	if (idList.length <= 0) {
 		return "0";

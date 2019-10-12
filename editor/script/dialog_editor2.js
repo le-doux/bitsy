@@ -11,20 +11,20 @@
 		- pre-group dialog blocks (less likely)
 
 	todo
-	- use new editor in multiple places!
+	X use new editor in multiple places!
 	- see where I can re-use more code
 	X deal w/ clutter of control buttons
 	- different colors for different types of blocks?
 		- tried it: not sure how useful it is
 	- light / dark alternating colors for options?
 	- arrows connecting blocks at same level
-	- better descriptions of actions
+	X better descriptions of actions
 	X save changes to dialog
-	- save changes to conditions
+	X save changes to conditions
 	- function editor
 	- new functions
 		- stop default, exit, end, narrate, give / take items
-	- combine DLG and END
+	X combine DLG and END
 	- add DLG to EXT
 */
 

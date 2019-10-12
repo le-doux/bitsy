@@ -984,8 +984,6 @@ function movePlayer(direction) {
 	
 	var ext = getExit( player().room, player().x, player().y );
 	var end = getEnding( player().room, player().x, player().y );
-	// TODO : vNext
-	// var eff = getEffect( player().room, player().x, player().y );
 	var itmIndex = getItemIndex( player().room, player().x, player().y );
 
 	// do items first, because you can pick up an item AND go through a door
@@ -1018,10 +1016,6 @@ function movePlayer(direction) {
 	else if (ext) {
 		movePlayerThroughExit(ext);
 	}
-	// TODO : vNext
-	// else if (eff) {
-	// 	startDialog( script[eff.id].source, eff.id );
-	// }
 	else if (spr) {
 		startSpriteDialog( spr /*spriteId*/ );
 	}
@@ -1041,19 +1035,6 @@ function movePlayerThroughExit(ext) {
 		player().y = ext.dest.y;
 		curRoom = ext.dest.room;
 	};
-
-	// TODO : vNext
-	// if(ext.script_id != null && script[ext.script_id]){
-	// 	var scriptSourceStr = script[ext.script_id].source;
-	// 	startDialog(scriptSourceStr, ext.script_id, function(isExitUnlocked) {
-	// 		if (isExitUnlocked == true) {
-	// 			GoToDest();
-	// 		}
-	// 	});
-	// }
-	// else {
-	// 	GoToDest();
-	// }
 
 	GoToDest();
 }
@@ -1148,17 +1129,6 @@ function getEnding(roomId,x,y) {
 	return null;
 }
 
-// TODO : vNext
-// function getEffect(roomId,x,y) {
-// 	for (i in room[roomId].effects) {
-// 		var e = room[roomId].effects[i];
-// 		if (x == e.x && y == e.y) {
-// 			return e;
-// 		}
-// 	}
-// 	return null;
-// }
-
 function getTile(x,y) {
 	// console.log(x + " " + y);
 	var t = getRoom().tilemap[y][x];
@@ -1242,10 +1212,6 @@ function parseWorld(file) {
 			// parse endings for back compat
 			i = parseEnding(lines, i);
 		}
-		// TODO: vNext
-		// else if (getType(curLine) === "PRG") {
-		// 	i = parseScript(lines, i);
-		// }
 		else if (getType(curLine) === "VAR") {
 			i = parseVariable(lines, i);
 		}
@@ -1389,10 +1355,6 @@ function serializeWorld(skipFonts) {
 					if (e.transition_effect != undefined && e.transition_effect != null) {
 						worldStr += " FX " + e.transition_effect;
 					}
-					// TODO : vNext
-					// if (e.script_id != undefined && e.script_id != null) {
-					// 	worldStr += " PRG " + e.script_id;
-					// }
 					worldStr += "\n";
 				}
 			}
@@ -1406,15 +1368,6 @@ function serializeWorld(skipFonts) {
 				worldStr += "\n";
 			}
 		}
-		// TODO : vNext
-		// if (room[id].effects.length > 0) {
-		// 	/* EFFECTS */
-		// 	for (j in room[id].effects) {
-		// 		var e = room[id].effects[j];
-		// 		worldStr += "EFF " + e.id + " " + e.x + "," + e.y;
-		// 		worldStr += "\n";
-		// 	}
-		// }
 		if (room[id].pal != null && room[id].pal != "default") {
 			/* PALETTE */
 			worldStr += "PAL " + room[id].pal + "\n";
@@ -1488,21 +1441,6 @@ function serializeWorld(skipFonts) {
 		worldStr += dialog[id] + "\n";
 		worldStr += "\n";
 	}
-	// TODO : vNext
-	// /* SCRIPTS */
-	// for (id in script) {
-	// 	if (script[id].type == ScriptType.Dialogue) {
-	// 		worldStr += "DLG " + id + "\n";
-	// 	}
-	// 	else if (script[id].type == ScriptType.Ending) {
-	// 		worldStr += "END " + id + "\n";
-	// 	}
-	// 	else {
-	// 		worldStr += "PRG " + id + "\n";
-	// 	}
-	// 	worldStr += script[id].source + "\n";
-	// 	worldStr += "\n";
-	// }
 	/* VARIABLES */
 	for (id in variable) {
 		worldStr += "VAR " + id + "\n";
@@ -1584,7 +1522,6 @@ function parseRoom(lines, i, versionNumber) {
 		walls : [],
 		exits : [],
 		endings : [],
-		// effects : [], // TODO vNext
 		items : [],
 		pal : null,
 		name : null
@@ -1722,18 +1659,6 @@ function parseRoom(lines, i, versionNumber) {
 			};
 			room[id].endings.push(end);
 		}
-		// TODO : vNext
-		// else if (getType(lines[i]) === "EFF") {
-		// 	/* ADD EFFECT */
-		// 	var effectId = getId( lines[i] );
-		// 	var effectCoords = getCoord( lines[i], 2 );
-		// 	var effect = {
-		// 		id : effectId,
-		// 		x : parseInt( effectCoords[0] ),
-		// 		y : parseInt( effectCoords[1] ),
-		// 	};
-		// 	room[id].effects.push(effect);
-		// }
 		else if (getType(lines[i]) === "PAL") {
 			/* CHOOSE PALETTE (that's not default) */
 			room[id].pal = getId(lines[i]);
@@ -2016,30 +1941,12 @@ function parseDrawingCore(lines, i, drwId) {
 	return i;
 }
 
-// TODO : vNext
-// var ScriptType = {
-// 	Script : 0,
-// 	Dialogue : 1, // TODO : move everything to this spelling?
-// 	Ending : 2,
-// };
-
 function parseScript(lines, i, backCompatPrefix) {
-	// TODO : vNext
-	// if (scriptType === undefined || scriptType === null) {
-	// 	scriptType = ScriptType.Script;
-	// }
-
 	var id = getId(lines[i]);
 	id = backCompatPrefix + id;
 	i++;
 
 	var results = scriptUtils.ReadDialogScript(lines,i);
-
-	// TODO : vNext
-	// script[id] = {
-	// 	source: results.script,
-	// 	type: scriptType,
-	// };
 
 	dialog[id] = results.script;
 

@@ -255,25 +255,6 @@ function deprecatedFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
-// TODO : vNext
-// function returnFunc(environment,parameters,onReturn) {
-// 	var ret = { isReturn: true, result: null };
-// 	if (parameters.length > 0 && parameters[0] != undefined && parameters[0] != null) {
-// 		ret.result = parameters[0];
-// 	}
-// 	onReturn(ret);
-// }
-
-// TODO : vNext
-// // TODO : this is kind of hacky
-// // - needs to work with names too
-// function changeAvatarFunc(environment,parameters,onReturn) {
-// 	if( parameters[0] != undefined && parameters[0] != null ) {
-// 		sprite["A"].drw = "SPR_" + parameters[0];
-// 	}
-// 	onReturn(null);
-// }
-
 function printFunc(environment,parameters,onReturn) {
 	// console.log("PRINT FUNC");
 	// console.log(parameters);
@@ -490,10 +471,6 @@ var Environment = function() {
 	functionMap.set("printTile", printTileFunc);
 	functionMap.set("printItem", printItemFunc);
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
-
-	// TODO : vNext
-	// functionMap.set("changeAvatar", changeAvatarFunc);
-	// functionMap.set("return", returnFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn) {
