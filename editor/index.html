@@ -451,27 +451,19 @@
 								<button title="add ending" class="color0" onclick="newEnding();">
 									<i class="material-icons">add</i> <span class="localize ending_label">ending</span>
 								</button>
-								<!-- <button title="add scripted effect" class="color0" onclick="newEffect();">
-									<i class="material-icons">add</i> effect
-								</button> -->
 							</div>
 						</div>
 						<div id="markerOptions">
 							<div id="endingOptions" class="controlBox">
 								<div style="display: flex;">
 									<span class="localize ending_dialog" style="flex-grow:1;">ending dialog</span>
-									<button title="open in dialog editor" style="" onclick="openEndingDialogInDialogTool();">
+									<button title="open in dialog editor" style="" onclick="openMarkerDialogInDialogTool();">
 										<i class="material-icons">open_in_new</i>
 									</button>
 								</div>
 								<div id="endingDialogContent" class="dialogContentMiniViewport">
 								</div>
 							</div>
-							<!-- <div id="effectOptions" class="controlBox">
-								<span>effect script</span>
-								<br/>
-								<textarea id="effectText" onchange="onEffectTextChange(event);" onkeydown="onEffectTextChange(event);" onkeyup="onEffectTextChange(event);" style="resize: vertical; width: 32ch;"></textarea>
-							</div> -->
 							<div id="exitOptions" class="controlBox">
 								<input type="checkbox" id="showExitOptionsCheck" onclick="onToggleExitOptions();" />
 								<label title="show / hide exit options" for="showExitOptionsCheck">
@@ -508,49 +500,25 @@
 											</select>
 										</div>
 
-										<!-- <div style="margin-bottom: 5px; margin-top: 12px;">
-											<span id="exitScriptOptions">
-												<input type="checkbox" id="exitDialogCheck" onchange="setElementClass('exitScriptControls','exitDialogActive',event.target.checked);"/>
-												<label for="exitDialogCheck">
-													<i class="material-icons">chat</i>
-													dialog
-												</label>
+										<div id="exitDialogControls">
+											<!-- TODO : temporary UI... I think I can do better -->
+											<div id="exitAddDialog">
+												<button onclick="addNewExitDialog()">add dialog</button>
+												<span>or</span>
+												<button>add lock</button>
+											</div>
 
-												<input type="checkbox" id="exitChangeAvatarCheck" onchange="setElementClass('exitScriptControls','exitAvatarActive',event.target.checked);"/>
-												<label for="exitChangeAvatarCheck">
-													<i class="material-icons">nature_people</i>
-													change avatar
-												</label>
-
-												<input type="checkbox" id="exitLockCheck" onchange="setElementClass('exitScriptControls','exitLockActive',event.target.checked);"/>
-												<label for="exitLockCheck">
-													<i class="material-icons">vpn_key</i>
-													lock
-												</label>
-											</span>
-										</div> -->
-
-										<!-- <div id="exitScriptControls" class="controlBox">
-											<span class="exitLockControl">unlock door if:</span>
-											<br class="exitLockControl"/>
-
-											<span class="exitDialogAndLockControl">dialog when door is locked:</span>
-											<br class="exitDialogAndLockControl"/>
-											<textarea class="exitDialogAndLockControl" style="resize: vertical; width: 32ch;"></textarea>
-											<br class="exitDialogAndLockControl"/>
-
-											<span class="exitDialogControl">dialog</span><span class="exitDialogAndLockControl"> when door is unlocked</span><span class="exitDialogControl">:</span>
-											<br class="exitDialogControl"/>
-											<textarea class="exitDialogControl" style="resize: vertical; width: 32ch;"></textarea>
-											<br class="exitDialogControl"/>
-
-											<span class="exitAvatarControl">on enter, change avatar sprite to:</span>
-											<br class="exitAvatarControl"/>
-											<select class="exitAvatarControl">
-												<option>sprite A</option>
-												<option>sprite a</option>
-											</select>
-										</div> -->
+											<div id="exitDialogEditor" class="controlBox">
+												<div style="display: flex;">
+													<span style="flex-grow:1;">exit dialog</span>
+													<button title="open in dialog editor" style="" onclick="openMarkerDialogInDialogTool();">
+														<i class="material-icons">open_in_new</i>
+													</button>
+												</div>
+												<div id="exitDialogContent" class="dialogContentMiniViewport">
+												</div>
+											</div>
+										</div>
 									</div>
 								</div>
 

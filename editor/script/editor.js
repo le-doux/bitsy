@@ -337,8 +337,12 @@ function openCurDialogInDialogTool() {
 	openDialogTool(getCurDialogId());
 }
 
-function openEndingDialogInDialogTool() {
-	markerTool.OpenEndingDialogInDialogTool();
+function openMarkerDialogInDialogTool() {
+	markerTool.OpenMarkerDialogInDialogTool();
+}
+
+function addNewExitDialog() {
+	markerTool.AddExitDialog();
 }
 
 

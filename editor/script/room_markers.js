@@ -305,6 +305,24 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		for (var i = 0; i < transitionSelect.options.length; i++) {
 			transitionSelect.options[i].selected = (transitionSelect.options[i].value === transitionId);
 		}
+
+		var exitDialogControls = document.getElementById("exitDialogControls");
+
+		if (exit.dlg != undefined && exit.dlg != null) {
+			if (!exitDialogControls.classList.contains("exitHasDialog")) {
+				exitDialogControls.classList.add("exitHasDialog");
+			}
+
+			var dialogContent = document.getElementById("exitDialogContent");
+			dialogContent.innerHTML = "";
+			var dialogEditor = dialogTool.CreateEditor(exit.dlg);
+			dialogContent.appendChild(dialogEditor.GetElement());
+		}
+		else {
+			if (exitDialogControls.classList.contains("exitHasDialog")) {
+				exitDialogControls.classList.remove("exitHasDialog");
+			}
+		}
 	}
 	this.UpdateExitOptions = UpdateExitOptions;
 
@@ -672,9 +690,31 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
-	this.OpenEndingDialogInDialogTool = function() {
-		if (curMarker != null && curMarker.type == MarkerType.Ending) {
-			openDialogTool(curMarker.ending.id);
+	this.OpenMarkerDialogInDialogTool = function() {
+		if (curMarker != null) {
+			if (curMarker.type == MarkerType.Ending) {
+				openDialogTool(curMarker.ending.id);
+			}
+			else if (curMarker.type == MarkerType.Exit) {
+				var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
+				if (exit.dlg != undefined && exit.dlg != null) {
+					openDialogTool(exit.dlg);
+				}
+			}
+		}
+	}
+
+	this.AddExitDialog = function() {
+		if (curMarker != null && curMarker.type == MarkerType.Exit) {
+			var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
+			if (exit.dlg === undefined || exit.dlg === null) {
+				var newDialogId = nextAvailableDialogId();
+				dialog[newDialogId] = "You walk through the doorway";
+				exit.dlg = newDialogId;
+				refreshGameData();
+
+				UpdateExitOptions(curExitOptionsSelectId);
+			}
 		}
 	}
 
