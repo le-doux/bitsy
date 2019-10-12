@@ -262,112 +262,6 @@ function setInitialVariables() {
 	scriptInterpreter.SetOnVariableChangeHandler( onVariableChanged );
 }
 
-// TODO: this is likely broken
-function breadthFirstSearch(map, from, to) {
-	from.trail = [];
-	var visited = [];
-	var queue = [from];
-	visited.push( posToString(from) );
-
-	//console.log( "~ bfs ~");
-	//console.log( posToString(from) + " to " + posToString(to) );
-
-	while ( queue.length > 0 ) {
-
-		//grab pos from queue and mark as visited
-		var curPos = queue.shift();
-
-		//console.log( posToString(curPos) );
-		//console.log( ".. " + pathToString(curPos.trail) );
-		//console.log( visited );
-
-		if (curPos.x == to.x && curPos.y == to.y) {
-			//found a path!
-			var path = curPos.trail.splice(0);
-			path.push( curPos );
-			return path;
-		}
-
-		//look at neighbors
-		neighbors(curPos).forEach( function(n) {
-			var inBounds = (n.x >= 0 && n.x < 16 && n.y >= 0 && n.y < 16);
-			if (inBounds) {
-				var noCollision = map[n.y][n.x] <= 0;
-				var notVisited = visited.indexOf( posToString(n) ) == -1;
-				if (noCollision && notVisited) {
-					n.trail = curPos.trail.slice();
-					n.trail.push(curPos);
-					queue.push( n );
-					visited.push( posToString(n) );
-				}
-			}
-		});
-
-	}
-
-	return []; // no path found
-}
-
-function posToString(pos) {
-	return pos.x + "," + pos.y;
-}
-
-function pathToString(path) {
-	var s = "";
-	for (i in path) {
-		s += posToString(path[i]) + " ";
-	}
-	return s;
-}
-
-function neighbors(pos) {
-	var neighborList = [];
-	neighborList.push( {x:pos.x+1, y:pos.y+0} );
-	neighborList.push( {x:pos.x-1, y:pos.y+0} );
-	neighborList.push( {x:pos.x+0, y:pos.y+1} );
-	neighborList.push( {x:pos.x+0, y:pos.y-1} );
-	return neighborList;
-}
-
-function collisionMap(roomId) {
-	var map = [
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	];
-
-	for (r in room[roomId].tilemap) {
-		var row = room[roomId].tilemap[r];
-		for (var c = 0; c < row.length; c++) {
-			if (room[roomId].walls.indexOf( row[x] ) != -1) {
-				map[r][c] = 1;
-			}
-		}
-	}
-
-	for (id in sprite) {
-		var spr = sprite[id];
-		if (spr.room === roomId) {
-			map[spr.y][spr.x] = 2;
-		}
-	}
-
-	return map;
-}
-
 function getOffset(evt) {
 	var offset = { x:0, y:0 };
 
@@ -532,9 +426,6 @@ function update() {
 			dialogRenderer.Draw( dialogBuffer, deltaTime );
 			dialogBuffer.Update( deltaTime );
 		}
-		else if (!isEnding) {
-			moveSprites(); // TODO : I probably need to remove this..
-		}
 
 		// keep moving avatar if player holds down button
 		if( !dialogBuffer.IsActive() && !isEnding )
@@ -675,71 +566,6 @@ function resetAllAnimations() {
 			itm.animation.frameIndex = 0;
 		}
 	}
-}
-
-var moveCounter = 0;
-var moveTime = 200;
-function moveSprites() {
-	moveCounter += deltaTime;
-
-	if (moveCounter >= moveTime) {
-
-		for (id in sprite) {
-			var spr = sprite[id];
-			if (spr.walkingPath.length > 0) {
-				//move sprite
-				var nextPos = spr.walkingPath.shift();
-				spr.x = nextPos.x;
-				spr.y = nextPos.y;
-
-
-				var end = getEnding( spr.room, spr.x, spr.y );
-				var ext = getExit( spr.room, spr.x, spr.y );
-				var itmIndex = getItemIndex( spr.room, spr.x, spr.y );
-				if (end) { //if the sprite hits an ending
-					if (id === playerId) { // only the player can end the game
-						startNarrating( dialog[end.id], true /*isEnding*/ );
-					}
-				}
-				else if (ext) { //if the sprite hits an exit
-					//move it to another scene
-					spr.room = ext.dest.room;
-					spr.x = ext.dest.x;
-					spr.y = ext.dest.y;
-					if (id === playerId) {
-						//if the player changes scenes, change the visible scene
-						curRoom = ext.dest.room;
-					}
-				}
-				else if(itmIndex > -1) {
-					var itm = room[ spr.room ].items[ itmIndex ];
-					room[ spr.room ].items.splice( itmIndex, 1 );
-					if( spr.inventory[ itm.id ] ) {
-						spr.inventory[ itm.id ] += 1;
-					}
-					else {
-						spr.inventory[ itm.id ] = 1;
-					}
-
-					if (onInventoryChanged != null) {
-						onInventoryChanged( itm.id );
-					}
-
-					if (id === playerId) {
-						startItemDialog( itm.id  /*itemId*/ );
-					}
-
-					// stop moving : is this a good idea?
-					spr.walkingPath = [];
-				}
-
-				if (id === playerId) didPlayerMoveThisFrame = true;
-			}
-		}
-
-		moveCounter = 0;
-	}
-
 }
 
 function getSpriteAt(x,y) {
@@ -1832,7 +1658,6 @@ function parseSprite(lines, i) {
 		room : null, //default location is "offstage"
 		x : -1,
 		y : -1,
-		walkingPath : [], //tile by tile movement path (isn't saved)
 		animation : {
 			isAnimated : (renderer.GetFrameCount(drwId) > 1),
 			frameIndex : 0,
