@@ -21,18 +21,17 @@ var Interpreter = function() {
 		env.SetScript( scriptName, script );
 	}
 	this.Run = function(scriptName, exitHandler) { // Runs pre-compiled script
-		// console.log("RUN");
-		// console.log(env.GetScript( scriptName ));
-		env.GetScript( scriptName )
-			.Eval( env, function(result) { OnScriptReturn(result, exitHandler); } );
+		var localEnv = new LocalEnvironment(env);
 
-		// console.log("SERIALIZE!!!!");
-		// console.log( env.GetScript( scriptName ).Serialize() );
+		var script = env.GetScript(scriptName);
+
+		script.Eval( localEnv, function(result) { OnScriptReturn(localEnv, exitHandler); } );
 	}
 	this.Interpret = function(scriptStr, exitHandler) { // Compiles and runs code immediately
 		// console.log("INTERPRET");
+		var localEnv = new LocalEnvironment(env);
 		var script = parser.Parse( scriptStr );
-		script.Eval( env, function(result) { OnScriptReturn(result, exitHandler); } );
+		script.Eval( localEnv, function(result) { OnScriptReturn(localEnv, exitHandler); } );
 	}
 	this.HasScript = function(name) { return env.HasScript(name); };
 
@@ -49,12 +48,6 @@ var Interpreter = function() {
 	}
 
 	function OnScriptReturn(result, exitHandler) {
-		if (isReturnObject(result)) {
-			result = result.result; // pull out the contained result
-		}
-
-		// console.log("RESULT " + result);
-
 		if (exitHandler != null) {
 			exitHandler(result);
 		}
@@ -365,6 +358,12 @@ function shakyFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
+function lockFunc(environment,parameters,onReturn) {
+	console.log(environment);
+	environment.LockDefaultAction();
+	onReturn(null);
+}
+
 /* BUILT-IN OPERATORS */
 function setExp(environment,left,right,onReturn) {
 	// console.log("SET " + left.name);
@@ -471,12 +470,15 @@ var Environment = function() {
 	functionMap.set("printTile", printTileFunc);
 	functionMap.set("printItem", printItemFunc);
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
+	functionMap.set("lock", lockFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
-	this.EvalFunction = function(name,parameters,onReturn) {
-		// console.log(functionMap);
-		// console.log(name);
-		functionMap.get( name )( this, parameters, onReturn );
+	this.EvalFunction = function(name,parameters,onReturn,env) {
+		if (env == undefined || env == null) {
+			env = this;
+		}
+
+		functionMap.get(name)(env, parameters, onReturn);
 	}
 
 	var variableMap = new Map();
@@ -487,15 +489,17 @@ var Environment = function() {
 		// console.log("SET VARIABLE " + name + " = " + value);
 		if(useHandler === undefined) useHandler = true;
 		variableMap.set(name, value);
-		if(onVariableChangeHandler != null && useHandler)
+		if(onVariableChangeHandler != null && useHandler){
 			onVariableChangeHandler(name);
+		}
 	};
 	this.DeleteVariable = function(name,useHandler) {
 		if(useHandler === undefined) useHandler = true;
 		if(variableMap.has(name)) {
 			variableMap.delete(name);
-			if(onVariableChangeHandler != null && useHandler)
+			if(onVariableChangeHandler != null && useHandler) {
 				onVariableChangeHandler(name);
+			}
 		}
 	};
 
@@ -530,6 +534,53 @@ var Environment = function() {
 	}
 }
 
+// Local environment for a single run of a script: knows local context
+var LocalEnvironment = function(parentEnvironment) {
+	// this.SetDialogBuffer // not allowed in local environment?
+	this.GetDialogBuffer = function() { return parentEnvironment.GetDialogBuffer(); };
+
+	this.HasFunction = function(name) { return parentEnvironment.HasFunction(name); };
+	this.EvalFunction = function(name,parameters,onReturn,env) {
+		if (env == undefined || env == null) {
+			env = this;
+		}
+
+		parentEnvironment.EvalFunction(name,parameters,onReturn,env);
+	}
+
+	this.HasVariable = function(name) { return parentEnvironment.HasVariable(name); };
+	this.GetVariable = function(name) { return parentEnvironment.GetVariable(name); };
+	this.SetVariable = function(name,value,useHandler) { parentEnvironment.SetVariable(name,value,useHandler); };
+	// this.DeleteVariable // not needed in local environment?
+
+	this.HasOperator = function(sym) { return parentEnvironment.HasOperator(sym); };
+	this.EvalOperator = function(sym,left,right,onReturn,env) {
+		if (env == undefined || env == null) {
+			env = this;
+		}
+
+		parentEnvironment.EvalOperator(sym,left,right,onReturn,env);
+	};
+
+	// TODO : I don't *think* any of this is required by the local environment
+	// this.HasScript
+	// this.GetScript
+	// this.SetScript
+
+	// TODO : pretty sure these debug methods aren't required by the local environment either
+	// this.SetOnVariableChangeHandler
+	// this.GetVariableNames
+
+	/* Here's where specific local context data goes:
+	 * so far it's just whether we want to stop the default action
+	 * that usually comes after this action
+	 * but there will be more later (I swear!)
+	*/
+	var isLocked = false;
+	this.LockDefaultAction = function() { isLocked = true; };
+	this.IsDefaultActionLocked = function() { return isLocked; };
+}
+
 function leadingWhitespace(depth) {
 	var str = "";
 	for(var i = 0; i < depth; i++) {
@@ -560,12 +611,6 @@ var TreeRelationship = function() {
 	};
 }
 
-function isReturnObject(val) {
-	return typeof val === "object" && val != null
-				&& val.isReturn != undefined && val.isReturn != null
-				&& val.isReturn;
-}
-
 var BlockMode = {
 	Code : "code",
 	Dialog : "dialog"
@@ -592,16 +637,9 @@ var BlockNode = function(mode, doIndentFirstLine) {
 				// console.log(">> CHILD " + i);
 				children[i].Eval( environment, function(val) {
 					// console.log("<< CHILD " + i);
-
-					if (isReturnObject(val)) { // early return
-						lastVal = val;
-						done();
-					}
-					else {
-						lastVal = val;
-						i++;
-						evalChildren(children,done);
-					}
+					lastVal = val;
+					i++;
+					evalChildren(children,done);
 				} );
 			}
 			else {

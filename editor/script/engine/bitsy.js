@@ -866,8 +866,10 @@ function movePlayerThroughExit(ext) {
 		// TODO : I need to simplify dialog code,
 		// so I don't have to get the ID and the source str
 		// every time!
-		startDialog(dialog[ext.dlg], ext.dlg, function() {
-			GoToDest();
+		startDialog(dialog[ext.dlg], ext.dlg, function(result) {
+			if (!result.IsDefaultActionLocked()) {
+				GoToDest();
+			}
 		});
 	}
 	else {
