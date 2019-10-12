@@ -345,6 +345,10 @@ function addNewExitDialog() {
 	markerTool.AddExitDialog();
 }
 
+function addNewExitDialogLock() {
+	markerTool.AddExitDialogLock();
+}
+
 
 function reloadDialogUI() {
 	var dialogContent = document.getElementById("paintDialogContent");

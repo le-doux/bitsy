@@ -704,18 +704,33 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
-	this.AddExitDialog = function() {
+	function AddExitDialogScript(scriptStr) {
 		if (curMarker != null && curMarker.type == MarkerType.Exit) {
 			var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
 			if (exit.dlg === undefined || exit.dlg === null) {
 				var newDialogId = nextAvailableDialogId();
-				dialog[newDialogId] = "You walk through the doorway";
+				dialog[newDialogId] = scriptStr;
 				exit.dlg = newDialogId;
 				refreshGameData();
 
 				UpdateExitOptions(curExitOptionsSelectId);
 			}
 		}
+	}
+
+	this.AddExitDialog = function() {
+		AddExitDialogScript("You walk through the doorway");
+	}
+
+	this.AddExitDialogLock = function() {
+		AddExitDialogScript(
+				'"""\n' +
+				'{\n' +
+				'  - {item "0"} < 1 ?\n' +
+				'    {lock}\n' +
+				'}\n' +
+				'"""'
+			);
 	}
 
 	events.Listen("palette_change", function(event) {
