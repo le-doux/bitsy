@@ -1036,7 +1036,17 @@ function movePlayerThroughExit(ext) {
 		curRoom = ext.dest.room;
 	};
 
-	GoToDest();
+	if (ext.dlg != undefined && ext.dlg != null) {
+		// TODO : I need to simplify dialog code,
+		// so I don't have to get the ID and the source str
+		// every time!
+		startDialog(dialog[ext.dlg], ext.dlg, function() {
+			GoToDest();
+		});
+	}
+	else {
+		GoToDest();
+	}
 }
 
 function getItemIndex( roomId, x, y ) {
