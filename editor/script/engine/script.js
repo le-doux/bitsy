@@ -124,6 +124,21 @@ var Utils = function() {
 		return block;
 	}
 
+	this.CreateLiteralNodeFromString = function(str) {
+		if (str === "true") {
+			return new LiteralNode(true);
+		}
+		else if (str === "false") {
+			return new LiteralNode(false);
+		}
+		else if (!isNaN(parseFloat(str))) {
+			return new LiteralNode(parseFloat(str));
+		}
+		else {
+			return new LiteralNode(str);
+		}
+	}
+
 	// TODO : need to split up code & dialog blocks :|
 	this.CreateCodeBlock = function() {
 		return new BlockNode(BlockMode.Code);
@@ -365,6 +380,12 @@ function shakyFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
+function narrateFunc(environment,parameters,onReturn) {
+	isNarrating = true;
+	dialogRenderer.SetCentered(true);
+	onReturn(null);
+}
+
 function lockFunc(environment,parameters,onReturn) {
 	environment.LockDefaultAction();
 	onReturn(null);
@@ -375,9 +396,11 @@ function endFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
-function narrateFunc(environment,parameters,onReturn) {
-	isNarrating = true;
-	dialogRenderer.SetCentered(true);
+function exitFunc(environment,parameters,onReturn) {
+	player().room = parameters[0];
+	player().x = parseInt(parameters[1]);
+	player().y = parseInt(parameters[2]);
+	curRoom = parameters[0];
 	onReturn(null);
 }
 
@@ -487,9 +510,10 @@ var Environment = function() {
 	functionMap.set("printTile", printTileFunc);
 	functionMap.set("printItem", printItemFunc);
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
+	functionMap.set("narrate", narrateFunc);
 	functionMap.set("lock", lockFunc);
 	functionMap.set("end", endFunc);
-	functionMap.set("narrate", narrateFunc);
+	functionMap.set("exit", exitFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn,env) {
@@ -738,28 +762,28 @@ function isMultilineListBlock(node) {
 	return false;
 }
 
-var FuncNode = function(name,arguments) {
+var FuncNode = function(name,args) {
 	Object.assign( this, new TreeRelationship() );
 	// Object.assign( this, new Runnable() );
 	this.type = "function";
 	this.name = name;
-	this.arguments = arguments;
+	this.args = args;
 
 	this.Eval = function(environment,onReturn) {
 
-		if( this.onEnter != null ) this.onEnter();
+		if(this.onEnter != null) {
+			this.onEnter();
+		}
 
-		// console.log("FUNC");
-		// console.log(this.arguments);
 		var argumentValues = [];
 		var i = 0;
-		function evalArgs(arguments,done) {
-			if(i < arguments.length) {
+		function evalArgs(args,done) {
+			if(i < args.length) {
 				// Evaluate each argument
-				arguments[i].Eval( environment, function(val) {
+				args[i].Eval( environment, function(val) {
 					argumentValues.push( val );
 					i++;
-					evalArgs(arguments,done);
+					evalArgs(args,done);
 				} );
 			}
 			else {
@@ -767,14 +791,12 @@ var FuncNode = function(name,arguments) {
 			}
 		};
 		var self = this; // hack to deal with scope
-		evalArgs( this.arguments, function() {
-			// Then evaluate the function
-			// console.log("ARGS");
-			// console.log(argumentValues);
+		evalArgs( this.args, function() {
+			if(self.onExit != null) {
+				self.onExit();
+			}
 
-			if( self.onExit != null ) self.onExit();
-
-			environment.EvalFunction( self.name, argumentValues, onReturn );
+			environment.EvalFunction(self.name, argumentValues, onReturn);
 		} );
 	}
 
@@ -782,7 +804,7 @@ var FuncNode = function(name,arguments) {
 		var isDialogBlock = this.parent.mode && this.parent.mode === BlockMode.Dialog;
 		if(isDialogBlock && this.name === "print") {
 			// TODO this could cause problems with "real" print functions
-			return this.arguments[0].value; // first argument should be the text of the {print} func
+			return this.args[0].value; // first argument should be the text of the {print} func
 		}
 		else if(isDialogBlock && this.name === "br") {
 			return "\n";
@@ -790,9 +812,9 @@ var FuncNode = function(name,arguments) {
 		else {
 			var str = "";
 			str += this.name;
-			for(var i = 0; i < this.arguments.length; i++) {
+			for(var i = 0; i < this.args.length; i++) {
 				str += " ";
-				str += this.arguments[i].Serialize(depth);
+				str += this.args[i].Serialize(depth);
 			}
 			return str;
 		}

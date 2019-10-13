@@ -320,6 +320,15 @@ function DialogTool() {
 					return editor;
 				}));
 
+		div.appendChild(
+			makeActionBuilderButton(
+				"exit",
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("exit");
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
 		var cancelButton = document.createElement("button");
 		cancelButton.classList.add("actionBuilderButton");
 		cancelButton.classList.add("actionBuilderCancel");
@@ -710,6 +719,7 @@ function DialogTool() {
 		"lock" : "lock the default action",
 		"end" : "end the game",
 		"narrate" : "start narration",
+		"exit" : "move player to room _ at pos _ _",
 	};
 
 	function FunctionEditor(node, parentEditor) {
@@ -722,9 +732,48 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
 
-		var span = document.createElement("span");
-		span.innerText = functionDescriptionMap[functionNode.name];
-		div.appendChild(span);
+		var descriptionDiv = document.createElement("div");
+		div.appendChild(descriptionDiv);
+
+		function CreateFunctionDescription() {
+			descriptionDiv.innerHTML = "";
+
+			var descriptionText = functionDescriptionMap[functionNode.name];
+			var descriptionTextSplit = descriptionText.split("_");
+
+			function CreateParameterChangeHandler(paramIndex) {
+				return function(event) {
+					var val = event.target.value;
+
+					var literal = scriptUtils.CreateLiteralNodeFromString(val);
+
+					functionNode.args.splice(paramIndex, 1, literal);
+
+					parentEditor.NotifyUpdate();
+				}
+			}
+
+			for (var i = 0; i < descriptionTextSplit.length; i++) {
+				var descriptionSpan = document.createElement("span");
+				descriptionSpan.innerText = descriptionTextSplit[i];
+				descriptionDiv.appendChild(descriptionSpan);
+
+				if (i < descriptionTextSplit.length - 1) {			
+					var parameterInput = document.createElement("input");
+					parameterInput.type = "text";
+
+					if (functionNode.args.length > i) {
+						parameterInput.value = functionNode.args[i].Serialize();
+					}
+
+					parameterInput.onchange = CreateParameterChangeHandler(i);
+
+					descriptionDiv.appendChild(parameterInput);	
+				}
+			}
+		}
+
+		CreateFunctionDescription();
 
 		this.GetElement = function() {
 			return div;

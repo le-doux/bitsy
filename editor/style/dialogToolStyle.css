@@ -128,3 +128,7 @@
 .selectedEditor > .addOption button {
 	display: block;
 }
+
+.functionEditor input[type="text"] {
+	width: 50px;
+}
