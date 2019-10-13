@@ -117,6 +117,13 @@ var Utils = function() {
 		return new FuncNode("print", [new LiteralNode(" ")]);
 	}
 
+	this.CreateFunctionBlock = function(name) {
+		var node = new FuncNode(name, []);
+		var block = new BlockNode( BlockMode.Code );
+		block.AddChild(node);
+		return block;
+	}
+
 	// TODO : need to split up code & dialog blocks :|
 	this.CreateCodeBlock = function() {
 		return new BlockNode(BlockMode.Code);

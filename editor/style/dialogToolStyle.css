@@ -23,14 +23,14 @@
 	padding: 2%;
 }
 
-.dialogEditor {
+.actionEditor {
+	background: white;
 	padding: 2%;
 	margin-bottom: 2%;
-	background: white;
 	border: solid 1px #6767b2;
 }
 
-.selectedEditor.dialogEditor {
+.selectedEditor.actionEditor {
 	border: solid 2px #6767b2;
 }
 
@@ -42,30 +42,8 @@
 	resize: vertical;
 }
 
-.sequenceEditor {
-	background: white;
-	padding: 2%;
-	margin-bottom: 2%;
-	border: solid 1px #6767b2;
-}
-
-.selectedEditor.sequenceEditor {
-	border: solid 2px #6767b2;
-}
-
 .sequenceDescription {
 	margin-bottom: 2%;
-}
-
-.conditionalEditor {
-	background: white;
-	padding: 2%;
-	margin-bottom: 2%;
-	border: solid 1px #6767b2;
-}
-
-.selectedEditor.conditionalEditor {
-	border: solid 2px #6767b2;
 }
 
 .conditionEditor {

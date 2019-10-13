@@ -25,7 +25,7 @@
 	- new functions
 		- stop default, exit, end, narrate, give / take items
 	X combine DLG and END
-	- add DLG to EXT
+	X add DLG to EXT
 */
 
 function DialogTool() {
@@ -123,6 +123,10 @@ function DialogTool() {
 			function isIf(node) { return isBlock(node) && isChildType(node,"if") && !node.children[0].IsSingleLine(); };
 			function isSeq(node) { return isBlock(node) && (isChildType(node,"sequence") || isChildType(node,"cycle") || isChildType(node,"shuffle")); };
 
+			function isDescribedFunction(node) {
+				return isBlock(node) && isChildType(node, "function") && functionDescriptionMap[node.children[0].name] != undefined;
+			}
+
 			var dialogNodeList = [];
 			function addText() {
 				if (dialogNodeList.length > 0) {
@@ -148,6 +152,12 @@ function DialogTool() {
 
 					console.log("SEQ NODE!!");
 					var editor = new SequenceEditor(node, self);
+					childEditors.push(editor);
+				}
+				else if (isDescribedFunction(node)) {
+					addText();
+
+					var editor = new FunctionEditor(node, self);
 					childEditors.push(editor);
 				}
 				else {
@@ -283,6 +293,15 @@ function DialogTool() {
 					return editor;
 				}));
 
+		div.appendChild(
+			makeActionBuilderButton(
+				"lock",
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("lock");
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
 		var cancelButton = document.createElement("button");
 		cancelButton.classList.add("actionBuilderButton");
 		cancelButton.classList.add("actionBuilderCancel");
@@ -303,6 +322,7 @@ function DialogTool() {
 
 		var div = document.createElement("div");
 		div.classList.add("dialogEditor");
+		div.classList.add("actionEditor");
 
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
@@ -353,6 +373,7 @@ function DialogTool() {
 
 		var div = document.createElement("div");
 		div.classList.add("sequenceEditor");
+		div.classList.add("actionEditor");
 
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
@@ -527,6 +548,7 @@ function DialogTool() {
 
 		var div = document.createElement("div");
 		div.classList.add("conditionalEditor");
+		div.classList.add("actionEditor");
 
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
@@ -666,12 +688,22 @@ function DialogTool() {
 		}
 	}
 
-	// TODO
-	function FunctionEditor(node) {
+	var functionDescriptionMap = {
+		"lock" : "lock the default action",
+	};
+
+	function FunctionEditor(node, parentEditor) {
+		var functionNode = node.children[0];
+
 		var div = document.createElement("div");
+		div.classList.add("functionEditor");
+		div.classList.add("actionEditor");
+
+		var orderControls = new OrderControls(this, parentEditor);
+		div.appendChild(orderControls.GetElement());
 
 		var span = document.createElement("span");
-		span.innerText = "function";
+		span.innerText = functionDescriptionMap[functionNode.name];
 		div.appendChild(span);
 
 		this.GetElement = function() {
@@ -681,6 +713,8 @@ function DialogTool() {
 		this.GetNodes = function() {
 			return [node];
 		}
+
+		AddSelectionBehavior(this);
 	}
 
 	function OrderControls(editor, parentEditor) {
