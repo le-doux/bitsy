@@ -329,6 +329,24 @@ function DialogTool() {
 					return editor;
 				}));
 
+		div.appendChild(
+			makeActionBuilderButton(
+				"give item",
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("giveItem");
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"take item",
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("takeItem");
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
 		var cancelButton = document.createElement("button");
 		cancelButton.classList.add("actionBuilderButton");
 		cancelButton.classList.add("actionBuilderCancel");
@@ -720,6 +738,8 @@ function DialogTool() {
 		"end" : "end the game",
 		"narrate" : "start narration",
 		"exit" : "move player to room _ at pos _ _",
+		"giveItem" : "give the player _ x _", // TODO : need to be able to change the param order?
+		"takeItem" : "take _ x _ from the player",
 	};
 
 	function FunctionEditor(node, parentEditor) {

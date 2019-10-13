@@ -404,6 +404,39 @@ function exitFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
+function giveItemFunc(environment,parameters,onReturn) {
+	var itemId = parameters[0];
+	var itemCount = parseInt(parameters[1]);
+
+	if (player().inventory[itemId]) {
+		player().inventory[itemId] += itemCount;
+	}
+	else {
+		player().inventory[itemId] = itemCount;
+	}
+
+	if (onInventoryChanged != null) {
+		onInventoryChanged(itemId);
+	}
+}
+
+function takeItemFunc(environment,parameters,onReturn) {
+	var itemId = parameters[0];
+	var itemCount = parseInt(parameters[1]);
+
+	if (player().inventory[itemId]) {
+		player().inventory[itemId] -= itemCount;
+
+		if (player().inventory[itemId] < 0) {
+			player().inventory[itemId] = 0;
+		}
+	}
+
+	if (onInventoryChanged != null) {
+		onInventoryChanged(itemId);
+	}
+}
+
 /* BUILT-IN OPERATORS */
 function setExp(environment,left,right,onReturn) {
 	// console.log("SET " + left.name);
@@ -514,6 +547,8 @@ var Environment = function() {
 	functionMap.set("lock", lockFunc);
 	functionMap.set("end", endFunc);
 	functionMap.set("exit", exitFunc);
+	functionMap.set("giveItem", giveItemFunc);
+	functionMap.set("takeItem", takeItemFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn,env) {
