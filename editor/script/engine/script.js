@@ -418,6 +418,8 @@ function giveItemFunc(environment,parameters,onReturn) {
 	if (onInventoryChanged != null) {
 		onInventoryChanged(itemId);
 	}
+
+	onReturn(null);
 }
 
 function takeItemFunc(environment,parameters,onReturn) {
@@ -435,6 +437,8 @@ function takeItemFunc(environment,parameters,onReturn) {
 	if (onInventoryChanged != null) {
 		onInventoryChanged(itemId);
 	}
+
+	onReturn(null);
 }
 
 /* BUILT-IN OPERATORS */
