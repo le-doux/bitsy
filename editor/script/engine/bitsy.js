@@ -1977,11 +1977,26 @@ var fontManager = new FontManager();
 
 function onExitDialog(scriptResult, dialogCallback) {
 	isDialogMode = false;
-	if (isNarrating) isNarrating = false;
+
+	if (isNarrating) {
+		isNarrating = false;
+	}
+
+	// TODO : this global variable for endings is pretty weird
+	if (isEnding) {
+		// Stop the game from ending if the end script has locked
+		// the default action
+		if (scriptResult.IsDefaultActionLocked()) {
+			isEnding = false;
+		}
+	}
+
 	if (isDialogPreview) {
 		isDialogPreview = false;
-		if (onDialogPreviewEnd != null)
+
+		if (onDialogPreviewEnd != null) {
 			onDialogPreviewEnd();
+		}
 	}
 
 	if (dialogCallback != undefined && dialogCallback != null) {
@@ -1999,10 +2014,13 @@ TODO
 function startNarrating(dialogStr,end) {
 	console.log("NARRATE " + dialogStr);
 
-	if(end === undefined) end = false;
+	if(end === undefined) {
+		end = false;
+	}
 
 	isNarrating = true;
 	isEnding = end;
+
 	startDialog(dialogStr);
 }
 
