@@ -366,8 +366,18 @@ function shakyFunc(environment,parameters,onReturn) {
 }
 
 function lockFunc(environment,parameters,onReturn) {
-	console.log(environment);
 	environment.LockDefaultAction();
+	onReturn(null);
+}
+
+function endFunc(environment,parameters,onReturn) {
+	isEnding = true;
+	onReturn(null);
+}
+
+function narrateFunc(environment,parameters,onReturn) {
+	isNarrating = true;
+	dialogRenderer.SetCentered(true);
 	onReturn(null);
 }
 
@@ -478,6 +488,8 @@ var Environment = function() {
 	functionMap.set("printItem", printItemFunc);
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
 	functionMap.set("lock", lockFunc);
+	functionMap.set("end", endFunc);
+	functionMap.set("narrate", narrateFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn,env) {

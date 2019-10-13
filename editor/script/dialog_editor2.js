@@ -302,6 +302,24 @@ function DialogTool() {
 					return editor;
 				}));
 
+		div.appendChild(
+			makeActionBuilderButton(
+				"end",
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("end");
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"narrate",
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("narrate");
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
 		var cancelButton = document.createElement("button");
 		cancelButton.classList.add("actionBuilderButton");
 		cancelButton.classList.add("actionBuilderCancel");
@@ -690,6 +708,8 @@ function DialogTool() {
 
 	var functionDescriptionMap = {
 		"lock" : "lock the default action",
+		"end" : "end the game",
+		"narrate" : "start narration",
 	};
 
 	function FunctionEditor(node, parentEditor) {
