@@ -124,7 +124,7 @@ var Utils = function() {
 		return block;
 	}
 
-	this.CreateLiteralNodeFromString = function(str) {
+	this.CreateLiteralNode = function(str) {
 		if (str === "true") {
 			return new LiteralNode(true);
 		}
@@ -137,6 +137,10 @@ var Utils = function() {
 		else {
 			return new LiteralNode(str);
 		}
+	}
+
+	this.CreateStringLiteralNode = function(str) {
+		return new LiteralNode(str);
 	}
 
 	// TODO : need to split up code & dialog blocks :|

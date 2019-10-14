@@ -734,15 +734,43 @@ function DialogTool() {
 	}
 
 	var functionDescriptionMap = {
-		"lock" : "lock the default action",
-		"end" : "end the game",
-		"narrate" : "start narration",
-		"exit" : "move player to room _ at pos _ _",
-		"giveItem" : "give the player _ x _", // TODO : need to be able to change the param order?
-		"takeItem" : "take _ x _ from the player",
+		"lock" : {
+			description : "lock the default action",
+			parameters : [],
+		},
+		"end" : {
+			description : "end the game",
+			parameters : [],
+		},
+		"exit" : {
+			description : "move player to _",
+			parameters : [
+				{ type: "roomPos", index: 0 },
+			],
+		},
+		"narrate" : {
+			description : "start narration",
+			parameters : [],
+		},
+		"giveItem" : {
+			description : "give player _ of _",
+			parameters : [
+				{ type: "count", index: 1 },
+				{ type: "itemId", index: 0 },
+			],
+		},
+		"takeItem" : {
+			description : "take _ of _ from player",
+			parameters : [
+				{ type: "count", index: 1 },
+				{ type: "itemId", index: 0 },
+			],
+		},
 	};
 
 	function FunctionEditor(node, parentEditor) {
+		var self = this;
+
 		var functionNode = node.children[0];
 
 		var div = document.createElement("div");
@@ -755,40 +783,30 @@ function DialogTool() {
 		var descriptionDiv = document.createElement("div");
 		div.appendChild(descriptionDiv);
 
+		// TODO : populate default values!!
 		function CreateFunctionDescription() {
 			descriptionDiv.innerHTML = "";
 
-			var descriptionText = functionDescriptionMap[functionNode.name];
+			var descriptionText = functionDescriptionMap[functionNode.name].description;
 			var descriptionTextSplit = descriptionText.split("_");
-
-			function CreateParameterChangeHandler(paramIndex) {
-				return function(event) {
-					var val = event.target.value;
-
-					var literal = scriptUtils.CreateLiteralNodeFromString(val);
-
-					functionNode.args.splice(paramIndex, 1, literal);
-
-					parentEditor.NotifyUpdate();
-				}
-			}
 
 			for (var i = 0; i < descriptionTextSplit.length; i++) {
 				var descriptionSpan = document.createElement("span");
 				descriptionSpan.innerText = descriptionTextSplit[i];
 				descriptionDiv.appendChild(descriptionSpan);
 
-				if (i < descriptionTextSplit.length - 1) {			
-					var parameterInput = document.createElement("input");
-					parameterInput.type = "text";
+				if (i < descriptionTextSplit.length - 1) {
+					var parameterInfo = functionDescriptionMap[functionNode.name].parameters[i];
 
-					if (functionNode.args.length > i) {
-						parameterInput.value = functionNode.args[i].Serialize();
+					var parameterEditor;
+					if (parameterEditorMap[parameterInfo.type]) {
+						parameterEditor = new parameterEditorMap[parameterInfo.type](functionNode, parameterInfo.index, self);
+					}
+					else {
+						parameterEditor = new DefaultParameterEditor(functionNode, parameterInfo.index, self);
 					}
 
-					parameterInput.onchange = CreateParameterChangeHandler(i);
-
-					descriptionDiv.appendChild(parameterInput);	
+					descriptionDiv.appendChild(parameterEditor.GetElement());	
 				}
 			}
 		}
@@ -803,8 +821,169 @@ function DialogTool() {
 			return [node];
 		}
 
+		this.NotifyUpdate = function() {
+			parentEditor.NotifyUpdate();
+		}
+
 		AddSelectionBehavior(this);
 	}
+
+	function DefaultParameterEditor(functionNode, parameterIndex, parentEditor) {
+		var span = document.createElement("span");
+
+		var parameterInput = document.createElement("input");
+		parameterInput.type = "text";
+		span.appendChild(parameterInput);
+
+		if (functionNode.args.length > parameterIndex) {
+			parameterInput.value = functionNode.args[parameterIndex].Serialize();
+		}
+
+		parameterInput.onchange = function(event) {
+			var val = event.target.value;
+
+			var literal = scriptUtils.CreateLiteralNode(val);
+
+			functionNode.args.splice(parameterIndex, 1, literal);
+
+			parentEditor.NotifyUpdate();
+		}
+
+		this.GetElement = function() {
+			return span;
+		}
+	}
+
+	function CountParameterEditor(functionNode, parameterIndex, parentEditor) {
+		var span = document.createElement("span");
+
+		var parameterInput = document.createElement("input");
+		parameterInput.type = "number";
+		parameterInput.min = 0;
+		span.appendChild(parameterInput);
+
+		if (functionNode.args.length > parameterIndex) {
+			parameterInput.value = parseInt(functionNode.args[parameterIndex].Serialize());
+		}
+
+		parameterInput.onchange = function(event) {
+			var val = event.target.value;
+
+			var literal = scriptUtils.CreateLiteralNode(val);
+
+			functionNode.args.splice(parameterIndex, 1, literal);
+
+			parentEditor.NotifyUpdate();
+		}
+
+		this.GetElement = function() {
+			return span;
+		}
+	}
+
+	function ItemIdParameterEditor(functionNode, parameterIndex, parentEditor) {
+		var span = document.createElement("span");
+
+		var curSelectedId = "0";
+		if (functionNode.args.length > parameterIndex) {
+			// TODO : error checking
+			curSelectedId = functionNode.args[parameterIndex].Serialize().slice(1,-1);
+		}
+
+		var itemSelect = document.createElement("select");
+		itemSelect.title = "choose item to check";
+		span.appendChild(itemSelect);
+		for(id in item) {
+			var itemOption = document.createElement("option");
+			itemOption.value = id;
+			itemOption.innerText = (item[id].name != null ? item[id].name : localization.GetStringOrFallback("item_label", "item") + " " + id);
+			itemOption.selected = id === curSelectedId;
+			itemSelect.appendChild(itemOption);
+		}
+
+		itemSelect.onchange = function(event) {
+			var val = event.target.value;
+
+			var literal = scriptUtils.CreateStringLiteralNode(val);
+
+			functionNode.args.splice(parameterIndex, 1, literal);
+
+			parentEditor.NotifyUpdate();		
+		}
+
+		this.GetElement = function() {
+			return span;
+		}
+	}
+
+	function RoomPosParameterEditor(functionNode, parameterIndex, parentEditor) {
+		var span = document.createElement("span");
+
+		var posLabel = document.createElement("span");
+		span.appendChild(posLabel);
+
+		var roomId = "0";
+		var roomPosX = 0;
+		var roomPosY = 0;
+
+		if (functionNode.args.length > (parameterIndex + 2)) {
+			roomId = functionNode.args[parameterIndex + 0].Serialize().slice(1,-1);
+			roomPosX = parseInt(functionNode.args[parameterIndex + 1].Serialize());
+			roomPosY = parseInt(functionNode.args[parameterIndex + 2].Serialize());
+		}
+
+		function UpdatePosLabel() {
+			var roomName = room[roomId] != undefined ? room[roomId].name : undefined;
+			if (roomName == undefined || roomName == null) {
+				roomName = localization.GetStringOrFallback("room_tool_name", "room") + " " + roomId;
+			}
+			posLabel.innerText = roomName + " (" + roomPosX + "," + roomPosY + ")";
+		}
+		UpdatePosLabel();
+
+		var isMoving = false;
+
+		var moveButton = document.createElement("button");
+		moveButton.innerText = "move";
+		moveButton.onclick = function() {
+			isMoving = !isMoving;
+
+			if (isMoving) {
+				posLabel.innerText = "click in room";
+			}
+			else {
+				UpdatePosLabel();
+			}
+		}
+		span.appendChild(moveButton);
+
+		events.Listen("click_room", function(event) {
+			if (isMoving) {
+				roomId = event.roomId;
+				roomPosX = event.x;
+				roomPosY = event.y;
+
+				functionNode.args.splice(parameterIndex + 0, 1, scriptUtils.CreateStringLiteralNode(roomId));
+				functionNode.args.splice(parameterIndex + 1, 1, scriptUtils.CreateLiteralNode(roomPosX));
+				functionNode.args.splice(parameterIndex + 2, 1, scriptUtils.CreateLiteralNode(roomPosY));
+
+				isMoving = false;
+				UpdatePosLabel();
+
+				parentEditor.NotifyUpdate();
+			}
+		});
+
+		this.GetElement = function() {
+			return span;
+		}
+	}
+
+	var parameterEditorMap = {
+		"count" : CountParameterEditor,
+		"itemId" : ItemIdParameterEditor,
+		"roomPos" : RoomPosParameterEditor,
+	};
 
 	function OrderControls(editor, parentEditor) {
 		var div = document.createElement("div");
