@@ -132,3 +132,17 @@
 .functionEditor input[type="text"] {
 	width: 50px;
 }
+
+.roomPosParameterEditor {
+	padding: 5px;
+	border-radius: 2px;
+	background: #e8e8ff;
+}
+
+.roomPosParameterEditor span {
+	margin-right: 5px;
+}
+
+.roomPosParameterEditor button {
+	background: #ccccff;
+}

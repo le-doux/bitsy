@@ -29,7 +29,17 @@ function RoomTool(canvas) {
 
 	this.markers = null;
 
+	var isDisabledExternally = false;
+	events.Listen("disable_room_tool", function() {
+		isDisabledExternally = true;
+	});
+	events.Listen("enable_room_tool", function() {
+		isDisabledExternally = false;
+	});
+
 	function onMouseDown(e) {
+		var isDisabledTemp = isDisabledExternally; // hack to exit early if disabled at START of mouse down
+
 		var off = getOffset(e);
 		off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
 		var x = Math.floor( off.x / (tilesize*scale) );
@@ -37,6 +47,10 @@ function RoomTool(canvas) {
 		// console.log(x + " " + y);
 
 		events.Raise("click_room", { roomId : curRoom, x : x, y : y });
+
+		if (isDisabledTemp) {
+			return;
+		}
 
 		if( self.editDrawingAtCoordinateCallback != null && e.altKey ) {
 			self.editDrawingAtCoordinateCallback(x,y); // "eye dropper"
@@ -126,6 +140,10 @@ function RoomTool(canvas) {
 	}
 
 	function onMouseMove(e) {
+		if (isDisabledExternally) {
+			return;
+		}
+
 		if( self.markers.GetSelectedMarker() != null && self.markers.IsDraggingMarker() ) {
 			// drag marker around
 			var off = getOffset(e);
@@ -142,6 +160,10 @@ function RoomTool(canvas) {
 	}
 
 	function onMouseUp(e) {
+		if (isDisabledExternally) {
+			return;
+		}
+
 		editTilesOnDrag(e);
 		isDragAddingTiles = false;
 		isDragDeletingTiles = false;

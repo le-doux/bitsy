@@ -918,6 +918,7 @@ function DialogTool() {
 
 	function RoomPosParameterEditor(functionNode, parameterIndex, parentEditor) {
 		var span = document.createElement("span");
+		span.classList.add("roomPosParameterEditor");
 
 		var posLabel = document.createElement("span");
 		span.appendChild(posLabel);
@@ -944,15 +945,21 @@ function DialogTool() {
 		var isMoving = false;
 
 		var moveButton = document.createElement("button");
-		moveButton.innerText = "move";
+		// moveButton.innerText = "move";
+		moveButton.innerHTML = '<i class="material-icons">location_searching</i>';
+		moveButton.title = "click to select new room location";
 		moveButton.onclick = function() {
 			isMoving = !isMoving;
 
 			if (isMoving) {
-				posLabel.innerText = "click in room";
+				posLabel.innerHTML = "<i>click in room</i>";
+				moveButton.innerHTML = '<i class="material-icons">cancel</i>';
+				events.Raise("disable_room_tool"); // TODO : don't know if I like this design
 			}
 			else {
 				UpdatePosLabel();
+				moveButton.innerHTML = '<i class="material-icons">location_searching</i>';
+				events.Raise("enable_room_tool");
 			}
 		}
 		span.appendChild(moveButton);
@@ -969,8 +976,11 @@ function DialogTool() {
 
 				isMoving = false;
 				UpdatePosLabel();
+				moveButton.innerHTML = '<i class="material-icons">location_searching</i>';
 
 				parentEditor.NotifyUpdate();
+
+				events.Raise("enable_room_tool");
 			}
 		});
 
