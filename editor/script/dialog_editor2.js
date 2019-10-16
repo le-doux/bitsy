@@ -174,6 +174,17 @@ function DialogTool() {
 			for (var i = 0; i < childEditors.length; i++) {
 				var editor = childEditors[i];
 				childEditorRootDiv.appendChild(editor.GetElement());
+
+				if (i < childEditors.length - 1) {
+					var svgArrow = document.createElement("div");
+					svgArrow.style.textAlign = "center";
+					// svgArrow.style.padding = "0px";
+					svgArrow.innerHTML = 
+						'<svg width="10" height="10">' +
+						'<polygon points="0, 0, 10, 0, 5, 10" fill="#6767b2" />' +
+						'</svg>';
+					childEditorRootDiv.appendChild(svgArrow);
+				}
 			}
 		}
 
