@@ -16,7 +16,9 @@
 	height: 100px;
 	overflow: scroll;
 	border-top: solid 1px #ccccff;
-	min-width: 275px;
+	/*min-width: 275px;*/
+	width: 300px;
+	white-space: normal;
 }
 
 .blockEditor {
