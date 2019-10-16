@@ -9,6 +9,7 @@
 	line-height: 1;
 	resize: both;
 	background: #e8e8ff;
+	white-space: normal;
 }
 
 .dialogContentMiniViewport {
@@ -20,14 +21,20 @@
 
 .blockEditor {
 	background: #e8e8ff;
-	padding: 2%;
+	padding: 5px;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
 }
 
 .actionEditor {
 	background: white;
-	padding: 2%;
-	margin-bottom: 2%;
+	padding: 5px;
+	margin-bottom: 5px;
 	border: solid 1px #6767b2;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
 }
 
 .selectedEditor.actionEditor {
@@ -43,17 +50,17 @@
 }
 
 .sequenceDescription {
-	margin-bottom: 2%;
+	margin-bottom: 5px;
 }
 
 .conditionEditor {
-	margin: 2%;
+	margin: 5px;
 }
 
 .optionEditor {
 	background: #e8e8ff;
-	margin-bottom: 2%;
-	padding: 2%;
+	margin-bottom: 5px;
+	padding: 5px;
 }
 
 .optionControls {
@@ -105,7 +112,7 @@
 
 .orderControls {
 	display: none;
-	margin-bottom: 2%;
+	margin-bottom: 5px;
 }
 
 .selectedEditor > .orderControls {
