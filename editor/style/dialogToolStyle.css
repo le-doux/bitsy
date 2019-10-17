@@ -31,7 +31,7 @@
 
 .actionEditor {
 	background: white;
-	padding: 5px;
+	padding: 10px;
 	/*margin-bottom: 5px;*/
 	border: solid 1px #6767b2;
 	display: flex;
@@ -76,6 +76,7 @@
 	/*display: flex;*/
 	display: none;
 	flex-direction: column;
+	margin-top: 5px;
 }
 
 .selectedEditor > .blockEditor > .actionBuilder {
