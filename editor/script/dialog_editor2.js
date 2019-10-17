@@ -438,7 +438,9 @@ function DialogTool() {
 		descriptionDiv.classList.add("sequenceDescription");
 		div.appendChild(descriptionDiv);
 
-		function CreateSequenceDescription() {
+		function CreateSequenceDescription(isEditable) {
+			console.log("CREATE DESC");
+
 			descriptionDiv.innerHTML = "";
 
 			var descriptionText = sequenceTypeDescriptionMap[sequenceNode.type];
@@ -448,28 +450,36 @@ function DialogTool() {
 			descSpan1.innerText = descriptionTextSplit[0];
 			descriptionDiv.appendChild(descSpan1);
 
-			var sequenceTypeSelect = document.createElement("select");
-			for (var type in sequenceTypeDescriptionMap) {
-				var sequenceTypeOption = document.createElement("option");
-				sequenceTypeOption.value = type;
-				sequenceTypeOption.innerText = type;
-				sequenceTypeOption.selected = (type === sequenceNode.type);
-				sequenceTypeSelect.appendChild(sequenceTypeOption);
+			if (isEditable) {
+				var sequenceTypeSelect = document.createElement("select");
+				for (var type in sequenceTypeDescriptionMap) {
+					var sequenceTypeOption = document.createElement("option");
+					sequenceTypeOption.value = type;
+					sequenceTypeOption.innerText = type;
+					sequenceTypeOption.selected = (type === sequenceNode.type);
+					sequenceTypeSelect.appendChild(sequenceTypeOption);
+				}
+				sequenceTypeSelect.onchange = function() {
+					sequenceNode = scriptUtils.ChangeSequenceType(sequenceNode, sequenceTypeSelect.value);
+					node.children = [sequenceNode];
+					CreateSequenceDescription(true);
+					parentEditor.NotifyUpdate();
+				}
+				descriptionDiv.appendChild(sequenceTypeSelect);
 			}
-			sequenceTypeSelect.onchange = function() {
-				sequenceNode = scriptUtils.ChangeSequenceType(sequenceNode, sequenceTypeSelect.value);
-				node.children = [sequenceNode];
-				CreateSequenceDescription();
-				parentEditor.NotifyUpdate();
+			else {
+				var sequenceTypeSpan = document.createElement("span");
+				sequenceTypeSpan.classList.add("parameterUneditable");
+				sequenceTypeSpan.innerText = sequenceNode.type;
+				descriptionDiv.appendChild(sequenceTypeSpan);
 			}
-			descriptionDiv.appendChild(sequenceTypeSelect);
 
 			var descSpan2 = document.createElement("span");
 			descSpan2.innerText = descriptionTextSplit[1];
 			descriptionDiv.appendChild(descSpan2);
 		}
 
-		CreateSequenceDescription();
+		CreateSequenceDescription(false);
 
 		var optionRootDiv = document.createElement("div");
 		optionRootDiv.classList.add("optionRoot");
@@ -496,7 +506,10 @@ function DialogTool() {
 			return div;
 		}
 
-		AddSelectionBehavior(this);
+		AddSelectionBehavior(
+			this,
+			function() { CreateSequenceDescription(true); }, /*onSelect*/
+			function() { CreateSequenceDescription(false); } /*onDeselect*/ );
 
 		this.GetNodes = function() {
 			return [node];
@@ -1047,13 +1060,19 @@ function DialogTool() {
 	}
 
 	var curSelectedEditor = null;
-	function AddSelectionBehavior(editor) {
+	function AddSelectionBehavior(editor, onSelect, onDeselect) {
 		editor.Select = function() {
 			editor.GetElement().classList.add("selectedEditor");
+			if (onSelect) {
+				onSelect();
+			}
 		}
 
 		editor.Deselect = function() {
 			editor.GetElement().classList.remove("selectedEditor");
+			if (onDeselect) {
+				onDeselect();
+			}
 		}
 
 		editor.GetElement().onclick = function(event) {

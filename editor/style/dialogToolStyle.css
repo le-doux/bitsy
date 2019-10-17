@@ -155,3 +155,9 @@
 .roomPosParameterEditor button {
 	background: #ccccff;
 }
+
+.parameterUneditable {
+	/*padding: 5px;*/
+	border-radius: 2px;
+	background: #e8e8ff;
+}
