@@ -808,7 +808,9 @@ function DialogTool() {
 		div.appendChild(descriptionDiv);
 
 		// TODO : populate default values!!
-		function CreateFunctionDescription() {
+		var curParameterEditors = [];
+		function CreateFunctionDescription(isEditable) {
+			curParameterEditors = [];
 			descriptionDiv.innerHTML = "";
 
 			var descriptionText = functionDescriptionMap[functionNode.name].description;
@@ -824,18 +826,19 @@ function DialogTool() {
 
 					var parameterEditor;
 					if (parameterEditorMap[parameterInfo.type]) {
-						parameterEditor = new parameterEditorMap[parameterInfo.type](functionNode, parameterInfo.index, self);
+						parameterEditor = new parameterEditorMap[parameterInfo.type](functionNode, parameterInfo.index, self, isEditable);
 					}
 					else {
-						parameterEditor = new DefaultParameterEditor(functionNode, parameterInfo.index, self);
+						parameterEditor = new DefaultParameterEditor(functionNode, parameterInfo.index, self, isEditable);
 					}
 
+					curParameterEditors.push(parameterEditor);
 					descriptionDiv.appendChild(parameterEditor.GetElement());	
 				}
 			}
 		}
 
-		CreateFunctionDescription();
+		CreateFunctionDescription(false);
 
 		this.GetElement = function() {
 			return div;
@@ -849,28 +852,49 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
-		AddSelectionBehavior(this);
+		AddSelectionBehavior(
+			this,
+			function() { CreateFunctionDescription(true); }, /*onSelect*/
+			function() { /*onDeselect*/
+				for (var i = 0; i < curParameterEditors.length; i++) {
+					if (curParameterEditors[i].Deselect) {
+						curParameterEditors[i].Deselect();
+					}
+				}
+
+				CreateFunctionDescription(false);
+			});
 	}
 
-	function DefaultParameterEditor(functionNode, parameterIndex, parentEditor) {
+	function DefaultParameterEditor(functionNode, parameterIndex, parentEditor, isEditable) {
 		var span = document.createElement("span");
 
-		var parameterInput = document.createElement("input");
-		parameterInput.type = "text";
-		span.appendChild(parameterInput);
+		var value = functionNode.args.length > parameterIndex ? functionNode.args[parameterIndex].Serialize() : "";
 
-		if (functionNode.args.length > parameterIndex) {
-			parameterInput.value = functionNode.args[parameterIndex].Serialize();
+		if (isEditable) {
+			var parameterInput = document.createElement("input");
+			parameterInput.type = "text";
+			span.appendChild(parameterInput);
+
+			if (functionNode.args.length > parameterIndex) {
+				parameterInput.value = value;
+			}
+
+			parameterInput.onchange = function(event) {
+				var val = event.target.value;
+
+				var literal = scriptUtils.CreateLiteralNode(val);
+
+				functionNode.args.splice(parameterIndex, 1, literal);
+
+				parentEditor.NotifyUpdate();
+			}
 		}
-
-		parameterInput.onchange = function(event) {
-			var val = event.target.value;
-
-			var literal = scriptUtils.CreateLiteralNode(val);
-
-			functionNode.args.splice(parameterIndex, 1, literal);
-
-			parentEditor.NotifyUpdate();
+		else {
+			var parameterValue = document.createElement("span");
+			parameterValue.classList.add("parameterUneditable");
+			parameterValue.innerText = value;
+			span.appendChild(parameterValue);
 		}
 
 		this.GetElement = function() {
@@ -878,34 +902,42 @@ function DialogTool() {
 		}
 	}
 
-	function CountParameterEditor(functionNode, parameterIndex, parentEditor) {
+	function CountParameterEditor(functionNode, parameterIndex, parentEditor, isEditable) {
 		var span = document.createElement("span");
 
-		var parameterInput = document.createElement("input");
-		parameterInput.type = "number";
-		parameterInput.min = 0;
-		span.appendChild(parameterInput);
+		var value = functionNode.args.length > parameterIndex ? parseInt(functionNode.args[parameterIndex].Serialize()) : 1;
 
-		if (functionNode.args.length > parameterIndex) {
-			parameterInput.value = parseInt(functionNode.args[parameterIndex].Serialize());
+		if (isEditable) {
+			var parameterInput = document.createElement("input");
+			parameterInput.type = "number";
+			parameterInput.min = 0;
+			parameterInput.value = value;
+			span.appendChild(parameterInput);
+
+			parameterInput.onchange = function(event) {
+				var val = event.target.value;
+
+				var literal = scriptUtils.CreateLiteralNode(val);
+
+				functionNode.args.splice(parameterIndex, 1, literal);
+
+				parentEditor.NotifyUpdate();
+			}			
+		}
+		else {
+			var parameterValue = document.createElement("span");
+			parameterValue.classList.add("parameterUneditable");
+			parameterValue.innerText = value;
+			span.appendChild(parameterValue);
 		}
 
-		parameterInput.onchange = function(event) {
-			var val = event.target.value;
-
-			var literal = scriptUtils.CreateLiteralNode(val);
-
-			functionNode.args.splice(parameterIndex, 1, literal);
-
-			parentEditor.NotifyUpdate();
-		}
 
 		this.GetElement = function() {
 			return span;
 		}
 	}
 
-	function ItemIdParameterEditor(functionNode, parameterIndex, parentEditor) {
+	function ItemIdParameterEditor(functionNode, parameterIndex, parentEditor, isEditable) {
 		var span = document.createElement("span");
 
 		var curSelectedId = "0";
@@ -914,33 +946,46 @@ function DialogTool() {
 			curSelectedId = functionNode.args[parameterIndex].Serialize().slice(1,-1);
 		}
 
-		var itemSelect = document.createElement("select");
-		itemSelect.title = "choose item to check";
-		span.appendChild(itemSelect);
-		for(id in item) {
-			var itemOption = document.createElement("option");
-			itemOption.value = id;
-			itemOption.innerText = (item[id].name != null ? item[id].name : localization.GetStringOrFallback("item_label", "item") + " " + id);
-			itemOption.selected = id === curSelectedId;
-			itemSelect.appendChild(itemOption);
+		function GetItemNameFromId(id) {
+			return (item[id].name != null ? item[id].name : localization.GetStringOrFallback("item_label", "item") + " " + id);
 		}
 
-		itemSelect.onchange = function(event) {
-			var val = event.target.value;
+		if (isEditable) {
+			var itemSelect = document.createElement("select");
+			itemSelect.title = "choose item to check";
+			span.appendChild(itemSelect);
+			for(id in item) {
+				var itemOption = document.createElement("option");
+				itemOption.value = id;
+				itemOption.innerText = GetItemNameFromId(id);
+				itemOption.selected = id === curSelectedId;
+				itemSelect.appendChild(itemOption);
+			}
 
-			var literal = scriptUtils.CreateStringLiteralNode(val);
+			itemSelect.onchange = function(event) {
+				var val = event.target.value;
 
-			functionNode.args.splice(parameterIndex, 1, literal);
+				var literal = scriptUtils.CreateStringLiteralNode(val);
 
-			parentEditor.NotifyUpdate();		
+				functionNode.args.splice(parameterIndex, 1, literal);
+
+				parentEditor.NotifyUpdate();
+			}			
 		}
+		else {
+			var parameterValue = document.createElement("span");
+			parameterValue.classList.add("parameterUneditable");
+			parameterValue.innerText = GetItemNameFromId(curSelectedId);
+			span.appendChild(parameterValue);	
+		}
+
 
 		this.GetElement = function() {
 			return span;
 		}
 	}
 
-	function RoomPosParameterEditor(functionNode, parameterIndex, parentEditor) {
+	function RoomPosParameterEditor(functionNode, parameterIndex, parentEditor, isEditable) {
 		var span = document.createElement("span");
 		span.classList.add("roomPosParameterEditor");
 
@@ -966,50 +1011,61 @@ function DialogTool() {
 		}
 		UpdatePosLabel();
 
-		var isMoving = false;
+		if (isEditable) {
+			var isMoving = false;
 
-		var moveButton = document.createElement("button");
-		// moveButton.innerText = "move";
-		moveButton.innerHTML = '<i class="material-icons">location_searching</i>';
-		moveButton.title = "click to select new room location";
-		moveButton.onclick = function() {
-			isMoving = !isMoving;
+			var moveButton = document.createElement("button");
+			// moveButton.innerText = "move";
+			moveButton.innerHTML = '<i class="material-icons">location_searching</i>';
+			moveButton.title = "click to select new room location";
+			moveButton.onclick = function() {
+				isMoving = !isMoving;
 
-			if (isMoving) {
-				posLabel.innerHTML = "<i>click in room</i>";
-				moveButton.innerHTML = '<i class="material-icons">cancel</i>';
-				events.Raise("disable_room_tool"); // TODO : don't know if I like this design
+				if (isMoving) {
+					posLabel.innerHTML = "<i>click in room</i>";
+					moveButton.innerHTML = '<i class="material-icons">cancel</i>';
+					events.Raise("disable_room_tool"); // TODO : don't know if I like this design
+				}
+				else {
+					UpdatePosLabel();
+					moveButton.innerHTML = '<i class="material-icons">location_searching</i>';
+					events.Raise("enable_room_tool");
+				}
 			}
-			else {
-				UpdatePosLabel();
-				moveButton.innerHTML = '<i class="material-icons">location_searching</i>';
-				events.Raise("enable_room_tool");
-			}
+			span.appendChild(moveButton);
+
+			events.Listen("click_room", function(event) {
+				if (isMoving) {
+					roomId = event.roomId;
+					roomPosX = event.x;
+					roomPosY = event.y;
+
+					functionNode.args.splice(parameterIndex + 0, 1, scriptUtils.CreateStringLiteralNode(roomId));
+					functionNode.args.splice(parameterIndex + 1, 1, scriptUtils.CreateLiteralNode(roomPosX));
+					functionNode.args.splice(parameterIndex + 2, 1, scriptUtils.CreateLiteralNode(roomPosY));
+
+					isMoving = false;
+					UpdatePosLabel();
+					moveButton.innerHTML = '<i class="material-icons">location_searching</i>';
+
+					parentEditor.NotifyUpdate();
+
+					events.Raise("enable_room_tool");
+				}
+			});
 		}
-		span.appendChild(moveButton);
-
-		events.Listen("click_room", function(event) {
-			if (isMoving) {
-				roomId = event.roomId;
-				roomPosX = event.x;
-				roomPosY = event.y;
-
-				functionNode.args.splice(parameterIndex + 0, 1, scriptUtils.CreateStringLiteralNode(roomId));
-				functionNode.args.splice(parameterIndex + 1, 1, scriptUtils.CreateLiteralNode(roomPosX));
-				functionNode.args.splice(parameterIndex + 2, 1, scriptUtils.CreateLiteralNode(roomPosY));
-
-				isMoving = false;
-				UpdatePosLabel();
-				moveButton.innerHTML = '<i class="material-icons">location_searching</i>';
-
-				parentEditor.NotifyUpdate();
-
-				events.Raise("enable_room_tool");
-			}
-		});
 
 		this.GetElement = function() {
 			return span;
+		}
+
+		this.Deselect = function() {
+			if (isMoving) {
+				isMoving = false;
+				UpdatePosLabel();
+				moveButton.innerHTML = '<i class="material-icons">location_searching</i>';
+				events.Raise("enable_room_tool");
+			}
 		}
 	}
 
@@ -1077,6 +1133,10 @@ function DialogTool() {
 
 		editor.GetElement().onclick = function(event) {
 			event.stopPropagation();
+
+			if (curSelectedEditor === editor) {
+				return; // already selected!
+			}
 
 			if (curSelectedEditor != null) {
 				curSelectedEditor.Deselect();
