@@ -45,9 +45,6 @@ function DrawingId(type,id) { // TODO: is this the right name?
 		var dialogId = null;
 		if(self.type == TileType.Sprite) {
 			dialogId = sprite[self.id].dlg;
-			if(dialogId == null && dialog[self.id] != null) {
-				dialogId = self.id;
-			}
 		}
 		else if(self.type == TileType.Item) {
 			dialogId = item[self.id].dlg;

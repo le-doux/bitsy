@@ -102,6 +102,10 @@ function sortedRoomIdList() {
 	return sortedBase36IdList( room );
 }
 
+function sortedDialogIdList() {
+	return sortedBase36IdList(dialog);
+}
+
 function sortedPaletteIdList() {
 	var keyList = Object.keys(palette);
 	keyList.splice(keyList.indexOf("default"),1);
@@ -118,14 +122,7 @@ function sortedBase36IdList( objHolder ) {
 }
 
 function nextAvailableDialogId(prefix) {
-	if(prefix === undefined || prefix === null) prefix = "";
-	var i = 0;
-	var id = prefix + i.toString(36);
-	while( dialog[id] != null ) {
-		i++;
-		id = prefix + i.toString(36);
-	}
-	return id;
+	return nextObjectId(sortedDialogIdList());
 }
 
 function nextObjectHexId(idList) {

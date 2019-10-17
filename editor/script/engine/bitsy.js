@@ -1044,11 +1044,11 @@ function parseWorld(file) {
 			i = parseDrawing(lines, i);
 		}
 		else if (getType(curLine) === "DLG") {
-			i = parseDialog(lines, i);
+			i = parseDialog(lines, i, versionNumber);
 		}
 		else if (getType(curLine) === "END" && versionNumber < 7) {
 			// parse endings for back compat
-			i = parseEnding(lines, i);
+			i = parseEnding(lines, i, versionNumber);
 		}
 		else if (getType(curLine) === "VAR") {
 			i = parseVariable(lines, i);
@@ -1779,7 +1779,7 @@ function parseDrawingCore(lines, i, drwId) {
 	return i;
 }
 
-function parseScript(lines, i, backCompatPrefix) {
+function parseScript(lines, i, backCompatPrefix, versionNumber) {
 	var id = getId(lines[i]);
 	id = backCompatPrefix + id;
 	i++;
@@ -1788,17 +1788,27 @@ function parseScript(lines, i, backCompatPrefix) {
 
 	dialog[id] = results.script;
 
+	if (versionNumber < 7) {
+		// explicitly hook up dialog that used to be implicitly
+		// connected by sharing sprite and dialog IDs in old versions
+		if (sprite[id]) {
+			if (sprite[id].dlg === undefined || sprite[id].dlg === null) {
+				sprite[id].dlg = id;
+			}
+		}
+	}
+
 	i = results.index;
 
 	return i;
 }
 
-function parseDialog(lines, i) {
-	return parseScript(lines, i, "");
+function parseDialog(lines, i, versionNumber) {
+	return parseScript(lines, i, "", versionNumber);
 }
 
-function parseEnding(lines, i) {
-	return parseScript(lines, i, "_end_");
+function parseEnding(lines, i, versionNumber) {
+	return parseScript(lines, i, "_end_", versionNumber);
 }
 
 function parseVariable(lines, i) {
@@ -2035,7 +2045,7 @@ function startItemDialog(itemId) {
 
 function startSpriteDialog(spriteId) {
 	var spr = sprite[spriteId];
-	var dialogId = spr.dlg ? spr.dlg : spriteId;
+	var dialogId = spr.dlg;
 	// console.log("START SPRITE DIALOG " + dialogId);
 	if(dialog[dialogId]){
 		var dialogStr = dialog[dialogId];
