@@ -100,10 +100,6 @@
 	display: none;
 }
 
-.actionBuilderActive .actionBuilderButton {
-	display: block;
-}
-
 .actionBuilderAdd {
 	background: #ccccff;
 }
@@ -111,6 +107,31 @@
 .actionBuilderCancel {
 	background: #6767b2;
 	color: white;
+	display: none;
+}
+
+.actionBuilderActive .actionBuilderCancel {
+	display: block;
+}
+
+.actionBuilderRoot .actionBuilderCategory {
+	display: block;
+}
+
+.actionBuilder_dialog .actionBuilderButton_dialog {
+	display: block;
+}
+
+.actionBuilder_flow .actionBuilderButton_flow {
+	display: block;
+}
+
+.actionBuilder_exit .actionBuilderButton_exit {
+	display: block;
+}
+
+.actionBuilder_item .actionBuilderButton_item {
+	display: block;
 }
 
 .orderControls {

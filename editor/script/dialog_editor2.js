@@ -244,23 +244,47 @@ function DialogTool() {
 		addButton.innerText = "add action";
 		addButton.onclick = function() {
 			div.classList.add("actionBuilderActive");
+			div.classList.add("actionBuilderRoot");
 		}
 		div.appendChild(addButton);
 
-		function makeActionBuilderButton(text, createEditorFunc) {
+		var activeCategoryClass = null;
+		function makeActionCategoryButton(categoryName, text) {
+			var actionCategoryButton = document.createElement("button");
+			actionCategoryButton.classList.add("actionBuilderButton");
+			actionCategoryButton.classList.add("actionBuilderCategory");
+			actionCategoryButton.innerHTML = text + '<i class="material-icons">arrow_forward_ios</i>';
+			actionCategoryButton.onclick = function() {
+				div.classList.remove("actionBuilderRoot");
+				activeCategoryClass = "actionBuilder_" + categoryName;
+				div.classList.add(activeCategoryClass);
+			}
+			return actionCategoryButton;
+		}
+
+		div.appendChild(makeActionCategoryButton("dialog", "dialog actions"));
+		div.appendChild(makeActionCategoryButton("flow", "flow control actions"));
+		div.appendChild(makeActionCategoryButton("exit", "exit and ending actions"));
+		div.appendChild(makeActionCategoryButton("item", "item actions"));
+
+		function makeActionBuilderButton(categoryName, text, createEditorFunc) {
 			var actionBuilderButton = document.createElement("button");
 			actionBuilderButton.classList.add("actionBuilderButton");
+			actionBuilderButton.classList.add("actionBuilderButton_" + categoryName);
 			actionBuilderButton.innerText = text;
 			actionBuilderButton.onclick = function() {
 				var editor = createEditorFunc();
 				parentEditor.AppendChild(editor);
 				div.classList.remove("actionBuilderActive");
+				div.classList.remove(activeCategoryClass);
+				activeCategoryClass = null;
 			}
 			return actionBuilderButton;
 		}
 
 		div.appendChild(
 			makeActionBuilderButton(
+				"dialog",
 				"dialog",
 				function() {
 					var printFunc = scriptUtils.CreateEmptyPrintFunc();
@@ -270,6 +294,7 @@ function DialogTool() {
 
 		div.appendChild(
 			makeActionBuilderButton(
+				"flow",
 				"sequence",
 				function() {
 					var node = scriptUtils.CreateSequenceBlock();
@@ -279,6 +304,7 @@ function DialogTool() {
 
 		div.appendChild(
 			makeActionBuilderButton(
+				"flow",
 				"cycle",
 				function() {
 					var node = scriptUtils.CreateCycleBlock();
@@ -288,6 +314,7 @@ function DialogTool() {
 
 		div.appendChild(
 			makeActionBuilderButton(
+				"flow",
 				"shuffle",
 				function() {
 					var node = scriptUtils.CreateShuffleBlock();
@@ -297,6 +324,7 @@ function DialogTool() {
 
 		div.appendChild(
 			makeActionBuilderButton(
+				"flow",
 				"conditional",
 				function() {
 					var node = scriptUtils.CreateIfBlock();
@@ -306,6 +334,7 @@ function DialogTool() {
 
 		div.appendChild(
 			makeActionBuilderButton(
+				"exit",
 				"lock",
 				function() {
 					var node = scriptUtils.CreateFunctionBlock("lock");
@@ -315,6 +344,7 @@ function DialogTool() {
 
 		div.appendChild(
 			makeActionBuilderButton(
+				"exit",
 				"end",
 				function() {
 					var node = scriptUtils.CreateFunctionBlock("end");
@@ -322,17 +352,18 @@ function DialogTool() {
 					return editor;
 				}));
 
-		div.appendChild(
-			makeActionBuilderButton(
-				"narrate",
-				function() {
-					var node = scriptUtils.CreateFunctionBlock("narrate");
-					var editor = new FunctionEditor(node, parentEditor);
-					return editor;
-				}));
+		// div.appendChild(
+		// 	makeActionBuilderButton(
+		// 		"narrate",
+		// 		function() {
+		// 			var node = scriptUtils.CreateFunctionBlock("narrate");
+		// 			var editor = new FunctionEditor(node, parentEditor);
+		// 			return editor;
+		// 		}));
 
 		div.appendChild(
 			makeActionBuilderButton(
+				"exit",
 				"exit",
 				function() {
 					var node = scriptUtils.CreateFunctionBlock("exit");
@@ -342,6 +373,7 @@ function DialogTool() {
 
 		div.appendChild(
 			makeActionBuilderButton(
+				"item",
 				"give item",
 				function() {
 					var node = scriptUtils.CreateFunctionBlock("giveItem");
@@ -351,6 +383,7 @@ function DialogTool() {
 
 		div.appendChild(
 			makeActionBuilderButton(
+				"item",
 				"take item",
 				function() {
 					var node = scriptUtils.CreateFunctionBlock("takeItem");
@@ -361,9 +394,14 @@ function DialogTool() {
 		var cancelButton = document.createElement("button");
 		cancelButton.classList.add("actionBuilderButton");
 		cancelButton.classList.add("actionBuilderCancel");
-		cancelButton.innerText = "cancel";
+		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " cancel";
 		cancelButton.onclick = function() {
 			div.classList.remove("actionBuilderActive");
+			div.classList.remove("actionBuilderRoot");
+			if (activeCategoryClass != null) {
+				div.classList.remove(activeCategoryClass);
+				activeCategoryClass = null;
+			}
 		}
 		div.appendChild(cancelButton);
 
