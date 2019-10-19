@@ -454,9 +454,12 @@
 							</div>
 						</div>
 						<div id="markerOptions">
-							<div id="endingOptions" class="controlBox">
-								<div style="display: flex;">
-									<span class="localize ending_dialog" style="flex-grow:1;">ending dialog</span>
+							<div id="endingOptions" class="dialogContentMiniViewportHolder">
+								<div class="controlBox" style="display: flex;">
+									<span style="flex-grow: 1">
+										<i class="material-icons">chat</i>
+										<span class="localize ending_dialog">ending dialog</span>
+									</span>
 									<button title="open in dialog editor" style="" onclick="openMarkerDialogInDialogTool();">
 										<i class="material-icons">open_in_new</i>
 									</button>
@@ -508,9 +511,12 @@
 												<button onclick="addNewExitDialogLock();">add lock</button>
 											</div>
 
-											<div id="exitDialogEditor" class="controlBox">
-												<div style="display: flex;">
-													<span style="flex-grow:1;">exit dialog</span>
+											<div id="exitDialogEditor" class="dialogContentMiniViewportHolder">
+												<div class="controlBox" style="display: flex;">
+													<span style="flex-grow:1;">
+														<i class="material-icons">chat</i>
+														<span>exit dialog</span>
+													</span>
 													<button title="open in dialog editor" style="" onclick="openMarkerDialogInDialogTool();">
 														<i class="material-icons">open_in_new</i>
 													</button>
@@ -619,9 +625,10 @@
 							<span class="localize wall_toggle">wall</span>
 						</label>
 					</div>
-					<div id="dialog" class="controlBox" style="display:none;">
-						<div style="display: flex;">
+					<div id="dialog" class="dialogContentMiniViewportHolder" style="display:none;">
+						<div class="controlBox" style="display: flex;">
 							<span style="flex-grow: 1">
+								<i class="material-icons">chat</i>
 								<span class="localize dialog_tool_name">dialog</span>
 							</span>
 							<button title="open in dialog editor" style="" onclick="openCurDialogInDialogTool();">

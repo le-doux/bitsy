@@ -186,6 +186,12 @@ input {
 	border-radius: 2px;
 }
 
+.controlBox .material-icons {
+	font-size: 110%;
+	vertical-align: middle;
+	line-height: 100%;
+}
+
 .controlSpan {
 	padding: 3px;
 	margin-bottom: 5px;
@@ -369,7 +375,7 @@ input {
 }
 
 #paint {
-	width: 285px;
+	width: 315px;
 }
 
 #dialogCodeText {
