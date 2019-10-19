@@ -117,8 +117,13 @@ var Utils = function() {
 		return new FuncNode("print", [new LiteralNode(" ")]);
 	}
 
-	this.CreateFunctionBlock = function(name) {
-		var node = new FuncNode(name, []);
+	this.CreateFunctionBlock = function(name, initParamValues) {
+		var parameters = [];
+		for (var i = 0; i < initParamValues.length; i++) {
+			parameters.push(new LiteralNode(initParamValues[i]));
+		}
+
+		var node = new FuncNode(name, parameters);
 		var block = new BlockNode( BlockMode.Code );
 		block.AddChild(node);
 		return block;

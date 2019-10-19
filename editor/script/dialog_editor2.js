@@ -241,7 +241,7 @@ function DialogTool() {
 
 		var addButton = document.createElement("button");
 		addButton.classList.add("actionBuilderAdd");
-		addButton.innerText = "add action";
+		addButton.innerHTML = '<i class="material-icons">add</i>' + " add action";
 		addButton.onclick = function() {
 			div.classList.add("actionBuilderActive");
 			div.classList.add("actionBuilderRoot");
@@ -271,7 +271,7 @@ function DialogTool() {
 			var actionBuilderButton = document.createElement("button");
 			actionBuilderButton.classList.add("actionBuilderButton");
 			actionBuilderButton.classList.add("actionBuilderButton_" + categoryName);
-			actionBuilderButton.innerText = text;
+			actionBuilderButton.innerHTML = '<i class="material-icons">add</i>' + " " + text;
 			actionBuilderButton.onclick = function() {
 				var editor = createEditorFunc();
 				parentEditor.AppendChild(editor);
@@ -337,7 +337,7 @@ function DialogTool() {
 				"exit",
 				"lock",
 				function() {
-					var node = scriptUtils.CreateFunctionBlock("lock");
+					var node = scriptUtils.CreateFunctionBlock("lock", []);
 					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
@@ -347,7 +347,7 @@ function DialogTool() {
 				"exit",
 				"end",
 				function() {
-					var node = scriptUtils.CreateFunctionBlock("end");
+					var node = scriptUtils.CreateFunctionBlock("end", []);
 					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
@@ -366,7 +366,7 @@ function DialogTool() {
 				"exit",
 				"exit",
 				function() {
-					var node = scriptUtils.CreateFunctionBlock("exit");
+					var node = scriptUtils.CreateFunctionBlock("exit", ["0", 0, 0]);
 					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
@@ -376,7 +376,7 @@ function DialogTool() {
 				"item",
 				"give item",
 				function() {
-					var node = scriptUtils.CreateFunctionBlock("giveItem");
+					var node = scriptUtils.CreateFunctionBlock("giveItem", ["0", 1]);
 					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
@@ -386,7 +386,7 @@ function DialogTool() {
 				"item",
 				"take item",
 				function() {
-					var node = scriptUtils.CreateFunctionBlock("takeItem");
+					var node = scriptUtils.CreateFunctionBlock("takeItem", ["0", 1]);
 					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
