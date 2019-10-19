@@ -344,10 +344,12 @@ function PaintTool(canvas, roomTool) {
 
 	// TODO -- sould these newDrawing methods be internal to PaintTool?
 	function newTile(id) {
-		if (id)
+		if (id) {
 			self.drawing.id = id; //this optional parameter lets me override the default next id
-		else
+		}
+		else {
 			self.drawing.id = nextTileId();
+		}
 
 		makeTile(self.drawing.id);
 		self.reloadDrawing(); //hack for ui consistency (hack x 2: order matters for animated tiles)
@@ -359,12 +361,20 @@ function PaintTool(canvas, roomTool) {
 	}
 
 	function newSprite(id) {
-		if (id)
+		if (id) {
 			self.drawing.id = id; //this optional parameter lets me override the default next id
-		else
+		}
+		else {
 			self.drawing.id = nextSpriteId();
+		}
 
 		makeSprite(self.drawing.id);
+
+		// add dialog too (TODO : do we want to do this for real?)
+		var dlgId = nextAvailableDialogId();
+		sprite[self.drawing.id].dlg = dlgId;
+		dialog[dlgId] = " ";
+
 		self.reloadDrawing(); //hack (order matters for animated tiles)
 
 		self.updateCanvas();
@@ -374,12 +384,20 @@ function PaintTool(canvas, roomTool) {
 	}
 
 	function newItem(id) {
-		if (id)
+		if (id) {
 			self.drawing.id = id; //this optional parameter lets me override the default next id
-		else
+		}
+		else {
 			self.drawing.id = nextItemId();
+		}
 
 		makeItem(self.drawing.id);
+
+		// add dialog too (TODO : do we want to do this for real?)
+		var dlgId = nextAvailableDialogId();
+		item[self.drawing.id].dlg = dlgId;
+		dialog[dlgId] = " ";
+
 		self.reloadDrawing(); //hack (order matters for animated tiles)
 
 		self.updateCanvas();
