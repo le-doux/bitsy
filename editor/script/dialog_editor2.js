@@ -771,15 +771,9 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		topControlsDiv.appendChild(orderControls.GetElement());
 
-		// condition - WIP
-		var textArea = document.createElement("textarea");
-		textArea.classList.add("conditionEditor");
-		textArea.value = conditionNode.Serialize();
-		textArea.onchange = function() {
-			conditionNode = scriptInterpreter.CreateExpression(textArea.value);
-			parentEditor.NotifyUpdate();
-		}
-		div.appendChild(textArea);
+		// condition
+		var comparisonEditor = new ConditionalComparisonEditor(conditionNode, parentEditor);
+		div.appendChild(comparisonEditor.GetElement());
 
 		// result
 		var resultBlockEditor = new BlockEditor(resultNode, parentEditor);
@@ -790,8 +784,29 @@ function DialogTool() {
 		}
 
 		this.GetNodes = function() {
-			// this is kind of hacky...
-			return [conditionNode, resultNode];
+			// this is kind of hacky... (should I add GetNodes to blockEditor for consistency?)
+			return comparisonEditor.GetNodes().concat([resultNode]);
+		}
+	}
+
+	function ConditionalComparisonEditor(conditionNode, parentEditor) {
+		var div = document.createElement("div");
+
+		var textArea = document.createElement("textarea");
+		textArea.classList.add("conditionEditor");
+		textArea.value = conditionNode.Serialize();
+		textArea.onchange = function() {
+			conditionNode = scriptInterpreter.CreateExpression(textArea.value);
+			parentEditor.NotifyUpdate();
+		}
+		div.appendChild(textArea);
+
+		this.GetElement = function() {
+			return div;
+		}
+
+		this.GetNodes = function() {
+			return [conditionNode];
 		}
 	}
 
