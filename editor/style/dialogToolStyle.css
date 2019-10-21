@@ -62,8 +62,12 @@
 	margin-bottom: 5px;
 }
 
-.conditionEditor {
+/*.conditionEditor {
 	margin: 5px;
+}*/
+
+.conditionalComparisonEditor {
+	/* TODO */
 }
 
 .optionEditor {

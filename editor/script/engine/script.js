@@ -144,6 +144,10 @@ var Utils = function() {
 		}
 	}
 
+	this.CreateElseNode = function() {
+		return new ElseNode();
+	}
+
 	this.CreateStringLiteralNode = function(str) {
 		return new LiteralNode(str);
 	}
