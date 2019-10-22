@@ -677,7 +677,7 @@ function DialogTool() {
 		addOptionButton.onclick = function() {
 			var conditionNode = scriptInterpreter.CreateExpression('{item "0"} == 1');
 			var resultNode = scriptUtils.CreateOptionBlock();
-			var optionEditor = new ConditionalOptionEditor(conditionNode, resultNode, self);
+			var optionEditor = new ConditionalOptionEditor(conditionNode, resultNode, self, optionEditors.length);
 			optionEditors.push(optionEditor);
 
 			RefreshOptionsUI();
@@ -690,7 +690,17 @@ function DialogTool() {
 			return div;
 		}
 
-		AddSelectionBehavior(this);
+		AddSelectionBehavior(this,
+			function() { /* onSelect */
+				for (var i = 0; i < optionEditors.length; i++) {
+					optionEditors[i].Select();
+				}
+			},
+			function() { /* onDeselect */
+				for (var i = 0; i < optionEditors.length; i++) {
+					optionEditors[i].Deselect();
+				}
+			});
 
 		this.GetNodes = function() {
 			return [node];
@@ -728,7 +738,7 @@ function DialogTool() {
 			for (var i = 0; i < conditionalNode.conditions.length; i++) {
 				var conditionNode = conditionalNode.conditions[i];
 				var resultNode = conditionalNode.results[i];
-				var optionEditor = new ConditionalOptionEditor(conditionNode, resultNode, self);
+				var optionEditor = new ConditionalOptionEditor(conditionNode, resultNode, self, i);
 				optionRootDiv.appendChild(optionEditor.GetElement());
 				optionEditors.push(optionEditor);
 			}
@@ -738,6 +748,7 @@ function DialogTool() {
 			optionRootDiv.innerHTML = "";
 			for (var i = 0; i < optionEditors.length; i++) {
 				var editor = optionEditors[i];
+				editor.UpdateIndex(i);
 				optionRootDiv.appendChild(editor.GetElement());
 			}
 		}
@@ -760,7 +771,7 @@ function DialogTool() {
 		CreateOptionEditors();
 	}
 
-	function ConditionalOptionEditor(conditionNode, resultNode, parentEditor) {
+	function ConditionalOptionEditor(conditionNode, resultNode, parentEditor, index) {
 		var div = document.createElement("div");
 		div.classList.add("optionEditor");
 
@@ -772,7 +783,7 @@ function DialogTool() {
 		topControlsDiv.appendChild(orderControls.GetElement());
 
 		// condition
-		var comparisonEditor = new ConditionalComparisonEditor(conditionNode, parentEditor);
+		var comparisonEditor = new ConditionalComparisonEditor(conditionNode, parentEditor, index);
 		div.appendChild(comparisonEditor.GetElement());
 
 		// result
@@ -787,11 +798,24 @@ function DialogTool() {
 			// this is kind of hacky... (should I add GetNodes to blockEditor for consistency?)
 			return comparisonEditor.GetNodes().concat([resultNode]);
 		}
+
+		this.UpdateIndex = function(i) {
+			index = i;
+			comparisonEditor.UpdateIndex(index);
+		}
+
+		this.Select = function() {
+			comparisonEditor.Select();
+		}
+
+		this.Deselect = function() {
+			comparisonEditor.Deselect();
+		}
 	}
 
 	function GetConditionType(condition) {
 		if (condition.type === "else") {
-			return "default";
+			return "else";
 		}
 		else if (condition.type === "operator") {
 			if (condition.right.type === "literal" && !isNaN(condition.right.value)) {
@@ -810,7 +834,7 @@ function DialogTool() {
 	}
 
 	// TODO : use these
-	var conditionTypes = ["item","variable","default","custom"];
+	var conditionTypes = ["item","variable","else","custom"];
 	// var conditionTypeNames = [
 	// 	localization.GetStringOrFallback("item_label", "item"),
 	// 	localization.GetStringOrFallback("variable_label", "variable"),
@@ -823,15 +847,37 @@ function DialogTool() {
 	var comparisonTypes = ["==", ">", "<", ">=", "<="];
 	// var comparisonTypesVerbose = ["is equal to", "is greater than", "is less than", "is greater than or equal to", "is less than or equal to"];
 
-	function ConditionalComparisonEditor(conditionNode, parentEditor) {
+	function ConditionalComparisonEditor(conditionNode, parentEditor, index) {
 		var conditionType = GetConditionType(conditionNode);
 
+		// init description elements
+		var conditionStartSpan;
+		var conditionDescriptionSpan;
+		var conditionEndSpan;
+
 		// init input elements
-		var textArea; // for custom input
+		var conditionTypeSelect;
 		var itemSelect;
 		var variableSelect;
 		var comparisonSelect;
 		var valueInput;
+		var textArea; // for custom input
+
+		function GetItemId() {
+			return conditionNode.left.children[0].args[0].value;
+		}
+
+		function GetVariableId() {
+			return conditionNode.left.name;
+		}
+
+		function GetComparisonOperator() {
+			return conditionNode.operator;
+		}
+
+		function GetRightHandValue() {
+			return parseInt(conditionNode.right.value);
+		}
 
 		// init value handler - custom is the default
 		var valueChangeHandler = function() {
@@ -859,8 +905,19 @@ function DialogTool() {
 		function CreateComparisonControls() {
 			div.innerHTML = "";
 
+			conditionStartSpan = document.createElement("span");
+			if (conditionType != "else") {
+				if (index === 0) {
+					conditionStartSpan.innerText = "if ";
+				}
+				else {
+					conditionStartSpan.innerText = "else if ";
+				}
+			}
+			div.appendChild(conditionStartSpan);
+
 			// type select
-			var conditionTypeSelect = document.createElement("select");
+			conditionTypeSelect = document.createElement("select");
 			conditionTypeSelect.title = "choose type of condition to check";
 			div.appendChild(conditionTypeSelect);
 			for(var i = 0; i < conditionTypes.length; i++) {
@@ -871,7 +928,7 @@ function DialogTool() {
 				conditionTypeSelect.appendChild(conditionTypeOption);
 			}
 			conditionTypeSelect.onchange = function() {
-				if (conditionTypeSelect.value === "default") {
+				if (conditionTypeSelect.value === "else") {
 					conditionNode = scriptUtils.CreateElseNode();
 				}
 				else if (conditionTypeSelect.value === "item") {
@@ -895,27 +952,28 @@ function DialogTool() {
 
 			if (conditionType === "item") {
 				// item select
-				var itemSelect = document.createElement("select");
+				itemSelect = document.createElement("select");
 				itemSelect.title = "choose item to check";
 				div.appendChild(itemSelect);
 				for (id in item) {
 					var itemOption = document.createElement("option");
 					itemOption.value = id;
 					itemOption.innerText = GetItemNameFromId(id);
-					// itemOption.selected = id === curSelectedId;
+					itemOption.selected = id === GetItemId();
 					itemSelect.appendChild(itemOption);
 				}
 				itemSelect.onchange = valueChangeHandler;
 			}
 			else if (conditionType === "variable") {
 				// variable select
-				var variableSelect = document.createElement("select");
+				variableSelect = document.createElement("select");
 				variableSelect.title = "choose variable to check";
 				div.appendChild(variableSelect);
 				for (id in variable) {
 					var variableOption = document.createElement("option");
 					variableOption.value = id;
 					variableOption.innerText = id;
+					variableOption.selected = id === GetVariableId();
 					variableSelect.appendChild(variableOption);
 				}
 				variableSelect.onchange = valueChangeHandler;
@@ -923,22 +981,23 @@ function DialogTool() {
 
 			if (conditionType === "item" || conditionType === "variable") {
 				// comparison select
-				var comparisonSelect = document.createElement("select");
+				comparisonSelect = document.createElement("select");
 				comparisonSelect.title = "choose a comparison type";
 				div.appendChild(comparisonSelect);
 				for (var i = 0; i < comparisonTypes.length; i++) {
 					var comparisonOption = document.createElement("option");
 					comparisonOption.value = comparisonTypes[i];
 					comparisonOption.innerText = comparisonTypes[i];
+					comparisonOption.selected = comparisonTypes[i] === GetComparisonOperator();
 					comparisonSelect.appendChild(comparisonOption);
 				}
 				comparisonSelect.onchange = valueChangeHandler;
 
 				// value input
-				var valueInput = document.createElement("input");
+				valueInput = document.createElement("input");
 				valueInput.type = "number";
 				valueInput.title = "choose number to compare";
-				valueInput.value = 1;
+				valueInput.value = GetRightHandValue();
 				div.appendChild(valueInput);
 				valueInput.onchange = valueChangeHandler;
 			}
@@ -950,9 +1009,67 @@ function DialogTool() {
 				textArea.onchange = valueChangeHandler;
 				div.appendChild(textArea);
 			}
+
+			conditionEndSpan = document.createElement("span");
+			if (conditionType != "else") {
+				conditionEndSpan.innerText = ", then:";
+			}
+			else {
+				conditionEndSpan.innerText = " :";
+			}
+			div.appendChild(conditionEndSpan);
 		}
 
-		CreateComparisonControls();
+		function CreateComparisonDescription() {
+			div.innerHTML = "";
+
+			conditionStartSpan = document.createElement("span");
+			if (conditionType != "else") {
+				if (index === 0) {
+					conditionStartSpan.innerText = "if ";
+				}
+				else {
+					conditionStartSpan.innerText = "else if ";
+				}
+			}
+			div.appendChild(conditionStartSpan);
+
+			conditionDescriptionSpan = document.createElement("span");
+			conditionDescriptionSpan.classList.add("parameterUneditable");
+			conditionDescriptionSpan.innerText = "";
+
+			if (conditionType != "custom") {
+				conditionDescriptionSpan.innerText += conditionType;
+			}
+
+			if (conditionType === "item") {
+				conditionDescriptionSpan.innerText += " " + GetItemId(); // name instead?
+			}
+			else if (conditionType === "variable") {
+				conditionDescriptionSpan.innerText += " " + GetVariableId();
+			}
+
+			if (conditionType === "item" || conditionType === "variable") {
+				conditionDescriptionSpan.innerText += " " + GetComparisonOperator();
+				conditionDescriptionSpan.innerText += " " + GetRightHandValue();
+			}
+			else if (conditionType === "custom") {
+				conditionDescriptionSpan.innerText += conditionNode.Serialize();
+			}
+
+			div.appendChild(conditionDescriptionSpan);
+
+			conditionEndSpan = document.createElement("span");
+			if (conditionType != "else") {
+				conditionEndSpan.innerText = ", then:";
+			}
+			else {
+				conditionEndSpan.innerText = ":";
+			}
+			div.appendChild(conditionEndSpan);
+		}
+
+		CreateComparisonDescription();
 
 		this.GetElement = function() {
 			return div;
@@ -960,6 +1077,28 @@ function DialogTool() {
 
 		this.GetNodes = function() {
 			return [conditionNode];
+		}
+
+		this.UpdateIndex = function(i) {
+			index = i;
+
+			// update the initial label based on the order of the option
+			if (conditionType != "else") {
+				if (index === 0) {
+					conditionStartSpan.innerText = "if ";
+				}
+				else {
+					conditionStartSpan.innerText = "else if ";
+				}
+			}
+		}
+
+		this.Select = function() {
+			CreateComparisonControls();
+		}
+
+		this.Deselect = function() {
+			CreateComparisonDescription();
 		}
 	}
 

@@ -62,14 +62,6 @@
 	margin-bottom: 5px;
 }
 
-/*.conditionEditor {
-	margin: 5px;
-}*/
-
-.conditionalComparisonEditor {
-	/* TODO */
-}
-
 .optionEditor {
 	background: #e8e8ff;
 	margin-bottom: 5px;
@@ -231,8 +223,14 @@
 */
 
 .conditionalComparisonEditor {
-	padding-bottom: 5px;
+	padding: 5px;
+	padding-left: 0px;
+	padding-bottom: 10px;
 	border-bottom: solid 1px #ccccff;
+}
+
+.conditionalComparisonEditor .parameterUneditable {
+	background: #ccccff;
 }
 
 .conditionalComparisonEditor input[type="number"] {
