@@ -229,3 +229,12 @@
 - special colors for sequence options, etc
 - do I really want to special case everything under the exit tool?
 */
+
+.conditionalComparisonEditor {
+	padding-bottom: 5px;
+	border-bottom: solid 1px #ccccff;
+}
+
+.conditionalComparisonEditor input[type="number"] {
+	width: 50px;
+}
