@@ -192,36 +192,6 @@
 	background: #e8e8ff;
 }
 
-/* special stuff for exit controls */
-#exitDialogControls .dialogContentMiniViewportHolder {
-	background: #ccccff;
-}
-
-#exitDialogControls .dialogContentMiniViewport {
-	border-top: solid 1px #6767b2;
-}
-
-#exitDialogControls .dialogContentMiniViewportHolder .controlBox button {
-	border: solid 1px #6767b2;
-}
-
-#exitDialogControls .dialogContentMiniViewportHolder .actionBuilder button {
-	border: solid 1px #6767b2;
-}
-
-#exitDialogControls .dialogContentMiniViewportHolder .actionBuilderCancel {
-	background: #6767b2;
-}
-
-#exitDialogControls .blockEditor {
-	background: #ccccff;
-}
-
-/* TODO
-- special colors for sequence options, etc
-- do I really want to special case everything under the exit tool?
-*/
-
 .conditionalComparisonEditor {
 	padding: 5px;
 	padding-left: 0px;
@@ -235,4 +205,32 @@
 
 .conditionalComparisonEditor input[type="number"] {
 	width: 50px;
+}
+
+/* special stuff for exit controls */
+#exitDialogControls .dialogContentMiniViewportHolder {
+	background: #ccccff;
+}
+
+#exitDialogControls .dialogContentMiniViewport {
+	border-top: solid 1px #6767b2;
+	background: #ccccff;
+}
+
+#exitDialogControls .dialogContentMiniViewportHolder .controlBox button {
+	border: solid 1px #6767b2;
+	/*background: #e8e8ff;*/
+}
+
+/* hackily specific :( */
+#exitDialogControls .dialogContentMiniViewport > .selectedEditor > .blockEditor {
+	background: #ccccff;
+}
+
+#exitDialogControls .dialogContentMiniViewport > .selectedEditor > .blockEditor > .actionBuilder button {
+	border: solid 1px #6767b2;
+}
+
+#exitDialogControls .dialogContentMiniViewportHolder .actionBuilderCancel {
+	background: #6767b2;
 }
