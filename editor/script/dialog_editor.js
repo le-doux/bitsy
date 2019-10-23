@@ -1524,3 +1524,32 @@ function ConvertNumberStringToArabic(numberString) {
 
 	return arabicNumberString;
 }
+
+// TODO : what is this used for?
+function createIconElement(iconName) {
+	var icon = document.createElement("i");
+	icon.classList.add('material-icons');
+	icon.innerText = iconName;
+	return icon;
+}
+
+var dialogSel = {
+	target : null,
+	start : 0,
+	end : 0,
+	onchange : null
+}
+
+function createOnTextSelectionChange(onchange) {
+	return function(event) {
+		dialogSel.target = event.target;
+		dialogSel.start = event.target.selectionStart;
+		dialogSel.end = event.target.selectionEnd;
+		dialogSel.onchange = onchange;
+
+		var effectButtons = document.getElementsByClassName("dialogEffectButton");
+		for(var i = 0; i < effectButtons.length; i++) {
+			effectButtons[i].disabled = false;
+		}
+	}
+}
