@@ -100,7 +100,7 @@ var Utils = function() {
 	// for editor ui
 	this.CreateDialogBlock = function(children,doIndentFirstLine) {
 		if(doIndentFirstLine === undefined) doIndentFirstLine = true;
-		var block = new BlockNode( BlockMode.Dialog, doIndentFirstLine );
+		var block = new DialogBlockNode(doIndentFirstLine);
 		for(var i = 0; i < children.length; i++) {
 			block.AddChild( children[i] );
 		}
@@ -108,7 +108,7 @@ var Utils = function() {
 	}
 
 	this.CreateOptionBlock = function() {
-		var block = new BlockNode( BlockMode.Dialog, false );
+		var block = new DialogBlockNode(false);
 		block.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 		return block;
 	}
@@ -124,7 +124,7 @@ var Utils = function() {
 		}
 
 		var node = new FuncNode(name, parameters);
-		var block = new BlockNode( BlockMode.Code );
+		var block = new CodeBlockNode();
 		block.AddChild(node);
 		return block;
 	}
@@ -154,7 +154,7 @@ var Utils = function() {
 
 	// TODO : need to split up code & dialog blocks :|
 	this.CreateCodeBlock = function() {
-		return new BlockNode(BlockMode.Code);
+		return new CodeBlockNode();
 	}
 
 	this.ChangeSequenceType = function(oldSequence,type) {
@@ -171,60 +171,60 @@ var Utils = function() {
 	}
 
 	this.CreateSequenceBlock = function() {
-		var option1 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		var option1 = new DialogBlockNode( false /*doIndentFirstLine*/ );
 		option1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 
-		var option2 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		var option2 = new DialogBlockNode( false /*doIndentFirstLine*/ );
 		option2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 
 		var sequence = new SequenceNode( [ option1, option2 ] );
-		var block = new BlockNode( BlockMode.Code );
+		var block = new CodeBlockNode();
 		block.AddChild( sequence );
 		return block;
 	}
 
 	this.CreateCycleBlock = function() {
-		var option1 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		var option1 = new DialogBlockNode( false /*doIndentFirstLine*/ );
 		option1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 
-		var option2 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		var option2 = new DialogBlockNode( false /*doIndentFirstLine*/ );
 		option2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 
 		var sequence = new CycleNode( [ option1, option2 ] );
-		var block = new BlockNode( BlockMode.Code );
+		var block = new CodeBlockNode();
 		block.AddChild( sequence );
 		return block;
 	}
 
 	this.CreateShuffleBlock = function() {
-		var option1 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		var option1 = new DialogBlockNode( false /*doIndentFirstLine*/ );
 		option1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 
-		var option2 = new BlockNode( BlockMode.Dialog, false /*doIndentFirstLine*/ );
+		var option2 = new DialogBlockNode( false /*doIndentFirstLine*/ );
 		option2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 
 		var sequence = new ShuffleNode( [ option1, option2 ] );
-		var block = new BlockNode( BlockMode.Code );
+		var block = new CodeBlockNode();
 		block.AddChild( sequence );
 		return block;
 	}
 
 	this.CreateIfBlock = function() {
-		var leftNode = new BlockNode( BlockMode.Code );
+		var leftNode = new CodeBlockNode();
 		leftNode.AddChild( new FuncNode("item", [new LiteralNode("0")] ) );
 		var rightNode = new LiteralNode( 1 );
 		var condition1 = new ExpNode("==", leftNode, rightNode );
 
 		var condition2 = new ElseNode();
 
-		var result1 = new BlockNode( BlockMode.Dialog );
+		var result1 = new DialogBlockNode();
 		result1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 
-		var result2 = new BlockNode( BlockMode.Dialog );
+		var result2 = new DialogBlockNode();
 		result2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 
 		var ifNode = new IfNode( [ condition1, condition2 ], [ result1, result2 ] );
-		var block = new BlockNode( BlockMode.Code );
+		var block = new CodeBlockNode();
 		block.AddChild( ifNode );
 		return block;
 	}
@@ -706,36 +706,30 @@ var TreeRelationship = function() {
 	};
 }
 
-var BlockMode = {
-	Code : "code",
-	Dialog : "dialog"
-};
-
-var BlockNode = function(mode, doIndentFirstLine) {
+var DialogBlockNode = function(doIndentFirstLine) {
 	Object.assign( this, new TreeRelationship() );
 	// Object.assign( this, new Runnable() );
-	this.type = "block";
-	this.mode = mode;
+	this.type = "dialog_block";
 
-	this.Eval = function(environment,onReturn) {
+	this.Eval = function(environment, onReturn) {
 		// console.log("EVAL BLOCK " + this.children.length);
 
-		if( this.onEnter != null ) {
+		if (this.onEnter != null) {
 			this.onEnter();
 		}
 
 		var lastVal = null;
 		var i = 0;
 
-		function evalChildren(children,done) {
+		function evalChildren(children, done) {
 			if (i < children.length) {
 				// console.log(">> CHILD " + i);
-				children[i].Eval( environment, function(val) {
+				children[i].Eval(environment, function(val) {
 					// console.log("<< CHILD " + i);
 					lastVal = val;
 					i++;
 					evalChildren(children,done);
-				} );
+				});
 			}
 			else {
 				done();
@@ -743,72 +737,141 @@ var BlockNode = function(mode, doIndentFirstLine) {
 		};
 
 		var self = this;
-		evalChildren( this.children, function() {
+		evalChildren(this.children, function() {
 			if( self.onExit != null ) {
 				self.onExit();
 			}
 			onReturn(lastVal);
-		} );
+		});
 	}
 
-	if(doIndentFirstLine === undefined) doIndentFirstLine = true; // This is just for serialization
+	if (doIndentFirstLine === undefined) {
+		doIndentFirstLine = true; // This is just for serialization
+	}
 
 	this.Serialize = function(depth) {
-		if(depth === undefined) depth = 0;
+		if (depth === undefined) {
+			depth = 0;
+		}
+
+		var str = "";
+		var lastNode = null;
+
+		for (var i = 0; i < this.children.length; i++) {
+
+			var curNode = this.children[i];
+
+			var shouldIndentFirstLine = (i == 0 && doIndentFirstLine);
+			var shouldIndentAfterLinebreak = (lastNode && lastNode.type === "function" && lastNode.name === "br");
+			var shouldIndentCodeBlock = false;
+
+			if (i > 0 && curNode.type === "code_block" && !isBlockWithNoNewline(curNode)) {
+				str += "\n";
+				shouldIndentCodeBlock = true;
+			}
+
+			if (shouldIndentFirstLine || shouldIndentAfterLinebreak || shouldIndentCodeBlock) {
+				str += leadingWhitespace(depth);
+			}
+
+			str += curNode.Serialize(depth);
+			lastNode = curNode;
+		}
+
+		return str;
+	}
+
+	this.ToString = function() {
+		return this.type;
+	};
+}
+
+var CodeBlockNode = function() {
+	Object.assign( this, new TreeRelationship() );
+	this.type = "code_block";
+
+	this.Eval = function(environment, onReturn) {
+		// console.log("EVAL BLOCK " + this.children.length);
+
+		if (this.onEnter != null) {
+			this.onEnter();
+		}
+
+		var lastVal = null;
+		var i = 0;
+
+		function evalChildren(children, done) {
+			if (i < children.length) {
+				// console.log(">> CHILD " + i);
+				children[i].Eval(environment, function(val) {
+					// console.log("<< CHILD " + i);
+					lastVal = val;
+					i++;
+					evalChildren(children,done);
+				});
+			}
+			else {
+				done();
+			}
+		};
+
+		var self = this;
+		evalChildren(this.children, function() {
+			if( self.onExit != null ) {
+				self.onExit();
+			}
+			onReturn(lastVal);
+		});
+	}
+
+	this.Serialize = function(depth) {
+		if(depth === undefined) {
+			depth = 0;
+		}
 
 		// console.log("SERIALIZE BLOCK!!!");
 		// console.log(depth);
 		// console.log(doIndentFirstLine);
 
-		var str = "";
-		var lastNode = null;
-		if (this.mode === BlockMode.Code) str += "{"; // todo: increase scope of Sym?
+		var str = "{"; // todo: increase scope of Sym?
+
+		// TODO : do code blocks ever have more than one child anymore????
 		for (var i = 0; i < this.children.length; i++) {
-
 			var curNode = this.children[i];
-
-			if(curNode.type === "block" && lastNode && lastNode.type === "block" && !isBlockWithNoNewline(curNode) && !isBlockWithNoNewline(lastNode))
-				str += "\n";
-
-			var shouldIndentFirstLine = (i == 0 && doIndentFirstLine);
-			var shouldIndentAfterLinebreak = (lastNode && lastNode.type === "function" && lastNode.name === "br");
-			if(this.mode === BlockMode.Dialog && (shouldIndentFirstLine || shouldIndentAfterLinebreak))
-				str += leadingWhitespace(depth);
 			str += curNode.Serialize(depth);
-			lastNode = curNode;
 		}
-		if (this.mode === BlockMode.Code) str += "}";
+
+		str += "}";
+
 		return str;
 	}
 
 	this.ToString = function() {
-		return this.type + " " + this.mode;
+		return this.type;
 	};
 }
 
 function isBlockWithNoNewline(node) {
-	return isTextEffectBlock(node) || isMultilineListBlock(node);
+	return isTextEffectBlock(node); // || isMultilineListBlock(node);
 }
 
+var textEffectBlockNames = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw"];
 function isTextEffectBlock(node) {
-	if(node.type === "block") {
-		if(node.children.length > 0 && node.children[0].type === "function") {
+	if (node.type === "code_block") {
+		if (node.children.length > 0 && node.children[0].type === "function") {
 			var func = node.children[0];
-			if(func.name === "clr1" || func.name === "clr2" || func.name === "clr3" || func.name === "wvy" || func.name === "shk" || func.name === "rbw") {
-				return true;
-			}
+			return textEffectBlockNames.indexOf(func.name) != -1;
 		}
 	}
 	return false;
 }
 
+var listBlockTypes = ["sequence", "cycle", "shuffle", "if"];
 function isMultilineListBlock(node) {
-	if(node.type === "block") {
-		if(node.children.length > 0) {
+	if (node.type === "code_block") {
+		if (node.children.length > 0) {
 			var child = node.children[0];
-			if(child.type === "sequence" || child.type === "cycle" || child.type === "shuffle" || child.type === "if") {
-				return true;
-			}
+			return listBlockTypes.indexOf(child.type) != -1;
 		}
 	}
 	return false;
@@ -853,7 +916,7 @@ var FuncNode = function(name,args) {
 	}
 
 	this.Serialize = function(depth) {
-		var isDialogBlock = this.parent.mode && this.parent.mode === BlockMode.Dialog;
+		var isDialogBlock = this.parent.type === "dialog_block";
 		if(isDialogBlock && this.name === "print") {
 			// TODO this could cause problems with "real" print functions
 			return this.args[0].value; // first argument should be the text of the {print} func
@@ -1187,12 +1250,12 @@ var Parser = function(env) {
 
 		// TODO : make this work for single-line, no dialog block scripts
 
-		var state = new ParserState( new BlockNode(BlockMode.Dialog), scriptStr );
+		var state = new ParserState(new DialogBlockNode(), scriptStr);
 
 		if( state.MatchAhead(Sym.DialogOpen) ) {
 			// multi-line dialog block
 			var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
-			state = new ParserState( new BlockNode(BlockMode.Dialog), dialogStr );
+			state = new ParserState(new DialogBlockNode(), dialogStr);
 			state = ParseDialog( state );
 		}
 		// else if( state.MatchAhead(Sym.CodeOpen) ) { // NOTE: This causes problems when you lead with a code block
@@ -1381,7 +1444,7 @@ var Parser = function(env) {
 	function ParseDialogBlock(state) {
 		var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
 
-		var dialogState = new ParserState( new BlockNode(BlockMode.Dialog), dialogStr );
+		var dialogState = new ParserState(new DialogBlockNode(), dialogStr);
 		dialogState = ParseDialog( dialogState );
 
 		state.curNode.AddChild( dialogState.rootNode );
@@ -1455,7 +1518,7 @@ var Parser = function(env) {
 		var results = [];
 		for(var i = 0; i < resultStrings.length; i++) {
 			var str = resultStrings[i];
-			var dialogBlockState = new ParserState( new BlockNode(BlockMode.Dialog), str );
+			var dialogBlockState = new ParserState(new DialogBlockNode(), str);
 			dialogBlockState = ParseDialog( dialogBlockState );
 			var dialogBlock = dialogBlockState.rootNode;
 			results.push( dialogBlock );
@@ -1512,7 +1575,7 @@ var Parser = function(env) {
 		var options = [];
 		for(var i = 0; i < itemStrings.length; i++) {
 			var str = itemStrings[i];
-			var dialogBlockState = new ParserState( new BlockNode( BlockMode.Dialog, false /* doIndentFirstLine */ ), str );
+			var dialogBlockState = new ParserState(new DialogBlockNode(false /* doIndentFirstLine */), str);
 			dialogBlockState = ParseDialog( dialogBlockState );
 			var dialogBlock = dialogBlockState.rootNode;
 			options.push( dialogBlock );
@@ -1546,7 +1609,7 @@ var Parser = function(env) {
 
 		while( !( state.Char() === "\n" || state.Done() ) ) {
 			if( state.MatchAhead(Sym.CodeOpen) ) {
-				var codeBlockState = new ParserState( new BlockNode(BlockMode.Code), state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose ) );
+				var codeBlockState = new ParserState(new CodeBlockNode(), state.ConsumeBlock(Sym.CodeOpen, Sym.CodeClose));
 				codeBlockState = ParseCode( codeBlockState );
 				var codeBlock = codeBlockState.rootNode;
 				args.push( codeBlock );
@@ -1588,7 +1651,7 @@ var Parser = function(env) {
 		if(valStr[0] === Sym.CodeOpen) {
 			// CODE BLOCK!!!
 			var codeStr = (new ParserState( null, valStr )).ConsumeBlock(Sym.CodeOpen, Sym.CodeClose); //hacky
-			var codeBlockState = new ParserState( new BlockNode( BlockMode.Code ), codeStr );
+			var codeBlockState = new ParserState(new CodeBlockNode(), codeStr);
 			codeBlockState = ParseCode( codeBlockState );
 			return codeBlockState.rootNode;
 		}
@@ -1689,7 +1752,7 @@ var Parser = function(env) {
 			var resultStr = expStr.substring(ifIndex+ifSymbol.length);
 			var results = [];
 			function AddResult(str) {
-				var dialogBlockState = new ParserState( new BlockNode(BlockMode.Dialog), str );
+				var dialogBlockState = new ParserState(new DialogBlockNode(), str);
 				dialogBlockState = ParseDialog( dialogBlockState );
 				var dialogBlock = dialogBlockState.rootNode;
 				results.push( dialogBlock );
@@ -1805,7 +1868,7 @@ var Parser = function(env) {
 		// console.log("PARSE CODE");
 		// console.log(codeStr);
 
-		var codeState = new ParserState( new BlockNode(BlockMode.Code), codeStr );
+		var codeState = new ParserState(new CodeBlockNode(), codeStr);
 		codeState = ParseCode( codeState );
 		
 		state.curNode.AddChild( codeState.rootNode );

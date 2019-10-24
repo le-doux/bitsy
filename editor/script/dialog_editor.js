@@ -118,13 +118,13 @@ function DialogTool() {
 			// build the editors
 			childEditors = [];
 
-			function isBlock(node) { return node.type === "block"; };
+			function isCodeBlock(node) { return node.type === "code_block"; };
 			function isChildType(node,type) { return node.children[0].type === type; };
-			function isIf(node) { return isBlock(node) && isChildType(node,"if") && !node.children[0].IsSingleLine(); };
-			function isSeq(node) { return isBlock(node) && (isChildType(node,"sequence") || isChildType(node,"cycle") || isChildType(node,"shuffle")); };
+			function isIf(node) { return isCodeBlock(node) && isChildType(node,"if") && !node.children[0].IsSingleLine(); };
+			function isSeq(node) { return isCodeBlock(node) && (isChildType(node,"sequence") || isChildType(node,"cycle") || isChildType(node,"shuffle")); };
 
 			function isDescribedFunction(node) {
-				return isBlock(node) && isChildType(node, "function") && functionDescriptionMap[node.children[0].name] != undefined;
+				return isCodeBlock(node) && isChildType(node, "function") && functionDescriptionMap[node.children[0].name] != undefined;
 			}
 
 			var dialogNodeList = [];
@@ -819,7 +819,7 @@ function DialogTool() {
 		}
 		else if (condition.type === "operator") {
 			if (condition.right.type === "literal" && !isNaN(condition.right.value)) {
-				if (condition.left.type === "block") {
+				if (condition.left.type === "code_block") {
 					var child = condition.left.children[0];
 					if (child.type === "function" && child.name === "item") {
 						return "item";
