@@ -1553,3 +1553,43 @@ function createOnTextSelectionChange(onchange) {
 		}
 	}
 }
+
+function preventTextDeselect(event) {
+	if(dialogSel.target != null) {
+		// event.preventDefault();
+	}
+}
+
+function preventTextDeselectAndClick(event) {
+	if(dialogSel.target != null) {
+		// event.preventDefault();
+		event.target.click();
+	}
+}
+
+function wrapTextSelection(effect) {
+	if( dialogSel.target != null ) {
+		var curText = dialogSel.target.value;
+		var selText = curText.slice(dialogSel.start, dialogSel.end);
+
+		var isEffectAlreadyApplied = selText.indexOf( effect ) > -1;
+		if(isEffectAlreadyApplied) {
+			//remove all instances of effect
+			var effectlessText = selText.split( effect ).join( "" );
+			var newText = curText.slice(0, dialogSel.start) + effectlessText + curText.slice(dialogSel.end);
+			dialogSel.target.value = newText;
+			dialogSel.target.setSelectionRange(dialogSel.start,dialogSel.start + effectlessText.length);
+			if(dialogSel.onchange != null)
+				dialogSel.onchange( dialogSel ); // dialogSel needs to mimic the event the onchange would usually receive
+		}
+		else {
+			// add effect
+			var effectText = effect + selText + effect;
+			var newText = curText.slice(0, dialogSel.start) + effectText + curText.slice(dialogSel.end);
+			dialogSel.target.value = newText;
+			dialogSel.target.setSelectionRange(dialogSel.start,dialogSel.start + effectText.length);
+			if(dialogSel.onchange != null)
+				dialogSel.onchange( dialogSel ); // dialogSel needs to mimic the event the onchange would usually receive
+		}
+	}
+}
