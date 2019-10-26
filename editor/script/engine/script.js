@@ -855,7 +855,7 @@ function isBlockWithNoNewline(node) {
 	return isTextEffectBlock(node); // || isMultilineListBlock(node);
 }
 
-var textEffectBlockNames = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw"];
+var textEffectBlockNames = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw", "printSprite", "printItem", "printTile"];
 function isTextEffectBlock(node) {
 	if (node.type === "code_block") {
 		if (node.children.length > 0 && node.children[0].type === "function") {
@@ -1337,8 +1337,23 @@ var Parser = function(env) {
 		this.Source = function() { return sourceStr; };
 	};
 
+	/*
+		This function adds {print} nodes and linebreak {br} nodes to display text,
+		interleaved with the visibly-bracketed code nodes for functions and flow control,
+		such as text effects {shk} {wvy} or sequences like {cycle} and {shuffle}. The parsing
+		of those code blocks is handled by ParseCodeBlock.
+
+		The trickiest part is figuring out which newline (\n) characters should actually
+		be translated into {br} commands that are displayed in the dialog box, and which
+		are ignore-able whitespace used to make {code} commands easier to read.
+
+		The rules for newlines are:
+		- any line containing text is considered a dialog line
+		- any completely empty line is *also* considered a dialog line
+		- a line *only* containing {code} blocks is NOT a dialog line
+		- all dialog lines after the first in the block shuld be preceded by a {br}
+	*/
 	function ParseDialog(state) {
-		// console.log("PARSE DIALOG");
 		state.Print();
 
 		// for linebreak logic: add linebreaks after lines with dialog or empty lines (if it's not the very first line)
@@ -1346,49 +1361,36 @@ var Parser = function(env) {
 		var hasDialog = false;
 		var isFirstLine = true;
 
-		// console.log("---- PARSE DIALOG ----");
-
 		var text = "";
 		var addTextNode = function() {
-			// console.log("TEXT " + text.length);
 			if (text.length > 0) {
-				// console.log("TEXT " + text);
-				// console.log("text!!");
-				// console.log([text]);
-
-				state.curNode.AddChild( new FuncNode( "print", [new LiteralNode(text)] ) );
+				var printNode = new FuncNode("print", [new LiteralNode(text)]);
+				state.curNode.AddChild(printNode);
 				text = "";
 
-				hasDialog = true;
+				hasDialog = true; // for linebreaks (todo : better name?)
 			}
 		}
 
-		while ( !state.Done() ) {
+		while (!state.Done()) {
 
-			if( state.MatchAhead(Sym.CodeOpen) ) {
+			if (state.MatchAhead(Sym.CodeOpen)) {
 				addTextNode();
-				state = ParseCodeBlock( state );
+				state = ParseCodeBlock(state);
 
-				// console.log("CODE");
-
+				// TODO : comment this -- looks like we are looking at the previous block to see what it is
 				var len = state.curNode.children.length;
-				if(len > 0 && state.curNode.children[len-1].type === "block") {
+				if (len > 0 && state.curNode.children[len-1].type === "code_block") {
 					var block = state.curNode.children[len-1];
-					if(isMultilineListBlock(block))
+					if (isMultilineListBlock(block)) {
 						hasDialog = true; // hack to get correct newline behavior for multiline blocks
+					}
 				}
 
 				hasBlock = true;
 			}
-			// NOTE: nested dialog blocks disabled for now
-			// else if( state.MatchAhead(Sym.DialogOpen) ) {
-			// 	addTextNode();
-			// 	state = ParseDialogBlock( state ); // These can be nested (should they though???)
-
-			// 	hasBlock = true;
-			// }
 			else {
-				if ( state.MatchAhead(Sym.Linebreak) ) {
+				if (state.MatchAhead(Sym.Linebreak)) {
 					addTextNode();
 
 					/*
@@ -1403,28 +1405,26 @@ var Parser = function(env) {
 					also, apparently:
 					- NEVER line break on the last line
 					*/
-					var isLastLine = (state.Index() + 1) == state.Count();
-					// console.log("block " + hasBlock);
-					// console.log("dialog " + hasDialog);
-					var isEmptyLine = !hasBlock && !hasDialog;
-					// console.log("empty " + isEmptyLine);
-					var isValidEmptyLine = isEmptyLine && !(isFirstLine || isLastLine);
-					// console.log("valid empty " + isValidEmptyLine);
-					var shouldAddLinebreak = (hasDialog || isValidEmptyLine) && !isLastLine; // last clause is a hack (but it works - why?)
-					// console.log("LINEBREAK? " + shouldAddLinebreak);
-					if( shouldAddLinebreak ) {
-						// console.log("NEWLINE");
-						// console.log("empty? " + isEmptyLine);
-						// console.log("dialog? " + hasDialog);
-						state.curNode.AddChild( new FuncNode( "br", [] ) ); // use function or character?
-					}
+
+					// var isLastLine = (state.Index() + 1) == state.Count();
+					// var isEmptyLine = !hasBlock && !hasDialog;
+					// var isValidEmptyLine = isEmptyLine && !(isFirstLine || isLastLine);
+					// var shouldAddLinebreak = (hasDialog || isValidEmptyLine) && !isLastLine; // last clause is a hack (but it works - why?)
+					// if (shouldAddLinebreak) {
+					// 	var linebreakNode = new FuncNode("br", []);
+					// 	state.curNode.AddChild(linebreakNode); // use function or character?
+					// }
+
+					// TODO test if we ALWAYS add a linebreak
+					var linebreakNode = new FuncNode("br", []);
+					state.curNode.AddChild(linebreakNode); // use function or character?
 
 					// linebreak logic
 					isFirstLine = false;
 					hasBlock = false;
 					hasDialog = false;
 
-					text = "";
+					text = ""; // TODO : what is THIS for? seems redundant REMOVE
 				}
 				else {
 					text += state.Char();
@@ -1433,11 +1433,9 @@ var Parser = function(env) {
 			}
 
 		}
+
 		addTextNode();
 
-		// console.log("---- PARSE DIALOG ----");
-
-		// console.log(state);
 		return state;
 	}
 
