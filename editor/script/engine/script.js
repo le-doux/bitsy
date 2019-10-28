@@ -1230,8 +1230,6 @@ var ElseNode = function() {
 }
 
 var Sym = {
-	// DialogOpen : "/\"",
-	// DialogClose : "\"/",
 	DialogOpen : '"""',
 	DialogClose : '"""',
 	CodeOpen : "{",
@@ -1246,28 +1244,19 @@ var Parser = function(env) {
 	var environment = env;
 
 	this.Parse = function(scriptStr) {
-		// console.log("NEW PARSE!!!!!!");
-
-		// TODO : make this work for single-line, no dialog block scripts
-
 		var state = new ParserState(new DialogBlockNode(), scriptStr);
 
-		if( state.MatchAhead(Sym.DialogOpen) ) {
+		if (state.MatchAhead(Sym.DialogOpen)) {
 			// multi-line dialog block
-			var dialogStr = state.ConsumeBlock( Sym.DialogOpen, Sym.DialogClose );
+			var dialogStr = state.ConsumeBlock(Sym.DialogOpen + Sym.Linebreak, Sym.DialogClose);
 			state = new ParserState(new DialogBlockNode(), dialogStr);
-			state = ParseDialog( state );
+			state = ParseDialog(state);
 		}
-		// else if( state.MatchAhead(Sym.CodeOpen) ) { // NOTE: This causes problems when you lead with a code block
-		// 	// code-block: should this ever happen?
-		// 	state = ParseCodeBlock( state );
-		// }
 		else {
 			// single-line dialog block
-			state = ParseDialog( state );
+			state = ParseDialog(state);
 		}
 
-		// console.log( state.rootNode );
 		return state.rootNode;
 	};
 
@@ -1338,103 +1327,111 @@ var Parser = function(env) {
 	};
 
 	/*
+		ParseDialog():
 		This function adds {print} nodes and linebreak {br} nodes to display text,
-		interleaved with the visibly-bracketed code nodes for functions and flow control,
-		such as text effects {shk} {wvy} or sequences like {cycle} and {shuffle}. The parsing
-		of those code blocks is handled by ParseCodeBlock.
+		interleaved with bracketed code nodes for functions and flow control,
+		such as text effects {shk} {wvy} or sequences like {cycle} and {shuffle}.
+		The parsing of those code blocks is handled by ParseCodeBlock.
 
 		The trickiest part is figuring out which newline (\n) characters should actually
 		be translated into {br} commands that are displayed in the dialog box, and which
 		are ignore-able whitespace used to make {code} commands easier to read.
 
 		The rules for newlines are:
-		- any line containing text is considered a dialog line
-		- any completely empty line is *also* considered a dialog line
-		- a line *only* containing {code} blocks is NOT a dialog line
-		- all dialog lines after the first in the block shuld be preceded by a {br}
+		- there should be a linebreak {br} between each pair of *consecutive* dialog lines
+		- a dialog line is defined as any line that either:
+			- contains dialog text (any text outside of a code block)
+			- *or* is entirely empty (no text, no code)
+		- lines *only* containing {code} blocks are not dialog lines
+
+		NOTE TO SELF: all the state I'm storing in here feels like
+		evidence that the parsing system kind of broke down at this point :(
+		Maybe it would feel better if I move into the "state" object
 	*/
 	function ParseDialog(state) {
-		state.Print();
+		var curLineNodeList = [];
+		var curText = "";
+		var curLineIsEmpty = true;
+		var curLineContainsDialogText = false;
+		var prevLineIsDialogLine = false;
 
-		// for linebreak logic: add linebreaks after lines with dialog or empty lines (if it's not the very first line)
-		var hasBlock = false;
-		var hasDialog = false;
-		var isFirstLine = true;
+		var curLineIsDialogLine = function() {
+			return curLineContainsDialogText || curLineIsEmpty;
+		}
 
-		var text = "";
-		var addTextNode = function() {
-			if (text.length > 0) {
-				var printNode = new FuncNode("print", [new LiteralNode(text)]);
-				state.curNode.AddChild(printNode);
-				text = "";
+		var resetLineStateForNewLine = function() {
+			prevLineIsDialogLine = curLineIsDialogLine();
+			curLineContainsDialogText = false;
+			curLineIsEmpty = true;
+			curText = "";
+			curLineNodeList = [];
+		}
 
-				hasDialog = true; // for linebreaks (todo : better name?)
+		var tryAddTextNodeToList = function() {
+			if (curText.length > 0) {
+				var printNode = new FuncNode("print", [new LiteralNode(curText)]);
+				curLineNodeList.push(printNode);
+
+				curText = "";
+				curLineIsEmpty = false;
+				curLineContainsDialogText = true;
+			}
+		}
+
+		var addCodeNodeToList = function() {
+			var codeSource = state.ConsumeBlock(Sym.CodeOpen, Sym.CodeClose);
+			var codeState = new ParserState(new CodeBlockNode(), codeSource);
+			codeState = ParseCode(codeState);
+			var codeBlockNode = codeState.rootNode;
+			curLineNodeList.push(codeBlockNode);
+
+			curLineIsEmpty = false;
+		}
+
+		var tryAddLinebreakNodeToList = function() {
+			if (prevLineIsDialogLine && curLineIsDialogLine()) {
+				var linebreakNode = new FuncNode("br", []);
+				curLineNodeList.unshift(linebreakNode);
+			}
+		}
+
+		var addLineNodesToParent = function() {
+			for (var i = 0; i < curLineNodeList.length; i++) {
+				state.curNode.AddChild(curLineNodeList[i]);
 			}
 		}
 
 		while (!state.Done()) {
-
-			if (state.MatchAhead(Sym.CodeOpen)) {
-				addTextNode();
-				state = ParseCodeBlock(state);
-
-				// TODO : comment this -- looks like we are looking at the previous block to see what it is
-				var len = state.curNode.children.length;
-				if (len > 0 && state.curNode.children[len-1].type === "code_block") {
-					var block = state.curNode.children[len-1];
-					if (isMultilineListBlock(block)) {
-						hasDialog = true; // hack to get correct newline behavior for multiline blocks
-					}
-				}
-
-				hasBlock = true;
+			if (state.MatchAhead(Sym.CodeOpen)) { // process code block
+				// add any buffered text to a print node, and parse the code
+				tryAddTextNodeToList();
+				addCodeNodeToList();
 			}
-			else {
-				if (state.MatchAhead(Sym.Linebreak)) {
-					addTextNode();
+			else if (state.MatchAhead(Sym.Linebreak)) { // process new line
+				// add any buffered text to a print node, 
+				// and add a linebreak if we are between two dialog lines
+				tryAddTextNodeToList();
+				tryAddLinebreakNodeToList();
 
-					/*
-					NOTES:
-					linebreaks SHOULD happen on
-					- lines with text (including the first or last line)
-					- empty lines (that are NOT the first or last line)
-					linebreaks should NOT happen on
-					- lines with only CODE blocks
-					- empty FIRST or LAST lines
+				// add stored nodes for this line to the parent node we are building,
+				// and reset state for the next line
+				addLineNodesToParent();
+				resetLineStateForNewLine();
 
-					also, apparently:
-					- NEVER line break on the last line
-					*/
-
-					// var isLastLine = (state.Index() + 1) == state.Count();
-					// var isEmptyLine = !hasBlock && !hasDialog;
-					// var isValidEmptyLine = isEmptyLine && !(isFirstLine || isLastLine);
-					// var shouldAddLinebreak = (hasDialog || isValidEmptyLine) && !isLastLine; // last clause is a hack (but it works - why?)
-					// if (shouldAddLinebreak) {
-					// 	var linebreakNode = new FuncNode("br", []);
-					// 	state.curNode.AddChild(linebreakNode); // use function or character?
-					// }
-
-					// TODO test if we ALWAYS add a linebreak
-					var linebreakNode = new FuncNode("br", []);
-					state.curNode.AddChild(linebreakNode); // use function or character?
-
-					// linebreak logic
-					isFirstLine = false;
-					hasBlock = false;
-					hasDialog = false;
-
-					text = ""; // TODO : what is THIS for? seems redundant REMOVE
-				}
-				else {
-					text += state.Char();
-				}
 				state.Step();
 			}
-
+			else {
+				// continue adding text to the current text buffer
+				curText += state.Char();
+				state.Step();
+			}
 		}
 
-		addTextNode();
+		// make sure we don't leave anything behind:
+		// add buffered text to a print node and add all nodes
+		// to the current parent node
+		tryAddTextNodeToList();
+		addLineNodesToParent();
 
 		return state;
 	}
@@ -1862,15 +1859,9 @@ var Parser = function(env) {
 
 	function ParseCodeBlock(state) {
 		var codeStr = state.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose );
-
-		// console.log("PARSE CODE");
-		// console.log(codeStr);
-
 		var codeState = new ParserState(new CodeBlockNode(), codeStr);
 		codeState = ParseCode( codeState );
-		
 		state.curNode.AddChild( codeState.rootNode );
-
 		return state;
 	}
 
