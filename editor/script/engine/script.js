@@ -761,20 +761,28 @@ var DialogBlockNode = function(doIndentFirstLine) {
 
 			var curNode = this.children[i];
 
+			var curNodeIsNonInlineCode = curNode.type === "code_block" && !isInlineCode(curNode);
+			var prevNodeIsNonInlineCode = lastNode && lastNode.type === "code_block" && !isInlineCode(lastNode);
+
 			var shouldIndentFirstLine = (i == 0 && doIndentFirstLine);
 			var shouldIndentAfterLinebreak = (lastNode && lastNode.type === "function" && lastNode.name === "br");
-			var shouldIndentCodeBlock = false;
+			var shouldIndentCodeBlock = i > 0 && curNodeIsNonInlineCode;
+			var shouldIndentAfterCodeBlock = prevNodeIsNonInlineCode;
 
-			if (i > 0 && curNode.type === "code_block" && !isBlockWithNoNewline(curNode)) {
+			if (i > 0 && curNodeIsNonInlineCode && !prevNodeIsNonInlineCode) {
 				str += "\n";
-				shouldIndentCodeBlock = true;
 			}
 
-			if (shouldIndentFirstLine || shouldIndentAfterLinebreak || shouldIndentCodeBlock) {
+			if (shouldIndentFirstLine || shouldIndentAfterLinebreak || shouldIndentCodeBlock || shouldIndentAfterCodeBlock) {
 				str += leadingWhitespace(depth);
 			}
 
 			str += curNode.Serialize(depth);
+
+			if (i < this.children.length-1 && curNodeIsNonInlineCode) {
+				str += "\n";
+			}
+
 			lastNode = curNode;
 		}
 
@@ -851,7 +859,7 @@ var CodeBlockNode = function() {
 	};
 }
 
-function isBlockWithNoNewline(node) {
+function isInlineCode(node) {
 	return isTextEffectBlock(node); // || isMultilineListBlock(node);
 }
 
@@ -917,11 +925,11 @@ var FuncNode = function(name,args) {
 
 	this.Serialize = function(depth) {
 		var isDialogBlock = this.parent.type === "dialog_block";
-		if(isDialogBlock && this.name === "print") {
+		if (isDialogBlock && this.name === "print") {
 			// TODO this could cause problems with "real" print functions
 			return this.args[0].value; // first argument should be the text of the {print} func
 		}
-		else if(isDialogBlock && this.name === "br") {
+		else if (isDialogBlock && this.name === "br") {
 			return "\n";
 		}
 		else {
@@ -1331,7 +1339,7 @@ var Parser = function(env) {
 		This function adds {print} nodes and linebreak {br} nodes to display text,
 		interleaved with bracketed code nodes for functions and flow control,
 		such as text effects {shk} {wvy} or sequences like {cycle} and {shuffle}.
-		The parsing of those code blocks is handled by ParseCodeBlock.
+		The parsing of those code blocks is handled by ParseCode.
 
 		The trickiest part is figuring out which newline (\n) characters should actually
 		be translated into {br} commands that are displayed in the dialog box, and which
@@ -1413,6 +1421,7 @@ var Parser = function(env) {
 				tryAddTextNodeToList();
 				tryAddLinebreakNodeToList();
 
+				// since we've reached the end of a line
 				// add stored nodes for this line to the parent node we are building,
 				// and reset state for the next line
 				addLineNodesToParent();
@@ -1427,7 +1436,7 @@ var Parser = function(env) {
 			}
 		}
 
-		// make sure we don't leave anything behind:
+		// to make sure we don't leave anything behind:
 		// add buffered text to a print node and add all nodes
 		// to the current parent node
 		tryAddTextNodeToList();
