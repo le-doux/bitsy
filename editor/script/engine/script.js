@@ -1080,44 +1080,47 @@ var SequenceBase = function() {
 }
 
 var SequenceNode = function(options) {
-	Object.assign( this, new TreeRelationship() );
-	Object.assign( this, new SequenceBase() );
+	Object.assign(this, new TreeRelationship());
+	Object.assign(this, new SequenceBase());
 	this.type = "sequence";
 	this.options = options;
 
 	var index = 0;
-	this.Eval = function(environment,onReturn) {
+	this.Eval = function(environment, onReturn) {
 		// console.log("SEQUENCE " + index);
-		this.options[index].Eval( environment, onReturn );
+		this.options[index].Eval(environment, onReturn);
 
 		var next = index + 1;
-		if(next < this.options.length)
+		if (next < this.options.length) {
 			index = next;
+		}
 	}
 }
 
 var CycleNode = function(options) {
-	Object.assign( this, new TreeRelationship() );
-	Object.assign( this, new SequenceBase() );
+	Object.assign(this, new TreeRelationship());
+	Object.assign(this, new SequenceBase());
 	this.type = "cycle";
 	this.options = options;
 
 	var index = 0;
-	this.Eval = function(environment,onReturn) {
+	this.Eval = function(environment, onReturn) {
 		// console.log("CYCLE " + index);
-		this.options[index].Eval( environment, onReturn );
+		this.options[index].Eval(environment, onReturn);
 
 		var next = index + 1;
-		if(next < this.options.length)
+		if (next < this.options.length) {
 			index = next;
-		else
+		}
+		else {
 			index = 0;
+		}
 	}
 }
 
 var ShuffleNode = function(options) {
-	Object.assign( this, new TreeRelationship() );
-	Object.assign( this, new SequenceBase() );
+	Object.assign(this, new TreeRelationship());
+	Object.assign(this, new SequenceBase());
 	this.type = "shuffle";
 	this.options = options;
 
@@ -1125,20 +1128,16 @@ var ShuffleNode = function(options) {
 	function shuffle(options) {
 		optionsShuffled = [];
 		var optionsUnshuffled = options.slice();
-		while(optionsUnshuffled.length > 0) {
-			var i = Math.floor( Math.random() * optionsUnshuffled.length );
-			optionsShuffled.push( optionsUnshuffled.splice(i,1)[0] );
+		while (optionsUnshuffled.length > 0) {
+			var i = Math.floor(Math.random() * optionsUnshuffled.length);
+			optionsShuffled.push(optionsUnshuffled.splice(i,1)[0]);
 		}
 	}
 	shuffle(this.options);
 
 	var index = 0;
-	this.Eval = function(environment,onReturn) {
-		// OLD RANDOM VERSION
-		// var index = Math.floor(Math.random() * this.options.length);
-		// this.options[index].Eval( environment, onReturn );
-
-		optionsShuffled[index].Eval( environment, onReturn );
+	this.Eval = function(environment, onReturn) {
+		optionsShuffled[index].Eval(environment, onReturn);
 		
 		index++;
 		if (index >= this.options.length) {
@@ -1303,33 +1302,41 @@ var Parser = function(env) {
 			// console.log("PEAK ::" + str + "::");
 			return str;
 		}
-		this.ConsumeBlock = function( open, close ) {
+		this.ConsumeBlock = function(open, close, includeSymbols) {
+			if (includeSymbols === undefined || includeSymbols === null) {
+				includeSymbols = false;
+			}
+
 			var startIndex = i;
 
 			var matchCount = 0;
-			if( this.MatchAhead( open ) ) {
+			if (this.MatchAhead(open)) {
 				matchCount++;
-				this.Step( open.length );
+				this.Step(open.length);
 			}
 
-			while( matchCount > 0 && !this.Done() ) {
-				if( this.MatchAhead( close ) ) {
+			while (matchCount > 0 && !this.Done()) {
+				if (this.MatchAhead(close)) {
 					matchCount--;
 					this.Step( close.length );
 				}
-				else if( this.MatchAhead( open ) ) {
+				else if (this.MatchAhead(open)) {
 					matchCount++;
-					this.Step( open.length );
+					this.Step(open.length);
 				}
 				else {
 					this.Step();
 				}
 			}
 
-			// console.log("!!! " + startIndex + " " + i);
-
-			return sourceStr.slice( startIndex + open.length, i - close.length );
+			if (includeSymbols) {
+				return sourceStr.slice(startIndex, i);
+			}
+			else {
+				return sourceStr.slice(startIndex + open.length, i - close.length);
+			}
 		}
+
 		this.Print = function() { console.log(sourceStr); };
 		this.Source = function() { return sourceStr; };
 	};
@@ -1538,61 +1545,121 @@ var Parser = function(env) {
 		return str === "sequence" || str === "cycle" || str === "shuffle";
 	}
 
-	// TODO: don't forget about eating whitespace
+	/*
+		ParseSequence():
+		Sequence nodes contain a list of dialog block nodes. The order those
+		nodes are evaluated is determined by the type of sequence:
+		- sequence: each child node evaluated once in order
+		- cycle: repeats from the beginning after all nodes evaluate
+		- shuffle: evaluate in a random order
+
+		Each item in a sequence is sepearated by a "-" character.
+		The seperator must come at the beginning of the line,
+		but may be preceded by whitespace (in any amount).
+
+		About whitespace: Whitespace at the start of a line
+		is ignored if it less than or equal to the count of
+		whitespace that preceded the list separator ("-") at
+		the start of that item. (The count also includes the
+		seperator and the extra space after the seperator.)
+
+		TODO
+		- fix the issue with extra newlines inserted into nested sequences
+		- consider whether to ConsumeBlock code blocks, or return to tracking them manually!
+		- look at conditional parsing next!
+	 */
 	function ParseSequence(state, sequenceType) {
-		// console.log("SEQUENCE " + sequenceType);
 		state.Print();
 
-		var isNewline = false;
 		var itemStrings = [];
 		var curItemIndex = -1; // -1 indicates not reading an item yet
-		var codeBlockCount = 0;
+		var maxLeadingWhitespace = -1;
 
-		while( !state.Done() ) {
-			if(state.Char() === Sym.CodeOpen)
-				codeBlockCount++;
-			else if(state.Char() === Sym.CodeClose)
-				codeBlockCount--;
+		function parseLine(state) {
+			var lineText = "";
+			var whitespaceCount = 0;
+			var isNewListItem = false;
+			var encounteredNonWhitespace = false;
 
-			var isWhitespace = (state.Char() === " " || state.Char() === "\t");
-			var isSkippableWhitespace = isNewline && isWhitespace;
-			var isNewListItem = isNewline && (codeBlockCount <= 0) && (state.Char() === Sym.List);
+			while (!state.Done() && !(state.Char() === Sym.Linebreak)) {
+				// count whitespace until we hit the first non-whitespace character
+				if (!encounteredNonWhitespace) {
+					if (state.Char() === " " || state.Char() === "\t") {
+						whitespaceCount++;
+					}
+					else {
+						encounteredNonWhitespace = true;
 
-			if(isNewListItem) {
-				// console.log("found next list item");
+						if (state.Char() === Sym.List) {
+							isNewListItem = true;
+							whitespaceCount += 2; // count the list seperator AND the following extra space
+						}
+					}
+				}
+
+				// add characters one at a time, unless it's a code block
+				// since code blocks can contain additional sequences inside
+				// them that will mess up our list item detection
+				if (state.Char() === Sym.CodeOpen) {
+					lineText += state.ConsumeBlock(Sym.CodeOpen, Sym.CodeClose, true /*includeSymbols*/);
+				}
+				else {
+					lineText += state.Char();
+					state.Step();
+				}
+			}
+
+			if (state.Char() === Sym.Linebreak) {
+				state.Step();
+			}
+
+			return { text:lineText, whitespace:whitespaceCount, isNewListItem:isNewListItem };
+		}
+
+		// TODO : confusing naming because it can contain multiple lines
+		function trimLineText(lineText, trimLength) {
+			var lineList = lineText.split(Sym.linebreak);
+			lineList = lineList.map(function(x) { return x.slice(trimLength) });
+			return lineList.join(Sym.linebreak);
+		}
+
+		while (!state.Done()) {
+			var lineResults = parseLine(state);
+
+			if (lineResults.isNewListItem) {
+				maxLeadingWhitespace = lineResults.whitespace;
 				curItemIndex++;
 				itemStrings[curItemIndex] = "";
 			}
-			else if(curItemIndex > -1) {
-				if(!isSkippableWhitespace)
-					itemStrings[curItemIndex] += state.Char();
-			}
 
-			isNewline = (state.Char() === Sym.Linebreak) || isSkippableWhitespace || isNewListItem;
+			// trim leading whitespace (up to the max allowed for this item)
+			var trimLength = Math.min(lineResults.whitespace, maxLeadingWhitespace);
+			var trimmedLine = trimLineText(lineResults.text, trimLength);
 
-			// console.log(state.Char());
-			state.Step();
+			itemStrings[curItemIndex] += trimmedLine + Sym.Linebreak;
 		}
-		// console.log(itemStrings);
-		// console.log("SEQUENCE DONE");
+
+		console.log("ITEM STRINGS!!!!");
+		console.log(itemStrings);
 
 		var options = [];
-		for(var i = 0; i < itemStrings.length; i++) {
+		for (var i = 0; i < itemStrings.length; i++) {
 			var str = itemStrings[i];
 			var dialogBlockState = new ParserState(new DialogBlockNode(false /* doIndentFirstLine */), str);
-			dialogBlockState = ParseDialog( dialogBlockState );
+			dialogBlockState = ParseDialog(dialogBlockState);
 			var dialogBlock = dialogBlockState.rootNode;
-			options.push( dialogBlock );
+			options.push(dialogBlock);
 		}
 
-		// console.log(options);
-
-		if(sequenceType === "sequence")
-			state.curNode.AddChild( new SequenceNode( options ) );
-		else if(sequenceType === "cycle")
-			state.curNode.AddChild( new CycleNode( options ) );
-		else if(sequenceType === "shuffle")
-			state.curNode.AddChild( new ShuffleNode( options ) );
+		if (sequenceType === "sequence") {
+			state.curNode.AddChild(new SequenceNode(options));
+		}
+		else if (sequenceType === "cycle") {
+			state.curNode.AddChild(new CycleNode(options));
+		}
+		else if (sequenceType === "shuffle") {
+			state.curNode.AddChild(new ShuffleNode(options));
+		}
 
 		return state;
 	}
