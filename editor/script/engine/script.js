@@ -1463,7 +1463,7 @@ var Parser = function(env) {
 		return state;
 	}
 
-	function ParseIf(state) {
+	function ParseConditional(state) {
 		var conditionStrings = [];
 		var resultStrings = [];
 		var curIndex = -1;
@@ -1471,25 +1471,27 @@ var Parser = function(env) {
 		var isConditionDone = false;
 		var codeBlockCount = 0;
 
-		while( !state.Done() ) {
-			if(state.Char() === Sym.CodeOpen)
+		while (!state.Done()) {
+			if (state.Char() === Sym.CodeOpen) {
 				codeBlockCount++;
-			else if(state.Char() === Sym.CodeClose)
+			}
+			else if (state.Char() === Sym.CodeClose) {
 				codeBlockCount--;
+			}
 
 			var isWhitespace = (state.Char() === " " || state.Char() === "\t");
 			var isSkippableWhitespace = isNewline && isWhitespace;
 			var isNewListItem = isNewline && (codeBlockCount <= 0) && (state.Char() === Sym.List);
 
-			if(isNewListItem) {
+			if (isNewListItem) {
 				curIndex++;
 				isConditionDone = false;
 				conditionStrings[curIndex] = "";
 				resultStrings[curIndex] = "";
 			}
-			else if(curIndex > -1) {
-				if(!isConditionDone) {
-					if(state.Char() === "?" || state.Char() === "\n") { // TODO: use Sym
+			else if (curIndex > -1) {
+				if (!isConditionDone) {
+					if (state.Char() === "?" || state.Char() === "\n") { // TODO: use Sym
 						// end of condition
 						isConditionDone = true;
 					}
@@ -1500,8 +1502,9 @@ var Parser = function(env) {
 				}
 				else {
 					// read in result
-					if(!isSkippableWhitespace)
+					if (!isSkippableWhitespace) {
 						resultStrings[curIndex] += state.Char();
+					}
 				}
 			}
 
@@ -1515,27 +1518,27 @@ var Parser = function(env) {
 		// console.log(resultStrings);
 
 		var conditions = [];
-		for(var i = 0; i < conditionStrings.length; i++) {
+		for (var i = 0; i < conditionStrings.length; i++) {
 			var str = conditionStrings[i].trim();
-			if(str === "else") {
-				conditions.push( new ElseNode() );
+			if (str === "else") {
+				conditions.push(new ElseNode());
 			}
 			else {
-				var exp = CreateExpression( str );
-				conditions.push( exp );
+				var exp = CreateExpression(str);
+				conditions.push(exp);
 			}
 		}
 
 		var results = [];
-		for(var i = 0; i < resultStrings.length; i++) {
+		for (var i = 0; i < resultStrings.length; i++) {
 			var str = resultStrings[i];
 			var dialogBlockState = new ParserState(new DialogBlockNode(), str);
-			dialogBlockState = ParseDialog( dialogBlockState );
+			dialogBlockState = ParseDialog(dialogBlockState);
 			var dialogBlock = dialogBlockState.rootNode;
-			results.push( dialogBlock );
+			results.push(dialogBlock);
 		}
 
-		state.curNode.AddChild( new IfNode( conditions, results ) );
+		state.curNode.AddChild(new IfNode(conditions, results));
 
 		return state;
 	}
@@ -1902,26 +1905,23 @@ var Parser = function(env) {
 	}
 
 	function ParseCode(state) {
-		console.log("PARSE CODE --- " + state.Source());
-
 		// skip leading whitespace
 		while (IsWhitespace(state.Char())) {
 			state.Step();
 		}
 
-		if( state.Char() === Sym.List && (state.Peak([]).indexOf("?") > -1) ) { // TODO : symbols? matchahead?
-			// console.log("PEAK IF " + state.Peak( ["?"] ));
-			state = ParseIf( state );
+		if (state.Char() === Sym.List && (state.Peak([]).indexOf("?") > -1)) { // TODO : symbols? matchahead?
+			state = ParseConditional(state);
 		}
-		else if( environment.HasFunction( state.Peak( [" "] ) ) ) { // TODO --- what about newlines???
-			var funcName = state.Peak( [" "] );
-			state.Step( funcName.length );
-			state = ParseFunction( state, funcName );
+		else if (environment.HasFunction(state.Peak([" "]))) { // TODO --- what about newlines???
+			var funcName = state.Peak([" "]);
+			state.Step(funcName.length);
+			state = ParseFunction(state, funcName);
 		}
-		else if( IsSequence( state.Peak( [" ", Sym.Linebreak] ) ) ) {
-			var sequenceType = state.Peak( [" ", Sym.Linebreak] );
-			state.Step( sequenceType.length );
-			state = ParseSequence( state, sequenceType );
+		else if (IsSequence(state.Peak([" ", Sym.Linebreak]))) {
+			var sequenceType = state.Peak([" ", Sym.Linebreak]);
+			state.Step(sequenceType.length);
+			state = ParseSequence(state, sequenceType);
 		}
 		else if (IsExpression(state.Source())) {
 			state = ParseExpression(state);
