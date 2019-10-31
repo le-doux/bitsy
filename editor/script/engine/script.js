@@ -1575,7 +1575,7 @@ var Parser = function(env) {
 		var curItemIndex = -1; // -1 indicates not reading an item yet
 		var maxLeadingWhitespace = -1;
 
-		function parseLine(state) {
+		function parseSequenceItemLine(state) {
 			var lineText = "";
 			var whitespaceCount = 0;
 			var isNewListItem = false;
@@ -1616,15 +1616,17 @@ var Parser = function(env) {
 			return { text:lineText, whitespace:whitespaceCount, isNewListItem:isNewListItem };
 		}
 
-		// TODO : confusing naming because it can contain multiple lines
-		function trimLineText(lineText, trimLength) {
-			var lineList = lineText.split(Sym.linebreak);
-			lineList = lineList.map(function(x) { return x.slice(trimLength) });
-			return lineList.join(Sym.linebreak);
+		function trimLeadingWhitespace(text, trimLength) {
+			// the split and join is necessary because a single "line"
+			// can contain sequences that may contain newlines of their own
+			// (we treat them all as one "line" for sequence parsing purposes)
+			var textSplit = text.split(Sym.linebreak);
+			textSplit = textSplit.map(function(line) { return line.slice(trimLength) });
+			return textSplit.join(Sym.linebreak);
 		}
 
 		while (!state.Done()) {
-			var lineResults = parseLine(state);
+			var lineResults = parseSequenceItemLine(state);
 
 			if (lineResults.isNewListItem) {
 				maxLeadingWhitespace = lineResults.whitespace;
@@ -1634,13 +1636,13 @@ var Parser = function(env) {
 
 			// trim leading whitespace (up to the max allowed for this item)
 			var trimLength = Math.min(lineResults.whitespace, maxLeadingWhitespace);
-			var trimmedLine = trimLineText(lineResults.text, trimLength);
+			var trimmedText = trimLeadingWhitespace(lineResults.text, trimLength);
 
-			itemStrings[curItemIndex] += trimmedLine + Sym.Linebreak;
+			itemStrings[curItemIndex] += trimmedText + Sym.Linebreak;
 		}
 
-		console.log("ITEM STRINGS!!!!");
-		console.log(itemStrings);
+		// a bit hacky: cut off the trailing newlines from all the items
+		itemStrings = itemStrings.map(function(item) { return item.slice(0,-1); });
 
 		var options = [];
 		for (var i = 0; i < itemStrings.length; i++) {
