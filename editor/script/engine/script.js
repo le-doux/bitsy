@@ -1182,7 +1182,7 @@ var IfNode = function(conditions, results, isSingleLine) {
 		var str = "";
 		if(isSingleLine) {
 			str += this.conditions[0].Serialize() + " ? " + this.results[0].Serialize();
-			if(this.conditions.length > 1 && this.conditions[1].type === "else")
+			if(this.conditions.length > 1 && this.conditions[1].type === Sym.Else)
 				str += " : " + this.results[1].Serialize();
 		}
 		else {
@@ -1221,14 +1221,14 @@ var IfNode = function(conditions, results, isSingleLine) {
 
 var ElseNode = function() {
 	Object.assign( this, new TreeRelationship() );
-	this.type = "else";
+	this.type = Sym.Else;
 
 	this.Eval = function(environment,onReturn) {
 		onReturn(true);
 	}
 
 	this.Serialize = function() {
-		return "else";
+		return Sym.Else;
 	}
 
 	this.ToString = function() {
@@ -1244,7 +1244,9 @@ var Sym = {
 	Linebreak : "\n", // just call it "break" ?
 	Separator : ":",
 	List : "-",
-	String : '"'
+	String : '"',
+	ConditionEnd : "?",
+	Else : "else",
 };
 
 var Parser = function(env) {
@@ -1491,7 +1493,7 @@ var Parser = function(env) {
 			}
 			else if (curIndex > -1) {
 				if (!isConditionDone) {
-					if (state.Char() === "?" || state.Char() === "\n") { // TODO: use Sym
+					if (state.Char() === Sym.ConditionEnd || state.Char() === Sym.Linebreak) { // TODO: use Sym
 						// end of condition
 						isConditionDone = true;
 					}
@@ -1520,7 +1522,7 @@ var Parser = function(env) {
 		var conditions = [];
 		for (var i = 0; i < conditionStrings.length; i++) {
 			var str = conditionStrings[i].trim();
-			if (str === "else") {
+			if (str === Sym.Else) {
 				conditions.push(new ElseNode());
 			}
 			else {
@@ -1768,12 +1770,9 @@ var Parser = function(env) {
 	}
 
 	var setSymbol = "=";
-	var ifSymbol = "?";
 	var elseSymbol = ":";
 	var operatorSymbols = ["==", ">=", "<=", ">", "<", "-", "+", "/", "*"]; // operators need to be in reverse order of precedence
 	function CreateExpression(expStr) {
-		console.log("CREATE EXPRESSION --- " + expStr);
-
 		expStr = expStr.trim();
 
 		function IsInsideString(index) {
@@ -1819,13 +1818,13 @@ var Parser = function(env) {
 		}
 
 		// special if "expression" for single-line if statements
-		var ifIndex = expStr.indexOf(ifSymbol);
+		var ifIndex = expStr.indexOf(Sym.ConditionEnd);
 		if( ifIndex > -1 && !IsInsideString(ifIndex) && !IsInsideCode(ifIndex) ) {
-			operator = ifSymbol;
+			operator = Sym.ConditionEnd;
 			var conditionStr = expStr.substring(0,ifIndex).trim();
 			var conditions = [ CreateExpression(conditionStr) ];
 
-			var resultStr = expStr.substring(ifIndex+ifSymbol.length);
+			var resultStr = expStr.substring(ifIndex+Sym.ConditionEnd.length);
 			var results = [];
 			function AddResult(str) {
 				var dialogBlockState = new ParserState(new DialogBlockNode(), str);
@@ -1910,7 +1909,7 @@ var Parser = function(env) {
 			state.Step();
 		}
 
-		if (state.Char() === Sym.List && (state.Peak([]).indexOf("?") > -1)) { // TODO : symbols? matchahead?
+		if (state.Char() === Sym.List && (state.Peak([]).indexOf(Sym.ConditionEnd) > -1)) { // TODO : symbols? matchahead?
 			state = ParseConditional(state);
 		}
 		else if (environment.HasFunction(state.Peak([" "]))) { // TODO --- what about newlines???
