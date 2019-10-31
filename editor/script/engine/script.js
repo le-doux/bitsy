@@ -1465,59 +1465,105 @@ var Parser = function(env) {
 		return state;
 	}
 
+	/*
+		ParseConditional():
+		A conditional contains a list of conditions that can be
+		evaluated to true or false, followed by more dialog
+		that will be evaluated if the condition is true. The first
+		true condition is the one that gets evaluated.
+	*/
 	function ParseConditional(state) {
 		var conditionStrings = [];
 		var resultStrings = [];
 		var curIndex = -1;
-		var isNewline = true;
-		var isConditionDone = false;
-		var codeBlockCount = 0;
+		var maxLeadingWhitespace = -1;
+
+		// TODO : very similar to sequence parsing - can we share anything?
+		function parseConditionalItemLine(state) {
+			var lineText = "";
+			var whitespaceCount = 0;
+			var isNewCondition = false;
+			var encounteredNonWhitespace = false;
+			var encounteredConditionEnd = false;
+
+			while (!state.Done() && !(state.Char() === Sym.Linebreak)) {
+				// count whitespace until we hit the first non-whitespace character
+				if (!encounteredNonWhitespace) {
+					if (state.Char() === " " || state.Char() === "\t") {
+						whitespaceCount++;
+					}
+					else {
+						encounteredNonWhitespace = true;
+
+						if (state.Char() === Sym.List) {
+							isNewCondition = true;
+							whitespaceCount += 2; // count the list seperator AND the following extra space
+						}
+					}
+				}
+
+				// if this is the condition, we need to track whether we've
+				// reached the end of the condition
+				if (isNewCondition && !encounteredConditionEnd) {
+					if (state.Char() === Sym.ConditionEnd) {
+						encounteredConditionEnd = true;
+					}
+				}
+
+				// add characters one at a time, unless it's a code block
+				// since code blocks can contain additional sequences inside
+				// them that will mess up our list item detection
+				if (state.Char() === Sym.CodeOpen) {
+					lineText += state.ConsumeBlock(Sym.CodeOpen, Sym.CodeClose, true /*includeSymbols*/);
+				}
+				else {
+					if (!encounteredConditionEnd) { // skip all characters including & after the condition end
+						lineText += state.Char();
+					}
+					state.Step();
+				}
+			}
+
+			if (state.Char() === Sym.Linebreak) {
+				state.Step();
+			}
+
+			return { text:lineText, whitespace:whitespaceCount, isNewCondition:isNewCondition };
+		}
+
+		// TODO : this is copied from sequence parsing; share?
+		function trimLeadingWhitespace(text, trimLength) {
+			var textSplit = text.split(Sym.linebreak);
+			textSplit = textSplit.map(function(line) { return line.slice(trimLength) });
+			return textSplit.join(Sym.linebreak);
+		}
 
 		while (!state.Done()) {
-			if (state.Char() === Sym.CodeOpen) {
-				codeBlockCount++;
-			}
-			else if (state.Char() === Sym.CodeClose) {
-				codeBlockCount--;
-			}
+			var lineResults = parseConditionalItemLine(state);
 
-			var isWhitespace = (state.Char() === " " || state.Char() === "\t");
-			var isSkippableWhitespace = isNewline && isWhitespace;
-			var isNewListItem = isNewline && (codeBlockCount <= 0) && (state.Char() === Sym.List);
-
-			if (isNewListItem) {
+			if (lineResults.isNewCondition) {
+				maxLeadingWhitespace = lineResults.whitespace;
 				curIndex++;
-				isConditionDone = false;
 				conditionStrings[curIndex] = "";
 				resultStrings[curIndex] = "";
 			}
-			else if (curIndex > -1) {
-				if (!isConditionDone) {
-					if (state.Char() === Sym.ConditionEnd || state.Char() === Sym.Linebreak) { // TODO: use Sym
-						// end of condition
-						isConditionDone = true;
-					}
-					else {
-						// read in condition
-						conditionStrings[curIndex] += state.Char();
-					}
-				}
-				else {
-					// read in result
-					if (!isSkippableWhitespace) {
-						resultStrings[curIndex] += state.Char();
-					}
-				}
+
+			// trim leading whitespace (up to the max allowed for this item)
+			var trimLength = Math.min(lineResults.whitespace, maxLeadingWhitespace);
+			var trimmedText = trimLeadingWhitespace(lineResults.text, trimLength);
+
+			if (lineResults.isNewCondition) {
+				conditionStrings[curIndex] += trimmedText;
 			}
-
-			isNewline = (state.Char() === Sym.Linebreak) || isSkippableWhitespace || isNewListItem;
-
-			state.Step();
+			else {
+				resultStrings[curIndex] += trimmedText + Sym.Linebreak;
+			}
 		}
 
-		// console.log("PARSE IF:");
-		// console.log(conditionStrings);
-		// console.log(resultStrings);
+		// hack: cut off the trailing newlines from all the result strings
+		resultStrings = resultStrings.map(function(result) { return result.slice(0,-1); });
+
+		console.log(resultStrings);
 
 		var conditions = [];
 		for (var i = 0; i < conditionStrings.length; i++) {
@@ -1567,15 +1613,8 @@ var Parser = function(env) {
 		whitespace that preceded the list separator ("-") at
 		the start of that item. (The count also includes the
 		seperator and the extra space after the seperator.)
-
-		TODO
-		- fix the issue with extra newlines inserted into nested sequences
-		- consider whether to ConsumeBlock code blocks, or return to tracking them manually!
-		- look at conditional parsing next!
 	 */
 	function ParseSequence(state, sequenceType) {
-		state.Print();
-
 		var itemStrings = [];
 		var curItemIndex = -1; // -1 indicates not reading an item yet
 		var maxLeadingWhitespace = -1;
