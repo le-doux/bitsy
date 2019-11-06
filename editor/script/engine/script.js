@@ -1297,7 +1297,7 @@ var Parser = function(env) {
 			var str = "";
 			var j = i;
 			// console.log(j);
-			while(j < sourceStr.length && end.indexOf( sourceStr[j] ) == -1 ) {
+			while (j < sourceStr.length && end.indexOf(sourceStr[j]) == -1) {
 				str += sourceStr[j];
 				j++;
 			}
@@ -1373,6 +1373,7 @@ var Parser = function(env) {
 		var prevLineIsDialogLine = false;
 
 		var curLineIsDialogLine = function() {
+			console.log("IS DIALOG LINE??? " + curLineContainsDialogText + " " + curLineIsEmpty);
 			return curLineContainsDialogText || curLineIsEmpty;
 		}
 
@@ -1406,6 +1407,7 @@ var Parser = function(env) {
 		}
 
 		var tryAddLinebreakNodeToList = function() {
+			console.log("TRY ADD LINEBREAK " + prevLineIsDialogLine + " " + curLineIsDialogLine());
 			if (prevLineIsDialogLine && curLineIsDialogLine()) {
 				var linebreakNode = new FuncNode("br", []);
 				curLineNodeList.unshift(linebreakNode);
@@ -1425,6 +1427,7 @@ var Parser = function(env) {
 				addCodeNodeToList();
 			}
 			else if (state.MatchAhead(Sym.Linebreak)) { // process new line
+				console.log("line break!!!!");
 				// add any buffered text to a print node, 
 				// and add a linebreak if we are between two dialog lines
 				tryAddTextNodeToList();
@@ -1548,9 +1551,13 @@ var Parser = function(env) {
 				resultStrings[curIndex] = "";
 			}
 
+			console.log("TRIM WHITESPACE CONDITIONAL " + lineResults.whitespace + " " + maxLeadingWhitespace + " :\n" + lineResults.text);
+
 			// trim leading whitespace (up to the max allowed for this item)
 			var trimLength = Math.min(lineResults.whitespace, maxLeadingWhitespace);
 			var trimmedText = trimLeadingWhitespace(lineResults.text, trimLength);
+
+			console.log("TRIM WHITESPACE CONDITIONAL RESULTS:\n" + trimmedText);
 
 			if (lineResults.isNewCondition) {
 				conditionStrings[curIndex] += trimmedText;
@@ -1583,6 +1590,7 @@ var Parser = function(env) {
 			var dialogBlockState = new ParserState(new DialogBlockNode(), str);
 			dialogBlockState = ParseDialog(dialogBlockState);
 			var dialogBlock = dialogBlockState.rootNode;
+			console.log(dialogBlock);
 			results.push(dialogBlock);
 		}
 
@@ -1942,13 +1950,23 @@ var Parser = function(env) {
 		return state;
 	}
 
-	function ParseCode(state) {
-		// skip leading whitespace
-		while (IsWhitespace(state.Char())) {
-			state.Step();
+	function IsConditionalBlock(state) {
+		var peakToFirstListSymbol = state.Peak([Sym.List]);
+		var areAllCharsBeforeListWhitespace = true;
+		for (var i = 0; i < peakToFirstListSymbol.length; i++) {
+			if (!IsWhitespace(peakToFirstListSymbol[i])) {
+				areAllCharsBeforeListWhitespace = false;
+			}
 		}
 
-		if (state.Char() === Sym.List && (state.Peak([]).indexOf(Sym.ConditionEnd) > -1)) { // TODO : symbols? matchahead?
+		var peakToFirstConditionSymbol = state.Peak([Sym.ConditionEnd]);
+		peakToFirstConditionSymbol = peakToFirstConditionSymbol.slice(peakToFirstListSymbol.length);
+		var hasNoLinebreakBetweenListAndConditionEnd = peakToFirstConditionSymbol.indexOf(Sym.Linebreak) == -1;
+
+		return areAllCharsBeforeListWhitespace && hasNoLinebreakBetweenListAndConditionEnd;
+	}
+
+	function ParseCode(state) {
 			state = ParseConditional(state);
 		}
 		else if (environment.HasFunction(state.Peak([" "]))) { // TODO --- what about newlines???
