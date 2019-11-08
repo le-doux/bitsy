@@ -427,7 +427,10 @@ function DialogTool() {
 
 		function OnDialogTextChange() {
 			console.log("dialog changed!!!");
-			dialogNode = scriptInterpreter.Parse( '"""\n' +  textArea.value + '\n"""' );
+			var scriptStr = '"""\n' +  textArea.value + '\n"""';
+			console.log(scriptStr);
+			dialogNode = scriptInterpreter.Parse(scriptStr);
+			console.log(dialogNode);
 			parentEditor.NotifyUpdate(true);
 		}
 		var textSelectionChangeHandler = createOnTextSelectionChange(OnDialogTextChange);

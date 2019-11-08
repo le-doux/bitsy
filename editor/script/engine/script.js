@@ -1055,8 +1055,6 @@ var SequenceBase = function() {
 		var str = "";
 		str += this.type + "\n";
 		for (var i = 0; i < this.options.length; i++) {
-			// console.log("SERIALIZE SEQUENCE ");
-			// console.log(depth);
 			str += leadingWhitespace(depth + 1) + Sym.List + " " + this.options[i].Serialize(depth + 2) + "\n";
 		}
 		str += leadingWhitespace(depth);
@@ -1257,7 +1255,7 @@ var Parser = function(env) {
 
 		if (state.MatchAhead(Sym.DialogOpen)) {
 			// multi-line dialog block
-			var dialogStr = state.ConsumeBlock(Sym.DialogOpen + Sym.Linebreak, Sym.DialogClose);
+			var dialogStr = state.ConsumeBlock(Sym.DialogOpen + Sym.Linebreak, Sym.Linebreak + Sym.DialogClose);
 			state = new ParserState(new DialogBlockNode(), dialogStr);
 			state = ParseDialog(state);
 		}
@@ -1373,7 +1371,6 @@ var Parser = function(env) {
 		var prevLineIsDialogLine = false;
 
 		var curLineIsDialogLine = function() {
-			console.log("IS DIALOG LINE??? " + curLineContainsDialogText + " " + curLineIsEmpty);
 			return curLineContainsDialogText || curLineIsEmpty;
 		}
 
@@ -1427,7 +1424,6 @@ var Parser = function(env) {
 				addCodeNodeToList();
 			}
 			else if (state.MatchAhead(Sym.Linebreak)) { // process new line
-				console.log("line break!!!!");
 				// add any buffered text to a print node, 
 				// and add a linebreak if we are between two dialog lines
 				tryAddTextNodeToList();
@@ -1452,6 +1448,7 @@ var Parser = function(env) {
 		// add buffered text to a print node and add all nodes
 		// to the current parent node
 		tryAddTextNodeToList();
+		tryAddLinebreakNodeToList();
 		addLineNodesToParent();
 
 		return state;
@@ -1967,6 +1964,7 @@ var Parser = function(env) {
 	}
 
 	function ParseCode(state) {
+		if (IsConditionalBlock(state)) {
 			state = ParseConditional(state);
 		}
 		else if (environment.HasFunction(state.Peak([" "]))) { // TODO --- what about newlines???
