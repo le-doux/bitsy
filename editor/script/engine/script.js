@@ -54,7 +54,7 @@ var Interpreter = function() {
 	}
 
 	this.CreateExpression = function(expStr) {
-		return parser.CreateExpression( expStr );
+		return parser.CreateExpression(expStr);
 	}
 
 	this.SetVariable = function(name,value,useHandler) {
@@ -860,7 +860,11 @@ var CodeBlockNode = function() {
 }
 
 function isInlineCode(node) {
-	return isTextEffectBlock(node); // || isMultilineListBlock(node);
+	return isTextEffectBlock(node) || isUndefinedBlock(node); // || isMultilineListBlock(node);
+}
+
+function isUndefinedBlock(node) {
+	return node.type === "code_block" && node.children.length > 0 && node.children[0].type === "undefined";
 }
 
 var textEffectBlockNames = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw", "printSprite", "printItem", "printTile"];
@@ -883,6 +887,25 @@ function isMultilineListBlock(node) {
 		}
 	}
 	return false;
+}
+
+// for round-tripping undefined code through the parser (useful for hacks!)
+var UndefinedNode = function(sourceStr) {
+	Object.assign(this, new TreeRelationship());
+	this.type = "undefined";
+	this.source = sourceStr;
+
+	this.Eval = function(environment,onReturn) {
+		onReturn(null);
+	}
+
+	this.Serialize = function(depth) {
+		return this.source;
+	}
+
+	this.ToString = function() {
+		return "undefined";
+	}
 }
 
 var FuncNode = function(name,args) {
@@ -1245,6 +1268,9 @@ var Sym = {
 	String : '"',
 	ConditionEnd : "?",
 	Else : "else",
+	ElseExp : ":", // special shorthand for expressions (deprecate?)
+	Set : "=",
+	Operators : ["==", ">=", "<=", ">", "<", "-", "+", "/", "*"], // operators need to be in reverse order of precedence
 };
 
 var Parser = function(env) {
@@ -1283,11 +1309,13 @@ var Parser = function(env) {
 			str = "" + str; // hack to turn single chars into strings
 			// console.log(str);
 			// console.log(str.length);
-			for(var j = 0; j < str.length; j++) {
-				if( i + j >= sourceStr.length )
+			for (var j = 0; j < str.length; j++) {
+				if (i + j >= sourceStr.length) {
 					return false;
-				else if( str[j] != sourceStr[i+j] )
+				}
+				else if (str[j] != sourceStr[i+j]) {
 					return false;
+				}
 			}
 			return true;
 		}
@@ -1813,9 +1841,6 @@ var Parser = function(env) {
 		}
 	}
 
-	var setSymbol = "=";
-	var elseSymbol = ":";
-	var operatorSymbols = ["==", ">=", "<=", ">", "<", "-", "+", "/", "*"]; // operators need to be in reverse order of precedence
 	function CreateExpression(expStr) {
 		expStr = expStr.trim();
 
@@ -1848,14 +1873,14 @@ var Parser = function(env) {
 		var operator = null;
 
 		// set is special because other operator can look like it, and it has to go first in the order of operations
-		var setIndex = expStr.indexOf(setSymbol);
+		var setIndex = expStr.indexOf(Sym.Set);
 		if( setIndex > -1 && !IsInsideString(setIndex) && !IsInsideCode(setIndex) ) { // it might be a set operator
 			if( expStr[setIndex+1] != "=" && expStr[setIndex-1] != ">" && expStr[setIndex-1] != "<" ) {
 				// ok it actually IS a set operator and not ==, >=, or <=
-				operator = setSymbol;
+				operator = Sym.Set;
 				var variableName = expStr.substring(0,setIndex).trim(); // TODO : valid variable name testing
 				var left = IsValidVariableName(variableName) ? new VarNode( variableName ) : new LiteralNode(null);
-				var right = CreateExpression( expStr.substring(setIndex+setSymbol.length) );
+				var right = CreateExpression( expStr.substring(setIndex+Sym.Set.length) );
 				var exp = new ExpNode( operator, left, right );
 				return exp;
 			}
@@ -1877,11 +1902,11 @@ var Parser = function(env) {
 				results.push( dialogBlock );
 			}
 
-			var elseIndex = resultStr.indexOf(elseSymbol); // does this need to test for strings?
+			var elseIndex = resultStr.indexOf(Sym.ElseExp); // does this need to test for strings?
 			if(elseIndex > -1) {
 				conditions.push( new ElseNode() );
 
-				var elseStr = resultStr.substring(elseIndex+elseSymbol.length);
+				var elseStr = resultStr.substring(elseIndex+Sym.ElseExp.length);
 				var resultStr = resultStr.substring(0,elseIndex);
 
 				AddResult( resultStr.trim() );
@@ -1894,8 +1919,8 @@ var Parser = function(env) {
 			return new IfNode( conditions, results, true /*isSingleLine*/ );
 		}
 
-		for( var i = 0; (operator == null) && (i < operatorSymbols.length); i++ ) {
-			var opSym = operatorSymbols[i];
+		for( var i = 0; (operator == null) && (i < Sym.Operators.length); i++ ) {
+			var opSym = Sym.Operators[i];
 			var opIndex = expStr.indexOf( opSym );
 			if( opIndex > -1 && !IsInsideString(opIndex) && !IsInsideCode(opIndex) ) {
 				operator = opSym;
@@ -1918,37 +1943,40 @@ var Parser = function(env) {
 
 	function IsExpression(str) {
 		var tempState = new ParserState(null, str); // hacky
-		var nonWhitespaceCount = 0;
+		var textOutsideCodeBlocks = "";
 
 		while (!tempState.Done()) {
-			if( IsWhitespace(tempState.Char()) ) {
-				tempState.Step(); // consume whitespace
-			}
-			else if( tempState.MatchAhead(Sym.CodeOpen) ) {
-				tempState.ConsumeBlock( Sym.CodeOpen, Sym.CodeClose );
+			if (tempState.MatchAhead(Sym.CodeOpen)) {
+				tempState.ConsumeBlock(Sym.CodeOpen, Sym.CodeClose);
 			}
 			else {
-				nonWhitespaceCount++;
+				textOutsideCodeBlocks += tempState.Char();
 				tempState.Step();
 			}
 		}
 
-		var isExpression = nonWhitespaceCount > 0;
-		return isExpression;
+		var containsAnyExpressionOperators = (textOutsideCodeBlocks.indexOf(Sym.ConditionEnd) != -1) ||
+				(textOutsideCodeBlocks.indexOf(Sym.Set) != -1) ||
+				(Sym.Operators.some(function(opSym) { return textOutsideCodeBlocks.indexOf(opSym) != -1; }));
+
+		return containsAnyExpressionOperators;
 	}
 
 	function ParseExpression(state) {
 		var line = state.Source(); // state.Peak( [Sym.Linebreak] ); // TODO : remove the linebreak thing
 		// console.log("EXPRESSION " + line);
-		var exp = CreateExpression( line );
+		var exp = CreateExpression(line);
 		// console.log(exp);
-		state.curNode.AddChild( exp );
-		state.Step( line.length );
+		state.curNode.AddChild(exp);
+		state.Step(line.length);
 		return state;
 	}
 
 	function IsConditionalBlock(state) {
 		var peakToFirstListSymbol = state.Peak([Sym.List]);
+
+		var foundListSymbol = peakToFirstListSymbol < state.Source().length;
+
 		var areAllCharsBeforeListWhitespace = true;
 		for (var i = 0; i < peakToFirstListSymbol.length; i++) {
 			if (!IsWhitespace(peakToFirstListSymbol[i])) {
@@ -1960,7 +1988,9 @@ var Parser = function(env) {
 		peakToFirstConditionSymbol = peakToFirstConditionSymbol.slice(peakToFirstListSymbol.length);
 		var hasNoLinebreakBetweenListAndConditionEnd = peakToFirstConditionSymbol.indexOf(Sym.Linebreak) == -1;
 
-		return areAllCharsBeforeListWhitespace && hasNoLinebreakBetweenListAndConditionEnd;
+		return foundListSymbol && 
+			areAllCharsBeforeListWhitespace && 
+			hasNoLinebreakBetweenListAndConditionEnd;
 	}
 
 	function ParseCode(state) {
@@ -1979,6 +2009,11 @@ var Parser = function(env) {
 		}
 		else if (IsExpression(state.Source())) {
 			state = ParseExpression(state);
+		}
+		else {
+			var undefinedSrc = state.Peak([]);
+			var undefinedNode = new UndefinedNode(undefinedSrc);
+			state.curNode.AddChild(undefinedNode);
 		}
 
 		// just go to the end now
