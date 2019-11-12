@@ -1350,8 +1350,12 @@ function getCoord(line,arg) {
 }
 
 function parseTitle(lines, i) {
-	title = lines[i];
+	var results = scriptUtils.ReadDialogScript(lines,i);
+	title = results.script;
+	i = results.index;
+
 	i++;
+
 	return i;
 }
 

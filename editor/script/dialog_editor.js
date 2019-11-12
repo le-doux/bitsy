@@ -33,6 +33,10 @@ function DialogTool() {
 		return new DialogScriptEditor(dialogId);
 	}
 
+	this.CreateTitleEditor = function() {
+		// TODO	
+	}
+
 	function DialogScriptEditor(dialogId) {
 		var dialogStr = dialog[dialogId];
 		var scriptRootNode = scriptInterpreter.Parse(dialogStr);
