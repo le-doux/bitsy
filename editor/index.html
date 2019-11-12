@@ -836,15 +836,6 @@
 									<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
 								</label>
 							</span>
-
-							<span style="float:right">
-								<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);" />
-								<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
-									<i class="material-icons">code</i> 
-									<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
-									<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
-								</label>
-							</span>
 						</div>
 
 						<div id="dialogTools" class="controlBox">
@@ -896,10 +887,6 @@
 									<span class="localize dialog_effect_rainbow">rainbow</span>
 								</button>
 							</div>
-						</div>
-
-						<div id="dialogCode" style="display:none;">
-							<textarea id="dialogCodeText" onkeydown="on_change_adv_dialog();" onkeyup="on_change_adv_dialog();" onchange="on_change_adv_dialog();"></textarea>
 						</div>
 
 						<div id="dialogEditor">

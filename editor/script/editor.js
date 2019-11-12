@@ -1936,7 +1936,6 @@ function getCurPaintModeStr() {
 }
 
 function on_change_adv_dialog() {
-	document.getElementById("dialogText").value = document.getElementById("dialogCodeText").value;
 	on_change_dialog();
 }
 
@@ -3083,39 +3082,6 @@ function blockScrollBackpage(e) {
 	// 	e.preventDefault();
 	// 	el.scrollLeft = Math.max(0, Math.min(maxX, el.scrollLeft + event.deltaX));
 	// }
-}
-
-function toggleDialogCode(e) {
-	console.log("DIALOG CODE");
-	console.log(e.target.checked);
-	if (e.target.checked) {
-		showDialogCode();
-	}
-	else {
-		hideDialogCode();
-	}
-}
-
-function showDialogCode() {
-	document.getElementById("dialogCode").style.display = "block";
-	document.getElementById("dialogEditor").style.display = "none";
-	// document.getElementById("dialogShowCode").style.display = "none";
-	// document.getElementById("dialogHideCode").style.display = "block";
-	document.getElementById("dialogTools").style.display = "none";
-
-	document.getElementById("dialogToggleCodeShowText").style.display = "none";
-	document.getElementById("dialogToggleCodeHideText").style.display = "inline";
-}
-
-function hideDialogCode() {
-	document.getElementById("dialogCode").style.display = "none";
-	document.getElementById("dialogEditor").style.display = "block";
-	// document.getElementById("dialogShowCode").style.display = "block";
-	// document.getElementById("dialogHideCode").style.display = "none";
-	document.getElementById("dialogTools").style.display = "block";
-
-	document.getElementById("dialogToggleCodeShowText").style.display = "inline";
-	document.getElementById("dialogToggleCodeHideText").style.display = "none";
 }
 
 function showDialogToolsSection() {
