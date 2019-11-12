@@ -828,6 +828,8 @@ function start() {
 	// 	}
 	// }
 
+	showDialogToolsSection(); // hack to avoid the mismatched radio selection
+
 	initLanguageOptions();
 }
 
@@ -3085,11 +3087,13 @@ function blockScrollBackpage(e) {
 }
 
 function showDialogToolsSection() {
+	document.getElementById("dialogToolsOptionSection").checked = true;
 	document.getElementById("dialogToolsSection").style.display = "block";
 	document.getElementById("dialogToolsEffects").style.display = "none";
 }
 
 function showDialogToolsEffects() {
+	document.getElementById("dialogToolsOptionEffects").checked = true;
 	document.getElementById("dialogToolsSection").style.display = "none";
 	document.getElementById("dialogToolsEffects").style.display = "block";
 }
