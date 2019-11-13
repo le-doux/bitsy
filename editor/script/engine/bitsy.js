@@ -1993,6 +1993,8 @@ var dialogBuffer = dialogModule.CreateBuffer();
 var fontManager = new FontManager();
 
 function onExitDialog(scriptResult, dialogCallback) {
+	console.log("EXIT DIALOG!");
+
 	isDialogMode = false;
 
 	if (isNarrating) {
@@ -2095,7 +2097,7 @@ function startDialog(dialogStr,scriptId,dialogCallback) {
 }
 
 var isDialogPreview = false;
-function startPreviewDialog(script, onScriptEnd) {
+function startPreviewDialog(script, dialogCallback) {
 	isNarrating = true;
 
 	isDialogMode = true;
@@ -2103,13 +2105,20 @@ function startPreviewDialog(script, onScriptEnd) {
 	isDialogPreview = true;
 
 	dialogRenderer.Reset();
-	dialogRenderer.SetCentered( true );
+	dialogRenderer.SetCentered(true);
 	dialogBuffer.Reset();
-	scriptInterpreter.SetDialogBuffer( dialogBuffer );
+	scriptInterpreter.SetDialogBuffer(dialogBuffer);
 
-	onDialogPreviewEnd = onScriptEnd;
+	// TODO : do I really need a seperate callback for this debug mode??
+	onDialogPreviewEnd = dialogCallback;
 
-	scriptInterpreter.Eval( script, null );
+	var onScriptEndCallback = function(scriptResult) {
+		dialogBuffer.OnDialogEnd(function() {
+			onExitDialog(scriptResult, null);
+		});
+	};
+
+	scriptInterpreter.Eval(script, onScriptEndCallback);
 }
 
 /* NEW SCRIPT STUFF */

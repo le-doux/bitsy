@@ -54,6 +54,10 @@ function DialogTool() {
 			return div; //rootEditor.GetElement();
 		}
 
+		this.GetNode = function() {
+			return scriptRootNode;
+		}
+
 		function OnUpdate() {
 			var dialogStr = rootEditor.Serialize();
 

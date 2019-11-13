@@ -3109,30 +3109,29 @@ function showInventoryVariable() {
 }
 
 var isPreviewDialogMode = false;
-var previewDialogScriptTree = null;
 function togglePreviewDialog(event) {
-	console.log("TOGGLE PREVIEW " + event.target.checked);
-	if(event.target.checked) {
-		isPreviewDialogMode = true;
-		console.log(isPreviewDialogMode);
+	if (event.target.checked) {
+		if (curDialogEditor != null) {
+			isPreviewDialogMode = true;
 
-		if(previewDialogScriptTree != null) {
-			if (document.getElementById("roomPanel").style.display === "none")
+			if (document.getElementById("roomPanel").style.display === "none") {
 				showPanel("roomPanel");
+			}
 
-			console.log("PLAY MODE");
 			on_play_mode();
 		
-			startPreviewDialog( previewDialogScriptTree, function() {
-				console.log("CALLBACK!!!");
-				togglePreviewDialog( { target : { checked : false } } );
-			});
+			startPreviewDialog(
+				curDialogEditor.GetNode(), 
+				function() {
+					togglePreviewDialog({ target : { checked : false } });
+				});
 		}
 	}
 	else {
 		on_edit_mode();
 		isPreviewDialogMode = false;
 	}
+
 	updatePlayModeButton();
 	updatePreviewDialogButton();
 }
