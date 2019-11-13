@@ -33,9 +33,10 @@ function DialogTool() {
 		return new DialogScriptEditor(dialogId);
 	}
 
-	this.CreateTitleEditor = function() {
-		// TODO	
-	}
+	// TODO later? edit multi-line titles
+	// this.CreateTitleEditor = function() {
+	// 	// TODO	
+	// }
 
 	function DialogScriptEditor(dialogId) {
 		var dialogStr = dialog[dialogId];
