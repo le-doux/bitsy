@@ -1,8 +1,8 @@
 #dialogContentViewport {
-	min-width: 340px;
-	height:450px;
-	overflow:scroll;
-	display:block;
+	min-width: 410px;
+	height: 450px;
+	overflow: scroll;
+	display: block;
 	border: solid 1px #ccccff;
 	border-radius: 2px;
 	margin-bottom: 10px;

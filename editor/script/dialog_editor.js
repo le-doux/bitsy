@@ -86,6 +86,20 @@ function DialogTool() {
 			OnUpdate();
 		}
 
+		this.AddCycle = function() {
+			var node = scriptUtils.CreateCycleBlock();
+			var editor = new SequenceEditor(node, rootEditor);
+			rootEditor.AppendChild(editor);
+			OnUpdate();
+		}
+
+		this.AddShuffle = function() {
+			var node = scriptUtils.CreateShuffleBlock();
+			var editor = new SequenceEditor(node, rootEditor);
+			rootEditor.AppendChild(editor);
+			OnUpdate();
+		}
+
 		this.AddConditional = function() {
 			var node = scriptUtils.CreateIfBlock();
 			var editor = new ConditionalEditor(node, rootEditor);
@@ -1511,6 +1525,18 @@ function addDialogBlockUI() {
 function addSeqBlockUI() {
 	if (curDialogEditor != null) {
 		curDialogEditor.AddSequence();
+	}
+}
+
+function addCycleBlock() {
+	if (curDialogEditor != null) {
+		curDialogEditor.AddCycle();
+	}
+}
+
+function addShuffleBlock() {
+	if (curDialogEditor != null) {
+		curDialogEditor.AddShuffle();
 	}
 }
 
