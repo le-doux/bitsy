@@ -40,7 +40,7 @@ function DialogTool() {
 
 	function DialogScriptEditor(dialogId) {
 		var dialogStr = dialog[dialogId];
-		var scriptRootNode = scriptInterpreter.Parse(dialogStr);
+		var scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
 
 		scriptInterpreter.DebugVisualizeScriptTree(scriptRootNode);
 
@@ -449,11 +449,11 @@ function DialogTool() {
 		// div.appendChild(span);
 
 		function OnDialogTextChange() {
-			console.log("dialog changed!!!");
+			// console.log("dialog changed!!!");
 			var scriptStr = '"""\n' +  textArea.value + '\n"""';
-			console.log(scriptStr);
+			// console.log(scriptStr);
 			dialogNode = scriptInterpreter.Parse(scriptStr);
-			console.log(dialogNode);
+			// console.log(dialogNode);
 			parentEditor.NotifyUpdate(true);
 		}
 		var textSelectionChangeHandler = createOnTextSelectionChange(OnDialogTextChange);

@@ -17,8 +17,8 @@ var Interpreter = function() {
 	// TODO -- maybe this should return a string instead othe actual script??
 	this.Compile = function(scriptName, scriptStr) {
 		// console.log("COMPILE");
-		var script = parser.Parse( scriptStr );
-		env.SetScript( scriptName, script );
+		var script = parser.Parse(scriptStr, scriptName);
+		env.SetScript(scriptName, script);
 	}
 	this.Run = function(scriptName, exitHandler) { // Runs pre-compiled script
 		var localEnv = new LocalEnvironment(env);
@@ -30,7 +30,7 @@ var Interpreter = function() {
 	this.Interpret = function(scriptStr, exitHandler) { // Compiles and runs code immediately
 		// console.log("INTERPRET");
 		var localEnv = new LocalEnvironment(env);
-		var script = parser.Parse( scriptStr );
+		var script = parser.Parse(scriptStr, "anonymous");
 		script.Eval( localEnv, function(result) { OnScriptReturn(localEnv, exitHandler); } );
 	}
 	this.HasScript = function(name) { return env.HasScript(name); };
@@ -40,8 +40,8 @@ var Interpreter = function() {
 		parser = new Parser( env );
 	}
 
-	this.Parse = function(scriptStr) { // parses a script but doesn't save it
-		return parser.Parse( scriptStr );
+	this.Parse = function(scriptStr, rootId) { // parses a script but doesn't save it
+		return parser.Parse(scriptStr, rootId);
 	}
 	this.Eval = function(scriptTree, exitHandler) { // runs a script stored externally
 		scriptTree.Eval( env, function(result) { OnScriptReturn(result, exitHandler); } );
@@ -689,8 +689,15 @@ function leadingWhitespace(depth) {
 var TreeRelationship = function() {
 	this.parent = null;
 	this.children = [];
+
+	this.treeId = null; // for debugging
+
 	this.AddChild = function(node) {
-		this.children.push( node );
+		if (this.treeId != undefined && this.treeId != null) {
+			node.treeId = this.treeId + "_" + this.children.length;
+		}
+
+		this.children.push(node);
 		node.parent = this;
 	};
 
@@ -699,8 +706,8 @@ var TreeRelationship = function() {
 			depth = 0;
 		}
 
-		visitor.Visit( this, depth );
-		for( var i = 0; i < this.children.length; i++ ) {
+		visitor.Visit(this, depth);
+		for (var i = 0; i < this.children.length; i++) {
 			this.children[i].VisitAll( visitor, depth + 1 );
 		}
 	};
@@ -717,6 +724,8 @@ var DialogBlockNode = function(doIndentFirstLine) {
 		if (this.onEnter != null) {
 			this.onEnter();
 		}
+
+		console.log("ENTER " + this.treeId);
 
 		var lastVal = null;
 		var i = 0;
@@ -1276,8 +1285,10 @@ var Sym = {
 var Parser = function(env) {
 	var environment = env;
 
-	this.Parse = function(scriptStr) {
-		var state = new ParserState(new DialogBlockNode(), scriptStr);
+	this.Parse = function(scriptStr, rootId) {
+		var rootNode = new DialogBlockNode();
+		rootNode.treeId = rootId;
+		var state = new ParserState(rootNode, scriptStr);
 
 		if (state.MatchAhead(Sym.DialogOpen)) {
 			// multi-line dialog block
