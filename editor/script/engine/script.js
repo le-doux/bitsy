@@ -690,16 +690,16 @@ var TreeRelationship = function() {
 	this.parent = null;
 	this.children = [];
 
-	this.treeId = null; // for debugging
-
 	this.AddChild = function(node) {
-		if (this.treeId != undefined && this.treeId != null) {
-			node.treeId = this.treeId + "_" + this.children.length;
-		}
-
 		this.children.push(node);
 		node.parent = this;
 	};
+
+	this.AddChildren = function(nodeList) {
+		for (var i = 0; i < nodeList.length; i++) {
+			this.AddChild(nodeList[i]);
+		}
+	}
 
 	this.VisitAll = function(visitor, depth) {
 		if (depth == undefined || depth == null) {
@@ -711,6 +711,23 @@ var TreeRelationship = function() {
 			this.children[i].VisitAll( visitor, depth + 1 );
 		}
 	};
+
+	this.rootId = null; // for debugging
+	this.GetId = function() {
+		console.log(this);
+		if (this.rootId != null) {
+			return this.rootId;
+		}
+		else if (this.parent != null) {
+			var parentId = this.parent.GetId();
+			if (parentId != null) {
+				return parentId + "_" + this.parent.children.indexOf(this);
+			}
+		}
+		else {
+			return null;
+		}
+	}
 }
 
 var DialogBlockNode = function(doIndentFirstLine) {
@@ -725,7 +742,7 @@ var DialogBlockNode = function(doIndentFirstLine) {
 			this.onEnter();
 		}
 
-		console.log("ENTER " + this.treeId);
+		console.log("ENTER " + this.GetId());
 
 		var lastVal = null;
 		var i = 0;
@@ -1086,8 +1103,8 @@ var SequenceBase = function() {
 	this.Serialize = function(depth) {
 		var str = "";
 		str += this.type + "\n";
-		for (var i = 0; i < this.options.length; i++) {
-			str += leadingWhitespace(depth + 1) + Sym.List + " " + this.options[i].Serialize(depth + 2) + "\n";
+		for (var i = 0; i < this.children.length; i++) {
+			str += leadingWhitespace(depth + 1) + Sym.List + " " + this.children[i].Serialize(depth + 2) + "\n";
 		}
 		str += leadingWhitespace(depth);
 		return str;
@@ -1098,9 +1115,9 @@ var SequenceBase = function() {
 			depth = 0;
 		}
 
-		visitor.Visit( this, depth );
-		for( var i = 0; i < this.options.length; i++ ) {
-			this.options[i].VisitAll( visitor, depth + 1 );
+		visitor.Visit(this, depth);
+		for (var i = 0; i < this.children.length; i++) {
+			this.children[i].VisitAll( visitor, depth + 1 );
 		}
 	};
 
@@ -1113,12 +1130,12 @@ var SequenceNode = function(options) {
 	Object.assign(this, new TreeRelationship());
 	Object.assign(this, new SequenceBase());
 	this.type = "sequence";
-	this.options = options;
+	this.AddChildren(options);
 
 	var index = 0;
 	this.Eval = function(environment, onReturn) {
 		// console.log("SEQUENCE " + index);
-		this.options[index].Eval(environment, onReturn);
+		this.children[index].Eval(environment, onReturn);
 
 		var next = index + 1;
 		if (next < this.options.length) {
@@ -1131,15 +1148,15 @@ var CycleNode = function(options) {
 	Object.assign(this, new TreeRelationship());
 	Object.assign(this, new SequenceBase());
 	this.type = "cycle";
-	this.options = options;
+	this.AddChildren(options);
 
 	var index = 0;
 	this.Eval = function(environment, onReturn) {
 		// console.log("CYCLE " + index);
-		this.options[index].Eval(environment, onReturn);
+		this.children[index].Eval(environment, onReturn);
 
 		var next = index + 1;
-		if (next < this.options.length) {
+		if (next < this.children.length) {
 			index = next;
 		}
 		else {
@@ -1152,7 +1169,7 @@ var ShuffleNode = function(options) {
 	Object.assign(this, new TreeRelationship());
 	Object.assign(this, new SequenceBase());
 	this.type = "shuffle";
-	this.options = options;
+	this.AddChildren(options);
 
 	var optionsShuffled = [];
 	function shuffle(options) {
@@ -1163,15 +1180,15 @@ var ShuffleNode = function(options) {
 			optionsShuffled.push(optionsUnshuffled.splice(i,1)[0]);
 		}
 	}
-	shuffle(this.options);
+	shuffle(this.children);
 
 	var index = 0;
 	this.Eval = function(environment, onReturn) {
 		optionsShuffled[index].Eval(environment, onReturn);
 		
 		index++;
-		if (index >= this.options.length) {
-			shuffle(this.options);
+		if (index >= this.children.length) {
+			shuffle(this.children);
 			index = 0;
 		}
 	}
@@ -1287,7 +1304,7 @@ var Parser = function(env) {
 
 	this.Parse = function(scriptStr, rootId) {
 		var rootNode = new DialogBlockNode();
-		rootNode.treeId = rootId;
+		rootNode.rootId = rootId;
 		var state = new ParserState(rootNode, scriptStr);
 
 		if (state.MatchAhead(Sym.DialogOpen)) {

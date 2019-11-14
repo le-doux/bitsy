@@ -607,8 +607,8 @@ function DialogTool() {
 		function CreateOptionEditors() {
 			optionEditors = [];
 
-			for (var i = 0; i < sequenceNode.options.length; i++) {
-				var optionNode = sequenceNode.options[i];
+			for (var i = 0; i < sequenceNode.children.length; i++) {
+				var optionNode = sequenceNode.children[i];
 				var optionEditor = new SequenceOptionEditor(optionNode, self);
 				optionEditor.SetOrderNumber(i+1);
 				optionRootDiv.appendChild(optionEditor.GetElement());
@@ -633,7 +633,8 @@ function DialogTool() {
 				updatedOptions = updatedOptions.concat(editor.GetNodes());
 			}
 
-			sequenceNode.options = updatedOptions;
+			sequenceNode.children = [];
+			sequenceNode.AddChildren(updatedOptions);
 		}
 
 		CreateOptionEditors();
