@@ -59,6 +59,8 @@ function DialogTool() {
 		}
 
 		function OnUpdate() {
+			scriptInterpreter.DebugVisualizeScriptTree(scriptRootNode);
+
 			var dialogStr = rootEditor.Serialize();
 
 			if (dialogStr.indexOf("\n") > -1) {
@@ -220,6 +222,10 @@ function DialogTool() {
 			}
 
 			blockNode.children = updatedChildren;
+		}
+
+		this.GetNodes = function() {
+			return [blockNode];
 		}
 
 		this.Serialize = function() {
@@ -762,10 +768,8 @@ function DialogTool() {
 		function CreateOptionEditors() {
 			optionEditors = [];
 
-			for (var i = 0; i < conditionalNode.conditions.length; i++) {
-				var conditionNode = conditionalNode.conditions[i];
-				var resultNode = conditionalNode.results[i];
-				var optionEditor = new ConditionalOptionEditor(conditionNode, resultNode, self, i);
+			for (var i = 0; i < conditionalNode.children.length; i++) {
+				var optionEditor = new ConditionalOptionEditor(conditionalNode.children[i], self, i);
 				optionRootDiv.appendChild(optionEditor.GetElement());
 				optionEditors.push(optionEditor);
 			}
@@ -798,7 +802,7 @@ function DialogTool() {
 		CreateOptionEditors();
 	}
 
-	function ConditionalOptionEditor(conditionNode, resultNode, parentEditor, index) {
+	function ConditionalOptionEditor(conditionPairNode, parentEditor, index) {
 		var div = document.createElement("div");
 		div.classList.add("optionEditor");
 
@@ -810,11 +814,11 @@ function DialogTool() {
 		topControlsDiv.appendChild(orderControls.GetElement());
 
 		// condition
-		var comparisonEditor = new ConditionalComparisonEditor(conditionNode, parentEditor, index);
+		var comparisonEditor = new ConditionalComparisonEditor(conditionPairNode.children[0], parentEditor, index);
 		div.appendChild(comparisonEditor.GetElement());
 
 		// result
-		var resultBlockEditor = new BlockEditor(resultNode, parentEditor);
+		var resultBlockEditor = new BlockEditor(conditionPairNode.children[1], parentEditor);
 		div.appendChild(resultBlockEditor.GetElement());
 
 		this.GetElement = function() {
@@ -822,8 +826,14 @@ function DialogTool() {
 		}
 
 		this.GetNodes = function() {
-			// this is kind of hacky... (should I add GetNodes to blockEditor for consistency?)
-			return comparisonEditor.GetNodes().concat([resultNode]);
+			return [conditionPairNode];
+		}
+
+		this.NotifyUpdate = function() {
+			conditionPairNode.children = [];
+
+			var updatedChildren = comparisonEditor.GetNodes().concat(resultBlockEditor.GetNodes());
+			conditionPairNode.AddChildren(updatedChildren);
 		}
 
 		this.UpdateIndex = function(i) {

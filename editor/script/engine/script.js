@@ -714,7 +714,7 @@ var TreeRelationship = function() {
 
 	this.rootId = null; // for debugging
 	this.GetId = function() {
-		console.log(this);
+		// console.log(this);
 		if (this.rootId != null) {
 			return this.rootId;
 		}
@@ -816,7 +816,7 @@ var DialogBlockNode = function(doIndentFirstLine) {
 	}
 
 	this.ToString = function() {
-		return this.type;
+		return this.type + " " + this.GetId();
 	};
 }
 
@@ -881,7 +881,7 @@ var CodeBlockNode = function() {
 	}
 
 	this.ToString = function() {
-		return this.type;
+		return this.type + " " + this.GetId();
 	};
 }
 
@@ -930,7 +930,7 @@ var UndefinedNode = function(sourceStr) {
 	}
 
 	this.ToString = function() {
-		return "undefined";
+		return "undefined" + " " + this.GetId();
 	}
 }
 
@@ -993,7 +993,7 @@ var FuncNode = function(name,args) {
 	}
 
 	this.ToString = function() {
-		return this.type + " " + this.name;
+		return this.type + " " + this.name + " " + this.GetId();
 	};
 }
 
@@ -1021,7 +1021,7 @@ var LiteralNode = function(value) {
 	}
 
 	this.ToString = function() {
-		return this.type + " " + this.value;
+		return this.type + " " + this.value + " " + this.GetId();
 	};
 }
 
@@ -1045,7 +1045,7 @@ var VarNode = function(name) {
 	}
 
 	this.ToString = function() {
-		return this.type + " " + this.name;
+		return this.type + " " + this.name + " " + this.GetId();
 	};
 }
 
@@ -1095,7 +1095,7 @@ var ExpNode = function(operator, left, right) {
 	};
 
 	this.ToString = function() {
-		return this.type + " " + this.operator;
+		return this.type + " " + this.operator + " " + this.GetId();
 	};
 }
 
@@ -1122,7 +1122,7 @@ var SequenceBase = function() {
 	};
 
 	this.ToString = function() {
-		return this.type;
+		return this.type + " " + this.GetId();
 	};
 }
 
@@ -1194,49 +1194,53 @@ var ShuffleNode = function(options) {
 	}
 }
 
+// TODO : rename? ConditionalNode?
 var IfNode = function(conditions, results, isSingleLine) {
-	Object.assign( this, new TreeRelationship() );
+	Object.assign(this, new TreeRelationship());
 	this.type = "if";
-	this.conditions = conditions;
-	this.results = results;
 
-	this.Eval = function(environment,onReturn) {
+	for (var i = 0; i < conditions.length; i++) {
+		this.AddChild(new ConditionPairNode(conditions[i], results[i]));
+	}
+
+	this.Eval = function(environment, onReturn) {
 		// console.log("EVAL IF");
 		var i = 0;
 		var self = this;
 		function TestCondition() {
-			// console.log("EVAL " + i);
-			self.conditions[i].Eval(environment, function(val) {
-				// console.log(val);
-				if(val == true) {
-					self.results[i].Eval(environment, onReturn);
+			self.children[i].Eval(environment, function(result) {
+				if (result.conditionValue == true) {
+					onReturn(result.resultValue);
 				}
-				else if(i+1 < self.conditions.length) {
+				else if (i+1 < self.children.length) {
 					i++;
-					TestCondition(); // test next condition
+					TestCondition();
 				}
 				else {
-					onReturn(null); // out of conditions and none were true
+					onReturn(null);
 				}
 			});
 		};
 		TestCondition();
 	}
 
-	if(isSingleLine === undefined) isSingleLine = false; // This is just for serialization
+	if (isSingleLine === undefined) {
+		isSingleLine = false; // This is just for serialization
+	}
 
 	this.Serialize = function(depth) {
 		var str = "";
 		if(isSingleLine) {
-			str += this.conditions[0].Serialize() + " ? " + this.results[0].Serialize();
-			if(this.conditions.length > 1 && this.conditions[1].type === Sym.Else)
-				str += " : " + this.results[1].Serialize();
+			// HACKY - should I even keep this mode???
+			str += this.children[0].children[0].Serialize() + " ? " + this.children[0].children[1].Serialize();
+			if (this.children.length > 1 && this.children[1].children[0].type === Sym.Else) {
+				str += " " + Sym.ElseExp + " " + this.children[1].children[1].Serialize();
+			}
 		}
 		else {
 			str += "\n";
-			for (var i = 0; i < this.conditions.length; i++) {
-				str += leadingWhitespace(depth + 1) + Sym.List + " " + this.conditions[i].Serialize(depth) + " ?\n";
-				str += this.results[i].Serialize(depth + 2) + "\n";
+			for (var i = 0; i < this.children.length; i++) {
+				str += this.children[i].Serialize(depth);
 			}
 			str += leadingWhitespace(depth);
 		}
@@ -1252,18 +1256,59 @@ var IfNode = function(conditions, results, isSingleLine) {
 			depth = 0;
 		}
 
-		visitor.Visit( this, depth );
-		for( var i = 0; i < this.conditions.length; i++ ) {
-			this.conditions[i].VisitAll( visitor, depth + 1 );
-		}
-		for( var i = 0; i < this.results.length; i++ ) {
-			this.results[i].VisitAll( visitor, depth + 1 );
+		visitor.Visit(this, depth);
+
+		for (var i = 0; i < this.children.length; i++) {
+			this.children[i].VisitAll(visitor, depth + 1);
 		}
 	};
 
 	this.ToString = function() {
-		return this.type + " " + this.mode;
+		return this.type + " " + this.mode + " " + this.GetId();
 	};
+}
+
+var ConditionPairNode = function(condition, result) {
+	Object.assign(this, new TreeRelationship());
+
+	this.type = "condition_pair";
+
+	this.AddChild(condition);
+	this.AddChild(result);
+
+	this.Eval = function(environment, onReturn) {
+		this.children[0].Eval(environment, function(conditionValue) {
+			if (conditionValue == true) {
+				this.children[1].Eval(environment, function(resultValue) {
+					onReturn({ conditionValue:conditionValue, resultValue:resultValue });
+				});
+			}
+		});
+	}
+
+	this.Serialize = function(depth) {
+		var str = "";
+		str += leadingWhitespace(depth + 1);
+		str += Sym.List + " " + this.children[0].Serialize(depth) + " " + Sym.ConditionEnd + Sym.Linebreak;
+		str += this.children[1].Serialize(depth + 2) + Sym.Linebreak;
+		return str;
+	}
+
+	this.VisitAll = function(visitor, depth) {
+		if (depth == undefined || depth == null) {
+			depth = 0;
+		}
+
+		visitor.Visit(this, depth);
+
+		for (var i = 0; i < this.children.length; i++) {
+			this.children[i].VisitAll(visitor, depth + 1);
+		}
+	}
+
+	this.ToString = function() {
+		return this.type + " " + this.GetId();
+	}
 }
 
 var ElseNode = function() {
@@ -1279,7 +1324,7 @@ var ElseNode = function() {
 	}
 
 	this.ToString = function() {
-		return this.type + " " + this.mode;
+		return this.type + " " + this.mode + " " + this.GetId();
 	};
 }
 
@@ -1310,7 +1355,9 @@ var Parser = function(env) {
 		if (state.MatchAhead(Sym.DialogOpen)) {
 			// multi-line dialog block
 			var dialogStr = state.ConsumeBlock(Sym.DialogOpen + Sym.Linebreak, Sym.Linebreak + Sym.DialogClose);
-			state = new ParserState(new DialogBlockNode(), dialogStr);
+			rootNode = new DialogBlockNode();
+			rootNode.rootId = rootId; // hacky!!
+			state = new ParserState(rootNode, dialogStr);
 			state = ParseDialog(state);
 		}
 		else {
