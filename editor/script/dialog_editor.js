@@ -814,11 +814,11 @@ function DialogTool() {
 		topControlsDiv.appendChild(orderControls.GetElement());
 
 		// condition
-		var comparisonEditor = new ConditionalComparisonEditor(conditionPairNode.children[0], parentEditor, index);
+		var comparisonEditor = new ConditionalComparisonEditor(conditionPairNode.children[0], this, index);
 		div.appendChild(comparisonEditor.GetElement());
 
 		// result
-		var resultBlockEditor = new BlockEditor(conditionPairNode.children[1], parentEditor);
+		var resultBlockEditor = new BlockEditor(conditionPairNode.children[1], this);
 		div.appendChild(resultBlockEditor.GetElement());
 
 		this.GetElement = function() {
@@ -834,6 +834,8 @@ function DialogTool() {
 
 			var updatedChildren = comparisonEditor.GetNodes().concat(resultBlockEditor.GetNodes());
 			conditionPairNode.AddChildren(updatedChildren);
+
+			parentEditor.NotifyUpdate();
 		}
 
 		this.UpdateIndex = function(i) {
@@ -917,24 +919,28 @@ function DialogTool() {
 		}
 
 		// init value handler - custom is the default
-		var valueChangeHandler = function() {
-			conditionNode = scriptInterpreter.CreateExpression(textArea.value);
-			parentEditor.NotifyUpdate();
-		}
-		if (conditionType === "item") {
+		var valueChangeHandler = null;
+		function InitValueChangeHandler() {
 			valueChangeHandler = function() {
-				var expStr = '{item "' + itemSelect.value + '"} ' + comparisonSelect.value + ' ' + valueInput.value;
-				conditionNode = scriptInterpreter.CreateExpression(expStr);
+				conditionNode = scriptInterpreter.CreateExpression(textArea.value);
 				parentEditor.NotifyUpdate();
 			}
-		}
-		else if (conditionType === "variable") {
-			valueChangeHandler = function() {
-				var expStr = variableSelect.value + ' ' + comparisonSelect.value + ' ' + valueInput.value;
-				conditionNode = scriptInterpreter.CreateExpression(expStr);
-				parentEditor.NotifyUpdate();
+			if (conditionType === "item") {
+				valueChangeHandler = function() {
+					var expStr = '{item "' + itemSelect.value + '"} ' + comparisonSelect.value + ' ' + valueInput.value;
+					conditionNode = scriptInterpreter.CreateExpression(expStr);
+					parentEditor.NotifyUpdate();
+				}
+			}
+			else if (conditionType === "variable") {
+				valueChangeHandler = function() {
+					var expStr = variableSelect.value + ' ' + comparisonSelect.value + ' ' + valueInput.value;
+					conditionNode = scriptInterpreter.CreateExpression(expStr);
+					parentEditor.NotifyUpdate();
+				}
 			}
 		}
+		InitValueChangeHandler();
 
 		var div = document.createElement("div");
 		div.classList.add("conditionalComparisonEditor");
@@ -982,8 +988,8 @@ function DialogTool() {
 				}
 
 				conditionType = GetConditionType(conditionNode);
+				InitValueChangeHandler();
 				CreateComparisonControls();
-
 				parentEditor.NotifyUpdate();
 			}
 
