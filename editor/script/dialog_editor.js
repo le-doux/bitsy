@@ -644,6 +644,18 @@ function DialogTool() {
 		}
 
 		CreateOptionEditors();
+
+		events.Listen("script_node_enter", function(event) {
+			if (event.id === node.GetId()) {
+				div.classList.add("executing");
+			}
+		});
+
+		events.Listen("script_node_exit", function(event) {
+			if (event.id === node.GetId()) {
+				div.classList.remove("executing");
+			}
+		});
 	}
 
 	function SequenceOptionEditor(optionNode, parentEditor) {
@@ -800,6 +812,18 @@ function DialogTool() {
 		}
 
 		CreateOptionEditors();
+
+		events.Listen("script_node_enter", function(event) {
+			if (event.id === node.GetId()) {
+				div.classList.add("executing");
+			}
+		});
+
+		events.Listen("script_node_exit", function(event) {
+			if (event.id === node.GetId()) {
+				div.classList.remove("executing");
+			}
+		});
 	}
 
 	function ConditionalOptionEditor(conditionPairNode, parentEditor, index) {
@@ -1252,6 +1276,18 @@ function DialogTool() {
 
 				CreateFunctionDescription(false);
 			});
+
+		events.Listen("script_node_enter", function(event) {
+			if (event.id === node.GetId()) {
+				div.classList.add("executing");
+			}
+		});
+
+		events.Listen("script_node_exit", function(event) {
+			if (event.id === node.GetId()) {
+				div.classList.remove("executing");
+			}
+		});
 	}
 
 	function DefaultParameterEditor(functionNode, parameterIndex, parentEditor, isEditable) {

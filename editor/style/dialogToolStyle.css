@@ -44,6 +44,12 @@
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
+	transition: background 1s ease-in;
+}
+
+.executing.actionEditor {
+	background: #6767b2;
+	color: white;
 }
 
 .selectedEditor.actionEditor {

@@ -738,8 +738,8 @@ var DialogBlockNode = function(doIndentFirstLine) {
 	this.Eval = function(environment, onReturn) {
 		// console.log("EVAL BLOCK " + this.children.length);
 
-		if (this.onEnter != null) {
-			this.onEnter();
+		if (events != undefined && events != null) {
+			events.Raise("script_node_enter", { id: this.GetId() });
 		}
 
 		console.log("ENTER " + this.GetId());
@@ -764,9 +764,10 @@ var DialogBlockNode = function(doIndentFirstLine) {
 
 		var self = this;
 		evalChildren(this.children, function() {
-			if( self.onExit != null ) {
-				self.onExit();
+			if (events != undefined && events != null) {
+				events.Raise("script_node_exit", { id: self.GetId() });
 			}
+
 			onReturn(lastVal);
 		});
 	}
@@ -827,8 +828,8 @@ var CodeBlockNode = function() {
 	this.Eval = function(environment, onReturn) {
 		// console.log("EVAL BLOCK " + this.children.length);
 
-		if (this.onEnter != null) {
-			this.onEnter();
+		if (events != undefined && events != null) {
+			events.Raise("script_node_enter", { id: this.GetId() });
 		}
 
 		var lastVal = null;
@@ -851,9 +852,10 @@ var CodeBlockNode = function() {
 
 		var self = this;
 		evalChildren(this.children, function() {
-			if( self.onExit != null ) {
-				self.onExit();
+			if (events != undefined && events != null) {
+				events.Raise("script_node_exit", { id: self.GetId() });
 			}
+
 			onReturn(lastVal);
 		});
 	}
@@ -942,9 +944,10 @@ var FuncNode = function(name,args) {
 	this.args = args;
 
 	this.Eval = function(environment,onReturn) {
+		console.log("EVAL FUNC!!");
 
-		if(this.onEnter != null) {
-			this.onEnter();
+		if (events != undefined && events != null) {
+			events.Raise("script_node_enter", { id: this.GetId() });
 		}
 
 		var argumentValues = [];
@@ -964,8 +967,8 @@ var FuncNode = function(name,args) {
 		};
 		var self = this; // hack to deal with scope
 		evalArgs( this.args, function() {
-			if(self.onExit != null) {
-				self.onExit();
+			if (events != undefined && events != null) {
+				events.Raise("script_node_exit", { id: self.GetId() });
 			}
 
 			environment.EvalFunction(self.name, argumentValues, onReturn);
@@ -1276,10 +1279,12 @@ var ConditionPairNode = function(condition, result) {
 	this.AddChild(condition);
 	this.AddChild(result);
 
+	var self = this;
+
 	this.Eval = function(environment, onReturn) {
-		this.children[0].Eval(environment, function(conditionValue) {
+		self.children[0].Eval(environment, function(conditionValue) {
 			if (conditionValue == true) {
-				this.children[1].Eval(environment, function(resultValue) {
+				self.children[1].Eval(environment, function(resultValue) {
 					onReturn({ conditionValue:conditionValue, resultValue:resultValue });
 				});
 			}
