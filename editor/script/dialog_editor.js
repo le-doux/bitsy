@@ -483,6 +483,31 @@ function DialogTool() {
 		this.GetNodes = function() {
 			return dialogNode.children;
 		}
+
+		// TODO : the issue with these events is that
+		// the hook up between the dialog nodes and the rest
+		// of the tree keeps getting destroyed by
+		// my "clever-ness" with the dialogNode parent
+		events.Listen("script_node_enter", function(event) {
+			var enterIndex = dialogNode.children.findIndex(function(node) { return node.GetId() === event.id });
+			if (enterIndex == 0) {
+				console.log("ENTER DIALOG " + event.id + " " + enterIndex);
+				console.log(dialogNode.children.map(function(node) { return node.GetId(); }));
+				div.classList.add("executing");
+			}
+		});
+
+		events.Listen("script_node_exit", function(event) {
+			var exitIndex = dialogNode.children.findIndex(function(node) { return node.GetId() === event.id });
+			if (exitIndex >= dialogNode.children.length-1) {
+				console.log("EXIT DIALOG " + event.id + " " + exitIndex);
+				console.log(dialogNode.children.map(function(node) { return node.GetId(); }));
+				div.classList.remove("executing");
+				div.classList.remove("executingLeave");
+				void div.offsetWidth; // hack to force reflow to allow animation to restart
+				div.classList.add("executingLeave");
+			}
+		});
 	}
 
 	var sequenceTypeDescriptionMap = {
@@ -654,6 +679,9 @@ function DialogTool() {
 		events.Listen("script_node_exit", function(event) {
 			if (event.id === node.GetId()) {
 				div.classList.remove("executing");
+				div.classList.remove("executingLeave");
+				void div.offsetWidth; // hack to force reflow to allow animation to restart
+				div.classList.add("executingLeave");
 			}
 		});
 	}
@@ -822,6 +850,9 @@ function DialogTool() {
 		events.Listen("script_node_exit", function(event) {
 			if (event.id === node.GetId()) {
 				div.classList.remove("executing");
+				div.classList.remove("executingLeave");
+				void div.offsetWidth; // hack to force reflow to allow animation to restart
+				div.classList.add("executingLeave");
 			}
 		});
 	}
@@ -1286,6 +1317,9 @@ function DialogTool() {
 		events.Listen("script_node_exit", function(event) {
 			if (event.id === node.GetId()) {
 				div.classList.remove("executing");
+				div.classList.remove("executingLeave");
+				void div.offsetWidth; // hack to force reflow to allow animation to restart
+				div.classList.add("executingLeave");
 			}
 		});
 	}

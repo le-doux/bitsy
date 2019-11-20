@@ -742,8 +742,6 @@ var DialogBlockNode = function(doIndentFirstLine) {
 			events.Raise("script_node_enter", { id: this.GetId() });
 		}
 
-		console.log("ENTER " + this.GetId());
-
 		var lastVal = null;
 		var i = 0;
 
@@ -944,8 +942,6 @@ var FuncNode = function(name,args) {
 	this.args = args;
 
 	this.Eval = function(environment,onReturn) {
-		console.log("EVAL FUNC!!");
-
 		if (events != undefined && events != null) {
 			events.Raise("script_node_enter", { id: this.GetId() });
 		}

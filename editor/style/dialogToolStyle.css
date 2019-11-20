@@ -44,12 +44,22 @@
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	transition: background 1s ease-in;
+	/*transition: background 1s ease-in;*/
 }
 
 .executing.actionEditor {
 	background: #6767b2;
 	color: white;
+}
+
+@keyframes executingLeaveAnimation {
+	from { background: #6767b2; }
+	to { background: white; }	
+}
+
+.executingLeave.actionEditor {
+	animation-name: executingLeaveAnimation;
+	animation-duration: 1s;
 }
 
 .selectedEditor.actionEditor {
