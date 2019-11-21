@@ -155,7 +155,6 @@ function DialogTool() {
 			var dialogNodeList = [];
 			function addText() {
 				if (dialogNodeList.length > 0) {
-					console.log("TEXT BLOCK!!");
 					var editor = new DialogEditor(dialogNodeList, self);
 					childEditors.push(editor);
 
@@ -168,14 +167,12 @@ function DialogTool() {
 				if (isIf(node)) {
 					addText();
 
-					console.log("IF NODE!!");
 					var editor = new ConditionalEditor(node, self);
 					childEditors.push(editor);
 				}
 				else if (isSeq(node)) {
 					addText();
 
-					console.log("SEQ NODE!!");
 					var editor = new SequenceEditor(node, self);
 					childEditors.push(editor);
 				}
@@ -221,7 +218,7 @@ function DialogTool() {
 				updatedChildren = updatedChildren.concat(editor.GetNodes());
 			}
 
-			blockNode.children = updatedChildren;
+			blockNode.SetChildren(updatedChildren);
 		}
 
 		this.GetNodes = function() {
@@ -439,10 +436,8 @@ function DialogTool() {
 		}
 	}
 
+	// TODO : this name is confusing to me
 	function DialogEditor(dialogNodeList, parentEditor) {
-		// this hack is still annoying as heck
-		var dialogNode = scriptUtils.CreateDialogBlock(dialogNodeList);
-
 		var div = document.createElement("div");
 		div.classList.add("dialogEditor");
 		div.classList.add("actionEditor");
@@ -455,17 +450,16 @@ function DialogTool() {
 		// div.appendChild(span);
 
 		function OnDialogTextChange() {
-			// console.log("dialog changed!!!");
+			// hacky :(
 			var scriptStr = '"""\n' +  textArea.value + '\n"""';
-			// console.log(scriptStr);
-			dialogNode = scriptInterpreter.Parse(scriptStr);
-			// console.log(dialogNode);
+			var tempDialogNode = scriptInterpreter.Parse(scriptStr);
+			dialogNodeList = tempDialogNode.children;
 			parentEditor.NotifyUpdate(true);
 		}
 		var textSelectionChangeHandler = createOnTextSelectionChange(OnDialogTextChange);
 
 		var textArea = document.createElement("textarea");
-		textArea.value = dialogNode.Serialize();
+		textArea.value = scriptUtils.SerializeDialogNodeList(dialogNodeList);
 		textArea.onchange = OnDialogTextChange;
 		textArea.rows = 2;
 		textArea.cols = 32;
@@ -481,31 +475,27 @@ function DialogTool() {
 		AddSelectionBehavior(this);
 
 		this.GetNodes = function() {
-			return dialogNode.children;
+			return dialogNodeList;
 		}
 
-		// TODO : the issue with these events is that
-		// the hook up between the dialog nodes and the rest
-		// of the tree keeps getting destroyed by
-		// my "clever-ness" with the dialogNode parent
 		events.Listen("script_node_enter", function(event) {
-			var enterIndex = dialogNode.children.findIndex(function(node) { return node.GetId() === event.id });
-			if (enterIndex == 0) {
-				console.log("ENTER DIALOG " + event.id + " " + enterIndex);
-				console.log(dialogNode.children.map(function(node) { return node.GetId(); }));
-				div.classList.add("executing");
+			if (event.id != undefined) {
+				var enterIndex = dialogNodeList.findIndex(function(node) { return node.GetId() === event.id });
+				if (enterIndex == 0) {
+					div.classList.add("executing");
+				}
 			}
 		});
 
 		events.Listen("script_node_exit", function(event) {
-			var exitIndex = dialogNode.children.findIndex(function(node) { return node.GetId() === event.id });
-			if (exitIndex >= dialogNode.children.length-1) {
-				console.log("EXIT DIALOG " + event.id + " " + exitIndex);
-				console.log(dialogNode.children.map(function(node) { return node.GetId(); }));
-				div.classList.remove("executing");
-				div.classList.remove("executingLeave");
-				void div.offsetWidth; // hack to force reflow to allow animation to restart
-				div.classList.add("executingLeave");
+			if (event.id != undefined) {
+				var exitIndex = dialogNodeList.findIndex(function(node) { return node.GetId() === event.id });
+				if (exitIndex >= dialogNodeList.length-1) {
+					div.classList.remove("executing");
+					div.classList.remove("executingLeave");
+					void div.offsetWidth; // hack to force reflow to allow animation to restart
+					div.classList.add("executingLeave");
+				}				
 			}
 		});
 	}
@@ -534,8 +524,6 @@ function DialogTool() {
 		div.appendChild(descriptionDiv);
 
 		function CreateSequenceDescription(isEditable) {
-			console.log("CREATE DESC");
-
 			descriptionDiv.innerHTML = "";
 
 			var descriptionText = sequenceTypeDescriptionMap[sequenceNode.type];
@@ -556,7 +544,7 @@ function DialogTool() {
 				}
 				sequenceTypeSelect.onchange = function() {
 					sequenceNode = scriptUtils.ChangeSequenceType(sequenceNode, sequenceTypeSelect.value);
-					node.children = [sequenceNode];
+					node.SetChildren([sequenceNode]);
 					CreateSequenceDescription(true);
 					parentEditor.NotifyUpdate();
 				}
@@ -664,8 +652,7 @@ function DialogTool() {
 				updatedOptions = updatedOptions.concat(editor.GetNodes());
 			}
 
-			sequenceNode.children = [];
-			sequenceNode.AddChildren(updatedOptions);
+			sequenceNode.SetChildren(updatedOptions);
 		}
 
 		CreateOptionEditors();
@@ -885,10 +872,8 @@ function DialogTool() {
 		}
 
 		this.NotifyUpdate = function() {
-			conditionPairNode.children = [];
-
 			var updatedChildren = comparisonEditor.GetNodes().concat(resultBlockEditor.GetNodes());
-			conditionPairNode.AddChildren(updatedChildren);
+			conditionPairNode.SetChildren(updatedChildren);
 
 			parentEditor.NotifyUpdate();
 		}

@@ -274,6 +274,13 @@ var Utils = function() {
 		}
 		return dialogStr;
 	}
+
+	this.SerializeDialogNodeList = function(nodeList) {
+		var tempBlock = new DialogBlockNode(false);
+		 // set children directly to avoid breaking the parenting chain for this temp operation
+		tempBlock.children = nodeList;
+		return tempBlock.Serialize();
+	}
 }
 
 
@@ -699,7 +706,12 @@ var TreeRelationship = function() {
 		for (var i = 0; i < nodeList.length; i++) {
 			this.AddChild(nodeList[i]);
 		}
-	}
+	};
+
+	this.SetChildren = function(nodeList) {
+		this.children = [];
+		this.AddChildren(nodeList);
+	};
 
 	this.VisitAll = function(visitor, depth) {
 		if (depth == undefined || depth == null) {
