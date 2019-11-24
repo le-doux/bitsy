@@ -1,0 +1,19 @@
+{
+  "name": "bitsy",
+  "version": "6.4.0",
+  "description": "make tiny games, worlds, and stories",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/le-doux/bitsy.git"
+  },
+  "author": "Adam Le Doux",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/le-doux/bitsy/issues"
+  },
+  "homepage": "https://github.com/le-doux/bitsy#readme"
+}
