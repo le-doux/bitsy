@@ -50,16 +50,14 @@ input[type=text] {
 #editorWindow {
 	width:100%;
 	/*height:750px;*/
-
 	overflow:scroll;
 	-webkit-overflow-scrolling: touch;
-
 	box-sizing: border-box;
-
 	flex: 1 1 auto;
-
+	transition: all 0.7s ease-in-out;
 	/*border: solid 2px red;*/
 }
+
 #editorContent {
 	height:100%;
 	white-space: nowrap;

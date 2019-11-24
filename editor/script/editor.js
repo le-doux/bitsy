@@ -22,6 +22,9 @@ new notes from forum
 */
 
 /* MODES */
+const PLAY_MODE = "play";
+const EDIT_MODE = "edit";
+
 var TileType = {
 	Tile : 0,
 	Sprite : 1,
@@ -1631,6 +1634,7 @@ function on_edit_mode() {
 		}
 	}
 	document.getElementById("previewDialogCheck").disabled = false;
+	updateEditorWindowByMode(EDIT_MODE);
 }
 
 // hacky - part of hiding font data from the game data
@@ -1652,6 +1656,17 @@ function on_play_mode() {
 		console.log("DISALBE PREVIEW!!!");
 		document.getElementById("previewDialogCheck").disabled = true;
 	}
+	updateEditorWindowByMode(PLAY_MODE);
+}
+
+function updateEditorWindowByMode(mode) {
+	const playModeClassAction = (mode === PLAY_MODE) ? "add" : "remove";
+	updateEditorWindowClasses(playModeClassAction, "playMode");
+}
+
+function updateEditorWindowClasses(action, className) {
+	const editorWindow = document.getElementById("editorWindow");
+	editorWindow.classList[action](className);
 }
 
 function updatePlayModeButton() {
