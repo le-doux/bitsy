@@ -4,6 +4,8 @@ TODO
 X fix adding conditions (sort of)
 X weird indentation thing with conditions
 X use item names in UI
+- reformat paint editor
+- wait to trigger functions until all text has been displayed!
 */
 
 function DialogTool() {

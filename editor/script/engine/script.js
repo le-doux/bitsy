@@ -426,6 +426,8 @@ function lockFunc(environment,parameters,onReturn) {
 
 function endFunc(environment,parameters,onReturn) {
 	isEnding = true;
+	isNarrating = true;
+	dialogRenderer.SetCentered(true);
 	onReturn(null);
 }
 
