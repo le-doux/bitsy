@@ -221,8 +221,6 @@ function DialogTool() {
 		}
 
 		this.InsertChild = function(childEditor, index) {
-			// index = Math.max(index, 0);
-
 			childEditors.splice(index, 0, childEditor);
 			RefreshChildUI();
 
@@ -292,6 +290,12 @@ function DialogTool() {
 				"dialog",
 				function() {
 					var printFunc = scriptUtils.CreateEmptyPrintFunc();
+
+					// hacky access of the parent node is required
+					// because the print function needs to start with a parent
+					// otherwise the dialog editor can't serialize the text D:
+					parentEditor.GetNodes()[0].AddChild(printFunc);
+
 					var editor = new DialogEditor([printFunc], parentEditor);
 					return editor;
 				}));
