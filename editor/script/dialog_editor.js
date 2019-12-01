@@ -1,11 +1,8 @@
 /* 
 TODO 
-- limit the width of dialog textboxes
-X fix adding conditions (sort of)
-X weird indentation thing with conditions
-X use item names in UI
-- reformat paint editor so that it takes up less vertical space!
 - wait to trigger functions until all text has been displayed!
+- I need to probably rethink the layout of the paint tool still...
+	- remove the weird hacky formatting exceptions for margins, etc
 */
 
 function DialogTool() {
@@ -18,20 +15,32 @@ function DialogTool() {
 	// 	// TODO	
 	// }
 
-	function DialogScriptEditor(dialogId) {
-		var dialogStr = dialog[dialogId];
-		var scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
+	var dialogScriptEditorUniqueIdCounter = 0;
 
-		scriptInterpreter.DebugVisualizeScriptTree(scriptRootNode);
+	function DialogScriptEditor(dialogId) {
+		var editorId = dialogScriptEditorUniqueIdCounter;
+		dialogScriptEditorUniqueIdCounter++;
+
+		var scriptRootNode, div, rootEditor;
 
 		var div = document.createElement("div");
 		div.classList.add("selectedEditor"); // always selected so we can add actions to the root
 
-		var rootEditor = new BlockEditor(scriptRootNode, this);
-		div.appendChild(rootEditor.GetElement());
+		var self = this;
+		function RefreshEditorUI() {
+			var dialogStr = dialog[dialogId];
+
+			div.innerHTML = "";
+			scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
+			rootEditor = new BlockEditor(scriptRootNode, self);
+
+			div.appendChild(rootEditor.GetElement());
+		}
+
+		RefreshEditorUI();
 
 		this.GetElement = function() {
-			return div; //rootEditor.GetElement();
+			return div;
 		}
 
 		this.GetNode = function() {
@@ -51,11 +60,19 @@ function DialogTool() {
 			dialog[dialogId] = dialogStr;
 
 			refreshGameData();
+
+			events.Raise("dialog_update", { dialogId:dialogId, editorId:editorId });
 		}
 
 		this.NotifyUpdate = function() {
 			OnUpdate();
 		}
+
+		events.Listen("dialog_update", function(event) {
+			if (event.dialogId === dialogId && event.editorId != editorId) {
+				RefreshEditorUI();
+			}
+		});
 
 		/* root level creation functions for the dialog editor top-bar UI */
 		this.AddDialog = function() {
