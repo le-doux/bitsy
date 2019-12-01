@@ -375,7 +375,14 @@ input {
 }
 
 #paint {
-	width: 315px;
+	/*width: 315px;*/
+	width: 300px;
+}
+
+/* kind of hacky way to condense ui in the paint tool */
+#paintPanel .buttonGroup {
+	padding: 0px;
+	margin: 0px;
 }
 
 #dialogCodeText {

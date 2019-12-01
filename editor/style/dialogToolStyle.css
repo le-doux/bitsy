@@ -17,14 +17,15 @@
 	padding: 5px;
 	margin-bottom: 5px;
 	border-radius: 2px;
+	/*width: 246px;*/
 }
 
 .dialogContentMiniViewport {
-	height: 150px;
+	height: 140px;
 	overflow: scroll;
 	border-top: solid 1px #ccccff;
 	/*min-width: 275px;*/
-	width: 300px;
+	/*width: 300px;*/
 	white-space: normal;
 }
 

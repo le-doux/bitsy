@@ -4,7 +4,7 @@ TODO
 X fix adding conditions (sort of)
 X weird indentation thing with conditions
 X use item names in UI
-- reformat paint editor
+- reformat paint editor so that it takes up less vertical space!
 - wait to trigger functions until all text has been displayed!
 */
 
@@ -442,15 +442,21 @@ function DialogTool() {
 		}
 		var textSelectionChangeHandler = createOnTextSelectionChange(OnDialogTextChange);
 
+		var textHolderDiv = document.createElement("div");
 		var textArea = document.createElement("textarea");
 		textArea.value = scriptUtils.SerializeDialogNodeList(dialogNodeList);
 		textArea.onchange = OnDialogTextChange;
 		textArea.rows = 2;
 		textArea.cols = 32;
+		// test: style to center text area
+		// textArea.style.margin = "auto";
+		// textArea.style.display = "block"; // TODO : move to style file
 		textArea.addEventListener('click', textSelectionChangeHandler);
 		textArea.addEventListener('select', textSelectionChangeHandler);
 		textArea.addEventListener('blur', textSelectionChangeHandler);
-		div.appendChild(textArea);
+		textHolderDiv.appendChild(textArea);
+		// textHolderDiv.style.background = "black"; // TODO : does this look better?
+		div.appendChild(textHolderDiv);
 
 		this.GetElement = function() {
 			return div;

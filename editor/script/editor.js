@@ -1623,7 +1623,7 @@ function updatePreviewDialogButton() {
 
 function togglePaintGrid(e) {
 	paintTool.drawPaintGrid = e.target.checked;
-	document.getElementById("paintGridIcon").innerHTML = paintTool.drawPaintGrid ? "visibility" : "visibility_off";
+	document.getElementById("paintGridIcon").innerHTML = paintTool.drawPaintGrid ? "grid_on" : "grid_off";
 	paintTool.updateCanvas();
 }
 
