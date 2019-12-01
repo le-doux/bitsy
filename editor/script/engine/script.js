@@ -99,10 +99,14 @@ var Interpreter = function() {
 var Utils = function() {
 	// for editor ui
 	this.CreateDialogBlock = function(children,doIndentFirstLine) {
-		if(doIndentFirstLine === undefined) doIndentFirstLine = true;
+		if (doIndentFirstLine === undefined) {
+			doIndentFirstLine = true;
+		}
+
 		var block = new DialogBlockNode(doIndentFirstLine);
-		for(var i = 0; i < children.length; i++) {
-			block.AddChild( children[i] );
+
+		for (var i = 0; i < children.length; i++) {
+			block.AddChild(children[i]);
 		}
 		return block;
 	}
@@ -111,6 +115,15 @@ var Utils = function() {
 		var block = new DialogBlockNode(false);
 		block.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 		return block;
+	}
+
+	this.CreateConditionPair = function() {
+		var itemFunc = this.CreateFunctionBlock("item", ["0"]);
+		var condition = new ExpNode("==", itemFunc, new LiteralNode(1));
+		var result = new DialogBlockNode(true);
+		result.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		var conditionPair = new ConditionPairNode(condition, result);
+		return conditionPair;
 	}
 
 	this.CreateEmptyPrintFunc = function() {
@@ -1214,10 +1227,10 @@ var IfNode = function(conditions, results, isSingleLine) {
 		this.AddChild(new ConditionPairNode(conditions[i], results[i]));
 	}
 
+	var self = this;
 	this.Eval = function(environment, onReturn) {
 		// console.log("EVAL IF");
 		var i = 0;
-		var self = this;
 		function TestCondition() {
 			self.children[i].Eval(environment, function(result) {
 				if (result.conditionValue == true) {
@@ -1290,11 +1303,14 @@ var ConditionPairNode = function(condition, result) {
 	var self = this;
 
 	this.Eval = function(environment, onReturn) {
-		self.children[0].Eval(environment, function(conditionValue) {
-			if (conditionValue == true) {
+		self.children[0].Eval(environment, function(conditionSuccess) {
+			if (conditionSuccess) {
 				self.children[1].Eval(environment, function(resultValue) {
-					onReturn({ conditionValue:conditionValue, resultValue:resultValue });
+					onReturn({ conditionValue:true, resultValue:resultValue });
 				});
+			}
+			else {
+				onReturn({ conditionValue:false });
 			}
 		});
 	}
@@ -1328,7 +1344,7 @@ var ElseNode = function() {
 	Object.assign( this, new TreeRelationship() );
 	this.type = Sym.Else;
 
-	this.Eval = function(environment,onReturn) {
+	this.Eval = function(environment, onReturn) {
 		onReturn(true);
 	}
 

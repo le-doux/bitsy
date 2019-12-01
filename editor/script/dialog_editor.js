@@ -1,31 +1,9 @@
-/*
-	- DLG contains dialog contents
-	- dialog contents are parsed into a tree of nodes
-	- nodes are displayed using editors
-
-	how much of the old editor code can I re-use?
-
-	do I need to make *any* changes to the parser?
-		- remove code blocks (probably)
-		- make functions, sequences, etc direct instead of wrapped (possibly)
-		- pre-group dialog blocks (less likely)
-
-	todo
-	X use new editor in multiple places!
-	- see where I can re-use more code
-	X deal w/ clutter of control buttons
-	- different colors for different types of blocks?
-		- tried it: not sure how useful it is
-	- light / dark alternating colors for options?
-	- arrows connecting blocks at same level
-	X better descriptions of actions
-	X save changes to dialog
-	X save changes to conditions
-	- function editor
-	- new functions
-		- stop default, exit, end, narrate, give / take items
-	X combine DLG and END
-	X add DLG to EXT
+/* 
+TODO 
+- limit the width of dialog textboxes
+X fix adding conditions (sort of)
+X weird indentation thing with conditions
+X use item names in UI
 */
 
 function DialogTool() {
@@ -267,7 +245,7 @@ function DialogTool() {
 
 		var addButton = document.createElement("button");
 		addButton.classList.add("actionBuilderAdd");
-		addButton.innerHTML = '<i class="material-icons">add</i>' + " add action";
+		addButton.innerHTML = '<i class="material-icons">add</i>' + " add";
 		addButton.onclick = function() {
 			div.classList.add("actionBuilderActive");
 			div.classList.add("actionBuilderRoot");
@@ -573,7 +551,7 @@ function DialogTool() {
 		div.appendChild(addOptionRootDiv);
 
 		var addOptionButton = document.createElement("button");
-		addOptionButton.innerText = "add option";
+		addOptionButton.innerHTML = '<i class="material-icons">add</i>' + "add option";
 		addOptionButton.onclick = function() {
 			var optionNode = scriptUtils.CreateOptionBlock();
 			var optionEditor = new SequenceOptionEditor(optionNode, self);
@@ -733,11 +711,10 @@ function DialogTool() {
 		div.appendChild(addOptionRootDiv);
 
 		var addOptionButton = document.createElement("button");
-		addOptionButton.innerText = "add option";
+		addOptionButton.innerHTML = '<i class="material-icons">add</i>' + "add option";
 		addOptionButton.onclick = function() {
-			var conditionNode = scriptInterpreter.CreateExpression('{item "0"} == 1');
-			var resultNode = scriptUtils.CreateOptionBlock();
-			var optionEditor = new ConditionalOptionEditor(conditionNode, resultNode, self, optionEditors.length);
+			var conditionPairNode = scriptUtils.CreateConditionPair();
+			var optionEditor = new ConditionalOptionEditor(conditionPairNode, self, optionEditors.length);
 			optionEditors.push(optionEditor);
 
 			RefreshOptionsUI();
@@ -811,19 +788,16 @@ function DialogTool() {
 			}
 		}
 
+		// TODO : share w/ sequence editor?
 		function UpdateNodeOptions() {
-			var updatedConditions = [];
-			var updatedResults = [];
+			var updatedOptions = [];
 
 			for (var i = 0; i < optionEditors.length; i++) {
 				var editor = optionEditors[i];
-				var nodes = editor.GetNodes();
-				updatedConditions = updatedConditions.concat(nodes[0]);
-				updatedResults = updatedResults.concat(nodes[1]);
+				updatedOptions = updatedOptions.concat(editor.GetNodes());
 			}
 
-			conditionalNode.conditions = updatedConditions;
-			conditionalNode.results = updatedResults;
+			conditionalNode.SetChildren(updatedOptions);
 		}
 
 		CreateOptionEditors();
@@ -1126,7 +1100,7 @@ function DialogTool() {
 			}
 
 			if (conditionType === "item") {
-				conditionDescriptionSpan.innerText += " " + GetItemId(); // name instead?
+				conditionDescriptionSpan.innerText += " " + GetItemNameFromId(GetItemId());
 			}
 			else if (conditionType === "variable") {
 				conditionDescriptionSpan.innerText += " " + GetVariableId();
