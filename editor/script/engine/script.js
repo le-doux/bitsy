@@ -1168,7 +1168,7 @@ var SequenceNode = function(options) {
 		this.children[index].Eval(environment, onReturn);
 
 		var next = index + 1;
-		if (next < this.options.length) {
+		if (next < this.children.length) {
 			index = next;
 		}
 	}
