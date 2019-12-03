@@ -949,7 +949,11 @@ var UndefinedNode = function(sourceStr) {
 	this.source = sourceStr;
 
 	this.Eval = function(environment,onReturn) {
-		onReturn(null);
+		addOrRemoveTextEffect(environment, "_debug_highlight");
+		printFunc(environment, ["{" + sourceStr + "}"], function() {
+			onReturn(null);
+		});
+		addOrRemoveTextEffect(environment, "_debug_highlight");
 	}
 
 	this.Serialize = function(depth) {

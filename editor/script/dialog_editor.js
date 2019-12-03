@@ -77,6 +77,7 @@ function DialogTool() {
 		/* root level creation functions for the dialog editor top-bar UI */
 		this.AddDialog = function() {
 			var printFunc = scriptUtils.CreateEmptyPrintFunc();
+			rootEditor.GetNodes()[0].AddChild(printFunc); // hacky -- see note in action builder
 			var editor = new DialogEditor([printFunc], rootEditor);
 			rootEditor.AppendChild(editor);
 			OnUpdate();

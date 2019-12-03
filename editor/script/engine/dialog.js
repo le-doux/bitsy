@@ -850,4 +850,14 @@ var ShakyEffect = function() {
 };
 TextEffects["shk"] = new ShakyEffect();
 
+var DebugHighlightEffect = function() {
+	this.DoEffect = function(char) {
+		char.color.r = 255;
+		char.color.g = 255;
+		char.color.b = 0;
+		char.color.a = 255;
+	}
+}
+TextEffects["_debug_highlight"] = new DebugHighlightEffect();
+
 } // Dialog()
