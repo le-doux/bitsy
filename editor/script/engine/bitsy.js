@@ -818,8 +818,6 @@ function movePlayer(direction) {
 		var itemRoom = player().room;
 
 		startItemDialog(itm.id, function(scriptResult) {
-			console.log("ITEM SCRIPT DONE!");
-			console.log(scriptResult);
 			if (!scriptResult.IsDefaultActionLocked()) {
 				// remove item from room
 				room[itemRoom].items.splice(itmIndex, 1);

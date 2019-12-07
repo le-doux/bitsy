@@ -1191,8 +1191,11 @@ function DialogTool() {
 
 	var functionDescriptionMap = {
 		"lock" : {
-			description : "lock the default action",
+			description : "lock event",
 			parameters : [],
+			helpText : "prevents the default action that happens "
+				+ "after this event (changing rooms for exits, "
+				+ "stopping the game for endings, picking up items, etc.)",
 		},
 		"end" : {
 			description : "end the game",
@@ -1239,6 +1242,9 @@ function DialogTool() {
 		var descriptionDiv = document.createElement("div");
 		div.appendChild(descriptionDiv);
 
+		var helpTextDiv = document.createElement("div");
+		div.appendChild(helpTextDiv);
+
 		// TODO : populate default values!!
 		var curParameterEditors = [];
 		function CreateFunctionDescription(isEditable) {
@@ -1266,6 +1272,16 @@ function DialogTool() {
 
 					curParameterEditors.push(parameterEditor);
 					descriptionDiv.appendChild(parameterEditor.GetElement());	
+				}
+			}
+
+			helpTextDiv.innerText = "";
+			helpTextDiv.classList.remove("helpText");
+			if (isEditable) {
+				var helpText = functionDescriptionMap[functionNode.name].helpText;
+				if (helpText != undefined && helpText != null) {
+					helpTextDiv.innerText = helpText;
+					helpTextDiv.classList.add("helpText");
 				}
 			}
 		}

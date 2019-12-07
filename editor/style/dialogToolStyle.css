@@ -261,3 +261,10 @@
 #exitDialogControls .dialogContentMiniViewportHolder .actionBuilderCancel {
 	background: #6767b2;
 }
+
+.helpText {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	color: #ccccff;
+	max-width: 350px;
+}
