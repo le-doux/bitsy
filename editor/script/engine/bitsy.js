@@ -814,26 +814,30 @@ function movePlayer(direction) {
 
 	// do items first, because you can pick up an item AND go through a door
 	if (itmIndex > -1) {
-		// TODO pick up items (what about touch?)
-		// console.log("HIT ITM ");
-		// console.log( itmIndex );
-		var itm = room[ player().room ].items[ itmIndex ];
-		// console.log(itm);
-		room[ player().room ].items.splice( itmIndex, 1 );
-		if( player().inventory[ itm.id ] ) {
-			player().inventory[ itm.id ] += 1;
-		}
-		else {
-			player().inventory[ itm.id ] = 1;
-		}
+		var itm = room[player().room].items[itmIndex];
+		var itemRoom = player().room;
 
-		if(onInventoryChanged != null) {
-			onInventoryChanged( itm.id );
-		}
+		startItemDialog(itm.id, function(scriptResult) {
+			console.log("ITEM SCRIPT DONE!");
+			console.log(scriptResult);
+			if (!scriptResult.IsDefaultActionLocked()) {
+				// remove item from room
+				room[itemRoom].items.splice(itmIndex, 1);
 
-		startItemDialog( itm.id  /*itemId*/ );
+				// update player inventory
+				if (player().inventory[itm.id]) {
+					player().inventory[itm.id] += 1;
+				}
+				else {
+					player().inventory[itm.id] = 1;
+				}
 
-		// console.log( player().inventory );
+				// show inventory change in UI
+				if (onInventoryChanged != null) {
+					onInventoryChanged(itm.id);
+				}
+			}
+		});
 	}
 
 	if (end) {
@@ -2043,12 +2047,15 @@ function startNarrating(dialogStr,end) {
 	startDialog(dialogStr);
 }
 
-function startItemDialog(itemId) {
+function startItemDialog(itemId, dialogCallback) {
 	var dialogId = item[itemId].dlg;
 	// console.log("START ITEM DIALOG " + dialogId);
-	if(dialog[dialogId]){
+	if (dialog[dialogId]) {
 		var dialogStr = dialog[dialogId];
-		startDialog(dialogStr,dialogId);
+		startDialog(dialogStr, dialogId, dialogCallback);
+	}
+	else {
+		dialogCallback({IsDefaultActionLocked:function() {return false;}});
 	}
 }
 
