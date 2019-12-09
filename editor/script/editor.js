@@ -2204,6 +2204,11 @@ function newExit() {
 	roomTool.drawEditMap();
 }
 
+function newOneWayExit() {
+	markerTool.AddExit(true);
+	roomTool.drawEditMap();
+}
+
 function newEnding() {
 	markerTool.AddEnding();
 	roomTool.drawEditMap();

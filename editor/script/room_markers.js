@@ -30,9 +30,13 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		RenderMarkerSelection();
 	}
 
-	this.AddExit = function() { // TODO : make destination select smarter
+	this.AddExit = function(isOneWay) { // TODO : make destination select smarter
 		if (selectedRoom == null) {
 			return;
+		}
+
+		if (isOneWay === undefined || isOneWay === null) {
+			isOneWay = false;
 		}
 
 		var roomIds = Object.keys(room);
@@ -58,17 +62,19 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 		room[selectedRoom].exits.push( newExit );
 
-		var newReturn = {
-			x : newExit.dest.x,
-			y : newExit.dest.y,
-			dest : {
-				room : selectedRoom,
-				x : newExit.x,
-				y : newExit.y
-			},
-			transition_effect : null,
+		if (!isOneWay) {
+			var newReturn = {
+				x : newExit.dest.x,
+				y : newExit.dest.y,
+				dest : {
+					room : selectedRoom,
+					x : newExit.x,
+					y : newExit.y
+				},
+				transition_effect : null,
+			}
+			room[newExit.dest.room].exits.push( newReturn );			
 		}
-		room[newExit.dest.room].exits.push( newReturn );
 
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Exit && m.exit == newExit; }));
