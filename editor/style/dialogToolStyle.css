@@ -164,6 +164,22 @@
 	display: block;
 }
 
+.actionBuilder_dialog .actionBuilderButton_back {
+	display: block;
+}
+
+.actionBuilder_flow .actionBuilderButton_back {
+	display: block;
+}
+
+.actionBuilder_exit .actionBuilderButton_back {
+	display: block;
+}
+
+.actionBuilder_item .actionBuilderButton_back {
+	display: block;
+}
+
 .orderControls {
 	display: none;
 	margin-bottom: 5px;

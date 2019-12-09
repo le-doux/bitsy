@@ -270,6 +270,17 @@ function DialogTool() {
 		}
 		div.appendChild(addButton);
 
+		var backButton = document.createElement("button");
+		backButton.classList.add("actionBuilderButton");
+		backButton.classList.add("actionBuilderButton_back");
+		backButton.innerHTML = '<i class="material-icons">arrow_back_ios</i>' + "back";
+		backButton.onclick = function() {
+			div.classList.add("actionBuilderRoot");
+			div.classList.remove(activeCategoryClass);
+			activeCategoryClass = null;
+		}
+		div.appendChild(backButton);
+
 		var activeCategoryClass = null;
 		function makeActionCategoryButton(categoryName, text) {
 			var actionCategoryButton = document.createElement("button");
