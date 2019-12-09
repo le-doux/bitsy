@@ -143,3 +143,11 @@ input[type=radio] + label.right {
 select {
 	font-size: 90%;
 }
+
+/*button.left {
+	margin-right: 0px;
+}
+
+button.right {
+	margin-left: 0px;
+}*/

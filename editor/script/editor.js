@@ -2199,14 +2199,23 @@ function toggleVersionNotes(e) {
 /* MARKERS (exits & endings) */
 var markerTool;
 
+var isOneWayExitMode = false;
+
 function newExit() {
-	markerTool.AddExit();
+	markerTool.AddExit(isOneWayExitMode);
 	roomTool.drawEditMap();
 }
 
-function newOneWayExit() {
-	markerTool.AddExit(true);
-	roomTool.drawEditMap();
+function changeExitMode() {
+	isOneWayExitMode = !isOneWayExitMode;
+
+	// TODO localize
+	if (isOneWayExitMode) {
+		document.getElementById("addExitText").innerText = "one-way exit"
+	}
+	else {
+		document.getElementById("addExitText").innerText = "exit"
+	}
 }
 
 function newEnding() {

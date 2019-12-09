@@ -444,11 +444,11 @@
 								</button>
 							</div>
 							<div id="markersAddCommands" class="buttonGroup">
-								<button title="add exit" class="color0" onclick="newExit();">
-									<i class="material-icons">add</i> <span class="localize exit_label">exit</span>
+								<button title="add exit" class="color0 left" onclick="newExit();" style="margin-right: -3px">
+									<i class="material-icons">add</i> <span id="addExitText" class="localize exit_label">exit</span>
 								</button>
-								<button title="add exit" class="color0" onclick="newOneWayExit();">
-									<i class="material-icons">add</i> <span>one-way exit</span> <!-- TODO localize -->
+								<button title="change exit mode" class="color0 right" onclick="changeExitMode();">
+									<i class="material-icons">more_horiz</i>
 								</button>
 								<button title="add ending" class="color0" onclick="newEnding();">
 									<i class="material-icons">add</i> <span class="localize ending_label">ending</span>
