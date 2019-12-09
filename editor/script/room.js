@@ -61,10 +61,8 @@ function RoomTool(canvas) {
 
 		if (self.areMarkersVisible) {
 			if (self.markers.IsPlacingMarker()) {
-				if (!self.markers.IsMarkerAtLocation(x,y)) {
-					self.markers.PlaceMarker(x,y);
-					self.drawEditMap();
-				}
+				self.markers.PlaceMarker(x,y);
+				self.drawEditMap();
 				isEditingMarker = true;
 			}
 			else if (self.markers.TrySelectMarkerAtLocation(x,y)) {
