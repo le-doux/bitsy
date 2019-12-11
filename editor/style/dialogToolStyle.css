@@ -29,6 +29,21 @@
 	white-space: normal;
 }
 
+.scriptEditorRoot {
+	width: 100%;
+	height: 100%;
+}
+
+.codeEditorTextArea {
+	background: black;
+	color: white;
+	border: none;
+	resize: both;
+	width: 100%;
+	height: 100%;
+	min-width: 410px;
+}
+
 /* more hacking to condense the paint panel -- I need a redesign */
 #paintPanel .dialogContentMiniViewport {
 	height: 100px;

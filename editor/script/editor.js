@@ -3100,6 +3100,21 @@ function blockScrollBackpage(e) {
 	// }
 }
 
+
+function toggleDialogCode(e) {
+	var showCode = e.target.checked;
+
+	// toggle button text
+	document.getElementById("dialogToggleCodeShowText").style.display = showCode ? "none" : "inline";
+	document.getElementById("dialogToggleCodeHideText").style.display = showCode ? "inline" : "none";
+
+	document.getElementById("dialogTools").style.display = showCode ? "none" : "block";
+
+	if (curDialogEditor != null) {
+		curDialogEditor.ShowPlainText(showCode);
+	}
+}
+
 function showDialogToolsSection() {
 	document.getElementById("dialogToolsOptionSection").checked = true;
 	document.getElementById("dialogToolsSection").style.display = "block";

@@ -17,7 +17,11 @@ function DialogTool() {
 
 	var dialogScriptEditorUniqueIdCounter = 0;
 
-	function DialogScriptEditor(dialogId) {
+	function DialogScriptEditor(dialogId, isPlaintext) {
+		if (isPlaintext === undefined || isPlaintext === null) {
+			isPlaintext = false;
+		}
+
 		var editorId = dialogScriptEditorUniqueIdCounter;
 		dialogScriptEditorUniqueIdCounter++;
 
@@ -25,6 +29,7 @@ function DialogTool() {
 
 		var div = document.createElement("div");
 		div.classList.add("selectedEditor"); // always selected so we can add actions to the root
+		div.classList.add("scriptEditorRoot");
 
 		var self = this;
 		function RefreshEditorUI() {
@@ -34,7 +39,21 @@ function DialogTool() {
 			scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
 			rootEditor = new BlockEditor(scriptRootNode, self);
 
-			div.appendChild(rootEditor.GetElement());
+			if (isPlaintext) {
+				var codeTextArea = document.createElement("textarea");
+				codeTextArea.classList.add("codeEditorTextArea");
+				codeTextArea.value = rootEditor.Serialize();
+				codeTextArea.onchange = function() {
+					var dialogStr = '"""\n' + codeTextArea.value + '\n"""';
+					scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
+					rootEditor = new BlockEditor(scriptRootNode, self);
+					OnUpdate();
+				}
+				div.appendChild(codeTextArea);
+			}
+			else {
+				div.appendChild(rootEditor.GetElement());
+			}
 		}
 
 		RefreshEditorUI();
@@ -48,7 +67,7 @@ function DialogTool() {
 		}
 
 		function OnUpdate() {
-			scriptInterpreter.DebugVisualizeScriptTree(scriptRootNode);
+			// scriptInterpreter.DebugVisualizeScriptTree(scriptRootNode);
 
 			var dialogStr = rootEditor.Serialize();
 
@@ -73,6 +92,11 @@ function DialogTool() {
 				RefreshEditorUI();
 			}
 		});
+
+		this.ShowPlainText = function(show) {
+			isPlaintext = show;
+			RefreshEditorUI();
+		}
 
 		/* root level creation functions for the dialog editor top-bar UI */
 		this.AddDialog = function() {
