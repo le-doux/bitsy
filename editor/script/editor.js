@@ -320,9 +320,9 @@ function tileTypeToIdPrefix(type) {
 var dialogTool = new DialogTool();
 var curDialogEditor = null;
 function openDialogTool(dialogId) {
-	curDialogEditor = dialogTool.CreateEditor(dialogId);
+	curDialogEditor = dialogTool.CreateEditor(dialogId, "dialogContentViewport");
 
-	var dialogEditorViewport = document.getElementById("dialogContentViewport");
+	var dialogEditorViewport = document.getElementById("dialogEditor");
 	dialogEditorViewport.innerHTML = "";
 	dialogEditorViewport.appendChild(curDialogEditor.GetElement());
 
@@ -3108,8 +3108,10 @@ function toggleDialogCode(e) {
 	document.getElementById("dialogToggleCodeShowText").style.display = showCode ? "none" : "inline";
 	document.getElementById("dialogToggleCodeHideText").style.display = showCode ? "inline" : "none";
 
+	// toggle dialog tools
 	document.getElementById("dialogTools").style.display = showCode ? "none" : "block";
 
+	// update editor
 	if (curDialogEditor != null) {
 		curDialogEditor.ShowPlainText(showCode);
 	}

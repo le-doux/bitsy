@@ -6,8 +6,8 @@ TODO
 */
 
 function DialogTool() {
-	this.CreateEditor = function(dialogId) {
-		return new DialogScriptEditor(dialogId);
+	this.CreateEditor = function(dialogId, viewportStyle) {
+		return new DialogScriptEditor(dialogId, false, viewportStyle);
 	}
 
 	// TODO later? edit multi-line titles
@@ -17,7 +17,7 @@ function DialogTool() {
 
 	var dialogScriptEditorUniqueIdCounter = 0;
 
-	function DialogScriptEditor(dialogId, isPlaintext) {
+	function DialogScriptEditor(dialogId, isPlaintext, viewportStyle) {
 		if (isPlaintext === undefined || isPlaintext === null) {
 			isPlaintext = false;
 		}
@@ -28,8 +28,6 @@ function DialogTool() {
 		var scriptRootNode, div, rootEditor;
 
 		var div = document.createElement("div");
-		div.classList.add("selectedEditor"); // always selected so we can add actions to the root
-		div.classList.add("scriptEditorRoot");
 
 		var self = this;
 		function RefreshEditorUI() {
@@ -52,7 +50,18 @@ function DialogTool() {
 				div.appendChild(codeTextArea);
 			}
 			else {
-				div.appendChild(rootEditor.GetElement());
+				var viewportDiv = document.createElement("div");
+
+				// always selected so we can add actions to the root
+				viewportDiv.classList.add("selectedEditor");
+
+				// allow custom viewport style
+				if (viewportStyle != undefined && viewportStyle != null) {
+					viewportDiv.classList.add(viewportStyle);
+				}
+
+				viewportDiv.appendChild(rootEditor.GetElement());
+				div.appendChild(viewportDiv);
 			}
 		}
 
