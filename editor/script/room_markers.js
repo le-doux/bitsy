@@ -272,7 +272,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 				var dialogContent = document.getElementById("endingDialogContent");
 				dialogContent.innerHTML = "";
-				var dialogEditor = dialogTool.CreateEditor(curMarker.ending.id);
+				var dialogEditor = dialogTool.CreatePlaintextEditor(curMarker.ending.id, "miniDialogPlaintextArea");
 				dialogContent.appendChild(dialogEditor.GetElement());
 			}
 		}
@@ -321,7 +321,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 			var dialogContent = document.getElementById("exitDialogContent");
 			dialogContent.innerHTML = "";
-			var dialogEditor = dialogTool.CreateEditor(exit.dlg);
+			var dialogEditor = dialogTool.CreatePlaintextEditor(exit.dlg, "miniDialogPlaintextArea");
 			dialogContent.appendChild(dialogEditor.GetElement());
 		}
 		else {

@@ -319,14 +319,18 @@ function tileTypeToIdPrefix(type) {
 */
 var dialogTool = new DialogTool();
 var curDialogEditor = null;
+var curPlaintextDialogEditor = null; // the duplication is a bit weird, but better than recreating editors all the time?
 function openDialogTool(dialogId) {
-	curDialogEditor = dialogTool.CreateEditor(dialogId, "dialogContentViewport");
+	curDialogEditor = dialogTool.CreateEditor(dialogId);
+	curPlaintextDialogEditor = dialogTool.CreatePlaintextEditor(dialogId, "largeDialogPlaintextArea");
 
 	var dialogEditorViewport = document.getElementById("dialogEditor");
 	dialogEditorViewport.innerHTML = "";
 	dialogEditorViewport.appendChild(curDialogEditor.GetElement());
 
-	showPanel('dialogPanel');
+	if (document.getElementById("dialogPanel").style.display === "none") {
+		showPanel("dialogPanel");
+	}
 }
 
 // TODO ... this should probably be temporary
@@ -354,7 +358,7 @@ function reloadDialogUI() {
 	var dialogId = getCurDialogId(); // hacky
 
 	if (dialogId in dialog) {
-		var dialogEditor = dialogTool.CreateEditor(dialogId);
+		var dialogEditor = dialogTool.CreatePlaintextEditor(dialogId, "miniDialogPlaintextArea");
 		dialogContent.appendChild(dialogEditor.GetElement());
 	}
 }
@@ -2403,6 +2407,7 @@ function afterTogglePanel(id,visible) {
 	}
 }
 
+// TODO : change into event!
 function afterShowPanel(id) {
 	if (id === "exitsPanel") {
 		showMarkers();
@@ -3112,8 +3117,13 @@ function toggleDialogCode(e) {
 	document.getElementById("dialogTools").style.display = showCode ? "none" : "block";
 
 	// update editor
-	if (curDialogEditor != null) {
-		curDialogEditor.ShowPlainText(showCode);
+	var dialogEditorViewport = document.getElementById("dialogEditor");
+	dialogEditorViewport.innerHTML = "";
+	if (showCode) {
+		dialogEditorViewport.appendChild(curPlaintextDialogEditor.GetElement());
+	}
+	else {
+		dialogEditorViewport.appendChild(curDialogEditor.GetElement());
 	}
 }
 

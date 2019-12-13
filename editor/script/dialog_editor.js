@@ -6,8 +6,12 @@ TODO
 */
 
 function DialogTool() {
-	this.CreateEditor = function(dialogId, viewportStyle) {
-		return new DialogScriptEditor(dialogId, false, viewportStyle);
+	this.CreateEditor = function(dialogId) {
+		return new DialogScriptEditor(dialogId);
+	}
+
+	this.CreatePlaintextEditor = function(dialogId, style) {
+		return new PlaintextDialogScriptEditor(dialogId, style);
 	}
 
 	// TODO later? edit multi-line titles
@@ -17,17 +21,72 @@ function DialogTool() {
 
 	var dialogScriptEditorUniqueIdCounter = 0;
 
-	function DialogScriptEditor(dialogId, isPlaintext, viewportStyle) {
-		if (isPlaintext === undefined || isPlaintext === null) {
-			isPlaintext = false;
+	function PlaintextDialogScriptEditor(dialogId, style) {
+		var editorId = dialogScriptEditorUniqueIdCounter;
+		dialogScriptEditorUniqueIdCounter++;
+
+		var scriptRootNode, div;
+		div = document.createElement("div");
+
+		var self = this;
+
+		function RefreshEditorUI() {
+			var dialogStr = dialog[dialogId];
+
+			div.innerHTML = "";
+			scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
+
+			var codeTextArea = document.createElement("textarea");
+			codeTextArea.rows = 2;
+			codeTextArea.cols = 32;
+			codeTextArea.classList.add(style);
+			codeTextArea.value = scriptRootNode.Serialize();
+			codeTextArea.onchange = function() {
+				var dialogStr = '"""\n' + codeTextArea.value + '\n"""'; // single lines?
+				scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
+				OnUpdate();
+			}
+			div.appendChild(codeTextArea);
 		}
 
+		RefreshEditorUI();
+
+		this.GetElement = function() {
+			return div;
+		}
+
+		this.GetNode = function() {
+			return scriptRootNode;
+		}
+
+		function OnUpdate() {
+			var dialogStr = scriptRootNode.Serialize();
+
+			if (dialogStr.indexOf("\n") > -1) {
+				// hacky - expose the triple-quotes symbol somewhere?
+				dialogStr = '"""\n' + dialogStr + '\n"""';
+			}
+
+			dialog[dialogId] = dialogStr;
+
+			refreshGameData();
+
+			events.Raise("dialog_update", { dialogId:dialogId, editorId:editorId });
+		}
+
+		events.Listen("dialog_update", function(event) {
+			if (event.dialogId === dialogId && event.editorId != editorId) {
+				RefreshEditorUI();
+			}
+		});
+	}
+
+	function DialogScriptEditor(dialogId) {
 		var editorId = dialogScriptEditorUniqueIdCounter;
 		dialogScriptEditorUniqueIdCounter++;
 
 		var scriptRootNode, div, rootEditor;
-
-		var div = document.createElement("div");
+		div = document.createElement("div");
 
 		var self = this;
 		function RefreshEditorUI() {
@@ -37,32 +96,13 @@ function DialogTool() {
 			scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
 			rootEditor = new BlockEditor(scriptRootNode, self);
 
-			if (isPlaintext) {
-				var codeTextArea = document.createElement("textarea");
-				codeTextArea.classList.add("codeEditorTextArea");
-				codeTextArea.value = rootEditor.Serialize();
-				codeTextArea.onchange = function() {
-					var dialogStr = '"""\n' + codeTextArea.value + '\n"""';
-					scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
-					rootEditor = new BlockEditor(scriptRootNode, self);
-					OnUpdate();
-				}
-				div.appendChild(codeTextArea);
-			}
-			else {
-				var viewportDiv = document.createElement("div");
+			var viewportDiv = document.createElement("div");
+			viewportDiv.classList.add("dialogContentViewport");
+			// always selected so we can add actions to the root
+			viewportDiv.classList.add("selectedEditor");
 
-				// always selected so we can add actions to the root
-				viewportDiv.classList.add("selectedEditor");
-
-				// allow custom viewport style
-				if (viewportStyle != undefined && viewportStyle != null) {
-					viewportDiv.classList.add(viewportStyle);
-				}
-
-				viewportDiv.appendChild(rootEditor.GetElement());
-				div.appendChild(viewportDiv);
-			}
+			viewportDiv.appendChild(rootEditor.GetElement());
+			div.appendChild(viewportDiv);
 		}
 
 		RefreshEditorUI();
@@ -101,11 +141,6 @@ function DialogTool() {
 				RefreshEditorUI();
 			}
 		});
-
-		this.ShowPlainText = function(show) {
-			isPlaintext = show;
-			RefreshEditorUI();
-		}
 
 		/* root level creation functions for the dialog editor top-bar UI */
 		this.AddDialog = function() {

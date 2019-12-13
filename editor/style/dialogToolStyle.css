@@ -29,14 +29,20 @@
 	white-space: normal;
 }
 
-/* todo : allow something different for mini viewports */
-.codeEditorTextArea {
+.largeDialogPlaintextArea {
 	background: black;
 	color: white;
 	border: none;
 	resize: both;
 	min-width: 410px;
 	min-height: 450px; /* todo : taller? */
+}
+
+.miniDialogPlaintextArea {
+	background: black;
+	color: white;
+	border: none;
+	resize: vertical;
 }
 
 /* more hacking to condense the paint panel -- I need a redesign */
