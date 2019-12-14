@@ -12,23 +12,6 @@
 	white-space: normal;
 }
 
-.dialogContentMiniViewportHolder {
-	background: #e8e8ff;
-	padding: 5px;
-	margin-bottom: 5px;
-	border-radius: 2px;
-	/*width: 246px;*/
-}
-
-.dialogContentMiniViewport {
-	height: 140px;
-	overflow: scroll;
-	border-top: solid 1px #ccccff;
-	/*min-width: 275px;*/
-	/*width: 300px;*/
-	white-space: normal;
-}
-
 .largeDialogPlaintextArea {
 	background: black;
 	color: white;
@@ -43,16 +26,6 @@
 	color: white;
 	border: none;
 	resize: vertical;
-}
-
-/* more hacking to condense the paint panel -- I need a redesign */
-#paintPanel .dialogContentMiniViewport {
-	height: 100px;
-}
-
-/* more hacking to condense the paint panel */
-#dialog .controlBox {
-	padding: 0px;
 }
 
 .blockEditor {
@@ -264,34 +237,6 @@
 
 .conditionalComparisonEditor input[type="number"] {
 	width: 50px;
-}
-
-/* special stuff for exit controls */
-#exitDialogControls .dialogContentMiniViewportHolder {
-	background: #ccccff;
-}
-
-#exitDialogControls .dialogContentMiniViewport {
-	border-top: solid 1px #6767b2;
-	background: #ccccff;
-}
-
-#exitDialogControls .dialogContentMiniViewportHolder .controlBox button {
-	border: solid 1px #6767b2;
-	/*background: #e8e8ff;*/
-}
-
-/* hackily specific :( */
-#exitDialogControls .dialogContentMiniViewport > .selectedEditor > .blockEditor {
-	background: #ccccff;
-}
-
-#exitDialogControls .dialogContentMiniViewport > .selectedEditor > .blockEditor > .actionBuilder button {
-	border: solid 1px #6767b2;
-}
-
-#exitDialogControls .dialogContentMiniViewportHolder .actionBuilderCancel {
-	background: #6767b2;
 }
 
 .helpText {

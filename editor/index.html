@@ -456,8 +456,8 @@
 							</div>
 						</div>
 						<div id="markerOptions">
-							<div id="endingOptions" class="dialogContentMiniViewportHolder">
-								<div class="controlBox" style="display: flex;">
+							<div id="endingOptions" class="controlBox">
+								<div style="display: flex;">
 									<span style="flex-grow: 1">
 										<i class="material-icons">chat</i>
 										<span class="localize ending_dialog">ending dialog</span>
@@ -466,7 +466,7 @@
 										<i class="material-icons">open_in_new</i>
 									</button>
 								</div>
-								<div id="endingDialogContent" class="dialogContentMiniViewport">
+								<div id="endingDialogContent">
 								</div>
 							</div>
 							<div id="exitOptions" class="controlBox">
@@ -519,8 +519,8 @@
 												</button>
 											</div>
 
-											<div id="exitDialogEditor" class="dialogContentMiniViewportHolder">
-												<div class="controlBox" style="display: flex;">
+											<div id="exitDialogEditor" class="controlBox">
+												<div style="display: flex;">
 													<span style="flex-grow:1;">
 														<i class="material-icons">chat</i>
 														<span>exit dialog</span>
@@ -529,7 +529,7 @@
 														<i class="material-icons">open_in_new</i>
 													</button>
 												</div>
-												<div id="exitDialogContent" class="dialogContentMiniViewport">
+												<div id="exitDialogContent">
 												</div>
 											</div>
 										</div>
@@ -583,10 +583,6 @@
 					<br>
 					<div id="paintEditMain">
 						<div id="paintNav" class="buttonGroup">
-							<span id="drawingNameUI" title="a name to refer to this drawing" class="controlSpan">
-								<!-- <span class="localize name_label">name</span> -->
-								<input type="text" id="drawingName" class="nameTextbox" onchange="on_drawing_name_change();" size="8"></input>
-							</span>
 							<button title="previous drawing" class="color0" onclick="prev();">
 								<i class="navigate_before material-icons"><span>navigate_before</span></i>
 							</button>
@@ -595,10 +591,6 @@
 							</button>
 							<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('paintExplorerPanel');">
 								<i class="material-icons">search</i>
-							</button>
-							<button id="showInventoryButton" title="show inventory" onclick="showPanel('inventoryPanel');">
-								<i class="material-icons">vpn_key</i> 
-								<!-- <span class="localize inventory_tool_name">inventory</span> -->
 							</button>
 						</div>
 						<div id="paintCommands" class="buttonGroup">
@@ -615,11 +607,19 @@
 						<div class="buttonGroup">
 							<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" checked/>
 							<label title="show / hide grid" for="paintGridCheck">
-								<i class="material-icons" id="paintGridIcon">grid_on</i> 
+								<i class="material-icons" id="paintGridIcon">visibility</i> 
+								<span class="localize grid_toggle_visible">grid</span>
 							</label>
 						</div>
 						<div style="margin-bottom: 5px;">
-							
+							<span id="drawingNameUI" title="a name to refer to this drawing" class="controlSpan">
+								<span class="localize name_label">name</span>
+								<input type="text" id="drawingName" class="nameTextbox" onchange="on_drawing_name_change();" size="10"></input>
+							</span>
+							<button id="showInventoryButton" title="show inventory" onclick="showPanel('inventoryPanel');">
+								<i class="material-icons">vpn_key</i> 
+								<span class="localize inventory_tool_name">inventory</span>
+							</button>
 						</div>
 					</div>
 
@@ -630,8 +630,8 @@
 							<span class="localize wall_toggle">wall</span>
 						</label>
 					</div>
-					<div id="dialog" class="dialogContentMiniViewportHolder" style="display:none;">
-						<div class="controlBox" style="display: flex;">
+					<div id="dialog" class="controlBox" style="display:none;">
+						<div style="display: flex;">
 							<span style="flex-grow: 1">
 								<i class="material-icons">chat</i>
 								<span class="localize dialog_tool_name">dialog</span>
@@ -640,7 +640,7 @@
 								<i class="material-icons">open_in_new</i>
 							</button>
 						</div>
-						<div id="paintDialogContent" class="dialogContentMiniViewport">
+						<div id="paintDialogContent">
 						</div>
 					</div>
 

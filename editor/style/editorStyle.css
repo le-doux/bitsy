@@ -375,8 +375,7 @@ input {
 }
 
 #paint {
-	/*width: 315px;*/
-	width: 300px;
+	width: 256px;
 }
 
 /* kind of hacky way to condense ui in the paint tool */
