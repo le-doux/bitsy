@@ -93,10 +93,10 @@
 	margin-right: 5px;
 }
 
-#exitDialogEditor {
+#exitDialogWidget {
 	display: none;
 }
 
-.exitHasDialog #exitDialogEditor {
+.exitHasDialog #exitDialogWidget {
 	display: block;
 }

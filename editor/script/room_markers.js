@@ -270,10 +270,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			else if (curMarker.type == MarkerType.Ending) {
 				endingOptions.style.display = "block";
 
-				var dialogContent = document.getElementById("endingDialogContent");
-				dialogContent.innerHTML = "";
-				var dialogEditor = dialogTool.CreatePlaintextEditor(curMarker.ending.id, "miniDialogPlaintextArea");
-				dialogContent.appendChild(dialogEditor.GetElement());
+				var endingDialogWidgetContainer = document.getElementById("endingDialogWidget");
+				endingDialogWidgetContainer.innerHTML = "";
+				var dialogWidget = dialogTool.CreateWidget(curMarker.ending.id, "ending dialog"); // TODO : localize
+				endingDialogWidgetContainer.appendChild(dialogWidget.GetElement());
 			}
 		}
 	}
@@ -319,10 +319,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				exitDialogControls.classList.add("exitHasDialog");
 			}
 
-			var dialogContent = document.getElementById("exitDialogContent");
-			dialogContent.innerHTML = "";
-			var dialogEditor = dialogTool.CreatePlaintextEditor(exit.dlg, "miniDialogPlaintextArea");
-			dialogContent.appendChild(dialogEditor.GetElement());
+			var widgetContainer = document.getElementById("exitDialogWidget");
+			widgetContainer.innerHTML = "";
+			var dialogWidget = dialogTool.CreateWidget(exit.dlg, "exit dialog"); // TODO : localize?
+			widgetContainer.appendChild(dialogWidget.GetElement());
 		}
 		else {
 			if (exitDialogControls.classList.contains("exitHasDialog")) {
@@ -692,20 +692,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			else if (curMarker.linkState == LinkState.OneWaySwapped) {
 				document.getElementById("exitDirectionBackIcon").style.visibility = "visible";
 				document.getElementById("exitDirectionForwardIcon").style.visibility = "hidden";
-			}
-		}
-	}
-
-	this.OpenMarkerDialogInDialogTool = function() {
-		if (curMarker != null) {
-			if (curMarker.type == MarkerType.Ending) {
-				openDialogTool(curMarker.ending.id);
-			}
-			else if (curMarker.type == MarkerType.Exit) {
-				var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
-				if (exit.dlg != undefined && exit.dlg != null) {
-					openDialogTool(exit.dlg);
-				}
 			}
 		}
 	}

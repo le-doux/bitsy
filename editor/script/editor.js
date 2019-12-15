@@ -333,15 +333,6 @@ function openDialogTool(dialogId) {
 	}
 }
 
-// TODO ... this should probably be temporary
-function openCurDialogInDialogTool() {
-	openDialogTool(getCurDialogId());
-}
-
-function openMarkerDialogInDialogTool() {
-	markerTool.OpenMarkerDialogInDialogTool();
-}
-
 function addNewExitDialog() {
 	markerTool.AddExitDialog();
 }
@@ -352,14 +343,14 @@ function addNewExitDialogLock() {
 
 
 function reloadDialogUI() {
-	var dialogContent = document.getElementById("paintDialogContent");
+	var dialogContent = document.getElementById("dialog");
 	dialogContent.innerHTML = "";
 
 	var dialogId = getCurDialogId(); // hacky
 
 	if (dialogId in dialog) {
-		var dialogEditor = dialogTool.CreatePlaintextEditor(dialogId, "miniDialogPlaintextArea");
-		dialogContent.appendChild(dialogEditor.GetElement());
+		var dialogWidget = dialogTool.CreateWidget(dialogId, "dialog");
+		dialogContent.appendChild(dialogWidget.GetElement());
 	}
 }
 

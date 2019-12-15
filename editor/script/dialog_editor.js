@@ -5,6 +5,7 @@ TODO
 	- remove the weird hacky formatting exceptions for margins, etc
 */
 
+// TODO : name?
 function DialogTool() {
 	this.CreateEditor = function(dialogId) {
 		return new DialogScriptEditor(dialogId);
@@ -14,10 +15,45 @@ function DialogTool() {
 		return new PlaintextDialogScriptEditor(dialogId, style);
 	}
 
+	// todo : name?
+	this.CreateWidget = function(dialogId, label) {
+		return new DialogWidget(dialogId, label);
+	}
+
 	// TODO later? edit multi-line titles
 	// this.CreateTitleEditor = function() {
 	// 	// TODO	
 	// }
+
+	// TODO : label should be label localization id
+	function DialogWidget(dialogId, label) {
+		var div = document.createElement("div");
+		div.classList.add("controlBox");
+
+		var controlDiv = document.createElement("div");
+		controlDiv.style.display = "flex"; // todo : style
+		div.appendChild(controlDiv);
+
+		var labelSpan = document.createElement("span");
+		labelSpan.style.flexGrow = 1;
+		labelSpan.innerHTML = '<i class="material-icons">chat</i> ' + label;
+		controlDiv.appendChild(labelSpan);
+
+		var openButton = document.createElement("button");
+		openButton.title = "open in dialog editor"; // todo : localize
+		openButton.innerHTML = '<i class="material-icons">open_in_new</i>';
+		openButton.onclick = function() {
+			openDialogTool(dialogId);
+		};
+		controlDiv.appendChild(openButton);
+
+		var scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
+		div.appendChild(scriptEditor.GetElement());
+
+		this.GetElement = function() {
+			return div;
+		}
+	}
 
 	var dialogScriptEditorUniqueIdCounter = 0;
 

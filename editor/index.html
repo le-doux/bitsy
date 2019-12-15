@@ -456,17 +456,8 @@
 							</div>
 						</div>
 						<div id="markerOptions">
-							<div id="endingOptions" class="controlBox">
-								<div style="display: flex;">
-									<span style="flex-grow: 1">
-										<i class="material-icons">chat</i>
-										<span class="localize ending_dialog">ending dialog</span>
-									</span>
-									<button title="open in dialog editor" style="" onclick="openMarkerDialogInDialogTool();">
-										<i class="material-icons">open_in_new</i>
-									</button>
-								</div>
-								<div id="endingDialogContent">
+							<div id="endingOptions">
+								<div id="endingDialogWidget">
 								</div>
 							</div>
 							<div id="exitOptions" class="controlBox">
@@ -519,18 +510,7 @@
 												</button>
 											</div>
 
-											<div id="exitDialogEditor" class="controlBox">
-												<div style="display: flex;">
-													<span style="flex-grow:1;">
-														<i class="material-icons">chat</i>
-														<span>exit dialog</span>
-													</span>
-													<button title="open in dialog editor" style="" onclick="openMarkerDialogInDialogTool();">
-														<i class="material-icons">open_in_new</i>
-													</button>
-												</div>
-												<div id="exitDialogContent">
-												</div>
+											<div id="exitDialogWidget">
 											</div>
 										</div>
 									</div>
@@ -630,18 +610,7 @@
 							<span class="localize wall_toggle">wall</span>
 						</label>
 					</div>
-					<div id="dialog" class="controlBox" style="display:none;">
-						<div style="display: flex;">
-							<span style="flex-grow: 1">
-								<i class="material-icons">chat</i>
-								<span class="localize dialog_tool_name">dialog</span>
-							</span>
-							<button title="open in dialog editor" style="" onclick="openCurDialogInDialogTool();">
-								<i class="material-icons">open_in_new</i>
-							</button>
-						</div>
-						<div id="paintDialogContent">
-						</div>
+					<div id="dialog" style="display:none;">
 					</div>
 
 					<div id="animationOuter" class="controlBox">
