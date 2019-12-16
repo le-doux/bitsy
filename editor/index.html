@@ -803,6 +803,16 @@
 					</div>
 
 					<div id="dialogEditorHasContent">
+						<!-- TODO : what is a good layout for these controls? -->
+						<div id="dialogNav">
+							<button title="previous dialog" class="color0" onclick="prevDialog();">
+								<i class="navigate_before material-icons"><span>navigate_before</span></i>
+							</button>
+							<button title="next dialog" class="color0" onclick="nextDialog();">
+								<i class="navigate_next material-icons"><span>navigate_next</span></i>
+							</button>
+						</div>
+
 						<div id="dialogTop">
 							<span style="float:left">
 								<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />

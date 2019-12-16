@@ -333,6 +333,14 @@ function openDialogTool(dialogId) {
 	}
 }
 
+function nextDialog() {
+	// TODO
+}
+
+function prevDialog() {
+	// TODO
+}
+
 function addNewExitDialog() {
 	markerTool.AddExitDialog();
 }
