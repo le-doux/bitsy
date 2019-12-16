@@ -318,9 +318,11 @@ function tileTypeToIdPrefix(type) {
 - some of this should be folded into paint tool later
 */
 var dialogTool = new DialogTool();
+var curDialogEditorId = null; // can I wrap this all up somewhere? -- feels a bit hacky to have all these globals
 var curDialogEditor = null;
 var curPlaintextDialogEditor = null; // the duplication is a bit weird, but better than recreating editors all the time?
 function openDialogTool(dialogId) {
+	curDialogEditorId = dialogId;
 	curDialogEditor = dialogTool.CreateEditor(dialogId);
 	curPlaintextDialogEditor = dialogTool.CreatePlaintextEditor(dialogId, "largeDialogPlaintextArea");
 
@@ -334,11 +336,59 @@ function openDialogTool(dialogId) {
 }
 
 function nextDialog() {
-	// TODO
+	var dialogIdList = sortedDialogIdList();
+	var dialogIndex = 0;
+	if (curDialogEditorId != null) {
+		dialogIndex = dialogIdList.indexOf(curDialogEditorId) + 1;
+		if (dialogIndex > dialogIdList.length) {
+			dialogIndex = 0;
+		}
+	}
+	openDialogTool(dialogIdList[dialogIndex]);
 }
 
 function prevDialog() {
-	// TODO
+	var dialogIdList = sortedDialogIdList();
+	var dialogIndex = 0;
+	if (curDialogEditorId != null) {
+		dialogIndex = dialogIdList.indexOf(curDialogEditorId) - 1;
+		if (dialogIndex < 0) {
+			dialogIndex = dialogIdList.length - 1;
+		}
+	}
+	openDialogTool(dialogIdList[dialogIndex]);
+}
+
+function addNewDialog() {
+	var id = nextAvailableDialogId();
+
+	dialog[id] = " ";
+	refreshGameData();
+
+	openDialogTool(id);
+}
+
+function duplicateDialog() {
+	if (curDialogEditorId != null) {
+		var id = nextAvailableDialogId();
+		dialog[id] = dialog[curDialogEditorId].slice();
+		refreshGameData();
+
+		openDialogTool(id);
+	}
+}
+
+function deleteDialog() {
+	if (curDialogEditorId != null) {
+		var tempDialogId = curDialogEditorId;
+
+		nextDialog();
+
+		delete dialog[tempDialogId];
+		refreshGameData();
+
+		// TODO -- remove all references to deleted dialog
+	}
 }
 
 function addNewExitDialog() {
