@@ -27,6 +27,8 @@ function DialogTool() {
 
 	// TODO : label should be label localization id
 	function DialogWidget(dialogId, label) {
+		var showSettings = false;
+
 		var div = document.createElement("div");
 		div.classList.add("controlBox");
 
@@ -39,6 +41,10 @@ function DialogTool() {
 		labelSpan.innerHTML = '<i class="material-icons">chat</i> ' + label;
 		controlDiv.appendChild(labelSpan);
 
+		var settingsButton = document.createElement("button");
+		settingsButton.innerHTML = '<i class="material-icons">settings</i>';
+		controlDiv.appendChild(settingsButton);
+
 		var openButton = document.createElement("button");
 		openButton.title = "open in dialog editor"; // todo : localize
 		openButton.innerHTML = '<i class="material-icons">open_in_new</i>';
@@ -47,8 +53,37 @@ function DialogTool() {
 		};
 		controlDiv.appendChild(openButton);
 
+		var editorDiv = document.createElement("div");
 		var scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
-		div.appendChild(scriptEditor.GetElement());
+		editorDiv.appendChild(scriptEditor.GetElement());
+		editorDiv.style.display = "block";
+		div.appendChild(editorDiv);
+
+		var dialogIdSelect = document.createElement("select");
+		var dialogIdList = sortedDialogIdList();
+		for (var i = 0; i < dialogIdList.length; i++) {
+			var dialogIdOption = document.createElement("option");
+			dialogIdOption.innerText = "dialog " + dialogIdList[i];
+			dialogIdOption.value = dialogIdList[i];
+			dialogIdOption.selected = dialogId === dialogIdList[i];
+			dialogIdSelect.appendChild(dialogIdOption);
+		}
+		dialogIdSelect.style.display = "none";
+		dialogIdSelect.onchange = function(e) {
+			console.log(e);
+			dialogId = e.target.value;
+			editorDiv.innerHTML = "";
+			scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
+			editorDiv.appendChild(scriptEditor.GetElement());
+		}
+		div.appendChild(dialogIdSelect);
+
+		settingsButton.onclick = function() {
+			showSettings = !showSettings;
+			settingsButton.innerHTML = '<i class="material-icons">' + (showSettings ? "edit" : "settings") + '</i>';
+			editorDiv.style.display = showSettings ? "none" : "block";
+			dialogIdSelect.style.display = showSettings ? "block" : "none";
+		}
 
 		this.GetElement = function() {
 			return div;

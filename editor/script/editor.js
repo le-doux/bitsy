@@ -330,6 +330,8 @@ function openDialogTool(dialogId) {
 	dialogEditorViewport.innerHTML = "";
 	dialogEditorViewport.appendChild(curDialogEditor.GetElement());
 
+	document.getElementById("dialogId").innerText = "dialog " + dialogId;
+
 	if (document.getElementById("dialogPanel").style.display === "none") {
 		showPanel("dialogPanel");
 	}
@@ -340,7 +342,7 @@ function nextDialog() {
 	var dialogIndex = 0;
 	if (curDialogEditorId != null) {
 		dialogIndex = dialogIdList.indexOf(curDialogEditorId) + 1;
-		if (dialogIndex > dialogIdList.length) {
+		if (dialogIndex >= dialogIdList.length) {
 			dialogIndex = 0;
 		}
 	}
