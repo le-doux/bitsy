@@ -402,16 +402,21 @@ function addNewExitDialogLock() {
 }
 
 
+// TODO : move into the paint tool
 function reloadDialogUI() {
 	var dialogContent = document.getElementById("dialog");
 	dialogContent.innerHTML = "";
 
-	var dialogId = getCurDialogId(); // hacky
+	var obj = paintTool.drawing.getEngineObject();
 
-	if (dialogId in dialog) {
-		var dialogWidget = dialogTool.CreateWidget(dialogId, "dialog");
-		dialogContent.appendChild(dialogWidget.GetElement());
-	}
+	var dialogWidget = dialogTool.CreateWidget(
+		"dialog",
+		obj.dlg,
+		true,
+		function(id) {
+			obj.dlg = id;
+		});
+	dialogContent.appendChild(dialogWidget.GetElement());
 }
 
 // hacky - assumes global paintTool object

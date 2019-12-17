@@ -272,7 +272,14 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 				var endingDialogWidgetContainer = document.getElementById("endingDialogWidget");
 				endingDialogWidgetContainer.innerHTML = "";
-				var dialogWidget = dialogTool.CreateWidget(curMarker.ending.id, "ending dialog"); // TODO : localize
+				// TODO : localize
+				var dialogWidget = dialogTool.CreateWidget(
+					"ending dialog",
+					curMarker.ending.id,
+					false,
+					function (id) {
+						curMarker.ending.id = id;
+					});
 				endingDialogWidgetContainer.appendChild(dialogWidget.GetElement());
 			}
 		}
@@ -321,7 +328,14 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 			var widgetContainer = document.getElementById("exitDialogWidget");
 			widgetContainer.innerHTML = "";
-			var dialogWidget = dialogTool.CreateWidget(exit.dlg, "exit dialog"); // TODO : localize?
+			// TODO : localize
+			var dialogWidget = dialogTool.CreateWidget(
+				"exit dialog",
+				exit.dlg,
+				true,
+				function (id) {
+					exit.dlg = id;
+				});
 			widgetContainer.appendChild(dialogWidget.GetElement());
 		}
 		else {

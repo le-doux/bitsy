@@ -16,8 +16,8 @@ function DialogTool() {
 	}
 
 	// todo : name?
-	this.CreateWidget = function(dialogId, label) {
-		return new DialogWidget(dialogId, label);
+	this.CreateWidget = function(label, dialogId, allowNone, onChange) {
+		return new DialogWidget(label, dialogId, allowNone, onChange);
 	}
 
 	// TODO later? edit multi-line titles
@@ -26,7 +26,7 @@ function DialogTool() {
 	// }
 
 	// TODO : label should be label localization id
-	function DialogWidget(dialogId, label) {
+	function DialogWidget(label, dialogId, allowNone, onChange, creationOptions) {
 		var showSettings = false;
 
 		var div = document.createElement("div");
@@ -54,13 +54,23 @@ function DialogTool() {
 		controlDiv.appendChild(openButton);
 
 		var editorDiv = document.createElement("div");
-		var scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
-		editorDiv.appendChild(scriptEditor.GetElement());
+		var scriptEditor;
+		if (dialogId != null || (creationOptions && creationOptions.CreateFromEmptyTextBox)) {
+			scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
+			editorDiv.appendChild(scriptEditor.GetElement());			
+		}
 		editorDiv.style.display = "block";
 		div.appendChild(editorDiv);
 
 		var dialogIdSelect = document.createElement("select");
 		var dialogIdList = sortedDialogIdList();
+		if (allowNone) {
+			var dialogNoneOption = document.createElement("option");
+			dialogNoneOption.innerText = "none";
+			dialogNoneOption.value = "none";
+			dialogNoneOption.selected = dialogId === null;
+			dialogIdSelect.appendChild(dialogNoneOption);
+		}
 		for (var i = 0; i < dialogIdList.length; i++) {
 			var dialogIdOption = document.createElement("option");
 			dialogIdOption.innerText = "dialog " + dialogIdList[i];
@@ -70,11 +80,20 @@ function DialogTool() {
 		}
 		dialogIdSelect.style.display = "none";
 		dialogIdSelect.onchange = function(e) {
-			console.log(e);
-			dialogId = e.target.value;
+			dialogId = e.target.value === "none" ? null : e.target.value;
+
 			editorDiv.innerHTML = "";
-			scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
-			editorDiv.appendChild(scriptEditor.GetElement());
+
+			if (dialogId != null || (creationOptions && creationOptions.CreateFromEmptyTextBox)) {
+				scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
+				editorDiv.appendChild(scriptEditor.GetElement());			
+			}
+
+			if (onChange != null) {
+				onChange(dialogId);
+			}
+
+			refreshGameData();
 		}
 		div.appendChild(dialogIdSelect);
 
@@ -102,7 +121,7 @@ function DialogTool() {
 		var self = this;
 
 		function RefreshEditorUI() {
-			var dialogStr = dialog[dialogId];
+			var dialogStr = dialogId === null ? "" : dialog[dialogId];
 
 			div.innerHTML = "";
 			scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
@@ -133,6 +152,14 @@ function DialogTool() {
 		function OnUpdate() {
 			var dialogStr = scriptRootNode.Serialize();
 
+			if (dialogStr.length > 0 && dialogId === null) {
+				dialogId = nextAvailableDialogId();
+			}
+
+			if (dialogId === null) {
+				return;
+			}
+
 			if (dialogStr.indexOf("\n") > -1) {
 				// hacky - expose the triple-quotes symbol somewhere?
 				dialogStr = '"""\n' + dialogStr + '\n"""';
@@ -146,7 +173,7 @@ function DialogTool() {
 		}
 
 		events.Listen("dialog_update", function(event) {
-			if (event.dialogId === dialogId && event.editorId != editorId) {
+			if (dialogId != null && event.dialogId === dialogId && event.editorId != editorId) {
 				RefreshEditorUI();
 			}
 		});

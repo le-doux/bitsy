@@ -1387,6 +1387,9 @@ var Parser = function(env) {
 		rootNode.rootId = rootId;
 		var state = new ParserState(rootNode, scriptStr);
 
+		console.log(scriptStr);
+		console.log(state.Source());
+
 		if (state.MatchAhead(Sym.DialogOpen)) {
 			// multi-line dialog block
 			var dialogStr = state.ConsumeBlock(Sym.DialogOpen + Sym.Linebreak, Sym.Linebreak + Sym.DialogClose);
