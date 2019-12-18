@@ -16,8 +16,8 @@ function DialogTool() {
 	}
 
 	// todo : name?
-	this.CreateWidget = function(label, dialogId, allowNone, onChange) {
-		return new DialogWidget(label, dialogId, allowNone, onChange);
+	this.CreateWidget = function(label, dialogId, allowNone, onChange, creationOptions) {
+		return new DialogWidget(label, dialogId, allowNone, onChange, creationOptions);
 	}
 
 	// TODO later? edit multi-line titles
@@ -55,53 +55,87 @@ function DialogTool() {
 
 		var editorDiv = document.createElement("div");
 		var scriptEditor;
-		if (dialogId != null || (creationOptions && creationOptions.CreateFromEmptyTextBox)) {
-			scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
-			editorDiv.appendChild(scriptEditor.GetElement());			
-		}
-		editorDiv.style.display = "block";
-		div.appendChild(editorDiv);
-
-		var dialogIdSelect = document.createElement("select");
-		var dialogIdList = sortedDialogIdList();
-		if (allowNone) {
-			var dialogNoneOption = document.createElement("option");
-			dialogNoneOption.innerText = "none";
-			dialogNoneOption.value = "none";
-			dialogNoneOption.selected = dialogId === null;
-			dialogIdSelect.appendChild(dialogNoneOption);
-		}
-		for (var i = 0; i < dialogIdList.length; i++) {
-			var dialogIdOption = document.createElement("option");
-			dialogIdOption.innerText = "dialog " + dialogIdList[i];
-			dialogIdOption.value = dialogIdList[i];
-			dialogIdOption.selected = dialogId === dialogIdList[i];
-			dialogIdSelect.appendChild(dialogIdOption);
-		}
-		dialogIdSelect.style.display = "none";
-		dialogIdSelect.onchange = function(e) {
-			dialogId = e.target.value === "none" ? null : e.target.value;
-
+		function UpdateEditorContent() {
 			editorDiv.innerHTML = "";
 
 			if (dialogId != null || (creationOptions && creationOptions.CreateFromEmptyTextBox)) {
 				scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
 				editorDiv.appendChild(scriptEditor.GetElement());			
 			}
+			else if (creationOptions.Presets) {
+				console.log(creationOptions.Presets);
+				for (var i = 0; i < creationOptions.Presets.length; i++) {
+					var preset = creationOptions.Presets[i];
+					var scriptStr = preset.Script;
+					var presetButton = document.createElement("button");
+					presetButton.style.flexGrow = 1; // TODO : style?
+					presetButton.innerHTML = '<i class="material-icons">add</i>' + preset.Name;
+					presetButton.onclick = function() {
+						dialogId = nextAvailableDialogId();
+						dialog[dialogId] = scriptStr;
+						events.Raise("new_dialog", {id:dialogId});
+						// TODO replace OnCreateNewDialog with OnCHange!!!!
+						if (creationOptions.OnCreateNewDialog) {
+							creationOptions.OnCreateNewDialog(dialogId);
+						}
+						UpdateEditorContent();
+					};
+					editorDiv.appendChild(presetButton);
+				}
+			}
+		}
+		UpdateEditorContent();
+		editorDiv.style.display = "flex";
+		div.appendChild(editorDiv);
 
+		var dialogIdSelect = document.createElement("select");
+		dialogIdSelect.style.display = "none";
+		dialogIdSelect.onchange = function(e) {
+			dialogId = e.target.value === "none" ? null : e.target.value;		
+			UpdateEditorContent();
 			if (onChange != null) {
 				onChange(dialogId);
 			}
-
 			refreshGameData();
 		}
 		div.appendChild(dialogIdSelect);
 
+		function UpdateDialogIdSelectOptions() {
+			dialogIdSelect.innerHTML = "";	
+			var dialogIdList = sortedDialogIdList();
+			if (allowNone) {
+				var dialogNoneOption = document.createElement("option");
+				dialogNoneOption.innerText = "none";
+				dialogNoneOption.value = "none";
+				dialogNoneOption.selected = dialogId === null;
+				dialogIdSelect.appendChild(dialogNoneOption);
+			}
+			for (var i = 0; i < dialogIdList.length; i++) {
+				var dialogIdOption = document.createElement("option");
+				dialogIdOption.innerText = "dialog " + dialogIdList[i];
+				dialogIdOption.value = dialogIdList[i];
+				dialogIdOption.selected = dialogId === dialogIdList[i];
+				dialogIdSelect.appendChild(dialogIdOption);
+			}
+		}
+		UpdateDialogIdSelectOptions();
+		events.Listen("new_dialog", function() { UpdateDialogIdSelectOptions(); });
+		events.Listen("dialog_update", function(event) {
+			if (scriptEditor != null && event.editorId == scriptEditor.GetEditorId()) {
+				if (dialogId != event.dialogId) {
+					dialogId = event.dialogId;
+					if (creationOptions.OnCreateNewDialog) {
+						creationOptions.OnCreateNewDialog(dialogId);
+					}
+				}
+			}
+		})
+
 		settingsButton.onclick = function() {
 			showSettings = !showSettings;
-			settingsButton.innerHTML = '<i class="material-icons">' + (showSettings ? "edit" : "settings") + '</i>';
-			editorDiv.style.display = showSettings ? "none" : "block";
-			dialogIdSelect.style.display = showSettings ? "block" : "none";
+			settingsButton.innerHTML = '<i class="material-icons">' + (showSettings ? "text_fields" : "settings") + '</i>';
+			editorDiv.style.display = showSettings ? "none" : "flex";
+			dialogIdSelect.style.display = showSettings ? "flex" : "none";
 		}
 
 		this.GetElement = function() {
@@ -152,8 +186,10 @@ function DialogTool() {
 		function OnUpdate() {
 			var dialogStr = scriptRootNode.Serialize();
 
+			var didMakeNewDialog = false;
 			if (dialogStr.length > 0 && dialogId === null) {
 				dialogId = nextAvailableDialogId();
+				didMakeNewDialog = true;
 			}
 
 			if (dialogId === null) {
@@ -170,6 +206,9 @@ function DialogTool() {
 			refreshGameData();
 
 			events.Raise("dialog_update", { dialogId:dialogId, editorId:editorId });
+			if (didMakeNewDialog) {
+				events.Raise("new_dialog", {id:dialogId});
+			}
 		}
 
 		events.Listen("dialog_update", function(event) {
@@ -177,6 +216,10 @@ function DialogTool() {
 				RefreshEditorUI();
 			}
 		});
+
+		this.GetEditorId = function() {
+			return editorId;
+		}
 	}
 
 	function DialogScriptEditor(dialogId) {

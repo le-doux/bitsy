@@ -368,6 +368,8 @@ function addNewDialog() {
 	refreshGameData();
 
 	openDialogTool(id);
+
+	events.Raise("new_dialog", { id:id });
 }
 
 function duplicateDialog() {
@@ -415,6 +417,13 @@ function reloadDialogUI() {
 		true,
 		function(id) {
 			obj.dlg = id;
+		},
+		{
+			CreateFromEmptyTextBox: true,
+			OnCreateNewDialog: function(id) {
+				obj.dlg = id;
+				refreshGameData();
+			},
 		});
 	dialogContent.appendChild(dialogWidget.GetElement());
 }

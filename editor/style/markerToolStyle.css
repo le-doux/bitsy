@@ -75,28 +75,3 @@
 #exitOptionsRadio label {
 	flex: 1; font-size: 100%;
 }
-
-#exitAddDialog {
-	display: flex;
-}
-
-.exitHasDialog #exitAddDialog {
-	display: none;
-}
-
-#exitAddDialog button {
-	flex-grow: 1;
-}
-
-#exitAddDialog span {
-	margin-left: 5px;
-	margin-right: 5px;
-}
-
-#exitDialogWidget {
-	display: none;
-}
-
-.exitHasDialog #exitDialogWidget {
-	display: block;
-}

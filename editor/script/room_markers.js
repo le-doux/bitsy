@@ -320,29 +320,36 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 
 		var exitDialogControls = document.getElementById("exitDialogControls");
-
-		if (exit.dlg != undefined && exit.dlg != null) {
-			if (!exitDialogControls.classList.contains("exitHasDialog")) {
-				exitDialogControls.classList.add("exitHasDialog");
-			}
-
-			var widgetContainer = document.getElementById("exitDialogWidget");
-			widgetContainer.innerHTML = "";
-			// TODO : localize
-			var dialogWidget = dialogTool.CreateWidget(
-				"exit dialog",
-				exit.dlg,
-				true,
-				function (id) {
-					exit.dlg = id;
-				});
-			widgetContainer.appendChild(dialogWidget.GetElement());
-		}
-		else {
-			if (exitDialogControls.classList.contains("exitHasDialog")) {
-				exitDialogControls.classList.remove("exitHasDialog");
-			}
-		}
+		exitDialogControls.innerHTML = "";
+		var dialogWidget = dialogTool.CreateWidget(
+			"exit dialog", // TODO : localize
+			exit.dlg,
+			true,
+			function (id) {
+				exit.dlg = id;
+			},
+			{
+				OnCreateNewDialog : function(id) {
+					obj.dlg = id;
+					refreshGameData();
+				},
+				Presets : [ // TODO : localize names
+					{
+						Name:	"add narration",
+						Script:	"You walk through the doorway",
+					},
+					{
+						Name:	"add lock",
+						Script:	'"""\n' +
+								'{\n' +
+								'  - {item "0"} < 1 ?\n' +
+								'    {lock}\n' +
+								'}\n' +
+								'"""',
+					},
+				],
+			});
+		exitDialogControls.appendChild(dialogWidget.GetElement());
 	}
 	this.UpdateExitOptions = UpdateExitOptions;
 
