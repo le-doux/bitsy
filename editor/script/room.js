@@ -36,6 +36,8 @@ function RoomTool(canvas) {
 		var y = Math.floor( off.y / (tilesize*scale) );
 		// console.log(x + " " + y);
 
+		e.preventDefault();
+
 		if( self.editDrawingAtCoordinateCallback != null && e.altKey ) {
 			self.editDrawingAtCoordinateCallback(x,y); // "eye dropper"
 			return;
