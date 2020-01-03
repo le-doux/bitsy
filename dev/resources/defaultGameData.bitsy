@@ -1,6 +1,6 @@
 Write your game's title here
 
-# BITSY VERSION 6.2
+# BITSY VERSION 7.0
 
 ! ROOM_FORMAT 1
 
@@ -58,7 +58,7 @@ SPR a
 01111100
 00111100
 00100100
-DLG SPR_0
+DLG 0
 POS 0 8,12
 
 ITM 0
@@ -70,13 +70,13 @@ ITM 0
 00100100
 00011000
 00000000
-NAME tea
+NAME 1
 DLG ITM_0
 
-DLG SPR_0
+DLG 0
 I'm a cat
 
-DLG ITM_0
+DLG 1
 You found a nice warm cup of tea
 
 VAR a
