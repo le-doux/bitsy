@@ -1413,7 +1413,7 @@ function DialogTool() {
 
 	var functionDescriptionMap = {
 		"lock" : {
-			description : "lock event",
+			description : "lock",
 			parameters : [],
 			helpText : "prevents the default action that happens "
 				+ "after this event (changing rooms for exits, "
