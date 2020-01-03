@@ -2,6 +2,7 @@
 TODO 
 - wait to trigger functions until all text has been displayed!
 - refactor widget so there aren't multiple callbacks for creating a new DLG
+- back compat for when you could implicitly link dialog to sprites by giving them the same ID
 */
 
 // TODO : name?

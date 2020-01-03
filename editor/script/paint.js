@@ -370,11 +370,6 @@ function PaintTool(canvas, roomTool) {
 
 		makeSprite(self.drawing.id);
 
-		// add dialog too (TODO : do we want to do this for real?)
-		var dlgId = nextAvailableDialogId();
-		sprite[self.drawing.id].dlg = dlgId;
-		dialog[dlgId] = " ";
-
 		self.reloadDrawing(); //hack (order matters for animated tiles)
 
 		self.updateCanvas();
@@ -392,11 +387,6 @@ function PaintTool(canvas, roomTool) {
 		}
 
 		makeItem(self.drawing.id);
-
-		// add dialog too (TODO : do we want to do this for real?)
-		var dlgId = nextAvailableDialogId();
-		item[self.drawing.id].dlg = dlgId;
-		dialog[dlgId] = " ";
 
 		self.reloadDrawing(); //hack (order matters for animated tiles)
 
