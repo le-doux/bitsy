@@ -465,8 +465,8 @@ function resetGameData() {
 
 	// TODO : localize default_title
 	title = localization.GetStringOrFallback("default_title", "Write your game's title here");
-	dialog["SPR_0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"); // hacky to do this in two places :(
-	dialog["ITM_0"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
+	dialog["0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"); // hacky to do this in two places :(
+	dialog["1"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
 
 	pickDefaultFontForLanguage(localization.GetLanguage());
 
@@ -3284,16 +3284,16 @@ function on_change_language_inner(language) {
 	}
 
 	// update default sprite
-	var defaultSpriteDlgExists = dialog["SPR_0"] != null && localization.LocalizationContains("default_sprite_dlg", dialog["SPR_0"]);
+	var defaultSpriteDlgExists = dialog["0"] != null && localization.LocalizationContains("default_sprite_dlg", dialog["0"]);
 	if (defaultSpriteDlgExists) {
-		dialog["SPR_0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
+		dialog["0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
 		paintTool.reloadDrawing();
 	}
 
 	// update default item
-	var defaultItemDlgExists = dialog["ITM_0"] != null && localization.LocalizationContains("default_item_dlg", dialog["ITM_0"]);
+	var defaultItemDlgExists = dialog["1"] != null && localization.LocalizationContains("default_item_dlg", dialog["1"]);
 	if (defaultItemDlgExists) {
-		dialog["ITM_0"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
+		dialog["1"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
 		paintTool.reloadDrawing(); // hacky to do this twice
 	}
 
