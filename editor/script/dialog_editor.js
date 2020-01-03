@@ -1,6 +1,7 @@
 /* 
 TODO 
 - wait to trigger functions until all text has been displayed!
+- refactor widget so there aren't multiple callbacks for creating a new DLG
 */
 
 // TODO : name?
@@ -462,6 +463,10 @@ function DialogTool() {
 			self.InsertChild(childEditor, childEditors.length);
 		}
 
+		this.ChildCount = function() {
+			return childEditors.length;
+		}
+
 		CreateChildEditors();
 		RefreshChildUI();
 	}
@@ -850,6 +855,10 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
+		this.ChildCount = function() {
+			return optionEditors.length;
+		}
+
 		var optionEditors = [];
 		function CreateOptionEditors() {
 			optionEditors = [];
@@ -1008,6 +1017,10 @@ function DialogTool() {
 			RefreshOptionsUI();
 			UpdateNodeOptions();
 			parentEditor.NotifyUpdate();
+		}
+
+		this.ChildCount = function() {
+			return optionEditors.length;
 		}
 
 		var optionEditors = [];
@@ -1750,6 +1763,7 @@ function DialogTool() {
 	function OrderControls(editor, parentEditor) {
 		var div = document.createElement("div");
 		div.classList.add("orderControls");
+		div.style.display = "none";
 
 		var moveUpButton = document.createElement("button");
 		// moveUpButton.innerText = "up";
@@ -1785,12 +1799,26 @@ function DialogTool() {
 		this.GetElement = function() {
 			return div;
 		}
+
+		editor.ShowOrderControls = function() {
+			if (parentEditor.ChildCount && parentEditor.ChildCount() > 1) {
+				// TODO : replace w/ added class name?
+				div.style.display = "block";
+			}
+		}
+
+		editor.HideOrderControls = function() {
+			div.style.display = "none";
+		}
 	}
 
 	var curSelectedEditor = null;
 	function AddSelectionBehavior(editor, onSelect, onDeselect) {
 		editor.Select = function() {
 			editor.GetElement().classList.add("selectedEditor");
+			if (editor.ShowOrderControls) {
+				editor.ShowOrderControls();
+			}
 			if (onSelect) {
 				onSelect();
 			}
@@ -1798,6 +1826,9 @@ function DialogTool() {
 
 		editor.Deselect = function() {
 			editor.GetElement().classList.remove("selectedEditor");
+			if (editor.HideOrderControls) {
+				editor.HideOrderControls();
+			}
 			if (onDeselect) {
 				onDeselect();
 			}

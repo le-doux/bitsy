@@ -166,16 +166,8 @@
 }
 
 .orderControls {
-	display: none;
+	display: block;
 	margin-bottom: 5px;
-}
-
-.selectedEditor > .orderControls {
-	display: block;
-}
-
-.selectedEditor > .optionControls .orderControls {
-	display: block;
 }
 
 .optionEditor.selectedEditor {
