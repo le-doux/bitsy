@@ -1,8 +1,6 @@
 /* 
 TODO 
 - wait to trigger functions until all text has been displayed!
-- I need to probably rethink the layout of the paint tool still...
-	- remove the weird hacky formatting exceptions for margins, etc
 */
 
 // TODO : name?
@@ -936,6 +934,8 @@ function DialogTool() {
 			}
 			orderLabel.innerText = numString + ")";
 		}
+
+		AddSelectionBehavior(this);
 	}
 
 	function ConditionalEditor(node, parentEditor) {
@@ -979,17 +979,7 @@ function DialogTool() {
 			return div;
 		}
 
-		AddSelectionBehavior(this,
-			function() { /* onSelect */
-				for (var i = 0; i < optionEditors.length; i++) {
-					optionEditors[i].Select();
-				}
-			},
-			function() { /* onDeselect */
-				for (var i = 0; i < optionEditors.length; i++) {
-					optionEditors[i].Deselect();
-				}
-			});
+		AddSelectionBehavior(this);
 
 		this.GetNodes = function() {
 			return [node];
@@ -1109,13 +1099,10 @@ function DialogTool() {
 			comparisonEditor.UpdateIndex(index);
 		}
 
-		this.Select = function() {
-			comparisonEditor.Select();
-		}
-
-		this.Deselect = function() {
-			comparisonEditor.Deselect();
-		}
+		AddSelectionBehavior(
+			this,
+			function() { comparisonEditor.Select(); },
+			function() { comparisonEditor.Deselect(); });
 	}
 
 	function GetConditionType(condition) {

@@ -102,10 +102,6 @@
 	display: flex;
 }
 
-.selectedEditor > .optionRoot > .optionEditor > .blockEditor > .actionBuilder {
-	display: flex;
-}
-
 .actionBuilder button {
 	flex-grow: 1;
 }
@@ -178,8 +174,12 @@
 	display: block;
 }
 
-.selectedEditor > .optionRoot > .optionEditor > .optionControls .orderControls {
+.selectedEditor > .optionControls .orderControls {
 	display: block;
+}
+
+.optionEditor.selectedEditor {
+	border: solid 1px #ccccff;
 }
 
 .addOption {
