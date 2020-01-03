@@ -60,17 +60,11 @@ function DialogTool() {
 
 			if (dialogId != null || (creationOptions && creationOptions.CreateFromEmptyTextBox)) {
 				scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
-				editorDiv.appendChild(scriptEditor.GetElement());			
+				editorDiv.appendChild(scriptEditor.GetElement());
 			}
 			else if (creationOptions.Presets) {
-				console.log(creationOptions.Presets);
-				for (var i = 0; i < creationOptions.Presets.length; i++) {
-					var preset = creationOptions.Presets[i];
-					var scriptStr = preset.Script;
-					var presetButton = document.createElement("button");
-					presetButton.style.flexGrow = 1; // TODO : style?
-					presetButton.innerHTML = '<i class="material-icons">add</i>' + preset.Name;
-					presetButton.onclick = function() {
+				function CreatePresetHandler(scriptStr) {
+					return function() {
 						dialogId = nextAvailableDialogId();
 						dialog[dialogId] = scriptStr;
 						events.Raise("new_dialog", {id:dialogId});
@@ -79,7 +73,15 @@ function DialogTool() {
 							creationOptions.OnCreateNewDialog(dialogId);
 						}
 						UpdateEditorContent();
-					};
+					}
+				}
+
+				for (var i = 0; i < creationOptions.Presets.length; i++) {
+					var preset = creationOptions.Presets[i];
+					var presetButton = document.createElement("button");
+					presetButton.style.flexGrow = 1; // TODO : style?
+					presetButton.innerHTML = '<i class="material-icons">add</i>' + preset.Name;
+					presetButton.onclick = CreatePresetHandler(preset.Script);
 					editorDiv.appendChild(presetButton);
 				}
 			}

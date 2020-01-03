@@ -330,7 +330,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			},
 			{
 				OnCreateNewDialog : function(id) {
-					obj.dlg = id;
+					exit.dlg = id;
 					refreshGameData();
 				},
 				Presets : [ // TODO : localize names
