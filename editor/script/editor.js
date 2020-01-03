@@ -322,13 +322,21 @@ var curDialogEditorId = null; // can I wrap this all up somewhere? -- feels a bi
 var curDialogEditor = null;
 var curPlaintextDialogEditor = null; // the duplication is a bit weird, but better than recreating editors all the time?
 function openDialogTool(dialogId) {
+	var showCode = document.getElementById("dialogShowCodeCheck").checked;
+
 	curDialogEditorId = dialogId;
 	curDialogEditor = dialogTool.CreateEditor(dialogId);
 	curPlaintextDialogEditor = dialogTool.CreatePlaintextEditor(dialogId, "largeDialogPlaintextArea");
 
 	var dialogEditorViewport = document.getElementById("dialogEditor");
 	dialogEditorViewport.innerHTML = "";
-	dialogEditorViewport.appendChild(curDialogEditor.GetElement());
+
+	if (showCode) {
+		dialogEditorViewport.appendChild(curPlaintextDialogEditor.GetElement());
+	}
+	else {
+		dialogEditorViewport.appendChild(curDialogEditor.GetElement());
+	}
 
 	document.getElementById("dialogId").innerText = "dialog " + dialogId;
 
