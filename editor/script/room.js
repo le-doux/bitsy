@@ -30,13 +30,13 @@ function RoomTool(canvas) {
 	this.markers = null;
 
 	function onMouseDown(e) {
+		e.preventDefault();
+		
 		var off = getOffset(e);
 		off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
 		var x = Math.floor( off.x / (tilesize*scale) );
 		var y = Math.floor( off.y / (tilesize*scale) );
 		// console.log(x + " " + y);
-
-		e.preventDefault();
 
 		if( self.editDrawingAtCoordinateCallback != null && e.altKey ) {
 			self.editDrawingAtCoordinateCallback(x,y); // "eye dropper"
