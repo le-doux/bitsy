@@ -229,14 +229,14 @@ function onready(startWithTitle) {
 	document.addEventListener('keyup', input.onkeyup);
 
 	if (isPlayerEmbeddedInEditor) {
-		canvas.addEventListener('touchstart', input.ontouchstart);
-		canvas.addEventListener('touchmove', input.ontouchmove);
-		canvas.addEventListener('touchend', input.ontouchend);
+		canvas.addEventListener('touchstart', input.ontouchstart, {passive:false});
+		canvas.addEventListener('touchmove', input.ontouchmove, {passive:false});
+		canvas.addEventListener('touchend', input.ontouchend, {passive:false});
 	}
 	else {
-		document.addEventListener('touchstart', input.ontouchstart);
-		document.addEventListener('touchmove', input.ontouchmove);
-		document.addEventListener('touchend', input.ontouchend);
+		document.addEventListener('touchstart', input.ontouchstart, {passive:false});
+		document.addEventListener('touchmove', input.ontouchmove, {passive:false});
+		document.addEventListener('touchend', input.ontouchend, {passive:false});
 	}
 
 	window.onblur = input.onblur;
