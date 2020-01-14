@@ -329,13 +329,13 @@ function PaintTool(canvas, roomTool) {
 
 	this.newDrawing = function(imageData) {
 		if ( self.drawing.type == TileType.Tile ) {
-			newTile(undefined, imageData);
+			newTile(imageData);
 		}
 		else if( self.drawing.type == TileType.Avatar || self.drawing.type == TileType.Sprite ) {
-			newSprite(undefined, imageData);
+			newSprite(imageData);
 		}
 		else if( self.drawing.type == TileType.Item ) {
-			newItem(undefined, imageData);
+			newItem(imageData);
 		}
 
 		// update paint explorer
@@ -346,12 +346,11 @@ function PaintTool(canvas, roomTool) {
     }
     
     this.duplicateDrawing = function() {
-        let objectId = getIdPrefix(self.drawing.type) + self.drawing.id;
-        let sourceImageData = renderer.GetImageSource(objectId);
-        let copiedImageData = copyDrawingData(sourceImageData);
+        var sourceImageData = renderer.GetImageSource(self.drawing.toString());
+        var copiedImageData = copyDrawingData(sourceImageData);
 
         // tiles have extra data to copy
-        let tileIsWall = false;
+        var tileIsWall = false;
         if (self.drawing.type === TileType.Tile) {
             tileIsWall = tile[self.drawing.id].isWall;
         }
@@ -367,11 +366,8 @@ function PaintTool(canvas, roomTool) {
     }
 
 	// TODO -- sould these newDrawing methods be internal to PaintTool?
-	function newTile(id, imageData) {
-		if (id)
-			self.drawing.id = id; //this optional parameter lets me override the default next id
-		else
-			self.drawing.id = nextTileId();
+	function newTile(imageData) {
+		self.drawing.id = nextTileId();
 
 		makeTile(self.drawing.id, imageData);
 		self.reloadDrawing(); //hack for ui consistency (hack x 2: order matters for animated tiles)
@@ -382,11 +378,8 @@ function PaintTool(canvas, roomTool) {
 		tileIndex = Object.keys(tile).length - 1;
 	}
 
-	function newSprite(id, imageData) {
-		if (id)
-			self.drawing.id = id; //this optional parameter lets me override the default next id
-		else
-			self.drawing.id = nextSpriteId();
+	function newSprite(imageData) {
+		self.drawing.id = nextSpriteId();
 
 		makeSprite(self.drawing.id, imageData);
 		self.reloadDrawing(); //hack (order matters for animated tiles)
@@ -397,11 +390,8 @@ function PaintTool(canvas, roomTool) {
 		spriteIndex = Object.keys(sprite).length - 1;
 	}
 
-	function newItem(id) {
-		if (id)
-			self.drawing.id = id; //this optional parameter lets me override the default next id
-		else
-			self.drawing.id = nextItemId();
+	function newItem() {
+		self.drawing.id = nextItemId();
 
 		makeItem(self.drawing.id, imageData);
 		self.reloadDrawing(); //hack (order matters for animated tiles)

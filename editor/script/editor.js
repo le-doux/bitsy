@@ -1270,18 +1270,8 @@ function prev() {
 	paintExplorer.ChangeSelection( drawing.id );
 }
 
-function getIdPrefix(type) {
-    if (type === TileType.Tile) {
-        return "TIL_";
-    } else if (type == TileType.Avatar || type == TileType.Sprite) {
-        return "SPR_";
-    } else if (type == TileType.Item) {
-        return "ITM_";
-    }
-}
-
 function copyDrawingData(sourceDrawingData) {
-    let copiedDrawingData = [];
+    var copiedDrawingData = [];
 
     for (frame in sourceDrawingData) {
         copiedDrawingData.push([]);
