@@ -214,7 +214,7 @@ function makeTile(id,imageData) {
 		animation : { //todo
 			isAnimated : (!imageData) ? false : (imageData.length>1),
 			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : imageData.length
+			frameCount : (!imageData) ? 2 : imageData.length),
 		},
 		name : null
 	};
@@ -233,7 +233,7 @@ function makeSprite(id,imageData) {
 		animation : { //todo
 			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
 			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : imageData.length
+			frameCount : (!imageData) ? 2 : imageData.length),
 		},
 		dlg : null,
 		name : null
@@ -252,7 +252,7 @@ function makeItem(id,imageData) { // NOTE : same as tile right now? make more li
 		animation : { //todo
 			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
 			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : imageData.length
+			frameCount : (!imageData) ? 2 : imageData.length),
 		},
 		dlg : null,
 		name : null
