@@ -200,6 +200,7 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 	}
 
 	function pickColorStart(e) {
+		e.preventDefault();
 		isMouseDown = true;
 		pickColor(e, false);
 	}
