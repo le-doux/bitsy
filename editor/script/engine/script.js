@@ -765,7 +765,7 @@ var DialogBlockNode = function(doIndentFirstLine) {
 	this.Eval = function(environment, onReturn) {
 		// console.log("EVAL BLOCK " + this.children.length);
 
-		if (events != undefined && events != null) {
+		if (isPlayerEmbeddedInEditor && events != undefined && events != null) {
 			events.Raise("script_node_enter", { id: this.GetId() });
 		}
 
@@ -789,7 +789,7 @@ var DialogBlockNode = function(doIndentFirstLine) {
 
 		var self = this;
 		evalChildren(this.children, function() {
-			if (events != undefined && events != null) {
+			if (isPlayerEmbeddedInEditor && events != undefined && events != null) {
 				events.Raise("script_node_exit", { id: self.GetId() });
 			}
 
@@ -853,7 +853,7 @@ var CodeBlockNode = function() {
 	this.Eval = function(environment, onReturn) {
 		// console.log("EVAL BLOCK " + this.children.length);
 
-		if (events != undefined && events != null) {
+		if (isPlayerEmbeddedInEditor && events != undefined && events != null) {
 			events.Raise("script_node_enter", { id: this.GetId() });
 		}
 
@@ -877,7 +877,7 @@ var CodeBlockNode = function() {
 
 		var self = this;
 		evalChildren(this.children, function() {
-			if (events != undefined && events != null) {
+			if (isPlayerEmbeddedInEditor && events != undefined && events != null) {
 				events.Raise("script_node_exit", { id: self.GetId() });
 			}
 
@@ -973,7 +973,7 @@ var FuncNode = function(name,args) {
 	this.args = args;
 
 	this.Eval = function(environment,onReturn) {
-		if (events != undefined && events != null) {
+		if (isPlayerEmbeddedInEditor && events != undefined && events != null) {
 			events.Raise("script_node_enter", { id: this.GetId() });
 		}
 
@@ -994,7 +994,7 @@ var FuncNode = function(name,args) {
 		};
 		var self = this; // hack to deal with scope
 		evalArgs( this.args, function() {
-			if (events != undefined && events != null) {
+			if (isPlayerEmbeddedInEditor && events != undefined && events != null) {
 				events.Raise("script_node_exit", { id: self.GetId() });
 			}
 
