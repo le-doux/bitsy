@@ -30,6 +30,8 @@ function RoomTool(canvas) {
 	this.markers = null;
 
 	function onMouseDown(e) {
+		e.preventDefault();
+		
 		var off = getOffset(e);
 		off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
 		var x = Math.floor( off.x / (tilesize*scale) );

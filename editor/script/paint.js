@@ -136,6 +136,8 @@ function PaintTool(canvas, roomTool) {
 
 	// TODO : 
 	function onMouseDown(e) {
+		e.preventDefault();
+		
 		if (isPlayMode) {
 			return; //can't paint during play mode
 		}
