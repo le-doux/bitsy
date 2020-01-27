@@ -943,6 +943,7 @@ function start() {
 	// }
 
 	showDialogToolsSection(); // hack to avoid the mismatched radio selection
+	openDialogTool(titleDialogId); // start with the title open
 
 	initLanguageOptions();
 }
