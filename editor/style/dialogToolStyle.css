@@ -237,3 +237,56 @@
 	color: #ccccff;
 	max-width: 350px;
 }
+
+/* todo: move into own file?*/
+/* TITLE WIDGET */
+.titleWidget {
+	display: flex;
+}
+
+.titleTextPreview {
+	color: black;
+	background: #eee;
+	border: solid 1px #eee;
+	padding-left: 5px;
+	border-radius: 5px;
+	font-family: monospace;
+	font-size: 16px;
+	flex-grow: 1;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.titleWidget.titleSingle .titleTextPreview:hover {
+	text-decoration: underline;
+	border: solid 1px #ccc;
+}
+
+.titleWidget.titleEdit .titleTextPreview {
+	display: none;
+}
+
+.titleTextInput {
+	display: none;
+	flex-grow: 1;
+	border: solid 1px #ccc;
+	border-radius: 5px;
+	padding-left: 5px;
+}
+
+.titleWidget.titleEdit .titleTextInput {
+	display: flex;
+}
+
+.titleOpenDialog {
+	display: none;
+	margin-left: 5px;
+}
+
+.titleWidget.titleMulti .titleOpenDialog {
+	display: flex;
+}
+
+.titleWidget.titleEdit .titleOpenDialog {
+	display: flex;
+}

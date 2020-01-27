@@ -24,30 +24,81 @@ function DialogTool() {
 		return new TitleWidget();
 	}
 
+	/* TitleWidget TODO
+	- gameTextDir class
+	- empty title mode
+	*/
 	function TitleWidget() {
+		var isMultiline = false;
+
+		// is it bad to share the id counter with the other editors?
+		var editorId = dialogScriptEditorUniqueIdCounter;
+		dialogScriptEditorUniqueIdCounter++;
+
 		var div = document.createElement("div");
+		div.classList.add("titleWidget");
 
 		var titlePreviewSpan = document.createElement("span");
+		titlePreviewSpan.classList.add("titleTextPreview")
 		div.appendChild(titlePreviewSpan);
 
 		var titleTextInput = document.createElement("input");
+		titleTextInput.classList.add("titleTextInput");
 		titleTextInput.type = "text";
 		div.appendChild(titleTextInput);
 
 		var openButton = document.createElement("button");
-		openButton.title = "open in dialog editor"; // todo : localize
+		openButton.classList.add("titleOpenDialog");
+		openButton.title = "open title in dialog editor"; // todo : localize
 		openButton.innerHTML = '<i class="material-icons">open_in_new</i>';
 		openButton.onclick = function() {
 			openDialogTool(titleDialogId);
 		}
 		div.appendChild(openButton);
 
-		var titleLines = getTitle().split("\n");
-		titlePreviewSpan.innerText = titleLines[0] + (titleLines.length > 1 ? "..." : "");
-		titleTextInput.value = titleLines[0];
+		function updateWidgetContent() {
+			var titleLines = getTitle().split("\n");
+			isMultiline = titleLines.length > 1;
+			div.classList.remove("titleEdit");
+			div.classList.remove("titleMulti");
+			div.classList.remove("titleSingle");
+			div.classList.add(isMultiline ? "titleMulti" : "titleSingle");
+			titlePreviewSpan.innerText = (isMultiline ? titleLines[1] + "..." : titleLines[0]);
+			titleTextInput.value = !isMultiline ? getTitle() : "";
+		}
 
-		// TODO : respond to game_data_change and dialog_update events here
-		// TODO : change what is visible based on whether the title is more than one line long
+		titlePreviewSpan.onclick = function() {
+			if (!isMultiline) {
+				div.classList.add("titleEdit");
+				titleTextInput.focus();
+				titleTextInput.selectionStart = 0;
+			}
+		}
+
+		titleTextInput.onchange = function() {
+			titlePreviewSpan.innerText = titleTextInput.value;
+			setTitle(titleTextInput.value);
+			refreshGameData();
+			events.Raise("dialog_update", { dialogId:titleDialogId, editorId:editorId });
+		}
+
+		titleTextInput.onblur = function() {
+			setTimeout(function() {
+				div.classList.remove("titleEdit");
+			}, 100); // the timeout is a hack to allow clicking the open button
+		}
+
+		events.Listen("dialog_update", function(event) {
+			if (event.dialogId === titleDialogId && event.editorId != editorId) {
+				updateWidgetContent();
+			}
+		});
+
+		events.Listen("game_data_change", function(event) {
+			updateWidgetContent(); // TODO : only do this if the text actually changes?
+		});
+
+		updateWidgetContent();
 
 		this.GetElement = function() {
 			return div;

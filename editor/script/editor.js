@@ -934,7 +934,7 @@ function start() {
 	// }
 
 	// create title widgets
-	var titleTextWidgets = document.getElementsByClassName("titleTextWidget");
+	var titleTextWidgets = document.getElementsByClassName("titleWidgetContainer");
 	for (var i = 0; i < titleTextWidgets.length; i++) {
 		var widget = dialogTool.CreateTitleWidget();
 		titleTextWidgets[i].appendChild(widget.GetElement());
