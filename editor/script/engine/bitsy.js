@@ -3,7 +3,6 @@ var canvas;
 var context; // TODO : remove if safe?
 var ctx;
 
-var title = "";
 var room = {};
 var tile = {};
 var sprite = {};
@@ -17,6 +16,14 @@ var palette = { //start off with a default palette
 	};
 var variable = {}; // these are starting variable values -- they don't update (or I don't think they will)
 var playerId = "A";
+
+var titleDialogId = "title";
+function getTitle() {
+	return dialog[titleDialogId];
+}
+function setTitle(titleSrc) {
+	dialog[titleDialogId] = titleSrc;
+}
 
 var defaultFontName = "ascii_small";
 var fontName = defaultFontName;
@@ -86,7 +93,6 @@ var editorDevFlags = {
 };
 
 function clearGameData() {
-	title = "";
 	room = {};
 	tile = {};
 	sprite = {};
@@ -241,7 +247,7 @@ function onready(startWithTitle) {
 	update_interval = setInterval(update,16);
 
 	if(startWithTitle) { // used by editor 
-		startNarrating(title);
+		startNarrating(getTitle());
 	}
 }
 
@@ -1106,7 +1112,7 @@ function serializeWorld(skipFonts) {
 
 	var worldStr = "";
 	/* TITLE */
-	worldStr += title + "\n";
+	worldStr += getTitle() + "\n";
 	worldStr += "\n";
 	/* VERSION */
 	worldStr += "# BITSY VERSION " + getEngineVersion() + "\n"; // add version as a comment for debugging purposes
@@ -1280,9 +1286,11 @@ function serializeWorld(skipFonts) {
 	}
 	/* DIALOG */
 	for (id in dialog) {
-		worldStr += "DLG " + id + "\n";
-		worldStr += dialog[id] + "\n";
-		worldStr += "\n";
+		if (id != titleDialogId) {
+			worldStr += "DLG " + id + "\n";
+			worldStr += dialog[id] + "\n";
+			worldStr += "\n";
+		}
 	}
 	/* VARIABLES */
 	for (id in variable) {
@@ -1352,7 +1360,7 @@ function getCoord(line,arg) {
 }
 
 function parseTitle(lines, i) {
-	title = lines[i];
+	setTitle(lines[i]);
 
 	// TODO later? parse multi-line titles	
 	// var results = scriptUtils.ReadDialogScript(lines,i);

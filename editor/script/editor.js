@@ -103,18 +103,25 @@ function sortedRoomIdList() {
 }
 
 function sortedDialogIdList() {
-	return sortedBase36IdList(dialog);
-}
-
-function sortedPaletteIdList() {
-	var keyList = Object.keys(palette);
-	keyList.splice(keyList.indexOf("default"),1);
+	var keyList = Object.keys(dialog);
+	keyList.splice(keyList.indexOf("title"), 1);
 	var keyObj = {};
 	for (var i = 0; i < keyList.length; i++) {
 		keyObj[keyList[i]] = {};
 	}
 
-	return sortedBase36IdList( keyObj );
+	return sortedBase36IdList(keyObj);
+}
+
+function sortedPaletteIdList() {
+	var keyList = Object.keys(palette);
+	keyList.splice(keyList.indexOf("default"), 1);
+	var keyObj = {};
+	for (var i = 0; i < keyList.length; i++) {
+		keyObj[keyList[i]] = {};
+	}
+
+	return sortedBase36IdList(keyObj);
 }
 
 function sortedBase36IdList( objHolder ) {
@@ -259,12 +266,12 @@ function makeDrawing(id,imageData) {
 
 /* EVENTS */
 function on_change_title(e) {
-	title = e.target.value;
+	setTitle(e.target.value);
 	refreshGameData();
-	tryWarnAboutMissingCharacters(title);
+	tryWarnAboutMissingCharacters(getTitle());
 
 	// hacky way to make sure ALL title textboxes remain up-to-date
-	updateTitleTextBox(title);
+	updateTitleTextBox(getTitle());
 }
 
 function updateTitleTextBox(titleString) {
@@ -346,27 +353,57 @@ function openDialogTool(dialogId) {
 }
 
 function nextDialog() {
-	var dialogIdList = sortedDialogIdList();
-	var dialogIndex = 0;
+	var id = titleDialogId; // the title is safe as a default choice
+
 	if (curDialogEditorId != null) {
-		dialogIndex = dialogIdList.indexOf(curDialogEditorId) + 1;
+		var dialogIdList = sortedDialogIdList();
+		var dialogIndex = dialogIdList.indexOf(curDialogEditorId);
+
+		// pick the index of the next dialog to open
+		dialogIndex++;
 		if (dialogIndex >= dialogIdList.length) {
-			dialogIndex = 0;
+			dialogIndex = -1; // hacky: I'm using -1 to denote the title
+		}
+
+		// turn the index into an ID
+		if (dialogIndex < 0) {
+			id = titleDialogId;
+		}
+		else {
+			id = dialogIdList[dialogIndex];
 		}
 	}
-	openDialogTool(dialogIdList[dialogIndex]);
+
+	openDialogTool(id);
 }
 
 function prevDialog() {
-	var dialogIdList = sortedDialogIdList();
-	var dialogIndex = 0;
+	var id = titleDialogId; // the title is safe as a default choice
+
 	if (curDialogEditorId != null) {
-		dialogIndex = dialogIdList.indexOf(curDialogEditorId) - 1;
-		if (dialogIndex < 0) {
+		var dialogIdList = sortedDialogIdList();
+		var dialogIndex = dialogIdList.indexOf(curDialogEditorId);
+
+		// pick the index of the next dialog to open
+		if (dialogIndex === -1) {
 			dialogIndex = dialogIdList.length - 1;
 		}
+		else {
+			dialogIndex--;
+		}
+
+		// turn the index into an ID
+		if (dialogIndex < 0) {
+			id = titleDialogId;
+		}
+		else {
+			id = dialogIdList[dialogIndex];
+		}
 	}
-	openDialogTool(dialogIdList[dialogIndex]);
+
+	console.log("PREV DIALOG " + id);
+
+	openDialogTool(id);
 }
 
 function addNewDialog() {
@@ -464,7 +501,7 @@ function resetGameData() {
 	setDefaultGameState();
 
 	// TODO : localize default_title
-	title = localization.GetStringOrFallback("default_title", "Write your game's title here");
+	setTitle(localization.GetStringOrFallback("default_title", "Write your game's title here"));
 	dialog["0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"); // hacky to do this in two places :(
 	dialog["1"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
 
@@ -491,7 +528,7 @@ function resetGameData() {
 	markerTool.Refresh();
 	roomTool.drawEditMap();
 
-	updateTitleTextBox(title);
+	updateTitleTextBox(getTitle());
 
 	events.Raise("game_data_change"); // TODO -- does this need to have a specific reset event or flag?
 }
@@ -2050,25 +2087,16 @@ function convertGameDataToCurVersion(importVersion) {
 			};
 		};
 
-		for(dlgId in dialog) {
-			var dialogScript = scriptInterpreter.Parse( dialog[dlgId] );
+		for (dlgId in dialog) {
+			var dialogScript = scriptInterpreter.Parse(dialog[dlgId]);
 			var visitor = new PrintFunctionVisitor();
-			dialogScript.VisitAll( visitor );
-			if( visitor.DidChange() ) {
+			dialogScript.VisitAll(visitor);
+			if (visitor.DidChange()) {
 				var newDialog = dialogScript.Serialize();
-				if(newDialog.indexOf("\n") > -1) {
+				if (newDialog.indexOf("\n") > -1) {
 					newDialog = '"""\n' + newDialog + '\n"""';
 				}
 				dialog[dlgId] = newDialog;
-			}
-		}
-
-		{
-			var titleScript = scriptInterpreter.Parse( title );
-			var visitor = new PrintFunctionVisitor();
-			titleScript.VisitAll( visitor );
-			if( visitor.DidChange() ) {
-				title = titleScript.Serialize();
 			}
 		}
 	}
@@ -2165,7 +2193,7 @@ function on_game_data_change_core() {
 
 	markerTool.SetRoom(curRoom);
 
-	updateTitleTextBox(title);
+	updateTitleTextBox(getTitle());
 
 	// TODO -- start using this for more things
 	events.Raise("game_data_change");
@@ -2220,7 +2248,7 @@ function toggleWallUI(checked) {
 }
 
 function filenameFromGameTitle() {
-	var filename = title.replace(/[^a-zA-Z]/g, "_"); // replace non alphabet characters
+	var filename = getTitle().replace(/[^a-zA-Z]/g, "_"); // replace non alphabet characters
 	filename = filename.toLowerCase();
 	filename = filename.substring(0,32); // keep it from getting too long
 	return filename;
@@ -2231,14 +2259,21 @@ function exportGame() {
 	// var gameData = document.getElementById("game_data").value; //grab game data
 	var gameData = getFullGameData();
 	var size = document.getElementById("exportSizeFixedInput").value;
-	exporter.exportGame( gameData, title, export_settings.page_color, filenameFromGameTitle() + ".html", isFixedSize, size ); //download as html file
+	//download as html file
+	exporter.exportGame(
+		gameData,
+		getTitle(),
+		export_settings.page_color,
+		filenameFromGameTitle() + ".html",
+		isFixedSize,
+		size);
 }
 
 function exportGameData() {
 	refreshGameData(); //just in case
 	// var gameData = document.getElementById("game_data").value; //grab game data
 	var gameData = getFullGameData();
-	ExporterUtils.DownloadFile( filenameFromGameTitle() + ".bitsy", gameData );
+	ExporterUtils.DownloadFile(filenameFromGameTitle() + ".bitsy", gameData);
 }
 
 function exportFont() {
@@ -3278,9 +3313,9 @@ function on_change_language_inner(language) {
 	hackyUpdatePlaceholderText();
 
 	// update title in new language IF the user hasn't made any changes to the default title
-	if (localization.LocalizationContains("default_title", title)) {
-		title = localization.GetStringOrFallback("default_title", "Write your game's title here");
-		updateTitleTextBox(title);
+	if (localization.LocalizationContains("default_title", getTitle())) {
+		setTitle(localization.GetStringOrFallback("default_title", "Write your game's title here"));
+		updateTitleTextBox(getTitle());
 	}
 
 	// update default sprite
