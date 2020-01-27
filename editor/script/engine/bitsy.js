@@ -1360,12 +1360,9 @@ function getCoord(line,arg) {
 }
 
 function parseTitle(lines, i) {
-	setTitle(lines[i]);
-
-	// TODO later? parse multi-line titles	
-	// var results = scriptUtils.ReadDialogScript(lines,i);
-	// title = results.script;
-	// i = results.index;
+	var results = scriptUtils.ReadDialogScript(lines,i);
+	setTitle(results.script);
+	i = results.index;
 
 	i++;
 
