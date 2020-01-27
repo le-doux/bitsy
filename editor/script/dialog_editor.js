@@ -20,10 +20,39 @@ function DialogTool() {
 		return new DialogWidget(label, dialogId, allowNone, onChange, creationOptions);
 	}
 
-	// TODO later? edit multi-line titles
-	// this.CreateTitleEditor = function() {
-	// 	// TODO	
-	// }
+	this.CreateTitleWidget = function() {
+		return new TitleWidget();
+	}
+
+	function TitleWidget() {
+		var div = document.createElement("div");
+
+		var titlePreviewSpan = document.createElement("span");
+		div.appendChild(titlePreviewSpan);
+
+		var titleTextInput = document.createElement("input");
+		titleTextInput.type = "text";
+		div.appendChild(titleTextInput);
+
+		var openButton = document.createElement("button");
+		openButton.title = "open in dialog editor"; // todo : localize
+		openButton.innerHTML = '<i class="material-icons">open_in_new</i>';
+		openButton.onclick = function() {
+			openDialogTool(titleDialogId);
+		}
+		div.appendChild(openButton);
+
+		var titleLines = getTitle().split("\n");
+		titlePreviewSpan.innerText = titleLines[0] + (titleLines.length > 1 ? "..." : "");
+		titleTextInput.value = titleLines[0];
+
+		// TODO : respond to game_data_change and dialog_update events here
+		// TODO : change what is visible based on whether the title is more than one line long
+
+		this.GetElement = function() {
+			return div;
+		}
+	}
 
 	// TODO : label should be label localization id
 	function DialogWidget(label, dialogId, allowNone, onChange, creationOptions) {

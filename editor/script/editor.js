@@ -270,15 +270,8 @@ function on_change_title(e) {
 	refreshGameData();
 	tryWarnAboutMissingCharacters(getTitle());
 
-	// hacky way to make sure ALL title textboxes remain up-to-date
-	updateTitleTextBox(getTitle());
-}
-
-function updateTitleTextBox(titleString) {
-	var titleTextBoxes = document.getElementsByClassName("titleTextBox");
-	for (var i = 0; i < titleTextBoxes.length; i++) {
-		titleTextBoxes[i].value = titleString;
-	}
+	// make sure all editors with a title know to update
+	events.Raise("dialog_update", { dialogId:titleDialogId, editorId:null });
 }
 
 /* MOBILE */
@@ -527,8 +520,6 @@ function resetGameData() {
 	markerTool.SetRoom(curRoom);
 	markerTool.Refresh();
 	roomTool.drawEditMap();
-
-	updateTitleTextBox(getTitle());
 
 	events.Raise("game_data_change"); // TODO -- does this need to have a specific reset event or flag?
 }
@@ -942,6 +933,14 @@ function start() {
 	// 	}
 	// }
 
+	// create title widgets
+	var titleTextWidgets = document.getElementsByClassName("titleTextWidget");
+	for (var i = 0; i < titleTextWidgets.length; i++) {
+		var widget = dialogTool.CreateTitleWidget();
+		titleTextWidgets[i].appendChild(widget.GetElement());
+	}
+
+	// prepare dialog tool
 	showDialogToolsSection(); // hack to avoid the mismatched radio selection
 	openDialogTool(titleDialogId); // start with the title open
 
@@ -2194,8 +2193,6 @@ function on_game_data_change_core() {
 
 	markerTool.SetRoom(curRoom);
 
-	updateTitleTextBox(getTitle());
-
 	// TODO -- start using this for more things
 	events.Raise("game_data_change");
 }
@@ -3316,7 +3313,8 @@ function on_change_language_inner(language) {
 	// update title in new language IF the user hasn't made any changes to the default title
 	if (localization.LocalizationContains("default_title", getTitle())) {
 		setTitle(localization.GetStringOrFallback("default_title", "Write your game's title here"));
-		updateTitleTextBox(getTitle());
+		// make sure all editors with a title know to update
+		events.Raise("dialog_update", { dialogId:titleDialogId, editorId:null });
 	}
 
 	// update default sprite
