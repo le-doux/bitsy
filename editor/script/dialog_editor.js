@@ -27,6 +27,7 @@ function DialogTool() {
 	/* TitleWidget TODO
 	- gameTextDir class
 	- empty title mode
+	- get rid of the duplicate preview and text input and just make the input readonly
 	*/
 	function TitleWidget() {
 		var isMultiline = false;
@@ -38,13 +39,10 @@ function DialogTool() {
 		var div = document.createElement("div");
 		div.classList.add("titleWidget");
 
-		var titlePreviewSpan = document.createElement("span");
-		titlePreviewSpan.classList.add("titleTextPreview")
-		div.appendChild(titlePreviewSpan);
-
 		var titleTextInput = document.createElement("input");
 		titleTextInput.classList.add("titleTextInput");
 		titleTextInput.type = "text";
+		titleTextInput.placeholder = "Title"; // TODO : localize
 		div.appendChild(titleTextInput);
 
 		var openButton = document.createElement("button");
@@ -59,33 +57,29 @@ function DialogTool() {
 		function updateWidgetContent() {
 			var titleLines = getTitle().split("\n");
 			isMultiline = titleLines.length > 1;
-			div.classList.remove("titleEdit");
-			div.classList.remove("titleMulti");
-			div.classList.remove("titleSingle");
-			div.classList.add(isMultiline ? "titleMulti" : "titleSingle");
-			titlePreviewSpan.innerText = (isMultiline ? titleLines[1] + "..." : titleLines[0]);
-			titleTextInput.value = !isMultiline ? getTitle() : "";
-		}
-
-		titlePreviewSpan.onclick = function() {
-			if (!isMultiline) {
-				div.classList.add("titleEdit");
-				titleTextInput.focus();
-				titleTextInput.selectionStart = 0;
-			}
+			titleTextInput.value = (isMultiline ? titleLines[1] + "..." : titleLines[0]);
+			titleTextInput.readOnly = isMultiline;
+			openButton.style.display = isMultiline ? "flex" : "none";
 		}
 
 		titleTextInput.onchange = function() {
-			titlePreviewSpan.innerText = titleTextInput.value;
 			setTitle(titleTextInput.value);
 			refreshGameData();
 			events.Raise("dialog_update", { dialogId:titleDialogId, editorId:editorId });
 		}
 
+		titleTextInput.onfocus = function() {
+			if (!isMultiline) {
+				openButton.style.display = "flex";
+			}
+		}
+
 		titleTextInput.onblur = function() {
-			setTimeout(function() {
-				div.classList.remove("titleEdit");
-			}, 100); // the timeout is a hack to allow clicking the open button
+			if (!isMultiline) {
+				setTimeout(function() {
+					openButton.style.display = "none";
+				}, 100); // the timeout is a hack to allow clicking the open button
+			}
 		}
 
 		events.Listen("dialog_update", function(event) {
