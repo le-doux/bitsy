@@ -514,3 +514,27 @@ input {
 #dialogTop {
 	height: 30px; margin-bottom: 5px;
 }
+
+.nameTextbox {
+	border-radius: 5px;
+	padding: 5px;
+	color: #ccccff;
+	background: #e8e8ff;
+	border: solid 1px #ccccff;
+}
+
+.nameTextbox:not([readonly]) {
+	color: #6767b2;
+}
+
+.nameTextbox:hover:not([readonly]) {
+	text-decoration: underline;
+	border: solid 1px #6767b2;
+}
+
+.nameTextbox:focus:not([readonly]) {
+	background: white;
+	border: solid 1px #6767b2;
+	color: black;
+	text-decoration: none;
+}
