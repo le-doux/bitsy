@@ -1794,16 +1794,22 @@ function roomPaletteChange(event) {
 	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 }
 
-function updateDrawingNameUI(visible) {
-	document.getElementById("drawingNameUI").setAttribute("style", visible ? "display:initial;" : "display:none;");
+function updateDrawingNameUI() {
 	var obj = paintTool.getCurObject();
-	console.log("update drawing name ui");
-	console.log(obj);
-	if( obj.name != null )
+
+	if (drawing.type == TileType.Avatar) { // hacky
+		document.getElementById("drawingName").value = "avatar"; // TODO: localize
+	}
+	else if (obj.name != null) {
 		document.getElementById("drawingName").value = obj.name;
-	else
+	}
+	else {
 		document.getElementById("drawingName").value = "";
+	}
+
 	document.getElementById("drawingName").placeholder = getCurPaintModeStr() + " " + drawing.id;
+
+	document.getElementById("drawingName").readOnly = (drawing.type == TileType.Avatar);
 }
 
 function on_paint_avatar() {
@@ -1821,11 +1827,9 @@ function on_paint_avatar() {
 function on_paint_avatar_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:none;");
-	document.getElementById("paintNav").setAttribute("style","display:none;");
-	document.getElementById("paintCommands").setAttribute("style","display:none;");
+	// TODO : make navigation commands un-clickable
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(false);
-	//document.getElementById("animation").setAttribute("style","display:none;");
 	document.getElementById("paintOptionAvatar").checked = true;
 	document.getElementById("paintExplorerOptionAvatar").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
@@ -1847,8 +1851,6 @@ function on_paint_tile() {
 function on_paint_tile_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:block;");
-	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
-	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
@@ -1880,8 +1882,6 @@ function on_paint_sprite() {
 function on_paint_sprite_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
-	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
-	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
@@ -1909,8 +1909,6 @@ function on_paint_item() {
 function on_paint_item_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
-	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
-	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");

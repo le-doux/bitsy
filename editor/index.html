@@ -531,30 +531,23 @@
 						</label>
 						
 					</form>
-					<div>
-						<div id="paintNav" class="buttonGroup">
-							<span id="drawingNameUI" title="a name to refer to this drawing">  <!--class="controlSpan">-->
-								<!-- <span class="localize name_label">name</span> -->
-								<input type="text" id="drawingName" class="nameTextbox" onchange="on_drawing_name_change();" size="10"></input>
-							</span>
-							<button title="previous drawing" class="color0" onclick="prev();">
-								<i class="navigate_before material-icons"><span>navigate_before</span></i>
-							</button>
-							<button title="next drawing" class="color0" onclick="next();" style="margin-left:-5px;">
-								<i class="navigate_next material-icons"><span>navigate_next</span></i>
-							</button>
-						</div>
-						<div id="paintCommands" class="buttonGroup">
-							<button title="add drawing" class="color0" onclick="newDrawing();">
-								<i class="material-icons">add</i>
-							</button>
-							<button title="duplicate drawing" class="color0" onclick="duplicateDrawing();">
-								<i class="material-icons">content_copy</i>
-							</button>
-							<button title="delete drawing" class="color0" onclick="deleteDrawing();">
-								<i class="material-icons">remove_circle</i>
-							</button>
-						</div>
+					<div id="paintNavigationControls">
+						<input title="a name to refer to this drawing" type="text" id="drawingName" class="nameTextbox" onchange="on_drawing_name_change();" size="10"></input>
+						<button title="previous drawing" class="color0" onclick="prev();">
+							<i class="navigate_before material-icons"><span>navigate_before</span></i>
+						</button>
+						<button title="next drawing" class="color0" onclick="next();" style="margin-left:-5px;">
+							<i class="navigate_next material-icons"><span>navigate_next</span></i>
+						</button>
+						<button title="add drawing" class="color0" onclick="newDrawing();">
+							<i class="material-icons">add</i>
+						</button>
+						<button title="duplicate drawing" class="color0" onclick="duplicateDrawing();">
+							<i class="material-icons">content_copy</i>
+						</button>
+						<button title="delete drawing" class="color0" onclick="deleteDrawing();">
+							<i class="material-icons">remove_circle</i>
+						</button>
 						<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('paintExplorerPanel');">
 							<i class="material-icons">search</i>
 						</button>
