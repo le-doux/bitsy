@@ -819,16 +819,6 @@ function start() {
 		}
 	}
 
-	// Automatically open tool trays that are needed
-	if( sortedRoomIdList().length > 1 )
-	{
-		toggleRoomToolsCore( true );
-	}
-	if( sortedPaletteIdList().length > 1 )
-	{
-		togglePaletteToolsCore( true );
-	}
-
 	//draw everything
 	on_paint_avatar();
 	paintTool.updateCanvas();
@@ -1640,21 +1630,6 @@ function toggleRoomToolsCore(visible) {
 		document.getElementById("roomTools").style.display = "none";
 		document.getElementById("roomToolsCheck").checked = false;
 		document.getElementById("roomToolsCheckIcon").innerHTML = "expand_less";
-	}
-}
-
-function togglePaletteTools(e) {
-	togglePaletteToolsCore( e.target.checked );
-}
-
-function togglePaletteToolsCore(visible) {
-	if( visible ) {
-		document.getElementById("paletteTools").style.display = "block";
-		document.getElementById("paletteToolsCheckIcon").innerHTML = "expand_more";
-	}
-	else {
-		document.getElementById("paletteTools").style.display = "none";
-		document.getElementById("paletteToolsCheckIcon").innerHTML = "expand_less";
 	}
 }
 
