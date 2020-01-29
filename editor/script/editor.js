@@ -1616,23 +1616,6 @@ function toggleToolBar(e) {
 	}
 }
 
-function toggleRoomTools(e) {
-	toggleRoomToolsCore( e.target.checked );
-}
-
-function toggleRoomToolsCore(visible) {
-	if( visible ) {
-		document.getElementById("roomTools").style.display = "block";
-		document.getElementById("roomToolsCheck").checked = true;
-		document.getElementById("roomToolsCheckIcon").innerHTML = "expand_more";
-	}
-	else {
-		document.getElementById("roomTools").style.display = "none";
-		document.getElementById("roomToolsCheck").checked = false;
-		document.getElementById("roomToolsCheckIcon").innerHTML = "expand_less";
-	}
-}
-
 function toggleDownloadOptions(e) {
 	if( e.target.checked ) {
 		document.getElementById("downloadOptions").style.display = "block";
