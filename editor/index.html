@@ -15,6 +15,7 @@
 		<link rel="stylesheet" type="text/css" href="style/markerToolStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/dialogToolStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/responsiveStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/navControlStyle.css">
 
 		<!-- GENERATED -->
 		<script src="script/generated/resources.js"></script>
@@ -284,7 +285,7 @@
 								<!-- <span class="localize name_label">name</span> -->
 								<!-- <span id="roomId">0</span> -->
 								
-								<input type="text" id="roomName" class="nameTextbox" onchange="on_room_name_change();" size="10"></input>
+								<input type="text" id="roomName" class="textInputField" onchange="on_room_name_change();" size="10"></input>
 								
 							</span>
 							<button title="previous room" class="color0" onclick="prevRoom();">
@@ -323,8 +324,7 @@
 
 							<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
 							<label title="show / hide exits & endings" for="roomMarkersCheck">
-								<i class="material-icons" id="roomMarkersIcon">visibility</i> 
-							</label>
+								<i class="material-icons" id="roomMarkersIcon">visibility</i></label>
 
 							<button title="add exits and endings" class="color0" onclick="showPanel('exitsPanel');">
 								<i class="material-icons">open_in_new</i>
@@ -532,7 +532,7 @@
 						
 					</form>
 					<div id="paintNavigationControls">
-						<input title="a name to refer to this drawing" type="text" id="drawingName" class="nameTextbox" onchange="on_drawing_name_change();" size="10"></input>
+						<input title="a name to refer to this drawing" type="text" id="drawingName" class="textInputField" onchange="on_drawing_name_change();" size="10"></input>
 						<button title="previous drawing" class="color0" onclick="prev();">
 							<i class="navigate_before material-icons"><span>navigate_before</span></i>
 						</button>
@@ -689,29 +689,24 @@
 						</div>
 					</div>
 
-					<div>
-						<span id="paletteNameUI" title="a name to refer to this drawing"> <!--class="controlSpan">-->
-							<!-- <span class="localize name_label">name</span> -->
-							<input type="text" id="paletteName" class="nameTextbox" onchange="on_palette_name_change(event);" size="10"></input>
-						</span>
+					<div class="navControl">
+						<input type="text" id="paletteName" title="a name to refer to this drawing" class="textInputField" onchange="on_palette_name_change(event);" size="10"></input>
 						
-						<div class="buttonGroup" id="paletteNav">
-							<button title="previous color palette" class="color0" onclick="prevPalette();">
-								<i class="navigate_before material-icons"><span>navigate_before</span></i>
-							</button>
-							<button title="next color palette" class="color0" onclick="nextPalette();">
-								<i class="navigate_next material-icons"><span>navigate_next</span></i>
-							</button>
-							<button title="add new color palette" class="color0" onclick="newPalette();">
-								<i class="material-icons">add</i>
-							</button>
-							<button title="duplicate palette" class="color0" onclick="duplicatePalette();">
-								<i class="material-icons">content_copy</i>
-							</button>
-							<button title="delete palette" class="color0" onclick="deletePalette();">
-								<i class="material-icons">remove_circle</i>
-							</button>
-						</div>
+						<button title="previous color palette" class="color0" onclick="prevPalette();">
+							<i class="navigate_before material-icons"><span>navigate_before</span></i>
+						</button>
+						<button title="next color palette" class="color0" onclick="nextPalette();">
+							<i class="navigate_next material-icons"><span>navigate_next</span></i>
+						</button>
+						<button title="add new color palette" class="color0" onclick="newPalette();">
+							<i class="material-icons">add</i>
+						</button>
+						<button title="duplicate palette" class="color0" onclick="duplicatePalette();">
+							<i class="material-icons">content_copy</i>
+						</button>
+						<button title="delete palette" class="color0" onclick="deletePalette();">
+							<i class="material-icons">remove_circle</i>
+						</button>
 					</div>
 
 					<form id="colorPaletteForm">
@@ -740,7 +735,7 @@
 						<div id="colorPickerSliderBg" title="color picker darkness / lightness slider">
 							<div id="colorPickerSliderThumb"></div>
 						</div>
-						<input id="colorPickerHexText" title="color picker hex code" type="text" />
+						<input id="colorPickerHexText" class="textInputField" title="color picker hex code" type="text" />
 					</div>
 				</div>
 

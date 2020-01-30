@@ -244,28 +244,8 @@
 	display: flex;
 }
 
-.titleTextInput {
+.titleWidget .textInputField {
 	flex-grow: 1;
-	border-radius: 5px;
-	padding: 5px;
-	color: #666;
-	background: #eee;
-	border: solid 1px #eee;
-}
-
-.titleTextInput:not([readonly]) {
-	color: black;
-}
-
-.titleTextInput:hover:not([readonly]) {
-	text-decoration: underline;
-	border: solid 1px #ccc;
-}
-
-.titleTextInput:focus:not([readonly]) {
-	background: white;
-	border: solid 1px #ccc;
-	text-decoration: none;
 }
 
 .titleOpenDialog {

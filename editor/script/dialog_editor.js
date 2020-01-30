@@ -40,7 +40,7 @@ function DialogTool() {
 		div.classList.add("titleWidget");
 
 		var titleTextInput = document.createElement("input");
-		titleTextInput.classList.add("titleTextInput");
+		titleTextInput.classList.add("textInputField");
 		titleTextInput.type = "text";
 		titleTextInput.placeholder = "Title"; // TODO : localize
 		div.appendChild(titleTextInput);

@@ -515,26 +515,27 @@ input {
 	height: 30px; margin-bottom: 5px;
 }
 
-.nameTextbox {
+.textInputField {
+	flex-grow: 1;
 	border-radius: 5px;
 	padding: 5px;
-	color: #ccccff;
-	background: #e8e8ff;
-	border: solid 1px #ccccff;
+	color: #666;
+	background: #eee;
+	border: solid 1px #eee;
+	line-height: 100%;
 }
 
-.nameTextbox:not([readonly]) {
-	color: #6767b2;
-}
-
-.nameTextbox:hover:not([readonly]) {
-	text-decoration: underline;
-	border: solid 1px #6767b2;
-}
-
-.nameTextbox:focus:not([readonly]) {
-	background: white;
-	border: solid 1px #6767b2;
+.textInputField:not([readonly]) {
 	color: black;
+}
+
+.textInputField:hover:not([readonly]) {
+	text-decoration: underline;
+	border: solid 1px #ccc;
+}
+
+.textInputField:focus:not([readonly]) {
+	background: white;
+	border: solid 1px #ccc;
 	text-decoration: none;
 }

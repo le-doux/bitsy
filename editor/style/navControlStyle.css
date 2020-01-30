@@ -1,0 +1,19 @@
+.navControl {
+	display: flex;
+	margin-bottom: 10px;
+}
+
+/*.navControl button {
+	line-height: 100%;
+}*/
+
+.navControl .textInputField {
+	margin-right: 4px;
+	flex-grow: 1;
+	/*margin-top: 2px;*/
+}
+
+.navControl button {
+	margin-top: 2px;
+	/*border: solid black 1px;*/
+}
