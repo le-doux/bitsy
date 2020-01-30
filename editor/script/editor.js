@@ -338,7 +338,8 @@ function openDialogTool(dialogId) {
 		dialogEditorViewport.appendChild(curDialogEditor.GetElement());
 	}
 
-	document.getElementById("dialogId").innerText = "dialog " + dialogId;
+	// TODO make this more real
+	document.getElementById("dialogName").value = "dialog " + dialogId;
 
 	if (document.getElementById("dialogPanel").style.display === "none") {
 		showPanel("dialogPanel");

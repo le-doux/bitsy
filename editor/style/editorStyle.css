@@ -14,7 +14,7 @@ body {
 }
 canvas {
 	background: black;
-	margin-top: 4px;
+	/*margin-top: 4px;*/
 }
 
 input[type=text] {

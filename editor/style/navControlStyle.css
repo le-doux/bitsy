@@ -17,3 +17,8 @@
 	margin-top: 2px;
 	/*border: solid black 1px;*/
 }
+
+.navControl input[type="checkbox"] + label {
+	margin-top: 2px;
+	margin-right: 4px; /* hack */
+}

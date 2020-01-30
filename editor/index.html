@@ -273,40 +273,29 @@
 						</div>
 					</div>
 					
-					<div style="margin-bottom:2px;">			
+					<div id="roomNav" class="navControl">
 						<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" />
 						<label title="play / pause game" for="playModeCheck">
 							<i class="material-icons" id="playModeIcon">play_arrow</i>
 							<span id="playModeText" class="localize play_game">play</span> <!-- TODO LOCALIZE: also stop_game -->
 						</label>
 
-						<div id="roomNav" class="buttonGroup">
-							<span title="a name to refer to this room"> <!--class="controlSpan">-->
-								<!-- <span class="localize name_label">name</span> -->
-								<!-- <span id="roomId">0</span> -->
-								
-								<input type="text" id="roomName" class="textInputField" onchange="on_room_name_change();" size="10"></input>
-								
-							</span>
-							<button title="previous room" class="color0" onclick="prevRoom();">
-								<i class="navigate_before material-icons"><span>navigate_before</span></i>
-							</button>
-							<button title="next room" class="color0" onclick="nextRoom();">
-								<i class="navigate_next material-icons"><span>navigate_next</span></i>
-							</button>
-						</div>
-
-						<div id="roomCommands" class="buttonGroup">
-							<button title="add new room" class="color0" onclick="newRoom();">
-								<i class="material-icons">add</i>
-							</button>
-							<button title="duplicate room" class="color0" onclick="duplicateRoom();">
-								<i class="material-icons">content_copy</i>
-							</button>
-							<button title="delete room" class="color0" onclick="deleteRoom();">
-								<i class="material-icons">remove_circle</i>
-							</button>
-						</div>
+						<input type="text" id="roomName" title="a name to refer to this room" class="textInputField" onchange="on_room_name_change();" size="10"></input>
+						<button title="previous room" class="color0" onclick="prevRoom();">
+							<i class="navigate_before material-icons"><span>navigate_before</span></i>
+						</button>
+						<button title="next room" class="color0" onclick="nextRoom();">
+							<i class="navigate_next material-icons"><span>navigate_next</span></i>
+						</button>
+						<button title="add new room" class="color0" onclick="newRoom();">
+							<i class="material-icons">add</i>
+						</button>
+						<button title="duplicate room" class="color0" onclick="duplicateRoom();">
+							<i class="material-icons">content_copy</i>
+						</button>
+						<button title="delete room" class="color0" onclick="deleteRoom();">
+							<i class="material-icons">remove_circle</i>
+						</button>
 					</div>
 
 					<canvas id="game"></canvas>
@@ -754,7 +743,15 @@
 
 					<div id="dialogEditorHasContent">
 						<!-- TODO : what is a good layout for these controls? -->
-						<div id="dialogNav">
+						<div class="navControl">
+							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
+							<label title="preview dialog" for="previewDialogCheck">
+								<i class="material-icons" id="previewDialogIcon">play_arrow</i>
+								<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
+							</label>
+
+							<input type="text" id="dialogName" title="a name to refer to this dialog" class="textInputField" onchange="//TODO" size="10"></input>
+
 							<button title="previous dialog" class="color0" onclick="prevDialog();">
 								<i class="navigate_before material-icons"><span>navigate_before</span></i>
 							</button>
@@ -770,26 +767,6 @@
 							<button title="delete dialog" class="color0" onclick="deleteDialog();">
 								<i class="material-icons">remove_circle</i>
 							</button>
-							<!-- hacky test -->
-							<span id="dialogId"></span>
-						</div>
-
-						<div id="dialogTop">
-							<span style="float:left">
-								<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
-								<label title="preview dialog" for="previewDialogCheck">
-									<i class="material-icons" id="previewDialogIcon">play_arrow</i>
-									<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
-								</label>
-							</span>
-							<span style="float:right">
-								<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);">
-								<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
-									<i class="material-icons">code</i> 
-									<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
-									<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
-								</label>
-							</span>
 						</div>
 
 						<div id="dialogTools" class="controlBox">
@@ -854,6 +831,15 @@
 						</div>
 
 						<div id="dialogEditor">
+						</div>
+
+						<div id="dialogOptions">
+							<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);">
+							<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
+								<i class="material-icons">code</i> 
+								<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
+								<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
+							</label>
 						</div>
 					</div>
 
