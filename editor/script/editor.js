@@ -1844,6 +1844,11 @@ function on_paint_avatar_ui_update() {
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerFilterInput").value = "";
+
+	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
+	for (var i = 0; i < disableForAvatarElements.length; i++) {
+		disableForAvatarElements[i].disabled = true;
+	}
 }
 
 function on_paint_tile() {
@@ -1868,6 +1873,11 @@ function on_paint_tile_ui_update() {
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerFilterInput").value = "";
+
+	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
+	for (var i = 0; i < disableForAvatarElements.length; i++) {
+		disableForAvatarElements[i].disabled = false;
+	}
 }
 
 function on_paint_sprite() {
@@ -1899,6 +1909,11 @@ function on_paint_sprite_ui_update() {
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerFilterInput").value = "";
+
+	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
+	for (var i = 0; i < disableForAvatarElements.length; i++) {
+		disableForAvatarElements[i].disabled = false;
+	}
 }
 
 function on_paint_item() {
@@ -1926,6 +1941,11 @@ function on_paint_item_ui_update() {
 	document.getElementById("showInventoryButton").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerFilterInput").value = "";
+
+	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
+	for (var i = 0; i < disableForAvatarElements.length; i++) {
+		disableForAvatarElements[i].disabled = false;
+	}
 }
 
 function paintExplorerFilterChange( e ) {
