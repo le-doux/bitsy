@@ -8,7 +8,7 @@
 }*/
 
 .navControl .textInputField {
-	margin-right: 4px;
+	margin-right: 2px;
 	flex-grow: 1;
 	/*margin-top: 2px;*/
 }
@@ -20,5 +20,9 @@
 
 .navControl input[type="checkbox"] + label {
 	margin-top: 2px;
-	margin-right: 4px; /* hack */
+	margin-right: 2px;
+}
+
+.navControl .spacer {
+	width: 4px;
 }

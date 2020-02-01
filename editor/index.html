@@ -280,13 +280,21 @@
 							<span id="playModeText" class="localize play_game">play</span> <!-- TODO LOCALIZE: also stop_game -->
 						</label>
 
+						<span class="spacer"></span>
+
 						<input type="text" id="roomName" title="a name to refer to this room" class="textInputField" onchange="on_room_name_change();" size="10"></input>
+
+						<span class="spacer"></span>
+
 						<button title="previous room" class="color0" onclick="prevRoom();">
 							<i class="navigate_before material-icons"><span>navigate_before</span></i>
 						</button>
 						<button title="next room" class="color0" onclick="nextRoom();">
 							<i class="navigate_next material-icons"><span>navigate_next</span></i>
 						</button>
+
+						<span class="spacer"></span>
+
 						<button title="add new room" class="color0" onclick="newRoom();">
 							<i class="material-icons">add</i>
 						</button>
@@ -494,7 +502,7 @@
 							<span class="localize paint_tool_name">paint</span>
 						</div>
 					</div>
-					<form id="paintModeRadio">
+					<form id="paintModeRadio" style="margin-bottom: 5px;">
 						<input type="radio" name="paint mode" value="avatar" onclick="on_paint_avatar();" id="paintOptionAvatar" checked>
 						<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
 							<i class="material-icons">perm_identity</i>
@@ -520,14 +528,20 @@
 						</label>
 						
 					</form>
-					<div id="paintNavigationControls">
+					<div id="paintNavigationControls" class="navControl">
 						<input title="a name to refer to this drawing" type="text" id="drawingName" class="textInputField" onchange="on_drawing_name_change();" size="10"></input>
+
+						<span class="spacer"></span>
+
 						<button title="previous drawing" class="color0" onclick="prev();">
 							<i class="navigate_before material-icons"><span>navigate_before</span></i>
 						</button>
-						<button title="next drawing" class="color0" onclick="next();" style="margin-left:-5px;">
+						<button title="next drawing" class="color0" onclick="next();">
 							<i class="navigate_next material-icons"><span>navigate_next</span></i>
 						</button>
+
+						<span class="spacer"></span>
+
 						<button title="add drawing" class="color0" onclick="newDrawing();">
 							<i class="material-icons">add</i>
 						</button>
@@ -537,6 +551,9 @@
 						<button title="delete drawing" class="color0" onclick="deleteDrawing();">
 							<i class="material-icons">remove_circle</i>
 						</button>
+
+						<span class="spacer"></span>
+
 						<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('paintExplorerPanel');">
 							<i class="material-icons">search</i>
 						</button>
@@ -679,14 +696,19 @@
 					</div>
 
 					<div class="navControl">
-						<input type="text" id="paletteName" title="a name to refer to this drawing" class="textInputField" onchange="on_palette_name_change(event);" size="10"></input>
-						
+						<input type="text" id="paletteName" title="a name to refer to this color palette" class="textInputField" onchange="on_palette_name_change(event);" size="10"></input>
+
+						<span class="spacer"></span>
+
 						<button title="previous color palette" class="color0" onclick="prevPalette();">
 							<i class="navigate_before material-icons"><span>navigate_before</span></i>
 						</button>
 						<button title="next color palette" class="color0" onclick="nextPalette();">
 							<i class="navigate_next material-icons"><span>navigate_next</span></i>
 						</button>
+
+						<span class="spacer"></span>
+
 						<button title="add new color palette" class="color0" onclick="newPalette();">
 							<i class="material-icons">add</i>
 						</button>
@@ -742,7 +764,6 @@
 					</div>
 
 					<div id="dialogEditorHasContent">
-						<!-- TODO : what is a good layout for these controls? -->
 						<div class="navControl">
 							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
 							<label title="preview dialog" for="previewDialogCheck">
@@ -750,7 +771,11 @@
 								<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
 							</label>
 
+							<span class="spacer"></span>
+
 							<input type="text" id="dialogName" title="a name to refer to this dialog" class="textInputField" onchange="//TODO" size="10"></input>
+
+							<span class="spacer"></span>
 
 							<button title="previous dialog" class="color0" onclick="prevDialog();">
 								<i class="navigate_before material-icons"><span>navigate_before</span></i>
@@ -758,6 +783,9 @@
 							<button title="next dialog" class="color0" onclick="nextDialog();">
 								<i class="navigate_next material-icons"><span>navigate_next</span></i>
 							</button>
+
+							<span class="spacer"></span>
+
 							<button title="add new dialog" class="color0" onclick="addNewDialog();">
 								<i class="material-icons">add</i>
 							</button>
