@@ -338,8 +338,16 @@ function openDialogTool(dialogId) {
 		dialogEditorViewport.appendChild(curDialogEditor.GetElement());
 	}
 
-	// TODO make this more real
-	document.getElementById("dialogName").value = "dialog " + dialogId;
+	document.getElementById("dialogName").placeholder = "dialog " + dialogId;
+	if (dialogId === titleDialogId) {
+		document.getElementById("dialogName").readOnly = true;
+		document.getElementById("dialogName").value = titleDialogId;
+	}
+	else {
+		document.getElementById("dialogName").readOnly = false;
+		// TODO
+		document.getElementById("dialogName").value = "";
+	}
 
 	if (document.getElementById("dialogPanel").style.display === "none") {
 		showPanel("dialogPanel");
