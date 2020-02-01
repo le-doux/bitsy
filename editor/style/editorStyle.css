@@ -519,14 +519,16 @@ input {
 	flex-grow: 1;
 	border-radius: 5px;
 	padding: 5px;
-	color: #666;
-	background: #eee;
-	border: solid 1px #eee;
 	line-height: 100%;
+	color: #6767b2;
+	background: #e8e8ff;
+	border: solid 1px #e8e8ff;
 }
 
 .textInputField:not([readonly]) {
 	color: black;
+	background: #eee;
+	border: solid 1px #eee;
 }
 
 .textInputField:hover:not([readonly]) {
