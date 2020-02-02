@@ -392,7 +392,7 @@ function PaintTool(canvas, roomTool) {
 		spriteIndex = Object.keys(sprite).length - 1;
 	}
 
-	function newItem() {
+	function newItem(imageData) {
 		self.drawing.id = nextItemId();
 
 		makeItem(self.drawing.id, imageData);
