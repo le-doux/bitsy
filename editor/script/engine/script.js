@@ -256,6 +256,7 @@ var Utils = function() {
 		}
 		else {
 			scriptStr += lines[i];
+			i++;
 		}
 		return { script:scriptStr, index:i };
 	}

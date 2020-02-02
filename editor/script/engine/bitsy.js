@@ -19,10 +19,10 @@ var playerId = "A";
 
 var titleDialogId = "title";
 function getTitle() {
-	return dialog[titleDialogId];
+	return dialog[titleDialogId].src;
 }
 function setTitle(titleSrc) {
-	dialog[titleDialogId] = titleSrc;
+	dialog[titleDialogId] = { src:titleSrc, name:null };
 }
 
 var defaultFontName = "ascii_small";
@@ -845,13 +845,13 @@ function movePlayer(direction) {
 	}
 
 	if (end) {
-		startNarrating( dialog[end.id], true /*isEnding*/ );
+		startNarrating(dialog[end.id].src, true /*isEnding*/);
 	}
 	else if (ext) {
 		movePlayerThroughExit(ext);
 	}
 	else if (spr) {
-		startSpriteDialog( spr /*spriteId*/ );
+		startSpriteDialog(spr /*spriteId*/);
 	}
 }
 
@@ -874,7 +874,7 @@ function movePlayerThroughExit(ext) {
 		// TODO : I need to simplify dialog code,
 		// so I don't have to get the ID and the source str
 		// every time!
-		startDialog(dialog[ext.dlg], ext.dlg, function(result) {
+		startDialog(dialog[ext.dlg].src, ext.dlg, function(result) {
 			if (!result.IsDefaultActionLocked()) {
 				GoToDest();
 			}
@@ -1288,7 +1288,10 @@ function serializeWorld(skipFonts) {
 	for (id in dialog) {
 		if (id != titleDialogId) {
 			worldStr += "DLG " + id + "\n";
-			worldStr += dialog[id] + "\n";
+			worldStr += dialog[id].src + "\n";
+			if (dialog[id].name != null) {
+				worldStr += "NAME " + dialog[id].name + "\n";
+			}
 			worldStr += "\n";
 		}
 	}
@@ -1533,7 +1536,7 @@ function parsePalette(lines,i) { //todo this has to go first right now :(
 	var name = null;
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		var args = lines[i].split(" ");
-		if(args[0] === "NAME") {
+		if (args[0] === "NAME") {
 			name = lines[i].split(/\s(.+)/)[1];
 		}
 		else {
@@ -1800,7 +1803,7 @@ function parseScript(lines, i, backCompatPrefix, versionNumber) {
 
 	var results = scriptUtils.ReadDialogScript(lines,i);
 
-	dialog[id] = results.script;
+	dialog[id] = { src:results.script, name:null };
 
 	if (versionNumber < 7) {
 		// explicitly hook up dialog that used to be implicitly
@@ -1818,10 +1821,22 @@ function parseScript(lines, i, backCompatPrefix, versionNumber) {
 }
 
 function parseDialog(lines, i, versionNumber) {
-	return parseScript(lines, i, "", versionNumber);
+	// hacky but I need to store this so I can set the name below
+	var id = getId(lines[i]);
+
+	i = parseScript(lines, i, "", versionNumber);
+
+	// TODO: DESIGN DECISION --- should spaces be allowed in dialog names?
+	if (lines[i].length > 0 && getType(lines[i]) === "NAME") {
+		dialog[id].name = lines[i].split(/\s(.+)/)[1]; // TODO : hacky to keep copying this regex around...
+		i++;
+	}
+
+	return i;
 }
 
 function parseEnding(lines, i, versionNumber) {
+	// TODO : does this need to handle names?
 	return parseScript(lines, i, "_end_", versionNumber);
 }
 
@@ -2054,7 +2069,7 @@ function startItemDialog(itemId, dialogCallback) {
 	var dialogId = item[itemId].dlg;
 	// console.log("START ITEM DIALOG " + dialogId);
 	if (dialog[dialogId]) {
-		var dialogStr = dialog[dialogId];
+		var dialogStr = dialog[dialogId].src;
 		startDialog(dialogStr, dialogId, dialogCallback);
 	}
 	else {
@@ -2066,8 +2081,8 @@ function startSpriteDialog(spriteId) {
 	var spr = sprite[spriteId];
 	var dialogId = spr.dlg;
 	// console.log("START SPRITE DIALOG " + dialogId);
-	if(dialog[dialogId]){
-		var dialogStr = dialog[dialogId];
+	if (dialog[dialogId]){
+		var dialogStr = dialog[dialogId].src;
 		startDialog(dialogStr,dialogId);
 	}
 }

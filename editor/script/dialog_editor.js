@@ -140,7 +140,7 @@ function DialogTool() {
 				function CreatePresetHandler(scriptStr) {
 					return function() {
 						dialogId = nextAvailableDialogId();
-						dialog[dialogId] = scriptStr;
+						dialog[dialogId] = { src:scriptStr, name:null }; // TODO: I really need a standard way to init dialogs now!
 						events.Raise("new_dialog", {id:dialogId});
 						// TODO replace OnCreateNewDialog with OnCHange!!!!
 						if (creationOptions.OnCreateNewDialog) {
@@ -231,7 +231,7 @@ function DialogTool() {
 		var self = this;
 
 		function RefreshEditorUI() {
-			var dialogStr = dialogId === null ? "" : dialog[dialogId];
+			var dialogStr = dialogId === null ? "" : dialog[dialogId].src;
 
 			div.innerHTML = "";
 			scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
@@ -277,7 +277,7 @@ function DialogTool() {
 				dialogStr = '"""\n' + dialogStr + '\n"""';
 			}
 
-			dialog[dialogId] = dialogStr;
+			dialog[dialogId].src = dialogStr;
 
 			refreshGameData();
 
@@ -307,7 +307,7 @@ function DialogTool() {
 
 		var self = this;
 		function RefreshEditorUI() {
-			var dialogStr = dialog[dialogId];
+			var dialogStr = dialog[dialogId].src;
 
 			div.innerHTML = "";
 			scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
@@ -342,7 +342,7 @@ function DialogTool() {
 				dialogStr = '"""\n' + dialogStr + '\n"""';
 			}
 
-			dialog[dialogId] = dialogStr;
+			dialog[dialogId].src = dialogStr;
 
 			refreshGameData();
 

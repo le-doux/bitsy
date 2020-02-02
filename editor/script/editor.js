@@ -345,13 +345,28 @@ function openDialogTool(dialogId) {
 	}
 	else {
 		document.getElementById("dialogName").readOnly = false;
-		// TODO
-		document.getElementById("dialogName").value = "";
+		if (dialog[dialogId].name != null) {
+			document.getElementById("dialogName").value = dialog[dialogId].name;
+		}
+		else {
+			document.getElementById("dialogName").value = "";
+		}
 	}
 
 	if (document.getElementById("dialogPanel").style.display === "none") {
 		showPanel("dialogPanel");
 	}
+}
+
+// TODO : probably this should be incorporated into the dialog editor main code somehow
+function onDialogNameChange(event) {
+	if (event.target.value != null && event.target.value.length > 0) {
+		dialog[curDialogEditorId].name = event.target.value;
+	}
+	else {
+		dialog[curDialogEditorId].name = null;
+	}
+	refreshGameData();
 }
 
 function nextDialog() {
@@ -411,7 +426,7 @@ function prevDialog() {
 function addNewDialog() {
 	var id = nextAvailableDialogId();
 
-	dialog[id] = " ";
+	dialog[id] = { src:" ", name:null };
 	refreshGameData();
 
 	openDialogTool(id);
@@ -422,7 +437,7 @@ function addNewDialog() {
 function duplicateDialog() {
 	if (curDialogEditorId != null) {
 		var id = nextAvailableDialogId();
-		dialog[id] = dialog[curDialogEditorId].slice();
+		dialog[id] = { src:dialog[curDialogEditorId].slice(), name:null };
 		refreshGameData();
 
 		openDialogTool(id);
@@ -504,8 +519,14 @@ function resetGameData() {
 
 	// TODO : localize default_title
 	setTitle(localization.GetStringOrFallback("default_title", "Write your game's title here"));
-	dialog["0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"); // hacky to do this in two places :(
-	dialog["1"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
+	dialog["0"] = {
+		src: localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"), // hacky to do this in two places :(
+		name: null,
+	};
+	dialog["1"] = {
+		src: localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea"),
+		name: null,
+	};
 
 	pickDefaultFontForLanguage(localization.GetLanguage());
 
@@ -1047,15 +1068,15 @@ function on_drawing_name_change() {
 		if(newName != oldName) {
 			for(dlgId in dialog) {
 				// console.log("DLG " + dlgId);
-				var dialogScript = scriptInterpreter.Parse( dialog[dlgId] );
+				var dialogScript = scriptInterpreter.Parse(dialog[dlgId].src);
 				var visitor = new ItemNameSwapVisitor();
-				dialogScript.VisitAll( visitor );
-				if( visitor.DidSwap() ) {
+				dialogScript.VisitAll(visitor);
+				if (visitor.DidSwap()) {
 					var newDialog = dialogScript.Serialize();
-					if(newDialog.indexOf("\n") > -1) {
+					if (newDialog.indexOf("\n") > -1) {
 						newDialog = '"""\n' + newDialog + '\n"""';
 					}
-					dialog[dlgId] = newDialog;
+					dialog[dlgId].src = newDialog;
 				}
 			}
 		}
@@ -2073,7 +2094,7 @@ function convertGameDataToCurVersion(importVersion) {
 		};
 
 		for (dlgId in dialog) {
-			var dialogScript = scriptInterpreter.Parse(dialog[dlgId]);
+			var dialogScript = scriptInterpreter.Parse(dialog[dlgId].src);
 			var visitor = new PrintFunctionVisitor();
 			dialogScript.VisitAll(visitor);
 			if (visitor.DidChange()) {
@@ -2081,7 +2102,7 @@ function convertGameDataToCurVersion(importVersion) {
 				if (newDialog.indexOf("\n") > -1) {
 					newDialog = '"""\n' + newDialog + '\n"""';
 				}
-				dialog[dlgId] = newDialog;
+				dialog[dlgId].src = newDialog;
 			}
 		}
 	}
@@ -3305,14 +3326,20 @@ function on_change_language_inner(language) {
 	// update default sprite
 	var defaultSpriteDlgExists = dialog["0"] != null && localization.LocalizationContains("default_sprite_dlg", dialog["0"]);
 	if (defaultSpriteDlgExists) {
-		dialog["0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
+		dialog["0"] = {
+			src: localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"),
+			name: null,
+		};
 		paintTool.reloadDrawing();
 	}
 
 	// update default item
 	var defaultItemDlgExists = dialog["1"] != null && localization.LocalizationContains("default_item_dlg", dialog["1"]);
 	if (defaultItemDlgExists) {
-		dialog["1"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
+		dialog["1"] = {
+			src: localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea"),
+			name: null,
+		};
 		paintTool.reloadDrawing(); // hacky to do this twice
 	}
 
