@@ -188,7 +188,12 @@ function DialogTool() {
 			}
 			for (var i = 0; i < dialogIdList.length; i++) {
 				var dialogIdOption = document.createElement("option");
-				dialogIdOption.innerText = "dialog " + dialogIdList[i];
+				if (dialog[dialogIdList[i]].name != null) {
+					dialogIdOption.innerText = dialog[dialogIdList[i]].name;
+				}
+				else {
+					dialogIdOption.innerText = "dialog " + dialogIdList[i]; // TODO: localize
+				}
 				dialogIdOption.value = dialogIdList[i];
 				dialogIdOption.selected = dialogId === dialogIdList[i];
 				dialogIdSelect.appendChild(dialogIdOption);
