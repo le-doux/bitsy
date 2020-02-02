@@ -78,7 +78,7 @@ function DialogTool() {
 			if (!isMultiline) {
 				setTimeout(function() {
 					openButton.style.display = "none";
-				}, 100); // the timeout is a hack to allow clicking the open button
+				}, 300); // the timeout is a hack to allow clicking the open button
 			}
 		}
 
