@@ -234,10 +234,10 @@ function onready(startWithTitle) {
 		canvas.addEventListener('touchend', input.ontouchend, {passive:false});
 	}
 	else {
-		// creates a 'touchTrigger' element that covers the entire screen and can universal have touch event listeners added w/o issue.
+		// creates a 'touchTrigger' element that covers the entire screen and can universally have touch event listeners added w/o issue.
 
 		// we're checking for existing touchTriggers both at game start and end, so it's slightly redundant.
-	  	let existingTouchTrigger = document.querySelector('#touchTrigger');
+	  	var existingTouchTrigger = document.querySelector('#touchTrigger');
 	  	if (existingTouchTrigger === null){
 	  	  var touchTrigger = document.createElement("div");
 	  	  touchTrigger.setAttribute("id","touchTrigger");
@@ -415,14 +415,14 @@ function stopGame() {
 	else {
 		//check for touchTrigger and removes it
 
-    	let existingTouchTrigger = document.querySelector('#touchTrigger');
-    	if (existingTouchTrigger !== null){
-    		existingTouchTrigger.removeEventListener('touchstart', input.ontouchstart);
-    		existingTouchTrigger.removeEventListener('touchmove', input.ontouchmove);
-    		existingTouchTrigger.removeEventListener('touchend', input.ontouchend);
+    		var existingTouchTrigger = document.querySelector('#touchTrigger');
+    		if (existingTouchTrigger !== null){
+    			existingTouchTrigger.removeEventListener('touchstart', input.ontouchstart);
+    			existingTouchTrigger.removeEventListener('touchmove', input.ontouchmove);
+    			existingTouchTrigger.removeEventListener('touchend', input.ontouchend);
 
-    		existingTouchTrigger.parentElement.removeChild(existingTouchTrigger);
-    	}
+    			existingTouchTrigger.parentElement.removeChild(existingTouchTrigger);
+    		}
 	}
 
 	window.onblur = null;
