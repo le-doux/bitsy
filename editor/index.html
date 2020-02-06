@@ -453,50 +453,57 @@
 								<div id="endingDialogWidget">
 								</div>
 							</div>
-							<div id="exitOptions" class="controlBox">
-								<input type="checkbox" id="showExitOptionsCheck" onclick="onToggleExitOptions();" />
-								<label title="show / hide exit options" for="showExitOptionsCheck">
-									<span class="localize exit_options">exit options</span>
-									<i class="material-icons" id="showExitOptionsCheckIcon">expand_less</i>
-								</label>
-
-								<div id="exitOptionsInner">
-									<form id="exitOptionsRadio">
-										<input type="radio" name="exit options select" value="exit1" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions1" checked>
-										<label title="show exit 1 options" for="exitOptions1" class="left">
-											<span class="localize exit_label">exit</span>
-										</label>
-
-										<input type="radio" name="exit options select" value="exit2" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions2">
-										<label title="show exit 2 options" for="exitOptions2" class="right">
-											<span class="localize exit_return_label">return exit</span>
-										</label>
-									</form>
-
-									<div style="padding:4px;">
-										<div title="select transition effect" class="controlBox">
-											<span class="localize exit_transition_label">transition effect</span>: 
-											<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value);">
-												<option value="none">none</option>
-												<option value="fade_w">fade (white)</option>
-												<option value="fade_b">fade (black)</option>
-												<option value="wave">wave</option>
-												<option value="tunnel">tunnel</option>
-												<option value="slide_u">slide up</option>
-												<option value="slide_d">slide down</option>
-												<option value="slide_l">slide left</option>
-												<option value="slide_r">slide right</option>
-											</select>
-										</div>
-
-										<div id="exitDialogControls">
-											<!-- todo : do these need to be nested like this? -->
-											<div id="exitDialogWidget">
-											</div>
-										</div>
-									</div>
+							<div id="exitOptions">
+								<div>
+									<span>exit options</span>
 								</div>
 
+								<div title="select transition effect" class="controlBox">
+									<span class="localize exit_transition_label">transition effect</span>: 
+									<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value);">
+										<option value="none">none</option>
+										<option value="fade_w">fade (white)</option>
+										<option value="fade_b">fade (black)</option>
+										<option value="wave">wave</option>
+										<option value="tunnel">tunnel</option>
+										<option value="slide_u">slide up</option>
+										<option value="slide_d">slide down</option>
+										<option value="slide_l">slide left</option>
+										<option value="slide_r">slide right</option>
+									</select>
+								</div>
+
+								<div id="exitDialogControls">
+									<!-- todo : do these need to be nested like this? -->
+									<div id="exitDialogWidget">
+									</div>
+								</div>
+							</div>
+							<div id="returnExitOptions" style="margin-top: 5px">
+								<div>
+									<span>return exit options</span>
+								</div>
+
+								<div title="select transition effect" class="controlBox">
+									<span class="localize exit_transition_label">transition effect</span>: 
+									<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value);">
+										<option value="none">none</option>
+										<option value="fade_w">fade (white)</option>
+										<option value="fade_b">fade (black)</option>
+										<option value="wave">wave</option>
+										<option value="tunnel">tunnel</option>
+										<option value="slide_u">slide up</option>
+										<option value="slide_d">slide down</option>
+										<option value="slide_l">slide left</option>
+										<option value="slide_r">slide right</option>
+									</select>
+								</div>
+
+								<div id="exitDialogControls">
+									<!-- todo : do these need to be nested like this? -->
+									<div id="exitDialogWidget">
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>

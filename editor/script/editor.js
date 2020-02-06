@@ -2410,14 +2410,6 @@ function toggleRoomMarkers(visible) {
 	document.getElementById("roomMarkersIcon").innerHTML = visible ? "visibility" : "visibility_off";
 }
 
-function onToggleExitOptions() {
-	markerTool.SetExitOptionsVisibility(document.getElementById("showExitOptionsCheck").checked);
-}
-
-function onChangeExitOptionsSelect(exitSelectId) {
-	markerTool.UpdateExitOptions(exitSelectId);
-}
-
 function onChangeExitTransitionEffect(effectId) {
 	markerTool.ChangeExitTransitionEffect(effectId);
 }

@@ -91,8 +91,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			y : 2,
 			id : nextAvailableDialogId(),
 		};
-		room[selectedRoom].endings.push( newEnding );
-		dialog[ newEnding.id ] = localization.GetStringOrFallback("default_end_dlg", "The end");
+		room[selectedRoom].endings.push(newEnding);
+		dialog[newEnding.id] = { src:localization.GetStringOrFallback("default_end_dlg", "The end"), name:null };
 
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; }));
@@ -285,28 +285,16 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
-	this.SetExitOptionsVisibility = function(visible) {
-		document.getElementById("exitOptionsInner").style.display = visible ? "block" : "none";
-		document.getElementById("showExitOptionsCheckIcon").innerText = visible ? "expand_more" : "expand_less";
-
-		if (visible) {
-			var exitOptionsSelect = document.getElementsByName("exit options select");
-			var exitOptionsSelectValue = null;
-			for(var i = 0; i < exitOptionsSelect.length; i++){
-				exitOptionsSelect[i].checked = exitOptionsSelect[i].value === "exit1";
-			}
-			UpdateExitOptions("exit1");
-		}
-	}
-
 	var curExitOptionsSelectId = null; // hacky but don't judge me
 	function UpdateExitOptions(exitSelectId) {
 		curExitOptionsSelectId = exitSelectId;
 
-		document.getElementById("exitOptionsRadio").style.display = curMarker.hasReturn ? "flex" : "none";
+		// TODO
+		// document.getElementById("exitOptionsRadio").style.display = curMarker.hasReturn ? "flex" : "none";
 
 		// console.log("EXIT OPTIONS " + curExitOptionsSelectId);
-		var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
+		// TODO
+		var exit = curMarker.exit; // (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
 
 		var transitionId = exit.transition_effect;
 		if (transitionId == null) {
