@@ -357,6 +357,42 @@
 						</div>
 					</div>
 					<div id="exitsPanelContent">
+						<div id="markersControls" class="navControl">
+							<!-- TODO : hook up to actual "name", resize -->
+							<input type="text" id="markerName" class="textInputField" size="5" readonly></input>
+
+							<span class="spacer"></span>
+
+							<button title="previous" class="color0" onclick="prevMarker();">
+								<i class="navigate_before material-icons"><span>navigate_before</span></i>
+							</button>
+							<button title="next" class="color0" onclick="nextMarker();">
+								<i class="navigate_next material-icons"><span>navigate_next</span></i>
+							</button>
+
+							<span class="spacer"></span>
+
+							<!-- TODO add duplicate -->
+							<button title="delete" class="color0" onclick="deleteMarker();">
+								<i class="material-icons">remove_circle</i>
+							</button>
+
+							<span class="spacer"></span>
+
+							<!-- TODO refactor into one button with multiple sub-options -->
+							<button title="add exit" class="color0 left" onclick="newExit();">
+								<i class="material-icons">add</i> <span id="addExitText" class="localize exit_label">exit</span>
+							</button>
+							<button title="change exit mode" class="color0 right" onclick="changeExitMode();">
+								<i class="material-icons">more_horiz</i>
+							</button>
+
+							<span class="spacer"></span>
+
+							<button title="add ending" class="color0" onclick="newEnding();">
+								<i class="material-icons">add</i> <span class="localize ending_label">ending</span>
+							</button>
+						</div>
 						<div id="noMarkerMessage" class="controlBox">
 							<span class="localize marker_tool_empty">There are no exits or endings in this room yet! You can add one with this tool. :)</span>
 						</div>
@@ -410,30 +446,6 @@
 										</span>
 									</div>
 								</div>
-							</div>
-						</div>
-						<div id="markersControls" class="controlBox">
-							<div id="markersNav" class="buttonGroup">
-								<button title="previous" class="color0" onclick="prevMarker();">
-									<i class="navigate_before material-icons"><span>navigate_before</span></i>
-								</button>
-								<button title="next" class="color0" onclick="nextMarker();" style="margin-left:-5px;">
-									<i class="navigate_next material-icons"><span>navigate_next</span></i>
-								</button>
-								<button title="delete" class="color0" onclick="deleteMarker();">
-									<i class="material-icons">remove_circle</i>
-								</button>
-							</div>
-							<div id="markersAddCommands" class="buttonGroup">
-								<button title="add exit" class="color0 left" onclick="newExit();" style="margin-right: -3px">
-									<i class="material-icons">add</i> <span id="addExitText" class="localize exit_label">exit</span>
-								</button>
-								<button title="change exit mode" class="color0 right" onclick="changeExitMode();">
-									<i class="material-icons">more_horiz</i>
-								</button>
-								<button title="add ending" class="color0" onclick="newEnding();">
-									<i class="material-icons">add</i> <span class="localize ending_label">ending</span>
-								</button>
 							</div>
 						</div>
 						<div id="markerOptions">
