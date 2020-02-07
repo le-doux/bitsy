@@ -246,6 +246,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	function UpdateMarkerOptions() {
 		var exitOptions = document.getElementById("exitOptions");
 		exitOptions.style.display = "none";
+
 		var returnExitOptions = document.getElementById("returnExitOptions");
 		returnExitOptions.style.display = "none";
 
@@ -257,9 +258,11 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		if (curMarker != null) {
 			if (curMarker.type == MarkerType.Exit) {
-				exitOptions.style.display = "block";
+				if (document.getElementById("exitOptionsCheck1").checked) {
+					exitOptions.style.display = "block";
+				}
 
-				if (curMarker.hasReturn) {
+				if (curMarker.hasReturn && document.getElementById("exitOptionsCheck2").checked) {
 					returnExitOptions.style.display = "block";
 				}
 
@@ -349,6 +352,17 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var exit = (exitIndex == 1 && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
 		exit.transition_effect = effectId === "none" ? null : effectId;
 		refreshGameData();
+	}
+
+	this.ToggleExitOptions = function(exitIndex, visibility) {
+		if (exitIndex == 1 && !curMarker.hasReturn) {
+			return; // exit doesn't exist!
+		}
+
+		console.log(visibility);
+
+		var optionsDiv = document.getElementById(exitIndex == 0 ? "exitOptions" : "returnExitOptions");
+		optionsDiv.style.display = visibility ? "block" : "none";
 	}
 
 	this.RemoveMarker = function() {

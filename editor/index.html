@@ -401,6 +401,14 @@
 								<span id="markerName1">marker 1</span>
 								<canvas id="markerCanvas1" title="location of marker (click to go to room)" onclick="selectMarkerRoom1();"></canvas>
 								<div class="markerPosControl">
+									<div title="marker coordinates">
+										<span id="textMarkerPos1">room 0 (0,0)</span>
+									</div>
+									<div>
+										<span id="textMoveMessage1">
+											<i class="localize marker_move_click">click in room</i>
+										</span>
+									</div>
 									<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
 									<label for="toggleMoveMarker1" title="click to move marker">
 										<i class="material-icons">location_searching</i>
@@ -409,13 +417,12 @@
 									<button id="cancelMoveMarker1" title="cancel move" onclick="cancelMoveMarker1();">
 										<i class="material-icons">cancel</i>
 									</button>
-									<div title="marker coordinates">
-										<span id="textMarkerPos1">room 0 (0,0)</span>
-									</div>
 									<div>
-										<span id="textMoveMessage1">
-											<i class="localize marker_move_click">click in room</i>
-										</span>
+										<input type="checkbox" id="exitOptionsCheck1" onclick="toggleExitOptions(0, event.target.checked);" />
+										<label title="show / hide exit options" for="exitOptionsCheck1">
+											<i class="material-icons">settings</i> 
+											<span>options</span> <!-- TODO : localize -->
+										</label>
 									</div>
 								</div>
 							</div>
@@ -444,6 +451,13 @@
 										<span id="textMoveMessage2">
 											<i class="localize marker_move_click">click in room</i>
 										</span>
+									</div>
+									<div>
+										<input type="checkbox" id="exitOptionsCheck2" onclick="toggleExitOptions(1, event.target.checked);" />
+										<label title="show / hide exit options" for="exitOptionsCheck2">
+											<i class="material-icons">settings</i> 
+											<span>options</span> <!-- TODO : localize -->
+										</label>
 									</div>
 								</div>
 							</div>
