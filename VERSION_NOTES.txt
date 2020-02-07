@@ -4,6 +4,8 @@ v6.5: [in progress]
 -- @zachThePerson fixed error messages with chrome touch controls
 -- @ragzouken duplicating drawings didn't update the finder thumbnail
 -- @zachThePerson dragging out of a tool would select outside text
+-- @ayolland fixed touch controls in iOS
+-- @aloelazoe fixed a bug when adding new items
 
 v6.4:
 - importing games from HTML works again
