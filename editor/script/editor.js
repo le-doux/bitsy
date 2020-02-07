@@ -2410,8 +2410,8 @@ function toggleRoomMarkers(visible) {
 	document.getElementById("roomMarkersIcon").innerHTML = visible ? "visibility" : "visibility_off";
 }
 
-function onChangeExitTransitionEffect(effectId) {
-	markerTool.ChangeExitTransitionEffect(effectId);
+function onChangeExitTransitionEffect(effectId, exitId) {
+	markerTool.ChangeExitTransitionEffect(effectId, exitId);
 }
 
 // TODO : put helper method somewhere more.. helpful

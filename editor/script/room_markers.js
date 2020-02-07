@@ -246,6 +246,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	function UpdateMarkerOptions() {
 		var exitOptions = document.getElementById("exitOptions");
 		exitOptions.style.display = "none";
+		var returnExitOptions = document.getElementById("returnExitOptions");
+		returnExitOptions.style.display = "none";
 
 		var endingOptions = document.getElementById("endingOptions");
 		endingOptions.style.display = "none";
@@ -257,15 +259,11 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			if (curMarker.type == MarkerType.Exit) {
 				exitOptions.style.display = "block";
 
-				var exitOptionsSelect = document.getElementsByName("exit options select");
-				var exitOptionsSelectValue = null;
-				for(var i = 0; i < exitOptionsSelect.length; i++){
-					if(exitOptionsSelect[i].checked){
-						exitOptionsSelectValue = exitOptionsSelect[i].value;
-					}
+				if (curMarker.hasReturn) {
+					returnExitOptions.style.display = "block";
 				}
 
-				UpdateExitOptions(exitOptionsSelectValue);
+				UpdateAllExitOptions();
 			}
 			else if (curMarker.type == MarkerType.Ending) {
 				endingOptions.style.display = "block";
@@ -285,16 +283,19 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
-	var curExitOptionsSelectId = null; // hacky but don't judge me
-	function UpdateExitOptions(exitSelectId) {
-		curExitOptionsSelectId = exitSelectId;
+	function UpdateAllExitOptions() {
+		UpdateExitOptions(0);
+		if (curMarker.hasReturn) {
+			UpdateExitOptions(1);
+		}
+	}
 
-		// TODO
-		// document.getElementById("exitOptionsRadio").style.display = curMarker.hasReturn ? "flex" : "none";
+	function UpdateExitOptions(exitIndex) {
+		if (exitIndex == 1 && !curMarker.hasReturn) {
+			return; // oh no! the return doesn't exist!
+		}
 
-		// console.log("EXIT OPTIONS " + curExitOptionsSelectId);
-		// TODO
-		var exit = curMarker.exit; // (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
+		var exit = (exitIndex == 1 && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
 
 		var transitionId = exit.transition_effect;
 		if (transitionId == null) {
@@ -302,12 +303,12 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 		// console.log("transitionId " + transitionId);
 
-		var transitionSelect = document.getElementById("exitTransitionEffectSelect");
+		var transitionSelect = document.getElementById(exitIndex == 0 ? "exitTransitionEffectSelect" : "returnExitTransitionEffectSelect");
 		for (var i = 0; i < transitionSelect.options.length; i++) {
 			transitionSelect.options[i].selected = (transitionSelect.options[i].value === transitionId);
 		}
 
-		var exitDialogControls = document.getElementById("exitDialogControls");
+		var exitDialogControls = document.getElementById(exitIndex == 0 ? "exitDialogControls" : "returnExitDialogControls");
 		exitDialogControls.innerHTML = "";
 		var dialogWidget = dialogTool.CreateWidget(
 			"exit dialog", // TODO : localize
@@ -339,10 +340,13 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			});
 		exitDialogControls.appendChild(dialogWidget.GetElement());
 	}
-	this.UpdateExitOptions = UpdateExitOptions;
 
-	this.ChangeExitTransitionEffect = function(effectId) {
-		var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
+	this.ChangeExitTransitionEffect = function(effectId, exitIndex) {
+		if (exitIndex == 1 && !curMarker.hasReturn) {
+			return; // exit doesn't exist!
+		}
+
+		var exit = (exitIndex == 1 && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
 		exit.transition_effect = effectId === "none" ? null : effectId;
 		refreshGameData();
 	}
@@ -419,10 +423,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// hacky global method!!
 		if (curMarker != null && curMarker.MarkerCount() >= 1) {
 			selectRoom(curMarker.GetMarkerPos(0).room);
-
-			// if (curMarker.type == MarkerType.Exit) {
-			// 	UpdateExitOptions("exit1");
-			// }
 		}
 	}
 
@@ -430,10 +430,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// hacky global method!!
 		if (curMarker != null && curMarker.MarkerCount() >= 2) {
 			selectRoom(curMarker.GetMarkerPos(1).room);
-
-			// if (curMarker.type == MarkerType.Exit) {
-			// 	UpdateExitOptions("exit2");
-			// }
 		}
 	}
 
@@ -714,7 +710,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				exit.dlg = newDialogId;
 				refreshGameData();
 
-				UpdateExitOptions(curExitOptionsSelectId);
+				UpdateAllExitOptions();
 			}
 		}
 	}

@@ -455,12 +455,12 @@
 							</div>
 							<div id="exitOptions">
 								<div>
-									<span>exit options</span>
+									<span>exit options:</span> <!-- TODO : localize -->
 								</div>
 
 								<div title="select transition effect" class="controlBox">
 									<span class="localize exit_transition_label">transition effect</span>: 
-									<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value);">
+									<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value, 0);">
 										<option value="none">none</option>
 										<option value="fade_w">fade (white)</option>
 										<option value="fade_b">fade (black)</option>
@@ -474,19 +474,16 @@
 								</div>
 
 								<div id="exitDialogControls">
-									<!-- todo : do these need to be nested like this? -->
-									<div id="exitDialogWidget">
-									</div>
 								</div>
 							</div>
-							<div id="returnExitOptions" style="margin-top: 5px">
+							<div id="returnExitOptions" style="margin-top: 10px">
 								<div>
-									<span>return exit options</span>
+									<span>return exit options:</span> <!-- TODO : localize -->
 								</div>
 
 								<div title="select transition effect" class="controlBox">
 									<span class="localize exit_transition_label">transition effect</span>: 
-									<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value);">
+									<select id="returnExitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value, 1);">
 										<option value="none">none</option>
 										<option value="fade_w">fade (white)</option>
 										<option value="fade_b">fade (black)</option>
@@ -499,10 +496,7 @@
 									</select>
 								</div>
 
-								<div id="exitDialogControls">
-									<!-- todo : do these need to be nested like this? -->
-									<div id="exitDialogWidget">
-									</div>
+								<div id="returnExitDialogControls">
 								</div>
 							</div>
 						</div>
