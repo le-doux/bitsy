@@ -257,12 +257,17 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// effectOptions.style.display = "none";
 
 		if (curMarker != null) {
+			document.getElementById("exitOptionsToggle1").style.display =
+				(curMarker.type == MarkerType.Exit ? "block" : "none");
+			document.getElementById("exitOptionsToggle2").style.display =
+				(curMarker.type == MarkerType.Exit && curMarker.hasReturn ? "block" : "none");
+
 			if (curMarker.type == MarkerType.Exit) {
-				if (document.getElementById("exitOptionsCheck1").checked) {
+				if (document.getElementById("exitOptionsToggleCheck1").checked) {
 					exitOptions.style.display = "block";
 				}
 
-				if (curMarker.hasReturn && document.getElementById("exitOptionsCheck2").checked) {
+				if (curMarker.hasReturn && document.getElementById("exitOptionsToggleCheck2").checked) {
 					returnExitOptions.style.display = "block";
 				}
 
@@ -358,8 +363,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		if (exitIndex == 1 && !curMarker.hasReturn) {
 			return; // exit doesn't exist!
 		}
-
-		console.log(visibility);
 
 		var optionsDiv = document.getElementById(exitIndex == 0 ? "exitOptions" : "returnExitOptions");
 		optionsDiv.style.display = visibility ? "block" : "none";

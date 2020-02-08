@@ -417,9 +417,9 @@
 									<button id="cancelMoveMarker1" title="cancel move" onclick="cancelMoveMarker1();">
 										<i class="material-icons">cancel</i>
 									</button>
-									<div>
-										<input type="checkbox" id="exitOptionsCheck1" onclick="toggleExitOptions(0, event.target.checked);" />
-										<label title="show / hide exit options" for="exitOptionsCheck1">
+									<div id="exitOptionsToggle1">
+										<input type="checkbox" id="exitOptionsToggleCheck1" onclick="toggleExitOptions(0, event.target.checked);" />
+										<label title="show / hide exit options" for="exitOptionsToggleCheck1">
 											<i class="material-icons">settings</i> 
 											<span>options</span> <!-- TODO : localize -->
 										</label>
@@ -452,9 +452,9 @@
 											<i class="localize marker_move_click">click in room</i>
 										</span>
 									</div>
-									<div>
-										<input type="checkbox" id="exitOptionsCheck2" onclick="toggleExitOptions(1, event.target.checked);" />
-										<label title="show / hide exit options" for="exitOptionsCheck2">
+									<div id="exitOptionsToggle2">
+										<input type="checkbox" id="exitOptionsToggleCheck2" onclick="toggleExitOptions(1, event.target.checked);" />
+										<label title="show / hide exit options" for="exitOptionsToggleCheck2">
 											<i class="material-icons">settings</i> 
 											<span>options</span> <!-- TODO : localize -->
 										</label>
