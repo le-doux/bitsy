@@ -262,12 +262,17 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		if (curMarker != null) {
 			document.getElementById("exitOptionsToggle1").style.display =
-				(curMarker.type == MarkerType.Exit ? "block" : "none");
+				(curMarker.type == MarkerType.Exit && curMarker.linkState != LinkState.OneWaySwapped ? 
+					"block" : "none");
+			document.getElementById("exitOptionsToggle1_alt").style.display =
+				(curMarker.type == MarkerType.Exit && curMarker.linkState == LinkState.OneWaySwapped ? 
+					"block" : "none");
 			document.getElementById("exitOptionsToggle2").style.display =
 				(curMarker.type == MarkerType.Exit && curMarker.hasReturn ? "block" : "none");
 
 			if (curMarker.type == MarkerType.Exit) {
-				if (document.getElementById("exitOptionsToggleCheck1").checked) {
+				if (document.getElementById("exitOptionsToggleCheck1").checked
+					|| document.getElementById("exitOptionsToggleCheck1_alt").checked) {
 					exitOptions.style.display = "block";
 				}
 

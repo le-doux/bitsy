@@ -2407,6 +2407,11 @@ function onChangeExitTransitionEffect(effectId, exitIndex) {
 }
 
 function toggleExitOptions(exitIndex, visibility) {
+	if (exitIndex == 0) {
+		// hacky way to keep these in syncs!!!
+		document.getElementById("exitOptionsToggleCheck1").checked = visibility;
+		document.getElementById("exitOptionsToggleCheck1_alt").checked = visibility;
+	}
 	markerTool.ToggleExitOptions(exitIndex, visibility);
 }
 
