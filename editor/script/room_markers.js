@@ -212,6 +212,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			UpdateMarkerNames();
 		}
 		else {
+			document.getElementById("markerName").value = ""; // hacky
 			noMarkerMessage.style.display = "inline-block";
 		}
 
