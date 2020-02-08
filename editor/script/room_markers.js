@@ -221,10 +221,13 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	function UpdateMarkerNames() {
+		var markerInputName = document.getElementById("markerName"); // TODO : not sure exactly what I want to do with this or if I want it
+
 		var markerName1 = document.getElementById("markerName1");
 		var markerName2 = document.getElementById("markerName2");
 
 		if (curMarker.type == MarkerType.Exit) {
+			markerInputName.value = "exit (" + curMarker.exit.x + "," + curMarker.exit.y + ")"; // TODO : localize
 			if (curMarker.linkState == LinkState.TwoWay) {
 				markerName1.innerText = localization.GetStringOrFallback("exit_label", "exit");
 				markerName2.innerText = localization.GetStringOrFallback("exit_return_label", "return exit");
@@ -239,6 +242,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 		}
 		else if (curMarker.type == MarkerType.Ending) {
+			markerInputName.value = "ending (" + curMarker.ending.x + "," + curMarker.ending.y + ")"; // TODO : localize
 			markerName1.innerText = localization.GetStringOrFallback("ending_label", "ending");
 		}
 	}
