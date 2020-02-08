@@ -2363,20 +2363,12 @@ function toggleMoveMarker1(e) {
 	markerTool.TogglePlacingFirstMarker(e.target.checked);
 }
 
-function cancelMoveMarker1() {
-	markerTool.TogglePlacingFirstMarker(false);
-}
-
 function selectMarkerRoom1() {
 	markerTool.SelectMarkerRoom1();
 }
 
 function toggleMoveMarker2(e) {
 	markerTool.TogglePlacingSecondMarker(e.target.checked);
-}
-
-function cancelMoveMarker2() {
-	markerTool.TogglePlacingSecondMarker(false);
 }
 
 function selectMarkerRoom2() {

@@ -403,21 +403,15 @@
 								<div class="markerPosControl">
 									<div title="marker coordinates">
 										<span id="textMarkerPos1">room 0 (0,0)</span>
-									</div>
-									<div>
 										<span id="textMoveMessage1">
 											<i class="localize marker_move_click">click in room</i>
 										</span>
+										<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
+										<label for="toggleMoveMarker1" title="click to move marker">
+											<i class="material-icons" id="toggleMoveMarkerIcon1">location_searching</i>
+										</label>
 									</div>
-									<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
-									<label for="toggleMoveMarker1" title="click to move marker">
-										<i class="material-icons">location_searching</i>
-										<span id="textMoveMarker1" class="localize marker_move">move</span>
-									</label>
-									<button id="cancelMoveMarker1" title="cancel move" onclick="cancelMoveMarker1();">
-										<i class="material-icons">cancel</i>
-									</button>
-									<div id="exitOptionsToggle1">
+									<div id="exitOptionsToggle1" style="margin-top: 5px;">
 										<input type="checkbox" id="exitOptionsToggleCheck1" onclick="toggleExitOptions(0, event.target.checked);" />
 										<label title="show / hide exit options" for="exitOptionsToggleCheck1">
 											<i class="material-icons">settings</i> 
@@ -436,23 +430,17 @@
 								<span id="markerName2">marker 2</span>
 								<canvas id="markerCanvas2" title="location of marker (click to go to room)" onclick="selectMarkerRoom2();"></canvas>
 								<div class="markerPosControl">
-									<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" />
-									<label for="toggleMoveMarker2" title="click to move marker">
-										<i class="material-icons">location_searching</i>
-										<span id="textMoveMarker2"class="localize marker_move">move</span>
-									</label>
-									<button id="cancelMoveMarker2" title="cancel move" onclick="cancelMoveMarker2();">
-										<i class="material-icons">cancel</i>
-									</button>
 									<div title="marker coordinates">
 										<span id="textMarkerPos2">room 0 (0,0)</span>
-									</div>
-									<div>
 										<span id="textMoveMessage2">
 											<i class="localize marker_move_click">click in room</i>
 										</span>
+										<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" />
+										<label for="toggleMoveMarker2" title="click to move marker">
+											<i class="material-icons" id="toggleMoveMarkerIcon2">location_searching</i>
+										</label>
 									</div>
-									<div id="exitOptionsToggle2">
+									<div id="exitOptionsToggle2" style="margin-top: 5px;">
 										<input type="checkbox" id="exitOptionsToggleCheck2" onclick="toggleExitOptions(1, event.target.checked);" />
 										<label title="show / hide exit options" for="exitOptionsToggleCheck2">
 											<i class="material-icons">settings</i> 

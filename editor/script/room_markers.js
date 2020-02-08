@@ -469,31 +469,27 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// hackily relies on global UI names oh well D:
 		if (placementMode == PlacementMode.FirstMarker) {
 			document.getElementById("toggleMoveMarker1").checked = true;
-			document.getElementById("textMoveMarker1").innerText = localization.GetStringOrFallback("marker_moving", "moving");
-			document.getElementById("cancelMoveMarker1").style.display = "inline";
+			document.getElementById("toggleMoveMarkerIcon1").innerText = "cancel";
 			document.getElementById("textMoveMessage1").style.display = "inline";
 			document.getElementById("textMarkerPos1").style.display = "none";
 		}
 		else {
 			// var markerPos1 = curMarker.GetMarkerPos(0);
 			document.getElementById("toggleMoveMarker1").checked = false;
-			document.getElementById("textMoveMarker1").innerText = localization.GetStringOrFallback("marker_move", "move");
-			document.getElementById("cancelMoveMarker1").style.display = "none";
+			document.getElementById("toggleMoveMarkerIcon1").innerText = "location_searching";
 			document.getElementById("textMoveMessage1").style.display = "none";
 			document.getElementById("textMarkerPos1").style.display = "inline";
 		}
 
 		if (placementMode == PlacementMode.SecondMarker) {
 			document.getElementById("toggleMoveMarker2").checked = true;
-			document.getElementById("textMoveMarker2").innerText = localization.GetStringOrFallback("marker_moving", "moving");
-			document.getElementById("cancelMoveMarker2").style.display = "inline";
+			document.getElementById("toggleMoveMarkerIcon2").innerText = "cancel";
 			document.getElementById("textMoveMessage2").style.display = "inline";
 			document.getElementById("textMarkerPos2").style.display = "none";
 		}
 		else {
 			document.getElementById("toggleMoveMarker2").checked = false;
-			document.getElementById("textMoveMarker2").innerText = localization.GetStringOrFallback("marker_move", "move");
-			document.getElementById("cancelMoveMarker2").style.display = "none";
+			document.getElementById("toggleMoveMarkerIcon2").innerText = "location_searching";
 			document.getElementById("textMoveMessage2").style.display = "none";
 			document.getElementById("textMarkerPos2").style.display = "inline";
 		}
