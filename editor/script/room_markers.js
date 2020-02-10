@@ -34,13 +34,17 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var addMarkerOptions = document.getElementById("addMarkerOptions");
 		var markersSelect = document.getElementById("markersSelect");
 		var noMarkerMessage = document.getElementById("noMarkerMessage");
+		var markerOptions = document.getElementById("markerOptions");
 		addMarkerOptions.style.display = "flex";
 		markersSelect.style.display = "none";
 		noMarkerMessage.style.display = "none";
+		markerOptions.style.display = "none";
 		document.getElementById("markerName").value = ""; // hacky
 	}
 
 	this.CancelAdd = function() {
+		var markerOptions = document.getElementById("markerOptions");
+		markerOptions.style.display = "block";
 		RenderMarkerSelection();
 	}
 
