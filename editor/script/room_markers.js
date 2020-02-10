@@ -30,6 +30,20 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		RenderMarkerSelection();
 	}
 
+	this.StartAdd = function() {
+		var addMarkerOptions = document.getElementById("addMarkerOptions");
+		var markersSelect = document.getElementById("markersSelect");
+		var noMarkerMessage = document.getElementById("noMarkerMessage");
+		addMarkerOptions.style.display = "flex";
+		markersSelect.style.display = "none";
+		noMarkerMessage.style.display = "none";
+		document.getElementById("markerName").value = ""; // hacky
+	}
+
+	this.CancelAdd = function() {
+		RenderMarkerSelection();
+	}
+
 	this.AddExit = function(isOneWay) { // TODO : make destination select smarter
 		if (selectedRoom == null) {
 			return;
@@ -158,8 +172,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	function RenderMarkerSelection() { // TODO - break this up???
 		console.log('render marker');
 
+		var addMarkerOptions = document.getElementById("addMarkerOptions");
 		var markersSelect = document.getElementById("markersSelect");
 		var noMarkerMessage = document.getElementById("noMarkerMessage");
+		addMarkerOptions.style.display = "none";
 		markersSelect.style.display = "none";
 		noMarkerMessage.style.display = "none";
 

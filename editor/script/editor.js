@@ -2315,23 +2315,22 @@ function toggleVersionNotes(e) {
 /* MARKERS (exits & endings) */
 var markerTool;
 
-var isOneWayExitMode = false;
+function startAddMarker() {
+	markerTool.StartAdd();
+}
+
+function cancelAddMarker() {
+	markerTool.CancelAdd();
+}
 
 function newExit() {
-	markerTool.AddExit(isOneWayExitMode);
+	markerTool.AddExit(false);
 	roomTool.drawEditMap();
 }
 
-function changeExitMode() {
-	isOneWayExitMode = !isOneWayExitMode;
-
-	// TODO localize
-	if (isOneWayExitMode) {
-		document.getElementById("addExitText").innerText = "one-way exit"
-	}
-	else {
-		document.getElementById("addExitText").innerText = "exit"
-	}
+function newExitOneWay() {
+	markerTool.AddExit(true);
+	roomTool.drawEditMap();
 }
 
 function newEnding() {

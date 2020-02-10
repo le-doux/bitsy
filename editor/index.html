@@ -372,25 +372,33 @@
 
 							<span class="spacer"></span>
 
-							<!-- TODO add duplicate -->
+							<button title="add exit or ending" class="color0" onclick="startAddMarker();">
+								<i class="material-icons">add</i>
+							</button>
+
+							<!-- TODO : implement -->
+							<button title="duplicate exit or ending" class="color0" onclick="//TODO">
+								<i class="material-icons">content_copy</i>
+							</button>
+
 							<button title="delete" class="color0" onclick="deleteMarker();">
 								<i class="material-icons">remove_circle</i>
 							</button>
-
-							<span class="spacer"></span>
-
-							<!-- TODO refactor into one button with multiple sub-options -->
-							<button title="add exit" class="color0 left" onclick="newExit();">
+						</div>
+						<!-- todo : move style elsewhere -->
+						<div id="addMarkerOptions" class="controlBox" style="display: flex; flex-direction: column; min-width: 300px">
+							<button title="add two-way exit" onclick="newExit();">
 								<i class="material-icons">add</i> <span id="addExitText" class="localize exit_label">exit</span>
 							</button>
-							<button title="change exit mode" class="color0 right" onclick="changeExitMode();">
-								<i class="material-icons">more_horiz</i>
+							<button title="add one-way exit" onclick="newExitOneWay();">
+								<i class="material-icons">add</i> <span id="addExitText">one-way exit</span> <!-- TODO : localize -->
 							</button>
-
-							<span class="spacer"></span>
-
-							<button title="add ending" class="color0" onclick="newEnding();">
+							<button title="add ending" onclick="newEnding();">
 								<i class="material-icons">add</i> <span class="localize ending_label">ending</span>
+							</button>
+							<!-- TODO : need a general cancel button style -->
+							<button title="cancel" style="background: #6767b2; color: white;" onclick="cancelAddMarker();">
+								<i class="material-icons">cancel</i> <span>cancel</span> <!-- TODO : localize -->
 							</button>
 						</div>
 						<div id="noMarkerMessage" class="controlBox">
