@@ -304,37 +304,27 @@ function deprecatedFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
-function printFunc(environment,parameters,onReturn) {
-	// console.log("PRINT FUNC");
-	// console.log(parameters);
-	if( parameters[0] != undefined && parameters[0] != null ) {
-		// console.log(parameters[0]);
-		// console.log(parameters[0].toString());
-		// var textStr = parameters[0].toString();
+function printFunc(environment, parameters, onReturn) {
+	if (parameters[0] != undefined && parameters[0] != null) {
 		var textStr = "" + parameters[0];
-		// console.log(textStr);
-		var onFinishHandler = function() {
-			// console.log("FINISHED PRINTING ---- SCRIPT");
-			onReturn(null);
-		}; // called when dialog is finished printing
-		environment.GetDialogBuffer().AddText( textStr, onFinishHandler );
+		environment.GetDialogBuffer().AddText(textStr);
+		environment.GetDialogBuffer().AddScriptReturn(function() { onReturn(null); });
 	}
 	else {
 		onReturn(null);
 	}
 }
 
-function linebreakFunc(environment,parameters,onReturn) {
+function linebreakFunc(environment, parameters, onReturn) {
 	// console.log("LINEBREAK FUNC");
 	environment.GetDialogBuffer().AddLinebreak();
-	onReturn(null);
+	environment.GetDialogBuffer().AddScriptReturn(function() { onReturn(null); });
 }
 
-function printDrawingFunc(environment,parameters,onReturn) {
+function printDrawingFunc(environment, parameters, onReturn) {
 	var drawingId = parameters[0];
-	environment.GetDialogBuffer().AddDrawing( drawingId, function() {
-		onReturn(null);
-	});
+	environment.GetDialogBuffer().AddDrawing(drawingId);
+	environment.GetDialogBuffer().AddScriptReturn(function() { onReturn(null); });
 }
 
 function printSpriteFunc(environment,parameters,onReturn) {

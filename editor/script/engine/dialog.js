@@ -277,8 +277,6 @@ var DialogBuffer = function() {
 	};
 
 	this.DoNextChar = function() {
-		// console.log("DO NEXT CHAR");
-
 		nextCharTimer = 0; //reset timer
 
 		//time to update characters
@@ -295,13 +293,11 @@ var DialogBuffer = function() {
 			//the page is full!
 			isDialogReadyToContinue = true;
 			didPageFinishThisFrame = true;
-
-			// console.log("WAITING FOR INPUT");
 		}
 
-		// console.log(this.CurChar());
-		if(this.CurChar() != null)
+		if (this.CurChar() != null) {
 			this.CurChar().OnPrint(); // make sure we hit the callback before we run out of text
+		}
 	};
 
 	this.Update = function(dt) {
@@ -412,7 +408,7 @@ var DialogBuffer = function() {
 		}
 		this.OnPrint = function() {
 			if (printHandler != null) {
-				console.log("PRINT HANDLER ---- DIALOG BUFFER");
+				// console.log("PRINT HANDLER ---- DIALOG BUFFER");
 				printHandler();
 				printHandler = null; // only call handler once (hacky)
 			}
@@ -456,6 +452,14 @@ var DialogBuffer = function() {
 		this.spacing = 8;
 	}
 
+	function DialogScriptControlChar() {
+		Object.assign(this, new DialogChar([]));
+
+		this.width = 0;
+		this.height = 0;
+		this.spacing = 0;
+	}
+
 	function AddWordToCharArray(charArray,word,effectList) {
 		for(var i = 0; i < word.length; i++) {
 			charArray.push( new DialogFontChar( font, word[i], effectList ) );
@@ -482,49 +486,59 @@ var DialogBuffer = function() {
 
 	var pixelsPerRow = 192; // hard-coded fun times!!!
 
-	this.AddDrawing = function(drawingId, onFinishHandler) {
+	this.AddScriptReturn = function(onReturnHandler) {
+		var curPageIndex = buffer.length - 1;
+		var curRowIndex = buffer[curPageIndex].length - 1;
+		var curRowArr = buffer[curPageIndex][curRowIndex];
+
+		var controlChar = new DialogScriptControlChar();
+		controlChar.SetPrintHandler(onReturnHandler);
+
+		curRowArr.push(controlChar);
+
+		isActive = true;
+	}
+
+	this.AddDrawing = function(drawingId) {
 		// console.log("DRAWING ID " + drawingId);
 
 		var curPageIndex = buffer.length - 1;
 		var curRowIndex = buffer[curPageIndex].length - 1;
 		var curRowArr = buffer[curPageIndex][curRowIndex];
 
-		var drawingChar = new DialogDrawingChar(drawingId, activeTextEffects)
-		drawingChar.SetPrintHandler( onFinishHandler );
+		var drawingChar = new DialogDrawingChar(drawingId, activeTextEffects);
 
 		var rowLength = GetCharArrayWidth(curRowArr);
 
 		// TODO : clean up copy-pasted code here :/
-		if (rowLength + drawingChar.spacing  <= pixelsPerRow || rowLength <= 0)
-		{
+		if (rowLength + drawingChar.spacing  <= pixelsPerRow || rowLength <= 0) {
 			//stay on same row
-			curRowArr.push( drawingChar );
+			curRowArr.push(drawingChar);
 		}
-		else if (curRowIndex == 0)
-		{
+		else if (curRowIndex == 0) {
 			//start next row
-			buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
-			buffer[ curPageIndex ].push( [] );
+			buffer[curPageIndex][curRowIndex] = curRowArr;
+			buffer[curPageIndex].push([]);
 			curRowIndex++;
-			curRowArr = buffer[ curPageIndex ][ curRowIndex ];
-			curRowArr.push( drawingChar );
+			curRowArr = buffer[curPageIndex][curRowIndex];
+			curRowArr.push(drawingChar);
 		}
 		else {
 			//start next page
-			buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
-			buffer.push( [] );
+			buffer[curPageIndex][curRowIndex] = curRowArr;
+			buffer.push([]);
 			curPageIndex++;
-			buffer[ curPageIndex ].push( [] );
+			buffer[curPageIndex].push([]);
 			curRowIndex = 0;
-			curRowArr = buffer[ curPageIndex ][ curRowIndex ];
-			curRowArr.push( drawingChar );
+			curRowArr = buffer[curPageIndex][curRowIndex];
+			curRowArr.push(drawingChar);
 		}
 
 		isActive = true; // this feels like a bad way to do this???
 	}
 
 	// TODO : convert this into something that takes DialogChar arrays
-	this.AddText = function(textStr,onFinishHandler) {
+	this.AddText = function(textStr) {
 		// console.log("ADD TEXT " + textStr);
 
 		//process dialog so it's easier to display
@@ -545,67 +559,68 @@ var DialogBuffer = function() {
 			}
 
 			var wordWithPrecedingSpace = ((i == 0) ? "" : " ") + word;
-			var wordLength = GetStringWidth( wordWithPrecedingSpace );
+			var wordLength = GetStringWidth(wordWithPrecedingSpace);
 
 			var rowLength = GetCharArrayWidth(curRowArr);
 
 			if (rowLength + wordLength <= pixelsPerRow || rowLength <= 0) {
 				//stay on same row
-				curRowArr = AddWordToCharArray( curRowArr, wordWithPrecedingSpace, activeTextEffects );
+				curRowArr = AddWordToCharArray(curRowArr, wordWithPrecedingSpace, activeTextEffects);
 			}
 			else if (curRowIndex == 0) {
 				//start next row
-				buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
-				buffer[ curPageIndex ].push( [] );
+				buffer[curPageIndex][curRowIndex] = curRowArr;
+				buffer[curPageIndex].push([]);
 				curRowIndex++;
-				curRowArr = buffer[ curPageIndex ][ curRowIndex ];
-				curRowArr = AddWordToCharArray( curRowArr, word, activeTextEffects );
+				curRowArr = buffer[curPageIndex][curRowIndex];
+				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects);
 			}
 			else {
 				//start next page
-				buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
-				buffer.push( [] );
+				buffer[curPageIndex][curRowIndex] = curRowArr;
+				buffer.push([]);
 				curPageIndex++;
-				buffer[ curPageIndex ].push( [] );
+				buffer[curPageIndex].push([]);
 				curRowIndex = 0;
-				curRowArr = buffer[ curPageIndex ][ curRowIndex ];
-				curRowArr = AddWordToCharArray( curRowArr, word, activeTextEffects );
+				curRowArr = buffer[curPageIndex][curRowIndex];
+				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects);
 			}
 		}
 
 		//destroy any empty stuff
-		var lastPage = buffer[ buffer.length-1 ];
-		var lastRow = lastPage[ lastPage.length-1 ];
-		if( lastRow.length == 0 )
-			lastPage.splice( lastPage.length-1, 1 );
-		if( lastPage.length == 0 )
-			buffer.splice( buffer.length-1, 1 );
-
-		//finish up 
-		lastPage = buffer[ buffer.length-1 ];
-		lastRow = lastPage[ lastPage.length-1 ];
-		if( lastRow.length > 0 ) {
-			var lastChar = lastRow[ lastRow.length-1 ];
-			lastChar.SetPrintHandler( onFinishHandler );
+		var lastPage = buffer[buffer.length-1];
+		var lastRow = lastPage[lastPage.length-1];
+		if (lastRow.length == 0) {
+			lastPage.splice(lastPage.length-1, 1);
+		}
+		if (lastPage.length == 0) {
+			buffer.splice(buffer.length-1, 1);
 		}
 
-		console.log(buffer);
+		//finish up 
+		lastPage = buffer[buffer.length-1];
+		lastRow = lastPage[lastPage.length-1];
+		if (lastRow.length > 0) {
+			var lastChar = lastRow[lastRow.length-1];
+		}
+
+		// console.log(buffer);
 
 		isActive = true;
 	};
 
 	this.AddLinebreak = function() {
-		var lastPage = buffer[ buffer.length-1 ];
-		if( lastPage.length <= 1 ) {
-			console.log("LINEBREAK - NEW ROW ");
+		var lastPage = buffer[buffer.length-1];
+		if (lastPage.length <= 1) {
+			// console.log("LINEBREAK - NEW ROW ");
 			// add new row
-			lastPage.push( [] );
+			lastPage.push([]);
 		}
 		else {
 			// add new page
-			buffer.push( [[]] );
+			buffer.push([[]]);
 		}
-		console.log(buffer);
+		// console.log(buffer);
 
 		isActive = true;
 	}
