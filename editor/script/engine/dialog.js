@@ -174,20 +174,22 @@ var DialogRenderer = function() {
 	};
 
 	var effectTime = 0; // TODO this variable should live somewhere better
-	this.Draw = function(buffer,dt) {
+	this.Draw = function(buffer, dt) {
 		effectTime += dt;
 
 		this.ClearTextbox();
 
-		buffer.ForEachActiveChar( this.DrawChar );
+		buffer.ForEachActiveChar(this.DrawChar);
 
-		if( buffer.CanContinue() )
+		if (buffer.CanContinue()) {
 			this.DrawNextArrow();
+		}
 
 		this.DrawTextbox();
 
-		if( buffer.DidPageFinishThisFrame() && onPageFinish != null )
+		if (buffer.DidPageFinishThisFrame() && onPageFinish != null) {
 			onPageFinish();
+		}
 	};
 
 	/* this is a hook for GIF rendering */
@@ -296,6 +298,12 @@ var DialogBuffer = function() {
 		}
 
 		if (this.CurChar() != null) {
+			if (this.CurChar().isPageBreak) {
+				// special case for page break marker character!
+				isDialogReadyToContinue = true;
+				didPageFinishThisFrame = true;
+			}
+			
 			this.CurChar().OnPrint(); // make sure we hit the callback before we run out of text
 		}
 	};
@@ -351,6 +359,13 @@ var DialogBuffer = function() {
 
 	this.Continue = function() {
 		console.log("CONTINUE");
+
+		// if we used a page break character to continue we need
+		// to run whatever is in the script afterwards! // TODO : make this comment better
+		if (this.CurChar().isPageBreak) {
+			this.CurChar().onContinue(); // TODO : should be uppercase?
+		}
+
 		if (pageIndex + 1 < this.CurPageCount()) {
 			//start next page
 			this.FlipPage();
@@ -460,6 +475,17 @@ var DialogBuffer = function() {
 		this.spacing = 0;
 	}
 
+	// is a control character really the best way to handle page breaks?
+	function DialogPageBreakChar() {
+		Object.assign(this, new DialogChar([]));
+
+		this.width = 0;
+		this.height = 0;
+		this.spacing = 0;
+
+		this.isPageBreak = true;
+	}
+
 	function AddWordToCharArray(charArray,word,effectList) {
 		for(var i = 0; i < word.length; i++) {
 			charArray.push( new DialogFontChar( font, word[i], effectList ) );
@@ -510,8 +536,21 @@ var DialogBuffer = function() {
 
 		var rowLength = GetCharArrayWidth(curRowArr);
 
+		var firstWordAfterPagebreak = this.CurChar() && this.CurChar().isPageBreak;
+
 		// TODO : clean up copy-pasted code here :/
-		if (rowLength + drawingChar.spacing  <= pixelsPerRow || rowLength <= 0) {
+		if (firstWordAfterPagebreak) {
+			buffer[curPageIndex][curRowIndex] = curRowArr;
+			buffer.push([]);
+			curPageIndex++;
+			buffer[curPageIndex].push([]);
+			curRowIndex = 0;
+			curRowArr = buffer[curPageIndex][curRowIndex];
+			curRowArr.push(drawingChar);
+
+			firstWordAfterPagebreak = false;
+		}
+		else if (rowLength + drawingChar.spacing  <= pixelsPerRow || rowLength <= 0) {
 			//stay on same row
 			curRowArr.push(drawingChar);
 		}
@@ -539,7 +578,7 @@ var DialogBuffer = function() {
 
 	// TODO : convert this into something that takes DialogChar arrays
 	this.AddText = function(textStr) {
-		// console.log("ADD TEXT " + textStr);
+		console.log("ADD TEXT " + textStr);
 
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
@@ -552,6 +591,8 @@ var DialogBuffer = function() {
 		var curRowIndex = buffer[curPageIndex].length - 1;
 		var curRowArr = buffer[curPageIndex][curRowIndex];
 
+		var firstWordAfterPagebreak = this.CurChar() && this.CurChar().isPageBreak;
+
 		for (var i = 0; i < words.length; i++) {
 			var word = words[i];
 			if (arabicHandler.ContainsArabicCharacters(word)) {
@@ -563,7 +604,19 @@ var DialogBuffer = function() {
 
 			var rowLength = GetCharArrayWidth(curRowArr);
 
-			if (rowLength + wordLength <= pixelsPerRow || rowLength <= 0) {
+			if (firstWordAfterPagebreak) {
+				// hacky copied bit for page breaks
+				buffer[curPageIndex][curRowIndex] = curRowArr;
+				buffer.push([]);
+				curPageIndex++;
+				buffer[curPageIndex].push([]);
+				curRowIndex = 0;
+				curRowArr = buffer[curPageIndex][curRowIndex];
+				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects);
+
+				firstWordAfterPagebreak = false;
+			}
+			else if (rowLength + wordLength <= pixelsPerRow || rowLength <= 0) {
 				//stay on same row
 				curRowArr = AddWordToCharArray(curRowArr, wordWithPrecedingSpace, activeTextEffects);
 			}
@@ -623,6 +676,19 @@ var DialogBuffer = function() {
 		// console.log(buffer);
 
 		isActive = true;
+	}
+
+	this.AddPagebreak = function(onReturnHandler) {
+		var curPageIndex = buffer.length - 1;
+		var curRowIndex = buffer[curPageIndex].length - 1;
+		var curRowArr = buffer[curPageIndex][curRowIndex];
+
+		var pagebreakChar = new DialogPageBreakChar();
+		pagebreakChar.onContinue = onReturnHandler; // kind of hacky? should it have a function wrapper?
+
+		curRowArr.push(pagebreakChar);
+
+		// isActive = true; // TODO : necessary for page break?		
 	}
 
 	/* new text effects */

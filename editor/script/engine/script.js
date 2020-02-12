@@ -321,6 +321,10 @@ function linebreakFunc(environment, parameters, onReturn) {
 	environment.GetDialogBuffer().AddScriptReturn(function() { onReturn(null); });
 }
 
+function pagebreakFunc(environment, parameters, onReturn) {
+	environment.GetDialogBuffer().AddPagebreak(function() { console.log("PAGE BREAK CONTINUE!"); onReturn(null); });
+}
+
 function printDrawingFunc(environment, parameters, onReturn) {
 	var drawingId = parameters[0];
 	environment.GetDialogBuffer().AddDrawing(drawingId);
@@ -579,6 +583,7 @@ var Environment = function() {
 	functionMap.set("exit", exitFunc);
 	functionMap.set("giveItem", giveItemFunc);
 	functionMap.set("takeItem", takeItemFunc);
+	functionMap.set("pg", pagebreakFunc); // TODO : name?
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn,env) {
