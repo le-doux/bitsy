@@ -683,12 +683,21 @@ var DialogBuffer = function() {
 		var curRowIndex = buffer[curPageIndex].length - 1;
 		var curRowArr = buffer[curPageIndex][curRowIndex];
 
+		// need to actually create a whole new page if following another pagebreak character
+		if (this.CurChar() && this.CurChar().isPageBreak) {
+			buffer.push([]);
+			curPageIndex++;
+			buffer[curPageIndex].push([]);
+			curRowIndex = 0;
+			curRowArr = buffer[curPageIndex][curRowIndex];
+		}
+
 		var pagebreakChar = new DialogPageBreakChar();
 		pagebreakChar.onContinue = onReturnHandler; // kind of hacky? should it have a function wrapper?
 
 		curRowArr.push(pagebreakChar);
 
-		// isActive = true; // TODO : necessary for page break?		
+		isActive = true;		
 	}
 
 	/* new text effects */
