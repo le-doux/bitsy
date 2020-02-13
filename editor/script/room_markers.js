@@ -188,6 +188,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		markerControl1.style.visibility = "hidden";
 		markerControl2.style.visibility = "hidden";
 
+		var markerOptions = document.getElementById("markerOptions");
+		markerOptions.style.display = "block";
+
 		if (curMarker != null) {
 			markersSelect.style.display = "flex";
 			var w = tilesize * scale;
@@ -248,7 +251,20 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var markerName2 = document.getElementById("markerName2");
 
 		if (curMarker.type == MarkerType.Exit) {
-			markerInputName.value = "exit (" + curMarker.exit.x + "," + curMarker.exit.y + ")"; // TODO : localize
+			// TODO : why are the counts backwards?
+			// kind of a long-winded way to figure out a number for this exit in this room
+			var exitIndex = 0;
+			var exitCount = 0;
+			for (var i = 0; i < markerList.length; i++) {
+				if (markerList[i].exit) {
+					if (markerList[i] == curMarker) {
+						exitIndex = exitCount;
+					}
+					exitCount++;
+				}
+			}
+
+			markerInputName.value = "exit " + (exitIndex + 1) + "/" + exitCount; // TODO : localize
 			if (curMarker.linkState == LinkState.TwoWay) {
 				markerName1.innerText = localization.GetStringOrFallback("exit_label", "exit");
 				markerName2.innerText = localization.GetStringOrFallback("exit_return_label", "return exit");
@@ -263,7 +279,19 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 		}
 		else if (curMarker.type == MarkerType.Ending) {
-			markerInputName.value = "ending (" + curMarker.ending.x + "," + curMarker.ending.y + ")"; // TODO : localize
+			// a similarly long-winded way to get the ending number
+			var endingIndex = 0;
+			var endingCount = 0;
+			for (var i = 0; i < markerList.length; i++) {
+				if (markerList[i].ending) {
+					if (markerList[i] == curMarker) {
+						endingIndex = endingCount;
+					}
+					endingCount++;
+				}
+			}
+
+			markerInputName.value = "ending " + (endingIndex + 1) + "/" + endingCount; // TODO : localize
 			markerName1.innerText = localization.GetStringOrFallback("ending_label", "ending");
 		}
 	}
