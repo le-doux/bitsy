@@ -1,6 +1,5 @@
 /* 
-TODO 
-- wait to trigger functions until all text has been displayed!
+TODO
 - refactor widget so there aren't multiple callbacks for creating a new DLG
 - back compat for when you could implicitly link dialog to sprites by giving them the same ID
 */
@@ -622,6 +621,16 @@ function DialogTool() {
 					parentEditor.GetNodes()[0].AddChild(printFunc);
 
 					var editor = new DialogEditor([printFunc], parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"dialog",
+				"pagebreak", // TODO : name?
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("pg", []);
+					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
 
@@ -1526,6 +1535,10 @@ function DialogTool() {
 				{ type: "count", index: 1 },
 				{ type: "itemId", index: 0 },
 			],
+		},
+		"pg" : {
+			description : "start a new page", // TODO : ok description?
+			parameters : [],
 		},
 	};
 
