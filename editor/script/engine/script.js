@@ -427,11 +427,36 @@ function endFunc(environment,parameters,onReturn) {
 }
 
 function exitFunc(environment,parameters,onReturn) {
-	player().room = parameters[0];
-	player().x = parseInt(parameters[1]);
-	player().y = parseInt(parameters[2]);
-	curRoom = parameters[0];
-	onReturn(null);
+	var destRoom = parameters[0];
+	var destX = parseInt(parameters[1]);
+	var destY = parseInt(parameters[2]);
+
+	if (parameters.length >= 4) {
+		var transitionEffect = parameters[3];
+
+		transition.BeginTransition(
+			player().room,
+			player().x,
+			player().y,
+			destRoom,
+			destX,
+			destY,
+			transitionEffect);
+		transition.UpdateTransition(0);
+	}
+
+	player().room = destRoom;
+	player().x = destX;
+	player().y = destY;
+	curRoom = destRoom;
+
+	// TODO : this doesn't play nice with pagebreak because it thinks the dialog is finished!
+	// if (transition.IsTransitionActive()) {
+	// 	transition.OnTransitionComplete(function() { onReturn(null); });
+	// }
+	// else {
+		onReturn(null);
+	// }
 }
 
 function giveItemFunc(environment,parameters,onReturn) {

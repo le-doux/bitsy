@@ -367,11 +367,13 @@ var DialogBuffer = function() {
 		}
 
 		if (pageIndex + 1 < this.CurPageCount()) {
+			console.log("FLIP PAGE!");
 			//start next page
 			this.FlipPage();
 			return true; /* hasMoreDialog */
 		}
 		else {
+			console.log("END DIALOG!");
 			//end dialog mode
 			this.EndDialog();
 			return false; /* hasMoreDialog */
@@ -592,6 +594,8 @@ var DialogBuffer = function() {
 		var curRowArr = buffer[curPageIndex][curRowIndex];
 
 		var firstWordAfterPagebreak = this.CurChar() && this.CurChar().isPageBreak;
+
+		console.log("first word? " + firstWordAfterPagebreak);
 
 		for (var i = 0; i < words.length; i++) {
 			var word = words[i];
