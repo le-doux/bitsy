@@ -322,7 +322,7 @@ function linebreakFunc(environment, parameters, onReturn) {
 }
 
 function pagebreakFunc(environment, parameters, onReturn) {
-	environment.GetDialogBuffer().AddPagebreak(function() { console.log("PAGE BREAK CONTINUE!"); onReturn(null); });
+	environment.GetDialogBuffer().AddPagebreak(function() { onReturn(null); });
 }
 
 function printDrawingFunc(environment, parameters, onReturn) {
@@ -451,12 +451,12 @@ function exitFunc(environment,parameters,onReturn) {
 	curRoom = destRoom;
 
 	// TODO : this doesn't play nice with pagebreak because it thinks the dialog is finished!
-	// if (transition.IsTransitionActive()) {
-	// 	transition.OnTransitionComplete(function() { onReturn(null); });
-	// }
-	// else {
+	if (transition.IsTransitionActive()) {
+		transition.OnTransitionComplete(function() { onReturn(null); });
+	}
+	else {
 		onReturn(null);
-	// }
+	}
 }
 
 function giveItemFunc(environment,parameters,onReturn) {
