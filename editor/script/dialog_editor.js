@@ -1513,9 +1513,10 @@ function DialogTool() {
 			parameters : [],
 		},
 		"exit" : {
-			description : "move player to _",
+			description : "move player to _ | with transition _",
 			parameters : [
 				{ type: "roomPos", index: 0 },
+				{ type: "transitionEffect", index: 3},
 			],
 		},
 		"narrate" : {
@@ -1763,6 +1764,70 @@ function DialogTool() {
 		}
 	}
 
+	function TransitionEffectParameterEditor(functionNode, parameterIndex, parentEditor, isEditable) {
+		// TODO : localize
+		var transitionTypes = [
+			{ name:"fade (white)", id:"fade_w" },
+			{ name:"fade (black)", id:"fade_b" },
+			{ name:"wave", id:"wave" },
+			{ name:"tunnel", id:"tunnel" },
+			{ name:"slide up", id:"slide_u" },
+			{ name:"slide down", id:"slide_d" },
+			{ name:"slide left", id:"slide_l" },
+			{ name:"slide right", id:"slide_r" },
+		];
+
+		var span = document.createElement("span");
+
+		var curTransitionId = null;
+		if (functionNode.args.length > parameterIndex) {
+			// TODO : error checking
+			curTransitionId = functionNode.args[parameterIndex].Serialize().slice(1,-1);
+		}
+
+		if (isEditable) {
+			var transitionSelect = document.createElement("select");
+			transitionSelect.title = "select transition effect";
+			span.appendChild(transitionSelect);
+
+			for (var i = 0; i < transitionTypes.length; i++) {
+				var id = transitionTypes[i].id;
+				var transitionOption = document.createElement("option");
+				transitionOption.value = id;
+				transitionOption.innerText = transitionTypes[i].name;
+				transitionOption.selected = id === curTransitionId;
+				transitionSelect.appendChild(transitionOption);
+			}
+
+			transitionSelect.onchange = function(event) {
+				var val = event.target.value;
+
+				var literal = scriptUtils.CreateStringLiteralNode(val);
+
+				functionNode.args.splice(parameterIndex, 1, literal);
+
+				parentEditor.NotifyUpdate();
+			}			
+		}
+		else {
+			// TODO : kind of using the loop in a weird way
+			for (var i = 0; i < transitionTypes.length; i++) {
+				var id = transitionTypes[i].id;
+				if (id === curTransitionId) {
+					var parameterValue = document.createElement("span");
+					parameterValue.classList.add("parameterUneditable");
+					parameterValue.innerText = transitionTypes[i].name;
+					span.appendChild(parameterValue);	
+				}
+			}
+		}
+
+
+		this.GetElement = function() {
+			return span;
+		}
+	}
+
 	function RoomPosParameterEditor(functionNode, parameterIndex, parentEditor, isEditable) {
 		var span = document.createElement("span");
 		span.classList.add("roomPosParameterEditor");
@@ -1851,6 +1916,7 @@ function DialogTool() {
 		"count" : CountParameterEditor,
 		"itemId" : ItemIdParameterEditor,
 		"roomPos" : RoomPosParameterEditor,
+		"transitionEffect" : TransitionEffectParameterEditor,
 	};
 
 	function OrderControls(editor, parentEditor) {
