@@ -1513,7 +1513,7 @@ function DialogTool() {
 			parameters : [],
 		},
 		"exit" : {
-			description : "move player to _ | with transition _",
+			description : "move player to _[ with transition _]",
 			parameters : [
 				{ type: "roomPos", index: 0 },
 				{ type: "transitionEffect", index: 3},
@@ -1572,8 +1572,18 @@ function DialogTool() {
 
 			for (var i = 0; i < descriptionTextSplit.length; i++) {
 				var descriptionSpan = document.createElement("span");
-				descriptionSpan.innerText = descriptionTextSplit[i];
 				descriptionDiv.appendChild(descriptionSpan);
+
+				var text = descriptionTextSplit[i];
+				if (text[0] === "[") {
+					// TODO : optional text start
+				}
+				else if (text[text.length - 1] === "]") {
+					// TODO : optional text end
+				}
+				else {
+					descriptionSpan.innerText = text;
+				}
 
 				if (i < descriptionTextSplit.length - 1) {
 					var parameterInfo = functionDescriptionMap[functionNode.name].parameters[i];
