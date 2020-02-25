@@ -1515,8 +1515,8 @@ function DialogTool() {
 		"exit" : {
 			description : "move player to _[ with transition _]",
 			parameters : [
-				{ type: "roomPos", index: 0 },
-				{ type: "transitionEffect", index: 3},
+				{ type: "roomPos", index: 0, name: "destination" },
+				{ type: "transitionEffect", index: 3, name: "transition effect" },
 			],
 		},
 		"narrate" : {
@@ -1558,6 +1558,10 @@ function DialogTool() {
 		var descriptionDiv = document.createElement("div");
 		div.appendChild(descriptionDiv);
 
+		var addParameterDiv = document.createElement("div");
+		addParameterDiv.style.marginTop = "5px"; // hack
+		div.appendChild(addParameterDiv);
+
 		var helpTextDiv = document.createElement("div");
 		div.appendChild(helpTextDiv);
 
@@ -1566,6 +1570,7 @@ function DialogTool() {
 		function CreateFunctionDescription(isEditable) {
 			curParameterEditors = [];
 			descriptionDiv.innerHTML = "";
+			addParameterDiv.innerHTML = "";
 
 			var descriptionText = functionDescriptionMap[functionNode.name].description;
 			var descriptionTextSplit = descriptionText.split("_");
@@ -1575,29 +1580,62 @@ function DialogTool() {
 				descriptionDiv.appendChild(descriptionSpan);
 
 				var text = descriptionTextSplit[i];
-				if (text[0] === "[") {
-					// TODO : optional text start
+				if (text[0] === "[") { // optional parameter text start
+					var nextParam = functionDescriptionMap[functionNode.name].parameters[i];
+					if (functionNode.args.length > nextParam.index) {
+						descriptionSpan.innerText = text.slice(1);
+					}
 				}
-				else if (text[text.length - 1] === "]") {
-					// TODO : optional text end
+				else if (text[text.length - 1] === "]") { // optional parameter text end
+					var prevParam = functionDescriptionMap[functionNode.name].parameters[i-1];
+					if (functionNode.args.length > prevParam.index) {
+						descriptionSpan.innerText = text.slice(0, text.length - 1);
+					}
 				}
-				else {
+				else { // regular description text
 					descriptionSpan.innerText = text;
 				}
 
 				if (i < descriptionTextSplit.length - 1) {
 					var parameterInfo = functionDescriptionMap[functionNode.name].parameters[i];
 
-					var parameterEditor;
-					if (parameterEditorMap[parameterInfo.type]) {
-						parameterEditor = new parameterEditorMap[parameterInfo.type](functionNode, parameterInfo.index, self, isEditable);
-					}
-					else {
-						parameterEditor = new DefaultParameterEditor(functionNode, parameterInfo.index, self, isEditable);
-					}
+					if (functionNode.args.length > parameterInfo.index) {
+						var parameterEditor;
+						if (parameterEditorMap[parameterInfo.type]) {
+							parameterEditor = new parameterEditorMap[parameterInfo.type](functionNode, parameterInfo.index, self, isEditable);
+						}
+						else {
+							parameterEditor = new DefaultParameterEditor(functionNode, parameterInfo.index, self, isEditable);
+						}
 
-					curParameterEditors.push(parameterEditor);
-					descriptionDiv.appendChild(parameterEditor.GetElement());	
+						curParameterEditors.push(parameterEditor);
+						descriptionDiv.appendChild(parameterEditor.GetElement());							
+					}
+					else if (isEditable && functionNode.args.length == parameterInfo.index && parameterInfo.name) {
+						function createAddParameterHandler(parameterInfo) {
+							return function() {
+								var defaultValues = parameterDefaultValueMap[parameterInfo.type];
+								for (var j = 0; j < defaultValues.length; j++) {
+									// TODO : will this work for all situations??
+									var literal = null;
+									if (typeof defaultValues[j] === "string") {
+										literal = scriptUtils.CreateStringLiteralNode(defaultValues[j]);
+									}
+									else {
+										literal = scriptUtils.CreateLiteralNode(defaultValues[j]);
+									}
+									functionNode.args.push(literal);
+								}
+								parentEditor.NotifyUpdate();
+								CreateFunctionDescription(true);
+							}
+						}
+
+						var addParameterButton = document.createElement('button');
+						addParameterButton.innerHTML = '<i class="material-icons">add</i>' + parameterInfo.name;
+						addParameterButton.onclick = createAddParameterHandler(parameterInfo);
+						addParameterDiv.appendChild(addParameterButton);
+					}
 				}
 			}
 
@@ -1927,6 +1965,14 @@ function DialogTool() {
 		"itemId" : ItemIdParameterEditor,
 		"roomPos" : RoomPosParameterEditor,
 		"transitionEffect" : TransitionEffectParameterEditor,
+	};
+
+	// TODO : merge with map above?
+	var parameterDefaultValueMap = {
+		"count" : [0],
+		"itemId" : ["0"],
+		"roomPos" : ["0", 0, 0],
+		"transitionEffect" : ["fade_w"],
 	};
 
 	function OrderControls(editor, parentEditor) {
