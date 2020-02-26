@@ -1515,8 +1515,8 @@ function DialogTool() {
 		"exit" : {
 			description : "move player to _[ with transition _]",
 			parameters : [
-				{ type: "roomPos", index: 0, name: "destination" },
-				{ type: "transitionEffect", index: 3, name: "transition effect" },
+				{ type: "roomPos", index: 0, name: "destination", },
+				{ type: "transitionEffect", index: 3, name: "transition effect", },
 			],
 		},
 		"narrate" : {
@@ -1526,15 +1526,15 @@ function DialogTool() {
 		"giveItem" : {
 			description : "give player _ of _",
 			parameters : [
-				{ type: "count", index: 1 },
-				{ type: "itemId", index: 0 },
+				{ type: "count", index: 1, name: "amount", },
+				{ type: "itemId", index: 0, name: "item", },
 			],
 		},
 		"takeItem" : {
 			description : "take _ of _ from player",
 			parameters : [
-				{ type: "count", index: 1 },
-				{ type: "itemId", index: 0 },
+				{ type: "count", index: 1, name: "amount", },
+				{ type: "itemId", index: 0, name: "item", },
 			],
 		},
 		"pg" : {
