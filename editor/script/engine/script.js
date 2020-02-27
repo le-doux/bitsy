@@ -142,6 +142,7 @@ var Utils = function() {
 		return block;
 	}
 
+	// TODO : rename ParseStringToLiteralNode?
 	this.CreateLiteralNode = function(str) {
 		if (str === "true") {
 			return new LiteralNode(true);

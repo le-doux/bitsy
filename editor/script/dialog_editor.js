@@ -1600,13 +1600,14 @@ function DialogTool() {
 					var parameterInfo = functionDescriptionMap[functionNode.name].parameters[i];
 
 					if (functionNode.args.length > parameterInfo.index) {
-						var parameterEditor;
-						if (parameterEditorMap[parameterInfo.type]) {
-							parameterEditor = new parameterEditorMap[parameterInfo.type](functionNode, parameterInfo.index, self, isEditable);
-						}
-						else {
-							parameterEditor = new DefaultParameterEditor(functionNode, parameterInfo.index, self, isEditable);
-						}
+						// var parameterEditor;
+						// if (parameterEditorMap[parameterInfo.type]) {
+						// 	parameterEditor = new parameterEditorMap[parameterInfo.type](functionNode, parameterInfo.index, self, isEditable);
+						// }
+						// else {
+						// 	parameterEditor = new DefaultParameterEditor(functionNode, parameterInfo.index, self, isEditable);
+						// }
+						var parameterEditor = new ParameterEditor(["number", "text", "bool"], functionNode, parameterInfo.index, self, isEditable);
 
 						curParameterEditors.push(parameterEditor);
 						descriptionDiv.appendChild(parameterEditor.GetElement());							
@@ -1691,6 +1692,138 @@ function DialogTool() {
 				div.classList.add("executingLeave");
 			}
 		});
+	}
+
+	function ParameterEditor(parameterTypes, functionNode, parameterIndex, parentEditor, isEditable) {
+		var curType;
+
+		var span = document.createElement("span");
+
+		function UpdateEditor(type) {
+			curType = type;
+			var curValue = GetValue();
+
+			span.innerHTML = "";
+
+			if (isEditable) {
+				var parameterEditable = document.createElement("span");
+				parameterEditable.classList.add("parameterEditable");
+
+				var typeSelect = document.createElement("select");
+				parameterEditable.appendChild(typeSelect);
+				for (var i = 0; i < parameterTypes.length; i++) {
+					var typeOption = document.createElement("option");
+					typeOption.value = parameterTypes[i];
+					typeOption.innerText = parameterTypes[i]; // TODO : localize
+					typeOption.selected = curType === parameterTypes[i];
+					typeSelect.appendChild(typeOption);
+				}
+
+				typeSelect.onchange = function(event) {
+					ChangeEditorType(event.target.value);
+				}
+
+				var parameterInput = CreateInput(
+					curType,
+					curValue,
+					function(argNode) {
+						functionNode.args.splice(parameterIndex, 1, argNode);
+						parentEditor.NotifyUpdate();
+					});
+				parameterEditable.appendChild(parameterInput);
+
+				span.appendChild(parameterEditable);
+			}
+			else {
+				var parameterValue = document.createElement("span");
+				parameterValue.classList.add("parameterUneditable");
+				parameterValue.innerText = curValue;
+				span.appendChild(parameterValue);			
+			}
+		}
+
+		function ChangeEditorType(type) {
+			SetArgToDefault(type);
+			UpdateEditor(type);
+			parentEditor.NotifyUpdate();
+		}
+
+		function SetArgToDefault(type) {
+			var argNode;
+			if (type === "number") {
+				argNode = scriptUtils.CreateLiteralNode("0");
+			}
+			else if (type === "text") {
+				argNode = scriptUtils.CreateLiteralNode("");
+			}
+			else if (type === "bool") {
+				argNode = scriptUtils.CreateLiteralNode("true");
+			}
+			functionNode.args.splice(parameterIndex, 1, argNode);
+		}
+
+		function CreateInput(type, value, onChange) {
+			var parameterInput;
+
+			if (type === "number") {
+				parameterInput = document.createElement("input");
+				parameterInput.type = "number";
+				parameterInput.min = 0;
+				parameterInput.value = value;
+				parameterInput.onchange = function(event) {
+					var val = event.target.value;
+					var argNode = scriptUtils.CreateLiteralNode(val);
+					onChange(argNode);
+				}
+			}
+			else if (type === "text") {
+				parameterInput = document.createElement("input");
+				parameterInput.type = "text";
+				parameterInput.value = value;
+				parameterInput.onchange = function(event) {
+					var val = event.target.value;
+					var argNode = scriptUtils.CreateStringLiteralNode(val);
+					onChange(argNode);
+				}
+			}
+			else if (type === "bool") {
+				parameterInput = document.createElement("select");
+
+				var boolTrueOption = document.createElement("option");
+				boolTrueOption.value = "true";
+				boolTrueOption.innerText = "true"; // TODO : localize
+				boolTrueOption.selected = value;
+				parameterInput.appendChild(boolTrueOption);
+
+				var boolFalseOption = document.createElement("option");
+				boolFalseOption.value = "false";
+				boolFalseOption.innerText = "false"; // TODO : localize
+				boolFalseOption.selected = !value;
+				parameterInput.appendChild(boolFalseOption);
+
+				parameterInput.onchange = function(event) {
+					var val = event.target.value;
+					var argNode = scriptUtils.CreateLiteralNode(val);
+					onChange(argNode);
+				}
+			}
+
+			return parameterInput;
+		}
+
+		function GetValue() {
+			var arg = functionNode.args[parameterIndex];
+			if (arg.type === "literal") {
+				return arg.value;
+			}
+			return null;
+		}
+
+		UpdateEditor(parameterTypes[0]);
+
+		this.GetElement = function() {
+			return span;
+		}
 	}
 
 	function DefaultParameterEditor(functionNode, parameterIndex, parentEditor, isEditable) {
