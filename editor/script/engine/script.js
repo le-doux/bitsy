@@ -158,6 +158,10 @@ var Utils = function() {
 		}
 	}
 
+	this.CreateVariableNode = function(variableName) {
+		return new VarNode(variableName);
+	}
+
 	this.CreateElseNode = function() {
 		return new ElseNode();
 	}

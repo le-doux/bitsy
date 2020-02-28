@@ -1607,7 +1607,7 @@ function DialogTool() {
 						// else {
 						// 	parameterEditor = new DefaultParameterEditor(functionNode, parameterInfo.index, self, isEditable);
 						// }
-						var parameterEditor = new ParameterEditor(["number", "text", "bool"], functionNode, parameterInfo.index, self, isEditable);
+						var parameterEditor = new ParameterEditor(["number", "text", "bool", "variable"], functionNode, parameterInfo.index, self, isEditable);
 
 						curParameterEditors.push(parameterEditor);
 						descriptionDiv.appendChild(parameterEditor.GetElement());							
@@ -1702,6 +1702,7 @@ function DialogTool() {
 		function UpdateEditor(type) {
 			curType = type;
 			var curValue = GetValue();
+			console.log('cur value ' + curValue);
 
 			span.innerHTML = "";
 
@@ -1759,6 +1760,9 @@ function DialogTool() {
 			else if (type === "bool") {
 				argNode = scriptUtils.CreateLiteralNode("true");
 			}
+			else if (type === "variable") {
+				argNode = scriptUtils.CreateVariableNode("a"); // TODO : find first var instead?
+			}
 			functionNode.args.splice(parameterIndex, 1, argNode);
 		}
 
@@ -1807,6 +1811,31 @@ function DialogTool() {
 					onChange(argNode);
 				}
 			}
+			else if (type === "variable") {
+				parameterInput = document.createElement("span");
+
+				var variableInput = document.createElement("input");
+				variableInput.type = "text";
+				variableInput.setAttribute("list", "variable_datalist");
+				variableInput.value = value;
+				parameterInput.appendChild(variableInput);
+				
+				var variableDatalist = document.createElement("datalist");
+				variableDatalist.id = "variable_datalist"; // will duplicates break this?
+				for (var name in variable) {
+					var variableOption = document.createElement("option");
+					variableOption.value = name;
+					variableDatalist.appendChild(variableOption);
+				}
+				parameterInput.appendChild(variableDatalist);
+
+				variableInput.onchange = function(event) {
+					var val = event.target.value;
+					console.log("VARIABLE CHANGE");
+					var argNode = scriptUtils.CreateVariableNode(val);
+					onChange(argNode);
+				}
+			}
 
 			return parameterInput;
 		}
@@ -1815,6 +1844,9 @@ function DialogTool() {
 			var arg = functionNode.args[parameterIndex];
 			if (arg.type === "literal") {
 				return arg.value;
+			}
+			else if (arg.type === "variable") {
+				return arg.name;
 			}
 			return null;
 		}
