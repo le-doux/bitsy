@@ -1565,6 +1565,24 @@ function DialogTool() {
 		var helpTextDiv = document.createElement("div");
 		div.appendChild(helpTextDiv);
 
+		var customControls = orderControls.GetCustomControlsContainer();
+
+		// TODO : hide if there are no parameters??
+		var editParameterTypeCheckbox = document.createElement("input");
+		editParameterTypeCheckbox.type = "checkbox";
+		editParameterTypeCheckbox.id = "paramTypeCheck_" + node.GetId();
+		editParameterTypeCheckbox.checked = false;
+		editParameterTypeCheckbox.onclick = function() {
+			CreateFunctionDescription(true);
+		}
+		customControls.appendChild(editParameterTypeCheckbox);
+
+		var editParameterTypeLabel = document.createElement("label");
+		editParameterTypeLabel.innerHTML = '<i class="material-icons">settings</i>';
+		editParameterTypeLabel.setAttribute("for", "paramTypeCheck_" + node.GetId());
+		editParameterTypeLabel.title = "edit parameter types"
+		customControls.appendChild(editParameterTypeLabel);
+
 		// TODO : populate default values!!
 		var curParameterEditors = [];
 		function CreateFunctionDescription(isEditable) {
@@ -1607,7 +1625,13 @@ function DialogTool() {
 						// else {
 						// 	parameterEditor = new DefaultParameterEditor(functionNode, parameterInfo.index, self, isEditable);
 						// }
-						var parameterEditor = new ParameterEditor(["number", "text", "bool", "variable"], functionNode, parameterInfo.index, self, isEditable);
+						var parameterEditor = new ParameterEditor(
+							["number", "text", "bool", "variable"],
+							functionNode,
+							parameterInfo.index,
+							self,
+							isEditable,
+							editParameterTypeCheckbox.checked);
 
 						curParameterEditors.push(parameterEditor);
 						descriptionDiv.appendChild(parameterEditor.GetElement());							
@@ -1694,7 +1718,7 @@ function DialogTool() {
 		});
 	}
 
-	function ParameterEditor(parameterTypes, functionNode, parameterIndex, parentEditor, isEditable) {
+	function ParameterEditor(parameterTypes, functionNode, parameterIndex, parentEditor, isEditable, isTypeEditable) {
 		var curType;
 
 		var span = document.createElement("span");
@@ -1710,18 +1734,20 @@ function DialogTool() {
 				var parameterEditable = document.createElement("span");
 				parameterEditable.classList.add("parameterEditable");
 
-				var typeSelect = document.createElement("select");
-				parameterEditable.appendChild(typeSelect);
-				for (var i = 0; i < parameterTypes.length; i++) {
-					var typeOption = document.createElement("option");
-					typeOption.value = parameterTypes[i];
-					typeOption.innerText = parameterTypes[i]; // TODO : localize
-					typeOption.selected = curType === parameterTypes[i];
-					typeSelect.appendChild(typeOption);
-				}
+				if (isTypeEditable) {
+					var typeSelect = document.createElement("select");
+					parameterEditable.appendChild(typeSelect);
+					for (var i = 0; i < parameterTypes.length; i++) {
+						var typeOption = document.createElement("option");
+						typeOption.value = parameterTypes[i];
+						typeOption.innerText = parameterTypes[i]; // TODO : localize
+						typeOption.selected = curType === parameterTypes[i];
+						typeSelect.appendChild(typeOption);
+					}
 
-				typeSelect.onchange = function(event) {
-					ChangeEditorType(event.target.value);
+					typeSelect.onchange = function(event) {
+						ChangeEditorType(event.target.value);
+					}
 				}
 
 				var parameterInput = CreateInput(
@@ -2192,6 +2218,16 @@ function DialogTool() {
 		}
 		div.appendChild(moveDownButton);
 
+		var rightHandButtons = document.createElement("div");
+		rightHandButtons.style.display = "inline-block";
+		rightHandButtons.style.float = "right";
+		div.appendChild(rightHandButtons);
+
+		var customRightHandButtons = document.createElement("div");
+		customRightHandButtons.style.display = "inline-block";
+		customRightHandButtons.style.marginTop = "4px"; // WHY?????
+		rightHandButtons.appendChild(customRightHandButtons);
+
 		var deleteButton = document.createElement("button");
 		// deleteButton.innerText = "delete";
 		deleteButton.innerHTML = '<i class="material-icons">clear</i>';
@@ -2199,10 +2235,14 @@ function DialogTool() {
 		deleteButton.onclick = function() {
 			parentEditor.RemoveChild(editor);
 		}
-		div.appendChild(deleteButton);
+		rightHandButtons.appendChild(deleteButton);
 
 		this.GetElement = function() {
 			return div;
+		}
+
+		this.GetCustomControlsContainer = function() {
+			return customRightHandButtons;
 		}
 
 		editor.ShowOrderControls = function() {
