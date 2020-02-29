@@ -1500,6 +1500,58 @@ function DialogTool() {
 		}
 	}
 
+	function CreateRoomMoveDestinationCommand(functionNode, parentEditor, createFunctionDescriptionFunc) {
+		var isMoving = false;
+
+		var commandDescription = '<i class="material-icons">location_searching</i> move destination';
+
+		var moveCommand = document.createElement("div");
+
+		var moveMessageSpan = document.createElement("span");
+		moveCommand.appendChild(moveMessageSpan);
+
+		var moveButton = document.createElement("button");
+		moveButton.innerHTML = commandDescription;
+		moveButton.title = "click to select new destination";
+		moveButton.onclick = function() {
+			isMoving = !isMoving;
+
+			if (isMoving) {
+				moveMessageSpan.innerHTML = "<i>click in room</i>";
+				moveButton.innerHTML = '<i class="material-icons">cancel</i>';
+				events.Raise("disable_room_tool"); // TODO : don't know if I like this design
+			}
+			else {
+				moveMessageSpan.innerHTML = "";
+				moveButton.innerHTML = commandDescription;
+				events.Raise("enable_room_tool");
+			}
+		}
+		moveCommand.appendChild(moveButton);
+
+		events.Listen("click_room", function(event) {
+			if (isMoving) {
+				roomId = event.roomId;
+				roomPosX = event.x;
+				roomPosY = event.y;
+
+				functionNode.args.splice(0, 1, scriptUtils.CreateStringLiteralNode(roomId));
+				functionNode.args.splice(1, 1, scriptUtils.CreateLiteralNode(roomPosX));
+				functionNode.args.splice(2, 1, scriptUtils.CreateLiteralNode(roomPosY));
+
+				isMoving = false;
+				moveMessageSpan.innerHTML = "";
+				moveButton.innerHTML = commandDescription;
+
+				createFunctionDescriptionFunc(true);
+				parentEditor.NotifyUpdate();
+				events.Raise("enable_room_tool");
+			}
+		});
+
+		return moveCommand;
+	}
+
 	var functionDescriptionMap = {
 		"lock" : {
 			description : "lock",
@@ -1520,6 +1572,7 @@ function DialogTool() {
 				{ types: ["number", "variable"], index: 2, name: "y", },
 				{ types: ["transition", "text", "variable"], index: 3, name: "transition effect", },
 			],
+			commands : [CreateRoomMoveDestinationCommand],
 		},
 		"narrate" : {
 			description : "start narration",
@@ -1560,6 +1613,10 @@ function DialogTool() {
 		var descriptionDiv = document.createElement("div");
 		div.appendChild(descriptionDiv);
 
+		var customCommandsDiv = document.createElement("div");
+		customCommandsDiv.style.marginTop = "5px"; // hack : need to hide these spacers...
+		div.appendChild(customCommandsDiv);
+
 		var addParameterDiv = document.createElement("div");
 		addParameterDiv.style.marginTop = "5px"; // hack
 		div.appendChild(addParameterDiv);
@@ -1590,6 +1647,7 @@ function DialogTool() {
 		function CreateFunctionDescription(isEditable) {
 			curParameterEditors = [];
 			descriptionDiv.innerHTML = "";
+			customCommandsDiv.innerHTML = "";
 			addParameterDiv.innerHTML = "";
 
 			var descriptionText = functionDescriptionMap[functionNode.name].description;
@@ -1634,7 +1692,7 @@ function DialogTool() {
 					else if (isEditable && functionNode.args.length == parameterInfo.index && parameterInfo.name) {
 						function createAddParameterHandler(functionNode, parameterInfo) {
 							return function() {
-								functionNode.args.push(CreateDefaultArgNode(parameterInfo.types[0]));\
+								functionNode.args.push(CreateDefaultArgNode(parameterInfo.types[0]));
 								CreateFunctionDescription(true);
 								parentEditor.NotifyUpdate();
 							}
@@ -1645,6 +1703,14 @@ function DialogTool() {
 						addParameterButton.onclick = createAddParameterHandler(functionNode, parameterInfo);
 						addParameterDiv.appendChild(addParameterButton);
 					}
+				}
+			}
+
+			// add custom edit commands
+			var commands = functionDescriptionMap[functionNode.name].commands;
+			if (isEditable && commands) {
+				for (var i = 0; i < commands.length; i++) {
+					customCommandsDiv.appendChild(commands[i](functionNode, parentEditor, CreateFunctionDescription));
 				}
 			}
 
