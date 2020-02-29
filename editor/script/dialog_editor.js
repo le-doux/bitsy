@@ -1513,10 +1513,12 @@ function DialogTool() {
 			parameters : [],
 		},
 		"exit" : {
-			description : "move player to _[ with transition _]",
+			description : "move player to _ at _,_[ with effect _]",
 			parameters : [
-				{ type: "roomPos", index: 0, name: "destination", },
-				{ type: "transitionEffect", index: 3, name: "transition effect", },
+				{ types: ["room", "text", "variable"], index: 0, name: "room", },
+				{ types: ["number", "variable"], index: 1, name: "x", },
+				{ types: ["number", "variable"], index: 2, name: "y", },
+				{ types: ["transition", "text", "variable"], index: 3, name: "transition effect", },
 			],
 		},
 		"narrate" : {
@@ -1526,15 +1528,15 @@ function DialogTool() {
 		"giveItem" : {
 			description : "give player _ of _",
 			parameters : [
-				{ type: "count", index: 1, name: "amount", },
-				{ type: "itemId", index: 0, name: "item", },
+				{ types: ["number", "variable"], index: 1, name: "amount", },
+				{ types: ["item", "text", "variable"], index: 0, name: "item", },
 			],
 		},
 		"takeItem" : {
 			description : "take _ of _ from player",
 			parameters : [
-				{ type: "count", index: 1, name: "amount", },
-				{ type: "itemId", index: 0, name: "item", },
+				{ types: ["number", "variable"], index: 1, name: "amount", },
+				{ types: ["item", "text", "variable"], index: 0, name: "item", },
 			],
 		},
 		"pg" : {
@@ -1618,15 +1620,8 @@ function DialogTool() {
 					var parameterInfo = functionDescriptionMap[functionNode.name].parameters[i];
 
 					if (functionNode.args.length > parameterInfo.index) {
-						// var parameterEditor;
-						// if (parameterEditorMap[parameterInfo.type]) {
-						// 	parameterEditor = new parameterEditorMap[parameterInfo.type](functionNode, parameterInfo.index, self, isEditable);
-						// }
-						// else {
-						// 	parameterEditor = new DefaultParameterEditor(functionNode, parameterInfo.index, self, isEditable);
-						// }
 						var parameterEditor = new ParameterEditor(
-							["number", "text", "bool", "variable", "room", "item", "transition"],
+							parameterInfo.types,
 							functionNode,
 							parameterInfo.index,
 							self,
@@ -1637,28 +1632,17 @@ function DialogTool() {
 						descriptionDiv.appendChild(parameterEditor.GetElement());							
 					}
 					else if (isEditable && functionNode.args.length == parameterInfo.index && parameterInfo.name) {
-						function createAddParameterHandler(parameterInfo) {
+						function createAddParameterHandler(functionNode, parameterInfo) {
 							return function() {
-								var defaultValues = parameterDefaultValueMap[parameterInfo.type];
-								for (var j = 0; j < defaultValues.length; j++) {
-									// TODO : will this work for all situations??
-									var literal = null;
-									if (typeof defaultValues[j] === "string") {
-										literal = scriptUtils.CreateStringLiteralNode(defaultValues[j]);
-									}
-									else {
-										literal = scriptUtils.CreateLiteralNode(defaultValues[j]);
-									}
-									functionNode.args.push(literal);
-								}
-								parentEditor.NotifyUpdate();
+								functionNode.args.push(CreateDefaultArgNode(parameterInfo.types[0]));\
 								CreateFunctionDescription(true);
+								parentEditor.NotifyUpdate();
 							}
 						}
 
 						var addParameterButton = document.createElement('button');
 						addParameterButton.innerHTML = '<i class="material-icons">add</i>' + parameterInfo.name;
-						addParameterButton.onclick = createAddParameterHandler(parameterInfo);
+						addParameterButton.onclick = createAddParameterHandler(functionNode, parameterInfo);
 						addParameterDiv.appendChild(addParameterButton);
 					}
 				}
@@ -1718,6 +1702,32 @@ function DialogTool() {
 		});
 	}
 
+	function CreateDefaultArgNode(type) {
+		var argNode;
+		if (type === "number") {
+			argNode = scriptUtils.CreateLiteralNode("0");
+		}
+		else if (type === "text") {
+			argNode = scriptUtils.CreateLiteralNode("");
+		}
+		else if (type === "bool") {
+			argNode = scriptUtils.CreateLiteralNode("true");
+		}
+		else if (type === "variable") {
+			argNode = scriptUtils.CreateVariableNode("a"); // TODO : find first var instead?
+		}
+		else if (type === "room") {
+			argNode = scriptUtils.CreateStringLiteralNode("0"); // TODO : find first room instead?
+		}
+		else if (type === "item") {
+			argNode = scriptUtils.CreateStringLiteralNode("0"); // TODO : find first item instead?
+		}
+		else if (type === "transition") {
+			argNode = scriptUtils.CreateStringLiteralNode("fade_w");
+		}
+		return argNode;
+	}
+
 	// TODO : put in shared location?
 	var transitionTypes = [
 		{ name:"fade (white)",	id:"fade_w" },
@@ -1738,7 +1748,6 @@ function DialogTool() {
 		function UpdateEditor(type) {
 			curType = type;
 			var curValue = GetValue();
-			console.log('cur value ' + curValue);
 
 			span.innerHTML = "";
 
@@ -1806,29 +1815,7 @@ function DialogTool() {
 		}
 
 		function SetArgToDefault(type) {
-			var argNode;
-			if (type === "number") {
-				argNode = scriptUtils.CreateLiteralNode("0");
-			}
-			else if (type === "text") {
-				argNode = scriptUtils.CreateLiteralNode("");
-			}
-			else if (type === "bool") {
-				argNode = scriptUtils.CreateLiteralNode("true");
-			}
-			else if (type === "variable") {
-				argNode = scriptUtils.CreateVariableNode("a"); // TODO : find first var instead?
-			}
-			else if (type === "room") {
-				argNode = scriptUtils.CreateStringLiteralNode("0"); // TODO : find first room instead?
-			}
-			else if (type === "item") {
-				argNode = scriptUtils.CreateStringLiteralNode("0"); // TODO : find first item instead?
-			}
-			else if (type === "transition") {
-				argNode == scriptUtils.CreateStringLiteralNode("fade_w");
-			}
-			functionNode.args.splice(parameterIndex, 1, argNode);
+			functionNode.args.splice(parameterIndex, 1, CreateDefaultArgNode(type));
 		}
 
 		function CreateInput(type, value, onChange) {
@@ -2001,6 +1988,7 @@ function DialogTool() {
 		for (var i = 0; i < parameterTypes.length; i++) {
 			if (DoesEditorTypeMatchNode(parameterTypes[i], functionNode.args[parameterIndex])) {
 				curType = parameterTypes[i];
+				break;
 			}
 		}
 
@@ -2083,10 +2071,18 @@ function DialogTool() {
 	}
 
 	function GetItemNameFromId(id) {
+		if (!item[id]) {
+			return "";
+		}
+
 		return (item[id].name != null ? item[id].name : localization.GetStringOrFallback("item_label", "item") + " " + id);
 	}
 
 	function GetRoomNameFromId(id) {
+		if (!room[id]) {
+			return "";
+		}
+
 		return (room[id].name != null ? room[id].name : localization.GetStringOrFallback("room_label", "room") + " " + id);
 	}
 
