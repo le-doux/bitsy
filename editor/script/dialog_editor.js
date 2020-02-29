@@ -1626,7 +1626,7 @@ function DialogTool() {
 						// 	parameterEditor = new DefaultParameterEditor(functionNode, parameterInfo.index, self, isEditable);
 						// }
 						var parameterEditor = new ParameterEditor(
-							["number", "text", "bool", "variable"],
+							["number", "text", "bool", "variable", "room", "item", "transition"],
 							functionNode,
 							parameterInfo.index,
 							self,
@@ -1718,6 +1718,18 @@ function DialogTool() {
 		});
 	}
 
+	// TODO : put in shared location?
+	var transitionTypes = [
+		{ name:"fade (white)",	id:"fade_w" },
+		{ name:"fade (black)",	id:"fade_b" },
+		{ name:"wave",			id:"wave" },
+		{ name:"tunnel",		id:"tunnel" },
+		{ name:"slide up",		id:"slide_u" },
+		{ name:"slide down",	id:"slide_d" },
+		{ name:"slide left",	id:"slide_l" },
+		{ name:"slide right",	id:"slide_r" },
+	];
+
 	function ParameterEditor(parameterTypes, functionNode, parameterIndex, parentEditor, isEditable, isTypeEditable) {
 		var curType;
 
@@ -1764,8 +1776,26 @@ function DialogTool() {
 			else {
 				var parameterValue = document.createElement("span");
 				parameterValue.classList.add("parameterUneditable");
-				parameterValue.innerText = curValue;
-				span.appendChild(parameterValue);			
+				span.appendChild(parameterValue);
+
+				if (type === "room") {
+					parameterValue.innerText = GetRoomNameFromId(curValue);
+				}
+				else if (type === "item") {
+					parameterValue.innerText = GetItemNameFromId(curValue);
+				}
+				else if (type === "transition") {
+					// TODO : kind of using the loop in a weird way
+					for (var i = 0; i < transitionTypes.length; i++) {
+						var id = transitionTypes[i].id;
+						if (id === curValue) {
+							parameterValue.innerText = transitionTypes[i].name;
+						}
+					}
+				}
+				else {
+					parameterValue.innerText = curValue;
+				}
 			}
 		}
 
@@ -1788,6 +1818,15 @@ function DialogTool() {
 			}
 			else if (type === "variable") {
 				argNode = scriptUtils.CreateVariableNode("a"); // TODO : find first var instead?
+			}
+			else if (type === "room") {
+				argNode = scriptUtils.CreateStringLiteralNode("0"); // TODO : find first room instead?
+			}
+			else if (type === "item") {
+				argNode = scriptUtils.CreateStringLiteralNode("0"); // TODO : find first item instead?
+			}
+			else if (type === "transition") {
+				argNode == scriptUtils.CreateStringLiteralNode("fade_w");
 			}
 			functionNode.args.splice(parameterIndex, 1, argNode);
 		}
@@ -1857,8 +1896,62 @@ function DialogTool() {
 
 				variableInput.onchange = function(event) {
 					var val = event.target.value;
-					console.log("VARIABLE CHANGE");
 					var argNode = scriptUtils.CreateVariableNode(val);
+					onChange(argNode);
+				}
+			}
+			else if (type === "room") {
+				parameterInput = document.createElement("select");
+				parameterInput.title = "choose room";
+
+				for (id in room) {
+					var roomOption = document.createElement("option");
+					roomOption.value = id;
+					roomOption.innerText = GetRoomNameFromId(id);
+					roomOption.selected = id === value;
+					parameterInput.appendChild(roomOption);
+				}
+
+				parameterInput.onchange = function(event) {
+					var val = event.target.value;
+					var argNode = scriptUtils.CreateStringLiteralNode(val);
+					onChange(argNode);
+				}
+			}
+			else if (type === "item") {
+				parameterInput = document.createElement("select");
+				parameterInput.title = "choose item";
+
+				for (id in item) {
+					var itemOption = document.createElement("option");
+					itemOption.value = id;
+					itemOption.innerText = GetItemNameFromId(id);
+					itemOption.selected = id === value;
+					parameterInput.appendChild(itemOption);
+				}
+
+				parameterInput.onchange = function(event) {
+					var val = event.target.value;
+					var argNode = scriptUtils.CreateStringLiteralNode(val);
+					onChange(argNode);
+				}
+			}
+			else if (type === "transition") {
+				parameterInput = document.createElement("select");
+				parameterInput.title = "select transition effect";
+
+				for (var i = 0; i < transitionTypes.length; i++) {
+					var id = transitionTypes[i].id;
+					var transitionOption = document.createElement("option");
+					transitionOption.value = id;
+					transitionOption.innerText = transitionTypes[i].name;
+					transitionOption.selected = id === value;
+					parameterInput.appendChild(transitionOption);
+				}
+
+				parameterInput.onchange = function(event) {
+					var val = event.target.value;
+					var argNode = scriptUtils.CreateStringLiteralNode(val);
 					onChange(argNode);
 				}
 			}
@@ -1888,6 +1981,15 @@ function DialogTool() {
 				return true;
 			}
 			else if (type === "variable" && node.type === "variable") {
+				return true;
+			}
+			else if (type === "room" && node.type === "literal" && (typeof node.value) === "string") {
+				return true;
+			}
+			else if (type === "item" && node.type === "literal" && (typeof node.value) === "string") {
+				return true;
+			}
+			else if (type === "transition" && node.type === "literal" && (typeof node.value) === "string") {
 				return true;
 			}
 
@@ -1982,6 +2084,10 @@ function DialogTool() {
 
 	function GetItemNameFromId(id) {
 		return (item[id].name != null ? item[id].name : localization.GetStringOrFallback("item_label", "item") + " " + id);
+	}
+
+	function GetRoomNameFromId(id) {
+		return (room[id].name != null ? room[id].name : localization.GetStringOrFallback("room_label", "room") + " " + id);
 	}
 
 	function ItemIdParameterEditor(functionNode, parameterIndex, parentEditor, isEditable) {
