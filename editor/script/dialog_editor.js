@@ -1851,7 +1851,32 @@ function DialogTool() {
 			return null;
 		}
 
-		UpdateEditor(parameterTypes[0]);
+		function DoesEditorTypeMatchNode(type, node) {
+			if (type === "number" && node.type === "literal" && (typeof node.value) === "number") {
+				return true;
+			}
+			else if (type === "text" && node.type === "literal" && (typeof node.value) === "string") {
+				return true;
+			}
+			else if (type === "bool" && node.type === "literal" && (typeof node.value) === "boolean") {
+				return true;
+			}
+			else if (type === "variable" && node.type === "variable") {
+				return true;
+			}
+
+			return false;
+		}
+
+		// edit parameter with the first matching type this parameter supports
+		var curType = parameterTypes[0];
+		for (var i = 0; i < parameterTypes.length; i++) {
+			if (DoesEditorTypeMatchNode(parameterTypes[i], functionNode.args[parameterIndex])) {
+				curType = parameterTypes[i];
+			}
+		}
+
+		UpdateEditor(curType);
 
 		this.GetElement = function() {
 			return span;
