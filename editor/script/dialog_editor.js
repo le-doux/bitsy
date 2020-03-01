@@ -859,7 +859,7 @@ function DialogTool() {
 			}
 			else {
 				var parameterEditor = new ParameterEditor(
-					["number", "text", "bool", "variable"],
+					["number", "text", "bool", "variable", "function"],
 					function() { 
 						return node.left;
 					},
@@ -881,7 +881,7 @@ function DialogTool() {
 			}
 			else {
 				var parameterEditor = new ParameterEditor(
-					["number", "text", "bool", "variable"],
+					["number", "text", "bool", "variable", "function"],
 					function() {
 						return node.right;
 					},
@@ -2146,6 +2146,12 @@ function DialogTool() {
 					onChange(argNode);
 				}
 			}
+			else if (type === "function") {
+				// TODO : this is a placeholder for something...
+				parameterInput = document.createElement("span");
+				parameterInput.classList.add("parameterUneditable");
+				parameterInput.innerText = value;
+			}
 
 			return parameterInput;
 		}
@@ -2158,10 +2164,14 @@ function DialogTool() {
 			else if (arg.type === "variable") {
 				return arg.name;
 			}
+			else if (arg.type === "code_block" && arg.children[0].type === "function") {
+				return arg.children[0].name;
+			}
 			return null;
 		}
 
 		function DoesEditorTypeMatchNode(type, node) {
+			console.log(node.type === "code_block" && node.children[0].type === "function");
 			if (type === "number" && node.type === "literal" && (typeof node.value) === "number") {
 				return true;
 			}
@@ -2181,6 +2191,9 @@ function DialogTool() {
 				return true;
 			}
 			else if (type === "transition" && node.type === "literal" && (typeof node.value) === "string") {
+				return true;
+			}
+			else if (type === "function" && node.type === "code_block" && node.children[0].type === "function") {
 				return true;
 			}
 
