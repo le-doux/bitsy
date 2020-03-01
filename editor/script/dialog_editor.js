@@ -852,18 +852,47 @@ function DialogTool() {
 		}
 
 		function AddExpressionControl(node, isEditable) {
-			if (node.type == "operator") {
-				AddExpressionControl(node.left);
-
-				// temp
-				var operatorSpan = document.createElement("span");
-				operatorSpan.innerText = node.operator;
-				expressionSpan.appendChild(operatorSpan);
-
-				AddExpressionControl(node.right);
+			if (node.left.type === "operator") {
+				AddExpressionControl(node.left, isEditable);
 			}
 			else {
-				// TODO
+				var parameterEditor = new ParameterEditor(
+					["number", "text", "bool", "variable"],
+					function() { 
+						return node.left;
+					},
+					function(argNode) {
+						node.left = argNode;
+						parentEditor.NotifyUpdate();
+					},
+					isEditable,
+					false);
+
+				expressionSpan.appendChild(parameterEditor.GetElement());
+			}
+
+			// temp
+			var operatorSpan = document.createElement("span");
+			operatorSpan.innerText = node.operator;
+			expressionSpan.appendChild(operatorSpan);
+
+			if (node.right.type === "operator") {
+				AddExpressionControl(node.right, isEditable);
+			}
+			else {
+				var parameterEditor = new ParameterEditor(
+					["number", "text", "bool", "variable"],
+					function() {
+						return node.right;
+					},
+					function(argNode) {
+						node.right = argNode;
+						parentEditor.NotifyUpdate();
+					},
+					isEditable,
+					false);
+
+				expressionSpan.appendChild(parameterEditor.GetElement());
 			}
 		}
 
@@ -873,10 +902,17 @@ function DialogTool() {
 			return div;
 		}
 
-		AddSelectionBehavior(this);
+		AddSelectionBehavior(
+			this,
+			function() { CreateExpressionControls(true); },
+			function() { CreateExpressionControls(false); });
 
 		this.GetNodes = function() {
 			return [node];
+		}
+
+		this.NotifyUpdate = function() {
+			parentEditor.NotifyUpdate();
 		}
 	}
 
