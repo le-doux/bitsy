@@ -485,14 +485,15 @@ function DialogTool() {
 				childEditorRootDiv.appendChild(editor.GetElement());
 
 				if (i < childEditors.length - 1) {
-					var svgArrow = document.createElement("div");
-					svgArrow.style.textAlign = "center";
-					// svgArrow.style.padding = "0px";
-					svgArrow.innerHTML = 
-						'<svg width="10" height="10">' +
-						'<polygon points="0, 0, 10, 0, 5, 10" fill="#6767b2" />' +
-						'</svg>';
-					childEditorRootDiv.appendChild(svgArrow);
+					var arrowHolder = document.createElement("div");
+					arrowHolder.style.textAlign = "center";
+					childEditorRootDiv.appendChild(arrowHolder);
+
+					var svgArrow = document.createElement("img");
+					svgArrow.src = "image/down_arrow.svg";
+					svgArrow.style.margin = "5px";
+					svgArrow.style.width = "20px";
+					arrowHolder.appendChild(svgArrow);
 				}
 			}
 		}
