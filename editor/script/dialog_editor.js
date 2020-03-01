@@ -1711,6 +1711,19 @@ function DialogTool() {
 			var descriptionText = functionDescriptionMap[functionNode.name].description;
 			var descriptionTextSplit = descriptionText.split("_");
 
+			function createGetArgFunc(functionNode, parameterIndex) {
+				return function() {
+					return functionNode.args[parameterIndex];
+				};
+			}
+
+			function createSetArgFunc(functionNode, parameterIndex, parentEditor) {
+				return function(argNode) {
+					functionNode.args.splice(parameterIndex, 1, argNode);
+					parentEditor.NotifyUpdate();
+				};
+			}
+
 			for (var i = 0; i < descriptionTextSplit.length; i++) {
 				var descriptionSpan = document.createElement("span");
 				descriptionDiv.appendChild(descriptionSpan);
@@ -1738,9 +1751,8 @@ function DialogTool() {
 					if (functionNode.args.length > parameterInfo.index) {
 						var parameterEditor = new ParameterEditor(
 							parameterInfo.types,
-							functionNode,
-							parameterInfo.index,
-							self,
+							createGetArgFunc(functionNode, parameterInfo.index),
+							createSetArgFunc(functionNode, parameterInfo.index, self),
 							isEditable,
 							editParameterTypeCheckbox.checked);
 
@@ -1864,7 +1876,7 @@ function DialogTool() {
 		{ name:"slide right",	id:"slide_r" },
 	];
 
-	function ParameterEditor(parameterTypes, functionNode, parameterIndex, parentEditor, isEditable, isTypeEditable) {
+	function ParameterEditor(parameterTypes, getArgFunc, setArgFunc, isEditable, isTypeEditable) {
 		var curType;
 
 		var span = document.createElement("span");
@@ -1895,13 +1907,7 @@ function DialogTool() {
 					}
 				}
 
-				var parameterInput = CreateInput(
-					curType,
-					curValue,
-					function(argNode) {
-						functionNode.args.splice(parameterIndex, 1, argNode);
-						parentEditor.NotifyUpdate();
-					});
+				var parameterInput = CreateInput(curType, curValue, setArgFunc);
 				parameterEditable.appendChild(parameterInput);
 
 				span.appendChild(parameterEditable);
@@ -1935,11 +1941,10 @@ function DialogTool() {
 		function ChangeEditorType(type) {
 			SetArgToDefault(type);
 			UpdateEditor(type);
-			parentEditor.NotifyUpdate();
 		}
 
 		function SetArgToDefault(type) {
-			functionNode.args.splice(parameterIndex, 1, CreateDefaultArgNode(type));
+			setArgFunc(CreateDefaultArgNode(type));
 		}
 
 		function CreateInput(type, value, onChange) {
@@ -2071,7 +2076,7 @@ function DialogTool() {
 		}
 
 		function GetValue() {
-			var arg = functionNode.args[parameterIndex];
+			var arg = getArgFunc();
 			if (arg.type === "literal") {
 				return arg.value;
 			}
@@ -2110,7 +2115,7 @@ function DialogTool() {
 		// edit parameter with the first matching type this parameter supports
 		var curType = parameterTypes[0];
 		for (var i = 0; i < parameterTypes.length; i++) {
-			if (DoesEditorTypeMatchNode(parameterTypes[i], functionNode.args[parameterIndex])) {
+			if (DoesEditorTypeMatchNode(parameterTypes[i], getArgFunc())) {
 				curType = parameterTypes[i];
 				break;
 			}
