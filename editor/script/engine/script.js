@@ -300,6 +300,10 @@ var Utils = function() {
 		tempBlock.children = nodeList;
 		return tempBlock.Serialize();
 	}
+
+	this.GetOperatorList = function() {
+		return [Sym.Set].concat(Sym.Operators);
+	}
 }
 
 

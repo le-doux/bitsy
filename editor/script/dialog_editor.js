@@ -834,6 +834,8 @@ function DialogTool() {
 	}
 
 	function ExpressionEditor(node, parentEditor) {
+		var self = this;
+
 		var expressionRootNode = node.children[0];
 
 		var div = document.createElement("div");
@@ -871,10 +873,8 @@ function DialogTool() {
 				expressionSpan.appendChild(parameterEditor.GetElement());
 			}
 
-			// temp
-			var operatorSpan = document.createElement("span");
-			operatorSpan.innerText = node.operator;
-			expressionSpan.appendChild(operatorSpan);
+			var operatorEditor = new ExpressionOperatorEditor(node, self, isEditable);
+			expressionSpan.appendChild(operatorEditor.GetElement());
 
 			if (node.right.type === "operator") {
 				AddExpressionControl(node.right, isEditable);
@@ -913,6 +913,45 @@ function DialogTool() {
 
 		this.NotifyUpdate = function() {
 			parentEditor.NotifyUpdate();
+		}
+	}
+
+	function ExpressionOperatorEditor(operatorNode, parentEditor, isEditable) {
+		var operatorSpan = document.createElement("span");
+		operatorSpan.style.marginLeft = "5px";
+		operatorSpan.style.marginRight = "5px";
+
+		function CreateOperatorControl(isEditable) {
+			operatorSpan.innerHTML = "";
+
+			if (isEditable) {
+				var operatorSelect = document.createElement("select");
+
+				var operatorList = scriptUtils.GetOperatorList();
+				for (var i = 0; i < operatorList.length; i++) {
+					var operatorOption = document.createElement("option");
+					operatorOption.value = operatorList[i];
+					operatorOption.innerText = operatorList[i];
+					operatorOption.selected = operatorList[i] === operatorNode.operator;
+					operatorSelect.appendChild(operatorOption);
+				}
+
+				operatorSelect.onchange = function(event) {
+					operatorNode.operator = event.target.value;
+					parentEditor.NotifyUpdate();
+				}
+
+				operatorSpan.appendChild(operatorSelect);
+			}
+			else {
+				operatorSpan.innerText = operatorNode.operator;
+			}
+		}
+
+		CreateOperatorControl(isEditable);
+
+		this.GetElement = function() {
+			return operatorSpan;
 		}
 	}
 
