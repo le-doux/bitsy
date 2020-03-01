@@ -842,9 +842,32 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
 
-		var tempExpressionSpan = document.createElement("span");
-		tempExpressionSpan.innerText = expressionRootNode.Serialize();
-		div.appendChild(tempExpressionSpan);
+		var expressionSpan = document.createElement("span");
+		div.appendChild(expressionSpan);
+
+		function CreateExpressionControls(isEditable) {
+			expressionSpan.innerHTML = "";
+
+			AddExpressionControl(expressionRootNode, isEditable);
+		}
+
+		function AddExpressionControl(node, isEditable) {
+			if (node.type == "operator") {
+				AddExpressionControl(node.left);
+
+				// temp
+				var operatorSpan = document.createElement("span");
+				operatorSpan.innerText = node.operator;
+				expressionSpan.appendChild(operatorSpan);
+
+				AddExpressionControl(node.right);
+			}
+			else {
+				// TODO
+			}
+		}
+
+		CreateExpressionControls(false);
 
 		this.GetElement = function() {
 			return div;
