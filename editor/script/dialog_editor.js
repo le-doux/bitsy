@@ -439,6 +439,10 @@ function DialogTool() {
 				return isCodeBlock(node) && isChildType(node, "function") && functionDescriptionMap[node.children[0].name] != undefined;
 			}
 
+			function isExpression(node) {
+				return isCodeBlock(node) && isChildType(node, "operator");
+			};
+
 			var dialogNodeList = [];
 			function addText() {
 				if (dialogNodeList.length > 0) {
@@ -467,6 +471,12 @@ function DialogTool() {
 					addText();
 
 					var editor = new FunctionEditor(node, self);
+					childEditors.push(editor);
+				}
+				else if (isExpression(node)) {
+					addText();
+
+					var editor = new ExpressionEditor(node, self);
 					childEditors.push(editor);
 				}
 				else {
@@ -821,6 +831,30 @@ function DialogTool() {
 				}				
 			}
 		});
+	}
+
+	function ExpressionEditor(node, parentEditor) {
+		var expressionRootNode = node.children[0];
+
+		var div = document.createElement("div");
+		div.classList.add("actionEditor");
+
+		var orderControls = new OrderControls(this, parentEditor);
+		div.appendChild(orderControls.GetElement());
+
+		var tempExpressionSpan = document.createElement("span");
+		tempExpressionSpan.innerText = expressionRootNode.Serialize();
+		div.appendChild(tempExpressionSpan);
+
+		this.GetElement = function() {
+			return div;
+		}
+
+		AddSelectionBehavior(this);
+
+		this.GetNodes = function() {
+			return [node];
+		}
 	}
 
 	var sequenceTypeDescriptionMap = {
