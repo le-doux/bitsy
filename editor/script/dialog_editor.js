@@ -1534,6 +1534,12 @@ function DialogTool() {
 			description : "start a new page", // TODO : ok description?
 			parameters : [],
 		},
+		"item" : {
+			description : "# of _ in inventory",
+			parameters : [
+				{ types: ["item", "text", "variable"], index: 0, name: "item", },
+			],
+		},
 	};
 
 	function FunctionEditor(node, parentEditor, isInline) {
