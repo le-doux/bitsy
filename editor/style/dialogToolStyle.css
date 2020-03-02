@@ -52,6 +52,12 @@
 	color: white;
 }
 
+.actionEditor.inline {
+	display: inline;
+	padding: 2px;
+	border: none;
+}
+
 @keyframes executingLeaveAnimation {
 	from { background: #6767b2; }
 	to { background: white; }	

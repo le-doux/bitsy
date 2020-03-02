@@ -833,13 +833,27 @@ function DialogTool() {
 		});
 	}
 
-	function ExpressionEditor(node, parentEditor) {
+	function ExpressionEditor(node, parentEditor, isInline) {
+		if (isInline === undefined || isInline === null) {
+			isInline = false;
+		}
+
 		var self = this;
 
-		var expressionRootNode = node.children[0];
+		// kind of hacky -- but some expressions are wrapped in a code block and some aren't!
+		var expressionRootNode = null;
+		if (node.type === "operator") {
+			expressionRootNode = node;
+		}
+		else if (node.type === "code_block" && node.children[0].type === "operator") {
+			expressionRootNode = node.children[0];	
+		}
 
-		var div = document.createElement("div");
+		var div = document.createElement(isInline ? "span" : "div");
 		div.classList.add("actionEditor");
+		if (isInline) {
+			div.classList.add("inline");
+		}
 
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
@@ -902,10 +916,12 @@ function DialogTool() {
 			return div;
 		}
 
-		AddSelectionBehavior(
-			this,
-			function() { CreateExpressionControls(true); },
-			function() { CreateExpressionControls(false); });
+		if (!isInline) {
+			AddSelectionBehavior(
+				this,
+				function() { CreateExpressionControls(true); },
+				function() { CreateExpressionControls(false); });			
+		}
 
 		this.GetNodes = function() {
 			return [node];
@@ -913,6 +929,14 @@ function DialogTool() {
 
 		this.NotifyUpdate = function() {
 			parentEditor.NotifyUpdate();
+		}
+
+		this.Select = function() {
+			CreateExpressionControls(true);
+		}
+
+		this.Deselect = function() {
+			CreateExpressionControls(false);
 		}
 	}
 
@@ -1340,258 +1364,38 @@ function DialogTool() {
 			function() { comparisonEditor.Deselect(); });
 	}
 
-	function GetConditionType(condition) {
-		if (condition.type === "else") {
-			return "else";
-		}
-		else if (condition.type === "operator") {
-			if (condition.right.type === "literal" && !isNaN(condition.right.value)) {
-				if (condition.left.type === "code_block") {
-					var child = condition.left.children[0];
-					if (child.type === "function" && child.name === "item") {
-						return "item";
-					}
-				}
-				if (condition.left.type === "variable" && variable[condition.left.name] != null) {
-					return "variable";
-				}
-			}
-		}
-		return "custom";
-	}
-
-	// TODO : use these
-	var conditionTypes = ["item","variable","else","custom"];
-	// var conditionTypeNames = [
-	// 	localization.GetStringOrFallback("item_label", "item"),
-	// 	localization.GetStringOrFallback("variable_label", "variable"),
-	// 	localization.GetStringOrFallback("condition_type_default", "default"),
-	// 	localization.GetStringOrFallback("condition_type_custom", "custom")
-	// ];
-
-	// var conditionTypesVerbose = ["the player's inventory of the item", "the value of the variable", "no other condition is met (default)", "a custom condition is met"]
-	// var comparisonNames = ["equals","greater than","less than","greater than or equal to","less than or equal to"];
-	var comparisonTypes = ["==", ">", "<", ">=", "<="];
-	// var comparisonTypesVerbose = ["is equal to", "is greater than", "is less than", "is greater than or equal to", "is less than or equal to"];
-
 	function ConditionalComparisonEditor(conditionNode, parentEditor, index) {
-		var conditionType = GetConditionType(conditionNode);
+		var self = this;
 
-		// init description elements
 		var conditionStartSpan;
-		var conditionDescriptionSpan;
 		var conditionEndSpan;
-
-		// init input elements
-		var conditionTypeSelect;
-		var itemSelect;
-		var variableSelect;
-		var comparisonSelect;
-		var valueInput;
-		var textArea; // for custom input
-
-		function GetItemId() {
-			return conditionNode.left.children[0].args[0].value;
-		}
-
-		function GetVariableId() {
-			return conditionNode.left.name;
-		}
-
-		function GetComparisonOperator() {
-			return conditionNode.operator;
-		}
-
-		function GetRightHandValue() {
-			return parseInt(conditionNode.right.value);
-		}
-
-		// init value handler - custom is the default
-		var valueChangeHandler = null;
-		function InitValueChangeHandler() {
-			valueChangeHandler = function() {
-				conditionNode = scriptInterpreter.CreateExpression(textArea.value);
-				parentEditor.NotifyUpdate();
-			}
-			if (conditionType === "item") {
-				valueChangeHandler = function() {
-					var expStr = '{item "' + itemSelect.value + '"} ' + comparisonSelect.value + ' ' + valueInput.value;
-					conditionNode = scriptInterpreter.CreateExpression(expStr);
-					parentEditor.NotifyUpdate();
-				}
-			}
-			else if (conditionType === "variable") {
-				valueChangeHandler = function() {
-					var expStr = variableSelect.value + ' ' + comparisonSelect.value + ' ' + valueInput.value;
-					conditionNode = scriptInterpreter.CreateExpression(expStr);
-					parentEditor.NotifyUpdate();
-				}
-			}
-		}
-		InitValueChangeHandler();
+		var conditionExpressionEditor = null;
 
 		var div = document.createElement("div");
 		div.classList.add("conditionalComparisonEditor");
 
-		function CreateComparisonControls() {
+		function CreateComparisonControls() { // TODO : isEditable?
 			div.innerHTML = "";
 
 			conditionStartSpan = document.createElement("span");
-			if (conditionType != "else") {
-				if (index === 0) {
-					conditionStartSpan.innerText = "if ";
-				}
-				else {
-					conditionStartSpan.innerText = "else if ";
-				}
+			if (conditionNode.type === "else") {
+				conditionStartSpan.innerText = "else";
 			}
-			div.appendChild(conditionStartSpan);
-
-			// type select
-			conditionTypeSelect = document.createElement("select");
-			conditionTypeSelect.title = "choose type of condition to check";
-			div.appendChild(conditionTypeSelect);
-			for(var i = 0; i < conditionTypes.length; i++) {
-				var conditionTypeOption = document.createElement("option");
-				conditionTypeOption.value = conditionTypes[i];
-				conditionTypeOption.innerText = conditionTypes[i]; // conditionTypeNames[i];
-				conditionTypeOption.selected = conditionTypes[i] === conditionType;
-				conditionTypeSelect.appendChild(conditionTypeOption);
-			}
-			conditionTypeSelect.onchange = function() {
-				if (conditionTypeSelect.value === "else") {
-					conditionNode = scriptUtils.CreateElseNode();
-				}
-				else if (conditionTypeSelect.value === "item") {
-					var expStr = '{item "0"} == 1';
-					conditionNode = scriptInterpreter.CreateExpression(expStr);
-				}
-				else if (conditionTypeSelect.value === "variable") {
-					var expStr = 'a == 1';
-					conditionNode = scriptInterpreter.CreateExpression(expStr);
-				}
-				else if (conditionTypeSelect.value === "custom") {
-					var expStr = 'a = a + 1';
-					conditionNode = scriptInterpreter.CreateExpression(expStr);
-				}
-
-				conditionType = GetConditionType(conditionNode);
-				InitValueChangeHandler();
-				CreateComparisonControls();
-				parentEditor.NotifyUpdate();
-			}
-
-			if (conditionType === "item") {
-				// item select
-				itemSelect = document.createElement("select");
-				itemSelect.title = "choose item to check";
-				div.appendChild(itemSelect);
-				for (id in item) {
-					var itemOption = document.createElement("option");
-					itemOption.value = id;
-					itemOption.innerText = GetItemNameFromId(id);
-					itemOption.selected = id === GetItemId();
-					itemSelect.appendChild(itemOption);
-				}
-				itemSelect.onchange = valueChangeHandler;
-			}
-			else if (conditionType === "variable") {
-				// variable select
-				variableSelect = document.createElement("select");
-				variableSelect.title = "choose variable to check";
-				div.appendChild(variableSelect);
-				for (id in variable) {
-					var variableOption = document.createElement("option");
-					variableOption.value = id;
-					variableOption.innerText = id;
-					variableOption.selected = id === GetVariableId();
-					variableSelect.appendChild(variableOption);
-				}
-				variableSelect.onchange = valueChangeHandler;
-			}
-
-			if (conditionType === "item" || conditionType === "variable") {
-				// comparison select
-				comparisonSelect = document.createElement("select");
-				comparisonSelect.title = "choose a comparison type";
-				div.appendChild(comparisonSelect);
-				for (var i = 0; i < comparisonTypes.length; i++) {
-					var comparisonOption = document.createElement("option");
-					comparisonOption.value = comparisonTypes[i];
-					comparisonOption.innerText = comparisonTypes[i];
-					comparisonOption.selected = comparisonTypes[i] === GetComparisonOperator();
-					comparisonSelect.appendChild(comparisonOption);
-				}
-				comparisonSelect.onchange = valueChangeHandler;
-
-				// value input
-				valueInput = document.createElement("input");
-				valueInput.type = "number";
-				valueInput.title = "choose number to compare";
-				valueInput.value = GetRightHandValue();
-				div.appendChild(valueInput);
-				valueInput.onchange = valueChangeHandler;
-			}
-
-			if (conditionType === "custom") {
-				// custom condition input
-				textArea = document.createElement("textarea");
-				textArea.value = conditionNode.Serialize();
-				textArea.onchange = valueChangeHandler;
-				div.appendChild(textArea);
-			}
-
-			conditionEndSpan = document.createElement("span");
-			if (conditionType != "else") {
-				conditionEndSpan.innerText = ", then:";
+			else if (index === 0) {
+				conditionStartSpan.innerText = "if ";
 			}
 			else {
-				conditionEndSpan.innerText = " :";
-			}
-			div.appendChild(conditionEndSpan);
-		}
-
-		function CreateComparisonDescription() {
-			div.innerHTML = "";
-
-			conditionStartSpan = document.createElement("span");
-			if (conditionType != "else") {
-				if (index === 0) {
-					conditionStartSpan.innerText = "if ";
-				}
-				else {
-					conditionStartSpan.innerText = "else if ";
-				}
+				conditionStartSpan.innerText = "else if ";
 			}
 			div.appendChild(conditionStartSpan);
 
-			conditionDescriptionSpan = document.createElement("span");
-			conditionDescriptionSpan.classList.add("parameterUneditable");
-			conditionDescriptionSpan.innerText = "";
-
-			if (conditionType != "custom") {
-				conditionDescriptionSpan.innerText += conditionType;
+			if (conditionNode.type != "else") {
+				conditionExpressionEditor = new ExpressionEditor(conditionNode, self, true);
+				div.appendChild(conditionExpressionEditor.GetElement());
 			}
-
-			if (conditionType === "item") {
-				conditionDescriptionSpan.innerText += " " + GetItemNameFromId(GetItemId());
-			}
-			else if (conditionType === "variable") {
-				conditionDescriptionSpan.innerText += " " + GetVariableId();
-			}
-
-			if (conditionType === "item" || conditionType === "variable") {
-				conditionDescriptionSpan.innerText += " " + GetComparisonOperator();
-				conditionDescriptionSpan.innerText += " " + GetRightHandValue();
-			}
-			else if (conditionType === "custom") {
-				conditionDescriptionSpan.innerText += conditionNode.Serialize();
-			}
-
-			div.appendChild(conditionDescriptionSpan);
 
 			conditionEndSpan = document.createElement("span");
-			if (conditionType != "else") {
+			if (conditionNode.type != "else") {
 				conditionEndSpan.innerText = ", then:";
 			}
 			else {
@@ -1600,7 +1404,7 @@ function DialogTool() {
 			div.appendChild(conditionEndSpan);
 		}
 
-		CreateComparisonDescription();
+		CreateComparisonControls();
 
 		this.GetElement = function() {
 			return div;
@@ -1614,7 +1418,7 @@ function DialogTool() {
 			index = i;
 
 			// update the initial label based on the order of the option
-			if (conditionType != "else") {
+			if (conditionNode.type != "else") {
 				if (index === 0) {
 					conditionStartSpan.innerText = "if ";
 				}
@@ -1625,11 +1429,19 @@ function DialogTool() {
 		}
 
 		this.Select = function() {
-			CreateComparisonControls();
+			if (conditionExpressionEditor != null) {
+				conditionExpressionEditor.Select();
+			}
 		}
 
 		this.Deselect = function() {
-			CreateComparisonDescription();
+			if (conditionExpressionEditor != null) {
+				conditionExpressionEditor.Deselect();
+			}
+		}
+
+		this.NotifyUpdate = function() {
+			parentEditor.NotifyUpdate();
 		}
 	}
 
@@ -2171,7 +1983,6 @@ function DialogTool() {
 		}
 
 		function DoesEditorTypeMatchNode(type, node) {
-			console.log(node.type === "code_block" && node.children[0].type === "function");
 			if (type === "number" && node.type === "literal" && (typeof node.value) === "number") {
 				return true;
 			}
