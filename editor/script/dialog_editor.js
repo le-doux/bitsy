@@ -1535,7 +1535,7 @@ function DialogTool() {
 			parameters : [],
 		},
 		"item" : {
-			description : "# of _ in inventory",
+			description : "_ in inventory",
 			parameters : [
 				{ types: ["item", "text", "variable"], index: 0, name: "item", },
 			],
