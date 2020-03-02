@@ -72,6 +72,10 @@
 	border: solid 2px #6767b2;
 }
 
+.selectedEditor.actionEditor.inline {
+	border: none;
+}
+
 .dialogEditor textarea {
 	background: black;
 	color: white;

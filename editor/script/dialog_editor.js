@@ -855,8 +855,10 @@ function DialogTool() {
 			div.classList.add("inline");
 		}
 
-		var orderControls = new OrderControls(this, parentEditor);
-		div.appendChild(orderControls.GetElement());
+		if (!isInline) {
+			var orderControls = new OrderControls(this, parentEditor);
+			div.appendChild(orderControls.GetElement());			
+		}
 
 		var expressionSpan = document.createElement("span");
 		div.appendChild(expressionSpan);
@@ -916,12 +918,11 @@ function DialogTool() {
 			return div;
 		}
 
-		if (!isInline) {
-			AddSelectionBehavior(
-				this,
-				function() { CreateExpressionControls(true); },
-				function() { CreateExpressionControls(false); });			
-		}
+		AddSelectionBehavior(
+			this,
+			function() { CreateExpressionControls(true); },
+			function() { CreateExpressionControls(false); },
+			isInline);
 
 		this.GetNodes = function() {
 			return [node];
@@ -929,14 +930,6 @@ function DialogTool() {
 
 		this.NotifyUpdate = function() {
 			parentEditor.NotifyUpdate();
-		}
-
-		this.Select = function() {
-			CreateExpressionControls(true);
-		}
-
-		this.Deselect = function() {
-			CreateExpressionControls(false);
 		}
 	}
 
@@ -1543,49 +1536,66 @@ function DialogTool() {
 		},
 	};
 
-	function FunctionEditor(node, parentEditor) {
+	function FunctionEditor(node, parentEditor, isInline) {
+		if (isInline === undefined || isInline === null) {
+			isInline = false;
+		}
+
 		var self = this;
 
 		var functionNode = node.children[0];
 
-		var div = document.createElement("div");
+		var div = document.createElement(isInline ? "span" : "div");
 		div.classList.add("functionEditor");
 		div.classList.add("actionEditor");
+		if (isInline) {
+			div.classList.add("inline");
+		}
 
-		var orderControls = new OrderControls(this, parentEditor);
-		div.appendChild(orderControls.GetElement());
+		var orderControls = null;
 
-		var descriptionDiv = document.createElement("div");
+		if (!isInline) {
+			orderControls = new OrderControls(this, parentEditor);
+			div.appendChild(orderControls.GetElement());			
+		}
+
+		var descriptionDiv = document.createElement(isInline ? "span" : "div");
 		div.appendChild(descriptionDiv);
 
-		var customCommandsDiv = document.createElement("div");
-		customCommandsDiv.style.marginTop = "5px"; // hack : need to hide these spacers...
-		div.appendChild(customCommandsDiv);
+		var customCommandsDiv = null;
+		var addParameterDiv = null;
+		var helpTextDiv = null;
 
-		var addParameterDiv = document.createElement("div");
-		addParameterDiv.style.marginTop = "5px"; // hack
-		div.appendChild(addParameterDiv);
+		if (!isInline) {
+			customCommandsDiv = document.createElement("div");
+			customCommandsDiv.style.marginTop = "5px"; // hack : need to hide these spacers...
+			div.appendChild(customCommandsDiv);
 
-		var helpTextDiv = document.createElement("div");
-		div.appendChild(helpTextDiv);
+			addParameterDiv = document.createElement("div");
+			addParameterDiv.style.marginTop = "5px"; // hack
+			div.appendChild(addParameterDiv);
 
-		var customControls = orderControls.GetCustomControlsContainer();
+			helpTextDiv = document.createElement("div");
+			div.appendChild(helpTextDiv);
 
-		// TODO : hide if there are no parameters??
-		var editParameterTypeCheckbox = document.createElement("input");
-		editParameterTypeCheckbox.type = "checkbox";
-		editParameterTypeCheckbox.id = "paramTypeCheck_" + node.GetId();
-		editParameterTypeCheckbox.checked = false;
-		editParameterTypeCheckbox.onclick = function() {
-			CreateFunctionDescription(true);
+			var customControls = orderControls.GetCustomControlsContainer();
+
+			// TODO : hide if there are no parameters??
+			var editParameterTypeCheckbox = document.createElement("input");
+			editParameterTypeCheckbox.type = "checkbox";
+			editParameterTypeCheckbox.id = "paramTypeCheck_" + node.GetId();
+			editParameterTypeCheckbox.checked = false;
+			editParameterTypeCheckbox.onclick = function() {
+				CreateFunctionDescription(true);
+			}
+			customControls.appendChild(editParameterTypeCheckbox);
+
+			var editParameterTypeLabel = document.createElement("label");
+			editParameterTypeLabel.innerHTML = '<i class="material-icons">settings</i>';
+			editParameterTypeLabel.setAttribute("for", "paramTypeCheck_" + node.GetId());
+			editParameterTypeLabel.title = "edit parameter types"
+			customControls.appendChild(editParameterTypeLabel);
 		}
-		customControls.appendChild(editParameterTypeCheckbox);
-
-		var editParameterTypeLabel = document.createElement("label");
-		editParameterTypeLabel.innerHTML = '<i class="material-icons">settings</i>';
-		editParameterTypeLabel.setAttribute("for", "paramTypeCheck_" + node.GetId());
-		editParameterTypeLabel.title = "edit parameter types"
-		customControls.appendChild(editParameterTypeLabel);
 
 		// TODO : populate default values!!
 		var curParameterEditors = [];
@@ -1646,7 +1656,7 @@ function DialogTool() {
 						curParameterEditors.push(parameterEditor);
 						descriptionDiv.appendChild(parameterEditor.GetElement());							
 					}
-					else if (isEditable && functionNode.args.length == parameterInfo.index && parameterInfo.name) {
+					else if (!isInline && isEditable && functionNode.args.length == parameterInfo.index && parameterInfo.name) {
 						function createAddParameterHandler(functionNode, parameterInfo) {
 							return function() {
 								functionNode.args.push(CreateDefaultArgNode(parameterInfo.types[0]));
@@ -1663,21 +1673,23 @@ function DialogTool() {
 				}
 			}
 
-			// add custom edit commands
-			var commands = functionDescriptionMap[functionNode.name].commands;
-			if (isEditable && commands) {
-				for (var i = 0; i < commands.length; i++) {
-					customCommandsDiv.appendChild(commands[i](functionNode, parentEditor, CreateFunctionDescription));
+			if (!isInline) {
+				// add custom edit commands
+				var commands = functionDescriptionMap[functionNode.name].commands;
+				if (isEditable && commands) {
+					for (var i = 0; i < commands.length; i++) {
+						customCommandsDiv.appendChild(commands[i](functionNode, parentEditor, CreateFunctionDescription));
+					}
 				}
-			}
 
-			helpTextDiv.innerText = "";
-			helpTextDiv.classList.remove("helpText");
-			if (isEditable) {
-				var helpText = functionDescriptionMap[functionNode.name].helpText;
-				if (helpText != undefined && helpText != null) {
-					helpTextDiv.innerText = helpText;
-					helpTextDiv.classList.add("helpText");
+				helpTextDiv.innerText = "";
+				helpTextDiv.classList.remove("helpText");
+				if (isEditable) {
+					var helpText = functionDescriptionMap[functionNode.name].helpText;
+					if (helpText != undefined && helpText != null) {
+						helpTextDiv.innerText = helpText;
+						helpTextDiv.classList.add("helpText");
+					}
 				}
 			}
 		}
@@ -1707,22 +1719,25 @@ function DialogTool() {
 				}
 
 				CreateFunctionDescription(false);
+			},
+			isInline);
+
+		if (!isInline) {
+			events.Listen("script_node_enter", function(event) {
+				if (event.id === node.GetId()) {
+					div.classList.add("executing");
+				}
 			});
 
-		events.Listen("script_node_enter", function(event) {
-			if (event.id === node.GetId()) {
-				div.classList.add("executing");
-			}
-		});
-
-		events.Listen("script_node_exit", function(event) {
-			if (event.id === node.GetId()) {
-				div.classList.remove("executing");
-				div.classList.remove("executingLeave");
-				void div.offsetWidth; // hack to force reflow to allow animation to restart
-				div.classList.add("executingLeave");
-			}
-		});
+			events.Listen("script_node_exit", function(event) {
+				if (event.id === node.GetId()) {
+					div.classList.remove("executing");
+					div.classList.remove("executingLeave");
+					void div.offsetWidth; // hack to force reflow to allow animation to restart
+					div.classList.add("executingLeave");
+				}
+			});
+		}
 	}
 
 	function CreateDefaultArgNode(type) {
@@ -2110,7 +2125,11 @@ function DialogTool() {
 	}
 
 	var curSelectedEditor = null;
-	function AddSelectionBehavior(editor, onSelect, onDeselect) {
+	function AddSelectionBehavior(editor, onSelect, onDeselect, isInline) {
+		if (isInline === undefined || isInline === null) {
+			isInline = false;
+		}
+
 		editor.Select = function() {
 			editor.GetElement().classList.add("selectedEditor");
 			if (editor.ShowOrderControls) {
@@ -2131,19 +2150,21 @@ function DialogTool() {
 			}
 		}
 
-		editor.GetElement().onclick = function(event) {
-			event.stopPropagation();
+		if (!isInline) {
+			editor.GetElement().onclick = function(event) {
+				event.stopPropagation();
 
-			if (curSelectedEditor === editor) {
-				return; // already selected!
+				if (curSelectedEditor === editor) {
+					return; // already selected!
+				}
+
+				if (curSelectedEditor != null) {
+					curSelectedEditor.Deselect();
+				}
+
+				editor.Select();
+				curSelectedEditor = editor;
 			}
-
-			if (curSelectedEditor != null) {
-				curSelectedEditor.Deselect();
-			}
-
-			editor.Select();
-			curSelectedEditor = editor;
 		}
 	}
 }
