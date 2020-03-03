@@ -1608,8 +1608,11 @@ function DialogTool() {
 		function CreateFunctionDescription(isEditable) {
 			curParameterEditors = [];
 			descriptionDiv.innerHTML = "";
-			customCommandsDiv.innerHTML = "";
-			addParameterDiv.innerHTML = "";
+
+			if (!isInline) {
+				customCommandsDiv.innerHTML = "";
+				addParameterDiv.innerHTML = "";				
+			}
 
 			var descriptionText = functionDescriptionMap[functionNode.name].description;
 			var descriptionTextSplit = descriptionText.split("_");
@@ -1657,7 +1660,7 @@ function DialogTool() {
 							createGetArgFunc(functionNode, parameterInfo.index),
 							createSetArgFunc(functionNode, parameterInfo.index, self),
 							isEditable,
-							editParameterTypeCheckbox.checked);
+							!isInline && editParameterTypeCheckbox.checked);
 
 						curParameterEditors.push(parameterEditor);
 						descriptionDiv.appendChild(parameterEditor.GetElement());							
@@ -1785,6 +1788,8 @@ function DialogTool() {
 	];
 
 	function ParameterEditor(parameterTypes, getArgFunc, setArgFunc, isEditable, isTypeEditable) {
+		var self = this;
+
 		var curType;
 
 		var span = document.createElement("span");
@@ -1838,6 +1843,18 @@ function DialogTool() {
 						if (id === curValue) {
 							parameterValue.innerText = transitionTypes[i].name;
 						}
+					}
+				}
+				else if (type === "function") {
+					var funcNode = getArgFunc();
+					if (funcNode.type === "code_block" && funcNode.children[0].type === "function" &&
+						functionDescriptionMap[funcNode.children[0].name] != undefined) { // TODO : copied from block editor
+						var inlineFunctionEditor = new FunctionEditor(getArgFunc(), self, true);
+						parameterValue.appendChild(inlineFunctionEditor.GetElement());
+					}
+					else {
+						// just in case
+						parameterValue.innerText = value;
 					}
 				}
 				else {
@@ -1980,10 +1997,21 @@ function DialogTool() {
 				}
 			}
 			else if (type === "function") {
-				// TODO : this is a placeholder for something...
 				parameterInput = document.createElement("span");
-				parameterInput.classList.add("parameterUneditable");
-				parameterInput.innerText = value;
+
+				// todo : a little hacky to get the arg node instead of the value?
+				var funcNode = getArgFunc();
+				if (funcNode.type === "code_block" && funcNode.children[0].type === "function" &&
+					functionDescriptionMap[funcNode.children[0].name] != undefined) { // TODO : copied from block editor
+					var inlineFunctionEditor = new FunctionEditor(getArgFunc(), self, true);
+					inlineFunctionEditor.Select();
+					parameterInput.appendChild(inlineFunctionEditor.GetElement());
+				}
+				else {
+					// just in case
+					parameterInput.classList.add("parameterUneditable");
+					parameterInput.innerText = value;
+				}
 			}
 
 			return parameterInput;
@@ -2045,6 +2073,10 @@ function DialogTool() {
 
 		this.GetElement = function() {
 			return span;
+		}
+
+		this.NotifyUpdate = function() {
+			parentEditor.NotifyUpdate();
 		}
 	}
 
