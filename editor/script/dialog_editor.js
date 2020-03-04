@@ -1206,22 +1206,95 @@ function DialogTool() {
 		optionRootDiv.classList.add("optionRoot");
 		div.appendChild(optionRootDiv);
 
-		var addOptionRootDiv = document.createElement("div");
-		addOptionRootDiv.classList.add("addOption");
-		div.appendChild(addOptionRootDiv);
+		var addConditionRootDiv = document.createElement("div");
+		addConditionRootDiv.classList.add("addOption");
+		addConditionRootDiv.style.flexDirection = "column"; //hack
+		div.appendChild(addConditionRootDiv);
 
-		var addOptionButton = document.createElement("button");
-		addOptionButton.innerHTML = '<i class="material-icons">add</i>' + "add option";
-		addOptionButton.onclick = function() {
-			var conditionPairNode = scriptUtils.CreateConditionPair();
+		var addButton = document.createElement("button");
+		addButton.innerHTML = '<i class="material-icons">add</i>' + "add condition";
+		addButton.onclick = function() {
+			addButton.style.display = "none";
+			addItemCondition.style.display = "block";
+			addVariableCondition.style.display = "block";
+			addDefaultCondition.style.display = "block";
+			cancelButton.style.display = "block";
+		}
+		addConditionRootDiv.appendChild(addButton);
+
+		var addItemCondition = document.createElement("button");
+		addItemCondition.innerHTML = '<i class="material-icons">add</i>' + "item condition";
+		addItemCondition.style.display = "none";
+		addItemCondition.onclick = function() {
+			var conditionPairNode = scriptUtils.CreateItemConditionPair();
 			var optionEditor = new ConditionalOptionEditor(conditionPairNode, self, optionEditors.length);
 			optionEditors.push(optionEditor);
 
 			RefreshOptionsUI();
 			UpdateNodeOptions();
 			parentEditor.NotifyUpdate();
+
+			addButton.style.display = "block";
+			addItemCondition.style.display = "none";
+			addVariableCondition.style.display = "none";
+			addDefaultCondition.style.display = "none";
+			cancelButton.style.display = "none";
 		}
-		addOptionRootDiv.appendChild(addOptionButton);
+		addConditionRootDiv.appendChild(addItemCondition);
+
+		var addVariableCondition = document.createElement("button");
+		addVariableCondition.innerHTML = '<i class="material-icons">add</i>' + "variable condition";
+		addVariableCondition.style.display = "none";
+		addVariableCondition.onclick = function() {
+			var conditionPairNode = scriptUtils.CreateVariableConditionPair();
+			var optionEditor = new ConditionalOptionEditor(conditionPairNode, self, optionEditors.length);
+			optionEditors.push(optionEditor);
+
+			RefreshOptionsUI();
+			UpdateNodeOptions();
+			parentEditor.NotifyUpdate();
+
+			addButton.style.display = "block";
+			addItemCondition.style.display = "none";
+			addVariableCondition.style.display = "none";
+			addDefaultCondition.style.display = "none";
+			cancelButton.style.display = "none";
+		}
+		addConditionRootDiv.appendChild(addVariableCondition);
+
+		var addDefaultCondition = document.createElement("button");
+		addDefaultCondition.innerHTML = '<i class="material-icons">add</i>' + "default condition";
+		addDefaultCondition.style.display = "none";
+		addDefaultCondition.onclick = function() {
+			var conditionPairNode = scriptUtils.CreateDefaultConditionPair();
+			var optionEditor = new ConditionalOptionEditor(conditionPairNode, self, optionEditors.length);
+			optionEditors.push(optionEditor);
+
+			RefreshOptionsUI();
+			UpdateNodeOptions();
+			parentEditor.NotifyUpdate();
+
+			addButton.style.display = "block";
+			addItemCondition.style.display = "none";
+			addVariableCondition.style.display = "none";
+			addDefaultCondition.style.display = "none";
+			cancelButton.style.display = "none";
+		}
+		addConditionRootDiv.appendChild(addDefaultCondition);
+
+		var cancelButton = document.createElement("button");
+		cancelButton.classList.add("actionBuilderButton");
+		cancelButton.classList.add("actionBuilderCancel");
+		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " cancel";
+		cancelButton.style.display = "none";
+		cancelButton.onclick = function() {
+			addButton.style.display = "block";
+			addItemCondition.style.display = "none";
+			addVariableCondition.style.display = "none";
+			addDefaultCondition.style.display = "none";
+			cancelButton.style.display = "none";
+		}
+		addConditionRootDiv.appendChild(cancelButton);
 
 		this.GetElement = function() {
 			return div;

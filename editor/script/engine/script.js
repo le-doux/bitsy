@@ -117,9 +117,26 @@ var Utils = function() {
 		return block;
 	}
 
-	this.CreateConditionPair = function() {
+	this.CreateItemConditionPair = function() {
 		var itemFunc = this.CreateFunctionBlock("item", ["0"]);
 		var condition = new ExpNode("==", itemFunc, new LiteralNode(1));
+		var result = new DialogBlockNode(true);
+		result.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		var conditionPair = new ConditionPairNode(condition, result);
+		return conditionPair;
+	}
+
+	this.CreateVariableConditionPair = function() {
+		var varNode = this.CreateVariableNode("a");
+		var condition = new ExpNode("==", varNode, new LiteralNode(1));
+		var result = new DialogBlockNode(true);
+		result.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		var conditionPair = new ConditionPairNode(condition, result);
+		return conditionPair;
+	}
+
+	this.CreateDefaultConditionPair = function() {
+		var condition = this.CreateElseNode();
 		var result = new DialogBlockNode(true);
 		result.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
 		var conditionPair = new ConditionPairNode(condition, result);
