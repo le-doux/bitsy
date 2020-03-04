@@ -1846,10 +1846,8 @@ function DialogTool() {
 					}
 				}
 				else if (type === "function") {
-					var funcNode = getArgFunc();
-					if (funcNode.type === "code_block" && funcNode.children[0].type === "function" &&
-						functionDescriptionMap[funcNode.children[0].name] != undefined) { // TODO : copied from block editor
-						var inlineFunctionEditor = new FunctionEditor(getArgFunc(), self, true);
+					var inlineFunctionEditor = TryCreateFunctionEditor();
+					if (inlineFunctionEditor != null) {
 						parameterValue.appendChild(inlineFunctionEditor.GetElement());
 					}
 					else {
@@ -1861,6 +1859,16 @@ function DialogTool() {
 					parameterValue.innerText = curValue;
 				}
 			}
+		}
+
+		function TryCreateFunctionEditor() {
+			var inlineFunctionEditor = null;
+			var funcNode = getArgFunc();
+			if (funcNode.type === "code_block" && funcNode.children[0].type === "function" &&
+				functionDescriptionMap[funcNode.children[0].name] != undefined) { // TODO : copied from block editor
+				var inlineFunctionEditor = new FunctionEditor(getArgFunc(), self, true);
+			}
+			return inlineFunctionEditor;
 		}
 
 		function ChangeEditorType(type) {
@@ -1998,12 +2006,8 @@ function DialogTool() {
 			}
 			else if (type === "function") {
 				parameterInput = document.createElement("span");
-
-				// todo : a little hacky to get the arg node instead of the value?
-				var funcNode = getArgFunc();
-				if (funcNode.type === "code_block" && funcNode.children[0].type === "function" &&
-					functionDescriptionMap[funcNode.children[0].name] != undefined) { // TODO : copied from block editor
-					var inlineFunctionEditor = new FunctionEditor(getArgFunc(), self, true);
+				var inlineFunctionEditor = TryCreateFunctionEditor();
+				if (inlineFunctionEditor != null) {
 					inlineFunctionEditor.Select();
 					parameterInput.appendChild(inlineFunctionEditor.GetElement());
 				}
@@ -2076,7 +2080,8 @@ function DialogTool() {
 		}
 
 		this.NotifyUpdate = function() {
-			parentEditor.NotifyUpdate();
+			// hack to force an update
+			setArgFunc(getArgFunc());
 		}
 	}
 
