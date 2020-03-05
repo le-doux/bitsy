@@ -920,7 +920,16 @@ function DialogTool() {
 
 		AddSelectionBehavior(
 			this,
-			function() { CreateExpressionControls(true); },
+			function() {
+				CreateExpressionControls(true);
+
+				// hack test
+				if (!isInline) {
+					var builderTest = new ExpressionBuilder(node, parentEditor);
+					div.appendChild(builderTest.GetElement());
+				}
+
+			},
 			function() { CreateExpressionControls(false); },
 			isInline);
 
@@ -2281,6 +2290,163 @@ function DialogTool() {
 				editor.Select();
 				curSelectedEditor = editor;
 			}
+		}
+	}
+
+	/* EXPRESSION BUILDER
+		TODO :
+		- move into its own file?
+		- name vs expression editor? kind of confusing
+		- add protections against messing up using the assignment operator "="
+		- probably general protections against using the buttons wrong would help
+		- need special controls for
+			- text
+			- items
+			- variables
+		- delete button
+		- accept / cancel
+		- plaintext mode?
+	*/
+	function ExpressionBuilder(node, parentEditor) {
+		var expressionRootNode = null;
+		if (node.type === "operator") {
+			expressionRootNode = node;
+		}
+		else if (node.type === "code_block" && node.children[0].type === "operator") {
+			expressionRootNode = node.children[0];	
+		}
+
+		var div = document.createElement("div");
+
+		var expressionDiv = document.createElement("div");
+		div.appendChild(expressionDiv);
+		var expressionEditor = new ExpressionEditor(expressionRootNode, parentEditor, true);
+		expressionDiv.appendChild(expressionEditor.GetElement());
+		var curNumberSpan = document.createElement("span");
+		expressionDiv.appendChild(curNumberSpan);
+
+		var inputRoot = document.createElement("div");
+		inputRoot.style.display = "flex";
+		div.appendChild(inputRoot);
+
+		var numberInputs = ["7","8","9","4","5","6","1","2","3","0","."];
+		var curNumberBeforeDecimal = "";
+		var curNumberAfterDecimal = "";
+		var curNumberHasDecimal = false;
+		function CreateNumberInputHandler(number) { // TODO : uppercase function name?
+			return function() {
+				if (number === ".") {
+					curNumberHasDecimal = true;
+				}
+				else if (curNumberHasDecimal) {
+					curNumberAfterDecimal += number;
+				}
+				else {
+					curNumberBeforeDecimal += number;
+				}
+
+				var curNumberString = "";
+				curNumberString += curNumberBeforeDecimal.length > 0 ? curNumberBeforeDecimal : "0";
+				curNumberString += curNumberHasDecimal ? "." : "";
+				curNumberString += curNumberHasDecimal ? (curNumberAfterDecimal.length > 0 ? curNumberAfterDecimal : "0") : "";
+
+				curNumberSpan.innerText = curNumberString;
+			}
+		}
+
+		for (var i = 0; i < numberInputs.length; i++) {
+			var button = document.createElement("button");
+			button.innerText = numberInputs[i];
+			button.onclick = CreateNumberInputHandler(numberInputs[i]);
+
+			inputRoot.appendChild(button);
+		}
+
+		var boolInputs = ["true", "false"];
+		function CreateBoolInputHandler(bool) {
+			return function() {
+				var expressionString = expressionRootNode.Serialize();
+
+				expressionString += " " + bool;
+
+				expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
+
+				// hacky - move into its own function
+				expressionDiv.innerHTML = "";
+				var expressionEditor = new ExpressionEditor(expressionRootNode, parentEditor, true);
+				expressionDiv.appendChild(expressionEditor.GetElement());	
+				curNumberSpan = document.createElement("span");
+				expressionDiv.appendChild(curNumberSpan);
+				// extra hacky
+				curNumberBeforeDecimal = "";
+				curNumberAfterDecimal = "";
+				curNumberHasDecimal = false;
+			}
+		}
+
+		for (var i = 0; i < boolInputs.length; i++) {
+			var button = document.createElement("button");
+			button.innerText = boolInputs[i];
+			button.onclick = CreateBoolInputHandler(boolInputs[i]);
+
+			inputRoot.appendChild(button);			
+		}
+
+		var mathInputs = ["/", "*", "-", "+"];
+		function CreateOperatorInputHandler(operator) {
+			return function() {
+				var expressionString = expressionRootNode.Serialize();
+
+				// hacky
+				if (curNumberSpan.innerText.length > 0) {
+					expressionString += " " + curNumberSpan.innerText;
+				}
+
+				expressionString += " " + operator;
+
+				expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
+
+				// hacky - move into its own function
+				expressionDiv.innerHTML = "";
+				var expressionEditor = new ExpressionEditor(expressionRootNode, parentEditor, true);
+				expressionDiv.appendChild(expressionEditor.GetElement());	
+				curNumberSpan = document.createElement("span");
+				expressionDiv.appendChild(curNumberSpan);
+				// extra hacky
+				curNumberBeforeDecimal = "";
+				curNumberAfterDecimal = "";
+				curNumberHasDecimal = false;	
+			}
+		}
+
+		for (var i = 0; i < mathInputs.length; i++) {
+			var button = document.createElement("button");
+			button.innerText = mathInputs[i];
+			button.onclick = CreateOperatorInputHandler(mathInputs[i]);
+
+			inputRoot.appendChild(button);
+		}
+
+		var assignmentInputs = ["="];
+		for (var i = 0; i < assignmentInputs.length; i++) {
+			var button = document.createElement("button");
+			button.innerText = assignmentInputs[i];
+			button.onclick = CreateOperatorInputHandler(assignmentInputs[i]);
+
+			inputRoot.appendChild(button);	
+		}
+
+		var comparisonInputs = ["==", ">=", "<=", ">", "<"];
+		for (var i = 0; i < comparisonInputs.length; i++) {
+			var button = document.createElement("button");
+			button.innerText = comparisonInputs[i];
+			button.onclick = CreateOperatorInputHandler(comparisonInputs[i]);
+
+			inputRoot.appendChild(button);	
+		}
+
+		this.GetElement = function() {
+			return div;
 		}
 	}
 }
