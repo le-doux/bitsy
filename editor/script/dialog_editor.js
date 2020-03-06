@@ -602,7 +602,7 @@ function DialogTool() {
 		div.appendChild(makeActionCategoryButton("dialog", "dialog actions"));
 		div.appendChild(makeActionCategoryButton("flow", "flow control actions"));
 		div.appendChild(makeActionCategoryButton("exit", "exit and ending actions"));
-		div.appendChild(makeActionCategoryButton("item", "item actions"));
+		div.appendChild(makeActionCategoryButton("item", "item and variable actions"));
 
 		function makeActionBuilderButton(categoryName, text, createEditorFunc) {
 			var actionBuilderButton = document.createElement("button");
@@ -741,6 +741,30 @@ function DialogTool() {
 				function() {
 					var node = scriptUtils.CreateFunctionBlock("takeItem", ["0", 1]);
 					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"item",
+				"set variable value",
+				function() {
+					var expressionNode = scriptInterpreter.CreateExpression("a = 5");
+					var node = scriptUtils.CreateCodeBlock();
+					node.children.push(expressionNode);
+					var editor = new ExpressionEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"item",
+				"change variable value",
+				function() {
+					var expressionNode = scriptInterpreter.CreateExpression("a = a + 1");
+					var node = scriptUtils.CreateCodeBlock();
+					node.children.push(expressionNode);
+					var editor = new ExpressionEditor(node, parentEditor);
 					return editor;
 				}));
 
@@ -924,10 +948,10 @@ function DialogTool() {
 				CreateExpressionControls(true);
 
 				// hack test
-				if (!isInline) {
-					var builderTest = new ExpressionBuilder(node, parentEditor);
-					div.appendChild(builderTest.GetElement());
-				}
+				// if (!isInline) {
+				// 	var builderTest = new ExpressionBuilder(node, parentEditor);
+				// 	div.appendChild(builderTest.GetElement());
+				// }
 
 			},
 			function() { CreateExpressionControls(false); },
