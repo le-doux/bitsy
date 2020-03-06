@@ -310,6 +310,10 @@ function DialogTool() {
 		div = document.createElement("div");
 
 		var self = this;
+
+		var viewportDiv;
+		var expressionBuilderDiv;
+
 		function RefreshEditorUI() {
 			var dialogStr = dialog[dialogId].src;
 
@@ -317,13 +321,17 @@ function DialogTool() {
 			scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
 			rootEditor = new BlockEditor(scriptRootNode, self);
 
-			var viewportDiv = document.createElement("div");
+			viewportDiv = document.createElement("div");
 			viewportDiv.classList.add("dialogContentViewport");
 			// always selected so we can add actions to the root
 			viewportDiv.classList.add("selectedEditor");
 
 			viewportDiv.appendChild(rootEditor.GetElement());
 			div.appendChild(viewportDiv);
+
+			expressionBuilderDiv = document.createElement("div");
+			expressionBuilderDiv.style.display = "none";
+			div.appendChild(expressionBuilderDiv);
 		}
 
 		RefreshEditorUI();
@@ -355,6 +363,16 @@ function DialogTool() {
 
 		this.NotifyUpdate = function() {
 			OnUpdate();
+		}
+
+		// I have to say having to put this EVERYWHERE will be annoying (oh well)
+		this.OpenExpressionBuilder = function(expressionNode) {
+			var expressionBuilder = new ExpressionBuilder(expressionNode, self); // is self the right parentEditor?
+			expressionBuilderDiv.innerHTML = "";
+			expressionBuilderDiv.appendChild(expressionBuilder.GetElement());
+			expressionBuilderDiv.style.display = "block";
+
+			viewportDiv.style.display = "none";
 		}
 
 		events.Listen("dialog_update", function(event) {
@@ -423,6 +441,10 @@ function DialogTool() {
 			}
 
 			parentEditor.NotifyUpdate();
+		}
+
+		this.OpenExpressionBuilder = function(expressionNode) {
+			parentEditor.OpenExpressionBuilder(expressionNode);
 		}
 
 		var childEditors = [];
@@ -881,7 +903,17 @@ function DialogTool() {
 
 		if (!isInline) {
 			var orderControls = new OrderControls(this, parentEditor);
-			div.appendChild(orderControls.GetElement());			
+			div.appendChild(orderControls.GetElement());	
+
+			var customControls = orderControls.GetCustomControlsContainer();
+
+			var editExpressionButton = document.createElement("button")
+			editExpressionButton.title = "edit expression"; // TODO : localize
+			editExpressionButton.innerHTML = '<i class="material-icons">edit</i>';
+			editExpressionButton.onclick = function() {
+				parentEditor.OpenExpressionBuilder(node);
+			};
+			customControls.appendChild(editExpressionButton);
 		}
 
 		var expressionSpan = document.createElement("span");
@@ -963,6 +995,10 @@ function DialogTool() {
 
 		this.NotifyUpdate = function() {
 			parentEditor.NotifyUpdate();
+		}
+
+		this.OpenExpressionBuilder = function(expressionNode) {
+			parentEditor.OpenExpressionBuilder(expressionNode);
 		}
 	}
 
@@ -1105,6 +1141,10 @@ function DialogTool() {
 
 		this.NotifyUpdate = function() {
 			parentEditor.NotifyUpdate();
+		}
+
+		this.OpenExpressionBuilder = function(expressionNode) {
+			parentEditor.OpenExpressionBuilder(expressionNode);
 		}
 
 		this.RemoveChild = function(childEditor) {
@@ -1344,6 +1384,10 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
+		this.OpenExpressionBuilder = function(expressionNode) {
+			parentEditor.OpenExpressionBuilder(expressionNode);
+		}
+
 		this.RemoveChild = function(childEditor) {
 			optionEditors.splice(optionEditors.indexOf(childEditor),1);
 
@@ -1452,6 +1496,10 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
+		this.OpenExpressionBuilder = function(expressionNode) {
+			parentEditor.OpenExpressionBuilder(expressionNode);
+		}
+
 		this.UpdateIndex = function(i) {
 			index = i;
 			comparisonEditor.UpdateIndex(index);
@@ -1541,6 +1589,10 @@ function DialogTool() {
 
 		this.NotifyUpdate = function() {
 			parentEditor.NotifyUpdate();
+		}
+
+		this.OpenExpressionBuilder = function(expressionNode) {
+			parentEditor.OpenExpressionBuilder(expressionNode);
 		}
 	}
 
@@ -1821,6 +1873,10 @@ function DialogTool() {
 
 		this.NotifyUpdate = function() {
 			parentEditor.NotifyUpdate();
+		}
+
+		this.OpenExpressionBuilder = function(expressionNode) {
+			parentEditor.OpenExpressionBuilder(expressionNode);
 		}
 
 		AddSelectionBehavior(
@@ -2188,6 +2244,10 @@ function DialogTool() {
 		this.NotifyUpdate = function() {
 			// hack to force an update
 			setArgFunc(getArgFunc());
+		}
+
+		this.OpenExpressionBuilder = function(expressionNode) {
+			parentEditor.OpenExpressionBuilder(expressionNode);
 		}
 	}
 
