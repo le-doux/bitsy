@@ -330,6 +330,7 @@ function DialogTool() {
 			div.appendChild(viewportDiv);
 
 			expressionBuilderDiv = document.createElement("div");
+			expressionBuilderDiv.classList.add("dialogExpressionBuilderHolder");
 			expressionBuilderDiv.style.display = "none";
 			div.appendChild(expressionBuilderDiv);
 		}
@@ -366,12 +367,25 @@ function DialogTool() {
 		}
 
 		// I have to say having to put this EVERYWHERE will be annoying (oh well)
-		this.OpenExpressionBuilder = function(expressionNode) {
-			var expressionBuilder = new ExpressionBuilder(expressionNode, self); // is self the right parentEditor?
+		this.OpenExpressionBuilder = function(expressionString, onAcceptHandler) {
+			var expressionBuilder = new ExpressionBuilder(
+				expressionString,
+				self, // is self the right parentEditor?
+				function() { // cancel
+					expressionBuilderDiv.style.display = "none";
+					viewportDiv.style.display = "block";
+				},
+				function(expressionNode) { // accept
+					console.log(expressionNode.Serialize());
+					expressionBuilderDiv.style.display = "none";
+					viewportDiv.style.display = "block";
+					onAcceptHandler(expressionNode);
+				});
+
 			expressionBuilderDiv.innerHTML = "";
 			expressionBuilderDiv.appendChild(expressionBuilder.GetElement());
-			expressionBuilderDiv.style.display = "block";
 
+			expressionBuilderDiv.style.display = "block";
 			viewportDiv.style.display = "none";
 		}
 
@@ -443,8 +457,8 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
-		this.OpenExpressionBuilder = function(expressionNode) {
-			parentEditor.OpenExpressionBuilder(expressionNode);
+		this.OpenExpressionBuilder = function(expressionString, onAcceptHandler) {
+			parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 		}
 
 		var childEditors = [];
@@ -911,7 +925,19 @@ function DialogTool() {
 			editExpressionButton.title = "edit expression"; // TODO : localize
 			editExpressionButton.innerHTML = '<i class="material-icons">edit</i>';
 			editExpressionButton.onclick = function() {
-				parentEditor.OpenExpressionBuilder(node);
+				parentEditor.OpenExpressionBuilder(
+					expressionRootNode.Serialize(),
+					function(expressionNode) {
+						expressionRootNode = expressionNode;
+						if (node.type === "code_block" && node.children[0].type === "operator") {
+							node.children[0] = expressionRootNode;
+						}
+						else {
+							node = expressionRootNode;
+						}
+						CreateExpressionControls(true);
+						parentEditor.NotifyUpdate();
+					});
 			};
 			customControls.appendChild(editExpressionButton);
 		}
@@ -976,16 +1002,7 @@ function DialogTool() {
 
 		AddSelectionBehavior(
 			this,
-			function() {
-				CreateExpressionControls(true);
-
-				// hack test
-				// if (!isInline) {
-				// 	var builderTest = new ExpressionBuilder(node, parentEditor);
-				// 	div.appendChild(builderTest.GetElement());
-				// }
-
-			},
+			function() { CreateExpressionControls(true); },
 			function() { CreateExpressionControls(false); },
 			isInline);
 
@@ -997,8 +1014,8 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
-		this.OpenExpressionBuilder = function(expressionNode) {
-			parentEditor.OpenExpressionBuilder(expressionNode);
+		this.OpenExpressionBuilder = function(expressionString, onAcceptHandler) {
+			parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 		}
 	}
 
@@ -1143,8 +1160,8 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
-		this.OpenExpressionBuilder = function(expressionNode) {
-			parentEditor.OpenExpressionBuilder(expressionNode);
+		this.OpenExpressionBuilder = function(expressionString, onAcceptHandler) {
+			parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 		}
 
 		this.RemoveChild = function(childEditor) {
@@ -1384,8 +1401,8 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
-		this.OpenExpressionBuilder = function(expressionNode) {
-			parentEditor.OpenExpressionBuilder(expressionNode);
+		this.OpenExpressionBuilder = function(expressionString, onAcceptHandler) {
+			parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 		}
 
 		this.RemoveChild = function(childEditor) {
@@ -1496,8 +1513,8 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
-		this.OpenExpressionBuilder = function(expressionNode) {
-			parentEditor.OpenExpressionBuilder(expressionNode);
+		this.OpenExpressionBuilder = function(expressionString, onAcceptHandler) {
+			parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 		}
 
 		this.UpdateIndex = function(i) {
@@ -1591,8 +1608,8 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
-		this.OpenExpressionBuilder = function(expressionNode) {
-			parentEditor.OpenExpressionBuilder(expressionNode);
+		this.OpenExpressionBuilder = function(expressionString, onAcceptHandler) {
+			parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 		}
 	}
 
@@ -1875,8 +1892,8 @@ function DialogTool() {
 			parentEditor.NotifyUpdate();
 		}
 
-		this.OpenExpressionBuilder = function(expressionNode) {
-			parentEditor.OpenExpressionBuilder(expressionNode);
+		this.OpenExpressionBuilder = function(expressionString, onAcceptHandler) {
+			parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 		}
 
 		AddSelectionBehavior(
@@ -2246,8 +2263,8 @@ function DialogTool() {
 			setArgFunc(getArgFunc());
 		}
 
-		this.OpenExpressionBuilder = function(expressionNode) {
-			parentEditor.OpenExpressionBuilder(expressionNode);
+		this.OpenExpressionBuilder = function(expressionString, onAcceptHandler) {
+			parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 		}
 	}
 
@@ -2391,16 +2408,15 @@ function DialogTool() {
 		- accept / cancel
 		- plaintext mode?
 	*/
-	function ExpressionBuilder(node, parentEditor) {
-		var expressionRootNode = null;
-		if (node.type === "operator") {
-			expressionRootNode = node;
-		}
-		else if (node.type === "code_block" && node.children[0].type === "operator") {
-			expressionRootNode = node.children[0];	
-		}
+	function ExpressionBuilder(expressionString, parentEditor, onCancelHandler, onAcceptHandler) {
+		console.log(parentEditor);
+		console.log(onCancelHandler);
+		console.log(onAcceptHandler);
+
+		var expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
 
 		var div = document.createElement("div");
+		div.classList.add("expressionBuilder");
 
 		var expressionDiv = document.createElement("div");
 		div.appendChild(expressionDiv);
@@ -2436,6 +2452,15 @@ function DialogTool() {
 
 				curNumberSpan.innerText = curNumberString;
 			}
+		}
+
+		function TryAddCurrentNumberToExpression() {
+			if (curNumberSpan.innerText.length > 0) {
+				var expressionString = expressionRootNode.Serialize();
+				expressionString += " " + curNumberSpan.innerText;
+				expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
+			}
+			// TODO : clear the number?
 		}
 
 		for (var i = 0; i < numberInputs.length; i++) {
@@ -2479,15 +2504,10 @@ function DialogTool() {
 		var mathInputs = ["/", "*", "-", "+"];
 		function CreateOperatorInputHandler(operator) {
 			return function() {
+				TryAddCurrentNumberToExpression();
+
 				var expressionString = expressionRootNode.Serialize();
-
-				// hacky
-				if (curNumberSpan.innerText.length > 0) {
-					expressionString += " " + curNumberSpan.innerText;
-				}
-
 				expressionString += " " + operator;
-
 				expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
 
 				// hacky - move into its own function
@@ -2528,6 +2548,19 @@ function DialogTool() {
 
 			inputRoot.appendChild(button);	
 		}
+
+		var cancelButton = document.createElement("button");
+		cancelButton.innerText = "cancel";
+		cancelButton.onclick = onCancelHandler;
+		inputRoot.appendChild(cancelButton);
+
+		var acceptButton = document.createElement("button");
+		acceptButton.innerText = "accept";
+		acceptButton.onclick = function() {
+			TryAddCurrentNumberToExpression();
+			onAcceptHandler(expressionRootNode);
+		}
+		inputRoot.appendChild(acceptButton);
 
 		this.GetElement = function() {
 			return div;
