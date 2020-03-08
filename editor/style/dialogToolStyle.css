@@ -275,5 +275,21 @@
 
 .expressionBuilder {
 	background: white;
-	padding: 5px;
+	padding: 15px;
+}
+
+.expressionEditorRoot {
+	padding: 2px;
+	border: solid 1px #ccccff;
+	border-radius: 2px;
+	margin-bottom: 10px;
+}
+
+.expressionBuilderInputs {
+	display: flex;
+	margin-bottom: 10px;
+}
+
+.expressionBuilderInputs button {
+	font-family: monospace;
 }

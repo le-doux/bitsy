@@ -1772,6 +1772,7 @@ function DialogTool() {
 			customControls.appendChild(editParameterTypeCheckbox);
 
 			var editParameterTypeLabel = document.createElement("label");
+			editParameterTypeLabel.style.display = "inline-block"; // TODO : get style right
 			editParameterTypeLabel.innerHTML = '<i class="material-icons">settings</i>';
 			editParameterTypeLabel.setAttribute("for", "paramTypeCheck_" + node.GetId());
 			editParameterTypeLabel.title = "edit parameter types"
@@ -2318,7 +2319,7 @@ function DialogTool() {
 
 		var customRightHandButtons = document.createElement("div");
 		customRightHandButtons.style.display = "inline-block";
-		customRightHandButtons.style.marginTop = "4px"; // WHY?????
+		// customRightHandButtons.style.marginTop = "4px"; // WHY?????
 		rightHandButtons.appendChild(customRightHandButtons);
 
 		var deleteButton = document.createElement("button");
@@ -2409,16 +2410,13 @@ function DialogTool() {
 		- plaintext mode?
 	*/
 	function ExpressionBuilder(expressionString, parentEditor, onCancelHandler, onAcceptHandler) {
-		console.log(parentEditor);
-		console.log(onCancelHandler);
-		console.log(onAcceptHandler);
-
 		var expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
 
 		var div = document.createElement("div");
 		div.classList.add("expressionBuilder");
 
 		var expressionDiv = document.createElement("div");
+		expressionDiv.classList.add("expressionEditorRoot");
 		div.appendChild(expressionDiv);
 		var expressionEditor = new ExpressionEditor(expressionRootNode, parentEditor, true);
 		expressionDiv.appendChild(expressionEditor.GetElement());
@@ -2426,10 +2424,9 @@ function DialogTool() {
 		expressionDiv.appendChild(curNumberSpan);
 
 		var inputRoot = document.createElement("div");
-		inputRoot.style.display = "flex";
+		inputRoot.classList.add("expressionBuilderInputs");
 		div.appendChild(inputRoot);
 
-		var numberInputs = ["7","8","9","4","5","6","1","2","3","0","."];
 		var curNumberBeforeDecimal = "";
 		var curNumberAfterDecimal = "";
 		var curNumberHasDecimal = false;
@@ -2463,45 +2460,38 @@ function DialogTool() {
 			// TODO : clear the number?
 		}
 
+		var numberRoot = document.createElement("div");
+		numberRoot.style.flexGrow = "3";
+		numberRoot.style.display = "flex";
+		numberRoot.style.flexDirection = "column";
+		numberRoot.style.marginRight = "10px";
+		inputRoot.appendChild(numberRoot);
+
+		var numberInputs = [["7","8","9"],["4","5","6"],["1","2","3"],["0",".","_"]];
 		for (var i = 0; i < numberInputs.length; i++) {
-			var button = document.createElement("button");
-			button.innerText = numberInputs[i];
-			button.onclick = CreateNumberInputHandler(numberInputs[i]);
+			var numberInputRowDiv = document.createElement("div");
+			numberInputRowDiv.style.flexGrow = "1";
+			numberInputRowDiv.style.display = "flex";
+			numberRoot.appendChild(numberInputRowDiv);
+			var numberInputRow = numberInputs[i];
 
-			inputRoot.appendChild(button);
-		}
+			for (var j = 0; j < numberInputRow.length; j++) {
+				var button = document.createElement("button");
+				button.innerText = numberInputs[i][j];
+				button.style.flexGrow = "1";
+				button.onclick = CreateNumberInputHandler(numberInputs[i][j]);
 
-		var boolInputs = ["true", "false"];
-		function CreateBoolInputHandler(bool) {
-			return function() {
-				var expressionString = expressionRootNode.Serialize();
+				// hack
+				if (numberInputs[i][j] === "_") {
+					button.disabled = true;
+					button.style.background = "white";
+					button.style.color = "white";
+				}
 
-				expressionString += " " + bool;
-
-				expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
-
-				// hacky - move into its own function
-				expressionDiv.innerHTML = "";
-				var expressionEditor = new ExpressionEditor(expressionRootNode, parentEditor, true);
-				expressionDiv.appendChild(expressionEditor.GetElement());	
-				curNumberSpan = document.createElement("span");
-				expressionDiv.appendChild(curNumberSpan);
-				// extra hacky
-				curNumberBeforeDecimal = "";
-				curNumberAfterDecimal = "";
-				curNumberHasDecimal = false;
+				numberInputRowDiv.appendChild(button);
 			}
 		}
 
-		for (var i = 0; i < boolInputs.length; i++) {
-			var button = document.createElement("button");
-			button.innerText = boolInputs[i];
-			button.onclick = CreateBoolInputHandler(boolInputs[i]);
-
-			inputRoot.appendChild(button);			
-		}
-
-		var mathInputs = ["/", "*", "-", "+"];
 		function CreateOperatorInputHandler(operator) {
 			return function() {
 				TryAddCurrentNumberToExpression();
@@ -2523,22 +2513,27 @@ function DialogTool() {
 			}
 		}
 
-		for (var i = 0; i < mathInputs.length; i++) {
-			var button = document.createElement("button");
-			button.innerText = mathInputs[i];
-			button.onclick = CreateOperatorInputHandler(mathInputs[i]);
+		var operatorInputDiv = document.createElement("div");
+		operatorInputDiv.style.flexGrow = "1";
+		operatorInputDiv.style.display = "flex";
+		operatorInputDiv.style.flexDirection = "column";
+		inputRoot.appendChild(operatorInputDiv);
 
-			inputRoot.appendChild(button);
+		var operatorInputs = ["=", "/", "*", "-", "+"];
+		for (var i = 0; i < operatorInputs.length; i++) {
+			var button = document.createElement("button");
+			button.innerText = operatorInputs[i];
+			button.onclick = CreateOperatorInputHandler(operatorInputs[i]);
+
+			operatorInputDiv.appendChild(button);
 		}
 
-		var assignmentInputs = ["="];
-		for (var i = 0; i < assignmentInputs.length; i++) {
-			var button = document.createElement("button");
-			button.innerText = assignmentInputs[i];
-			button.onclick = CreateOperatorInputHandler(assignmentInputs[i]);
-
-			inputRoot.appendChild(button);	
-		}
+		var comparisonInputDiv = document.createElement("div");
+		comparisonInputDiv.style.flexGrow = "1";
+		comparisonInputDiv.style.display = "flex";
+		comparisonInputDiv.style.flexDirection = "column";
+		comparisonInputDiv.style.marginRight = "10px";
+		inputRoot.appendChild(comparisonInputDiv);
 
 		var comparisonInputs = ["==", ">=", "<=", ">", "<"];
 		for (var i = 0; i < comparisonInputs.length; i++) {
@@ -2546,13 +2541,57 @@ function DialogTool() {
 			button.innerText = comparisonInputs[i];
 			button.onclick = CreateOperatorInputHandler(comparisonInputs[i]);
 
-			inputRoot.appendChild(button);	
+			comparisonInputDiv.appendChild(button);	
 		}
+
+		function CreateBoolInputHandler(bool) {
+			return function() {
+				var expressionString = expressionRootNode.Serialize();
+
+				expressionString += " " + bool;
+
+				expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
+
+				// hacky - move into its own function
+				expressionDiv.innerHTML = "";
+				var expressionEditor = new ExpressionEditor(expressionRootNode, parentEditor, true);
+				expressionDiv.appendChild(expressionEditor.GetElement());	
+				curNumberSpan = document.createElement("span");
+				expressionDiv.appendChild(curNumberSpan);
+				// extra hacky
+				curNumberBeforeDecimal = "";
+				curNumberAfterDecimal = "";
+				curNumberHasDecimal = false;
+			}
+		}
+
+		var boolInputDiv = document.createElement("div");
+		boolInputDiv.style.flexGrow = "1";
+		boolInputDiv.style.display = "flex";
+		boolInputDiv.style.flexDirection = "column";
+		inputRoot.appendChild(boolInputDiv);
+
+		var boolInputs = ["true", "false"];
+		for (var i = 0; i < boolInputs.length; i++) {
+			var button = document.createElement("button");
+			button.innerText = boolInputs[i];
+			button.onclick = CreateBoolInputHandler(boolInputs[i]);
+
+			boolInputDiv.appendChild(button);			
+		}
+
+		var finishControlsRoot = document.createElement("div");
+		finishControlsRoot.style.display = "flex";
+		div.appendChild(finishControlsRoot);
+
+		var leftSideSpaceSpan = document.createElement("span");
+		leftSideSpaceSpan.style.flexGrow = "1";
+		finishControlsRoot.appendChild(leftSideSpaceSpan);
 
 		var cancelButton = document.createElement("button");
 		cancelButton.innerText = "cancel";
 		cancelButton.onclick = onCancelHandler;
-		inputRoot.appendChild(cancelButton);
+		finishControlsRoot.appendChild(cancelButton);
 
 		var acceptButton = document.createElement("button");
 		acceptButton.innerText = "accept";
@@ -2560,7 +2599,7 @@ function DialogTool() {
 			TryAddCurrentNumberToExpression();
 			onAcceptHandler(expressionRootNode);
 		}
-		inputRoot.appendChild(acceptButton);
+		finishControlsRoot.appendChild(acceptButton);
 
 		this.GetElement = function() {
 			return div;
