@@ -205,6 +205,14 @@
 	width: 50px;
 }
 
+.parameterEditor input[type="text"] {
+	width: 50px;
+}
+
+.parameterEditor input[type="number"] {
+	width: 50px;
+}
+
 .roomPosParameterEditor {
 	padding: 5px;
 	border-radius: 2px;
@@ -292,4 +300,47 @@
 
 .expressionBuilderInputs button {
 	font-family: monospace;
+}
+
+.expressionBuilder .parameterEditor input[type="text"] {
+	width: auto;
+}
+
+.expressionBuilder .parameterEditor input[type="number"] {
+	width: auto;
+}
+
+.addNonNumericControlBox {
+	padding: 2px;
+	border-radius: 2px;
+	margin-bottom: 5px;
+}
+
+/* alternate colors */
+.reverseColors {
+	background: #6767b2;
+	color: white;
+}
+
+.greenColor {
+	background: #cfffcf;
+	color: #4d824d;
+}
+
+.pinkColor {
+	background: #facdf2;
+	color: #91237e;
+}
+
+.goldColor {
+	background: #ffe98f;
+	color: #917d29;
+}
+
+.goldColorBackground {
+	background: #fff4c9;
+}
+
+.greenColorBackground {
+	background: #e3ffe3;
 }

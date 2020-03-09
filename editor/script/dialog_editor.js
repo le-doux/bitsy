@@ -1955,6 +1955,30 @@ function DialogTool() {
 		return argNode;
 	}
 
+	function GetColorClassForParameterType(type) {
+		if (type === "number") {
+			return "pinkColor";
+		}
+		else if (type === "text") {
+			return "goldColor";
+		}
+		else if (type === "bool") {
+			return "greenColor";
+		}
+		else if (type === "variable") {
+			return "greenColor";
+		}
+		else if (type === "room") {
+			return "goldColor";
+		}
+		else if (type === "item") {
+			return "goldColor";
+		}
+		else if (type === "transition") {
+			return "goldColor";
+		}
+	}
+
 	// TODO : put in shared location?
 	var transitionTypes = [
 		{ name:"fade (white)",	id:"fade_w" },
@@ -1973,6 +1997,7 @@ function DialogTool() {
 		var curType;
 
 		var span = document.createElement("span");
+		span.classList.add("parameterEditor");
 
 		function UpdateEditor(type) {
 			curType = type;
@@ -2008,6 +2033,7 @@ function DialogTool() {
 			else {
 				var parameterValue = document.createElement("span");
 				parameterValue.classList.add("parameterUneditable");
+				parameterValue.classList.add(GetColorClassForParameterType(type));
 				span.appendChild(parameterValue);
 
 				if (type === "room") {
@@ -2034,6 +2060,9 @@ function DialogTool() {
 						// just in case
 						parameterValue.innerText = value;
 					}
+				}
+				else if (type === "text") {
+					parameterValue.innerText = '"' + curValue + '"';
 				}
 				else {
 					parameterValue.innerText = curValue;
@@ -2423,9 +2452,9 @@ function DialogTool() {
 		var curNumberSpan = document.createElement("span");
 		expressionDiv.appendChild(curNumberSpan);
 
-		var inputRoot = document.createElement("div");
-		inputRoot.classList.add("expressionBuilderInputs");
-		div.appendChild(inputRoot);
+		var numericInputRoot = document.createElement("div");
+		numericInputRoot.classList.add("expressionBuilderInputs");
+		div.appendChild(numericInputRoot);
 
 		var curNumberBeforeDecimal = "";
 		var curNumberAfterDecimal = "";
@@ -2465,7 +2494,7 @@ function DialogTool() {
 		numberRoot.style.display = "flex";
 		numberRoot.style.flexDirection = "column";
 		numberRoot.style.marginRight = "10px";
-		inputRoot.appendChild(numberRoot);
+		numericInputRoot.appendChild(numberRoot);
 
 		var numberInputs = [["7","8","9"],["4","5","6"],["1","2","3"],["0",".","_"]];
 		for (var i = 0; i < numberInputs.length; i++) {
@@ -2477,6 +2506,7 @@ function DialogTool() {
 
 			for (var j = 0; j < numberInputRow.length; j++) {
 				var button = document.createElement("button");
+				button.classList.add(GetColorClassForParameterType("number"));
 				button.innerText = numberInputs[i][j];
 				button.style.flexGrow = "1";
 				button.onclick = CreateNumberInputHandler(numberInputs[i][j]);
@@ -2500,28 +2530,33 @@ function DialogTool() {
 				expressionString += " " + operator;
 				expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
 
-				// hacky - move into its own function
+				ResetExpressionDiv();
+			}
+		}
+
+		function ResetExpressionDiv() {
 				expressionDiv.innerHTML = "";
 				var expressionEditor = new ExpressionEditor(expressionRootNode, parentEditor, true);
 				expressionDiv.appendChild(expressionEditor.GetElement());	
 				curNumberSpan = document.createElement("span");
 				expressionDiv.appendChild(curNumberSpan);
-				// extra hacky
+
+				// reset the number stuff too
 				curNumberBeforeDecimal = "";
 				curNumberAfterDecimal = "";
-				curNumberHasDecimal = false;	
-			}
+				curNumberHasDecimal = false;
 		}
 
 		var operatorInputDiv = document.createElement("div");
 		operatorInputDiv.style.flexGrow = "1";
 		operatorInputDiv.style.display = "flex";
 		operatorInputDiv.style.flexDirection = "column";
-		inputRoot.appendChild(operatorInputDiv);
+		numericInputRoot.appendChild(operatorInputDiv);
 
 		var operatorInputs = ["=", "/", "*", "-", "+"];
 		for (var i = 0; i < operatorInputs.length; i++) {
 			var button = document.createElement("button");
+			button.style.flexGrow = "1";
 			button.innerText = operatorInputs[i];
 			button.onclick = CreateOperatorInputHandler(operatorInputs[i]);
 
@@ -2532,54 +2567,155 @@ function DialogTool() {
 		comparisonInputDiv.style.flexGrow = "1";
 		comparisonInputDiv.style.display = "flex";
 		comparisonInputDiv.style.flexDirection = "column";
-		comparisonInputDiv.style.marginRight = "10px";
-		inputRoot.appendChild(comparisonInputDiv);
+		// comparisonInputDiv.style.marginRight = "10px";
+		numericInputRoot.appendChild(comparisonInputDiv);
 
 		var comparisonInputs = ["==", ">=", "<=", ">", "<"];
 		for (var i = 0; i < comparisonInputs.length; i++) {
 			var button = document.createElement("button");
+			button.style.flexGrow = "1";
 			button.innerText = comparisonInputs[i];
 			button.onclick = CreateOperatorInputHandler(comparisonInputs[i]);
 
 			comparisonInputDiv.appendChild(button);	
 		}
 
+		var nonNumericInputDiv = document.createElement("div");
+		// nonNumericInputDiv.style.flexGrow = "1";
+		nonNumericInputDiv.style.marginBottom = "10px";
+		nonNumericInputDiv.style.display = "flex";
+		nonNumericInputDiv.style.flexDirection = "column";
+		div.appendChild(nonNumericInputDiv);
+
+		// add item:
+		var selectedItemNode = CreateDefaultArgNode("item");
+
+		var addItemDiv = document.createElement("div");
+		addItemDiv.style.display = "flex";
+		addItemDiv.classList.add("addNonNumericControlBox");
+		addItemDiv.classList.add("goldColorBackground");
+
+		var itemParameterEditor = new ParameterEditor(
+			["item"], 
+			function() { return selectedItemNode; },
+			function(node) { selectedItemNode = node; },
+			true,
+			false);
+
+		var addItemButton = document.createElement("button");
+		addItemButton.innerHTML = '<i class="material-icons">add</i>' + "item";
+		addItemButton.style.flexGrow = "1";
+		addItemButton.style.marginRight = "5px";
+		addItemButton.onclick = function() {
+			var expressionString = expressionRootNode.Serialize();
+			expressionString += " " + "{item " + selectedItemNode.Serialize() + "}";
+			expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
+
+			ResetExpressionDiv();
+		}
+		addItemDiv.appendChild(addItemButton);
+
+		var itemParameterEl = itemParameterEditor.GetElement();
+		itemParameterEl.style.flexGrow = "1";
+		addItemDiv.appendChild(itemParameterEl);
+
+		nonNumericInputDiv.appendChild(addItemDiv);
+
+		// add variable:
+		var selectedVarNode = CreateDefaultArgNode("variable");
+
+		var addVariableDiv = document.createElement("div");
+		addVariableDiv.style.display = "flex";
+		addVariableDiv.classList.add("controlBox");
+
+		var variableParameterEditor = new ParameterEditor(
+			["variable"], 
+			function() { return selectedVarNode; },
+			function(node) { selectedVarNode = node; },
+			true,
+			false);
+
+		var addVariableButton = document.createElement("button");
+		addVariableButton.innerHTML = '<i class="material-icons">add</i>' + "variable";
+		addVariableButton.style.flexGrow = "1";
+		addVariableButton.style.marginRight = "5px";
+		addVariableButton.onclick = function() {
+			var expressionString = expressionRootNode.Serialize();
+			expressionString += " " + selectedVarNode.Serialize();
+			expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
+
+			ResetExpressionDiv();
+		}
+		addVariableDiv.appendChild(addVariableButton);
+
+		var variableParameterEl = variableParameterEditor.GetElement();
+		variableParameterEl.style.flexGrow = "1";
+		addVariableDiv.appendChild(variableParameterEl);
+
+		nonNumericInputDiv.appendChild(addVariableDiv);
+
+		// add text:
+		var selectedTextNode = CreateDefaultArgNode("text");
+
+		var addTextDiv = document.createElement("div");
+		addTextDiv.style.display = "flex";
+		addTextDiv.classList.add("addNonNumericControlBox");
+		addTextDiv.classList.add("goldColorBackground");
+
+		var textParameterEditor = new ParameterEditor(
+			["text"], 
+			function() { return selectedTextNode; },
+			function(node) { selectedTextNode = node; },
+			true,
+			false);
+
+		var addTextButton = document.createElement("button");
+		addTextButton.classList.add(GetColorClassForParameterType("text"));
+		addTextButton.innerHTML = '<i class="material-icons">add</i>' + "text";
+		addTextButton.style.flexGrow = "1";
+		addTextButton.style.marginRight = "5px";
+		addTextButton.onclick = function() {
+			var expressionString = expressionRootNode.Serialize();
+			expressionString += " " + selectedTextNode.Serialize();
+			expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
+
+			ResetExpressionDiv();
+		}
+		addTextDiv.appendChild(addTextButton);
+
+		var textParameterEl = textParameterEditor.GetElement();
+		textParameterEl.style.flexGrow = "1";
+		addTextDiv.appendChild(textParameterEl);
+
+		nonNumericInputDiv.appendChild(addTextDiv);
+
+		// bool buttons
 		function CreateBoolInputHandler(bool) {
 			return function() {
 				var expressionString = expressionRootNode.Serialize();
-
 				expressionString += " " + bool;
-
 				expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
 
-				// hacky - move into its own function
-				expressionDiv.innerHTML = "";
-				var expressionEditor = new ExpressionEditor(expressionRootNode, parentEditor, true);
-				expressionDiv.appendChild(expressionEditor.GetElement());	
-				curNumberSpan = document.createElement("span");
-				expressionDiv.appendChild(curNumberSpan);
-				// extra hacky
-				curNumberBeforeDecimal = "";
-				curNumberAfterDecimal = "";
-				curNumberHasDecimal = false;
+				ResetExpressionDiv();
 			}
 		}
 
 		var boolInputDiv = document.createElement("div");
-		boolInputDiv.style.flexGrow = "1";
 		boolInputDiv.style.display = "flex";
-		boolInputDiv.style.flexDirection = "column";
-		inputRoot.appendChild(boolInputDiv);
+		nonNumericInputDiv.appendChild(boolInputDiv);
 
 		var boolInputs = ["true", "false"];
 		for (var i = 0; i < boolInputs.length; i++) {
 			var button = document.createElement("button");
+			button.classList.add(GetColorClassForParameterType("bool"));
+			button.style.flexGrow = "1";
 			button.innerText = boolInputs[i];
 			button.onclick = CreateBoolInputHandler(boolInputs[i]);
 
 			boolInputDiv.appendChild(button);			
 		}
 
+		// controls for finishing building the expression
 		var finishControlsRoot = document.createElement("div");
 		finishControlsRoot.style.display = "flex";
 		div.appendChild(finishControlsRoot);
@@ -2589,12 +2725,13 @@ function DialogTool() {
 		finishControlsRoot.appendChild(leftSideSpaceSpan);
 
 		var cancelButton = document.createElement("button");
-		cancelButton.innerText = "cancel";
+		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " cancel";
 		cancelButton.onclick = onCancelHandler;
 		finishControlsRoot.appendChild(cancelButton);
 
 		var acceptButton = document.createElement("button");
-		acceptButton.innerText = "accept";
+		acceptButton.innerHTML = '<i class="material-icons">check_circle</i>' + " keep";
+		acceptButton.classList.add("reverseColors");
 		acceptButton.onclick = function() {
 			TryAddCurrentNumberToExpression();
 			onAcceptHandler(expressionRootNode);
