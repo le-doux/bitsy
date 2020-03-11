@@ -902,11 +902,11 @@ function DialogTool() {
 
 		// kind of hacky -- but some expressions are wrapped in a code block and some aren't!
 		var expressionRootNode = null;
-		if (node.type === "operator") {
-			expressionRootNode = node;
-		}
-		else if (node.type === "code_block" && node.children[0].type === "operator") {
+		if (node.type === "code_block" && node.children[0].type === "operator") {
 			expressionRootNode = node.children[0];	
+		}
+		else {
+			expressionRootNode = node;
 		}
 
 		var div = document.createElement(isInline ? "span" : "div");
@@ -943,17 +943,36 @@ function DialogTool() {
 		}
 
 		var expressionSpan = document.createElement("span");
+		expressionSpan.style.display = "inline-flex";
 		div.appendChild(expressionSpan);
 
 		function CreateExpressionControls(isEditable) {
 			expressionSpan.innerHTML = "";
 
-			AddExpressionControl(expressionRootNode, isEditable);
+			if (expressionRootNode.type === "operator") {
+				AddOperatorControlRecursive(expressionRootNode, isEditable);	
+			}
+			else {
+				// parameter base case
+				var parameterEditor = new ParameterEditor(
+					["number", "text", "bool", "variable", "function"],
+					function() { 
+						return expressionRootNode;
+					},
+					function(argNode) {
+						expressionRootNode = argNode;
+						parentEditor.NotifyUpdate();
+					},
+					isEditable,
+					false);
+
+				expressionSpan.appendChild(parameterEditor.GetElement());
+			}
 		}
 
-		function AddExpressionControl(node, isEditable) {
+		function AddOperatorControlRecursive(node, isEditable) {
 			if (node.left.type === "operator") {
-				AddExpressionControl(node.left, isEditable);
+				AddOperatorControlRecursive(node.left, isEditable);
 			}
 			else {
 				var parameterEditor = new ParameterEditor(
@@ -975,7 +994,7 @@ function DialogTool() {
 			expressionSpan.appendChild(operatorEditor.GetElement());
 
 			if (node.right.type === "operator") {
-				AddExpressionControl(node.right, isEditable);
+				AddOperatorControlRecursive(node.right, isEditable);
 			}
 			else {
 				var parameterEditor = new ParameterEditor(
@@ -1960,22 +1979,22 @@ function DialogTool() {
 			return "pinkColor";
 		}
 		else if (type === "text") {
-			return "goldColor";
+			return "greenColor";
 		}
 		else if (type === "bool") {
 			return "greenColor";
 		}
 		else if (type === "variable") {
-			return "greenColor";
+			return "goldColor";
 		}
 		else if (type === "room") {
-			return "goldColor";
+			return "greenColor";
 		}
 		else if (type === "item") {
-			return "goldColor";
+			return "greenColor";
 		}
 		else if (type === "transition") {
-			return "goldColor";
+			return "greenColor";
 		}
 	}
 
@@ -2245,7 +2264,11 @@ function DialogTool() {
 		}
 
 		function DoesEditorTypeMatchNode(type, node) {
-			if (type === "number" && node.type === "literal" && (typeof node.value) === "number") {
+			if (type === "number" && node.type === "literal" && node.value === null) {
+				// this is a catch-all for weird-ness
+				return true;
+			}
+			else if (type === "number" && node.type === "literal" && (typeof node.value) === "number") {
 				return true;
 			}
 			else if (type === "text" && node.type === "literal" && (typeof node.value) === "string") {
@@ -2450,6 +2473,8 @@ function DialogTool() {
 		var expressionEditor = new ExpressionEditor(expressionRootNode, parentEditor, true);
 		expressionDiv.appendChild(expressionEditor.GetElement());
 		var curNumberSpan = document.createElement("span");
+		curNumberSpan.classList.add(GetColorClassForParameterType("number"));
+		curNumberSpan.style.borderRadius = "2px";
 		expressionDiv.appendChild(curNumberSpan);
 
 		var numericInputRoot = document.createElement("div");
@@ -2527,7 +2552,18 @@ function DialogTool() {
 				TryAddCurrentNumberToExpression();
 
 				var expressionString = expressionRootNode.Serialize();
-				expressionString += " " + operator;
+
+				if (operator === "=") {
+					// you need a variable to use the assignment operator!
+					var leftNode = GetLeftmostNode(expressionRootNode);
+					if (leftNode.type === "variable") {
+						expressionString = leftNode.Serialize() + " " + operator;
+					}
+				}
+				else {
+					expressionString += " " + operator;
+				}
+
 				expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
 
 				ResetExpressionDiv();
@@ -2539,6 +2575,8 @@ function DialogTool() {
 				var expressionEditor = new ExpressionEditor(expressionRootNode, parentEditor, true);
 				expressionDiv.appendChild(expressionEditor.GetElement());	
 				curNumberSpan = document.createElement("span");
+				curNumberSpan.classList.add(GetColorClassForParameterType("number"));
+				curNumberSpan.style.borderRadius = "2px";
 				expressionDiv.appendChild(curNumberSpan);
 
 				// reset the number stuff too
@@ -2560,6 +2598,10 @@ function DialogTool() {
 			button.innerText = operatorInputs[i];
 			button.onclick = CreateOperatorInputHandler(operatorInputs[i]);
 
+			if (operatorInputs[i] === "=") {
+				button.classList.add("goldColor");
+			}
+
 			operatorInputDiv.appendChild(button);
 		}
 
@@ -2567,7 +2609,7 @@ function DialogTool() {
 		comparisonInputDiv.style.flexGrow = "1";
 		comparisonInputDiv.style.display = "flex";
 		comparisonInputDiv.style.flexDirection = "column";
-		// comparisonInputDiv.style.marginRight = "10px";
+		comparisonInputDiv.style.marginRight = "10px";
 		numericInputRoot.appendChild(comparisonInputDiv);
 
 		var comparisonInputs = ["==", ">=", "<=", ">", "<"];
@@ -2580,53 +2622,55 @@ function DialogTool() {
 			comparisonInputDiv.appendChild(button);	
 		}
 
-		var nonNumericInputDiv = document.createElement("div");
-		// nonNumericInputDiv.style.flexGrow = "1";
-		nonNumericInputDiv.style.marginBottom = "10px";
-		nonNumericInputDiv.style.display = "flex";
-		nonNumericInputDiv.style.flexDirection = "column";
-		div.appendChild(nonNumericInputDiv);
+		// back button
+		var backInputDiv = document.createElement("div");
+		backInputDiv.style.flexGrow = "1";
+		backInputDiv.style.display = "flex";
+		backInputDiv.style.flexDirection = "column";
+		numericInputRoot.appendChild(backInputDiv);
 
-		// add item:
-		var selectedItemNode = CreateDefaultArgNode("item");
-
-		var addItemDiv = document.createElement("div");
-		addItemDiv.style.display = "flex";
-		addItemDiv.classList.add("addNonNumericControlBox");
-		addItemDiv.classList.add("goldColorBackground");
-
-		var itemParameterEditor = new ParameterEditor(
-			["item"], 
-			function() { return selectedItemNode; },
-			function(node) { selectedItemNode = node; },
-			true,
-			false);
-
-		var addItemButton = document.createElement("button");
-		addItemButton.innerHTML = '<i class="material-icons">add</i>' + "item";
-		addItemButton.style.flexGrow = "1";
-		addItemButton.style.marginRight = "5px";
-		addItemButton.onclick = function() {
+		var backButton = document.createElement("button");
+		backButton.innerHTML = '<i class="material-icons">backspace</i>';
+		backButton.onclick = function() {
 			var expressionString = expressionRootNode.Serialize();
-			expressionString += " " + "{item " + selectedItemNode.Serialize() + "}";
+			var rightNode = GetRightmostNode(expressionRootNode);
+
+			// console.log(rightNode);
+
+			var substringToDelete = rightNode.type === "operator" ? " " + rightNode.operator + " " : rightNode.Serialize();
+
+			// console.log(">>>DELETE>>>[" +substringToDelete+"]");
+
+			// console.log("["+expressionString+"]");
+
+			expressionString = expressionString.slice(0, expressionString.length - substringToDelete.length);
+			
+			// console.log("["+expressionString+"]");
+
 			expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
+
+			// console.log("["+expressionRootNode.Serialize()+"]");
 
 			ResetExpressionDiv();
 		}
-		addItemDiv.appendChild(addItemButton);
+		backInputDiv.appendChild(backButton);
 
-		var itemParameterEl = itemParameterEditor.GetElement();
-		itemParameterEl.style.flexGrow = "1";
-		addItemDiv.appendChild(itemParameterEl);
+		// NON NUMERIC INPUTS!
 
-		nonNumericInputDiv.appendChild(addItemDiv);
+		var nonNumericInputDiv = document.createElement("div");
+		// nonNumericInputDiv.style.flexGrow = "1";
+		nonNumericInputDiv.style.marginBottom = "15px";
+		nonNumericInputDiv.style.display = "flex";
+		nonNumericInputDiv.style.flexDirection = "column";
+		div.appendChild(nonNumericInputDiv);
 
 		// add variable:
 		var selectedVarNode = CreateDefaultArgNode("variable");
 
 		var addVariableDiv = document.createElement("div");
 		addVariableDiv.style.display = "flex";
-		addVariableDiv.classList.add("controlBox");
+		addVariableDiv.classList.add("addNonNumericControlBox");
+		addVariableDiv.classList.add("goldColorBackground");
 
 		var variableParameterEditor = new ParameterEditor(
 			["variable"], 
@@ -2636,6 +2680,7 @@ function DialogTool() {
 			false);
 
 		var addVariableButton = document.createElement("button");
+		addVariableButton.classList.add(GetColorClassForParameterType("variable"));
 		addVariableButton.innerHTML = '<i class="material-icons">add</i>' + "variable";
 		addVariableButton.style.flexGrow = "1";
 		addVariableButton.style.marginRight = "5px";
@@ -2654,13 +2699,48 @@ function DialogTool() {
 
 		nonNumericInputDiv.appendChild(addVariableDiv);
 
+		// add item:
+		var selectedItemNode = CreateDefaultArgNode("item");
+
+		var addItemDiv = document.createElement("div");
+		addItemDiv.style.display = "flex";
+		addItemDiv.classList.add("addNonNumericControlBox");
+		addItemDiv.classList.add("greenColorBackground");
+
+		var itemParameterEditor = new ParameterEditor(
+			["item"], 
+			function() { return selectedItemNode; },
+			function(node) { selectedItemNode = node; },
+			true,
+			false);
+
+		var addItemButton = document.createElement("button");
+		addItemButton.classList.add(GetColorClassForParameterType("item"));
+		addItemButton.innerHTML = '<i class="material-icons">add</i>' + "item";
+		addItemButton.style.flexGrow = "1";
+		addItemButton.style.marginRight = "5px";
+		addItemButton.onclick = function() {
+			var expressionString = expressionRootNode.Serialize();
+			expressionString += " " + "{item " + selectedItemNode.Serialize() + "}";
+			expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
+
+			ResetExpressionDiv();
+		}
+		addItemDiv.appendChild(addItemButton);
+
+		var itemParameterEl = itemParameterEditor.GetElement();
+		itemParameterEl.style.flexGrow = "1";
+		addItemDiv.appendChild(itemParameterEl);
+
+		nonNumericInputDiv.appendChild(addItemDiv);
+
 		// add text:
 		var selectedTextNode = CreateDefaultArgNode("text");
 
 		var addTextDiv = document.createElement("div");
 		addTextDiv.style.display = "flex";
 		addTextDiv.classList.add("addNonNumericControlBox");
-		addTextDiv.classList.add("goldColorBackground");
+		addTextDiv.classList.add("greenColorBackground");
 
 		var textParameterEditor = new ParameterEditor(
 			["text"], 
@@ -2721,15 +2801,17 @@ function DialogTool() {
 		div.appendChild(finishControlsRoot);
 
 		var leftSideSpaceSpan = document.createElement("span");
-		leftSideSpaceSpan.style.flexGrow = "1";
+		leftSideSpaceSpan.style.flexGrow = "3";
 		finishControlsRoot.appendChild(leftSideSpaceSpan);
 
 		var cancelButton = document.createElement("button");
+		cancelButton.style.flexGrow = "1";
 		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " cancel";
 		cancelButton.onclick = onCancelHandler;
 		finishControlsRoot.appendChild(cancelButton);
 
 		var acceptButton = document.createElement("button");
+		acceptButton.style.flexGrow = "2";
 		acceptButton.innerHTML = '<i class="material-icons">check_circle</i>' + " keep";
 		acceptButton.classList.add("reverseColors");
 		acceptButton.onclick = function() {
@@ -2740,6 +2822,36 @@ function DialogTool() {
 
 		this.GetElement = function() {
 			return div;
+		}
+
+		function GetRightmostNode(node) {
+			if (node.type === "operator") {
+				if (node.right === undefined || node.right === null ||
+					(node.right.type === "literal" && node.right.value === null)) {
+					return node;
+				}
+				else {
+					return GetRightmostNode(node.right);
+				}
+			}
+			else {
+				return node;
+			}
+		}
+
+		function GetLeftmostNode(node) {
+			if (node.type === "operator") {
+				if (node.left === undefined || node.left === null ||
+					(node.left.type === "literal" && node.left.value === null)) {
+					return node;
+				}
+				else {
+					return GetLeftmostNode(node.left);
+				}
+			}
+			else {
+				return node;
+			}
 		}
 	}
 }

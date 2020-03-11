@@ -1087,12 +1087,19 @@ var LiteralNode = function(value) {
 	this.Serialize = function(depth) {
 		var str = "";
 
-		if(this.value === null)
+		if (this.value === null) {
 			return str;
+		}
 
-		if(typeof this.value === "string") str += '"';
+		if (typeof this.value === "string") {
+			str += '"';
+		}
+
 		str += this.value;
-		if(typeof this.value === "string") str += '"';
+
+		if (typeof this.value === "string") {
+			str += '"';
+		}
 
 		return str;
 	}
@@ -1147,11 +1154,19 @@ var ExpNode = function(operator, left, right) {
 	this.Serialize = function(depth) {
 		var isNegativeNumber = this.operator === "-" && this.left.type === "literal" && this.left.value === null;
 
-		if(!isNegativeNumber) {
+		if (!isNegativeNumber) {
 			var str = "";
-			str += this.left.Serialize(depth);
-			str += " " + this.operator + " ";
-			str += this.right.Serialize(depth);
+
+			if (this.left != undefined && this.left != null) {
+				str += this.left.Serialize(depth) + " ";
+			}
+
+			str += this.operator;
+
+			if (this.right != undefined && this.right != null) {
+				str += " " + this.right.Serialize(depth);
+			}
+
 			return str;
 		}
 		else {

@@ -338,9 +338,13 @@
 }
 
 .goldColorBackground {
-	background: #fff4c9;
+	background: #fff8de;
 }
 
 .greenColorBackground {
-	background: #e3ffe3;
+	background: #edffed;
+}
+
+.greenColorText {
+	color: #4d824d;
 }
