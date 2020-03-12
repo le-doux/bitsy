@@ -476,7 +476,7 @@ function DialogTool() {
 			}
 
 			function isExpression(node) {
-				return isCodeBlock(node) && isChildType(node, "operator");
+				return isCodeBlock(node) && (isChildType(node, "operator") || isChildType(node, "literal") || isChildType(node, "variable"));
 			};
 
 			var dialogNodeList = [];
@@ -902,7 +902,10 @@ function DialogTool() {
 
 		// kind of hacky -- but some expressions are wrapped in a code block and some aren't!
 		var expressionRootNode = null;
-		if (node.type === "code_block" && node.children[0].type === "operator") {
+		if (node.type === "code_block" &&
+			(node.children[0].type === "operator"||
+				node.children[0].type === "literal" ||
+				node.children[0].type === "variable")) {
 			expressionRootNode = node.children[0];	
 		}
 		else {
@@ -929,7 +932,10 @@ function DialogTool() {
 					expressionRootNode.Serialize(),
 					function(expressionNode) {
 						expressionRootNode = expressionNode;
-						if (node.type === "code_block" && node.children[0].type === "operator") {
+						if (node.type === "code_block" &&
+							(node.children[0].type === "operator" ||
+								node.children[0].type === "literal" ||
+								node.children[0].type === "variable")) {
 							node.children[0] = expressionRootNode;
 						}
 						else {
@@ -961,6 +967,13 @@ function DialogTool() {
 					},
 					function(argNode) {
 						expressionRootNode = argNode;
+						if (node.type === "code_block") {
+							node.children[0] = expressionRootNode;
+						}
+						else {
+							node = expressionRootNode;
+						}
+
 						parentEditor.NotifyUpdate();
 					},
 					isEditable,

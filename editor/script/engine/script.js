@@ -2137,6 +2137,15 @@ var Parser = function(env) {
 		return containsAnyExpressionOperators;
 	}
 
+	function IsLiteral(str) {
+		var isBool = str === "true" || str === "false";
+		var isNum = !isNaN(parseFloat(str));
+		var isStr = str[0] === '"' && str[str.length-1] === '"';
+		var isVar = IsValidVariableName(str);
+		var isEmpty = str.length === 0;
+		return isBool || isNum || isStr || isVar || isEmpty;
+	}
+
 	function ParseExpression(state) {
 		var line = state.Source(); // state.Peak( [Sym.Linebreak] ); // TODO : remove the linebreak thing
 		// console.log("EXPRESSION " + line);
@@ -2182,7 +2191,7 @@ var Parser = function(env) {
 			state.Step(sequenceType.length);
 			state = ParseSequence(state, sequenceType);
 		}
-		else if (IsExpression(state.Source())) {
+		else if (IsLiteral(state.Source()) || IsExpression(state.Source())) {
 			state = ParseExpression(state);
 		}
 		else {
