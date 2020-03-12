@@ -55,6 +55,7 @@
 .actionEditor.inline {
 	display: inline;
 	padding: 2px;
+	padding-bottom: 4px; /* hack - useful??? */
 	border: none;
 }
 
@@ -343,4 +344,13 @@
 
 .greenColorText {
 	color: #4d824d;
+}
+
+/* misc */
+.inlineEditButtonHolder {
+	margin-left: 5px;
+}
+
+.inlineEditButtonHolder button {
+	padding: 0px;
 }

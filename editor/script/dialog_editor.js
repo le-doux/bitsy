@@ -983,7 +983,10 @@ function DialogTool() {
 			}
 
 			if (isInline && isEditable) {
-				expressionSpan.appendChild(editExpressionButton);
+				var editExpressionButtonSpan = document.createElement("span");
+				editExpressionButtonSpan.classList.add("inlineEditButtonHolder");
+				editExpressionButtonSpan.appendChild(editExpressionButton);
+				expressionSpan.appendChild(editExpressionButtonSpan);
 			}
 		}
 
