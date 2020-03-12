@@ -241,10 +241,6 @@
 	border-bottom: solid 1px #ccccff;
 }
 
-.conditionalComparisonEditor .parameterUneditable {
-	background: #ccccff;
-}
-
 .conditionalComparisonEditor input[type="number"] {
 	width: 50px;
 }

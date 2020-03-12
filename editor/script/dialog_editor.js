@@ -918,33 +918,33 @@ function DialogTool() {
 			div.classList.add("inline");
 		}
 
+		var editExpressionButton = document.createElement("button")
+		editExpressionButton.title = "edit expression"; // TODO : localize
+		editExpressionButton.innerHTML = '<i class="material-icons">edit</i>';
+		editExpressionButton.onclick = function() {
+			parentEditor.OpenExpressionBuilder(
+				expressionRootNode.Serialize(),
+				function(expressionNode) {
+					expressionRootNode = expressionNode;
+					if (node.type === "code_block" &&
+						(node.children[0].type === "operator" ||
+							node.children[0].type === "literal" ||
+							node.children[0].type === "variable")) {
+						node.children[0] = expressionRootNode;
+					}
+					else {
+						node = expressionRootNode;
+					}
+					CreateExpressionControls(true);
+					parentEditor.NotifyUpdate();
+				});
+		};
+
 		if (!isInline) {
 			var orderControls = new OrderControls(this, parentEditor);
 			div.appendChild(orderControls.GetElement());	
 
 			var customControls = orderControls.GetCustomControlsContainer();
-
-			var editExpressionButton = document.createElement("button")
-			editExpressionButton.title = "edit expression"; // TODO : localize
-			editExpressionButton.innerHTML = '<i class="material-icons">edit</i>';
-			editExpressionButton.onclick = function() {
-				parentEditor.OpenExpressionBuilder(
-					expressionRootNode.Serialize(),
-					function(expressionNode) {
-						expressionRootNode = expressionNode;
-						if (node.type === "code_block" &&
-							(node.children[0].type === "operator" ||
-								node.children[0].type === "literal" ||
-								node.children[0].type === "variable")) {
-							node.children[0] = expressionRootNode;
-						}
-						else {
-							node = expressionRootNode;
-						}
-						CreateExpressionControls(true);
-						parentEditor.NotifyUpdate();
-					});
-			};
 			customControls.appendChild(editExpressionButton);
 		}
 
@@ -980,6 +980,10 @@ function DialogTool() {
 					false);
 
 				expressionSpan.appendChild(parameterEditor.GetElement());
+			}
+
+			if (isInline && isEditable) {
+				expressionSpan.appendChild(editExpressionButton);
 			}
 		}
 
@@ -1607,7 +1611,7 @@ function DialogTool() {
 		}
 
 		this.GetNodes = function() {
-			return [conditionNode];
+			return conditionExpressionEditor.GetNodes();
 		}
 
 		this.UpdateIndex = function(i) {
