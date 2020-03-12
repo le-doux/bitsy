@@ -1747,6 +1747,18 @@ function DialogTool() {
 				{ types: ["item", "text", "variable"], index: 0, name: "item", },
 			],
 		},
+		"print" : {
+			description : "print _",
+			parameters : [
+				{ types: ["text", "variable"], index: 0, name: "output", },
+			],
+		},
+		"say" : {
+			description : "say _",
+			parameters : [
+				{ types: ["text", "variable"], index: 0, name: "output", },
+			],
+		}
 	};
 
 	function FunctionEditor(node, parentEditor, isInline) {
