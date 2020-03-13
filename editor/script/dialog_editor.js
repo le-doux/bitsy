@@ -961,7 +961,7 @@ function DialogTool() {
 			else {
 				// parameter base case
 				var parameterEditor = new ParameterEditor(
-					["number", "text", "bool", "variable", "function"],
+					["number", "text", "bool", "variable", "function", "expression"],
 					function() { 
 						return expressionRootNode;
 					},
@@ -977,7 +977,10 @@ function DialogTool() {
 						parentEditor.NotifyUpdate();
 					},
 					isEditable,
-					false);
+					false,
+					function(expressionString, onAcceptHandler) {
+						parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
+					});
 
 				expressionSpan.appendChild(parameterEditor.GetElement());
 			}
@@ -996,7 +999,7 @@ function DialogTool() {
 			}
 			else {
 				var parameterEditor = new ParameterEditor(
-					["number", "text", "bool", "variable", "function"],
+					["number", "text", "bool", "variable", "function", "expression"],
 					function() { 
 						return node.left;
 					},
@@ -1005,7 +1008,10 @@ function DialogTool() {
 						parentEditor.NotifyUpdate();
 					},
 					isEditable,
-					false);
+					false,
+					function(expressionString, onAcceptHandler) {
+						parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
+					});
 
 				expressionSpan.appendChild(parameterEditor.GetElement());
 			}
@@ -1018,7 +1024,7 @@ function DialogTool() {
 			}
 			else {
 				var parameterEditor = new ParameterEditor(
-					["number", "text", "bool", "variable", "function"],
+					["number", "text", "bool", "variable", "function", "expression"],
 					function() {
 						return node.right;
 					},
@@ -1027,7 +1033,10 @@ function DialogTool() {
 						parentEditor.NotifyUpdate();
 					},
 					isEditable,
-					false);
+					false,
+					function(expressionString, onAcceptHandler) {
+						parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
+					});
 
 				expressionSpan.appendChild(parameterEditor.GetElement());
 			}
@@ -1883,11 +1892,14 @@ function DialogTool() {
 
 					if (functionNode.args.length > parameterInfo.index) {
 						var parameterEditor = new ParameterEditor(
-							parameterInfo.types,
+							parameterInfo.types.concat(["function", "expression"]),
 							createGetArgFunc(functionNode, parameterInfo.index),
 							createSetArgFunc(functionNode, parameterInfo.index, self),
 							isEditable,
-							!isInline && editParameterTypeCheckbox.checked);
+							!isInline && editParameterTypeCheckbox.checked,
+							function(expressionString, onAcceptHandler) {
+								parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
+							});
 
 						curParameterEditors.push(parameterEditor);
 						descriptionDiv.appendChild(parameterEditor.GetElement());							
@@ -1994,6 +2006,15 @@ function DialogTool() {
 		else if (type === "variable") {
 			argNode = scriptUtils.CreateVariableNode("a"); // TODO : find first var instead?
 		}
+		else if (type === "function") {
+			argNode = scriptUtils.CreateFunctionBlock("item", ["0"]);
+		}
+		else if (type === "expression") {
+			var expNode = scriptInterpreter.CreateExpression("a + 1");
+			var blockNode = scriptUtils.CreateCodeBlock();
+			blockNode.AddChild(expNode);
+			argNode = blockNode;
+		}
 		else if (type === "room") {
 			argNode = scriptUtils.CreateStringLiteralNode("0"); // TODO : find first room instead?
 		}
@@ -2042,7 +2063,7 @@ function DialogTool() {
 		{ name:"slide right",	id:"slide_r" },
 	];
 
-	function ParameterEditor(parameterTypes, getArgFunc, setArgFunc, isEditable, isTypeEditable) {
+	function ParameterEditor(parameterTypes, getArgFunc, setArgFunc, isEditable, isTypeEditable, openExpressionBuilderFunc) {
 		var self = this;
 
 		var curType;
@@ -2112,6 +2133,15 @@ function DialogTool() {
 						parameterValue.innerText = value;
 					}
 				}
+				else if (type === "expression") {
+					var inlineExpressionEditor = TryCreateExpressionEditor();
+					if (inlineExpressionEditor != null) {
+						parameterValue.appendChild(inlineExpressionEditor.GetElement());
+					}
+					else {
+						parameterValue.innerText = value;
+					}
+				}
 				else if (type === "text") {
 					parameterValue.innerText = '"' + curValue + '"';
 				}
@@ -2126,9 +2156,21 @@ function DialogTool() {
 			var funcNode = getArgFunc();
 			if (funcNode.type === "code_block" && funcNode.children[0].type === "function" &&
 				functionDescriptionMap[funcNode.children[0].name] != undefined) { // TODO : copied from block editor
-				var inlineFunctionEditor = new FunctionEditor(getArgFunc(), self, true);
+				inlineFunctionEditor = new FunctionEditor(getArgFunc(), self, true);
 			}
 			return inlineFunctionEditor;
+		}
+
+		function TryCreateExpressionEditor() {
+			var inlineExpressionEditor = null;
+			var expressionNode = getArgFunc();
+			if (expressionNode.type === "code_block" && 
+				(expressionNode.children[0].type === "operator" || 
+					expressionNode.children[0].type === "literal" ||
+					expressionNode.children[0].type === "variable")) {
+				inlineExpressionEditor = new ExpressionEditor(expressionNode, self, true);
+			}
+			return inlineExpressionEditor;
 		}
 
 		function ChangeEditorType(type) {
@@ -2277,6 +2319,18 @@ function DialogTool() {
 					parameterInput.innerText = value;
 				}
 			}
+			else if (type === "expression") {
+				parameterInput = document.createElement("span");
+				var inlineExpressionEditor = TryCreateExpressionEditor();
+				if (inlineExpressionEditor != null) {
+					inlineExpressionEditor.Select();
+					parameterInput.appendChild(inlineExpressionEditor.GetElement());
+				}
+				else {
+					parameterInput.classList.add("parameterUneditable");
+					parameterInput.innerText = value;
+				}
+			}
 
 			return parameterInput;
 		}
@@ -2324,6 +2378,10 @@ function DialogTool() {
 			else if (type === "function" && node.type === "code_block" && node.children[0].type === "function") {
 				return true;
 			}
+			else if (type === "expression" && node.type === "code_block" && // TODO : I really need to put this in a helper function
+				(node.children[0].type === "operator" || node.children[0].type === "variable" || node.children[0].type === "literal")) {
+				return true;			
+			}
 
 			return false;
 		}
@@ -2349,7 +2407,9 @@ function DialogTool() {
 		}
 
 		this.OpenExpressionBuilder = function(expressionString, onAcceptHandler) {
-			parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
+			if (openExpressionBuilderFunc) {
+				openExpressionBuilderFunc(expressionString, onAcceptHandler);
+			}
 		}
 	}
 
