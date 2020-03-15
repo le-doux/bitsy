@@ -635,8 +635,8 @@ function DialogTool() {
 			return actionCategoryButton;
 		}
 
-		div.appendChild(makeActionCategoryButton("dialog", "dialog actions"));
-		div.appendChild(makeActionCategoryButton("flow", "flow control actions"));
+		div.appendChild(makeActionCategoryButton("dialog", "dialog"));
+		div.appendChild(makeActionCategoryButton("flow", "lists"));
 		div.appendChild(makeActionCategoryButton("exit", "exit and ending actions"));
 		div.appendChild(makeActionCategoryButton("item", "item and variable actions"));
 
@@ -724,9 +724,9 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"exit",
-				"lock",
+				"exit",
 				function() {
-					var node = scriptUtils.CreateFunctionBlock("lock", []);
+					var node = scriptUtils.CreateFunctionBlock("exit", ["0", 0, 0]);
 					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
@@ -744,9 +744,9 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"exit",
-				"exit",
+				"lock",
 				function() {
-					var node = scriptUtils.CreateFunctionBlock("exit", ["0", 0, 0]);
+					var node = scriptUtils.CreateFunctionBlock("lock", []);
 					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
