@@ -741,15 +741,6 @@ function DialogTool() {
 					return editor;
 				}));
 
-		// div.appendChild(
-		// 	makeActionBuilderButton(
-		// 		"narrate",
-		// 		function() {
-		// 			var node = scriptUtils.CreateFunctionBlock("narrate");
-		// 			var editor = new FunctionEditor(node, parentEditor);
-		// 			return editor;
-		// 		}));
-
 		div.appendChild(
 			makeActionBuilderButton(
 				"exit",

@@ -449,12 +449,6 @@ function shakyFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
-function narrateFunc(environment,parameters,onReturn) {
-	isNarrating = true;
-	dialogRenderer.SetCentered(true);
-	onReturn(null);
-}
-
 function lockFunc(environment,parameters,onReturn) {
 	environment.LockDefaultAction();
 	onReturn(null);
@@ -606,7 +600,6 @@ var Environment = function() {
 	functionMap.set("printTile", printTileFunc);
 	functionMap.set("printItem", printItemFunc);
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
-	functionMap.set("narrate", narrateFunc);
 	functionMap.set("lock", lockFunc);
 	functionMap.set("end", endFunc);
 	functionMap.set("exit", exitFunc);
