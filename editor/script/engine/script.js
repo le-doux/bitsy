@@ -390,10 +390,25 @@ function printFontFunc(environment, parameters, onReturn) {
 
 function itemFunc(environment,parameters,onReturn) {
 	var itemId = parameters[0];
-	if(names.item.has(itemId)) itemId = names.item.get(itemId); // id is actually a name
-	var itemCount = player().inventory[itemId] ? player().inventory[itemId] : 0; // TODO : ultimately the environment should include a reference to the game state
-	// console.log("ITEM FUNC " + itemId + " " + itemCount);
-	onReturn(itemCount);
+
+	if (names.item.has(itemId)) {
+		// id is actually a name
+		itemId = names.item.get(itemId);
+	}
+
+	var curItemCount = player().inventory[itemId] ? player().inventory[itemId] : 0;
+
+	if (parameters.length > 1) {
+		// TODO : is it a good idea to force inventory to be >= 0?
+		player().inventory[itemId] = Math.max(0, parseInt(parameters[1]));
+		curItemCount = player().inventory[itemId];
+
+		if (onInventoryChanged != null) {
+			onInventoryChanged(itemId);
+		}
+	}
+
+	onReturn(curItemCount);
 }
 
 function addOrRemoveTextEffect(environment,name) {
@@ -483,43 +498,6 @@ function exitFunc(environment,parameters,onReturn) {
 	else {
 		onReturn(null);
 	}
-}
-
-function giveItemFunc(environment,parameters,onReturn) {
-	var itemId = parameters[0];
-	var itemCount = parseInt(parameters[1]);
-
-	if (player().inventory[itemId]) {
-		player().inventory[itemId] += itemCount;
-	}
-	else {
-		player().inventory[itemId] = itemCount;
-	}
-
-	if (onInventoryChanged != null) {
-		onInventoryChanged(itemId);
-	}
-
-	onReturn(null);
-}
-
-function takeItemFunc(environment,parameters,onReturn) {
-	var itemId = parameters[0];
-	var itemCount = parseInt(parameters[1]);
-
-	if (player().inventory[itemId]) {
-		player().inventory[itemId] -= itemCount;
-
-		if (player().inventory[itemId] < 0) {
-			player().inventory[itemId] = 0;
-		}
-	}
-
-	if (onInventoryChanged != null) {
-		onInventoryChanged(itemId);
-	}
-
-	onReturn(null);
 }
 
 /* BUILT-IN OPERATORS */
@@ -632,8 +610,6 @@ var Environment = function() {
 	functionMap.set("lock", lockFunc);
 	functionMap.set("end", endFunc);
 	functionMap.set("exit", exitFunc);
-	functionMap.set("giveItem", giveItemFunc);
-	functionMap.set("takeItem", takeItemFunc);
 	functionMap.set("pg", pagebreakFunc); // TODO : name?
 
 	this.HasFunction = function(name) { return functionMap.has(name); };

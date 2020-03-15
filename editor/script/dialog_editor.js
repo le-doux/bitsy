@@ -763,9 +763,9 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"item",
-				"give item",
+				"set item count",
 				function() {
-					var node = scriptUtils.CreateFunctionBlock("giveItem", ["0", 1]);
+					var node = scriptUtils.CreateFunctionBlock("item", ["0", 10]);
 					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
@@ -773,9 +773,27 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"item",
-				"take item",
+				"increase item count",
 				function() {
-					var node = scriptUtils.CreateFunctionBlock("takeItem", ["0", 1]);
+					var expressionNode = scriptInterpreter.CreateExpression('{item "0"} + 1');
+					var codeBlock = scriptUtils.CreateCodeBlock();
+					codeBlock.children.push(expressionNode);
+					var node = scriptUtils.CreateFunctionBlock("item", ["0"]);
+					node.children[0].args.push(codeBlock); // hacky
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"item",
+				"decrease item count",
+				function() {
+					var expressionNode = scriptInterpreter.CreateExpression('{item "0"} - 1');
+					var codeBlock = scriptUtils.CreateCodeBlock();
+					codeBlock.children.push(expressionNode);
+					var node = scriptUtils.CreateFunctionBlock("item", ["0"]);
+					node.children[0].args.push(codeBlock); // hacky
 					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
@@ -1736,7 +1754,7 @@ function DialogTool() {
 			parameters : [],
 		},
 		"exit" : {
-			description : "move player to _ at _,_[ with effect _]",
+			description : "move player to _ at (_,_)[ with effect _]",
 			parameters : [
 				{ types: ["room", "text", "variable"], index: 0, name: "room", },
 				{ types: ["number", "variable"], index: 1, name: "x", },
@@ -1749,28 +1767,15 @@ function DialogTool() {
 			description : "start narration",
 			parameters : [],
 		},
-		"giveItem" : {
-			description : "give player _ of _",
-			parameters : [
-				{ types: ["number", "variable"], index: 1, name: "amount", },
-				{ types: ["item", "text", "variable"], index: 0, name: "item", },
-			],
-		},
-		"takeItem" : {
-			description : "take _ of _ from player",
-			parameters : [
-				{ types: ["number", "variable"], index: 1, name: "amount", },
-				{ types: ["item", "text", "variable"], index: 0, name: "item", },
-			],
-		},
 		"pg" : {
 			description : "start a new page", // TODO : ok description?
 			parameters : [],
 		},
 		"item" : {
-			description : "_ in inventory",
+			description : "_ in inventory[ = _]",
 			parameters : [
 				{ types: ["item", "text", "variable"], index: 0, name: "item", },
+				{ types: ["number", "variable"], index: 1, name: "amount", },
 			],
 		},
 		"print" : {
@@ -1874,10 +1879,12 @@ function DialogTool() {
 				descriptionDiv.appendChild(descriptionSpan);
 
 				var text = descriptionTextSplit[i];
-				if (text[0] === "[") { // optional parameter text start
+				if (text.indexOf("[") >= 0) { // optional parameter text start
+					var optionalTextStartSplit = text.split("[");
+					descriptionSpan.innerText = optionalTextStartSplit[0];
 					var nextParam = functionDescriptionMap[functionNode.name].parameters[i];
-					if (functionNode.args.length > nextParam.index) {
-						descriptionSpan.innerText = text.slice(1);
+					if (functionNode.args.length > nextParam.index && optionalTextStartSplit.length > 1) {
+						descriptionSpan.innerText += optionalTextStartSplit[1];
 					}
 				}
 				else if (text[text.length - 1] === "]") { // optional parameter text end
