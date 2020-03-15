@@ -918,7 +918,7 @@ function DialogTool() {
 			div.classList.add("inline");
 		}
 
-		var editExpressionButton = document.createElement("button")
+		var editExpressionButton = document.createElement("button");
 		editExpressionButton.title = "edit expression"; // TODO : localize
 		editExpressionButton.innerHTML = '<i class="material-icons">edit</i>';
 		editExpressionButton.onclick = function() {
@@ -940,12 +940,22 @@ function DialogTool() {
 				});
 		};
 
+		var editParameterTypes = false;
+		var toggleParameterTypesButton = document.createElement("button");
+		toggleParameterTypesButton.title = "toggle editing parameter types";
+		toggleParameterTypesButton.innerHTML = '<i class="material-icons">settings</i>';
+		toggleParameterTypesButton.onclick = function() {
+			editParameterTypes = !editParameterTypes;
+			CreateExpressionControls(true);
+		}
+
 		if (!isInline) {
 			var orderControls = new OrderControls(this, parentEditor);
 			div.appendChild(orderControls.GetElement());	
 
 			var customControls = orderControls.GetCustomControlsContainer();
 			customControls.appendChild(editExpressionButton);
+			customControls.appendChild(toggleParameterTypesButton);
 		}
 
 		var expressionSpan = document.createElement("span");
@@ -977,7 +987,7 @@ function DialogTool() {
 						parentEditor.NotifyUpdate();
 					},
 					isEditable,
-					false,
+					editParameterTypes,
 					function(expressionString, onAcceptHandler) {
 						parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 					});
@@ -1008,7 +1018,7 @@ function DialogTool() {
 						parentEditor.NotifyUpdate();
 					},
 					isEditable,
-					false,
+					editParameterTypes,
 					function(expressionString, onAcceptHandler) {
 						parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 					});
@@ -1033,7 +1043,7 @@ function DialogTool() {
 						parentEditor.NotifyUpdate();
 					},
 					isEditable,
-					false,
+					editParameterTypes,
 					function(expressionString, onAcceptHandler) {
 						parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 					});
@@ -1807,6 +1817,15 @@ function DialogTool() {
 		var addParameterDiv = null;
 		var helpTextDiv = null;
 
+		var editParameterTypes = false;
+		var toggleParameterTypesButton = document.createElement("button");
+		toggleParameterTypesButton.title = "toggle editing parameter types";
+		toggleParameterTypesButton.innerHTML = '<i class="material-icons">settings</i>';
+		toggleParameterTypesButton.onclick = function() {
+			editParameterTypes = !editParameterTypes;
+			CreateFunctionDescription(true);
+		}
+
 		if (!isInline) {
 			customCommandsDiv = document.createElement("div");
 			customCommandsDiv.style.marginTop = "5px"; // hack : need to hide these spacers...
@@ -1820,23 +1839,7 @@ function DialogTool() {
 			div.appendChild(helpTextDiv);
 
 			var customControls = orderControls.GetCustomControlsContainer();
-
-			// TODO : hide if there are no parameters??
-			var editParameterTypeCheckbox = document.createElement("input");
-			editParameterTypeCheckbox.type = "checkbox";
-			editParameterTypeCheckbox.id = "paramTypeCheck_" + node.GetId();
-			editParameterTypeCheckbox.checked = false;
-			editParameterTypeCheckbox.onclick = function() {
-				CreateFunctionDescription(true);
-			}
-			customControls.appendChild(editParameterTypeCheckbox);
-
-			var editParameterTypeLabel = document.createElement("label");
-			editParameterTypeLabel.style.display = "inline-block"; // TODO : get style right
-			editParameterTypeLabel.innerHTML = '<i class="material-icons">settings</i>';
-			editParameterTypeLabel.setAttribute("for", "paramTypeCheck_" + node.GetId());
-			editParameterTypeLabel.title = "edit parameter types"
-			customControls.appendChild(editParameterTypeLabel);
+			customControls.appendChild(toggleParameterTypesButton);
 		}
 
 		// TODO : populate default values!!
@@ -1896,7 +1899,7 @@ function DialogTool() {
 							createGetArgFunc(functionNode, parameterInfo.index),
 							createSetArgFunc(functionNode, parameterInfo.index, self),
 							isEditable,
-							!isInline && editParameterTypeCheckbox.checked,
+							!isInline && editParameterTypes,
 							function(expressionString, onAcceptHandler) {
 								parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
 							});
