@@ -54,7 +54,8 @@
 
 .actionEditor.inline {
 	display: inline;
-	padding: 2px;
+	padding: 0px;
+	padding-top: 2px;
 	padding-bottom: 4px; /* hack - useful??? */
 	border: none;
 }
