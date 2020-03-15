@@ -247,10 +247,10 @@
 }
 
 .helpText {
-	padding-top: 5px;
-	padding-bottom: 5px;
-	color: #ccccff;
+	padding: 5px;
 	max-width: 350px;
+	background: #ccccff;
+	border-radius: 2px;
 }
 
 /* todo: move into own file?*/

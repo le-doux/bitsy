@@ -1761,6 +1761,8 @@ function DialogTool() {
 		"pg" : {
 			description : "start a new page", // TODO : ok description?
 			parameters : [],
+			helpText : "if there are actions after this one, "
+				+ "they will start after the player presses continue",
 		},
 		"item" : {
 			description : "_ in inventory[ = _]",
