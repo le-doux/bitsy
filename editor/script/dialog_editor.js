@@ -2747,6 +2747,15 @@ function DialogTool() {
 		}
 		backInputDiv.appendChild(backButton);
 
+		var clearButton = document.createElement("button");
+		clearButton.innerText = "AC"; // TODO : localize
+		clearButton.onclick = function() {
+			var expressionString = "";
+			expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
+			ResetExpressionDiv();
+		}
+		backInputDiv.appendChild(clearButton);
+
 		// NON NUMERIC INPUTS!
 
 		var nonNumericInputDiv = document.createElement("div");
