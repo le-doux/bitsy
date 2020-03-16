@@ -40,7 +40,7 @@
 	background: white;
 	padding: 10px;
 	/*margin-bottom: 5px;*/
-	border: solid 1px #6767b2;
+	border: solid 1px #ccccff;
 	border-radius: 2px;
 	display: flex;
 	flex-direction: column;
@@ -100,6 +100,7 @@
 	background: #e8e8ff;
 	margin-bottom: 5px;
 	padding: 5px;
+	border-radius: 2px;
 }
 
 .optionControls {
@@ -189,7 +190,7 @@
 }
 
 .optionEditor.selectedEditor {
-	border: solid 1px #ccccff;
+	border: solid 2px #6767b2;
 }
 
 .addOption {
