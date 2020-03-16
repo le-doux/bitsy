@@ -261,6 +261,24 @@
 	border-radius: 2px;
 }
 
+/* dialog box */
+.dialogBoxContainer {
+	background: black;
+	resize: vertical;
+	overflow: hidden;
+	padding: 5px;
+	border-radius: 2px;
+}
+
+.dialogBoxContainer textarea {
+	height: calc(100% - 10px);
+	width: auto;
+	background: black;
+	color: white;
+	resize: none;
+	border: none;
+}
+
 /* todo: move into own file?*/
 /* TITLE WIDGET */
 .titleWidget {

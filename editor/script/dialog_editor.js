@@ -855,6 +855,7 @@ function DialogTool() {
 		var textSelectionChangeHandler = createOnTextSelectionChange(OnDialogTextChange);
 
 		var textHolderDiv = document.createElement("div");
+		textHolderDiv.classList.add("dialogBoxContainer");
 		var textArea = document.createElement("textarea");
 		textArea.value = scriptUtils.SerializeDialogNodeList(dialogNodeList);
 		textArea.onchange = OnDialogTextChange;
