@@ -923,6 +923,7 @@ function DialogTool() {
 
 		var div = document.createElement(isInline ? "span" : "div");
 		div.classList.add("actionEditor");
+		div.classList.add("expressionEditor");
 		if (isInline) {
 			div.classList.add("inline");
 		}
@@ -1126,9 +1127,9 @@ function DialogTool() {
 	}
 
 	var sequenceTypeDescriptionMap = {
-		"sequence" : "do items once in _:",
-		"cycle" : "repeat items in a _:",
-		"shuffle" : "_ items in a random order:",
+		"sequence" : { name:"sequence", description:"go through each item once in _:"},
+		"cycle" : { name:"cycle", description:"repeat items in a _:" },
+		"shuffle" : { name:"shuffle", description:"_ items in a random order:" },
 	};
 
 	function SequenceEditor(node, parentEditor) {
@@ -1144,6 +1145,10 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
 
+		var titleDiv = document.createElement("div");
+		titleDiv.classList.add("actionTitle");
+		div.appendChild(titleDiv);
+
 		var descriptionDiv = document.createElement("div");
 		descriptionDiv.classList.add("sequenceDescription");
 		div.appendChild(descriptionDiv);
@@ -1151,7 +1156,9 @@ function DialogTool() {
 		function CreateSequenceDescription(isEditable) {
 			descriptionDiv.innerHTML = "";
 
-			var descriptionText = sequenceTypeDescriptionMap[sequenceNode.type];
+			titleDiv.innerText = sequenceTypeDescriptionMap[sequenceNode.type].name; // TODO : localize
+
+			var descriptionText = sequenceTypeDescriptionMap[sequenceNode.type].description;
 			var descriptionTextSplit = descriptionText.split("_");
 
 			var descSpan1 = document.createElement("span");
@@ -1161,13 +1168,15 @@ function DialogTool() {
 			if (isEditable) {
 				var sequenceTypeSelect = document.createElement("select");
 				for (var type in sequenceTypeDescriptionMap) {
+					var typeName = sequenceTypeDescriptionMap[type].name; // TODO : localize
 					var sequenceTypeOption = document.createElement("option");
 					sequenceTypeOption.value = type;
-					sequenceTypeOption.innerText = type;
+					sequenceTypeOption.innerText = typeName;
 					sequenceTypeOption.selected = (type === sequenceNode.type);
 					sequenceTypeSelect.appendChild(sequenceTypeOption);
 				}
 				sequenceTypeSelect.onchange = function() {
+					console.log(sequenceNode);
 					sequenceNode = scriptUtils.ChangeSequenceType(sequenceNode, sequenceTypeSelect.value);
 					node.SetChildren([sequenceNode]);
 					CreateSequenceDescription(true);
@@ -1178,7 +1187,7 @@ function DialogTool() {
 			else {
 				var sequenceTypeSpan = document.createElement("span");
 				sequenceTypeSpan.classList.add("parameterUneditable");
-				sequenceTypeSpan.innerText = sequenceNode.type;
+				sequenceTypeSpan.innerText = sequenceTypeDescriptionMap[sequenceNode.type].name; // TODO : localize
 				descriptionDiv.appendChild(sequenceTypeSpan);
 			}
 
@@ -1355,9 +1364,15 @@ function DialogTool() {
 		var orderControls = new OrderControls(this, parentEditor);
 		div.appendChild(orderControls.GetElement());
 
-		var span = document.createElement("span");
-		span.innerText = "conditional";
-		div.appendChild(span);
+		var titleDiv = document.createElement("div");
+		titleDiv.classList.add("actionTitle");
+		titleDiv.innerText = "conditional"; // TODO : localize
+		div.appendChild(titleDiv);
+
+		var descriptionDiv = document.createElement("div");
+		descriptionDiv.classList.add("sequenceDescription"); // hack
+		descriptionDiv.innerText = "go to the first item whose condition is true:"; // TODO : localize
+		div.appendChild(descriptionDiv);
 
 		var optionRootDiv = document.createElement("div");
 		optionRootDiv.classList.add("optionRoot");
@@ -1734,17 +1749,21 @@ function DialogTool() {
 
 	var functionDescriptionMap = {
 		"lock" : {
-			description : "lock",
+			name : "lock",
+			description : "cancel the default action",
 			parameters : [],
-			helpText : "prevents the default action that happens "
-				+ "after this event (changing rooms for exits, "
-				+ "stopping the game for endings, picking up items, etc.)",
+			helpText : "exits won't change rooms, endings won't stop the game, "
+				+ "items won't be picked up, etc.",
 		},
 		"end" : {
-			description : "end the game",
+			name : "end",
+			description : "stop the game",
 			parameters : [],
+			helpText : "the game stops immediately, but if there is "
+				+ "dialog after this action, it will still play",
 		},
 		"exit" : {
+			name : "exit",
 			description : "move player to _ at (_,_)[ with effect _]",
 			parameters : [
 				{ types: ["room", "text", "variable"], index: 0, name: "room", },
@@ -1754,17 +1773,15 @@ function DialogTool() {
 			],
 			commands : [CreateRoomMoveDestinationCommand],
 		},
-		"narrate" : {
-			description : "start narration",
-			parameters : [],
-		},
 		"pg" : {
-			description : "start a new page", // TODO : ok description?
+			name : "pagebreak",
+			description : "start a new page of dialog",
 			parameters : [],
 			helpText : "if there are actions after this one, "
 				+ "they will start after the player presses continue",
 		},
 		"item" : {
+			name : "item",
 			description : "_ in inventory[ = _]",
 			parameters : [
 				{ types: ["item", "text", "variable"], index: 0, name: "item", },
@@ -1772,13 +1789,15 @@ function DialogTool() {
 			],
 		},
 		"print" : {
-			description : "print _",
+			name : "print",
+			description : "print _ in the dialog box",
 			parameters : [
 				{ types: ["text", "variable"], index: 0, name: "output", },
 			],
 		},
 		"say" : {
-			description : "say _",
+			name : "say",
+			description : "print _ in the dialog box",
 			parameters : [
 				{ types: ["text", "variable"], index: 0, name: "output", },
 			],
@@ -1806,6 +1825,14 @@ function DialogTool() {
 		if (!isInline) {
 			orderControls = new OrderControls(this, parentEditor);
 			div.appendChild(orderControls.GetElement());			
+		}
+
+		if (!isInline) {
+			var titleText = functionDescriptionMap[functionNode.name].name;
+			var titleDiv = document.createElement("div");
+			titleDiv.classList.add("actionTitle");
+			titleDiv.innerText = titleText;
+			div.appendChild(titleDiv);
 		}
 
 		var descriptionDiv = document.createElement(isInline ? "span" : "div");

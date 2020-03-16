@@ -41,10 +41,16 @@
 	padding: 10px;
 	/*margin-bottom: 5px;*/
 	border: solid 1px #6767b2;
+	border-radius: 2px;
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
 	/*transition: background 1s ease-in;*/
+}
+
+.actionTitle {
+	font-weight: bold;
+	margin-bottom: 5px;
 }
 
 .executing.actionEditor {
@@ -87,7 +93,7 @@
 }
 
 .sequenceDescription {
-	margin-bottom: 5px;
+	margin-bottom: 10px;
 }
 
 .optionEditor {

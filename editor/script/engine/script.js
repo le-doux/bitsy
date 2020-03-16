@@ -192,15 +192,15 @@ var Utils = function() {
 		return new CodeBlockNode();
 	}
 
-	this.ChangeSequenceType = function(oldSequence,type) {
+	this.ChangeSequenceType = function(oldSequence, type) {
 		if(type === "sequence") {
-			return new SequenceNode( oldSequence.options );
+			return new SequenceNode(oldSequence.children);
 		}
 		else if(type === "cycle") {
-			return new CycleNode( oldSequence.options );
+			return new CycleNode(oldSequence.children);
 		}
 		else if(type === "shuffle") {
-			return new ShuffleNode( oldSequence.options );
+			return new ShuffleNode(oldSequence.children);
 		}
 		return oldSequence;
 	}
