@@ -399,7 +399,7 @@ function DialogTool() {
 		this.AddDialog = function() {
 			var printFunc = scriptUtils.CreateEmptyPrintFunc();
 			rootEditor.GetNodes()[0].AddChild(printFunc); // hacky -- see note in action builder
-			var editor = new DialogPassageEditor([printFunc], rootEditor);
+			var editor = new DialogTextEditor([printFunc], rootEditor);
 			rootEditor.AppendChild(editor);
 			OnUpdate();
 		}
@@ -482,7 +482,7 @@ function DialogTool() {
 			var dialogNodeList = [];
 			function addText() {
 				if (dialogNodeList.length > 0) {
-					var editor = new DialogPassageEditor(dialogNodeList, self);
+					var editor = new DialogTextEditor(dialogNodeList, self);
 					childEditors.push(editor);
 
 					dialogNodeList = [];
@@ -667,7 +667,7 @@ function DialogTool() {
 					// otherwise the dialog editor can't serialize the text D:
 					parentEditor.GetNodes()[0].AddChild(printFunc);
 
-					var editor = new DialogPassageEditor([printFunc], parentEditor);
+					var editor = new DialogTextEditor([printFunc], parentEditor);
 					return editor;
 				}));
 
@@ -832,7 +832,7 @@ function DialogTool() {
 		}
 	}
 
-	function DialogPassageEditor(dialogNodeList, parentEditor) {
+	function DialogTextEditor(dialogNodeList, parentEditor) {
 		var div = document.createElement("div");
 		div.classList.add("dialogEditor");
 		div.classList.add("actionEditor");
