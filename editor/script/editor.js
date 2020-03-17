@@ -961,7 +961,6 @@ function start() {
 	}
 
 	// prepare dialog tool
-	showDialogToolsSection(); // hack to avoid the mismatched radio selection
 	openDialogTool(titleDialogId); // start with the title open
 
 	initLanguageOptions();
@@ -3229,18 +3228,6 @@ function toggleDialogCode(e) {
 	else {
 		dialogEditorViewport.appendChild(curDialogEditor.GetElement());
 	}
-}
-
-function showDialogToolsSection() {
-	document.getElementById("dialogToolsOptionSection").checked = true;
-	document.getElementById("dialogToolsSection").style.display = "block";
-	document.getElementById("dialogToolsEffects").style.display = "none";
-}
-
-function showDialogToolsEffects() {
-	document.getElementById("dialogToolsOptionEffects").checked = true;
-	document.getElementById("dialogToolsSection").style.display = "none";
-	document.getElementById("dialogToolsEffects").style.display = "block";
 }
 
 function showInventoryItem() {
