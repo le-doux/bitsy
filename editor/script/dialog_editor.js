@@ -2517,8 +2517,15 @@ function DialogTool() {
 		editor.ShowOrderControls = function() {
 			if (parentEditor.ChildCount && parentEditor.ChildCount() > 1) {
 				// TODO : replace w/ added class name?
-				div.style.display = "block";
+				moveUpButton.disabled = false;
+				moveDownButton.disabled = false;
 			}
+			else {
+				moveUpButton.disabled = true;
+				moveDownButton.disabled = true;
+			}
+
+			div.style.display = "block";
 		}
 
 		editor.HideOrderControls = function() {
