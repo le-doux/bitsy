@@ -832,6 +832,9 @@ function DialogTool() {
 		}
 	}
 
+	// a bit hacky to have it as a global variable but it's nice that it remembers what you did!
+	var globalShowTextEffectsControls = true;
+
 	function DialogTextEditor(dialogNodeList, parentEditor) {
 		var div = document.createElement("div");
 		div.classList.add("dialogEditor");
@@ -870,11 +873,60 @@ function DialogTool() {
 		// textHolderDiv.style.background = "black"; // TODO : does this look better?
 		div.appendChild(textHolderDiv);
 
+		// add text effects controls
+		var textEffectsDiv = document.createElement("div");
+		textEffectsDiv.classList.add("controlBox");
+		textEffectsDiv.style.display = "none";
+		textEffectsDiv.style.marginTop = "5px"; // hacky
+		div.appendChild(textEffectsDiv);
+
+		var toggleTextEffectsButton = document.createElement("button");
+		toggleTextEffectsButton.innerHTML = '<i class="material-icons">text_format</i>';
+		toggleTextEffectsButton.title = "show/hide text effects controls";
+		toggleTextEffectsButton.onclick = function() {
+			globalShowTextEffectsControls = !globalShowTextEffectsControls;
+			textEffectsDiv.style.display = globalShowTextEffectsControls ? "block" : "none";
+		}
+		orderControls.GetCustomControlsContainer().appendChild(toggleTextEffectsButton);
+
+		var textEffectsTitleDiv = document.createElement("div");
+		textEffectsTitleDiv.innerHTML = '<i class="material-icons">text_format</i>' + " text effects"; // TODO : localize
+		textEffectsDiv.appendChild(textEffectsTitleDiv);
+
+		var textEffectsControlsDiv = document.createElement("div");
+		textEffectsDiv.appendChild(textEffectsControlsDiv);
+
+		var effectsTags = ["{clr1}", "{clr2}", "{clr3}", "{wvy}", "{shk}", "{rbw}"];
+		var effectsNames = ["color 1", "color 2", "color 3", "wavy", "shaky", "rainbow"]; // TODO : localize
+		var effectsDescriptions = [
+			"text in tags matches the 1st color in the palette",
+			"text in tags matches the 2nd color in the palette",
+			"text in tags matches the 3rd color in the palette",
+			"text in tags waves up and down",
+			"text in tags shakes constantly",
+			"text in tags is rainbow colored"
+		];
+		function CreateAddEffectHandler(tag) {
+			return function() {
+				wrapTextSelection(tag); // hacky to still use this?
+			}
+		}
+		for (var i = 0; i < effectsTags.length; i++) {
+			var effectButton = document.createElement("button");
+			effectButton.onclick = CreateAddEffectHandler(effectsTags[i]);
+			effectButton.innerText = effectsNames[i];
+			effectButton.title = effectsDescriptions[i];
+			textEffectsControlsDiv.appendChild(effectButton);
+		}
+
 		this.GetElement = function() {
 			return div;
 		}
 
-		AddSelectionBehavior(this);
+		AddSelectionBehavior(
+			this,
+			function() { textEffectsDiv.style.display = globalShowTextEffectsControls ? "block" : "none"; },
+			function() { textEffectsDiv.style.display = "none"; });
 
 		this.GetNodes = function() {
 			return dialogNodeList;
