@@ -877,7 +877,7 @@ function DialogTool() {
 		var textEffectsDiv = document.createElement("div");
 		textEffectsDiv.classList.add("controlBox");
 		textEffectsDiv.style.display = "none";
-		textEffectsDiv.style.marginTop = "5px"; // hacky
+		textEffectsDiv.style.marginTop = "10px"; // hacky
 		div.appendChild(textEffectsDiv);
 
 		var toggleTextEffectsButton = document.createElement("button");
@@ -890,10 +890,12 @@ function DialogTool() {
 		orderControls.GetCustomControlsContainer().appendChild(toggleTextEffectsButton);
 
 		var textEffectsTitleDiv = document.createElement("div");
+		textEffectsTitleDiv.style.marginBottom = "5px";
 		textEffectsTitleDiv.innerHTML = '<i class="material-icons">text_format</i>' + " text effects"; // TODO : localize
 		textEffectsDiv.appendChild(textEffectsTitleDiv);
 
 		var textEffectsControlsDiv = document.createElement("div");
+		textEffectsControlsDiv.style.marginBottom = "5px";
 		textEffectsDiv.appendChild(textEffectsControlsDiv);
 
 		var effectsTags = ["{clr1}", "{clr2}", "{clr3}", "{wvy}", "{shk}", "{rbw}"];
@@ -917,6 +919,69 @@ function DialogTool() {
 			effectButton.innerText = effectsNames[i];
 			effectButton.title = effectsDescriptions[i];
 			textEffectsControlsDiv.appendChild(effectButton);
+		}
+
+		var textEffectsPrintDrawingDiv = document.createElement("div");
+		textEffectsDiv.appendChild(textEffectsPrintDrawingDiv);
+
+		var textEffectsPrintDrawingButton = document.createElement("button");
+		textEffectsPrintDrawingButton.innerHTML = '<i class="material-icons">add</i>' + "insert drawing"; // TODO : localize
+		textEffectsPrintDrawingButton.title = "draw a sprite, tile, or item in your dialog";
+		textEffectsPrintDrawingDiv.appendChild(textEffectsPrintDrawingButton);
+
+		var textEffectsPrintDrawingSelect = document.createElement("select");
+		textEffectsPrintDrawingDiv.appendChild(textEffectsPrintDrawingSelect);
+
+		// TODO : there needs to be a shared function for these dropdowns...
+		for (id in sprite) {
+			var option = document.createElement("option");
+
+			var spriteName = id === "A" ? "avatar" : "sprite " + id; // TODO : localize
+			if (sprite[id].name) {
+				spriteName = sprite[id].name;
+			}
+
+			option.innerText = spriteName;
+
+			option.value = '{printSprite "' + id + '"}';
+
+			textEffectsPrintDrawingSelect.appendChild(option);
+		}
+
+		for (id in tile) {
+			var option = document.createElement("option");
+
+			var tileName = "tile " + id; // TODO : localize
+			if (tile[id].name) {
+				tileName = tile[id].name;
+			}
+
+			option.innerText = tileName;
+
+			option.value = '{printTile "' + id + '"}';
+
+			textEffectsPrintDrawingSelect.appendChild(option);
+		}
+
+		for (id in item) {
+			var option = document.createElement("option");
+
+			var itemName = "item " + id; // TODO : localize
+			if (item[id].name) {
+				itemName = item[id].name;
+			}
+
+			option.innerText = itemName;
+
+			option.value = '{printItem "' + id + '"}';
+
+			textEffectsPrintDrawingSelect.appendChild(option);
+		}
+
+		textEffectsPrintDrawingButton.onclick = function() {
+			textArea.value += textEffectsPrintDrawingSelect.value;
+
+			OnDialogTextChange();
 		}
 
 		this.GetElement = function() {
