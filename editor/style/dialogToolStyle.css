@@ -279,6 +279,46 @@
 	border: none;
 }
 
+@font-face {
+	font-family: bitsy_ascii;
+	src: url(../font/bitsy_ascii_small.ttf);
+}
+
+.dialogTextboxContainer {
+	background: black;
+	padding: 15px;
+	border-radius: 2px;
+	overflow: hidden;
+/*	resize: vertical;
+	overflow: scroll;*/
+}
+
+.dialogTextboxContent {
+	background: black;
+	color: white;
+	font-family: bitsy_ascii, monospace;
+	font-size: 18px;
+	width: 32ch;
+	min-height: 2ch;
+	word-wrap: break-word;
+}
+
+.dialogTextboxContent div {
+	padding-left: 4px;
+	padding-top: 4px;
+	min-height: 18px;
+}
+
+.dialogTextboxContent div:nth-child(odd) {
+	border-left: solid 4px #222;
+}
+
+.dialogTextboxContent div:nth-child(even) {
+	border-left: solid 4px #444;
+	border-bottom: dashed 1px #666;
+	padding-bottom: 5px;
+}
+
 /* todo: move into own file?*/
 /* TITLE WIDGET */
 .titleWidget {

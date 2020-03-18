@@ -856,22 +856,41 @@ function DialogTool() {
 		}
 		var textSelectionChangeHandler = createOnTextSelectionChange(OnDialogTextChange);
 
-		var textHolderDiv = document.createElement("div");
-		textHolderDiv.classList.add("dialogBoxContainer");
-		var textArea = document.createElement("textarea");
-		textArea.value = scriptUtils.SerializeDialogNodeList(dialogNodeList);
-		textArea.onchange = OnDialogTextChange;
-		textArea.rows = 2;
-		textArea.cols = 32;
-		// test: style to center text area
-		// textArea.style.margin = "auto";
-		// textArea.style.display = "block"; // TODO : move to style file
-		textArea.addEventListener('click', textSelectionChangeHandler);
-		textArea.addEventListener('select', textSelectionChangeHandler);
-		textArea.addEventListener('blur', textSelectionChangeHandler);
-		textHolderDiv.appendChild(textArea);
-		// textHolderDiv.style.background = "black"; // TODO : does this look better?
-		div.appendChild(textHolderDiv);
+		// OLD version
+		// var textHolderDiv = document.createElement("div");
+		// textHolderDiv.classList.add("dialogBoxContainer");
+		// var textArea = document.createElement("textarea");
+		// textArea.value = scriptUtils.SerializeDialogNodeList(dialogNodeList);
+		// textArea.onchange = OnDialogTextChange;
+		// textArea.rows = 2;
+		// textArea.cols = 32;
+		// textArea.addEventListener('click', textSelectionChangeHandler);
+		// textArea.addEventListener('select', textSelectionChangeHandler);
+		// textArea.addEventListener('blur', textSelectionChangeHandler);
+		// textHolderDiv.appendChild(textArea);
+		// div.appendChild(textHolderDiv);
+
+		// NEW version
+		var textboxContainerDiv = document.createElement("div");
+		textboxContainerDiv.classList.add("dialogTextboxContainer");
+		var textboxContentDiv = document.createElement("div");
+		textboxContentDiv.classList.add("dialogTextboxContent");
+		textboxContainerDiv.appendChild(textboxContentDiv);
+		div.appendChild(textboxContainerDiv);
+
+		var dialogText = scriptUtils.SerializeDialogNodeList(dialogNodeList);
+		var dialogTextSplit = dialogText.split("\n");
+		for (var i = 0; i < dialogTextSplit.length; i++) {
+			var wrapperDiv = document.createElement("div");
+			wrapperDiv.innerText = dialogTextSplit[i];
+			textboxContentDiv.appendChild(wrapperDiv);	
+		}
+
+		textboxContentDiv.contentEditable = true;
+		textboxContentDiv.spellcheck = false;
+		textboxContentDiv.addEventListener("input", function(e) {
+			console.log(textboxContentDiv.innerText);
+		});
 
 		// add text effects controls
 		var textEffectsDiv = document.createElement("div");
