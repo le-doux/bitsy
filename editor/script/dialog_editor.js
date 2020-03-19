@@ -878,13 +878,76 @@ function DialogTool() {
 		textboxContainerDiv.appendChild(textboxContentDiv);
 		div.appendChild(textboxContainerDiv);
 
-		var dialogText = scriptUtils.SerializeDialogNodeList(dialogNodeList);
-		var dialogTextSplit = dialogText.split("\n");
-		for (var i = 0; i < dialogTextSplit.length; i++) {
-			var wrapperDiv = document.createElement("div");
-			wrapperDiv.innerText = dialogTextSplit[i];
-			textboxContentDiv.appendChild(wrapperDiv);	
+		// create HTML from dialog nodes
+		var curLineDiv = document.createElement("div");
+		curLineDiv.classList.add("textboxLine");
+
+		var renderableTextEffects = ["clr1", "clr2", "clr3"];
+		var curTextEffects = [];
+
+		for (var i = 0; i < dialogNodeList.length; i++) {
+			var node = dialogNodeList[i];
+			if (node.type === "code_block" && node.children[0].type === "function"
+				&& renderableTextEffects.indexOf(node.children[0].name) >= 0) {
+				if (curTextEffects.indexOf(node.children[0].name) < 0) {
+					curTextEffects.push(node.children[0].name);
+				}
+				else {
+					curTextEffects.splice(curTextEffects.indexOf(node.children[0].name), 1);
+				}
+			}
+			else if (node.type === "function" && node.name === "br") {
+				textboxContentDiv.appendChild(curLineDiv);
+				curLineDiv = document.createElement("div");
+			}
+			else {
+				var curTextSpan = document.createElement("span");
+				curTextSpan.classList.add("textboxSpan");
+				curLineDiv.appendChild(curTextSpan);
+				// store active effects in the span class list
+				for (var j = 0; j < curTextEffects.length; j++) {
+					curTextSpan.classList.add(curTextEffects[j]);
+				}
+
+				var nextText = node.Serialize();
+
+				for (var j = 0; j < nextText.length; j++) {
+					var characterSpan = document.createElement("span");
+					characterSpan.innerText = nextText[j];
+
+					// actually apply effects on a per-character basis
+					for (var k = 0; k < curTextEffects.length; k++) {
+						if (curTextEffects[k] === "clr1") {
+							var color = rgbToHex(getPal(curPal())[0][0], getPal(curPal())[0][1], getPal(curPal())[0][2]);
+							characterSpan.style.color = color;
+						}
+						else if (curTextEffects[k] === "clr2") {
+							var color = rgbToHex(getPal(curPal())[1][0], getPal(curPal())[1][1], getPal(curPal())[1][2]);
+							characterSpan.style.color = color;
+						}
+						else if (curTextEffects[k] === "clr3") {
+							var color = rgbToHex(getPal(curPal())[2][0], getPal(curPal())[2][1], getPal(curPal())[2][2]);
+							characterSpan.style.color = color;
+						}
+					}
+
+					curTextSpan.appendChild(characterSpan);
+				}
+			}
 		}
+
+		textboxContentDiv.appendChild(curLineDiv);
+		// end HTML render
+
+		console.log(dialogNodeList);
+
+		// var dialogText = scriptUtils.SerializeDialogNodeList(dialogNodeList);
+		// var dialogTextSplit = dialogText.split("\n");
+		// for (var i = 0; i < dialogTextSplit.length; i++) {
+		// 	var wrapperDiv = document.createElement("div");
+		// 	wrapperDiv.innerText = dialogTextSplit[i];
+		// 	textboxContentDiv.appendChild(wrapperDiv);	
+		// }
 
 		textboxContentDiv.contentEditable = true;
 		textboxContentDiv.spellcheck = false;

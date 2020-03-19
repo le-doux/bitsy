@@ -301,6 +301,7 @@
 	width: 32ch;
 	min-height: 2ch;
 	word-wrap: break-word;
+	white-space: pre;
 }
 
 .dialogTextboxContent div {
