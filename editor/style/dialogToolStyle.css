@@ -301,7 +301,7 @@
 	width: 32ch;
 	min-height: 2ch;
 	word-wrap: break-word;
-	white-space: pre;
+	white-space: pre-wrap;
 }
 
 .dialogTextboxContent div {
@@ -312,12 +312,70 @@
 
 .dialogTextboxContent div:nth-child(odd) {
 	border-left: solid 4px #222;
+	padding-bottom: 5px;
 }
 
 .dialogTextboxContent div:nth-child(even) {
 	border-left: solid 4px #444;
 	border-bottom: dashed 1px #666;
-	padding-bottom: 5px;
+	padding-bottom: 10px;
+}
+
+.textboxCodeSpan {
+	color: yellow; /* TODO : pick color */
+}
+
+.textboxCharacterSpan {
+	display: inline-block;
+}
+
+@keyframes textEffectWvy {
+	/*0% { transform:translateY(0px); }*/
+	0% { transform:translateY(25%); }
+	/*50% { transform:translateY(0px); }*/
+	50% { transform:translateY(-25%); }
+	/*100% { transform:translateY(0px); }*/
+	100% { transform:translateY(25%); }
+}
+
+.textEffectWvy {
+	animation-name: textEffectWvy;
+	animation-duration: 2s;
+	animation-iteration-count: infinite;
+}
+
+@keyframes textEffectShk {
+	0% { transform:translate(10%,0%); }
+	20% { transform:translate(10%,10%); }
+	40% { transform:translate(0%,10%); }
+	60% { transform:translate(-10%,-10%); }
+	80% { transform:translate(-10%,10%); }
+}
+
+.textEffectShk {
+	animation-name: textEffectShk;
+	animation-duration: 0.2s;
+	animation-iteration-count: infinite;
+}
+
+@keyframes textEffectRbw {
+	0% { color:hsl(0,100%,50%); }
+	10% { color:hsl(35,100%,50%); }
+	20% { color:hsl(70,100%,50%); }
+	30% { color:hsl(105,100%,50%); }
+	40% { color:hsl(140,100%,50%); }
+	50% { color:hsl(175,100%,50%); }
+	60% { color:hsl(210,100%,50%); }
+	70% { color:hsl(245,100%,50%); }
+	80% { color:hsl(280,100%,50%); }
+	90% { color:hsl(315,100%,50%); }
+	100% { color:hsl(355,100%,50%); }
+}
+
+.textEffectRbw {
+	animation-name: textEffectRbw;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
 }
 
 /* todo: move into own file?*/

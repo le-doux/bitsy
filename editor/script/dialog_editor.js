@@ -882,7 +882,7 @@ function DialogTool() {
 		var curLineDiv = document.createElement("div");
 		curLineDiv.classList.add("textboxLine");
 
-		var renderableTextEffects = ["clr1", "clr2", "clr3"];
+		var renderableTextEffects = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw"];
 		var curTextEffects = [];
 
 		for (var i = 0; i < dialogNodeList.length; i++) {
@@ -904,34 +904,59 @@ function DialogTool() {
 				var curTextSpan = document.createElement("span");
 				curTextSpan.classList.add("textboxSpan");
 				curLineDiv.appendChild(curTextSpan);
+
 				// store active effects in the span class list
 				for (var j = 0; j < curTextEffects.length; j++) {
 					curTextSpan.classList.add(curTextEffects[j]);
+				}
+
+				if (node.type === "code_block") {
+					curTextSpan.classList.add("textboxCodeSpan");
 				}
 
 				var nextText = node.Serialize();
 
 				for (var j = 0; j < nextText.length; j++) {
 					var characterSpan = document.createElement("span");
+					characterSpan.classList.add("textboxCharacterSpan");
 					characterSpan.innerText = nextText[j];
+
+					var outerSpan = characterSpan;
 
 					// actually apply effects on a per-character basis
 					for (var k = 0; k < curTextEffects.length; k++) {
+						var effectWrapperSpan = document.createElement("span");
+						effectWrapperSpan.classList.add("textboxCharacterSpan"); // hacky?
+						effectWrapperSpan.style.animationDelay = (-0.25 * curLineDiv.innerText.length) + "s";
+
 						if (curTextEffects[k] === "clr1") {
 							var color = rgbToHex(getPal(curPal())[0][0], getPal(curPal())[0][1], getPal(curPal())[0][2]);
-							characterSpan.style.color = color;
+							effectWrapperSpan.style.color = color;
 						}
 						else if (curTextEffects[k] === "clr2") {
 							var color = rgbToHex(getPal(curPal())[1][0], getPal(curPal())[1][1], getPal(curPal())[1][2]);
-							characterSpan.style.color = color;
+							effectWrapperSpan.style.color = color;
 						}
 						else if (curTextEffects[k] === "clr3") {
 							var color = rgbToHex(getPal(curPal())[2][0], getPal(curPal())[2][1], getPal(curPal())[2][2]);
-							characterSpan.style.color = color;
+							effectWrapperSpan.style.color = color;
 						}
+						else if (curTextEffects[k] === "wvy") {
+							effectWrapperSpan.classList.add("textEffectWvy");
+						}
+						else if (curTextEffects[k] === "shk") {
+							effectWrapperSpan.classList.add("textEffectShk");
+						}
+						else if (curTextEffects[k] === "rbw") {
+							effectWrapperSpan.classList.add("textEffectRbw");
+						}
+
+						effectWrapperSpan.appendChild(outerSpan);
+
+						outerSpan = effectWrapperSpan;
 					}
 
-					curTextSpan.appendChild(characterSpan);
+					curTextSpan.appendChild(outerSpan);
 				}
 			}
 		}
