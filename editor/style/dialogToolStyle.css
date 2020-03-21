@@ -45,7 +45,6 @@
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	/*transition: background 1s ease-in;*/
 }
 
 .actionTitle {
@@ -399,6 +398,12 @@
 }
 
 /* expression builder styles */
+@keyframes expressionBuilderOpenBounce {
+	0% { padding:10px; padding-bottom: 10px; }
+	50% { padding:2px; padding-bottom: 18px; }
+	100% { padding:10px; padding-bottom: 10px; }
+}
+
 .dialogExpressionBuilderHolder {
 	background: #e8e8ff;
 	padding: 10px;
@@ -406,6 +411,9 @@
 	border-radius: 2px;
 	margin-bottom: 10px;
 	height: 450px;
+
+	animation-name: expressionBuilderOpenBounce;
+	animation-duration: 0.25s;
 }
 
 .expressionBuilder {
