@@ -832,6 +832,8 @@ function DialogTool() {
 		}
 	}
 
+	var useExperimentalTextEditor = false;
+
 	// a bit hacky to have it as a global variable but it's nice that it remembers what you did!
 	var globalShowTextEffectsControls = true;
 
@@ -856,129 +858,123 @@ function DialogTool() {
 		}
 		var textSelectionChangeHandler = createOnTextSelectionChange(OnDialogTextChange);
 
-		// OLD version
-		// var textHolderDiv = document.createElement("div");
-		// textHolderDiv.classList.add("dialogBoxContainer");
-		// var textArea = document.createElement("textarea");
-		// textArea.value = scriptUtils.SerializeDialogNodeList(dialogNodeList);
-		// textArea.onchange = OnDialogTextChange;
-		// textArea.rows = 2;
-		// textArea.cols = 32;
-		// textArea.addEventListener('click', textSelectionChangeHandler);
-		// textArea.addEventListener('select', textSelectionChangeHandler);
-		// textArea.addEventListener('blur', textSelectionChangeHandler);
-		// textHolderDiv.appendChild(textArea);
-		// div.appendChild(textHolderDiv);
+		if (!useExperimentalTextEditor) {
+			var textHolderDiv = document.createElement("div");
+			textHolderDiv.classList.add("dialogBoxContainer");
+			var textArea = document.createElement("textarea");
+			textArea.value = scriptUtils.SerializeDialogNodeList(dialogNodeList);
+			textArea.onchange = OnDialogTextChange;
+			textArea.rows = 2;
+			textArea.cols = 32;
+			textArea.addEventListener('click', textSelectionChangeHandler);
+			textArea.addEventListener('select', textSelectionChangeHandler);
+			textArea.addEventListener('blur', textSelectionChangeHandler);
+			textHolderDiv.appendChild(textArea);
+			textHolderDiv.onclick = function() {
+				textArea.focus(); // hijack focus into the actual textarea
+			}
+			div.appendChild(textHolderDiv);			
+		}
+		else {
+			var textboxContainerDiv = document.createElement("div");
+			textboxContainerDiv.classList.add("dialogTextboxContainer");
+			var textboxContentDiv = document.createElement("div");
+			textboxContentDiv.classList.add("dialogTextboxContent");
+			textboxContainerDiv.appendChild(textboxContentDiv);
+			div.appendChild(textboxContainerDiv);
 
-		// NEW version
-		var textboxContainerDiv = document.createElement("div");
-		textboxContainerDiv.classList.add("dialogTextboxContainer");
-		var textboxContentDiv = document.createElement("div");
-		textboxContentDiv.classList.add("dialogTextboxContent");
-		textboxContainerDiv.appendChild(textboxContentDiv);
-		div.appendChild(textboxContainerDiv);
+			// create HTML from dialog nodes
+			var curLineDiv = document.createElement("div");
+			curLineDiv.classList.add("textboxLine");
 
-		// create HTML from dialog nodes
-		var curLineDiv = document.createElement("div");
-		curLineDiv.classList.add("textboxLine");
+			var renderableTextEffects = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw"];
+			var curTextEffects = [];
 
-		var renderableTextEffects = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw"];
-		var curTextEffects = [];
-
-		for (var i = 0; i < dialogNodeList.length; i++) {
-			var node = dialogNodeList[i];
-			if (node.type === "code_block" && node.children[0].type === "function"
-				&& renderableTextEffects.indexOf(node.children[0].name) >= 0) {
-				if (curTextEffects.indexOf(node.children[0].name) < 0) {
-					curTextEffects.push(node.children[0].name);
+			for (var i = 0; i < dialogNodeList.length; i++) {
+				var node = dialogNodeList[i];
+				if (node.type === "code_block" && node.children[0].type === "function"
+					&& renderableTextEffects.indexOf(node.children[0].name) >= 0) {
+					if (curTextEffects.indexOf(node.children[0].name) < 0) {
+						curTextEffects.push(node.children[0].name);
+					}
+					else {
+						curTextEffects.splice(curTextEffects.indexOf(node.children[0].name), 1);
+					}
+				}
+				else if (node.type === "function" && node.name === "br") {
+					textboxContentDiv.appendChild(curLineDiv);
+					curLineDiv = document.createElement("div");
 				}
 				else {
-					curTextEffects.splice(curTextEffects.indexOf(node.children[0].name), 1);
-				}
-			}
-			else if (node.type === "function" && node.name === "br") {
-				textboxContentDiv.appendChild(curLineDiv);
-				curLineDiv = document.createElement("div");
-			}
-			else {
-				var curTextSpan = document.createElement("span");
-				curTextSpan.classList.add("textboxSpan");
-				curLineDiv.appendChild(curTextSpan);
+					var curTextSpan = document.createElement("span");
+					curTextSpan.classList.add("textboxSpan");
+					curLineDiv.appendChild(curTextSpan);
 
-				// store active effects in the span class list
-				for (var j = 0; j < curTextEffects.length; j++) {
-					curTextSpan.classList.add(curTextEffects[j]);
-				}
-
-				if (node.type === "code_block") {
-					curTextSpan.classList.add("textboxCodeSpan");
-				}
-
-				var nextText = node.Serialize();
-
-				for (var j = 0; j < nextText.length; j++) {
-					var characterSpan = document.createElement("span");
-					characterSpan.classList.add("textboxCharacterSpan");
-					characterSpan.innerText = nextText[j];
-
-					var outerSpan = characterSpan;
-
-					// actually apply effects on a per-character basis
-					for (var k = 0; k < curTextEffects.length; k++) {
-						var effectWrapperSpan = document.createElement("span");
-						effectWrapperSpan.classList.add("textboxCharacterSpan"); // hacky?
-						effectWrapperSpan.style.animationDelay = (-0.25 * curLineDiv.innerText.length) + "s";
-
-						if (curTextEffects[k] === "clr1") {
-							var color = rgbToHex(getPal(curPal())[0][0], getPal(curPal())[0][1], getPal(curPal())[0][2]);
-							effectWrapperSpan.style.color = color;
-						}
-						else if (curTextEffects[k] === "clr2") {
-							var color = rgbToHex(getPal(curPal())[1][0], getPal(curPal())[1][1], getPal(curPal())[1][2]);
-							effectWrapperSpan.style.color = color;
-						}
-						else if (curTextEffects[k] === "clr3") {
-							var color = rgbToHex(getPal(curPal())[2][0], getPal(curPal())[2][1], getPal(curPal())[2][2]);
-							effectWrapperSpan.style.color = color;
-						}
-						else if (curTextEffects[k] === "wvy") {
-							effectWrapperSpan.classList.add("textEffectWvy");
-						}
-						else if (curTextEffects[k] === "shk") {
-							effectWrapperSpan.classList.add("textEffectShk");
-						}
-						else if (curTextEffects[k] === "rbw") {
-							effectWrapperSpan.classList.add("textEffectRbw");
-						}
-
-						effectWrapperSpan.appendChild(outerSpan);
-
-						outerSpan = effectWrapperSpan;
+					// store active effects in the span class list
+					for (var j = 0; j < curTextEffects.length; j++) {
+						curTextSpan.classList.add(curTextEffects[j]);
 					}
 
-					curTextSpan.appendChild(outerSpan);
+					if (node.type === "code_block") {
+						curTextSpan.classList.add("textboxCodeSpan");
+					}
+
+					var nextText = node.Serialize();
+
+					for (var j = 0; j < nextText.length; j++) {
+						var characterSpan = document.createElement("span");
+						characterSpan.classList.add("textboxCharacterSpan");
+						characterSpan.innerText = nextText[j];
+
+						var outerSpan = characterSpan;
+
+						// actually apply effects on a per-character basis
+						for (var k = 0; k < curTextEffects.length; k++) {
+							var effectWrapperSpan = document.createElement("span");
+							effectWrapperSpan.classList.add("textboxCharacterSpan"); // hacky?
+							effectWrapperSpan.style.animationDelay = (-0.25 * curLineDiv.innerText.length) + "s";
+
+							if (curTextEffects[k] === "clr1") {
+								var color = rgbToHex(getPal(curPal())[0][0], getPal(curPal())[0][1], getPal(curPal())[0][2]);
+								effectWrapperSpan.style.color = color;
+							}
+							else if (curTextEffects[k] === "clr2") {
+								var color = rgbToHex(getPal(curPal())[1][0], getPal(curPal())[1][1], getPal(curPal())[1][2]);
+								effectWrapperSpan.style.color = color;
+							}
+							else if (curTextEffects[k] === "clr3") {
+								var color = rgbToHex(getPal(curPal())[2][0], getPal(curPal())[2][1], getPal(curPal())[2][2]);
+								effectWrapperSpan.style.color = color;
+							}
+							else if (curTextEffects[k] === "wvy") {
+								effectWrapperSpan.classList.add("textEffectWvy");
+							}
+							else if (curTextEffects[k] === "shk") {
+								effectWrapperSpan.classList.add("textEffectShk");
+							}
+							else if (curTextEffects[k] === "rbw") {
+								effectWrapperSpan.classList.add("textEffectRbw");
+							}
+
+							effectWrapperSpan.appendChild(outerSpan);
+
+							outerSpan = effectWrapperSpan;
+						}
+
+						curTextSpan.appendChild(outerSpan);
+					}
 				}
 			}
+
+			textboxContentDiv.appendChild(curLineDiv);
+			// end HTML render
+
+			textboxContentDiv.contentEditable = true;
+			textboxContentDiv.spellcheck = false;
+			textboxContentDiv.addEventListener("input", function(e) {
+				console.log(textboxContentDiv.innerText);
+			});
 		}
-
-		textboxContentDiv.appendChild(curLineDiv);
-		// end HTML render
-
-		console.log(dialogNodeList);
-
-		// var dialogText = scriptUtils.SerializeDialogNodeList(dialogNodeList);
-		// var dialogTextSplit = dialogText.split("\n");
-		// for (var i = 0; i < dialogTextSplit.length; i++) {
-		// 	var wrapperDiv = document.createElement("div");
-		// 	wrapperDiv.innerText = dialogTextSplit[i];
-		// 	textboxContentDiv.appendChild(wrapperDiv);	
-		// }
-
-		textboxContentDiv.contentEditable = true;
-		textboxContentDiv.spellcheck = false;
-		textboxContentDiv.addEventListener("input", function(e) {
-			console.log(textboxContentDiv.innerText);
-		});
 
 		// add text effects controls
 		var textEffectsDiv = document.createElement("div");
