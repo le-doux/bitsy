@@ -2301,6 +2301,9 @@ function DialogTool() {
 		}
 	}
 
+	// for rendering item thumbnails
+	var thumbnailRenderer = new ThumbnailRenderer();
+
 	// TODO : put in shared location?
 	var transitionTypes = [
 		{ name:"fade (white)",	id:"fade_w" },
@@ -2363,6 +2366,13 @@ function DialogTool() {
 				}
 				else if (type === "item") {
 					parameterValue.innerText = GetItemNameFromId(curValue);
+
+					var itemThumbnail = document.createElement("img");
+					span.appendChild(itemThumbnail);
+					itemThumbnail.id = "param_item_" + curValue;
+					itemThumbnail.style.width = "16px";
+					itemThumbnail.style.margin = "2px";
+					thumbnailRenderer.Render(itemThumbnail.id, new DrawingId(TileType.Item, curValue), 0, itemThumbnail);
 				}
 				else if (type === "transition") {
 					// TODO : kind of using the loop in a weird way

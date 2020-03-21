@@ -229,6 +229,10 @@
 	width: 50px;
 }
 
+.parameterEditor {
+	display: inline-flex;
+}
+
 .parameterEditor input[type="text"] {
 	width: 50px;
 }
@@ -253,7 +257,7 @@
 }
 
 .parameterUneditable {
-	/*padding: 5px;*/
+	padding: 2px;
 	border-radius: 2px;
 	background: #e8e8ff;
 }
