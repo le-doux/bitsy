@@ -2716,7 +2716,11 @@ function DialogTool() {
 		deleteButton.innerHTML = '<i class="material-icons">clear</i>';
 		deleteButton.style.float = "right";
 		deleteButton.onclick = function() {
-			parentEditor.RemoveChild(editor);
+			editor.GetElement().classList.add("actionEditorDelete");
+			// allow animation to run before deleting the editor for real
+			setTimeout(function() {
+				parentEditor.RemoveChild(editor);
+			}, 250);
 		}
 		div.appendChild(deleteButton);
 
