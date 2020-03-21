@@ -2706,15 +2706,10 @@ function DialogTool() {
 		}
 		div.appendChild(moveDownButton);
 
-		var rightHandButtons = document.createElement("div");
-		rightHandButtons.style.display = "inline-block";
-		rightHandButtons.style.float = "right";
-		div.appendChild(rightHandButtons);
-
-		var customRightHandButtons = document.createElement("div");
-		customRightHandButtons.style.display = "inline-block";
-		// customRightHandButtons.style.marginTop = "4px"; // WHY?????
-		rightHandButtons.appendChild(customRightHandButtons);
+		var customButtonsContainer = document.createElement("div");
+		customButtonsContainer.style.display = "inline-block";
+		customButtonsContainer.style.marginLeft = "5px";
+		div.appendChild(customButtonsContainer);
 
 		var deleteButton = document.createElement("button");
 		// deleteButton.innerText = "delete";
@@ -2723,14 +2718,14 @@ function DialogTool() {
 		deleteButton.onclick = function() {
 			parentEditor.RemoveChild(editor);
 		}
-		rightHandButtons.appendChild(deleteButton);
+		div.appendChild(deleteButton);
 
 		this.GetElement = function() {
 			return div;
 		}
 
 		this.GetCustomControlsContainer = function() {
-			return customRightHandButtons;
+			return customButtonsContainer;
 		}
 
 		editor.ShowOrderControls = function() {
