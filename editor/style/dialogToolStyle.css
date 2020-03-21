@@ -66,6 +66,11 @@
 	border: none;
 }
 
+.conditionalComparisonEditor > .actionEditor.inline {
+	padding-right: 2px;
+	padding-left: 2px;
+}
+
 @keyframes executingLeaveAnimation {
 	from { background: #6767b2; }
 	to { background: white; }	
