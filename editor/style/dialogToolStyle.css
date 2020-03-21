@@ -257,7 +257,7 @@
 }
 
 .parameterUneditable {
-	padding: 2px;
+	/*padding: 2px;*/
 	border-radius: 2px;
 	background: #e8e8ff;
 }

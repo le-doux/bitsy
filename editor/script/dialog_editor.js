@@ -2371,7 +2371,7 @@ function DialogTool() {
 					span.appendChild(itemThumbnail);
 					itemThumbnail.id = "param_item_" + curValue;
 					itemThumbnail.style.width = "16px";
-					itemThumbnail.style.margin = "2px";
+					itemThumbnail.style.marginLeft = "4px";
 					thumbnailRenderer.Render(itemThumbnail.id, new DrawingId(TileType.Item, curValue), 0, itemThumbnail);
 				}
 				else if (type === "transition") {
