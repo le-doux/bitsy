@@ -77,20 +77,14 @@ input[type=text] {
 	border-radius: 4px;
 }
 .panel .bar {
-	padding: 5px;
-	padding-left: 10px;
-	padding-right: 10px;
-	padding-bottom: 2px;
+	padding: 8px;
 	margin: -10px;
 	margin-bottom: 10px;
-	font-size: 125%;
-	line-height: 150%;
+	font-size: 115%;
 	border-radius: 4px 4px 0px 0px;
 }
 .panel .bar .material-icons {
-	line-height: 150%;
 	vertical-align: middle;
-	font-size: 150%;
 }
 .panelShadow {
 	display: inline-block;
