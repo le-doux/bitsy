@@ -478,10 +478,11 @@
 }
 
 .expressionEditorRoot {
-	padding: 2px;
+	padding: 8px;
 	border: solid 1px #ccccff;
 	border-radius: 2px;
 	margin-bottom: 10px;
+	line-height: 100%; /* hacks upon hacks */
 }
 
 .expressionBuilderInputs {
