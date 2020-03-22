@@ -2024,6 +2024,8 @@ function DialogTool() {
 		}
 	};
 
+	var isHelpTextOn = true;
+
 	function FunctionEditor(node, parentEditor, isInline) {
 		if (isInline === undefined || isInline === null) {
 			isInline = false;
@@ -2062,6 +2064,7 @@ function DialogTool() {
 		var addParameterDiv = null;
 		var helpTextDiv = null;
 		var helpTextContent = null;
+		var hasHelpText = false;
 
 		var editParameterTypes = false;
 		var toggleParameterTypesButton = document.createElement("button");
@@ -2095,8 +2098,33 @@ function DialogTool() {
 			helpTextContent.classList.add("helpTextContent");
 			helpTextDiv.appendChild(helpTextContent);
 
+			var helpText = functionDescriptionMap[functionNode.name].helpText;
+			hasHelpText = helpText != undefined && helpText != null;
+			if (hasHelpText) {
+				helpTextContent.innerText = helpText;
+			}
+
+			var toggleHelpButton = document.createElement("button");
+			toggleHelpButton.title = "turn bitsy cat help on/off";
+			toggleHelpButton.innerHTML = '<i class="material-icons">help</i>';
+			toggleHelpButton.onclick = function() {
+				isHelpTextOn = !isHelpTextOn;
+
+				// hacky
+				if (hasHelpText && isHelpTextOn) {
+					helpTextDiv.style.display = "flex";
+				}
+				else {
+					helpTextDiv.style.display = "none";
+				}
+			}
+
 			var customControls = orderControls.GetCustomControlsContainer();
 			customControls.appendChild(toggleParameterTypesButton);
+
+			if (hasHelpText) {
+				customControls.appendChild(toggleHelpButton);
+			}
 		}
 
 		// TODO : populate default values!!
@@ -2192,11 +2220,8 @@ function DialogTool() {
 					}
 				}
 
-				var helpText = functionDescriptionMap[functionNode.name].helpText;
-				var hasHelpText = helpText != undefined && helpText != null;
-				if (isEditable && hasHelpText) {
+				if (isEditable && hasHelpText && isHelpTextOn) {
 					helpTextDiv.style.display = "flex";
-					helpTextContent.innerText = helpText;
 				}
 				else {
 					helpTextDiv.style.display = "none";
