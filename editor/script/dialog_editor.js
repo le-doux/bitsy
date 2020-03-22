@@ -99,6 +99,20 @@ function DialogTool() {
 		}
 	}
 
+	// find (non-inline) non-dialog code in a script
+	function FindCodeVisitor() {
+		var foundCode = false;
+		this.FoundCode = function() {
+			return foundCode;
+		}
+
+		this.Visit = function(node) {
+			if (node.type === "code_block" && !scriptUtils.IsInlineCode(node)) {
+				foundCode = true;
+			}
+		}
+	}
+
 	// TODO : label should be label localization id
 	function DialogWidget(label, dialogId, allowNone, onChange, creationOptions) {
 		var showSettings = false;
@@ -141,6 +155,8 @@ function DialogTool() {
 			if (dialogId != null || (creationOptions && creationOptions.CreateFromEmptyTextBox)) {
 				scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
 				editorDiv.appendChild(scriptEditor.GetElement());
+
+				CheckForComplexCodeInDialog();
 			}
 			else if (creationOptions.Presets) {
 				function CreatePresetHandler(scriptStr) {
@@ -166,7 +182,7 @@ function DialogTool() {
 				}
 			}
 		}
-		UpdateEditorContent();
+
 		editorDiv.style.display = "flex";
 		div.appendChild(editorDiv);
 
@@ -205,7 +221,10 @@ function DialogTool() {
 				dialogIdSelect.appendChild(dialogIdOption);
 			}
 		}
+
 		UpdateDialogIdSelectOptions();
+		UpdateEditorContent();
+		
 		events.Listen("new_dialog", function() { UpdateDialogIdSelectOptions(); });
 		events.Listen("dialog_update", function(event) {
 			if (scriptEditor != null && event.editorId == scriptEditor.GetEditorId()) {
@@ -218,11 +237,23 @@ function DialogTool() {
 			}
 		})
 
-		settingsButton.onclick = function() {
-			showSettings = !showSettings;
+		function ChangeSettingsVisibility(visible) {
+			showSettings = visible;
 			settingsButton.innerHTML = '<i class="material-icons">' + (showSettings ? "text_fields" : "settings") + '</i>';
 			editorDiv.style.display = showSettings ? "none" : "flex";
 			dialogIdSelect.style.display = showSettings ? "flex" : "none";
+		}
+
+		settingsButton.onclick = function() {
+			ChangeSettingsVisibility(!showSettings);
+		}
+
+		function CheckForComplexCodeInDialog() {
+			var codeVisitor = new FindCodeVisitor();
+			scriptEditor.GetNode().VisitAll(codeVisitor);
+			if (codeVisitor.FoundCode()) {
+				ChangeSettingsVisibility(true);
+			}
 		}
 
 		this.GetElement = function() {

@@ -321,6 +321,10 @@ var Utils = function() {
 	this.GetOperatorList = function() {
 		return [Sym.Set].concat(Sym.Operators);
 	}
+
+	this.IsInlineCode = function(node) {
+		return isInlineCode(node);
+	}
 }
 
 
