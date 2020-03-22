@@ -8,6 +8,7 @@ v6.5:
 -- @aloelazoe fixed a bug when adding new items
 - localization:
 -- Chinook language translation by sequoia edwards
+-- Japanese language translation by Tokoro
 
 v6.4:
 - importing games from HTML works again

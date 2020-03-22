@@ -48,3 +48,5 @@ Ray Song - Chinese translation
 sequoia edwards - Chinook translation
 
 Török Ádám - Hungarian translation
+
+Tokoro - Japanese translation
