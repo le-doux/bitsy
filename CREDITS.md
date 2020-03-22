@@ -45,7 +45,7 @@ Ray Song - Chinese translation
 
 @scumslug - Estonian translation
 
-sequoia edwards - Chinook translation
+Sequoia Edwards - Chinook translation
 
 Török Ádám - Hungarian translation
 

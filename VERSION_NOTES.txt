@@ -7,7 +7,7 @@ v6.5:
 -- @ayolland fixed touch controls in iOS
 -- @aloelazoe fixed a bug when adding new items
 - localization:
--- Chinook language translation by sequoia edwards
+-- Chinook language translation by Sequoia Edwards
 -- Japanese language translation by Tokoro
 
 v6.4:
