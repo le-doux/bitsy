@@ -2061,6 +2061,7 @@ function DialogTool() {
 		var customCommandsDiv = null;
 		var addParameterDiv = null;
 		var helpTextDiv = null;
+		var helpTextContent = null;
 
 		var editParameterTypes = false;
 		var toggleParameterTypesButton = document.createElement("button");
@@ -2081,7 +2082,18 @@ function DialogTool() {
 			div.appendChild(addParameterDiv);
 
 			helpTextDiv = document.createElement("div");
+			helpTextDiv.classList.add("helpText");
+			helpTextDiv.style.display = "none";
 			div.appendChild(helpTextDiv);
+			var helpTextImgHolder = document.createElement("div");
+			helpTextImgHolder.classList.add("helpTextImg");
+			helpTextDiv.appendChild(helpTextImgHolder);
+			var catImg = document.createElement("img");
+			catImg.src = "image/cat.svg";
+			helpTextImgHolder.appendChild(catImg);
+			helpTextContent = document.createElement("div");
+			helpTextContent.classList.add("helpTextContent");
+			helpTextDiv.appendChild(helpTextContent);
 
 			var customControls = orderControls.GetCustomControlsContainer();
 			customControls.appendChild(toggleParameterTypesButton);
@@ -2180,14 +2192,14 @@ function DialogTool() {
 					}
 				}
 
-				helpTextDiv.innerText = "";
-				helpTextDiv.classList.remove("helpText");
-				if (isEditable) {
-					var helpText = functionDescriptionMap[functionNode.name].helpText;
-					if (helpText != undefined && helpText != null) {
-						helpTextDiv.innerText = helpText;
-						helpTextDiv.classList.add("helpText");
-					}
+				var helpText = functionDescriptionMap[functionNode.name].helpText;
+				var hasHelpText = helpText != undefined && helpText != null;
+				if (isEditable && hasHelpText) {
+					helpTextDiv.style.display = "flex";
+					helpTextContent.innerText = helpText;
+				}
+				else {
+					helpTextDiv.style.display = "none";
 				}
 			}
 		}

@@ -280,6 +280,15 @@
 	border-radius: 2px;
 }
 
+.helpTextImg img {
+	width: 36px;
+}
+
+.helpTextContent {
+	flex-grow: 1;
+	margin-left: 10px;
+}
+
 /* dialog box */
 .dialogBoxContainer {
 	background: black;
