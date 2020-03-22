@@ -1307,6 +1307,10 @@ function DialogTool() {
 		}
 	}
 
+	// hacky to duplicate these here!
+	var comparisonOperators = ["==", ">=", "<=", ">", "<"];
+	var mathOperators =["-", "+", "/", "*"];
+
 	function ExpressionOperatorEditor(operatorNode, parentEditor, isEditable) {
 		var operatorSpan = document.createElement("span");
 		operatorSpan.style.marginLeft = "5px";
@@ -1315,10 +1319,12 @@ function DialogTool() {
 		function CreateOperatorControl(isEditable) {
 			operatorSpan.innerHTML = "";
 
-			if (isEditable) {
+			// the set operator '=' shouldn't be randomly exchanged with comparison operators!
+			if (isEditable && !(operatorNode.operator === '=')) {
 				var operatorSelect = document.createElement("select");
 
-				var operatorList = scriptUtils.GetOperatorList();
+				// use either the comparison operators or the math operators
+				var operatorList = comparisonOperators.indexOf(operatorNode.operator) >= 0 ? comparisonOperators : mathOperators;
 				for (var i = 0; i < operatorList.length; i++) {
 					var operatorOption = document.createElement("option");
 					operatorOption.value = operatorList[i];
