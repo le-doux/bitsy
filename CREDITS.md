@@ -1,6 +1,14 @@
 **Engine and Editor Development**
 
-Adam Le Doux
+Adam Le Doux - Project Lead
+
+@aloelazoe - Contributor
+
+@ayolland - Contributor
+
+@ragzouken - Contributor
+
+@zachThePerson - Contributor
 
 
 **Localization**
@@ -36,5 +44,7 @@ Peter Februar - French translation
 Ray Song - Chinese translation
 
 @scumslug - Estonian translation
+
+sequoia edwards - Chinook translation
 
 Török Ádám - Hungarian translation
