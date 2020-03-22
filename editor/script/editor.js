@@ -3229,7 +3229,7 @@ function pickDefaultFontForLanguage(lang) {
 	else if (lang === "ar") {
 		switchFont("arabic", true /*doPickTextDirection*/);
 	}
-	else if (lang === "zh") {
+	else if (lang === "zh" || lang === "ja") {
 		switchFont("unicode_asian", true /*doPickTextDirection*/);
 	}
 	else {
