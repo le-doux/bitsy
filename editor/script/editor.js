@@ -321,7 +321,11 @@ var dialogTool = new DialogTool();
 var curDialogEditorId = null; // can I wrap this all up somewhere? -- feels a bit hacky to have all these globals
 var curDialogEditor = null;
 var curPlaintextDialogEditor = null; // the duplication is a bit weird, but better than recreating editors all the time?
-function openDialogTool(dialogId) {
+function openDialogTool(dialogId, forceOpen) {
+	if (forceOpen === undefined || forceOpen === null) {
+		forceOpen = true;
+	}
+
 	var showCode = document.getElementById("dialogShowCodeCheck").checked;
 
 	curDialogEditorId = dialogId;
@@ -353,7 +357,7 @@ function openDialogTool(dialogId) {
 		}
 	}
 
-	if (document.getElementById("dialogPanel").style.display === "none") {
+	if (document.getElementById("dialogPanel").style.display === "none" && forceOpen) {
 		showPanel("dialogPanel");
 	}
 }
@@ -392,6 +396,8 @@ function nextDialog() {
 	}
 
 	openDialogTool(id);
+
+	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
 }
 
 function prevDialog() {
@@ -421,6 +427,8 @@ function prevDialog() {
 	console.log("PREV DIALOG " + id);
 
 	openDialogTool(id);
+
+	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
 }
 
 function addNewDialog() {
@@ -432,6 +440,8 @@ function addNewDialog() {
 	openDialogTool(id);
 
 	events.Raise("new_dialog", { id:id });
+
+	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
 }
 
 function duplicateDialog() {
@@ -441,6 +451,8 @@ function duplicateDialog() {
 		refreshGameData();
 
 		openDialogTool(id);
+
+		alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
 	}
 }
 
@@ -454,6 +466,8 @@ function deleteDialog() {
 		refreshGameData();
 
 		// TODO -- remove all references to deleted dialog
+
+		alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
 	}
 }
 
@@ -488,6 +502,10 @@ function reloadDialogUI() {
 			},
 		});
 	dialogContent.appendChild(dialogWidget.GetElement());
+
+	if (alwaysShowDrawingDialog && dialog[obj.dlg]) {
+		openDialogTool(obj.dlg, false);
+	}
 }
 
 // hacky - assumes global paintTool object
@@ -962,6 +980,7 @@ function start() {
 
 	// prepare dialog tool
 	openDialogTool(titleDialogId); // start with the title open
+	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked;
 
 	initLanguageOptions();
 }
@@ -3224,6 +3243,18 @@ function toggleDialogCode(e) {
 	}
 	else {
 		dialogEditorViewport.appendChild(curDialogEditor.GetElement());
+	}
+}
+
+var alwaysShowDrawingDialog = true;
+function toggleAlwaysShowDrawingDialog(e) {
+	alwaysShowDrawingDialog = e.target.checked;
+
+	if (alwaysShowDrawingDialog) {
+		var dlg = getCurDialogId();
+		if (dialog[dlg]) {
+			openDialogTool(dlg, false);
+		}
 	}
 }
 

@@ -50,6 +50,7 @@ function DialogTool() {
 		openButton.innerHTML = '<i class="material-icons">open_in_new</i>';
 		openButton.onclick = function() {
 			openDialogTool(titleDialogId);
+			alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
 		}
 		div.appendChild(openButton);
 
@@ -123,6 +124,12 @@ function DialogTool() {
 		openButton.innerHTML = '<i class="material-icons">open_in_new</i>';
 		openButton.onclick = function() {
 			openDialogTool(dialogId);
+
+			// hacky global state!
+			if (dialog[getCurDialogId()] && dialogId != getCurDialogId()) {
+				// disable always on mode when you open up exit or ending dialog!
+				alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
+			}
 		};
 		controlDiv.appendChild(openButton);
 
