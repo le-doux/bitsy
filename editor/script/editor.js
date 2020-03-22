@@ -3216,9 +3216,6 @@ function toggleDialogCode(e) {
 	document.getElementById("dialogToggleCodeShowText").style.display = showCode ? "none" : "inline";
 	document.getElementById("dialogToggleCodeHideText").style.display = showCode ? "inline" : "none";
 
-	// toggle dialog tools
-	document.getElementById("dialogTools").style.display = showCode ? "none" : "block";
-
 	// update editor
 	var dialogEditorViewport = document.getElementById("dialogEditor");
 	dialogEditorViewport.innerHTML = "";

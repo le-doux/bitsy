@@ -1877,7 +1877,12 @@ function DialogTool() {
 		}
 
 		this.GetNodes = function() {
-			return conditionExpressionEditor.GetNodes();
+			if (conditionNode.type === "else") {
+				return [conditionNode];
+			}
+			else {
+				return conditionExpressionEditor.GetNodes();
+			}
 		}
 
 		this.UpdateIndex = function(i) {
