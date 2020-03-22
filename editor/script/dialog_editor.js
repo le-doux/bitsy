@@ -3016,9 +3016,13 @@ function DialogTool() {
 		var clearButton = document.createElement("button");
 		clearButton.innerText = "AC"; // TODO : localize
 		clearButton.onclick = function() {
-			var expressionString = "";
-			expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
-			ResetExpressionDiv();
+			expressionDiv.classList.add("expressionBuilderClearShake");
+			setTimeout(function() {
+				expressionDiv.classList.remove("expressionBuilderClearShake");
+				var expressionString = "";
+				expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
+				ResetExpressionDiv();
+			}, 210);
 		}
 		backInputDiv.appendChild(clearButton);
 
@@ -3173,17 +3177,24 @@ function DialogTool() {
 
 		var cancelButton = document.createElement("button");
 		cancelButton.style.flexGrow = "1";
-		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " cancel";
-		cancelButton.onclick = onCancelHandler;
+		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " cancel"; // todo : localize
+		cancelButton.onclick = function() {
+			div.classList.add("expressionBuilderCancel");
+			setTimeout(onCancelHandler, 250);
+		};
 		finishControlsRoot.appendChild(cancelButton);
 
 		var acceptButton = document.createElement("button");
 		acceptButton.style.flexGrow = "2";
-		acceptButton.innerHTML = '<i class="material-icons">check_circle</i>' + " keep";
+		acceptButton.innerHTML = '<i class="material-icons">check_circle</i>' + " save"; // todo : localize
 		acceptButton.classList.add("reverseColors");
 		acceptButton.onclick = function() {
-			TryAddCurrentNumberToExpression();
-			onAcceptHandler(expressionRootNode);
+			acceptButton.classList.add("expressionBuilderSaveFlash");
+			div.classList.add("expressionBuilderSave");
+			setTimeout(function() {
+				TryAddCurrentNumberToExpression();
+				onAcceptHandler(expressionRootNode);				
+			}, 750);
 		}
 		finishControlsRoot.appendChild(acceptButton);
 

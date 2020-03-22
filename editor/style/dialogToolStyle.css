@@ -413,10 +413,29 @@
 }
 
 /* expression builder styles */
-@keyframes expressionBuilderOpenBounce {
-	0% { padding:10px; padding-bottom: 10px; }
-	50% { padding:2px; padding-bottom: 18px; }
-	100% { padding:10px; padding-bottom: 10px; }
+@keyframes expressionBuilderEnter {
+	0% { margin-top: 10px; opacity: 0; }
+	100% { margin-top: 0px; opacity: 1; }
+}
+
+@keyframes expressionBuilderExit {
+	0% { margin-top: 0px; opacity: 1; }
+	100% { margin-top: 10px; opacity: 0; }
+}
+
+@keyframes expressionBuilderSaveFlash {
+	0% { color:white; background:#6767b2; }
+	50% { color:#6767b2; background:white; }
+	100% { color:white; background:#6767b2; }
+}
+
+@keyframes expressionBuilderClearShake {
+	0% { transform:translate(5px,0px); }
+	20% { transform:translate(3px,5px); }
+	40% { transform:translate(0px,4px); }
+	60% { transform:translate(-5px,-3px); }
+	80% { transform:translate(-2px,5px); }
+	100% { transform:translate(0px,0px); }
 }
 
 .dialogExpressionBuilderHolder {
@@ -426,14 +445,36 @@
 	border-radius: 2px;
 	margin-bottom: 10px;
 	height: 450px;
-
-	animation-name: expressionBuilderOpenBounce;
-	animation-duration: 0.25s;
 }
 
 .expressionBuilder {
 	background: white;
 	padding: 15px;
+
+	animation-name: expressionBuilderEnter;
+	animation-duration: 0.25s;
+}
+
+.expressionBuilderCancel {
+	animation-name: expressionBuilderExit;
+	animation-duration: 0.25s;
+}
+
+.expressionBuilderSave {
+	animation-name: expressionBuilderExit;
+	animation-delay: 0.5s;
+	animation-duration: 0.25s;
+}
+
+.expressionBuilderSaveFlash {
+	animation-name: expressionBuilderSaveFlash;
+	animation-duration: 0.2s;
+	animation-iteration-count: 2;
+}
+
+.expressionBuilderClearShake {
+	animation-name: expressionBuilderClearShake;
+	animation-duration: 0.2s;
 }
 
 .expressionEditorRoot {
