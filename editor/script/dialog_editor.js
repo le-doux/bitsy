@@ -752,7 +752,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"flow",
-				"conditional",
+				"branching",
 				function() {
 					var node = scriptUtils.CreateIfBlock();
 					var editor = new ConditionalEditor(node, parentEditor);
@@ -1630,12 +1630,12 @@ function DialogTool() {
 
 		var titleDiv = document.createElement("div");
 		titleDiv.classList.add("actionTitle");
-		titleDiv.innerText = "conditional"; // TODO : localize
+		titleDiv.innerText = "branching"; // TODO : localize
 		div.appendChild(titleDiv);
 
 		var descriptionDiv = document.createElement("div");
 		descriptionDiv.classList.add("sequenceDescription"); // hack
-		descriptionDiv.innerText = "go to the first item whose condition is true:"; // TODO : localize
+		descriptionDiv.innerText = "go to the first branch whose condition is true:"; // TODO : localize
 		div.appendChild(descriptionDiv);
 
 		var optionRootDiv = document.createElement("div");
@@ -1648,7 +1648,7 @@ function DialogTool() {
 		div.appendChild(addConditionRootDiv);
 
 		var addButton = document.createElement("button");
-		addButton.innerHTML = '<i class="material-icons">add</i>' + "add condition";
+		addButton.innerHTML = '<i class="material-icons">add</i>' + "add branch";
 		addButton.onclick = function() {
 			addButton.style.display = "none";
 			addItemCondition.style.display = "block";
@@ -1659,7 +1659,7 @@ function DialogTool() {
 		addConditionRootDiv.appendChild(addButton);
 
 		var addItemCondition = document.createElement("button");
-		addItemCondition.innerHTML = '<i class="material-icons">add</i>' + "item condition";
+		addItemCondition.innerHTML = '<i class="material-icons">add</i>' + "item branch";
 		addItemCondition.style.display = "none";
 		addItemCondition.onclick = function() {
 			var conditionPairNode = scriptUtils.CreateItemConditionPair();
@@ -1679,7 +1679,7 @@ function DialogTool() {
 		addConditionRootDiv.appendChild(addItemCondition);
 
 		var addVariableCondition = document.createElement("button");
-		addVariableCondition.innerHTML = '<i class="material-icons">add</i>' + "variable condition";
+		addVariableCondition.innerHTML = '<i class="material-icons">add</i>' + "variable branch";
 		addVariableCondition.style.display = "none";
 		addVariableCondition.onclick = function() {
 			var conditionPairNode = scriptUtils.CreateVariableConditionPair();
@@ -1699,7 +1699,7 @@ function DialogTool() {
 		addConditionRootDiv.appendChild(addVariableCondition);
 
 		var addDefaultCondition = document.createElement("button");
-		addDefaultCondition.innerHTML = '<i class="material-icons">add</i>' + "default condition";
+		addDefaultCondition.innerHTML = '<i class="material-icons">add</i>' + "default branch";
 		addDefaultCondition.style.display = "none";
 		addDefaultCondition.onclick = function() {
 			var conditionPairNode = scriptUtils.CreateDefaultConditionPair();
