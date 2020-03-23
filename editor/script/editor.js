@@ -304,13 +304,33 @@ function mobileOffsetCorrection(off,e,innerSize) {
 	return off;
 }
 
+// todo : seems like this could be used several places...
+// todo : localize
+function tileTypeToString(type) {
+	if (type == TileType.Tile) {
+		return "tile";
+	}
+	else if (type == TileType.Sprite) {
+		return "sprite";
+	}
+	else if (type == TileType.Avatar) {
+		return "avatar";
+	}
+	else if (type == TileType.Item) {
+		return "item";
+	}
+}
+
 function tileTypeToIdPrefix(type) {
-	if( type == TileType.Tile )
+	if (type == TileType.Tile) {
 		return "TIL_";
-	else if( type == TileType.Sprite || type == TileType.Avatar )
+	}
+	else if (type == TileType.Sprite || type == TileType.Avatar) {
 		return "SPR_";
-	else if( type == TileType.Item )
+	}
+	else if (type == TileType.Item) {
 		return "ITM_";
+	}
 }
 
 /* DIALOG UI 
@@ -500,6 +520,11 @@ function reloadDialogUI() {
 				obj.dlg = id;
 				refreshGameData();
 			},
+			GetDefaultName: function() {
+				var desc = paintTool.drawing.getNameOrDescription();
+				console.log("DEFAULT NAME " + desc);
+				return desc + " dialog";
+			}, // todo : localize
 		});
 	dialogContent.appendChild(dialogWidget.GetElement());
 
@@ -1045,6 +1070,9 @@ function on_drawing_name_change() {
 		obj.name = str;
 	else
 		obj.name = null;
+
+	console.log("NEW NAME!");
+	console.log(obj);
 
 	updateNamesFromCurData()
 

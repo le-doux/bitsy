@@ -153,7 +153,8 @@ function DialogTool() {
 			editorDiv.innerHTML = "";
 
 			if (dialogId != null || (creationOptions && creationOptions.CreateFromEmptyTextBox)) {
-				scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea");
+				var defaultDialogNameFunc = creationOptions && creationOptions.GetDefaultName ? creationOptions.GetDefaultName : null;
+				scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea", defaultDialogNameFunc);
 				editorDiv.appendChild(scriptEditor.GetElement());
 
 				CheckForComplexCodeInDialog();
@@ -263,7 +264,11 @@ function DialogTool() {
 
 	var dialogScriptEditorUniqueIdCounter = 0;
 
-	function PlaintextDialogScriptEditor(dialogId, style) {
+	function PlaintextDialogScriptEditor(dialogId, style, defaultDialogNameFunc) {
+		if (defaultDialogNameFunc === undefined) {
+			defaultDialogNameFunc = null; // just to be safe
+		}
+
 		var editorId = dialogScriptEditorUniqueIdCounter;
 		dialogScriptEditorUniqueIdCounter++;
 
@@ -307,6 +312,7 @@ function DialogTool() {
 			var didMakeNewDialog = false;
 			if (dialogStr.length > 0 && dialogId === null) {
 				dialogId = nextAvailableDialogId();
+				dialog[dialogId] = { src: "", name: defaultDialogNameFunc ? defaultDialogNameFunc() : null }; // init new dialog
 				didMakeNewDialog = true;
 			}
 
