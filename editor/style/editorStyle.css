@@ -85,6 +85,8 @@ input[type=text] {
 }
 .panel .bar .material-icons {
 	vertical-align: middle;
+	font-size: 110%;
+	margin-top: -0.5%; /* hack to nudge the icon to better align with the title of the panel */
 }
 .panelShadow {
 	display: inline-block;

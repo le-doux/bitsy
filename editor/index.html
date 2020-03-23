@@ -309,14 +309,15 @@
 					<canvas id="game"></canvas>
 
 					<div style="display: flex;">
-						<div id="roomColor" class="buttonGroup controlBox">
+						<!-- these three have hacky extra styles attached -->
+						<div id="roomColor" class="buttonGroup controlBox" style="margin-bottom: 0px; padding: 2px;">
 							<span class="localize palette_tool_name">colors</span>: 
 							<select title="select color palette for room" id="roomPaletteSelect" onchange="roomPaletteChange(event);">
 								<option value="0">palette 0</option> <!-- other options are added dynamically -->
 							</select>
 						</div>
 
-						<div id="roomMarkers" class="buttonGroup controlBox">
+						<div id="roomMarkers" class="buttonGroup controlBox" style="margin-bottom: 0px; padding: 2px;">
 							<span class="localize marker_tool_name">exits & endings</span>:
 
 							<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
@@ -328,7 +329,7 @@
 							</button>
 						</div>
 
-						<div id="roomVisibility" class="buttonGroup controlBox" style="flex-grow: 1">
+						<div id="roomVisibility" class="buttonGroup controlBox" style="flex-grow: 1; margin-bottom: 0px; padding: 2px;">
 							<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
 							<label title="show / hide grid" for="roomGridCheck">
 								<i class="material-icons" id="roomGridIcon">visibility</i> 
