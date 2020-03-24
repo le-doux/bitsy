@@ -160,10 +160,13 @@ function DialogTool() {
 				CheckForComplexCodeInDialog();
 			}
 			else if (creationOptions.Presets) {
-				function CreatePresetHandler(scriptStr) {
+				function CreatePresetHandler(scriptStr, getDefaultNameFunc) {
 					return function() {
 						dialogId = nextAvailableDialogId();
-						dialog[dialogId] = { src:scriptStr, name:null }; // TODO: I really need a standard way to init dialogs now!
+						dialog[dialogId] = {
+							src: scriptStr,
+							name: (getDefaultNameFunc ? getDefaultNameFunc() : null),
+						}; // TODO: I really need a standard way to init dialogs now!
 						events.Raise("new_dialog", {id:dialogId});
 						// TODO replace OnCreateNewDialog with OnCHange!!!!
 						if (creationOptions.OnCreateNewDialog) {
@@ -178,7 +181,7 @@ function DialogTool() {
 					var presetButton = document.createElement("button");
 					presetButton.style.flexGrow = 1; // TODO : style?
 					presetButton.innerHTML = '<i class="material-icons">add</i>' + preset.Name;
-					presetButton.onclick = CreatePresetHandler(preset.Script);
+					presetButton.onclick = CreatePresetHandler(preset.Script, preset.GetDefaultName);
 					editorDiv.appendChild(presetButton);
 				}
 			}
@@ -234,6 +237,13 @@ function DialogTool() {
 					if (creationOptions.OnCreateNewDialog) {
 						creationOptions.OnCreateNewDialog(dialogId);
 					}
+				}
+			}
+			else if (scriptEditor != null && event.editorId != scriptEditor.GetEditorId()) {
+				// if we get an update from a linked editor saying this dialog
+				// is now complex, switch to the select view
+				if (dialogId != null && dialogId === event.dialogId) {
+					CheckForComplexCodeInDialog();
 				}
 			}
 		})

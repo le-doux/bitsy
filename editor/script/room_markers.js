@@ -392,6 +392,22 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 					{
 						Name:	"add narration",
 						Script:	"You walk through the doorway",
+						GetDefaultName: function() { // TODO : it's silly to have this at the preset level AND the top level
+							var defaultNamePrefix = "exit narration ";
+							var narrationCount = 0;
+							for (id in dialog) {
+								if (dialog[id].name) {
+									if (dialog[id].name.indexOf(defaultNamePrefix) === 0) {
+										var narrationCountStr = dialog[id].name.slice(defaultNamePrefix.length);
+										var narrationCountInt = parseInt(narrationCountStr);
+										if (!isNaN(narrationCountInt) && narrationCountInt > narrationCount) {
+											narrationCount = narrationCountInt;
+										}
+									}
+								}
+							}
+							return defaultNamePrefix + (narrationCount + 1);
+						},
 					},
 					{
 						Name:	"add lock",
@@ -401,6 +417,22 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 								'    {lock}\n' +
 								'}\n' +
 								'"""',
+						GetDefaultName: function() { // TODO : copy and paste :(
+							var defaultNamePrefix = "locked exit ";
+							var narrationCount = 0;
+							for (id in dialog) {
+								if (dialog[id].name) {
+									if (dialog[id].name.indexOf(defaultNamePrefix) === 0) {
+										var narrationCountStr = dialog[id].name.slice(defaultNamePrefix.length);
+										var narrationCountInt = parseInt(narrationCountStr);
+										if (!isNaN(narrationCountInt) && narrationCountInt > narrationCount) {
+											narrationCount = narrationCountInt;
+										}
+									}
+								}
+							}
+							return defaultNamePrefix + (narrationCount + 1);
+						},
 					},
 				],
 			});

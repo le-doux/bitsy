@@ -38,33 +38,25 @@ var names = {
 	tile : new Map(), // Note: Not currently enabled in the UI
 	sprite : new Map(),
 	item : new Map(),
-	/*dialog : new Map()*/ // TODO
+	dialog : new Map(),
 };
 function updateNamesFromCurData() {
-	names.room = new Map();
-	for(id in room) {
-		if(room[id].name != undefined && room[id].name != null) {
-			names.room.set( room[id].name, id );
+
+	function createNameMap(objectStore) {
+		var map = new Map();
+		for (id in objectStore) {
+			if (objectStore[id].name != undefined && objectStore[id].name != null) {
+				map.set(objectStore[id].name, id);
+			}
 		}
+		return map;
 	}
-	names.tile = new Map();
-	for(id in tile) {
-		if(tile[id].name != undefined && tile[id].name != null) {
-			names.tile.set( tile[id].name, id );
-		}
-	}
-	names.sprite = new Map();
-	for(id in sprite) {
-		if(sprite[id].name != undefined && sprite[id].name != null) {
-			names.sprite.set( sprite[id].name, id );
-		}
-	}
-	names.item = new Map();
-	for(id in item) {
-		if(item[id].name != undefined && item[id].name != null) {
-			names.item.set( item[id].name, id );
-		}
-	}
+
+	names.room = createNameMap(room);
+	names.tile = createNameMap(tile);
+	names.sprite = createNameMap(sprite);
+	names.item = createNameMap(item);
+	names.dialog = createNameMap(dialog);
 }
 
 var spriteStartLocations = {};
@@ -111,11 +103,13 @@ function clearGameData() {
 
 	spriteStartLocations = {};
 
+	// hacky to have this multiple times...
 	names = {
 		room : new Map(),
 		tile : new Map(),
 		sprite : new Map(),
-		item : new Map()
+		item : new Map(),
+		dialog : new Map(),
 	};
 
 	fontName = defaultFontName; // TODO : reset font manager too?
@@ -1829,6 +1823,7 @@ function parseDialog(lines, i, versionNumber) {
 	// TODO: DESIGN DECISION --- should spaces be allowed in dialog names?
 	if (lines[i].length > 0 && getType(lines[i]) === "NAME") {
 		dialog[id].name = lines[i].split(/\s(.+)/)[1]; // TODO : hacky to keep copying this regex around...
+		names.dialog.set(dialog[id].name, id);
 		i++;
 	}
 
