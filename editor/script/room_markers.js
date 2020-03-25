@@ -403,7 +403,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 						Name:	"add lock",
 						Script:	'"""\n' +
 								'{\n' +
-								'  - {item "0"} < 1 ?\n' +
+								'  - {item "1"} >= 1 ?\n' +
+								'    The key opens the door!\n' +
+								'  - else ?\n' +
+								'    The door is locked...\n' +
 								'    {lock}\n' +
 								'}\n' +
 								'"""',
