@@ -1820,7 +1820,6 @@ function parseDialog(lines, i, versionNumber) {
 
 	i = parseScript(lines, i, "", versionNumber);
 
-	// TODO: DESIGN DECISION --- should spaces be allowed in dialog names?
 	if (lines[i].length > 0 && getType(lines[i]) === "NAME") {
 		dialog[id].name = lines[i].split(/\s(.+)/)[1]; // TODO : hacky to keep copying this regex around...
 		names.dialog.set(dialog[id].name, id);

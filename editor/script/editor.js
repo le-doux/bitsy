@@ -564,11 +564,11 @@ function resetGameData() {
 	setTitle(localization.GetStringOrFallback("default_title", "Write your game's title here"));
 	dialog["0"] = {
 		src: localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"), // hacky to do this in two places :(
-		name: null,
+		name: "cat dialog", // todo : localize
 	};
 	dialog["1"] = {
 		src: localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea"),
-		name: null,
+		name: "tea dialog", // todo : localize
 	};
 
 	pickDefaultFontForLanguage(localization.GetLanguage());
