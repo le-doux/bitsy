@@ -3506,6 +3506,23 @@ function updateTextDirectionSelectUI() {
 	}
 }
 
+/* UTILS (todo : move into utils.js after merge) */
+function CreateDefaultName(defaultNamePrefix, objectStore) {
+	var nameCount = 0;
+	for (id in objectStore) {
+		if (objectStore[id].name) {
+			if (objectStore[id].name.indexOf(defaultNamePrefix) === 0) {
+				var nameCountStr = objectStore[id].name.slice(defaultNamePrefix.length);
+				var nameCountInt = parseInt(nameCountStr);
+				if (!isNaN(nameCountInt) && nameCountInt > nameCount) {
+					nameCount = nameCountInt;
+				}
+			}
+		}
+	}
+	return defaultNamePrefix + (nameCount + 1);
+}
+
 /* DOCS */
 function toggleDialogDocs(e) {
 	console.log("SHOW DOCS");
