@@ -8,6 +8,7 @@ PAL 0
 0,82,204
 128,159,255
 255,255,255
+NAME blueprint
 
 ROOM 0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -27,6 +28,7 @@ ROOM 0
 0,a,a,a,a,a,a,a,a,a,a,a,a,a,a,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 PAL 0
+NAME example room
 
 TIL a
 11111111
@@ -37,6 +39,7 @@ TIL a
 10000001
 10000001
 11111111
+NAME block
 
 SPR A
 00011000
@@ -76,9 +79,11 @@ DLG 1
 
 DLG 0
 I'm a cat
+NAME cat dialog
 
 DLG 1
 You found a nice warm cup of tea
+NAME tea dialog
 
 VAR a
 42
