@@ -5,10 +5,10 @@ Write your game's title here
 ! ROOM_FORMAT 1
 
 PAL 0
+NAME blueprint
 0,82,204
 128,159,255
 255,255,255
-NAME blueprint
 
 ROOM 0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -27,8 +27,8 @@ ROOM 0
 0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
 0,a,a,a,a,a,a,a,a,a,a,a,a,a,a,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-PAL 0
 NAME example room
+PAL 0
 
 TIL a
 11111111
@@ -77,6 +77,18 @@ ITM 0
 NAME tea
 DLG 1
 
+ITM 1
+00000000
+00111100
+00100100
+00111100
+00010000
+00011000
+00010000
+00011000
+NAME key
+DLG 2
+
 DLG 0
 I'm a cat
 NAME cat dialog
@@ -84,6 +96,10 @@ NAME cat dialog
 DLG 1
 You found a nice warm cup of tea
 NAME tea dialog
+
+DLG 2
+A key! {wvy}What does it open?{wvy}
+NAME key dialog
 
 VAR a
 42
