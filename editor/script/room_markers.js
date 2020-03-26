@@ -415,6 +415,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 						},
 					},
 				],
+				GetDefaultName : function() {
+					return CreateDefaultName("exit dialog ", dialog); // todo : localize
+				},
 			});
 		exitDialogControls.appendChild(dialogWidget.GetElement());
 	}

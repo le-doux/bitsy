@@ -137,6 +137,18 @@ function DialogTool() {
 		openButton.title = "open in dialog editor"; // todo : localize
 		openButton.innerHTML = '<i class="material-icons">open_in_new</i>';
 		openButton.onclick = function() {
+			// create an empty dialog if none exists to open in the editor
+			if (dialogId === null) {
+				// todo : there's a lot of duplicate code in this widget for different dialog creation workflows
+				var id = nextAvailableDialogId();
+				dialog[id] = {
+					src: "",
+					name: creationOptions && creationOptions.GetDefaultName ? creationOptions.GetDefaultName() : null,
+				};
+				ChangeSelectedDialog(id);
+				events.Raise("new_dialog", {id:id});
+			}
+
 			openDialogTool(dialogId);
 
 			// hacky global state!
@@ -190,15 +202,19 @@ function DialogTool() {
 		editorDiv.style.display = "flex";
 		div.appendChild(editorDiv);
 
-		var dialogIdSelect = document.createElement("select");
-		dialogIdSelect.style.display = "none";
-		dialogIdSelect.onchange = function(e) {
-			dialogId = e.target.value === "none" ? null : e.target.value;		
+		function ChangeSelectedDialog(id) {
+			dialogId = id;
 			UpdateEditorContent();
 			if (onChange != null) {
 				onChange(dialogId);
 			}
 			refreshGameData();
+		}
+
+		var dialogIdSelect = document.createElement("select");
+		dialogIdSelect.style.display = "none";
+		dialogIdSelect.onchange = function(e) {
+			ChangeSelectedDialog(e.target.value === "none" ? null : e.target.value);
 		}
 		div.appendChild(dialogIdSelect);
 

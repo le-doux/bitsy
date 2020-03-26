@@ -467,6 +467,12 @@ function endFunc(environment,parameters,onReturn) {
 
 function exitFunc(environment,parameters,onReturn) {
 	var destRoom = parameters[0];
+
+	if (names.room.has(destRoom)) {
+		// it's a name, not an id! (note: these could cause trouble if people names things weird)
+		destRoom = names.room.get(destRoom);
+	}
+
 	var destX = parseInt(parameters[1]);
 	var destY = parseInt(parameters[2]);
 
