@@ -446,12 +446,13 @@
 										<label for="toggleEditMarker1" title="edit coordinates">
 											<i class="material-icons">edit</i>
 										</label>
-										<input type="checkbox" id="exitOptionsToggleCheck1" onclick="toggleExitOptions(0, event.target.checked);" />
-										<label title="show / hide exit options" for="exitOptionsToggleCheck1">
-											<i class="material-icons">settings</i>
-										</label>
-									</div>
-									<div id="exitOptionsToggle1" style="margin-top: 5px;">
+
+										<span id="exitOptionsToggle1">
+											<input type="checkbox" id="exitOptionsToggleCheck1" onclick="toggleExitOptions(0, event.target.checked);" />
+											<label title="show / hide exit options" for="exitOptionsToggleCheck1">
+												<i class="material-icons">settings</i>
+											</label>
+										</span>
 									</div>
 								</div>
 							</div>
@@ -470,24 +471,46 @@
 										<span id="textMoveMessage2">
 											<i class="localize marker_move_click">click in room</i>
 										</span>
+									</div>
+									<div id="editControlsMarker2" title="edit coordinates" style="margin-bottom: 5px; display: none;">
+										<div>
+											<span>room: </span> <!-- todo: localize -->
+											<select id="editRoomMarker2"></select>
+										</div>
+										<div>
+											<span>x: </span> <!-- todo: localize -->
+											<input id="editPosXMarker2" type="number" style="width:6ch;"></input>
+										</div>
+										<div>
+											<span>y: </span> <!-- todo: localize -->
+											<input id="editPosYMarker2" type="number" style="width:6ch;"></input>
+										</div>
+									</div>
+									<div title="marker controls">
 										<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" />
 										<label for="toggleMoveMarker2" title="click to move marker">
 											<i class="material-icons" id="toggleMoveMarkerIcon2">location_searching</i>
+											<span>move</span> <!-- todo : localize -->
 										</label>
-									</div>
-									<div id="exitOptionsToggle2" style="margin-top: 5px;">
-										<input type="checkbox" id="exitOptionsToggleCheck2" onclick="toggleExitOptions(1, event.target.checked);" />
-										<label title="show / hide exit options" for="exitOptionsToggleCheck2">
-											<i class="material-icons">settings</i> 
-											<span>options</span> <!-- TODO : localize -->
+
+										<input type="checkbox" id="toggleEditMarker2" />
+										<label for="toggleEditMarker2" title="edit coordinates">
+											<i class="material-icons">edit</i>
 										</label>
-									</div>
-									<div id="exitOptionsToggle1_alt" style="margin-top: 5px;">
-										<input type="checkbox" id="exitOptionsToggleCheck1_alt" onclick="toggleExitOptions(0, event.target.checked);" />
-										<label title="show / hide exit options" for="exitOptionsToggleCheck1_alt">
-											<i class="material-icons">settings</i> 
-											<span>options</span> <!-- TODO : localize -->
-										</label>
+
+										<span id="exitOptionsToggle2">
+											<input type="checkbox" id="exitOptionsToggleCheck2" onclick="toggleExitOptions(1, event.target.checked);" />
+											<label title="show / hide exit options" for="exitOptionsToggleCheck2">
+												<i class="material-icons">settings</i>
+											</label>
+										</span>
+
+										<span id="exitOptionsToggle1_alt">
+											<input type="checkbox" id="exitOptionsToggleCheck1_alt" onclick="toggleExitOptions(0, event.target.checked);" />
+											<label title="show / hide exit options" for="exitOptionsToggleCheck1_alt">
+												<i class="material-icons">settings</i>
+											</label>
+										</span>
 									</div>
 								</div>
 							</div>

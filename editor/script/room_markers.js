@@ -250,7 +250,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	function UpdateRoomEditControls() {
 		if (curMarker !=  null) {
-			for (var i = 0; i < 1; i++) { // todo : bump to 2 when second is added
+			for (var i = 0; i < 2; i++) {
 				var pos = curMarker.GetMarkerPos(i);
 
 				if (pos) {
@@ -387,12 +387,12 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		if (curMarker != null) {
 			document.getElementById("exitOptionsToggle1").style.display =
 				(curMarker.type == MarkerType.Exit && curMarker.linkState != LinkState.OneWaySwapped ? 
-					"block" : "none");
+					"inline" : "none");
 			document.getElementById("exitOptionsToggle1_alt").style.display =
 				(curMarker.type == MarkerType.Exit && curMarker.linkState == LinkState.OneWaySwapped ? 
-					"block" : "none");
+					"inline" : "none");
 			document.getElementById("exitOptionsToggle2").style.display =
-				(curMarker.type == MarkerType.Exit && curMarker.hasReturn ? "block" : "none");
+				(curMarker.type == MarkerType.Exit && curMarker.hasReturn ? "inline" : "none");
 
 			if (curMarker.type == MarkerType.Exit) {
 				if (document.getElementById("exitOptionsToggleCheck1").checked
