@@ -595,11 +595,16 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
-	function GetPosString(markerPos) {
+	function GetPosString(markerPos, maxRoomNameLength) {
 		var roomName = room[markerPos.room] != undefined ? room[markerPos.room].name : undefined;
 		if (roomName == undefined || roomName == null) {
 			roomName = localization.GetStringOrFallback("room_tool_name", "room") + " " + markerPos.room;
 		}
+
+		if (maxRoomNameLength && roomName.length > maxRoomNameLength) {
+			roomName = roomName.slice(0, maxRoomNameLength) + "..."
+		}
+
 		return roomName + " (" + markerPos.x + "," + markerPos.y + ")";
 	}
 
@@ -639,8 +644,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			document.getElementById("textMarkerPos2").style.display = "inline";
 		}
 
-		document.getElementById("textMarkerPos1").innerText = GetPosString(markerPos1);
-		document.getElementById("textMarkerPos2").innerText = GetPosString(markerPos2);
+		document.getElementById("textMarkerPos1").innerText = GetPosString(markerPos1, 10);
+		document.getElementById("textMarkerPos1").title = GetPosString(markerPos1);
+		document.getElementById("textMarkerPos2").innerText = GetPosString(markerPos2, 10);
+		document.getElementById("textMarkerPos2").title = GetPosString(markerPos2);
 
 		// TODO : this behaves oddly... change??
 		// if (placementMode == PlacementMode.None) {
