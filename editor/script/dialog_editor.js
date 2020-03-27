@@ -1999,7 +1999,7 @@ function DialogTool() {
 	function CreateRoomMoveDestinationCommand(functionNode, parentEditor, createFunctionDescriptionFunc) {
 		var isMoving = false;
 
-		var commandDescription = '<i class="material-icons">location_searching</i> move destination';
+		var commandDescription = '<i class="material-icons">location_searching</i>' + " move destination"; // todo : localize
 
 		var moveCommand = document.createElement("div");
 
@@ -2013,8 +2013,8 @@ function DialogTool() {
 			isMoving = !isMoving;
 
 			if (isMoving) {
-				moveMessageSpan.innerHTML = "<i>click in room</i>";
-				moveButton.innerHTML = '<i class="material-icons">cancel</i>';
+				moveMessageSpan.innerHTML = "<i>click in room</i> "; // todo : localize
+				moveButton.innerHTML = '<i class="material-icons">cancel</i>' + " cancel"; // todo : localize
 				events.Raise("disable_room_tool"); // TODO : don't know if I like this design
 			}
 			else {

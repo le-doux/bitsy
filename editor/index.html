@@ -420,17 +420,38 @@
 										<span id="textMoveMessage1">
 											<i class="localize marker_move_click">click in room</i>
 										</span>
+									</div>
+									<div id="editControlsMarker1" title="edit coordinates" style="margin-bottom: 5px; display: none;">
+										<div>
+											<span>room: </span> <!-- todo: localize -->
+											<select id="editRoomMarker1"></select>
+										</div>
+										<div>
+											<span>x: </span> <!-- todo: localize -->
+											<input id="editPosXMarker1" type="number" style="width:6ch;"></input>
+										</div>
+										<div>
+											<span>y: </span> <!-- todo: localize -->
+											<input id="editPosYMarker1" type="number" style="width:6ch;"></input>
+										</div>
+									</div>
+									<div title="marker controls">
 										<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
-										<label for="toggleMoveMarker1" title="click to move marker">
+										<label for="toggleMoveMarker1" title="click to place marker in current room">
 											<i class="material-icons" id="toggleMoveMarkerIcon1">location_searching</i>
+											<span>move</span> <!-- todo : localize -->
+										</label>
+
+										<input type="checkbox" id="toggleEditMarker1" />
+										<label for="toggleEditMarker1" title="edit coordinates">
+											<i class="material-icons">edit</i>
+										</label>
+										<input type="checkbox" id="exitOptionsToggleCheck1" onclick="toggleExitOptions(0, event.target.checked);" />
+										<label title="show / hide exit options" for="exitOptionsToggleCheck1">
+											<i class="material-icons">settings</i>
 										</label>
 									</div>
 									<div id="exitOptionsToggle1" style="margin-top: 5px;">
-										<input type="checkbox" id="exitOptionsToggleCheck1" onclick="toggleExitOptions(0, event.target.checked);" />
-										<label title="show / hide exit options" for="exitOptionsToggleCheck1">
-											<i class="material-icons">settings</i> 
-											<span>options</span> <!-- TODO : localize -->
-										</label>
 									</div>
 								</div>
 							</div>

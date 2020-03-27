@@ -242,9 +242,81 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			noMarkerMessage.style.display = "inline-block";
 		}
 
+		UpdateRoomEditControls();
 		UpdateMarkerOptions();
 		UpdatePlacementButtons();
 		UpdateExitDirectionUI();
+	}
+
+	function UpdateRoomEditControls() {
+		if (curMarker !=  null) {
+			for (var i = 0; i < 1; i++) { // todo : bump to 2 when second is added
+				var pos = curMarker.GetMarkerPos(i);
+
+				if (pos) {
+					var editToggle = document.getElementById("toggleEditMarker" + (i + 1));
+					editToggle.onchange = function(index, input) {
+						return function() {
+							document.getElementById("editControlsMarker" + (index + 1)).style.display = input.checked ? "block" : "none";
+						}
+					}(i, editToggle);
+					editToggle.onchange();
+
+					var editRoomSelect = document.getElementById("editRoomMarker" + (i + 1));
+					editRoomSelect.innerHTML = "";
+					for (id in room) {
+						var roomName = room[id].name ? room[id].name : localization.GetStringOrFallback("room_tool_name", "room") + " " + id;
+						var roomOption = document.createElement("option");
+						roomOption.value = id;
+						roomOption.innerText = roomName;
+						roomOption.selected = pos ? pos.room === id : false;
+						editRoomSelect.appendChild(roomOption);
+					}
+					editRoomSelect.onchange = function(index, input) {
+						return function() {
+							var curPos = curMarker.GetMarkerPos(index);
+							curMarker.PlaceMarker(
+								index == 0 ? PlacementMode.FirstMarker : PlacementMode.SecondMarker,
+								input.value,
+								curPos.x,
+								curPos.y);
+							refreshGameData();
+							RenderMarkerSelection();
+						}
+					}(i, editRoomSelect);
+	
+					var editPosX = document.getElementById("editPosXMarker" + (i + 1));
+					editPosX.value = pos.x;
+					editPosX.onchange = function(index, input) {
+						return function() {
+							var curPos = curMarker.GetMarkerPos(index);
+							curMarker.PlaceMarker(
+								index == 0 ? PlacementMode.FirstMarker : PlacementMode.SecondMarker,
+								curPos.room,
+								input.value,
+								curPos.y);
+							refreshGameData();
+							RenderMarkerSelection();
+						}
+					}(i, editPosX);
+
+					var editPosY = document.getElementById("editPosYMarker" + (i + 1));
+					editPosY.value = pos.y;
+					editPosY.onchange = function(index, input) {
+						return function() {
+							var curPos = curMarker.GetMarkerPos(index);
+							curMarker.PlaceMarker(
+								index == 0 ? PlacementMode.FirstMarker : PlacementMode.SecondMarker,
+								curPos.room,
+								curPos.x,
+								input.value);
+							refreshGameData();
+							RenderMarkerSelection();
+						}
+					}(i, editPosY);
+				}
+			}		
+		}
 	}
 
 	function UpdateMarkerNames() {
