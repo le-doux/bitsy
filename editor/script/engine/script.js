@@ -20,18 +20,24 @@ var Interpreter = function() {
 		var script = parser.Parse(scriptStr, scriptName);
 		env.SetScript(scriptName, script);
 	}
-	this.Run = function(scriptName, exitHandler) { // Runs pre-compiled script
+	this.Run = function(scriptName, exitHandler, objectContext) { // Runs pre-compiled script
 		var localEnv = new LocalEnvironment(env);
-		localEnv.SetObject(object); // PROTO : should this be folded into the constructor
+
+		if (objectContext) {
+			localEnv.SetObject(objectContext); // PROTO : should this be folded into the constructor?
+		}
 
 		var script = env.GetScript(scriptName);
 
 		script.Eval( localEnv, function(result) { OnScriptReturn(localEnv, exitHandler); } );
 	}
-	this.Interpret = function(scriptStr, exitHandler) { // Compiles and runs code immediately
+	this.Interpret = function(scriptStr, exitHandler, objectContext) { // Compiles and runs code immediately
 		// console.log("INTERPRET");
 		var localEnv = new LocalEnvironment(env);
-		localEnv.SetObject(object); // PROTO
+
+		if (objectContext) {
+			localEnv.SetObject(objectContext); // PROTO : should this be folded into the constructor?
+		}
 
 		var script = parser.Parse(scriptStr, "anonymous");
 		script.Eval( localEnv, function(result) { OnScriptReturn(localEnv, exitHandler); } );
@@ -465,8 +471,8 @@ function propertyFunc(environment, parameters, onReturn) {
 		if (environment.HasProperty(propertyName)) {
 			// TODO : in a future update I can handle the case of initializing a new property
 			// after which we can move this block outside the HasProperty check
-			if (parameters.length > 1 && parameters[1]) {
-				var inValue = parameters[i];
+			if (parameters.length > 1) {
+				var inValue = parameters[1];
 				environment.SetProperty(propertyName, inValue);
 			}
 
@@ -520,6 +526,7 @@ function exitFunc(environment,parameters,onReturn) {
 	player().x = destX;
 	player().y = destY;
 	curRoom = destRoom;
+	initRoom(curRoom);
 
 	// TODO : this doesn't play nice with pagebreak because it thinks the dialog is finished!
 	if (transition.IsTransitionActive()) {
@@ -759,7 +766,7 @@ var LocalEnvironment = function(parentEnvironment) {
 
 	// accessors for properties of the object that's running the script
 	this.HasProperty = function(name) {
-		if (curObject && curObject.property && curObject.property[name]) {
+		if (curObject && curObject.property && curObject.property.hasOwnProperty(name)) {
 			return true;
 		}
 		else {
@@ -767,8 +774,8 @@ var LocalEnvironment = function(parentEnvironment) {
 		}
 	};
 	this.GetProperty = function(name) {
-		if (curObject && curObject.property && curObject.property[name]) {
-			return curObject.property[name];
+		if (curObject && curObject.property && curObject.property.hasOwnProperty(name)) {
+			return curObject.property[name]; // TODO : should these be getters and setters instead?
 		}
 		else {
 			return null;
@@ -776,7 +783,7 @@ var LocalEnvironment = function(parentEnvironment) {
 	};
 	this.SetProperty = function(name, value) {
 		// NOTE : for now, we need to gaurd against creating new properties
-		if (curObject && curObject.property && curObject.property[name]) {
+		if (curObject && curObject.property && curObject.property.hasOwnProperty(name)) {
 			curObject.property[name] = value;
 		}
 	};

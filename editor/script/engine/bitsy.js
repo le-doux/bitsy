@@ -862,21 +862,37 @@ function movePlayerThroughExit(ext) {
 		player().x = ext.dest.x;
 		player().y = ext.dest.y;
 		curRoom = ext.dest.room;
+
+		initRoom(curRoom);
 	};
 
 	if (ext.dlg != undefined && ext.dlg != null) {
 		// TODO : I need to simplify dialog code,
 		// so I don't have to get the ID and the source str
 		// every time!
-		startDialog(dialog[ext.dlg].src, ext.dlg, function(result) {
-			if (!result.IsDefaultActionLocked()) {
-				GoToDest();
-			}
-		});
+		startDialog(
+			dialog[ext.dlg].src,
+			ext.dlg,
+			function(result) {
+				var isLocked = ext.property && ext.property.locked === true;
+				if (!isLocked) {
+					GoToDest();
+				}
+			},
+			ext);
 	}
 	else {
 		GoToDest();
 	}
+}
+
+function initRoom(roomId) {
+	// set exit properties
+	for (var i = 0; i < room[roomId].exits.length; i++) {
+		room[roomId].exits[i].property = { locked:false };
+	}
+
+	// TODO : endings
 }
 
 function getItemIndex( roomId, x, y ) {
@@ -1086,6 +1102,10 @@ function parseWorld(file) {
 	else {
 		// uh oh there are no rooms I guess???
 		curRoom = null;
+	}
+
+	if (curRoom != null) {
+		initRoom(curRoom);
 	}
 
 	console.log("START ROOM " + curRoom);
@@ -2081,9 +2101,9 @@ function startSpriteDialog(spriteId) {
 	}
 }
 
-function startDialog(dialogStr,scriptId,dialogCallback) {
+function startDialog(dialogStr, scriptId, dialogCallback, objectContext) {
 	// console.log("START DIALOG ");
-	if(dialogStr.length <= 0) {
+	if (dialogStr.length <= 0) {
 		// console.log("ON EXIT DIALOG -- startDialog 1");
 		onExitDialog(dialogCallback);
 		return;
@@ -2092,9 +2112,9 @@ function startDialog(dialogStr,scriptId,dialogCallback) {
 	isDialogMode = true;
 
 	dialogRenderer.Reset();
-	dialogRenderer.SetCentered( isNarrating /*centered*/ );
+	dialogRenderer.SetCentered(isNarrating /*centered*/);
 	dialogBuffer.Reset();
-	scriptInterpreter.SetDialogBuffer( dialogBuffer );
+	scriptInterpreter.SetDialogBuffer(dialogBuffer);
 
 	var onScriptEnd = function(scriptResult) {
 		dialogBuffer.OnDialogEnd(function() {
@@ -2102,15 +2122,15 @@ function startDialog(dialogStr,scriptId,dialogCallback) {
 		});
 	};
 
-	if(scriptId === undefined) {
-		scriptInterpreter.Interpret( dialogStr, onScriptEnd );
+	if (scriptId === undefined) { // TODO : what's this for again?
+		scriptInterpreter.Interpret(dialogStr, onScriptEnd);
 	}
 	else {
-		if( !scriptInterpreter.HasScript(scriptId) ) {
-			scriptInterpreter.Compile( scriptId, dialogStr );
+		if (!scriptInterpreter.HasScript(scriptId)) {
+			scriptInterpreter.Compile(scriptId, dialogStr);
 		}
 		// scriptInterpreter.DebugVisualizeScript(scriptId);
-		scriptInterpreter.Run( scriptId, onScriptEnd );
+		scriptInterpreter.Run(scriptId, onScriptEnd, objectContext);
 	}
 
 }
