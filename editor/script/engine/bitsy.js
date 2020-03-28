@@ -817,7 +817,7 @@ function movePlayer(direction) {
 		var itm = room[player().room].items[itmIndex];
 		var itemRoom = player().room;
 
-		startItemDialog(itm.id, function(scriptResult) {
+		startItemDialog(itm.id, function() {
 			// remove item from room
 			room[itemRoom].items.splice(itmIndex, 1);
 
@@ -2095,7 +2095,7 @@ function startItemDialog(itemId, dialogCallback) {
 		startDialog(dialogStr, dialogId, dialogCallback);
 	}
 	else {
-		dialogCallback({IsDefaultActionLocked:function() {return false;}});
+		dialogCallback();
 	}
 }
 
