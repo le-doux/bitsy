@@ -839,7 +839,7 @@ function movePlayer(direction) {
 	}
 
 	if (end) {
-		startNarrating(dialog[end.id].src, true /*isEnding*/);
+		startEndingDialog(end);
 	}
 	else if (ext) {
 		movePlayerThroughExit(ext);
@@ -887,12 +887,15 @@ function movePlayerThroughExit(ext) {
 }
 
 function initRoom(roomId) {
-	// set exit properties
+	// init exit properties
 	for (var i = 0; i < room[roomId].exits.length; i++) {
 		room[roomId].exits[i].property = { locked:false };
 	}
 
-	// TODO : endings
+	// init ending properties
+	for (var i = 0; i < room[roomId].endings.length; i++) {
+		room[roomId].endings[i].property = { locked:false };
+	}
 }
 
 function getItemIndex( roomId, x, y ) {
@@ -2037,15 +2040,6 @@ function onExitDialog(scriptResult, dialogCallback) {
 		isNarrating = false;
 	}
 
-	// TODO : this global variable for endings is pretty weird
-	if (isEnding) {
-		// Stop the game from ending if the end script has locked
-		// the default action
-		if (scriptResult.IsDefaultActionLocked()) {
-			isEnding = false;
-		}
-	}
-
 	if (isDialogPreview) {
 		isDialogPreview = false;
 
@@ -2077,6 +2071,22 @@ function startNarrating(dialogStr,end) {
 	isEnding = end;
 
 	startDialog(dialogStr);
+}
+
+function startEndingDialog(ending) {
+	isNarrating = true;
+	isEnding = true;
+
+	startDialog(
+		dialog[ending.id].src,
+		ending.id,
+		function() {
+			var isLocked = ending.property && ending.property.locked === true;
+			if (isLocked) {
+				isEnding = false;
+			}
+		},
+		ending);
 }
 
 function startItemDialog(itemId, dialogCallback) {
