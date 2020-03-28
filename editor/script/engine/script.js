@@ -22,6 +22,7 @@ var Interpreter = function() {
 	}
 	this.Run = function(scriptName, exitHandler) { // Runs pre-compiled script
 		var localEnv = new LocalEnvironment(env);
+		localEnv.SetObject(object); // PROTO : should this be folded into the constructor
 
 		var script = env.GetScript(scriptName);
 
@@ -30,6 +31,8 @@ var Interpreter = function() {
 	this.Interpret = function(scriptStr, exitHandler) { // Compiles and runs code immediately
 		// console.log("INTERPRET");
 		var localEnv = new LocalEnvironment(env);
+		localEnv.SetObject(object); // PROTO
+
 		var script = parser.Parse(scriptStr, "anonymous");
 		script.Eval( localEnv, function(result) { OnScriptReturn(localEnv, exitHandler); } );
 	}
@@ -747,15 +750,35 @@ var LocalEnvironment = function(parentEnvironment) {
 	this.LockDefaultAction = function() { isLocked = true; };
 	this.IsDefaultActionLocked = function() { return isLocked; };
 
+	// PROTO
+	// The local environment knows what object called it -- currently only used to access properties
+	var curObject = null;
+	this.HasObject = function() { return curObject != undefined && curObject != null; }
+	this.SetObject = function(object) { curObject = object; }
+	this.GetObject = function() { return curObject; }
+
 	// accessors for properties of the object that's running the script
 	this.HasProperty = function(name) {
-		return false; // TODO
+		if (curObject && curObject.property && curObject.property[name]) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	};
 	this.GetProperty = function(name) {
-		return null; // TODO
+		if (curObject && curObject.property && curObject.property[name]) {
+			return curObject.property[name];
+		}
+		else {
+			return null;
+		}
 	};
 	this.SetProperty = function(name, value) {
-		// TODO
+		// NOTE : for now, we need to gaurd against creating new properties
+		if (curObject && curObject.property && curObject.property[name]) {
+			curObject.property[name] = value;
+		}
 	};
 }
 
