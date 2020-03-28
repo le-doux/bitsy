@@ -818,22 +818,20 @@ function movePlayer(direction) {
 		var itemRoom = player().room;
 
 		startItemDialog(itm.id, function(scriptResult) {
-			if (!scriptResult.IsDefaultActionLocked()) {
-				// remove item from room
-				room[itemRoom].items.splice(itmIndex, 1);
+			// remove item from room
+			room[itemRoom].items.splice(itmIndex, 1);
 
-				// update player inventory
-				if (player().inventory[itm.id]) {
-					player().inventory[itm.id] += 1;
-				}
-				else {
-					player().inventory[itm.id] = 1;
-				}
+			// update player inventory
+			if (player().inventory[itm.id]) {
+				player().inventory[itm.id] += 1;
+			}
+			else {
+				player().inventory[itm.id] = 1;
+			}
 
-				// show inventory change in UI
-				if (onInventoryChanged != null) {
-					onInventoryChanged(itm.id);
-				}
+			// show inventory change in UI
+			if (onInventoryChanged != null) {
+				onInventoryChanged(itm.id);
 			}
 		});
 	}
