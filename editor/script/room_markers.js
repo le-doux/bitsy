@@ -476,10 +476,11 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 						Script:	'"""\n' +
 								'{\n' +
 								'  - {item "1"} >= 1 ?\n' +
+								'    {property locked false}\n' +
 								'    The key opens the door!\n' +
 								'  - else ?\n' +
+								'    {property locked true}\n' +
 								'    The door is locked...\n' +
-								'    {lock}\n' +
 								'}\n' +
 								'"""',
 						GetDefaultName: function() {
