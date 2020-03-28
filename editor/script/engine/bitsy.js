@@ -64,7 +64,8 @@ var spriteStartLocations = {};
 /* VERSION */
 var version = {
 	major: 7, // major changes
-	minor: 0 // smaller changes
+	minor: 0, // smaller changes
+	devBuildPhase: "BETA",
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
@@ -1131,6 +1132,9 @@ function serializeWorld(skipFonts) {
 	worldStr += "\n";
 	/* VERSION */
 	worldStr += "# BITSY VERSION " + getEngineVersion() + "\n"; // add version as a comment for debugging purposes
+	if (version.devBuildPhase != "RELEASE") {
+		worldStr += "# DEVELOPMENT BUILD -- " + version.devBuildPhase;
+	}
 	worldStr += "\n";
 	/* FLAGS */
 	for (f in flags) {
