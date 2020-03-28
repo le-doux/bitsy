@@ -453,6 +453,29 @@ function shakyFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
+function propertyFunc(environment, parameters, onReturn) {
+	var outValue = null;
+
+	if (parameters.length > 0 && parameters[0]) {
+		var propertyName = parameters[0];
+
+		if (environment.HasProperty(propertyName)) {
+			// TODO : in a future update I can handle the case of initializing a new property
+			// after which we can move this block outside the HasProperty check
+			if (parameters.length > 1 && parameters[1]) {
+				var inValue = parameters[i];
+				environment.SetProperty(propertyName, inValue);
+			}
+
+			outValue = environment.GetProperty(propertyName);
+		}
+	}
+
+	console.log("PROPERTY! " + propertyName + " " + outValue);
+
+	onReturn(outValue);
+}
+
 function lockFunc(environment,parameters,onReturn) {
 	environment.LockDefaultAction();
 	onReturn(null);
@@ -610,10 +633,11 @@ var Environment = function() {
 	functionMap.set("printTile", printTileFunc);
 	functionMap.set("printItem", printItemFunc);
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
-	functionMap.set("lock", lockFunc);
+	functionMap.set("lock", lockFunc); // TODO : remove and replace with property?
 	functionMap.set("end", endFunc);
 	functionMap.set("exit", exitFunc);
 	functionMap.set("pg", pagebreakFunc); // TODO : name?
+	functionMap.set("property", propertyFunc); // TODO : name?
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn,env) {
@@ -722,6 +746,17 @@ var LocalEnvironment = function(parentEnvironment) {
 	var isLocked = false;
 	this.LockDefaultAction = function() { isLocked = true; };
 	this.IsDefaultActionLocked = function() { return isLocked; };
+
+	// accessors for properties of the object that's running the script
+	this.HasProperty = function(name) {
+		return false; // TODO
+	};
+	this.GetProperty = function(name) {
+		return null; // TODO
+	};
+	this.SetProperty = function(name, value) {
+		// TODO
+	};
 }
 
 function leadingWhitespace(depth) {
@@ -1003,29 +1038,51 @@ var FuncNode = function(name,args) {
 			events.Raise("script_node_enter", { id: this.GetId() });
 		}
 
+		var self = this; // hack to deal with scope (TODO : move up higher?)
+
 		var argumentValues = [];
 		var i = 0;
-		function evalArgs(args,done) {
-			if(i < args.length) {
-				// Evaluate each argument
-				args[i].Eval( environment, function(val) {
-					argumentValues.push( val );
+
+		function evalArgs(args, done) {
+			// TODO : really hacky way to make we get the first
+			// symbol's NAME instead of its variable value
+			// if we are trying to do something with a property
+			if (self.name === "property" && i === 0 && i < args.length) {
+				if (args[i].type === "variable") {
+					argumentValues.push(args[i].name);
 					i++;
-					evalArgs(args,done);
-				} );
+				}
+				else {
+					// first argument for a property MUST be a variable symbol
+					// -- so skip everything if it's not!
+					i = args.length;
+				}
+			}
+
+			if (i < args.length) {
+				// Evaluate each argument
+				args[i].Eval(
+					environment,
+					function(val) {
+						argumentValues.push(val);
+						i++;
+						evalArgs(args, done);
+					});
 			}
 			else {
 				done();
 			}
 		};
-		var self = this; // hack to deal with scope
-		evalArgs( this.args, function() {
-			if (isPlayerEmbeddedInEditor && events != undefined && events != null) {
-				events.Raise("script_node_exit", { id: self.GetId() });
-			}
 
-			environment.EvalFunction(self.name, argumentValues, onReturn);
-		} );
+		evalArgs(
+			this.args,
+			function() {
+				if (isPlayerEmbeddedInEditor && events != undefined && events != null) {
+					events.Raise("script_node_exit", { id: self.GetId() });
+				}
+
+				environment.EvalFunction(self.name, argumentValues, onReturn);
+			});
 	}
 
 	this.Serialize = function(depth) {
