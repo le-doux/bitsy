@@ -2089,6 +2089,14 @@ function DialogTool() {
 				{ types: ["number", "variable"], index: 1, name: "amount", },
 			],
 		},
+		"property" : {
+			name : "property",
+			description : "property _[ = _]",
+			parameters : [
+				{ types: ["variable"], index: 0, name: "name", doNotEdit: true }, // NOTE: disable editing of property names for this version
+				{ types: ["number", "text", "bool", "variable"], index: 1, name: "value" },
+			],
+		},
 		"print" : {
 			name : "print",
 			description : "print _ in the dialog box",
@@ -2266,7 +2274,7 @@ function DialogTool() {
 							parameterInfo.types.concat(["function", "expression"]),
 							createGetArgFunc(functionNode, parameterInfo.index),
 							createSetArgFunc(functionNode, parameterInfo.index, self),
-							isEditable,
+							isEditable && !(parameterInfo.doNotEdit),
 							!isInline && editParameterTypes,
 							function(expressionString, onAcceptHandler) {
 								parentEditor.OpenExpressionBuilder(expressionString, onAcceptHandler);
