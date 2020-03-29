@@ -188,6 +188,15 @@ var Utils = function() {
 		return new VarNode(variableName);
 	}
 
+	this.CreatePropertyNode = function(propertyName, literalValue) {
+		var varNode = new VarNode(propertyName);
+		var valNode = new LiteralNode(literalValue);
+		var node = new FuncNode("property", [varNode, valNode]);
+		var block = new CodeBlockNode();
+		block.AddChild(node);
+		return block;
+	}
+
 	this.CreateElseNode = function() {
 		return new ElseNode();
 	}

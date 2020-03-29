@@ -814,9 +814,9 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"exit",
-				"lock",
+				"lock / unlock",
 				function() {
-					var node = scriptUtils.CreateFunctionBlock("lock", []);
+					var node = scriptUtils.CreatePropertyNode("locked", true);
 					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
