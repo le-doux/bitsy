@@ -1271,7 +1271,9 @@ var SequenceBase = function() {
 		var str = "";
 		str += this.type + "\n";
 		for (var i = 0; i < this.children.length; i++) {
-			str += leadingWhitespace(depth + 1) + Sym.List + " " + this.children[i].Serialize(depth + 2) + "\n";
+			str += leadingWhitespace(depth + 1) + Sym.List + " ";
+			str += this.children[i].Serialize(depth + 2);
+			str += "\n";
 		}
 		str += leadingWhitespace(depth);
 		return str;
@@ -1754,7 +1756,7 @@ var Parser = function(env) {
 		var conditionStrings = [];
 		var resultStrings = [];
 		var curIndex = -1;
-		var maxLeadingWhitespace = -1;
+		var requiredLeadingWhitespace = -1;
 
 		// TODO : very similar to sequence parsing - can we share anything?
 		function parseConditionalItemLine(state) {
@@ -1820,32 +1822,29 @@ var Parser = function(env) {
 			var lineResults = parseConditionalItemLine(state);
 
 			if (lineResults.isNewCondition) {
-				maxLeadingWhitespace = lineResults.whitespace;
+				requiredLeadingWhitespace = lineResults.whitespace;
 				curIndex++;
 				conditionStrings[curIndex] = "";
 				resultStrings[curIndex] = "";
 			}
 
-			console.log("TRIM WHITESPACE CONDITIONAL " + lineResults.whitespace + " " + maxLeadingWhitespace + " :\n" + lineResults.text);
+			// to avoid extra newlines in nested conditionals, only count lines
+			// that at least match the whitespace count of the initial line
+			// NOTE: see the comment in sequence parsing for more details
+			if (lineResults.whitespace >= requiredLeadingWhitespace) {
+				var trimmedText = trimLeadingWhitespace(lineResults.text, requiredLeadingWhitespace);
 
-			// trim leading whitespace (up to the max allowed for this item)
-			var trimLength = Math.min(lineResults.whitespace, maxLeadingWhitespace);
-			var trimmedText = trimLeadingWhitespace(lineResults.text, trimLength);
-
-			console.log("TRIM WHITESPACE CONDITIONAL RESULTS:\n" + trimmedText);
-
-			if (lineResults.isNewCondition) {
-				conditionStrings[curIndex] += trimmedText;
-			}
-			else {
-				resultStrings[curIndex] += trimmedText + Sym.Linebreak;
+				if (lineResults.isNewCondition) {
+					conditionStrings[curIndex] += trimmedText;
+				}
+				else {
+					resultStrings[curIndex] += trimmedText + Sym.Linebreak;
+				}
 			}
 		}
 
 		// hack: cut off the trailing newlines from all the result strings
 		resultStrings = resultStrings.map(function(result) { return result.slice(0,-1); });
-
-		console.log(resultStrings);
 
 		var conditions = [];
 		for (var i = 0; i < conditionStrings.length; i++) {
@@ -1865,7 +1864,6 @@ var Parser = function(env) {
 			var dialogBlockState = new ParserState(new DialogBlockNode(), str);
 			dialogBlockState = ParseDialog(dialogBlockState);
 			var dialogBlock = dialogBlockState.rootNode;
-			console.log(dialogBlock);
 			results.push(dialogBlock);
 		}
 
@@ -1900,7 +1898,7 @@ var Parser = function(env) {
 	function ParseSequence(state, sequenceType) {
 		var itemStrings = [];
 		var curItemIndex = -1; // -1 indicates not reading an item yet
-		var maxLeadingWhitespace = -1;
+		var requiredLeadingWhitespace = -1;
 
 		function parseSequenceItemLine(state) {
 			var lineText = "";
@@ -1956,16 +1954,19 @@ var Parser = function(env) {
 			var lineResults = parseSequenceItemLine(state);
 
 			if (lineResults.isNewListItem) {
-				maxLeadingWhitespace = lineResults.whitespace;
+				requiredLeadingWhitespace = lineResults.whitespace;
 				curItemIndex++;
 				itemStrings[curItemIndex] = "";
 			}
 
-			// trim leading whitespace (up to the max allowed for this item)
-			var trimLength = Math.min(lineResults.whitespace, maxLeadingWhitespace);
-			var trimmedText = trimLeadingWhitespace(lineResults.text, trimLength);
-
-			itemStrings[curItemIndex] += trimmedText + Sym.Linebreak;
+			// to avoid double counting closing lines (empty ones ending in a curly brace)
+			// we only allow lines that have at least as much whitespace as the start of the list item
+			// TODO : I think right now this leads to a bug if the list item's indentation is less than
+			// its parent code block... hopefully that won't be a big deal for now
+			if (lineResults.whitespace >= requiredLeadingWhitespace) {
+				var trimmedText = trimLeadingWhitespace(lineResults.text, requiredLeadingWhitespace);
+				itemStrings[curItemIndex] += trimmedText + Sym.Linebreak;
+			}
 		}
 
 		// a bit hacky: cut off the trailing newlines from all the items
