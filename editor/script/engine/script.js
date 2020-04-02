@@ -1963,6 +1963,8 @@ var Parser = function(env) {
 			// we only allow lines that have at least as much whitespace as the start of the list item
 			// TODO : I think right now this leads to a bug if the list item's indentation is less than
 			// its parent code block... hopefully that won't be a big deal for now
+			// (NOTE: I think the bug could be fixed by only applying this to the FINAL line of an item, but
+			// that would require more consideration and testing)
 			if (lineResults.whitespace >= requiredLeadingWhitespace) {
 				var trimmedText = trimLeadingWhitespace(lineResults.text, requiredLeadingWhitespace);
 				itemStrings[curItemIndex] += trimmedText + Sym.Linebreak;
