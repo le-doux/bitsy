@@ -161,7 +161,7 @@ function DialogTool() {
 
 		var editorDiv = document.createElement("div");
 		var scriptEditor;
-		function UpdateEditorContent() {
+		function UpdateEditorContent(shouldOpenDialogToolIfComplex) {
 			editorDiv.innerHTML = "";
 
 			if (dialogId != null || (creationOptions && creationOptions.CreateFromEmptyTextBox)) {
@@ -169,7 +169,7 @@ function DialogTool() {
 				scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea", defaultDialogNameFunc);
 				editorDiv.appendChild(scriptEditor.GetElement());
 
-				CheckForComplexCodeInDialog();
+				CheckForComplexCodeInDialog(shouldOpenDialogToolIfComplex);
 			}
 			else if (creationOptions.Presets) {
 				function CreatePresetHandler(scriptStr, getDefaultNameFunc) {
@@ -184,7 +184,7 @@ function DialogTool() {
 						if (creationOptions.OnCreateNewDialog) {
 							creationOptions.OnCreateNewDialog(dialogId);
 						}
-						UpdateEditorContent();
+						UpdateEditorContent(true);
 					}
 				}
 
@@ -219,7 +219,7 @@ function DialogTool() {
 		div.appendChild(dialogIdSelect);
 
 		function UpdateDialogIdSelectOptions() {
-			dialogIdSelect.innerHTML = "";	
+			dialogIdSelect.innerHTML = "";
 			var dialogIdList = sortedDialogIdList();
 			if (allowNone) {
 				var dialogNoneOption = document.createElement("option");
@@ -275,11 +275,16 @@ function DialogTool() {
 			ChangeSettingsVisibility(!showSettings);
 		}
 
-		function CheckForComplexCodeInDialog() {
+		function CheckForComplexCodeInDialog(shouldOpenIfComplex) {
 			var codeVisitor = new FindCodeVisitor();
 			scriptEditor.GetNode().VisitAll(codeVisitor);
 			if (codeVisitor.FoundCode()) {
 				ChangeSettingsVisibility(true);
+
+				// kind of a werid pattern to use
+				if (shouldOpenIfComplex != undefined && shouldOpenIfComplex != null && shouldOpenIfComplex == true) {
+					openDialogTool(dialogId, parentPanelId)
+				}
 			}
 		}
 
