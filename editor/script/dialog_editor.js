@@ -15,8 +15,8 @@ function DialogTool() {
 	}
 
 	// todo : name?
-	this.CreateWidget = function(label, dialogId, allowNone, onChange, creationOptions) {
-		return new DialogWidget(label, dialogId, allowNone, onChange, creationOptions);
+	this.CreateWidget = function(label, parentPanelId, dialogId, allowNone, onChange, creationOptions) {
+		return new DialogWidget(label, parentPanelId, dialogId, allowNone, onChange, creationOptions);
 	}
 
 	this.CreateTitleWidget = function() {
@@ -114,7 +114,7 @@ function DialogTool() {
 	}
 
 	// TODO : label should be label localization id
-	function DialogWidget(label, dialogId, allowNone, onChange, creationOptions) {
+	function DialogWidget(label, parentPanelId, dialogId, allowNone, onChange, creationOptions) {
 		var showSettings = false;
 
 		var div = document.createElement("div");
@@ -149,7 +149,7 @@ function DialogTool() {
 				events.Raise("new_dialog", {id:id});
 			}
 
-			openDialogTool(dialogId);
+			openDialogTool(dialogId, parentPanelId);
 
 			// hacky global state!
 			if (dialog[getCurDialogId()] && dialogId != getCurDialogId()) {

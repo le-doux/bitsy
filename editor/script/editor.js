@@ -341,9 +341,9 @@ var dialogTool = new DialogTool();
 var curDialogEditorId = null; // can I wrap this all up somewhere? -- feels a bit hacky to have all these globals
 var curDialogEditor = null;
 var curPlaintextDialogEditor = null; // the duplication is a bit weird, but better than recreating editors all the time?
-function openDialogTool(dialogId, forceOpen) {
-	if (forceOpen === undefined || forceOpen === null) {
-		forceOpen = true;
+function openDialogTool(dialogId, insertNextToId, showIfHidden) { // todo : rename since it doesn't always "open" it?
+	if (showIfHidden === undefined || showIfHidden === null) {
+		showIfHidden = true;
 	}
 
 	var showCode = document.getElementById("dialogShowCodeCheck").checked;
@@ -377,8 +377,12 @@ function openDialogTool(dialogId, forceOpen) {
 		}
 	}
 
-	if (document.getElementById("dialogPanel").style.display === "none" && forceOpen) {
-		showPanel("dialogPanel");
+	var isHiddenOrShouldMove = (document.getElementById("dialogPanel").style.display === "none") ||
+		(insertNextToId != undefined && insertNextToId != null);
+
+	if (isHiddenOrShouldMove && showIfHidden) {
+		console.log("insert next to : " + insertNextToId);
+		showPanel("dialogPanel", insertNextToId);
 	}
 }
 
@@ -509,6 +513,7 @@ function reloadDialogUI() {
 
 	var dialogWidget = dialogTool.CreateWidget(
 		"dialog",
+		"paintPanel",
 		obj.dlg,
 		true,
 		function(id) {
@@ -529,7 +534,7 @@ function reloadDialogUI() {
 	dialogContent.appendChild(dialogWidget.GetElement());
 
 	if (alwaysShowDrawingDialog && dialog[obj.dlg]) {
-		openDialogTool(obj.dlg, false);
+		openDialogTool(obj.dlg, null, false);
 	}
 }
 
@@ -2072,8 +2077,8 @@ function renderAnimationPreview(id) {
 }
 
 function selectPaint() {
-	if(drawing.id === this.value && document.getElementById("paintPanel").style.display === "none") {
-		togglePanelCore("paintPanel", true /*visible*/); // animate?
+	if (drawing.id === this.value) {
+		showPanel("paintPanel", "paintExplorerPanel");
 	}
 
 	drawing.id = this.value;
@@ -2495,8 +2500,8 @@ function togglePanel(e) {
 	togglePanelCore( e.target.value, e.target.checked );
 }
 
-function showPanel(id) {
-	togglePanelCore( id, true /*visible*/ );
+function showPanel(id, insertNextToId) {
+	togglePanelCore(id, true /*visible*/, true /*doUpdatePrefs*/, insertNextToId);
 }
 
 function hidePanel(id) {
@@ -2517,23 +2522,38 @@ function hidePanel(id) {
 	);
 }
 
-function togglePanelCore(id,visible,doUpdatePrefs=true) {
+function togglePanelCore(id, visible, doUpdatePrefs, insertNextToId) {
+	if (doUpdatePrefs === undefined || doUpdatePrefs === null) {
+		doUpdatePrefs = true;
+	}
+
 	//hide/show panel
-	togglePanelUI( id, visible );
+	togglePanelUI(id, visible, insertNextToId);
 	//any side effects
-	afterTogglePanel( id, visible );
+	afterTogglePanel(id, visible);
 	//save panel preferences
 	// savePanelPref( id, visible );
-	if(doUpdatePrefs) {
+	if (doUpdatePrefs) {
 		updatePanelPrefs();
 	}
 }
 
-function togglePanelUI(id,visible) {
-	if( visible ) {
+function togglePanelUI(id, visible, insertNextToId) {
+	if (visible) {
 		var editorContent = document.getElementById("editorContent");
 		var cardElement = document.getElementById(id);
-		editorContent.appendChild(cardElement);
+
+		if (insertNextToId === undefined || insertNextToId === null) {
+			editorContent.appendChild(cardElement);
+		}
+		else {
+			var insertNextToElement = document.getElementById(insertNextToId);
+			editorContent.insertBefore(cardElement, insertNextToElement.nextSibling);
+
+			// hack - activate animation if using insert next to?
+			cardElement.classList.add("drop");
+			setTimeout( function() { cardElement.classList.remove("drop"); }, 300 );
+		}
 	}
 
 	document.getElementById(id).style.display = visible ? "inline-block" : "none";
@@ -3281,7 +3301,7 @@ function toggleAlwaysShowDrawingDialog(e) {
 	if (alwaysShowDrawingDialog) {
 		var dlg = getCurDialogId();
 		if (dialog[dlg]) {
-			openDialogTool(dlg, false);
+			openDialogTool(dlg);
 		}
 	}
 }

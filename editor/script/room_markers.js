@@ -414,6 +414,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				// TODO : localize
 				var dialogWidget = dialogTool.CreateWidget(
 					"ending dialog",
+					"exitsPanel",
 					curMarker.ending.id,
 					false,
 					function (id) {
@@ -453,6 +454,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		exitDialogControls.innerHTML = "";
 		var dialogWidget = dialogTool.CreateWidget(
 			"exit dialog", // TODO : localize
+			"exitsPanel",
 			exit.dlg,
 			true,
 			function (id) {
