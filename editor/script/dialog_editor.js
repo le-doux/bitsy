@@ -200,7 +200,6 @@ function DialogTool() {
 		}
 
 		editorDiv.style.display = "flex";
-		editorDiv.style.marginTop = "5px";
 		div.appendChild(editorDiv);
 
 		function ChangeSelectedDialog(id) {
@@ -306,7 +305,6 @@ function DialogTool() {
 
 		var scriptRootNode, div;
 		div = document.createElement("div");
-		div.style.width = "100%"; // hack
 
 		var self = this;
 
@@ -315,10 +313,6 @@ function DialogTool() {
 
 			div.innerHTML = "";
 			scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
-
-			var dialogBoxContainer = document.createElement("div");
-			dialogBoxContainer.classList.add("dialogBoxContainer");
-			div.appendChild(dialogBoxContainer);
 
 			var codeTextArea = document.createElement("textarea");
 			codeTextArea.rows = 2;
@@ -330,7 +324,7 @@ function DialogTool() {
 				scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
 				OnUpdate();
 			}
-			dialogBoxContainer.appendChild(codeTextArea);
+			div.appendChild(codeTextArea);
 		}
 
 		RefreshEditorUI();
