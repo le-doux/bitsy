@@ -68,6 +68,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var nextRoomId = roomIds[roomIndex];
 
 		// console.log(room);
+		// TODO : I really need a shared "createExit()" function
 		var newExit = {
 			x : 2,
 			y : 2,
@@ -77,6 +78,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				y : 13
 			},
 			transition_effect : null,
+			dlg : null,
 		}
 		room[selectedRoom].exits.push( newExit );
 
@@ -90,6 +92,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 					y : newExit.y
 				},
 				transition_effect : null,
+				dlg : null,
 			}
 			room[newExit.dest.room].exits.push( newReturn );
 		}
