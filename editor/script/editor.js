@@ -346,6 +346,8 @@ function openDialogTool(dialogId, insertNextToId, showIfHidden) { // todo : rena
 		showIfHidden = true;
 	}
 
+	document.getElementById("deleteDialogButton").disabled = dialogId === titleDialogId;
+
 	var showCode = document.getElementById("dialogShowCodeCheck").checked;
 
 	curDialogEditorId = dialogId;
@@ -481,7 +483,7 @@ function duplicateDialog() {
 }
 
 function deleteDialog() {
-	if (curDialogEditorId != null) {
+	if (curDialogEditorId != null && curDialogEditorId != titleDialogId) {
 		var tempDialogId = curDialogEditorId;
 
 		nextDialog();
