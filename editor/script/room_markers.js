@@ -115,7 +115,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		room[selectedRoom].endings.push(newEnding);
 		dialog[newEnding.id] = {
 			src: localization.GetStringOrFallback("default_end_dlg", "The end"),
-			name: CreateDefaultName("ending ", dialog) // todo : localize
+			name: CreateDefaultName("ending", dialog) // todo : localize
 		};
 
 		markerList = GatherMarkerList();
@@ -523,7 +523,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 						Name:	"add narration",
 						Script:	"You walk through the doorway",
 						GetDefaultName: function() {
-							return CreateDefaultName("exit narration ", dialog); // todo : localize
+							return CreateDefaultName("exit narration", dialog); // todo : localize
 						},
 					},
 					{
@@ -539,12 +539,12 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 								'}\n' +
 								'"""',
 						GetDefaultName: function() {
-							return CreateDefaultName("locked exit ", dialog); // todo : localize
+							return CreateDefaultName("locked exit", dialog); // todo : localize
 						},
 					},
 				],
 				GetDefaultName : function() {
-					return CreateDefaultName("exit dialog ", dialog); // todo : localize
+					return CreateDefaultName("exit dialog", dialog); // todo : localize
 				},
 			});
 		exitDialogControls.appendChild(dialogWidget.GetElement());
