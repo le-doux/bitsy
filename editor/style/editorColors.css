@@ -172,3 +172,14 @@ button:disabled {
 	background: #6767b2;
 	color:white;
 }
+
+.playMode {
+	background-color: rgba(0,0,0,0.5);
+	background-image: repeating-linear-gradient(
+		45deg,
+		rgba(0,0,0,0),
+		rgba(0,0,0,0) 15px,
+		rgba(0,0,0,0.03) 15px,
+		rgba(0,0,0,0.03) 30px
+	);
+}
