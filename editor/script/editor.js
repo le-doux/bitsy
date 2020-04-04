@@ -350,6 +350,18 @@ function openDialogTool(dialogId, insertNextToId, showIfHidden) { // todo : rena
 
 	var showCode = document.getElementById("dialogShowCodeCheck").checked;
 
+	// clean up any existing editors -- is there a more "automagical" way to do this???
+	if (curDialogEditor) {
+		curDialogEditor.OnDestroy();
+		delete curDialogEditor;
+	}
+
+	if (curPlaintextDialogEditor) {
+		curPlaintextDialogEditor.OnDestroy();
+		delete curPlaintextDialogEditor;
+	}
+	
+
 	curDialogEditorId = dialogId;
 	curDialogEditor = dialogTool.CreateEditor(dialogId);
 	curPlaintextDialogEditor = dialogTool.CreatePlaintextEditor(dialogId, "largeDialogPlaintextArea");
@@ -488,12 +500,42 @@ function deleteDialog() {
 
 		nextDialog();
 
+		// delete all references to deleted dialog (TODO : should this go in a wrapper function somewhere?)
+		for (id in sprite) {
+			if (sprite[id].dlg === tempDialogId) {
+				sprite[id].dlg = null;
+			}
+		}
+
+		for (id in item) {
+			if (item[id].dlg === tempDialogId) {
+				item[id].dlg = null;
+			}
+		}
+
+		for (id in room) {
+			for (var i = 0; i < room[id].exits.length; i++) {
+				var exit = room[id].exits[i];
+				if (exit.dlg === tempDialogId) {
+					exit.dlg = null;
+				}
+			}
+
+			for (var i = 0; i < room[id].endings.length; i++) {
+				var end = room[id].endings[i];
+				if (end.id === tempDialogId) {
+					room[id].endings.splice(i, 1);
+					i--;
+				}
+			}
+		}
+
 		delete dialog[tempDialogId];
 		refreshGameData();
 
-		// TODO -- remove all references to deleted dialog
-
 		alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
+
+		events.Raise("dialog_update", { dialogId:tempDialogId, editorId:null });
 	}
 }
 

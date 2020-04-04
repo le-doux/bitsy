@@ -115,6 +115,8 @@ function DialogTool() {
 
 	// TODO : label should be label localization id
 	function DialogWidget(label, parentPanelId, dialogId, allowNone, onChange, creationOptions) {
+		var listener = new EventListener(events);
+
 		// treat deleted dialogs as non-existent ones
 		if (!dialog.hasOwnProperty(dialogId)) {
 			dialogId = null;
@@ -174,13 +176,18 @@ function DialogTool() {
 			editorDiv.innerHTML = "";
 
 			if (DoesDialogExist() || (creationOptions && creationOptions.CreateFromEmptyTextBox)) {
+				if (scriptEditor) {
+					scriptEditor.OnDestroy();
+					scriptEditor = null;
+				}
+
 				var defaultDialogNameFunc = creationOptions && creationOptions.GetDefaultName ? creationOptions.GetDefaultName : null;
 				scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea", defaultDialogNameFunc);
 				editorDiv.appendChild(scriptEditor.GetElement());
 
 				CheckForComplexCodeInDialog(shouldOpenDialogToolIfComplex);
 			}
-			else if (creationOptions.Presets) {
+			else if (creationOptions && creationOptions.Presets) {
 				function CreatePresetHandler(scriptStr, getDefaultNameFunc) {
 					return function() {
 						dialogId = nextAvailableDialogId();
@@ -255,8 +262,13 @@ function DialogTool() {
 		UpdateDialogIdSelectOptions();
 		UpdateEditorContent();
 		
-		events.Listen("new_dialog", function() { UpdateDialogIdSelectOptions(); });
-		events.Listen("dialog_update", function(event) {
+		listener.Listen("new_dialog", function() { UpdateDialogIdSelectOptions(); });
+		listener.Listen("dialog_update", function(event) {
+			if (dialogId === event.dialogId && !DoesDialogExist()) {
+				ChangeSelectedDialog(null);
+				UpdateDialogIdSelectOptions();
+			}
+
 			if (scriptEditor != null && event.editorId == scriptEditor.GetEditorId()) {
 				if (dialogId != event.dialogId) {
 					dialogId = event.dialogId;
@@ -301,11 +313,21 @@ function DialogTool() {
 		this.GetElement = function() {
 			return div;
 		}
+
+		this.OnDestroy = function() {
+			if (scriptEditor) {
+				scriptEditor.OnDestroy();
+				delete scriptEditor;
+			}
+			listener.UnlistenAll();
+		}
 	}
 
 	var dialogScriptEditorUniqueIdCounter = 0;
 
 	function PlaintextDialogScriptEditor(dialogId, style, defaultDialogNameFunc) {
+		var listener = new EventListener(events);
+
 		if (defaultDialogNameFunc === undefined) {
 			defaultDialogNameFunc = null; // just to be safe
 		}
@@ -385,7 +407,7 @@ function DialogTool() {
 			}
 		}
 
-		events.Listen("dialog_update", function(event) {
+		listener.Listen("dialog_update", function(event) {
 			if (DoesDialogExist() && event.dialogId === dialogId && event.editorId != editorId) {
 				RefreshEditorUI();
 			}
@@ -394,9 +416,15 @@ function DialogTool() {
 		this.GetEditorId = function() {
 			return editorId;
 		}
+
+		this.OnDestroy = function() {
+			listener.UnlistenAll();
+		}
 	}
 
 	function DialogScriptEditor(dialogId) {
+		var listener = new EventListener(events);
+
 		var editorId = dialogScriptEditorUniqueIdCounter;
 		dialogScriptEditorUniqueIdCounter++;
 
@@ -483,7 +511,7 @@ function DialogTool() {
 			viewportDiv.style.display = "none";
 		}
 
-		events.Listen("dialog_update", function(event) {
+		listener.Listen("dialog_update", function(event) {
 			if (event.dialogId === dialogId && event.editorId != editorId) {
 				RefreshEditorUI();
 			}
@@ -524,6 +552,10 @@ function DialogTool() {
 			var editor = new ConditionalEditor(node, rootEditor);
 			rootEditor.AppendChild(editor);
 			OnUpdate();
+		}
+
+		this.OnDestroy = function() {
+			listener.UnlistenAll();
 		}
 	}
 

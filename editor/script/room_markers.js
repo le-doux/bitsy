@@ -125,7 +125,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	// todo : handle two-way exits (and collisions!)
 	this.DuplicateSelected = function() {
-		if (selectedRoom == null) {
+		if (selectedRoom == null || curMarker == null) {
 			return;
 		}
 
@@ -217,11 +217,13 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 			SelectMarker(curMarker); // refresh UI and so on
 		}
+		else if (markerList.length > 0) {
+			// fallback selected exit
+			SelectMarker(markerList[0]);
+		}
 		else {
-			if (markerList.length > 0) {
-				// fallback selected exit
-				SelectMarker(markerList[0]);
-			}
+			// no markers are left!
+			SelectMarker(null);
 		}
 	}
 
@@ -467,7 +469,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 					curMarker.ending.id,
 					false,
 					function (id) {
-						curMarker.ending.id = id;
+						if (curMarker) {
+							curMarker.ending.id = id;
+						}
 					});
 				endingDialogWidgetContainer.appendChild(dialogWidget.GetElement());
 			}
@@ -920,6 +924,15 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	events.Listen("palette_change", function(event) {
 		RenderMarkerSelection();
+	});
+
+	events.Listen("dialog_update", function(event) {
+		if (curMarker != null && curMarker.type === MarkerType.Ending) {
+			if (curMarker.ending.id === event.dialogId) {
+				curMarker = null;
+				ResetMarkerList();
+			}
+		}
 	});
 
 } // RoomMarkerTool()
@@ -1401,7 +1414,7 @@ function EndingMarker(parentRoom, ending) {
 	this.Remove = function() {
 		delete dialog[this.ending.id];
 		var endingIndex = room[this.parentRoom].endings.indexOf(this.ending);
-		room[this.parentRoom].endings.splice(endingIndex,1);
+		room[this.parentRoom].endings.splice(endingIndex, 1);
 	}
 
 	this.Match = function(otherMarker) {
