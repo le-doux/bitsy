@@ -115,6 +115,15 @@ function DialogTool() {
 
 	// TODO : label should be label localization id
 	function DialogWidget(label, parentPanelId, dialogId, allowNone, onChange, creationOptions) {
+		// treat deleted dialogs as non-existent ones
+		if (!dialog.hasOwnProperty(dialogId)) {
+			dialogId = null;
+		}
+
+		function DoesDialogExist() {
+			return dialogId != undefined && dialogId != null && dialog.hasOwnProperty(dialogId);
+		}
+
 		var showSettings = false;
 
 		var div = document.createElement("div");
@@ -138,7 +147,7 @@ function DialogTool() {
 		openButton.innerHTML = '<i class="material-icons">open_in_new</i>';
 		openButton.onclick = function() {
 			// create an empty dialog if none exists to open in the editor
-			if (dialogId === null) {
+			if (!DoesDialogExist()) {
 				// todo : there's a lot of duplicate code in this widget for different dialog creation workflows
 				var id = nextAvailableDialogId();
 				dialog[id] = {
@@ -164,7 +173,7 @@ function DialogTool() {
 		function UpdateEditorContent(shouldOpenDialogToolIfComplex) {
 			editorDiv.innerHTML = "";
 
-			if (dialogId != null || (creationOptions && creationOptions.CreateFromEmptyTextBox)) {
+			if (DoesDialogExist() || (creationOptions && creationOptions.CreateFromEmptyTextBox)) {
 				var defaultDialogNameFunc = creationOptions && creationOptions.GetDefaultName ? creationOptions.GetDefaultName : null;
 				scriptEditor = new PlaintextDialogScriptEditor(dialogId, "miniDialogPlaintextArea", defaultDialogNameFunc);
 				editorDiv.appendChild(scriptEditor.GetElement());
@@ -259,7 +268,7 @@ function DialogTool() {
 			else if (scriptEditor != null && event.editorId != scriptEditor.GetEditorId()) {
 				// if we get an update from a linked editor saying this dialog
 				// is now complex, switch to the select view
-				if (dialogId != null && dialogId === event.dialogId) {
+				if (DoesDialogExist() && dialogId === event.dialogId) {
 					CheckForComplexCodeInDialog();
 				}
 			}
@@ -301,6 +310,10 @@ function DialogTool() {
 			defaultDialogNameFunc = null; // just to be safe
 		}
 
+		function DoesDialogExist() {
+			return dialogId != undefined && dialogId != null && dialog.hasOwnProperty(dialogId);
+		}
+
 		var editorId = dialogScriptEditorUniqueIdCounter;
 		dialogScriptEditorUniqueIdCounter++;
 
@@ -311,7 +324,7 @@ function DialogTool() {
 		var self = this;
 
 		function RefreshEditorUI() {
-			var dialogStr = dialogId === null ? "" : dialog[dialogId].src;
+			var dialogStr = !DoesDialogExist() ? "" : dialog[dialogId].src;
 
 			div.innerHTML = "";
 			scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
@@ -347,13 +360,13 @@ function DialogTool() {
 			var dialogStr = scriptRootNode.Serialize();
 
 			var didMakeNewDialog = false;
-			if (dialogStr.length > 0 && dialogId === null) {
+			if (dialogStr.length > 0 && !DoesDialogExist()) {
 				dialogId = nextAvailableDialogId();
 				dialog[dialogId] = { src: "", name: defaultDialogNameFunc ? defaultDialogNameFunc() : null }; // init new dialog
 				didMakeNewDialog = true;
 			}
 
-			if (dialogId === null) {
+			if (!DoesDialogExist()) {
 				return;
 			}
 
@@ -373,7 +386,7 @@ function DialogTool() {
 		}
 
 		events.Listen("dialog_update", function(event) {
-			if (dialogId != null && event.dialogId === dialogId && event.editorId != editorId) {
+			if (DoesDialogExist() && event.dialogId === dialogId && event.editorId != editorId) {
 				RefreshEditorUI();
 			}
 		});
