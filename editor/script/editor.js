@@ -1268,7 +1268,9 @@ function duplicateExit(exit) {
 			room : exit.dest.room,
 			x : exit.dest.x,
 			y : exit.dest.y
-		}
+		},
+		transition_effect : exit.transition_effect,
+		dlg: exit.dlg,
 	}
 	return newExit;
 }
