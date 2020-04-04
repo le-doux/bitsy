@@ -495,15 +495,6 @@ function deleteDialog() {
 	}
 }
 
-function addNewExitDialog() {
-	markerTool.AddExitDialog();
-}
-
-function addNewExitDialogLock() {
-	markerTool.AddExitDialogLock();
-}
-
-
 // TODO : move into the paint tool
 function reloadDialogUI() {
 	var dialogContent = document.getElementById("dialog");
@@ -1245,6 +1236,7 @@ function duplicateRoom() {
 
 	curRoom = newRoomId;
 	//console.log(curRoom);
+	markerTool.SetRoom(curRoom); // hack to re-find all the markers
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
@@ -2391,9 +2383,9 @@ function newEnding() {
 	roomTool.drawEditMap();
 }
 
-function newEffect() {
-	markerTool.AddEffect();
-	roomTool.drawEditMap();
+function duplicateMarker() {
+	markerTool.DuplicateSelected();
+	roomTool.drawEditMap(); // TODO : this should be triggered by an event really
 }
 
 function deleteMarker() {

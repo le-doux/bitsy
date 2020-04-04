@@ -91,7 +91,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				},
 				transition_effect : null,
 			}
-			room[newExit.dest.room].exits.push( newReturn );			
+			room[newExit.dest.room].exits.push( newReturn );
 		}
 
 		markerList = GatherMarkerList();
@@ -118,6 +118,52 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; }));
 		refreshGameData();
+	}
+
+	// todo : handle two-way exits (and collisions!)
+	this.DuplicateSelected = function() {
+		if (selectedRoom == null) {
+			return;
+		}
+
+		if (curMarker.type === MarkerType.Exit) {
+			var newExit = duplicateExit(curMarker.exit);
+
+			if (newExit.x < 15) {
+				newExit.x++;
+			}
+			else if (newExit.y < 15) {
+				newExit.x = 0;
+				newExit.y++;
+			}
+
+			room[selectedRoom].exits.push(newExit);
+
+			markerList = GatherMarkerList();
+			SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Exit && m.exit == newExit; }));
+			refreshGameData();
+		}
+		else if (curMarker.type === MarkerType.Ending) {
+			var newEnding = { // TODO : there should be a helper function for this copy
+				x : curMarker.ending.x,
+				y : curMarker.ending.y,
+				id : curMarker.ending.id,
+			};
+
+			if (newEnding.x < 15) {
+				newEnding.x++;
+			}
+			else if (newEnding.y < 15) {
+				newEnding.x = 0;
+				newEnding.y++;
+			}
+
+			room[selectedRoom].endings.push(newEnding);
+
+			markerList = GatherMarkerList();
+			SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; }));
+			refreshGameData();
+		}
 	}
 
 	this.Clear = function() {
@@ -867,35 +913,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				document.getElementById("exitDirectionForwardIcon").style.visibility = "hidden";
 			}
 		}
-	}
-
-	function AddExitDialogScript(scriptStr) {
-		if (curMarker != null && curMarker.type == MarkerType.Exit) {
-			var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
-			if (exit.dlg === undefined || exit.dlg === null) {
-				var newDialogId = nextAvailableDialogId();
-				dialog[newDialogId] = scriptStr;
-				exit.dlg = newDialogId;
-				refreshGameData();
-
-				UpdateAllExitOptions();
-			}
-		}
-	}
-
-	this.AddExitDialog = function() {
-		AddExitDialogScript("You walk through the doorway");
-	}
-
-	this.AddExitDialogLock = function() {
-		AddExitDialogScript(
-				'"""\n' +
-				'{\n' +
-				'  - {item "0"} < 1 ?\n' +
-				'    {lock}\n' +
-				'}\n' +
-				'"""'
-			);
 	}
 
 	events.Listen("palette_change", function(event) {
