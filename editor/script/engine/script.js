@@ -158,7 +158,7 @@ var Utils = function() {
 	}
 
 	this.CreateEmptyPrintFunc = function() {
-		return new FuncNode("print", [new LiteralNode(" ")]);
+		return new FuncNode("print", [new LiteralNode("...")]);
 	}
 
 	this.CreateFunctionBlock = function(name, initParamValues) {
@@ -230,10 +230,10 @@ var Utils = function() {
 
 	this.CreateSequenceBlock = function() {
 		var option1 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		option1.AddChild(new FuncNode("print", [new LiteralNode("...")]));
 
 		var option2 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		option2.AddChild(new FuncNode("print", [new LiteralNode("...")]));
 
 		var sequence = new SequenceNode( [ option1, option2 ] );
 		var block = new CodeBlockNode();
@@ -243,10 +243,10 @@ var Utils = function() {
 
 	this.CreateCycleBlock = function() {
 		var option1 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		option1.AddChild(new FuncNode("print", [new LiteralNode("...")]));
 
 		var option2 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		option2.AddChild(new FuncNode("print", [new LiteralNode("...")]));
 
 		var sequence = new CycleNode( [ option1, option2 ] );
 		var block = new CodeBlockNode();
@@ -256,10 +256,10 @@ var Utils = function() {
 
 	this.CreateShuffleBlock = function() {
 		var option1 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		option1.AddChild(new FuncNode("print", [new LiteralNode("...")]));
 
 		var option2 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		option2.AddChild(new FuncNode("print", [new LiteralNode("...")]));
 
 		var sequence = new ShuffleNode( [ option1, option2 ] );
 		var block = new CodeBlockNode();
@@ -276,10 +276,10 @@ var Utils = function() {
 		var condition2 = new ElseNode();
 
 		var result1 = new DialogBlockNode();
-		result1.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		result1.AddChild(new FuncNode("print", [new LiteralNode("...")]));
 
 		var result2 = new DialogBlockNode();
-		result2.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		result2.AddChild(new FuncNode("print", [new LiteralNode("...")]));
 
 		var ifNode = new IfNode( [ condition1, condition2 ], [ result1, result2 ] );
 		var block = new CodeBlockNode();
