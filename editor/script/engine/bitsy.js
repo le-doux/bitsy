@@ -1015,16 +1015,20 @@ function isSpriteOffstage(id) {
 }
 
 function parseWorld(file) {
-	// console.log("~~~ PARSE WORLD ~~~");
-	// console.log(file);
-
-	// var parseTimer = new Timer();
-
 	spriteStartLocations = {};
 
 	resetFlags();
 
 	var versionNumber = 0;
+
+	// flags to keep track of which compatibility conversions
+	// need to be applied to this game data
+	var compatibilityFlags = {
+		convertSayToPrint : false,
+		combineEndingsWithDialog : false,
+		convertImplicitSpriteDialogIds : false,
+		updateScriptLinebreakParsing : false,
+	};
 
 	var lines = file.split("\n");
 	var i = 0;
@@ -1040,6 +1044,16 @@ function parseWorld(file) {
 			// collect version number (from a comment.. hacky I know)
 			if (curLine.indexOf("# BITSY VERSION ") != -1) {
 				versionNumber = parseFloat(curLine.replace("# BITSY VERSION ", ""));
+
+				if (versionNumber < 5.0) {
+					compatibilityFlags.convertSayToPrint = true;
+				}
+
+				if (versionNumber < 7.0) {
+					compatibilityFlags.combineEndingsWithDialog = true;
+					compatibilityFlags.convertImplicitSpriteDialogIds = true;
+					compatibilityFlags.updateScriptLinebreakParsing = true;
+				}
 			}
 
 			//skip blank lines & comments
@@ -1049,7 +1063,7 @@ function parseWorld(file) {
 			i = parsePalette(lines, i);
 		}
 		else if (getType(curLine) === "ROOM" || getType(curLine) === "SET") { //SET for back compat
-			i = parseRoom(lines, i, versionNumber);
+			i = parseRoom(lines, i, compatibilityFlags);
 		}
 		else if (getType(curLine) === "TIL") {
 			i = parseTile(lines, i);
@@ -1064,11 +1078,11 @@ function parseWorld(file) {
 			i = parseDrawing(lines, i);
 		}
 		else if (getType(curLine) === "DLG") {
-			i = parseDialog(lines, i, versionNumber);
+			i = parseDialog(lines, i, compatibilityFlags);
 		}
-		else if (getType(curLine) === "END" && versionNumber < 7) {
+		else if (getType(curLine) === "END" && compatibilityFlags.combineEndingsWithDialog) {
 			// parse endings for back compat
-			i = parseEnding(lines, i, versionNumber);
+			i = parseEnding(lines, i, compatibilityFlags);
 		}
 		else if (getType(curLine) === "VAR") {
 			i = parseVariable(lines, i);
@@ -1110,15 +1124,57 @@ function parseWorld(file) {
 		initRoom(curRoom);
 	}
 
-	console.log("START ROOM " + curRoom);
-
 	renderer.SetPalettes(palette);
 
-	// console.log(names);
-
-	// console.log("~~~~~ PARSE TIME " + parseTimer.Milliseconds());
+	scriptCompatibility(compatibilityFlags);
 
 	return versionNumber;
+}
+
+function scriptCompatibility(compatibilityFlags) {
+	if (compatibilityFlags.convertSayToPrint) {
+		console.log("CONVERT SAY TO PRINT!");
+
+		var PrintFunctionVisitor = function() {
+			var didChange = false;
+			this.DidChange = function() { return didChange; };
+
+			this.Visit = function(node) {
+				if (node.type != "function") {
+					return;
+				}
+
+				if (node.name === "say") {
+					node.name = "print";
+					didChange = true;
+				}
+			};
+		};
+
+		for (dlgId in dialog) {
+			var dialogScript = scriptInterpreter.Parse(dialog[dlgId].src);
+			var visitor = new PrintFunctionVisitor();
+			dialogScript.VisitAll(visitor);
+			if (visitor.DidChange()) {
+				var newDialog = dialogScript.Serialize();
+				if (newDialog.indexOf("\n") > -1) {
+					newDialog = '"""\n' + newDialog + '\n"""';
+				}
+				dialog[dlgId].src = newDialog;
+			}
+		}
+	}
+
+	if (compatibilityFlags.updateScriptLinebreakParsing) {
+		for (dlgId in dialog) {
+			var dialogScript = scriptInterpreter.CompatibilityParse(dialog[dlgId].src, compatibilityFlags);
+			var newDialog = dialogScript.Serialize();
+			if (newDialog.indexOf("\n") > -1) {
+				newDialog = '"""\n' + newDialog + '\n"""';
+			}
+			dialog[dlgId].src = newDialog;
+		}
+	}
 }
 
 //TODO this is in progress and doesn't support all features
@@ -1391,7 +1447,7 @@ function parseTitle(lines, i) {
 	return i;
 }
 
-function parseRoom(lines, i, versionNumber) {
+function parseRoom(lines, i, compatibilityFlags) {
 	var id = getId(lines[i]);
 	room[id] = {
 		id : id,
@@ -1519,19 +1575,20 @@ function parseRoom(lines, i, versionNumber) {
 		}
 		else if (getType(lines[i]) === "END") {
 			/* ADD ENDING */
-			var endId = getId( lines[i] );
+			var endId = getId(lines[i]);
 
-			// back compat for when endings were stored separate from other dialog
-			if (versionNumber < 7) {
-				endId = "_end_" + endId;
+			// compatibility with when endings were stored separate from other dialog
+			if (compatibilityFlags.combineEndingsWithDialog) {
+				endId = "end_" + endId;
 			}
 
-			var endCoords = getCoord( lines[i], 2 );
+			var endCoords = getCoord(lines[i], 2);
 			var end = {
 				id : endId,
-				x : parseInt( endCoords[0] ),
-				y : parseInt( endCoords[1] )
+				x : parseInt(endCoords[0]),
+				y : parseInt(endCoords[1])
 			};
+
 			room[id].endings.push(end);
 		}
 		else if (getType(lines[i]) === "PAL") {
@@ -1541,10 +1598,12 @@ function parseRoom(lines, i, versionNumber) {
 		else if (getType(lines[i]) === "NAME") {
 			var name = lines[i].split(/\s(.+)/)[1];
 			room[id].name = name;
-			names.room.set( name, id);
+			names.room.set(name, id);
 		}
+
 		i++;
 	}
+
 	return i;
 }
 
@@ -1815,7 +1874,7 @@ function parseDrawingCore(lines, i, drwId) {
 	return i;
 }
 
-function parseScript(lines, i, backCompatPrefix, versionNumber) {
+function parseScript(lines, i, backCompatPrefix, compatibilityFlags) {
 	var id = getId(lines[i]);
 	id = backCompatPrefix + id;
 	i++;
@@ -1824,7 +1883,7 @@ function parseScript(lines, i, backCompatPrefix, versionNumber) {
 
 	dialog[id] = { src:results.script, name:null };
 
-	if (versionNumber < 7) {
+	if (compatibilityFlags.convertImplicitSpriteDialogIds) {
 		// explicitly hook up dialog that used to be implicitly
 		// connected by sharing sprite and dialog IDs in old versions
 		if (sprite[id]) {
@@ -1839,11 +1898,11 @@ function parseScript(lines, i, backCompatPrefix, versionNumber) {
 	return i;
 }
 
-function parseDialog(lines, i, versionNumber) {
+function parseDialog(lines, i, compatibilityFlags) {
 	// hacky but I need to store this so I can set the name below
 	var id = getId(lines[i]);
 
-	i = parseScript(lines, i, "", versionNumber);
+	i = parseScript(lines, i, "", compatibilityFlags);
 
 	if (lines[i].length > 0 && getType(lines[i]) === "NAME") {
 		dialog[id].name = lines[i].split(/\s(.+)/)[1]; // TODO : hacky to keep copying this regex around...
@@ -1854,9 +1913,9 @@ function parseDialog(lines, i, versionNumber) {
 	return i;
 }
 
-function parseEnding(lines, i, versionNumber) {
-	// TODO : does this need to handle names?
-	return parseScript(lines, i, "_end_", versionNumber);
+// keeping this around to parse old files where endings were separate from dialogs
+function parseEnding(lines, i, compatibilityFlags) {
+	return parseScript(lines, i, "end_", compatibilityFlags);
 }
 
 function parseVariable(lines, i) {

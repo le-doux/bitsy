@@ -2169,49 +2169,11 @@ function on_game_data_change() {
 	refreshGameData();
 }
 
-function convertGameDataToCurVersion(importVersion) {
-	if (importVersion < 5.0) {
-		console.log("version under 5!!!!");
-
-		var PrintFunctionVisitor = function() {
-			var didChange = false;
-			this.DidChange = function() { return didChange; };
-
-			this.Visit = function(node) {
-				if ( node.type != "function" )
-					return;
-
-				// console.log("VISIT " + node.name);
-
-				if ( node.name === "say" ) {
-					node.name = "print";
-					didChange = true;
-				}
-			};
-		};
-
-		for (dlgId in dialog) {
-			var dialogScript = scriptInterpreter.Parse(dialog[dlgId].src);
-			var visitor = new PrintFunctionVisitor();
-			dialogScript.VisitAll(visitor);
-			if (visitor.DidChange()) {
-				var newDialog = dialogScript.Serialize();
-				if (newDialog.indexOf("\n") > -1) {
-					newDialog = '"""\n' + newDialog + '\n"""';
-				}
-				dialog[dlgId].src = newDialog;
-			}
-		}
-	}
-}
-
 function on_game_data_change_core() {
 	console.log(document.getElementById("game_data").value);
 
 	clearGameData();
 	var version = parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
-
-	convertGameDataToCurVersion(version);
 
 	var curPaintMode = drawing.type; //save current paint mode (hacky)
 

@@ -52,6 +52,17 @@ var Interpreter = function() {
 	this.Parse = function(scriptStr, rootId) { // parses a script but doesn't save it
 		return parser.Parse(scriptStr, rootId);
 	}
+
+	this.CompatibilityParse = function(scriptStr, compatibilityFlags) {
+		env.compatibilityFlags = compatibilityFlags;
+
+		var result = parser.Parse(scriptStr);
+
+		delete env.compatibilityFlags;
+
+		return result;
+	}
+
 	this.Eval = function(scriptTree, exitHandler) { // runs a script stored externally
 		var localEnv = new LocalEnvironment(env); // TODO : does this need an object context?
 		scriptTree.Eval(
@@ -1678,10 +1689,21 @@ var Parser = function(env) {
 		}
 
 		var tryAddLinebreakNodeToList = function() {
-			console.log("TRY ADD LINEBREAK " + prevLineIsDialogLine + " " + curLineIsDialogLine());
-			if (prevLineIsDialogLine && curLineIsDialogLine()) {
-				var linebreakNode = new FuncNode("br", []);
-				curLineNodeList.unshift(linebreakNode);
+			var useOldLinebreakLogic = environment.compatibilityFlags && environment.compatibilityFlags.updateScriptLinebreakParsing;
+
+			// TODO : this isn't *quite* working yet!
+			if (useOldLinebreakLogic) {
+				console.log("USE OLD LINEBREAK LOGIC!!");
+				if (prevLineIsDialogLine) {
+					var linebreakNode = new FuncNode("br", []);
+					curLineNodeList.unshift(linebreakNode);
+				}
+			}
+			else {
+				if (prevLineIsDialogLine && curLineIsDialogLine()) {
+					var linebreakNode = new FuncNode("br", []);
+					curLineNodeList.unshift(linebreakNode);
+				}
 			}
 		}
 
