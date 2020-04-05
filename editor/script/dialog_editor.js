@@ -2634,6 +2634,7 @@ function DialogTool() {
 				parameterInput = document.createElement("input");
 				parameterInput.type = "number";
 				parameterInput.min = 0;
+				parameterInput.step = "any";
 				parameterInput.value = value;
 				parameterInput.onchange = function(event) {
 					var val = event.target.value;
