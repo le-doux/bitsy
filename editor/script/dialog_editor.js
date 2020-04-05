@@ -360,11 +360,14 @@ function DialogTool() {
 			codeTextArea.cols = 32;
 			codeTextArea.classList.add(style);
 			codeTextArea.value = scriptRootNode.Serialize();
-			codeTextArea.onchange = function() {
+			function OnTextChangeHandler() {
 				var dialogStr = '"""\n' + codeTextArea.value + '\n"""'; // single lines?
 				scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
 				OnUpdate();
 			}
+			codeTextArea.onchange = OnTextChangeHandler;
+			codeTextArea.onkeyup = OnTextChangeHandler;
+			codeTextArea.onblur = OnTextChangeHandler;
 			dialogBoxContainer.appendChild(codeTextArea);
 		}
 
@@ -1038,6 +1041,8 @@ function DialogTool() {
 			var textArea = document.createElement("textarea");
 			textArea.value = scriptUtils.SerializeDialogNodeList(dialogNodeList);
 			textArea.onchange = OnDialogTextChange;
+			textArea.onkeyup = OnDialogTextChange;
+			textArea.onblur = OnDialogTextChange;
 			textArea.rows = 2;
 			textArea.cols = 32;
 			textArea.addEventListener('click', textSelectionChangeHandler);
@@ -1047,7 +1052,7 @@ function DialogTool() {
 			textHolderDiv.onclick = function() {
 				textArea.focus(); // hijack focus into the actual textarea
 			}
-			div.appendChild(textHolderDiv);			
+			div.appendChild(textHolderDiv);
 		}
 		else {
 			var textboxContainerDiv = document.createElement("div");
