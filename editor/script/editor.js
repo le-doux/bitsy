@@ -1770,6 +1770,8 @@ function on_edit_mode() {
 		// }
 	}
 	document.getElementById("previewDialogCheck").disabled = false;
+
+	events.Raise("on_edit_mode");
 }
 
 // hacky - part of hiding font data from the game data

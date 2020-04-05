@@ -563,6 +563,29 @@ function DialogTool() {
 			OnUpdate();
 		}
 
+		// I only listen to these events at the root of the script editor
+		// since that makes it easier to clean them up when the editor
+		// is destroyed and avoid leaking memory
+		listener.Listen("script_node_enter", function(event) {
+			if (rootEditor && rootEditor.OnNodeEnter) {
+				rootEditor.OnNodeEnter(event);
+			}
+		});
+
+		listener.Listen("script_node_exit", function(event) {
+			if (rootEditor && rootEditor.OnNodeExit) {
+				rootEditor.OnNodeExit(event);
+			}
+		});
+
+		// we need to remove all the animations when we enter edit mode
+		// regardless of whether we stopped the script mid-execution
+		listener.Listen("on_edit_mode", function(event) {
+			if (rootEditor && rootEditor.OnNodeExit) {
+				rootEditor.OnNodeExit({id:null, forceClear:true});
+			}
+		});
+
 		this.OnDestroy = function() {
 			listener.UnlistenAll();
 		}
@@ -726,6 +749,22 @@ function DialogTool() {
 
 		this.ChildCount = function() {
 			return childEditors.length;
+		}
+
+		this.OnNodeEnter = function(event) {
+			for (var i = 0; i < childEditors.length; i++) {
+				if (childEditors[i].OnNodeEnter) {
+					childEditors[i].OnNodeEnter(event);
+				}
+			}
+		}
+
+		this.OnNodeExit = function(event) {
+			for (var i = 0; i < childEditors.length; i++) {
+				if (childEditors[i].OnNodeExit) {
+					childEditors[i].OnNodeExit(event);
+				}
+			}
 		}
 
 		CreateChildEditors();
@@ -1235,26 +1274,27 @@ function DialogTool() {
 			return dialogNodeList;
 		}
 
-		events.Listen("script_node_enter", function(event) {
+		this.OnNodeEnter = function(event) {
 			if (event.id != undefined) {
 				var enterIndex = dialogNodeList.findIndex(function(node) { return node.GetId() === event.id });
 				if (enterIndex == 0) {
 					div.classList.add("executing");
 				}
 			}
-		});
+		};
 
-		events.Listen("script_node_exit", function(event) {
+		this.OnNodeExit = function(event) {
 			if (event.id != undefined) {
 				var exitIndex = dialogNodeList.findIndex(function(node) { return node.GetId() === event.id });
-				if (exitIndex >= dialogNodeList.length-1) {
+				if (exitIndex >= dialogNodeList.length-1 || event.forceClear) {
 					div.classList.remove("executing");
 					div.classList.remove("executingLeave");
 					void div.offsetWidth; // hack to force reflow to allow animation to restart
 					div.classList.add("executingLeave");
+					setTimeout(function() { div.classList.remove("executingLeave") }, 1100);
 				}
 			}
-		});
+		};
 	}
 
 	function ExpressionEditor(node, parentEditor, isInline) {
@@ -1660,20 +1700,37 @@ function DialogTool() {
 
 		CreateOptionEditors();
 
-		events.Listen("script_node_enter", function(event) {
+		this.OnNodeEnter = function(event) {
 			if (event.id === node.GetId()) {
 				div.classList.add("executing");
 			}
-		});
 
-		events.Listen("script_node_exit", function(event) {
-			if (event.id === node.GetId()) {
+			for (var i = 0; i < optionEditors.length; i++) {
+				if (optionEditors[i].OnNodeEnter) {
+					optionEditors[i].OnNodeEnter(event);
+				}
+			}
+		};
+
+		// TODO : some kind of "visit all" functionality like the
+		// script node system has would be super helpful...
+		// in fact sharing the child - parent relationship code between the two
+		// would make sense...
+		this.OnNodeExit = function(event) {
+			if (event.id === node.GetId() || event.forceClear) {
 				div.classList.remove("executing");
 				div.classList.remove("executingLeave");
 				void div.offsetWidth; // hack to force reflow to allow animation to restart
 				div.classList.add("executingLeave");
+				setTimeout(function() { div.classList.remove("executingLeave") }, 1100);
 			}
-		});
+
+			for (var i = 0; i < optionEditors.length; i++) {
+				if (optionEditors[i].OnNodeExit) {
+					optionEditors[i].OnNodeExit(event);
+				}
+			}
+		};
 	}
 
 	function SequenceOptionEditor(optionNode, parentEditor) {
@@ -1708,6 +1765,15 @@ function DialogTool() {
 				numString = ConvertNumberStringToArabic(numString);
 			}
 			orderLabel.innerText = numString + ")";
+		}
+
+		// just pass these on
+		this.OnNodeEnter = function(event) {
+			blockEditor.OnNodeEnter(event);
+		}
+
+		this.OnNodeExit = function(event) {
+			blockEditor.OnNodeExit(event);
 		}
 
 		AddSelectionBehavior(this);
@@ -1906,20 +1972,33 @@ function DialogTool() {
 
 		CreateOptionEditors();
 
-		events.Listen("script_node_enter", function(event) {
+		this.OnNodeEnter = function(event) {
 			if (event.id === node.GetId()) {
 				div.classList.add("executing");
 			}
-		});
 
-		events.Listen("script_node_exit", function(event) {
-			if (event.id === node.GetId()) {
+			for (var i = 0; i < optionEditors.length; i++) {
+				if (optionEditors[i].OnNodeEnter) {
+					optionEditors[i].OnNodeEnter(event);
+				}
+			}
+		};
+
+		this.OnNodeExit = function(event) {
+			if (event.id === node.GetId() || event.forceClear) {
 				div.classList.remove("executing");
 				div.classList.remove("executingLeave");
 				void div.offsetWidth; // hack to force reflow to allow animation to restart
 				div.classList.add("executingLeave");
+				setTimeout(function() { div.classList.remove("executingLeave") }, 1100);
 			}
-		});
+
+			for (var i = 0; i < optionEditors.length; i++) {
+				if (optionEditors[i].OnNodeExit) {
+					optionEditors[i].OnNodeExit(event);
+				}
+			}
+		};
 	}
 
 	function ConditionalOptionEditor(conditionPairNode, parentEditor, index) {
@@ -1963,6 +2042,15 @@ function DialogTool() {
 		this.UpdateIndex = function(i) {
 			index = i;
 			comparisonEditor.UpdateIndex(index);
+		}
+
+		// just pass these on
+		this.OnNodeEnter = function(event) {
+			resultBlockEditor.OnNodeEnter(event);
+		}
+
+		this.OnNodeExit = function(event) {
+			resultBlockEditor.OnNodeExit(event);
 		}
 
 		AddSelectionBehavior(
@@ -2415,22 +2503,21 @@ function DialogTool() {
 			},
 			isInline);
 
-		if (!isInline) {
-			events.Listen("script_node_enter", function(event) {
-				if (event.id === node.GetId()) {
-					div.classList.add("executing");
-				}
-			});
+		this.OnNodeEnter = function(event) {
+			if (!isInline && event.id === node.GetId()) {
+				div.classList.add("executing");
+			}
+		};
 
-			events.Listen("script_node_exit", function(event) {
-				if (event.id === node.GetId()) {
-					div.classList.remove("executing");
-					div.classList.remove("executingLeave");
-					void div.offsetWidth; // hack to force reflow to allow animation to restart
-					div.classList.add("executingLeave");
-				}
-			});
-		}
+		this.OnNodeExit = function(event) {
+			if (!isInline && (event.id === node.GetId() || event.forceClear)) {
+				div.classList.remove("executing");
+				div.classList.remove("executingLeave");
+				void div.offsetWidth; // hack to force reflow to allow animation to restart
+				div.classList.add("executingLeave");
+				setTimeout(function() { div.classList.remove("executingLeave") }, 1100);
+			}
+		};
 	}
 
 	function CreateDefaultArgNode(type) {
