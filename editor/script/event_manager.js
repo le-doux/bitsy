@@ -3,11 +3,18 @@ function EventManager() {
 
 	var eventStack = [];
 
+	var isDebug = true;
+
 	this.Listen = function(eventName, callback) {
 		if (callbacks[eventName] == null) {
 			callbacks[eventName] = [];
 		}
 		callbacks[eventName].push(callback);
+
+		if (isDebug) {
+			console.log("EVENTS >>> " + eventName + " >>> " + callbacks[eventName].length);
+		}
+
 		return callback;
 	}
 
@@ -16,6 +23,10 @@ function EventManager() {
 			var i = callbacks[eventName].indexOf(callback);
 			if (i > -1) {
 				callbacks[eventName].splice(i, 1);
+
+				if (isDebug) {
+					console.log("EVENTS >>> " + eventName + " >>> " + callbacks[eventName].length);
+				}
 			}
 		}
 	}

@@ -447,6 +447,15 @@ function DialogTool() {
 			viewportDiv.classList.add("dialogContentViewport");
 			// always selected so we can add actions to the root
 			viewportDiv.classList.add("selectedEditor");
+			viewportDiv.onclick = function() {
+				// a hack to allow you to not have anything selected
+				// if you click the background of the script editor
+				// global curSelectedEditor is still a bit hacky :/
+				if (curSelectedEditor != null) {
+					curSelectedEditor.Deselect();
+					curSelectedEditor = null;
+				}
+			}
 
 			viewportDiv.appendChild(rootEditor.GetElement());
 			div.appendChild(viewportDiv);
@@ -1243,7 +1252,7 @@ function DialogTool() {
 					div.classList.remove("executingLeave");
 					void div.offsetWidth; // hack to force reflow to allow animation to restart
 					div.classList.add("executingLeave");
-				}				
+				}
 			}
 		});
 	}
@@ -3117,7 +3126,7 @@ function DialogTool() {
 		function ResetExpressionDiv() {
 				expressionDiv.innerHTML = "";
 				var expressionEditor = new ExpressionEditor(expressionRootNode, parentEditor, true);
-				expressionDiv.appendChild(expressionEditor.GetElement());	
+				expressionDiv.appendChild(expressionEditor.GetElement());
 				curNumberSpan = document.createElement("span");
 				curNumberSpan.classList.add(GetColorClassForParameterType("number"));
 				curNumberSpan.style.borderRadius = "2px";
@@ -3349,7 +3358,7 @@ function DialogTool() {
 			button.innerText = boolInputs[i];
 			button.onclick = CreateBoolInputHandler(boolInputs[i]);
 
-			boolInputDiv.appendChild(button);			
+			boolInputDiv.appendChild(button);
 		}
 
 		// controls for finishing building the expression
@@ -3379,7 +3388,7 @@ function DialogTool() {
 			div.classList.add("expressionBuilderSave");
 			setTimeout(function() {
 				TryAddCurrentNumberToExpression();
-				onAcceptHandler(expressionRootNode);				
+				onAcceptHandler(expressionRootNode);
 			}, 750);
 		}
 		finishControlsRoot.appendChild(acceptButton);
