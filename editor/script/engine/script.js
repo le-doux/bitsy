@@ -499,11 +499,6 @@ function propertyFunc(environment, parameters, onReturn) {
 	onReturn(outValue);
 }
 
-function lockFunc(environment,parameters,onReturn) {
-	environment.LockDefaultAction();
-	onReturn(null);
-}
-
 function endFunc(environment,parameters,onReturn) {
 	isEnding = true;
 	isNarrating = true;
@@ -657,7 +652,6 @@ var Environment = function() {
 	functionMap.set("printTile", printTileFunc);
 	functionMap.set("printItem", printItemFunc);
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
-	functionMap.set("lock", lockFunc); // TODO : remove and replace with property?
 	functionMap.set("end", endFunc);
 	functionMap.set("exit", exitFunc);
 	functionMap.set("pg", pagebreakFunc); // TODO : name?
@@ -763,15 +757,10 @@ var LocalEnvironment = function(parentEnvironment) {
 	// this.GetVariableNames
 
 	/* Here's where specific local context data goes:
-	 * so far it's just whether we want to stop the default action
-	 * that usually comes after this action
-	 * but there will be more later (I swear!)
-	*/
-	var isLocked = false;
-	this.LockDefaultAction = function() { isLocked = true; };
-	this.IsDefaultActionLocked = function() { return isLocked; };
+	 * this includes access to the object running the script
+	 * and any properties it may have (so far only "locked")
+	 */
 
-	// PROTO
 	// The local environment knows what object called it -- currently only used to access properties
 	var curObject = null;
 	this.HasObject = function() { return curObject != undefined && curObject != null; }

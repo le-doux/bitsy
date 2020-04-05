@@ -2202,13 +2202,6 @@ function DialogTool() {
 	}
 
 	var functionDescriptionMap = {
-		"lock" : {
-			name : "lock",
-			description : "cancel the default action",
-			parameters : [],
-			helpText : "exits won't change rooms, endings won't stop the game, "
-				+ "items won't be picked up, etc.",
-		},
 		"end" : {
 			name : "end",
 			description : "stop the game",
@@ -2249,6 +2242,10 @@ function DialogTool() {
 				{ types: ["variable"], index: 0, name: "name", doNotEdit: true }, // NOTE: disable editing of property names for this version
 				{ types: ["number", "text", "bool", "variable"], index: 1, name: "value" },
 			],
+			// TODO : when there's more than one property, this will have to change!
+			helpText : "change the value of a property: for example,"
+				+ " set the locked property to true to stop an exit from changing rooms,"
+				+ " or to prevent an ending from stopping the game",
 		},
 		"print" : {
 			name : "print",
