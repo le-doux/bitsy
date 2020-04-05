@@ -53,7 +53,12 @@ var Interpreter = function() {
 		return parser.Parse(scriptStr, rootId);
 	}
 	this.Eval = function(scriptTree, exitHandler) { // runs a script stored externally
-		scriptTree.Eval( env, function(result) { OnScriptReturn(result, exitHandler); } );
+		var localEnv = new LocalEnvironment(env); // TODO : does this need an object context?
+		scriptTree.Eval(
+			localEnv,
+			function(result) {
+				OnScriptReturn(result, exitHandler);
+			});
 	}
 
 	function OnScriptReturn(result, exitHandler) {
