@@ -3,7 +3,7 @@ function EventManager() {
 
 	var eventStack = [];
 
-	var isDebug = true;
+	var isDebug = false;
 
 	this.Listen = function(eventName, callback) {
 		if (callbacks[eventName] == null) {

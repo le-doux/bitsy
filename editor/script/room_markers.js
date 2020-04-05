@@ -422,6 +422,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
+	var endingDialogWidget = null;
+
 	function UpdateMarkerOptions() {
 		var exitOptions = document.getElementById("exitOptions");
 		exitOptions.style.display = "none";
@@ -462,8 +464,14 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 				var endingDialogWidgetContainer = document.getElementById("endingDialogWidget");
 				endingDialogWidgetContainer.innerHTML = "";
+
+				// clean up old widget
+				if (endingDialogWidget) {
+					endingDialogWidget.OnDestroy();
+				}
+
 				// TODO : localize
-				var dialogWidget = dialogTool.CreateWidget(
+				endingDialogWidget = dialogTool.CreateWidget(
 					"ending dialog",
 					"exitsPanel",
 					curMarker.ending.id,
@@ -473,7 +481,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 							curMarker.ending.id = id;
 						}
 					});
-				endingDialogWidgetContainer.appendChild(dialogWidget.GetElement());
+				endingDialogWidgetContainer.appendChild(endingDialogWidget.GetElement());
 			}
 		}
 	}
@@ -485,6 +493,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
+	var exitDialogWidgets = [null, null];
 	function UpdateExitOptions(exitIndex) {
 		if (exitIndex == 1 && !curMarker.hasReturn) {
 			return; // oh no! the return doesn't exist!
@@ -505,7 +514,13 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		var exitDialogControls = document.getElementById(exitIndex == 0 ? "exitDialogControls" : "returnExitDialogControls");
 		exitDialogControls.innerHTML = "";
-		var dialogWidget = dialogTool.CreateWidget(
+
+		// clean up old widget
+		if (exitDialogWidgets[exitIndex] != null) {
+			exitDialogWidgets[exitIndex].OnDestroy();
+		}
+
+		exitDialogWidgets[exitIndex] = dialogTool.CreateWidget(
 			"exit dialog", // TODO : localize
 			"exitsPanel",
 			exit.dlg,
@@ -547,7 +562,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 					return CreateDefaultName("exit dialog", dialog); // todo : localize
 				},
 			});
-		exitDialogControls.appendChild(dialogWidget.GetElement());
+		exitDialogControls.appendChild(exitDialogWidgets[exitIndex].GetElement());
 	}
 
 	this.ChangeExitTransitionEffect = function(effectId, exitIndex) {

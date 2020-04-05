@@ -540,13 +540,20 @@ function deleteDialog() {
 }
 
 // TODO : move into the paint tool
+var paintDialogWidget = null;
 function reloadDialogUI() {
 	var dialogContent = document.getElementById("dialog");
 	dialogContent.innerHTML = "";
 
 	var obj = paintTool.drawing.getEngineObject();
 
-	var dialogWidget = dialogTool.CreateWidget(
+	// clean up previous widget
+	if (paintDialogWidget) {
+		paintDialogWidget.OnDestroy();
+		delete paintDialogWidget;
+	}
+
+	paintDialogWidget = dialogTool.CreateWidget(
 		"dialog",
 		"paintPanel",
 		obj.dlg,
@@ -565,7 +572,7 @@ function reloadDialogUI() {
 				return CreateDefaultName(desc + " dialog", dialog, true); // todo : localize
 			}, // todo : localize
 		});
-	dialogContent.appendChild(dialogWidget.GetElement());
+	dialogContent.appendChild(paintDialogWidget.GetElement());
 
 	if (alwaysShowDrawingDialog && dialog[obj.dlg]) {
 		openDialogTool(obj.dlg, null, false);
