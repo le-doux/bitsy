@@ -861,7 +861,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"flow",
-				"sequence",
+				"sequence list",
 				function() {
 					var node = scriptUtils.CreateSequenceBlock();
 					var editor = new SequenceEditor(node, parentEditor);
@@ -871,7 +871,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"flow",
-				"cycle",
+				"cycle list",
 				function() {
 					var node = scriptUtils.CreateCycleBlock();
 					var editor = new SequenceEditor(node, parentEditor);
@@ -881,7 +881,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"flow",
-				"shuffle",
+				"shuffle list",
 				function() {
 					var node = scriptUtils.CreateShuffleBlock();
 					var editor = new SequenceEditor(node, parentEditor);
@@ -891,7 +891,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"flow",
-				"branching",
+				"branching list",
 				function() {
 					var node = scriptUtils.CreateIfBlock();
 					var editor = new ConditionalEditor(node, parentEditor);
@@ -1562,7 +1562,7 @@ function DialogTool() {
 		function CreateSequenceDescription(isEditable) {
 			descriptionDiv.innerHTML = "";
 
-			titleDiv.innerText = sequenceTypeDescriptionMap[sequenceNode.type].name; // TODO : localize
+			titleDiv.innerText = sequenceTypeDescriptionMap[sequenceNode.type].name + " list"; // TODO : localize
 
 			var descriptionText = sequenceTypeDescriptionMap[sequenceNode.type].description;
 			var descriptionTextSplit = descriptionText.split("_");
@@ -1798,7 +1798,7 @@ function DialogTool() {
 
 		var titleDiv = document.createElement("div");
 		titleDiv.classList.add("actionTitle");
-		titleDiv.innerText = "branching"; // TODO : localize
+		titleDiv.innerText = "branching list"; // TODO : localize
 		div.appendChild(titleDiv);
 
 		var descriptionDiv = document.createElement("div");
