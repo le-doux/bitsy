@@ -1027,7 +1027,6 @@ function parseWorld(file) {
 		convertSayToPrint : false,
 		combineEndingsWithDialog : false,
 		convertImplicitSpriteDialogIds : false,
-		updateScriptLinebreakParsing : false,
 	};
 
 	var lines = file.split("\n");
@@ -1052,7 +1051,6 @@ function parseWorld(file) {
 				if (versionNumber < 7.0) {
 					compatibilityFlags.combineEndingsWithDialog = true;
 					compatibilityFlags.convertImplicitSpriteDialogIds = true;
-					compatibilityFlags.updateScriptLinebreakParsing = true;
 				}
 			}
 
@@ -1162,17 +1160,6 @@ function scriptCompatibility(compatibilityFlags) {
 				}
 				dialog[dlgId].src = newDialog;
 			}
-		}
-	}
-
-	if (compatibilityFlags.updateScriptLinebreakParsing) {
-		for (dlgId in dialog) {
-			var dialogScript = scriptInterpreter.CompatibilityParse(dialog[dlgId].src, compatibilityFlags);
-			var newDialog = dialogScript.Serialize();
-			if (newDialog.indexOf("\n") > -1) {
-				newDialog = '"""\n' + newDialog + '\n"""';
-			}
-			dialog[dlgId].src = newDialog;
 		}
 	}
 }

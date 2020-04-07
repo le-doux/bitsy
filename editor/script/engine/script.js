@@ -53,15 +53,16 @@ var Interpreter = function() {
 		return parser.Parse(scriptStr, rootId);
 	}
 
-	this.CompatibilityParse = function(scriptStr, compatibilityFlags) {
-		env.compatibilityFlags = compatibilityFlags;
+	// TODO : add back in if needed later...
+	// this.CompatibilityParse = function(scriptStr, compatibilityFlags) {
+	// 	env.compatibilityFlags = compatibilityFlags;
 
-		var result = parser.Parse(scriptStr);
+	// 	var result = parser.Parse(scriptStr);
 
-		delete env.compatibilityFlags;
+	// 	delete env.compatibilityFlags;
 
-		return result;
-	}
+	// 	return result;
+	// }
 
 	this.Eval = function(scriptTree, exitHandler) { // runs a script stored externally
 		var localEnv = new LocalEnvironment(env); // TODO : does this need an object context?
@@ -1018,7 +1019,7 @@ var CodeBlockNode = function() {
 }
 
 function isInlineCode(node) {
-	return isTextEffectBlock(node) || isUndefinedBlock(node); // || isMultilineListBlock(node);
+	return isTextEffectBlock(node) || isUndefinedBlock(node) || isMultilineListBlock(node);
 }
 
 function isUndefinedBlock(node) {
@@ -1633,12 +1634,8 @@ var Parser = function(env) {
 		such as text effects {shk} {wvy} or sequences like {cycle} and {shuffle}.
 		The parsing of those code blocks is handled by ParseCode.
 
-		The trickiest part is figuring out which newline (\n) characters should actually
-		be translated into {br} commands that are displayed in the dialog box, and which
-		are ignore-able whitespace used to make {code} commands easier to read.
-
-		The rules for newlines are:
-		- there should be a linebreak {br} between each pair of *consecutive* dialog lines
+		Note on parsing newline characters:
+		- there should be a linebreak {br} after each "dialog line"
 		- a dialog line is defined as any line that either:
 			- contains dialog text (any text outside of a code block)
 			- *or* is entirely empty (no text, no code)
@@ -1689,21 +1686,9 @@ var Parser = function(env) {
 		}
 
 		var tryAddLinebreakNodeToList = function() {
-			var useOldLinebreakLogic = environment.compatibilityFlags && environment.compatibilityFlags.updateScriptLinebreakParsing;
-
-			// TODO : this isn't *quite* working yet!
-			if (useOldLinebreakLogic) {
-				console.log("USE OLD LINEBREAK LOGIC!!");
-				if (prevLineIsDialogLine) {
-					var linebreakNode = new FuncNode("br", []);
-					curLineNodeList.unshift(linebreakNode);
-				}
-			}
-			else {
-				if (prevLineIsDialogLine && curLineIsDialogLine()) {
-					var linebreakNode = new FuncNode("br", []);
-					curLineNodeList.unshift(linebreakNode);
-				}
+			if (prevLineIsDialogLine) {
+				var linebreakNode = new FuncNode("br", []);
+				curLineNodeList.unshift(linebreakNode);
 			}
 		}
 
