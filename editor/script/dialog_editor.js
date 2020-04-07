@@ -1,9 +1,3 @@
-/* 
-TODO
-- refactor widget so there aren't multiple callbacks for creating a new DLG
-- back compat for when you could implicitly link dialog to sprites by giving them the same ID
-*/
-
 // TODO : name?
 function DialogTool() {
 	this.CreateEditor = function(dialogId) {
@@ -41,7 +35,7 @@ function DialogTool() {
 		var titleTextInput = document.createElement("input");
 		titleTextInput.classList.add("textInputField");
 		titleTextInput.type = "text";
-		titleTextInput.placeholder = "Title"; // TODO : localize
+		titleTextInput.placeholder = localization.GetStringOrFallback("title_placeholder", "Title");
 		div.appendChild(titleTextInput);
 
 		var openButton = document.createElement("button");
@@ -251,7 +245,7 @@ function DialogTool() {
 					dialogIdOption.innerText = dialog[dialogIdList[i]].name;
 				}
 				else {
-					dialogIdOption.innerText = "dialog " + dialogIdList[i]; // TODO: localize
+					dialogIdOption.innerText = localization.GetStringOrFallback("dialog_block_basic", "dialog") + " " + dialogIdList[i];
 				}
 				dialogIdOption.value = dialogIdList[i];
 				dialogIdOption.selected = dialogId === dialogIdList[i];
@@ -1173,7 +1167,7 @@ function DialogTool() {
 
 		var textEffectsTitleDiv = document.createElement("div");
 		textEffectsTitleDiv.style.marginBottom = "5px";
-		textEffectsTitleDiv.innerHTML = '<i class="material-icons">text_format</i>' + " text effects"; // TODO : localize
+		textEffectsTitleDiv.innerHTML = '<i class="material-icons">text_format</i>' + " " + localization.GetStringOrFallback("dialog_effect_new", "text effects");
 		textEffectsDiv.appendChild(textEffectsTitleDiv);
 
 		var textEffectsControlsDiv = document.createElement("div");
@@ -1181,7 +1175,15 @@ function DialogTool() {
 		textEffectsDiv.appendChild(textEffectsControlsDiv);
 
 		var effectsTags = ["{clr1}", "{clr2}", "{clr3}", "{wvy}", "{shk}", "{rbw}"];
-		var effectsNames = ["color 1", "color 2", "color 3", "wavy", "shaky", "rainbow"]; // TODO : localize
+		var effectsNames = [
+			localization.GetStringOrFallback("dialog_effect_color1", "color 1"),
+			localization.GetStringOrFallback("dialog_effect_color2", "color 2"),
+			localization.GetStringOrFallback("dialog_effect_color3", "color 3"),
+			localization.GetStringOrFallback("dialog_effect_wavy", "wavy"),
+			localization.GetStringOrFallback("dialog_effect_shaky", "shaky"),
+			localization.GetStringOrFallback("dialog_effect_rainbow", "rainbow"),
+		];
+
 		var effectsDescriptions = [
 			"text in tags matches the 1st color in the palette",
 			"text in tags matches the 2nd color in the palette",
@@ -1189,12 +1191,14 @@ function DialogTool() {
 			"text in tags waves up and down",
 			"text in tags shakes constantly",
 			"text in tags is rainbow colored"
-		];
+		]; // TODO : localize
+
 		function CreateAddEffectHandler(tag) {
 			return function() {
 				wrapTextSelection(tag); // hacky to still use this?
 			}
 		}
+
 		for (var i = 0; i < effectsTags.length; i++) {
 			var effectButton = document.createElement("button");
 			effectButton.onclick = CreateAddEffectHandler(effectsTags[i]);
@@ -1207,7 +1211,8 @@ function DialogTool() {
 		textEffectsDiv.appendChild(textEffectsPrintDrawingDiv);
 
 		var textEffectsPrintDrawingButton = document.createElement("button");
-		textEffectsPrintDrawingButton.innerHTML = '<i class="material-icons">add</i>' + "insert drawing"; // TODO : localize
+		textEffectsPrintDrawingButton.innerHTML = '<i class="material-icons">add</i>' + " "
+			+ localization.GetStringOrFallback("dialog_effect_drawing", "insert drawing");
 		textEffectsPrintDrawingButton.title = "draw a sprite, tile, or item in your dialog";
 		textEffectsPrintDrawingDiv.appendChild(textEffectsPrintDrawingButton);
 
@@ -1218,7 +1223,11 @@ function DialogTool() {
 		for (id in sprite) {
 			var option = document.createElement("option");
 
-			var spriteName = id === "A" ? "avatar" : "sprite " + id; // TODO : localize
+			var spriteName = (id === "A" ?
+				localization.GetStringOrFallback("avatar_label", "avatar") :
+				localization.GetStringOrFallback("sprite_label", "sprite"))
+					+ " " + id;
+
 			if (sprite[id].name) {
 				spriteName = sprite[id].name;
 			}
@@ -1233,7 +1242,7 @@ function DialogTool() {
 		for (id in tile) {
 			var option = document.createElement("option");
 
-			var tileName = "tile " + id; // TODO : localize
+			var tileName = localization.GetStringOrFallback("tile_label", "tile") + " " + id;
 			if (tile[id].name) {
 				tileName = tile[id].name;
 			}
@@ -1248,7 +1257,7 @@ function DialogTool() {
 		for (id in item) {
 			var option = document.createElement("option");
 
-			var itemName = "item " + id; // TODO : localize
+			var itemName = localization.GetStringOrFallback("item_label", "item") + " " + id;
 			if (item[id].name) {
 				itemName = item[id].name;
 			}
@@ -1315,7 +1324,7 @@ function DialogTool() {
 			(node.children[0].type === "operator"||
 				node.children[0].type === "literal" ||
 				node.children[0].type === "variable")) {
-			expressionRootNode = node.children[0];	
+			expressionRootNode = node.children[0];
 		}
 		else {
 			expressionRootNode = node;
@@ -1361,7 +1370,7 @@ function DialogTool() {
 
 		if (!isInline) {
 			var orderControls = new OrderControls(this, parentEditor);
-			div.appendChild(orderControls.GetElement());	
+			div.appendChild(orderControls.GetElement());
 
 			var customControls = orderControls.GetCustomControlsContainer();
 			customControls.appendChild(editExpressionButton);
@@ -1376,7 +1385,7 @@ function DialogTool() {
 			expressionSpan.innerHTML = "";
 
 			if (expressionRootNode.type === "operator") {
-				AddOperatorControlRecursive(expressionRootNode, isEditable);	
+				AddOperatorControlRecursive(expressionRootNode, isEditable);
 			}
 			else {
 				// parameter base case
@@ -1533,9 +1542,39 @@ function DialogTool() {
 	}
 
 	var sequenceTypeDescriptionMap = {
-		"sequence" : { name:"sequence", description:"go through each item once in _:"},
-		"cycle" : { name:"cycle", description:"repeat items in a _:" },
-		"shuffle" : { name:"shuffle", description:"_ items in a random order:" },
+		"sequence" : {
+			GetName : function() {
+				return localization.GetStringOrFallback("sequence_list_name", "sequence list");
+			},
+			GetTypeName : function() {
+				return localization.GetStringOrFallback("sequence_name", "sequence");
+			},
+			GetDescription : function() {
+				return localization.GetStringOrFallback("sequence_list_description", "go through each item once in _:");
+			},
+		},
+		"cycle" : {
+			GetName : function() {
+				return localization.GetStringOrFallback("cycle_list_name", "cycle list");
+			},
+			GetTypeName : function() {
+				return localization.GetStringOrFallback("cycle_name", "cycle");
+			},
+			GetDescription : function() {
+				return localization.GetStringOrFallback("cycle_list_description", "repeat items in a _:");
+			},
+		},
+		"shuffle" : {
+			GetName : function() {
+				return localization.GetStringOrFallback("shuffle_list_name", "shuffle list");
+			},
+			GetTypeName : function() {
+				return localization.GetStringOrFallback("shuffle_name", "shuffle");
+			},
+			GetDescription : function() {
+				return localization.GetStringOrFallback("shuffle_list_description", "_ items in a random order:");
+			},
+		},
 	};
 
 	function SequenceEditor(node, parentEditor) {
@@ -1562,9 +1601,9 @@ function DialogTool() {
 		function CreateSequenceDescription(isEditable) {
 			descriptionDiv.innerHTML = "";
 
-			titleDiv.innerText = sequenceTypeDescriptionMap[sequenceNode.type].name + " list"; // TODO : localize
+			titleDiv.innerText = sequenceTypeDescriptionMap[sequenceNode.type].GetName();
 
-			var descriptionText = sequenceTypeDescriptionMap[sequenceNode.type].description;
+			var descriptionText = sequenceTypeDescriptionMap[sequenceNode.type].GetDescription();
 			var descriptionTextSplit = descriptionText.split("_");
 
 			var descSpan1 = document.createElement("span");
@@ -1574,7 +1613,7 @@ function DialogTool() {
 			if (isEditable) {
 				var sequenceTypeSelect = document.createElement("select");
 				for (var type in sequenceTypeDescriptionMap) {
-					var typeName = sequenceTypeDescriptionMap[type].name; // TODO : localize
+					var typeName = sequenceTypeDescriptionMap[type].GetTypeName();
 					var sequenceTypeOption = document.createElement("option");
 					sequenceTypeOption.value = type;
 					sequenceTypeOption.innerText = typeName;
@@ -1593,7 +1632,7 @@ function DialogTool() {
 			else {
 				var sequenceTypeSpan = document.createElement("span");
 				sequenceTypeSpan.classList.add("parameterUneditable");
-				sequenceTypeSpan.innerText = sequenceTypeDescriptionMap[sequenceNode.type].name; // TODO : localize
+				sequenceTypeSpan.innerText = sequenceTypeDescriptionMap[sequenceNode.type].GetTypeName();
 				descriptionDiv.appendChild(sequenceTypeSpan);
 			}
 
@@ -1613,7 +1652,8 @@ function DialogTool() {
 		div.appendChild(addOptionRootDiv);
 
 		var addOptionButton = document.createElement("button");
-		addOptionButton.innerHTML = '<i class="material-icons">add</i>' + "add option";
+		addOptionButton.innerHTML = '<i class="material-icons">add</i>' + " "
+			+ localization.GetStringOrFallback("dialog_conditional_add", "add option"); // TODO : funny that this is the old conditional text
 		addOptionButton.onclick = function() {
 			var optionNode = scriptUtils.CreateOptionBlock();
 			var optionEditor = new SequenceOptionEditor(optionNode, self);
@@ -1798,12 +1838,12 @@ function DialogTool() {
 
 		var titleDiv = document.createElement("div");
 		titleDiv.classList.add("actionTitle");
-		titleDiv.innerText = "branching list"; // TODO : localize
+		titleDiv.innerText = localization.GetStringOrFallback("branching_list_name", "branching list");
 		div.appendChild(titleDiv);
 
 		var descriptionDiv = document.createElement("div");
 		descriptionDiv.classList.add("sequenceDescription"); // hack
-		descriptionDiv.innerText = "go to the first branch whose condition is true:"; // TODO : localize
+		descriptionDiv.innerText = localization.GetStringOrFallback("branching_list_description", "go to the first branch whose condition is true:");
 		div.appendChild(descriptionDiv);
 
 		var optionRootDiv = document.createElement("div");
@@ -1816,7 +1856,8 @@ function DialogTool() {
 		div.appendChild(addConditionRootDiv);
 
 		var addButton = document.createElement("button");
-		addButton.innerHTML = '<i class="material-icons">add</i>' + "add branch";
+		addButton.innerHTML = '<i class="material-icons">add</i>' + " "
+			+ localization.GetStringOrFallback("branch_add", "add branch");
 		addButton.onclick = function() {
 			addButton.style.display = "none";
 			addItemCondition.style.display = "block";
@@ -1827,7 +1868,8 @@ function DialogTool() {
 		addConditionRootDiv.appendChild(addButton);
 
 		var addItemCondition = document.createElement("button");
-		addItemCondition.innerHTML = '<i class="material-icons">add</i>' + "item branch";
+		addItemCondition.innerHTML = '<i class="material-icons">add</i>' + " "
+			+ localization.GetStringOrFallback("branch_type_item", "item branch");
 		addItemCondition.style.display = "none";
 		addItemCondition.onclick = function() {
 			var conditionPairNode = scriptUtils.CreateItemConditionPair();
@@ -1847,7 +1889,8 @@ function DialogTool() {
 		addConditionRootDiv.appendChild(addItemCondition);
 
 		var addVariableCondition = document.createElement("button");
-		addVariableCondition.innerHTML = '<i class="material-icons">add</i>' + "variable branch";
+		addVariableCondition.innerHTML = '<i class="material-icons">add</i>' + " "
+			+ localization.GetStringOrFallback("branch_type_variable", "variable branch");
 		addVariableCondition.style.display = "none";
 		addVariableCondition.onclick = function() {
 			var conditionPairNode = scriptUtils.CreateVariableConditionPair();
@@ -1867,7 +1910,8 @@ function DialogTool() {
 		addConditionRootDiv.appendChild(addVariableCondition);
 
 		var addDefaultCondition = document.createElement("button");
-		addDefaultCondition.innerHTML = '<i class="material-icons">add</i>' + "default branch";
+		addDefaultCondition.innerHTML = '<i class="material-icons">add</i>' + " "
+			+ localization.GetStringOrFallback("branch_type_default", "default branch");
 		addDefaultCondition.style.display = "none";
 		addDefaultCondition.onclick = function() {
 			var conditionPairNode = scriptUtils.CreateDefaultConditionPair();
@@ -1889,7 +1933,8 @@ function DialogTool() {
 		var cancelButton = document.createElement("button");
 		cancelButton.classList.add("actionBuilderButton");
 		cancelButton.classList.add("actionBuilderCancel");
-		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " cancel";
+		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " "
+			+ localization.GetStringOrFallback("cancel_label", "cancel");;
 		cancelButton.style.display = "none";
 		cancelButton.onclick = function() {
 			addButton.style.display = "block";
@@ -2079,13 +2124,13 @@ function DialogTool() {
 
 			conditionStartSpan = document.createElement("span");
 			if (conditionNode.type === "else") {
-				conditionStartSpan.innerText = "else";
+				conditionStartSpan.innerText = localization.GetStringOrFallback("condition_else_label", "else");
 			}
 			else if (index === 0) {
-				conditionStartSpan.innerText = "if ";
+				conditionStartSpan.innerText = localization.GetStringOrFallback("condition_if_label", "if") + " ";
 			}
 			else {
-				conditionStartSpan.innerText = "else if ";
+				conditionStartSpan.innerText = localization.GetStringOrFallback("condition_else_if_label", "else if") + " ";
 			}
 			div.appendChild(conditionStartSpan);
 
@@ -2096,7 +2141,7 @@ function DialogTool() {
 
 			conditionEndSpan = document.createElement("span");
 			if (conditionNode.type != "else") {
-				conditionEndSpan.innerText = ", then:";
+				conditionEndSpan.innerText = ", " + localization.GetStringOrFallback("condition_then_label", "then") + ":";
 			}
 			else {
 				conditionEndSpan.innerText = ":";
@@ -2125,10 +2170,10 @@ function DialogTool() {
 			// update the initial label based on the order of the option
 			if (conditionNode.type != "else") {
 				if (index === 0) {
-					conditionStartSpan.innerText = "if ";
+					conditionStartSpan.innerText = localization.GetStringOrFallback("condition_if_label", "if") + " ";
 				}
 				else {
-					conditionStartSpan.innerText = "else if ";
+					conditionStartSpan.innerText = localization.GetStringOrFallback("condition_else_if_label", "else if") + " ";
 				}
 			}
 		}
@@ -2154,6 +2199,8 @@ function DialogTool() {
 		}
 	}
 
+	// TODO : test if there is a memory leak with the even listening here
+	// TODO : pick up localization from here!
 	function CreateRoomMoveDestinationCommand(functionNode, parentEditor, createFunctionDescriptionFunc) {
 		var isMoving = false;
 
