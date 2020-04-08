@@ -2199,12 +2199,13 @@ function DialogTool() {
 		}
 	}
 
-	// TODO : test if there is a memory leak with the even listening here
-	// TODO : pick up localization from here!
-	function CreateRoomMoveDestinationCommand(functionNode, parentEditor, createFunctionDescriptionFunc) {
+	function RoomMoveDestinationCommand(functionNode, parentEditor, createFunctionDescriptionFunc) {
+		var listener = new EventListener(events);
+
 		var isMoving = false;
 
-		var commandDescription = '<i class="material-icons">location_searching</i>' + " move destination"; // todo : localize
+		var commandDescription = '<i class="material-icons">location_searching</i>' + " "
+			+ localization.GetStringOrFallback("exit_destination_move", "move destination");
 
 		var moveCommand = document.createElement("div");
 
@@ -2218,8 +2219,9 @@ function DialogTool() {
 			isMoving = !isMoving;
 
 			if (isMoving) {
-				moveMessageSpan.innerHTML = "<i>click in room</i> "; // todo : localize
-				moveButton.innerHTML = '<i class="material-icons">cancel</i>' + " cancel"; // todo : localize
+				moveMessageSpan.innerHTML = "<i>" + localization.GetStringOrFallback("marker_move_click", "click in room") + "</i> ";
+				moveButton.innerHTML = '<i class="material-icons">cancel</i>' + " "
+					+ localization.GetStringOrFallback("cancel_label", "cancel");
 				events.Raise("disable_room_tool"); // TODO : don't know if I like this design
 			}
 			else {
@@ -2230,7 +2232,7 @@ function DialogTool() {
 		}
 		moveCommand.appendChild(moveButton);
 
-		events.Listen("click_room", function(event) {
+		listener.Listen("click_room", function(event) {
 			if (isMoving) {
 				roomId = event.roomId;
 				roomPosX = event.x;
@@ -2250,7 +2252,13 @@ function DialogTool() {
 			}
 		});
 
-		return moveCommand;
+		this.GetElement = function() {
+			return moveCommand;
+		}
+
+		this.OnDestroy = function() {
+			listener.UnlistenAll();
+		}
 	}
 
 	var functionDescriptionMap = {
@@ -2270,7 +2278,7 @@ function DialogTool() {
 				{ types: ["number", "variable"], index: 2, name: "y", },
 				{ types: ["transition", "text", "variable"], index: 3, name: "transition effect", },
 			],
-			commands : [CreateRoomMoveDestinationCommand],
+			commands : [RoomMoveDestinationCommand],
 		},
 		"pg" : {
 			name : "pagebreak",
@@ -2420,13 +2428,14 @@ function DialogTool() {
 
 		// TODO : populate default values!!
 		var curParameterEditors = [];
+		var curCommandEditors = []; // store custom commands
 		function CreateFunctionDescription(isEditable) {
 			curParameterEditors = [];
 			descriptionDiv.innerHTML = "";
 
 			if (!isInline) {
 				customCommandsDiv.innerHTML = "";
-				addParameterDiv.innerHTML = "";				
+				addParameterDiv.innerHTML = "";
 			}
 
 			var descriptionText = functionDescriptionMap[functionNode.name].description;
@@ -2483,7 +2492,7 @@ function DialogTool() {
 							});
 
 						curParameterEditors.push(parameterEditor);
-						descriptionDiv.appendChild(parameterEditor.GetElement());							
+						descriptionDiv.appendChild(parameterEditor.GetElement());
 					}
 					else if (!isInline && isEditable && functionNode.args.length == parameterInfo.index && parameterInfo.name) {
 						function createAddParameterHandler(functionNode, parameterInfo) {
@@ -2503,11 +2512,19 @@ function DialogTool() {
 			}
 
 			if (!isInline) {
+				// clean up and reset command editors
+				for (var i = 0; i < curCommandEditors.length; i++) {
+					curCommandEditors[i].OnDestroy();
+				}
+				curCommandEditors = [];
+
 				// add custom edit commands
 				var commands = functionDescriptionMap[functionNode.name].commands;
 				if (isEditable && commands) {
 					for (var i = 0; i < commands.length; i++) {
-						customCommandsDiv.appendChild(commands[i](functionNode, parentEditor, CreateFunctionDescription));
+						var commandEditor = new commands[i](functionNode, parentEditor, CreateFunctionDescription);
+						curCommandEditors.push(commandEditor);
+						customCommandsDiv.appendChild(commandEditor.GetElement());
 					}
 				}
 
