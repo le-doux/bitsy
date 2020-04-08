@@ -2261,6 +2261,7 @@ function DialogTool() {
 		}
 	}
 
+	// TODO : localize
 	var functionDescriptionMap = {
 		"end" : {
 			name : "end",
@@ -2345,7 +2346,7 @@ function DialogTool() {
 
 		if (!isInline) {
 			orderControls = new OrderControls(this, parentEditor);
-			div.appendChild(orderControls.GetElement());			
+			div.appendChild(orderControls.GetElement());
 		}
 
 		if (!isInline) {
@@ -2404,7 +2405,7 @@ function DialogTool() {
 			}
 
 			var toggleHelpButton = document.createElement("button");
-			toggleHelpButton.title = "turn bitsy cat help on/off";
+			toggleHelpButton.title = "turn help text on/off";
 			toggleHelpButton.innerHTML = '<i class="material-icons">help</i>';
 			toggleHelpButton.onclick = function() {
 				isHelpTextOn = !isHelpTextOn;
@@ -2650,14 +2651,38 @@ function DialogTool() {
 
 	// TODO : put in shared location?
 	var transitionTypes = [
-		{ name:"fade (white)",	id:"fade_w" },
-		{ name:"fade (black)",	id:"fade_b" },
-		{ name:"wave",			id:"wave" },
-		{ name:"tunnel",		id:"tunnel" },
-		{ name:"slide up",		id:"slide_u" },
-		{ name:"slide down",	id:"slide_d" },
-		{ name:"slide left",	id:"slide_l" },
-		{ name:"slide right",	id:"slide_r" },
+		{
+			GetName: function() { return localization.GetStringOrFallback("transition_fade_w", "fade (white)"); },
+			id: "fade_w",
+		},
+		{
+			GetName: function() { return localization.GetStringOrFallback("transition_fade_b", "fade (black)"); },
+			id: "fade_b",
+		},
+		{
+			GetName: function() { return localization.GetStringOrFallback("transition_wave", "wave"); },
+			id: "wave",
+		},
+		{
+			GetName: function() { return localization.GetStringOrFallback("transition_tunnel", "tunnel"); },
+			id: "tunnel",
+		},
+		{
+			GetName: function() { return localization.GetStringOrFallback("transition_slide_u", "slide up"); },
+			id: "slide_u",
+		},
+		{
+			GetName: function() { return localization.GetStringOrFallback("transition_slide_d", "slide down"); },
+			id: "slide_d",
+		},
+		{
+			GetName: function() { return localization.GetStringOrFallback("transition_slide_l", "slide left"); },
+			id: "slide_l",
+		},
+		{
+			GetName: function() { return localization.GetStringOrFallback("transition_slide_r", "slide right"); },
+			id: "slide_r",
+		},
 	];
 
 	function ParameterEditor(parameterTypes, getArgFunc, setArgFunc, isEditable, isTypeEditable, openExpressionBuilderFunc) {
@@ -2726,7 +2751,7 @@ function DialogTool() {
 					for (var i = 0; i < transitionTypes.length; i++) {
 						var id = transitionTypes[i].id;
 						if (id === curValue) {
-							parameterValue.innerText = transitionTypes[i].name;
+							parameterValue.innerText = transitionTypes[i].GetName();
 						}
 					}
 				}
@@ -2903,7 +2928,7 @@ function DialogTool() {
 					var id = transitionTypes[i].id;
 					var transitionOption = document.createElement("option");
 					transitionOption.value = id;
-					transitionOption.innerText = transitionTypes[i].name;
+					transitionOption.innerText = transitionTypes[i].GetName();
 					transitionOption.selected = id === value;
 					parameterInput.appendChild(transitionOption);
 				}
