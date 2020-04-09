@@ -392,14 +392,14 @@
 								<i class="material-icons">add</i> <span id="addExitText" class="localize exit_label">exit</span>
 							</button>
 							<button title="add one-way exit" onclick="newExitOneWay();">
-								<i class="material-icons">add</i> <span id="addExitText">one-way exit</span> <!-- TODO : localize -->
+								<i class="material-icons">add</i> <span id="addExitText" class="localize exit_one_way_label">one-way exit</span>
 							</button>
 							<button title="add ending" onclick="newEnding();">
 								<i class="material-icons">add</i> <span class="localize ending_label">ending</span>
 							</button>
 							<!-- TODO : need a general cancel button style -->
 							<button title="cancel" style="background: #6767b2; color: white;" onclick="cancelAddMarker();">
-								<i class="material-icons">cancel</i> <span>cancel</span> <!-- TODO : localize -->
+								<i class="material-icons">cancel</i> <span class="localize action_cancel">cancel</span>
 							</button>
 						</div>
 						<div id="noMarkerMessage" class="controlBox">
@@ -425,7 +425,7 @@
 										<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
 										<label for="toggleMoveMarker1" title="click to place marker in current room">
 											<i class="material-icons" id="toggleMoveMarkerIcon1">location_searching</i>
-											<span>move</span> <!-- todo : localize -->
+											<span class="localize marker_move">move</span>
 										</label>
 
 										<input type="checkbox" id="toggleEditMarker1" />
@@ -442,15 +442,15 @@
 									</div>
 									<div id="editControlsMarker1" title="edit coordinates" style="margin-top: 5px; display: none;">
 										<div>
-											<span>room: </span> <!-- todo: localize -->
+											<span class="localize room_label">room</span>: 
 											<select id="editRoomMarker1"></select>
 										</div>
 										<div>
-											<span>x: </span> <!-- todo: localize -->
+											<span class="localize axis_x_label">x</span>: 
 											<input id="editPosXMarker1" type="number" style="width:6ch;"></input>
 										</div>
 										<div>
-											<span>y: </span> <!-- todo: localize -->
+											<span class="localize axis_y_label">y</span>: 
 											<input id="editPosYMarker1" type="number" style="width:6ch;"></input>
 										</div>
 									</div>
@@ -500,15 +500,15 @@
 									</div>
 									<div id="editControlsMarker2" title="edit coordinates" style="margin-top: 5px; display: none;">
 										<div>
-											<span>room: </span> <!-- todo: localize -->
+											<span class="localize room_label">room</span>: 
 											<select id="editRoomMarker2"></select>
 										</div>
 										<div>
-											<span>x: </span> <!-- todo: localize -->
+											<span class="localize axis_x_label">x</span>: 
 											<input id="editPosXMarker2" type="number" style="width:6ch;"></input>
 										</div>
 										<div>
-											<span>y: </span> <!-- todo: localize -->
+											<span class="localize axis_y_label">y</span>: 
 											<input id="editPosYMarker2" type="number" style="width:6ch;"></input>
 										</div>
 									</div>
