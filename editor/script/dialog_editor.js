@@ -774,7 +774,8 @@ function DialogTool() {
 
 		var addButton = document.createElement("button");
 		addButton.classList.add("actionBuilderAdd");
-		addButton.innerHTML = '<i class="material-icons">add</i>' + " add";
+		addButton.innerHTML = '<i class="material-icons">add</i>' + " "
+			+ localization.GetStringOrFallback("action_add_new", "add");
 		addButton.onclick = function() {
 			div.classList.add("actionBuilderActive");
 			div.classList.add("actionBuilderRoot");
@@ -784,7 +785,8 @@ function DialogTool() {
 		var backButton = document.createElement("button");
 		backButton.classList.add("actionBuilderButton");
 		backButton.classList.add("actionBuilderButton_back");
-		backButton.innerHTML = '<i class="material-icons">arrow_back_ios</i>' + "back";
+		backButton.innerHTML = '<i class="material-icons">arrow_back_ios</i>' + " "
+			+ localization.GetStringOrFallback("action_back", "back");
 		backButton.onclick = function() {
 			div.classList.add("actionBuilderRoot");
 			div.classList.remove(activeCategoryClass);
@@ -806,10 +808,18 @@ function DialogTool() {
 			return actionCategoryButton;
 		}
 
-		div.appendChild(makeActionCategoryButton("dialog", "dialog"));
-		div.appendChild(makeActionCategoryButton("flow", "lists"));
-		div.appendChild(makeActionCategoryButton("exit", "exit and ending actions"));
-		div.appendChild(makeActionCategoryButton("item", "item and variable actions"));
+		div.appendChild(makeActionCategoryButton(
+			"dialog",
+			localization.GetStringOrFallback("dialog_action_category_dialog", "dialog")));
+		div.appendChild(makeActionCategoryButton(
+			"flow",
+			localization.GetStringOrFallback("dialog_action_category_list", "lists")));
+		div.appendChild(makeActionCategoryButton(
+			"exit",
+			localization.GetStringOrFallback("dialog_action_category_exit", "exit and ending actions")));
+		div.appendChild(makeActionCategoryButton(
+			"item",
+			localization.GetStringOrFallback("dialog_action_category_item", "item and variable actions")));
 
 		function makeActionBuilderButton(categoryName, text, createEditorFunc) {
 			var actionBuilderButton = document.createElement("button");
@@ -826,6 +836,7 @@ function DialogTool() {
 			return actionBuilderButton;
 		}
 
+		// TODO : localize these too! *** START FROM HERE ***
 		div.appendChild(
 			makeActionBuilderButton(
 				"dialog",
@@ -1934,7 +1945,7 @@ function DialogTool() {
 		cancelButton.classList.add("actionBuilderButton");
 		cancelButton.classList.add("actionBuilderCancel");
 		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " "
-			+ localization.GetStringOrFallback("cancel_label", "cancel");;
+			+ localization.GetStringOrFallback("action_cancel", "cancel");;
 		cancelButton.style.display = "none";
 		cancelButton.onclick = function() {
 			addButton.style.display = "block";
@@ -2221,7 +2232,7 @@ function DialogTool() {
 			if (isMoving) {
 				moveMessageSpan.innerHTML = "<i>" + localization.GetStringOrFallback("marker_move_click", "click in room") + "</i> ";
 				moveButton.innerHTML = '<i class="material-icons">cancel</i>' + " "
-					+ localization.GetStringOrFallback("cancel_label", "cancel");
+					+ localization.GetStringOrFallback("action_cancel", "cancel");
 				events.Raise("disable_room_tool"); // TODO : don't know if I like this design
 			}
 			else {
@@ -2261,18 +2272,28 @@ function DialogTool() {
 		}
 	}
 
-	// TODO : localize
 	var functionDescriptionMap = {
 		"end" : {
-			name : "end",
-			description : "stop the game",
+			GetName : function() {
+				return localization.GetStringOrFallback("function_end_name", "end");
+			},
+			GetDescription : function() {
+				return localization.GetStringOrFallback("function_end_description", "stop the game");
+			},
+			GetHelpText : function() {
+				return localization.GetStringOrFallback(
+					"function_end_help",
+					"the game stops immediately, but if there is dialog after this action, it will still play");
+			},
 			parameters : [],
-			helpText : "the game stops immediately, but if there is "
-				+ "dialog after this action, it will still play",
 		},
 		"exit" : {
-			name : "exit",
-			description : "move player to _ at (_,_)[ with effect _]",
+			GetName : function() {
+				return localization.GetStringOrFallback("function_exit_name", "exit");
+			},
+			GetDescription : function() {
+				return localization.GetStringOrFallback("function_exit_description", "move player to _ at (_,_)[ with effect _]");
+			},
 			parameters : [
 				{ types: ["room", "text", "variable"], index: 0, name: "room", },
 				{ types: ["number", "variable"], index: 1, name: "x", },
@@ -2282,46 +2303,72 @@ function DialogTool() {
 			commands : [RoomMoveDestinationCommand],
 		},
 		"pg" : {
-			name : "pagebreak",
-			description : "start a new page of dialog",
+			GetName : function() {
+				return localization.GetStringOrFallback("function_pg_name", "pagebreak");
+			},
+			GetDescription : function() {
+				return localization.GetStringOrFallback("function_pg_description", "start a new page of dialog");
+			},
+			GetHelpText : function() {
+				return localization.GetStringOrFallback(
+					"function_pg_help",
+					"if there are actions after this one, they will start after the player presses continue");
+			},
 			parameters : [],
-			helpText : "if there are actions after this one, "
-				+ "they will start after the player presses continue",
 		},
 		"item" : {
-			name : "item",
-			description : "_ in inventory[ = _]",
+			GetName : function() {
+				return localization.GetStringOrFallback("function_item_name", "item");
+			},
+			GetDescription : function() {
+				return localization.GetStringOrFallback("function_item_description", "_ in inventory[ = _]");
+			},
 			parameters : [
 				{ types: ["item", "text", "variable"], index: 0, name: "item", },
 				{ types: ["number", "variable"], index: 1, name: "amount", },
 			],
 		},
 		"property" : {
-			name : "property",
-			description : "property _[ = _]",
+			GetName : function() {
+				return localization.GetStringOrFallback("function_property_name", "property");
+			},
+			GetDescription : function() {
+				return localization.GetStringOrFallback("function_property_description", "property _[ = _]");
+			},
+			GetHelpText : function() { // TODO : when there's more than one property, this will have to change!
+				return localization.GetStringOrFallback(
+					"function_property_locked_example_help",
+					"change the value of a property: "
+					+ "for example, set the locked property to true to stop an exit from changing rooms, "
+					+ "or to prevent an ending from stopping the game");
+			},
 			parameters : [
 				{ types: ["variable"], index: 0, name: "name", doNotEdit: true }, // NOTE: disable editing of property names for this version
 				{ types: ["number", "text", "bool", "variable"], index: 1, name: "value" },
 			],
-			// TODO : when there's more than one property, this will have to change!
-			helpText : "change the value of a property: for example,"
-				+ " set the locked property to true to stop an exit from changing rooms,"
-				+ " or to prevent an ending from stopping the game",
 		},
 		"print" : {
-			name : "print",
-			description : "print _ in the dialog box",
+			GetName : function() {
+				return localization.GetStringOrFallback("function_print_name", "print");
+			},
+			GetDescription : function() {
+				return localization.GetStringOrFallback("function_print_description", "print _ in the dialog box");
+			},
 			parameters : [
 				{ types: ["text", "variable"], index: 0, name: "output", },
 			],
 		},
 		"say" : {
-			name : "say",
-			description : "print _ in the dialog box",
+			GetName : function() {
+				return localization.GetStringOrFallback("function_say_name", "say");
+			},
+			GetDescription : function() {
+				return localization.GetStringOrFallback("function_print_description", "print _ in the dialog box");
+			},
 			parameters : [
 				{ types: ["text", "variable"], index: 0, name: "output", },
 			],
-		}
+		},
 	};
 
 	var isHelpTextOn = true;
@@ -2350,7 +2397,7 @@ function DialogTool() {
 		}
 
 		if (!isInline) {
-			var titleText = functionDescriptionMap[functionNode.name].name;
+			var titleText = functionDescriptionMap[functionNode.name].GetName();
 			var titleDiv = document.createElement("div");
 			titleDiv.classList.add("actionTitle");
 			titleDiv.innerText = titleText;
@@ -2398,10 +2445,10 @@ function DialogTool() {
 			helpTextContent.classList.add("helpTextContent");
 			helpTextDiv.appendChild(helpTextContent);
 
-			var helpText = functionDescriptionMap[functionNode.name].helpText;
-			hasHelpText = helpText != undefined && helpText != null;
+			var helpTextFunc = functionDescriptionMap[functionNode.name].GetHelpText;
+			hasHelpText = helpTextFunc != undefined && helpTextFunc != null;
 			if (hasHelpText) {
-				helpTextContent.innerText = helpText;
+				helpTextContent.innerText = helpTextFunc();
 			}
 
 			var toggleHelpButton = document.createElement("button");
@@ -2439,7 +2486,7 @@ function DialogTool() {
 				addParameterDiv.innerHTML = "";
 			}
 
-			var descriptionText = functionDescriptionMap[functionNode.name].description;
+			var descriptionText = functionDescriptionMap[functionNode.name].GetDescription();
 			var descriptionTextSplit = descriptionText.split("_");
 
 			function createGetArgFunc(functionNode, parameterIndex) {
@@ -3013,7 +3060,7 @@ function DialogTool() {
 			}
 			else if (type === "expression" && node.type === "code_block" && // TODO : I really need to put this in a helper function
 				(node.children[0].type === "operator" || node.children[0].type === "variable" || node.children[0].type === "literal")) {
-				return true;			
+				return true;
 			}
 
 			return false;
@@ -3184,13 +3231,6 @@ function DialogTool() {
 		- name vs expression editor? kind of confusing
 		- add protections against messing up using the assignment operator "="
 		- probably general protections against using the buttons wrong would help
-		- need special controls for
-			- text
-			- items
-			- variables
-		- delete button
-		- accept / cancel
-		- plaintext mode?
 	*/
 	function ExpressionBuilder(expressionString, parentEditor, onCancelHandler, onAcceptHandler) {
 		var expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
@@ -3365,29 +3405,16 @@ function DialogTool() {
 		backButton.onclick = function() {
 			var expressionString = expressionRootNode.Serialize();
 			var rightNode = GetRightmostNode(expressionRootNode);
-
-			// console.log(rightNode);
-
 			var substringToDelete = rightNode.type === "operator" ? " " + rightNode.operator + " " : rightNode.Serialize();
-
-			// console.log(">>>DELETE>>>[" +substringToDelete+"]");
-
-			// console.log("["+expressionString+"]");
-
 			expressionString = expressionString.slice(0, expressionString.length - substringToDelete.length);
-			
-			// console.log("["+expressionString+"]");
-
-			expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
-
-			// console.log("["+expressionRootNode.Serialize()+"]");
+			expressionRootNode = scriptInterpreter.CreateExpression(expressionString);\
 
 			ResetExpressionDiv();
 		}
 		backInputDiv.appendChild(backButton);
 
 		var clearButton = document.createElement("button");
-		clearButton.innerText = "AC"; // TODO : localize
+		clearButton.innerText = localization.GetStringOrFallback("expression_builder_all_clear", "AC");
 		clearButton.onclick = function() {
 			expressionDiv.classList.add("expressionBuilderClearShake");
 			setTimeout(function() {
@@ -3425,7 +3452,8 @@ function DialogTool() {
 
 		var addVariableButton = document.createElement("button");
 		addVariableButton.classList.add(GetColorClassForParameterType("variable"));
-		addVariableButton.innerHTML = '<i class="material-icons">add</i>' + "variable";
+		addVariableButton.innerHTML = '<i class="material-icons">add</i>' + " "
+			+ localization.GetStringOrFallback("variable_label", "variable");;
 		addVariableButton.style.flexGrow = "1";
 		addVariableButton.style.marginRight = "5px";
 		addVariableButton.onclick = function() {
@@ -3460,7 +3488,8 @@ function DialogTool() {
 
 		var addItemButton = document.createElement("button");
 		addItemButton.classList.add(GetColorClassForParameterType("item"));
-		addItemButton.innerHTML = '<i class="material-icons">add</i>' + "item";
+		addItemButton.innerHTML = '<i class="material-icons">add</i>' + " "
+			+ localization.GetStringOrFallback("item_label", "item");
 		addItemButton.style.flexGrow = "1";
 		addItemButton.style.marginRight = "5px";
 		addItemButton.onclick = function() {
@@ -3495,7 +3524,8 @@ function DialogTool() {
 
 		var addTextButton = document.createElement("button");
 		addTextButton.classList.add(GetColorClassForParameterType("text"));
-		addTextButton.innerHTML = '<i class="material-icons">add</i>' + "text";
+		addTextButton.innerHTML = '<i class="material-icons">add</i>' + " "
+			+ localization.GetStringOrFallback("value_type_text", "text");
 		addTextButton.style.flexGrow = "1";
 		addTextButton.style.marginRight = "5px";
 		addTextButton.onclick = function() {
@@ -3550,7 +3580,8 @@ function DialogTool() {
 
 		var cancelButton = document.createElement("button");
 		cancelButton.style.flexGrow = "1";
-		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " cancel"; // todo : localize
+		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " "
+			+ localization.GetStringOrFallback("action_cancel", "cancel");
 		cancelButton.onclick = function() {
 			div.classList.add("expressionBuilderCancel");
 			setTimeout(onCancelHandler, 250);
@@ -3559,7 +3590,8 @@ function DialogTool() {
 
 		var acceptButton = document.createElement("button");
 		acceptButton.style.flexGrow = "2";
-		acceptButton.innerHTML = '<i class="material-icons">check_circle</i>' + " save"; // todo : localize
+		acceptButton.innerHTML = '<i class="material-icons">check_circle</i>' + " "
+			+ localization.GetStringOrFallback("action_save", "save");
 		acceptButton.classList.add("reverseColors");
 		acceptButton.onclick = function() {
 			acceptButton.classList.add("expressionBuilderSaveFlash");
