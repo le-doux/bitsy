@@ -840,7 +840,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"dialog",
-				"dialog",
+				localization.GetStringOrFallback("dialog_block_basic", "dialog"),
 				function() {
 					var printFunc = scriptUtils.CreateEmptyPrintFunc();
 
@@ -856,7 +856,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"dialog",
-				"pagebreak", // TODO : name?
+				localization.GetStringOrFallback("function_pg_name", "pagebreak"),
 				function() {
 					var node = scriptUtils.CreateFunctionBlock("pg", []);
 					var editor = new FunctionEditor(node, parentEditor);
@@ -866,7 +866,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"flow",
-				"sequence list",
+				localization.GetStringOrFallback("sequence_list_name", "sequence list"),
 				function() {
 					var node = scriptUtils.CreateSequenceBlock();
 					var editor = new SequenceEditor(node, parentEditor);
@@ -876,7 +876,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"flow",
-				"cycle list",
+				localization.GetStringOrFallback("cycle_list_name", "cycle list"),
 				function() {
 					var node = scriptUtils.CreateCycleBlock();
 					var editor = new SequenceEditor(node, parentEditor);
@@ -886,7 +886,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"flow",
-				"shuffle list",
+				localization.GetStringOrFallback("shuffle_list_name", "shuffle list"),
 				function() {
 					var node = scriptUtils.CreateShuffleBlock();
 					var editor = new SequenceEditor(node, parentEditor);
@@ -896,7 +896,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"flow",
-				"branching list",
+				localization.GetStringOrFallback("branching_list_name", "branching list"),
 				function() {
 					var node = scriptUtils.CreateIfBlock();
 					var editor = new ConditionalEditor(node, parentEditor);
@@ -906,7 +906,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"exit",
-				"exit",
+				localization.GetStringOrFallback("function_exit_name", "exit"),
 				function() {
 					var node = scriptUtils.CreateFunctionBlock("exit", ["0", 0, 0]);
 					var editor = new FunctionEditor(node, parentEditor);
@@ -916,7 +916,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"exit",
-				"end",
+				localization.GetStringOrFallback("function_end_name", "end"),
 				function() {
 					var node = scriptUtils.CreateFunctionBlock("end", []);
 					var editor = new FunctionEditor(node, parentEditor);
@@ -926,7 +926,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"exit",
-				"lock / unlock",
+				localization.GetStringOrFallback("dialog_action_locked_set", "lock / unlock"),
 				function() {
 					var node = scriptUtils.CreatePropertyNode("locked", true);
 					var editor = new FunctionEditor(node, parentEditor);
@@ -936,7 +936,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"item",
-				"set item count",
+				localization.GetStringOrFallback("dialog_action_item_set", "set item count"),
 				function() {
 					var node = scriptUtils.CreateFunctionBlock("item", ["0", 10]);
 					var editor = new FunctionEditor(node, parentEditor);
@@ -946,7 +946,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"item",
-				"increase item count",
+				localization.GetStringOrFallback("dialog_action_item_increase", "increase item count"),
 				function() {
 					var expressionNode = scriptInterpreter.CreateExpression('{item "0"} + 1');
 					var codeBlock = scriptUtils.CreateCodeBlock();
@@ -960,7 +960,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"item",
-				"decrease item count",
+				localization.GetStringOrFallback("dialog_action_item_decrease", "decrease item count"),
 				function() {
 					var expressionNode = scriptInterpreter.CreateExpression('{item "0"} - 1');
 					var codeBlock = scriptUtils.CreateCodeBlock();
@@ -974,7 +974,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"item",
-				"set variable value",
+				localization.GetStringOrFallback("dialog_action_variable_set", "set variable value"),
 				function() {
 					var expressionNode = scriptInterpreter.CreateExpression("a = 5");
 					var node = scriptUtils.CreateCodeBlock();
@@ -986,7 +986,7 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"item",
-				"change variable value",
+				localization.GetStringOrFallback("dialog_action_variable_change", "change variable value"),
 				function() {
 					var expressionNode = scriptInterpreter.CreateExpression("a = a + 1");
 					var node = scriptUtils.CreateCodeBlock();
@@ -998,7 +998,8 @@ function DialogTool() {
 		var cancelButton = document.createElement("button");
 		cancelButton.classList.add("actionBuilderButton");
 		cancelButton.classList.add("actionBuilderCancel");
-		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " cancel";
+		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " "
+			+ localization.GetStringOrFallback("action_cancel", "cancel");
 		cancelButton.onclick = function() {
 			div.classList.remove("actionBuilderActive");
 			div.classList.remove("actionBuilderRoot");
@@ -3407,7 +3408,7 @@ function DialogTool() {
 			var rightNode = GetRightmostNode(expressionRootNode);
 			var substringToDelete = rightNode.type === "operator" ? " " + rightNode.operator + " " : rightNode.Serialize();
 			expressionString = expressionString.slice(0, expressionString.length - substringToDelete.length);
-			expressionRootNode = scriptInterpreter.CreateExpression(expressionString);\
+			expressionRootNode = scriptInterpreter.CreateExpression(expressionString);
 
 			ResetExpressionDiv();
 		}
