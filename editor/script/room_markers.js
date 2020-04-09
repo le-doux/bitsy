@@ -115,7 +115,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		room[selectedRoom].endings.push(newEnding);
 		dialog[newEnding.id] = {
 			src: localization.GetStringOrFallback("default_end_dlg", "The end"),
-			name: CreateDefaultName("ending", dialog) // todo : localize
+			name: CreateDefaultName(localization.GetStringOrFallback("ending_label", "ending"), dialog),
 		};
 
 		markerList = GatherMarkerList();
@@ -390,7 +390,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				}
 			}
 
-			markerInputName.value = "exit " + (exitIndex + 1) + "/" + exitCount; // TODO : localize
+			markerInputName.value = localization.GetStringOrFallback("exit_label", "exit") + " " + (exitIndex + 1) + "/" + exitCount;
 			if (curMarker.linkState == LinkState.TwoWay) {
 				markerName1.innerText = localization.GetStringOrFallback("exit_label", "exit");
 				markerName2.innerText = localization.GetStringOrFallback("exit_return_label", "return exit");
@@ -417,7 +417,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				}
 			}
 
-			markerInputName.value = "ending " + (endingIndex + 1) + "/" + endingCount; // TODO : localize
+			markerInputName.value = localization.GetStringOrFallback("ending_label", "ending") + " " + (endingIndex + 1) + "/" + endingCount;
 			markerName1.innerText = localization.GetStringOrFallback("ending_label", "ending");
 		}
 	}
@@ -470,9 +470,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 					endingDialogWidget.OnDestroy();
 				}
 
-				// TODO : localize
 				endingDialogWidget = dialogTool.CreateWidget(
-					"ending dialog",
+					localization.GetStringOrFallback("ending_dialog", "ending dialog"),
 					"exitsPanel",
 					curMarker.ending.id,
 					false,
@@ -521,7 +520,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 
 		exitDialogWidgets[exitIndex] = dialogTool.CreateWidget(
-			"exit dialog", // TODO : localize
+			localization.GetStringOrFallback("exit_dialog", "exit dialog"),
 			"exitsPanel",
 			exit.dlg,
 			true,
@@ -533,33 +532,39 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 					exit.dlg = id;
 					refreshGameData();
 				},
-				Presets : [ // TODO : localize names
+				Presets : [
 					{
-						Name:	"add narration",
-						Script:	"You walk through the doorway",
+						Name:	localization.GetStringOrFallback("exit_dialog_narration_add", "add narration"),
+						Script:	localization.GetStringOrFallback("exit_dialog_narration_default_text", "You walk through the doorway"),
 						GetDefaultName: function() {
-							return CreateDefaultName("exit narration", dialog); // todo : localize
+							return CreateDefaultName(
+								localization.GetStringOrFallback("exit_dialog_narration_name", "exit narration"),
+								dialog);
 						},
 					},
 					{
-						Name:	"add lock",
+						Name:	localization.GetStringOrFallback("exit_dialog_lock_add", "add lock"),
 						Script:	'"""\n' +
 								'{\n' +
 								'  - {item "1"} >= 1 ?\n' +
 								'    {property locked false}\n' +
-								'    The key opens the door!\n' +
+								'    ' + localization.GetStringOrFallback("exit_dialog_lock_default_text1", "The key opens the door!") + '\n' +
 								'  - else ?\n' +
 								'    {property locked true}\n' +
-								'    The door is locked...\n' +
+								'    ' + localization.GetStringOrFallback("exit_dialog_lock_default_text2", "The door is locked...") + '\n' +
 								'}\n' +
 								'"""',
 						GetDefaultName: function() {
-							return CreateDefaultName("locked exit", dialog); // todo : localize
+							return CreateDefaultName(
+								localization.GetStringOrFallback("exit_dialog_lock_name", "locked exit"),
+								dialog);
 						},
 					},
 				],
 				GetDefaultName : function() {
-					return CreateDefaultName("exit dialog", dialog); // todo : localize
+					return CreateDefaultName(
+						localization.GetStringOrFallback("exit_dialog", "exit dialog"),
+						dialog);
 				},
 			});
 		exitDialogControls.appendChild(exitDialogWidgets[exitIndex].GetElement());
