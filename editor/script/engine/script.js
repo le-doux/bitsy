@@ -927,7 +927,11 @@ var DialogBlockNode = function(doIndentFirstLine) {
 			var shouldIndentCodeBlock = i > 0 && curNodeIsNonInlineCode;
 			var shouldIndentAfterCodeBlock = prevNodeIsNonInlineCode;
 
-			if (i > 0 && curNodeIsNonInlineCode && !prevNodeIsNonInlineCode) {
+			// need to indent before non-inline code BUT there are exceptions
+			// - we already indent if the previous line was ALSO non-inline code AND
+			// - we already indent if the previous line had a linebreak at the end.. so don't add extra linebreaks!
+			// TODO : revisit this before releasing 7.0, since it seems kinda broken
+			if (i > 0 && curNodeIsNonInlineCode && !prevNodeIsNonInlineCode && !shouldIndentAfterLinebreak) {
 				str += "\n";
 			}
 
@@ -1026,7 +1030,8 @@ function isUndefinedBlock(node) {
 	return node.type === "code_block" && node.children.length > 0 && node.children[0].type === "undefined";
 }
 
-var textEffectBlockNames = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw", "printSprite", "printItem", "printTile"];
+// TODO : do I really need to add "print" and "say" here? revisit before 7.0 release
+var textEffectBlockNames = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw", "printSprite", "printItem", "printTile", "print", "say"];
 function isTextEffectBlock(node) {
 	if (node.type === "code_block") {
 		if (node.children.length > 0 && node.children[0].type === "function") {

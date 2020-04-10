@@ -357,6 +357,12 @@ function DialogTool() {
 			function OnTextChangeHandler() {
 				var dialogStr = '"""\n' + codeTextArea.value + '\n"""'; // single lines?
 				scriptRootNode = scriptInterpreter.Parse(dialogStr, dialogId);
+
+				// useful debug messages when parsing is broken:
+				// scriptInterpreter.DebugVisualizeScriptTree(scriptRootNode);
+				// console.log(dialogStr);
+				// console.log(scriptRootNode.Serialize());
+
 				OnUpdate();
 			}
 			codeTextArea.onchange = OnTextChangeHandler;
