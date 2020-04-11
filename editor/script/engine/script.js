@@ -666,8 +666,8 @@ var Environment = function() {
 	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
 	functionMap.set("end", endFunc);
 	functionMap.set("exit", exitFunc);
-	functionMap.set("pg", pagebreakFunc); // TODO : name?
-	functionMap.set("property", propertyFunc); // TODO : name?
+	functionMap.set("pg", pagebreakFunc);
+	functionMap.set("property", propertyFunc);
 
 	this.HasFunction = function(name) { return functionMap.has(name); };
 	this.EvalFunction = function(name,parameters,onReturn,env) {
@@ -927,10 +927,8 @@ var DialogBlockNode = function(doIndentFirstLine) {
 			var shouldIndentCodeBlock = i > 0 && curNodeIsNonInlineCode;
 			var shouldIndentAfterCodeBlock = prevNodeIsNonInlineCode;
 
-			// need to indent before non-inline code BUT there are exceptions
-			// - we already indent if the previous line was ALSO non-inline code AND
-			// - we already indent if the previous line had a linebreak at the end.. so don't add extra linebreaks!
-			// TODO : revisit this before releasing 7.0, since it seems kinda broken
+			// need to insert a newline before the first block of non-inline code that isn't 
+			// preceded by a {br}, since those will create their own newline
 			if (i > 0 && curNodeIsNonInlineCode && !prevNodeIsNonInlineCode && !shouldIndentAfterLinebreak) {
 				str += "\n";
 			}
@@ -1030,7 +1028,6 @@ function isUndefinedBlock(node) {
 	return node.type === "code_block" && node.children.length > 0 && node.children[0].type === "undefined";
 }
 
-// TODO : do I really need to add "print" and "say" here? revisit before 7.0 release
 var textEffectBlockNames = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw", "printSprite", "printItem", "printTile", "print", "say"];
 function isTextEffectBlock(node) {
 	if (node.type === "code_block") {
@@ -1640,10 +1637,11 @@ var Parser = function(env) {
 		The parsing of those code blocks is handled by ParseCode.
 
 		Note on parsing newline characters:
-		- there should be a linebreak {br} after each "dialog line"
-		- a dialog line is defined as any line that either:
-			- contains dialog text (any text outside of a code block)
-			- *or* is entirely empty (no text, no code)
+		- there should be a linebreak {br} inbetween each pair of dialog lines
+		- a "dialog line" is defined as any line that either:
+			- 1) contains dialog text (any text outside of a code block)
+			- 2) is entirely empty (no text, no code)
+			- *or* 3) contains a list block (sequence, cycle, shuffle, or conditional)
 		- lines *only* containing {code} blocks are not dialog lines
 
 		NOTE TO SELF: all the state I'm storing in here feels like
@@ -1688,10 +1686,15 @@ var Parser = function(env) {
 			curLineNodeList.push(codeBlockNode);
 
 			curLineIsEmpty = false;
+
+			// lists count as dialog text, because they can contain it
+			if (isMultilineListBlock(codeBlockNode)) {
+				curLineContainsDialogText = true;
+			}
 		}
 
 		var tryAddLinebreakNodeToList = function() {
-			if (prevLineIsDialogLine) {
+			if (prevLineIsDialogLine && curLineIsDialogLine()) {
 				var linebreakNode = new FuncNode("br", []);
 				curLineNodeList.unshift(linebreakNode);
 			}
