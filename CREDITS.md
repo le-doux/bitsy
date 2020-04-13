@@ -1,6 +1,14 @@
 **Engine and Editor Development**
 
-Adam Le Doux
+Adam Le Doux - Project Lead
+
+@aloelazoe - Contributor
+
+@ayolland - Contributor
+
+@ragzouken - Contributor
+
+@zachThePerson - Contributor
 
 
 **Localization**
@@ -37,4 +45,8 @@ Ray Song - Chinese translation
 
 @scumslug - Estonian translation
 
+Sequoia Edwards - Chinook translation
+
 Török Ádám - Hungarian translation
+
+Tokoro - Japanese translation

@@ -227,14 +227,29 @@ function onready(startWithTitle) {
 	document.addEventListener('keyup', input.onkeyup);
 
 	if (isPlayerEmbeddedInEditor) {
-		canvas.addEventListener('touchstart', input.ontouchstart);
-		canvas.addEventListener('touchmove', input.ontouchmove);
-		canvas.addEventListener('touchend', input.ontouchend);
+		canvas.addEventListener('touchstart', input.ontouchstart, {passive:false});
+		canvas.addEventListener('touchmove', input.ontouchmove, {passive:false});
+		canvas.addEventListener('touchend', input.ontouchend, {passive:false});
 	}
 	else {
-		document.addEventListener('touchstart', input.ontouchstart);
-		document.addEventListener('touchmove', input.ontouchmove);
-		document.addEventListener('touchend', input.ontouchend);
+		// creates a 'touchTrigger' element that covers the entire screen and can universally have touch event listeners added w/o issue.
+
+		// we're checking for existing touchTriggers both at game start and end, so it's slightly redundant.
+	  	var existingTouchTrigger = document.querySelector('#touchTrigger');
+	  	if (existingTouchTrigger === null){
+	  	  var touchTrigger = document.createElement("div");
+	  	  touchTrigger.setAttribute("id","touchTrigger");
+
+	  	  // afaik css in js is necessary here to force a fullscreen element
+	  	  touchTrigger.setAttribute(
+	  	    "style","position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden;"
+	  	  );
+	  	  document.body.appendChild(touchTrigger);
+
+	  	  touchTrigger.addEventListener('touchstart', input.ontouchstart);
+	  	  touchTrigger.addEventListener('touchmove', input.ontouchmove);
+	  	  touchTrigger.addEventListener('touchend', input.ontouchend);
+	  	}
 	}
 
 	window.onblur = input.onblur;
@@ -290,9 +305,16 @@ function stopGame() {
 		canvas.removeEventListener('touchend', input.ontouchend);
 	}
 	else {
-		document.removeEventListener('touchstart', input.ontouchstart);
-		document.removeEventListener('touchmove', input.ontouchmove);
-		document.removeEventListener('touchend', input.ontouchend);
+		//check for touchTrigger and removes it
+
+    		var existingTouchTrigger = document.querySelector('#touchTrigger');
+    		if (existingTouchTrigger !== null){
+    			existingTouchTrigger.removeEventListener('touchstart', input.ontouchstart);
+    			existingTouchTrigger.removeEventListener('touchmove', input.ontouchmove);
+    			existingTouchTrigger.removeEventListener('touchend', input.ontouchend);
+
+    			existingTouchTrigger.parentElement.removeChild(existingTouchTrigger);
+    		}
 	}
 
 	window.onblur = null;

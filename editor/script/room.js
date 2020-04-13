@@ -38,6 +38,8 @@ function RoomTool(canvas) {
 	});
 
 	function onMouseDown(e) {
+		e.preventDefault();
+
 		var isDisabledTemp = isDisabledExternally; // hack to exit early if disabled at START of mouse down
 
 		var off = getOffset(e);
@@ -172,8 +174,8 @@ function RoomTool(canvas) {
 	function editTilesOnDrag(e) {
 		var off = getOffset(e);
 		off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
-		var x = Math.floor(off.x / (tilesize*scale));
-		var y = Math.floor(off.y / (tilesize*scale));
+		var x = clamp(Math.floor(off.x / (tilesize*scale)), 0, mapsize - 1);
+		var y = clamp(Math.floor(off.y / (tilesize*scale)), 0, mapsize - 1);
 		// var row = room[curRoom].tilemap[y];
 		if (isDragAddingTiles) {
 			if ( room[curRoom].tilemap[y][x] != self.drawing.id ) {
