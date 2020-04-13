@@ -116,12 +116,13 @@ function PaletteTool(colorPicker,labelIds,nameFieldId) {
 	this.AddNew = function() {
 		// create new palette and save the data
 		var id = nextPaletteId();
+
 		palette[ id ] = {
 			name : null,
 			colors : [
-			[255,255,255],
-			[255,255,255],
-			[255,255,255] ]
+			hslToRgb(Math.random(), 1.0, 0.5),
+			hslToRgb(Math.random(), 1.0, 0.5),
+			hslToRgb(Math.random(), 1.0, 0.5) ]
 		};
 
 		curPaletteId = id;

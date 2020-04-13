@@ -30,9 +30,31 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		RenderMarkerSelection();
 	}
 
-	this.AddExit = function() { // TODO : make destination select smarter
+	this.StartAdd = function() {
+		var addMarkerOptions = document.getElementById("addMarkerOptions");
+		var markersSelect = document.getElementById("markersSelect");
+		var noMarkerMessage = document.getElementById("noMarkerMessage");
+		var markerOptions = document.getElementById("markerOptions");
+		addMarkerOptions.style.display = "flex";
+		markersSelect.style.display = "none";
+		noMarkerMessage.style.display = "none";
+		markerOptions.style.display = "none";
+		document.getElementById("markerName").value = ""; // hacky
+	}
+
+	this.CancelAdd = function() {
+		var markerOptions = document.getElementById("markerOptions");
+		markerOptions.style.display = "block";
+		RenderMarkerSelection();
+	}
+
+	this.AddExit = function(isOneWay) { // TODO : make destination select smarter
 		if (selectedRoom == null) {
 			return;
+		}
+
+		if (isOneWay === undefined || isOneWay === null) {
+			isOneWay = false;
 		}
 
 		var roomIds = Object.keys(room);
@@ -46,6 +68,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var nextRoomId = roomIds[roomIndex];
 
 		// console.log(room);
+		// TODO : I really need a shared "createExit()" function
 		var newExit = {
 			x : 2,
 			y : 2,
@@ -55,24 +78,24 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				y : 13
 			},
 			transition_effect : null,
-			// TODO : vNext
-			// script_id : null,
+			dlg : null,
 		}
 		room[selectedRoom].exits.push( newExit );
 
-		var newReturn = {
-			x : newExit.dest.x,
-			y : newExit.dest.y,
-			dest : {
-				room : selectedRoom,
-				x : newExit.x,
-				y : newExit.y
-			},
-			transition_effect : null,
-			// TODO : vNext
-			// script_id : null,
+		if (!isOneWay) {
+			var newReturn = {
+				x : newExit.dest.x,
+				y : newExit.dest.y,
+				dest : {
+					room : selectedRoom,
+					x : newExit.x,
+					y : newExit.y
+				},
+				transition_effect : null,
+				dlg : null,
+			}
+			room[newExit.dest.room].exits.push( newReturn );
 		}
-		room[newExit.dest.room].exits.push( newReturn );
 
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Exit && m.exit == newExit; }));
@@ -87,30 +110,64 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var newEnding = {
 			x : 2,
 			y : 2,
-			id : nextEndingId(),
+			id : nextAvailableDialogId(),
 		};
-		room[selectedRoom].endings.push( newEnding );
-		ending[ newEnding.id ] = localization.GetStringOrFallback("default_end_dlg", "The end");
+		room[selectedRoom].endings.push(newEnding);
+		dialog[newEnding.id] = {
+			src: localization.GetStringOrFallback("default_end_dlg", "The end"),
+			name: CreateDefaultName(localization.GetStringOrFallback("ending_label", "ending"), dialog),
+		};
 
 		markerList = GatherMarkerList();
 		SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; }));
 		refreshGameData();
 	}
 
-	// TODO : vNext
-	// this.AddEffect = function() {
-	// 	var newEffect = {
-	// 		x : 2,
-	// 		y : 2,
-	// 		id : nextScriptHexId(),
-	// 	};
-	// 	room[selectedRoom].effects.push( newEffect );
-	// 	script[ newEffect.id ] = { type: ScriptType.Script, source: "" }; // TODO : default effect?
+	// todo : handle two-way exits (and collisions!)
+	this.DuplicateSelected = function() {
+		if (selectedRoom == null || curMarker == null) {
+			return;
+		}
 
-	// 	markerList = GatherMarkerList();
-	// 	SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Effect && m.effect == newEffect; }));
-	// 	refreshGameData();
-	// }
+		if (curMarker.type === MarkerType.Exit) {
+			var newExit = duplicateExit(curMarker.exit);
+
+			if (newExit.x < 15) {
+				newExit.x++;
+			}
+			else if (newExit.y < 15) {
+				newExit.x = 0;
+				newExit.y++;
+			}
+
+			room[selectedRoom].exits.push(newExit);
+
+			markerList = GatherMarkerList();
+			SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Exit && m.exit == newExit; }));
+			refreshGameData();
+		}
+		else if (curMarker.type === MarkerType.Ending) {
+			var newEnding = { // TODO : there should be a helper function for this copy
+				x : curMarker.ending.x,
+				y : curMarker.ending.y,
+				id : curMarker.ending.id,
+			};
+
+			if (newEnding.x < 15) {
+				newEnding.x++;
+			}
+			else if (newEnding.y < 15) {
+				newEnding.x = 0;
+				newEnding.y++;
+			}
+
+			room[selectedRoom].endings.push(newEnding);
+
+			markerList = GatherMarkerList();
+			SelectMarker(markerList.find(function(m) { return m.type == MarkerType.Ending && m.ending == newEnding; }));
+			refreshGameData();
+		}
+	}
 
 	this.Clear = function() {
 		selectedRoom = null;
@@ -160,19 +217,23 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 			SelectMarker(curMarker); // refresh UI and so on
 		}
+		else if (markerList.length > 0) {
+			// fallback selected exit
+			SelectMarker(markerList[0]);
+		}
 		else {
-			if (markerList.length > 0) {
-				// fallback selected exit
-				SelectMarker(markerList[0]);
-			}
+			// no markers are left!
+			SelectMarker(null);
 		}
 	}
 
 	function RenderMarkerSelection() { // TODO - break this up???
 		console.log('render marker');
 
+		var addMarkerOptions = document.getElementById("addMarkerOptions");
 		var markersSelect = document.getElementById("markersSelect");
 		var noMarkerMessage = document.getElementById("noMarkerMessage");
+		addMarkerOptions.style.display = "none";
 		markersSelect.style.display = "none";
 		noMarkerMessage.style.display = "none";
 
@@ -180,6 +241,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var markerControl2 = document.getElementById("markerControl2");
 		markerControl1.style.visibility = "hidden";
 		markerControl2.style.visibility = "hidden";
+
+		var markerOptions = document.getElementById("markerOptions");
+		markerOptions.style.display = "block";
 
 		if (curMarker != null) {
 			markersSelect.style.display = "flex";
@@ -225,19 +289,108 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			UpdateMarkerNames();
 		}
 		else {
+			document.getElementById("markerName").value = ""; // hacky
 			noMarkerMessage.style.display = "inline-block";
 		}
 
+		UpdateRoomEditControls();
 		UpdateMarkerOptions();
 		UpdatePlacementButtons();
 		UpdateExitDirectionUI();
 	}
 
+	function UpdateRoomEditControls() {
+		if (curMarker !=  null) {
+			for (var i = 0; i < 2; i++) {
+				var pos = curMarker.GetMarkerPos(i);
+
+				if (pos) {
+					var editToggle = document.getElementById("toggleEditMarker" + (i + 1));
+					editToggle.onchange = function(index, input) {
+						return function() {
+							document.getElementById("editControlsMarker" + (index + 1)).style.display = input.checked ? "block" : "none";
+						}
+					}(i, editToggle);
+					editToggle.onchange();
+
+					var editRoomSelect = document.getElementById("editRoomMarker" + (i + 1));
+					editRoomSelect.innerHTML = "";
+					for (id in room) {
+						var roomName = room[id].name ? room[id].name : localization.GetStringOrFallback("room_tool_name", "room") + " " + id;
+						var roomOption = document.createElement("option");
+						roomOption.value = id;
+						roomOption.innerText = roomName;
+						roomOption.selected = pos ? pos.room === id : false;
+						editRoomSelect.appendChild(roomOption);
+					}
+					editRoomSelect.onchange = function(index, input) {
+						return function() {
+							var curPos = curMarker.GetMarkerPos(index);
+							curMarker.PlaceMarker(
+								index == 0 ? PlacementMode.FirstMarker : PlacementMode.SecondMarker,
+								input.value,
+								curPos.x,
+								curPos.y);
+							refreshGameData();
+							RenderMarkerSelection();
+						}
+					}(i, editRoomSelect);
+	
+					var editPosX = document.getElementById("editPosXMarker" + (i + 1));
+					editPosX.value = pos.x;
+					editPosX.onchange = function(index, input) {
+						return function() {
+							var curPos = curMarker.GetMarkerPos(index);
+							curMarker.PlaceMarker(
+								index == 0 ? PlacementMode.FirstMarker : PlacementMode.SecondMarker,
+								curPos.room,
+								input.value,
+								curPos.y);
+							refreshGameData();
+							RenderMarkerSelection();
+						}
+					}(i, editPosX);
+
+					var editPosY = document.getElementById("editPosYMarker" + (i + 1));
+					editPosY.value = pos.y;
+					editPosY.onchange = function(index, input) {
+						return function() {
+							var curPos = curMarker.GetMarkerPos(index);
+							curMarker.PlaceMarker(
+								index == 0 ? PlacementMode.FirstMarker : PlacementMode.SecondMarker,
+								curPos.room,
+								curPos.x,
+								input.value);
+							refreshGameData();
+							RenderMarkerSelection();
+						}
+					}(i, editPosY);
+				}
+			}		
+		}
+	}
+
 	function UpdateMarkerNames() {
+		var markerInputName = document.getElementById("markerName"); // TODO : not sure exactly what I want to do with this or if I want it
+
 		var markerName1 = document.getElementById("markerName1");
 		var markerName2 = document.getElementById("markerName2");
 
 		if (curMarker.type == MarkerType.Exit) {
+			// TODO : why are the counts backwards?
+			// kind of a long-winded way to figure out a number for this exit in this room
+			var exitIndex = 0;
+			var exitCount = 0;
+			for (var i = 0; i < markerList.length; i++) {
+				if (markerList[i].exit) {
+					if (markerList[i] == curMarker) {
+						exitIndex = exitCount;
+					}
+					exitCount++;
+				}
+			}
+
+			markerInputName.value = localization.GetStringOrFallback("exit_label", "exit") + " " + (exitIndex + 1) + "/" + exitCount;
 			if (curMarker.linkState == LinkState.TwoWay) {
 				markerName1.innerText = localization.GetStringOrFallback("exit_label", "exit");
 				markerName2.innerText = localization.GetStringOrFallback("exit_return_label", "return exit");
@@ -252,17 +405,31 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			}
 		}
 		else if (curMarker.type == MarkerType.Ending) {
+			// a similarly long-winded way to get the ending number
+			var endingIndex = 0;
+			var endingCount = 0;
+			for (var i = 0; i < markerList.length; i++) {
+				if (markerList[i].ending) {
+					if (markerList[i] == curMarker) {
+						endingIndex = endingCount;
+					}
+					endingCount++;
+				}
+			}
+
+			markerInputName.value = localization.GetStringOrFallback("ending_label", "ending") + " " + (endingIndex + 1) + "/" + endingCount;
 			markerName1.innerText = localization.GetStringOrFallback("ending_label", "ending");
 		}
-		// TODO : vNext
-		// else if (curMarker.type == MarkerType.Effect) {
-		// 	markerName1.innerText = "effect"; // TODO localize
-		// }
 	}
+
+	var endingDialogWidget = null;
 
 	function UpdateMarkerOptions() {
 		var exitOptions = document.getElementById("exitOptions");
 		exitOptions.style.display = "none";
+
+		var returnExitOptions = document.getElementById("returnExitOptions");
+		returnExitOptions.style.display = "none";
 
 		var endingOptions = document.getElementById("endingOptions");
 		endingOptions.style.display = "none";
@@ -271,59 +438,67 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// effectOptions.style.display = "none";
 
 		if (curMarker != null) {
-			if (curMarker.type == MarkerType.Exit) {
-				exitOptions.style.display = "block";
+			document.getElementById("exitOptionsToggle1").style.display =
+				(curMarker.type == MarkerType.Exit && curMarker.linkState != LinkState.OneWaySwapped ? 
+					"inline" : "none");
+			document.getElementById("exitOptionsToggle1_alt").style.display =
+				(curMarker.type == MarkerType.Exit && curMarker.linkState == LinkState.OneWaySwapped ? 
+					"inline" : "none");
+			document.getElementById("exitOptionsToggle2").style.display =
+				(curMarker.type == MarkerType.Exit && curMarker.hasReturn ? "inline" : "none");
 
-				var exitOptionsSelect = document.getElementsByName("exit options select");
-				var exitOptionsSelectValue = null;
-				for(var i = 0; i < exitOptionsSelect.length; i++){
-					if(exitOptionsSelect[i].checked){
-						exitOptionsSelectValue = exitOptionsSelect[i].value;
-					}
+			if (curMarker.type == MarkerType.Exit) {
+				if (document.getElementById("exitOptionsToggleCheck1").checked
+					|| document.getElementById("exitOptionsToggleCheck1_alt").checked) {
+					exitOptions.style.display = "block";
 				}
 
-				UpdateExitOptions(exitOptionsSelectValue);
+				if (curMarker.hasReturn && document.getElementById("exitOptionsToggleCheck2").checked) {
+					returnExitOptions.style.display = "block";
+				}
+
+				UpdateAllExitOptions();
 			}
 			else if (curMarker.type == MarkerType.Ending) {
 				endingOptions.style.display = "block";
-				var endingText = document.getElementById("endingText");
-				var endingSource = ending[curMarker.ending.id];
-				var endingStr = scriptUtils.RemoveDialogBlockFormat(endingSource);
-				endingText.value = endingStr;
+
+				var endingDialogWidgetContainer = document.getElementById("endingDialogWidget");
+				endingDialogWidgetContainer.innerHTML = "";
+
+				// clean up old widget
+				if (endingDialogWidget) {
+					endingDialogWidget.OnDestroy();
+				}
+
+				endingDialogWidget = dialogTool.CreateWidget(
+					localization.GetStringOrFallback("ending_dialog", "ending dialog"),
+					"exitsPanel",
+					curMarker.ending.id,
+					false,
+					function (id) {
+						if (curMarker) {
+							curMarker.ending.id = id;
+						}
+					});
+				endingDialogWidgetContainer.appendChild(endingDialogWidget.GetElement());
 			}
-			// TODO : vNext
-			// else if (curMarker.type == MarkerType.Effect) {
-			// 	effectOptions.style.display = "block";
-			// 	var effectText = document.getElementById("effectText");
-			// 	var effectSource = script[curMarker.effect.id].source;
-			// 	var effectStr = scriptUtils.RemoveDialogBlockFormat(effectSource);
-			// 	effectText.value = effectStr;
-			// }
 		}
 	}
 
-	this.SetExitOptionsVisibility = function(visible) {
-		document.getElementById("exitOptionsInner").style.display = visible ? "block" : "none";
-		document.getElementById("showExitOptionsCheckIcon").innerText = visible ? "expand_more" : "expand_less";
-
-		if (visible) {
-			var exitOptionsSelect = document.getElementsByName("exit options select");
-			var exitOptionsSelectValue = null;
-			for(var i = 0; i < exitOptionsSelect.length; i++){
-				exitOptionsSelect[i].checked = exitOptionsSelect[i].value === "exit1";
-			}
-			UpdateExitOptions("exit1");
+	function UpdateAllExitOptions() {
+		UpdateExitOptions(0);
+		if (curMarker.hasReturn) {
+			UpdateExitOptions(1);
 		}
 	}
 
-	var curExitOptionsSelectId = null; // hacky but don't judge me
-	function UpdateExitOptions(exitSelectId) {
-		curExitOptionsSelectId = exitSelectId;
+	var exitDialogWidgets = [null, null];
+	function UpdateExitOptions(exitIndex) {
+		if (exitIndex == 1 && !curMarker.hasReturn) {
+			return; // oh no! the return doesn't exist!
+		}
 
-		document.getElementById("exitOptionsRadio").style.display = curMarker.hasReturn ? "flex" : "none";
-
-		// console.log("EXIT OPTIONS " + curExitOptionsSelectId);
-		var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
+		var exit = (exitIndex == 1 && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
 
 		var transitionId = exit.transition_effect;
 		if (transitionId == null) {
@@ -331,17 +506,87 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 		// console.log("transitionId " + transitionId);
 
-		var transitionSelect = document.getElementById("exitTransitionEffectSelect");
+		var transitionSelect = document.getElementById(exitIndex == 0 ? "exitTransitionEffectSelect" : "returnExitTransitionEffectSelect");
 		for (var i = 0; i < transitionSelect.options.length; i++) {
 			transitionSelect.options[i].selected = (transitionSelect.options[i].value === transitionId);
 		}
-	}
-	this.UpdateExitOptions = UpdateExitOptions;
 
-	this.ChangeExitTransitionEffect = function(effectId) {
-		var exit = (curExitOptionsSelectId === "exit2" && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
+		var exitDialogControls = document.getElementById(exitIndex == 0 ? "exitDialogControls" : "returnExitDialogControls");
+		exitDialogControls.innerHTML = "";
+
+		// clean up old widget
+		if (exitDialogWidgets[exitIndex] != null) {
+			exitDialogWidgets[exitIndex].OnDestroy();
+		}
+
+		exitDialogWidgets[exitIndex] = dialogTool.CreateWidget(
+			localization.GetStringOrFallback("exit_dialog", "exit dialog"),
+			"exitsPanel",
+			exit.dlg,
+			true,
+			function (id) {
+				exit.dlg = id;
+			},
+			{
+				OnCreateNewDialog : function(id) {
+					exit.dlg = id;
+					refreshGameData();
+				},
+				Presets : [
+					{
+						Name:	localization.GetStringOrFallback("exit_dialog_narration_add", "add narration"),
+						Script:	localization.GetStringOrFallback("exit_dialog_narration_default_text", "You walk through the doorway"),
+						GetDefaultName: function() {
+							return CreateDefaultName(
+								localization.GetStringOrFallback("exit_dialog_narration_name", "exit narration"),
+								dialog);
+						},
+					},
+					{
+						Name:	localization.GetStringOrFallback("exit_dialog_lock_add", "add lock"),
+						Script:	'"""\n' +
+								'{\n' +
+								'  - {item "1"} >= 1 ?\n' +
+								'    {property locked false}\n' +
+								'    ' + localization.GetStringOrFallback("exit_dialog_lock_default_text1", "The key opens the door!") + '\n' +
+								'  - else ?\n' +
+								'    {property locked true}\n' +
+								'    ' + localization.GetStringOrFallback("exit_dialog_lock_default_text2", "The door is locked...") + '\n' +
+								'}\n' +
+								'"""',
+						GetDefaultName: function() {
+							return CreateDefaultName(
+								localization.GetStringOrFallback("exit_dialog_lock_name", "locked exit"),
+								dialog);
+						},
+					},
+				],
+				GetDefaultName : function() {
+					return CreateDefaultName(
+						localization.GetStringOrFallback("exit_dialog", "exit dialog"),
+						dialog);
+				},
+			});
+		exitDialogControls.appendChild(exitDialogWidgets[exitIndex].GetElement());
+	}
+
+	this.ChangeExitTransitionEffect = function(effectId, exitIndex) {
+		if (exitIndex == 1 && !curMarker.hasReturn) {
+			return; // exit doesn't exist!
+		}
+
+		var exit = (exitIndex == 1 && curMarker.hasReturn) ? curMarker.return : curMarker.exit;
 		exit.transition_effect = effectId === "none" ? null : effectId;
 		refreshGameData();
+	}
+
+	this.ToggleExitOptions = function(exitIndex, visibility) {
+		if (exitIndex == 1 && !curMarker.hasReturn) {
+			return; // exit doesn't exist!
+		}
+
+		var optionsDiv = document.getElementById(exitIndex == 0 ? "exitOptions" : "returnExitOptions");
+		optionsDiv.style.display = visibility ? "block" : "none";
 	}
 
 	this.RemoveMarker = function() {
@@ -416,10 +661,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// hacky global method!!
 		if (curMarker != null && curMarker.MarkerCount() >= 1) {
 			selectRoom(curMarker.GetMarkerPos(0).room);
-
-			// if (curMarker.type == MarkerType.Exit) {
-			// 	UpdateExitOptions("exit1");
-			// }
 		}
 	}
 
@@ -427,18 +668,19 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// hacky global method!!
 		if (curMarker != null && curMarker.MarkerCount() >= 2) {
 			selectRoom(curMarker.GetMarkerPos(1).room);
-
-			// if (curMarker.type == MarkerType.Exit) {
-			// 	UpdateExitOptions("exit2");
-			// }
 		}
 	}
 
-	function GetPosString(markerPos) {
+	function GetPosString(markerPos, maxRoomNameLength) {
 		var roomName = room[markerPos.room] != undefined ? room[markerPos.room].name : undefined;
 		if (roomName == undefined || roomName == null) {
 			roomName = localization.GetStringOrFallback("room_tool_name", "room") + " " + markerPos.room;
 		}
+
+		if (maxRoomNameLength && roomName.length > maxRoomNameLength) {
+			roomName = roomName.slice(0, maxRoomNameLength) + "..."
+		}
+
 		return roomName + " (" + markerPos.x + "," + markerPos.y + ")";
 	}
 
@@ -453,37 +695,35 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// hackily relies on global UI names oh well D:
 		if (placementMode == PlacementMode.FirstMarker) {
 			document.getElementById("toggleMoveMarker1").checked = true;
-			document.getElementById("textMoveMarker1").innerText = localization.GetStringOrFallback("marker_moving", "moving");
-			document.getElementById("cancelMoveMarker1").style.display = "inline";
+			document.getElementById("toggleMoveMarkerIcon1").innerText = "cancel";
 			document.getElementById("textMoveMessage1").style.display = "inline";
 			document.getElementById("textMarkerPos1").style.display = "none";
 		}
 		else {
 			// var markerPos1 = curMarker.GetMarkerPos(0);
 			document.getElementById("toggleMoveMarker1").checked = false;
-			document.getElementById("textMoveMarker1").innerText = localization.GetStringOrFallback("marker_move", "move");
-			document.getElementById("cancelMoveMarker1").style.display = "none";
+			document.getElementById("toggleMoveMarkerIcon1").innerText = "location_searching";
 			document.getElementById("textMoveMessage1").style.display = "none";
 			document.getElementById("textMarkerPos1").style.display = "inline";
 		}
 
 		if (placementMode == PlacementMode.SecondMarker) {
 			document.getElementById("toggleMoveMarker2").checked = true;
-			document.getElementById("textMoveMarker2").innerText = localization.GetStringOrFallback("marker_moving", "moving");
-			document.getElementById("cancelMoveMarker2").style.display = "inline";
+			document.getElementById("toggleMoveMarkerIcon2").innerText = "cancel";
 			document.getElementById("textMoveMessage2").style.display = "inline";
 			document.getElementById("textMarkerPos2").style.display = "none";
 		}
 		else {
 			document.getElementById("toggleMoveMarker2").checked = false;
-			document.getElementById("textMoveMarker2").innerText = localization.GetStringOrFallback("marker_move", "move");
-			document.getElementById("cancelMoveMarker2").style.display = "none";
+			document.getElementById("toggleMoveMarkerIcon2").innerText = "location_searching";
 			document.getElementById("textMoveMessage2").style.display = "none";
 			document.getElementById("textMarkerPos2").style.display = "inline";
 		}
 
-		document.getElementById("textMarkerPos1").innerText = GetPosString(markerPos1);
-		document.getElementById("textMarkerPos2").innerText = GetPosString(markerPos2);
+		document.getElementById("textMarkerPos1").innerText = GetPosString(markerPos1, 10);
+		document.getElementById("textMarkerPos1").title = GetPosString(markerPos1);
+		document.getElementById("textMarkerPos2").innerText = GetPosString(markerPos2, 10);
+		document.getElementById("textMarkerPos2").title = GetPosString(markerPos2);
 
 		// TODO : this behaves oddly... change??
 		// if (placementMode == PlacementMode.None) {
@@ -625,17 +865,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 						ending)
 					);
 			}
-
-			// TODO : vNext
-			// for (var e in room[selectedRoom].effects) {
-			// 	var effect = room[selectedRoom].effects[e];
-
-			// 	markerList.push(
-			// 		new EffectMarker(
-			// 			selectedRoom,
-			// 			effect)
-			// 		);
-			// }
 		}
 
 		return markerList;
@@ -713,23 +942,17 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
-	this.ChangeEndingText = function(text) {
-		if (curMarker != null && curMarker.type == MarkerType.Ending) {
-			ending[curMarker.ending.id] = scriptUtils.EnsureDialogBlockFormat(text);
-			refreshGameData();
-		}
-	}
-
-	// TDODO : vNext
-	// this.ChangeEffectText = function(text) {
-	// 	if (curMarker != null && curMarker.type == MarkerType.Effect) {
-	// 		script[curMarker.effect.id].source = scriptUtils.EnsureDialogBlockFormat(text);
-	// 		refreshGameData();
-	// 	}
-	// }
-
 	events.Listen("palette_change", function(event) {
 		RenderMarkerSelection();
+	});
+
+	events.Listen("dialog_update", function(event) {
+		if (curMarker != null && curMarker.type === MarkerType.Ending) {
+			if (curMarker.ending.id === event.dialogId) {
+				curMarker = null;
+				ResetMarkerList();
+			}
+		}
 	});
 
 } // RoomMarkerTool()
@@ -737,8 +960,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 var MarkerType = { // TODO : I should probably find a way to get rid of this
 	Exit : 0,
 	Ending : 1,
-	// TODO : vNext
-	// Effect: 2,
 };
 
 var PlacementMode = {
@@ -1086,8 +1307,6 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 			this.SwapExitAndEntrance();
 
 			if (tempReturnOptions != null) {
-				// TODO : vNext
-				// this.exit.script_id = tempReturnOptions.script_id;
 				this.exit.transition_effect = tempReturnOptions.transition_effect;
 			}
 
@@ -1098,8 +1317,6 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 			this.SwapExitAndEntrance(); // swap first
 
 			if (tempExitOptions != null) {
-				// TODO : vNext
-				// this.exit.script_id = tempExitOptions.script_id;
 				this.exit.transition_effect = tempExitOptions.transition_effect;
 			}
 
@@ -1112,13 +1329,9 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 					y : this.exit.y
 				},
 				transition_effect : null,
-				// TODO : vNext
-				// script_id : null,
 			}
 
 			if (tempReturnOptions != null) {
-				// TODO : vNext
-				// newReturn.script_id = tempReturnOptions.script_id;
 				newReturn.transition_effect = tempReturnOptions.transition_effect;
 			}
 
@@ -1221,7 +1434,7 @@ function EndingMarker(parentRoom, ending) {
 	this.Remove = function() {
 		delete dialog[this.ending.id];
 		var endingIndex = room[this.parentRoom].endings.indexOf(this.ending);
-		room[this.parentRoom].endings.splice(endingIndex,1);
+		room[this.parentRoom].endings.splice(endingIndex, 1);
 	}
 
 	this.Match = function(otherMarker) {
@@ -1230,72 +1443,3 @@ function EndingMarker(parentRoom, ending) {
 
 	// this.OnSelect = function() {} // TODO
 } // EndingMarker()
-
-
-// TODO : vNext
-// // TODO : feels like I can find a way to share more logic with EndingMarker
-// function EffectMarker(parentRoom, effect) {
-// 	InitMarkerObj( this, new RoomMarkerBase(parentRoom) );
-
-// 	this.type = MarkerType.Effect;
-
-// 	this.effect = effect;
-
-// 	this.Draw = function(ctx,roomId,w,selected) {
-// 		if (this.parentRoom === roomId) {
-// 			this.base.DrawMarker(ctx, this.effect.x, this.effect.y, w, selected);
-// 			// TODO - specialize??
-// 		}
-// 	}
-
-// 	this.GetMarkerPos = function(markerIndex) {
-// 		return {
-// 			room: this.parentRoom,
-// 			x: this.effect.x,
-// 			y: this.effect.y,
-// 		};
-// 	}
-
-// 	this.IsAtLocation = function(roomId,x,y) {
-// 		return this.parentRoom === roomId && this.effect.x == x && this.effect.y == y;
-// 	}
-
-// 	var isDragging = false;
-
-// 	this.StartDrag = function(roomId,x,y) {
-// 		isDragging = this.IsAtLocation(roomId,x,y);
-// 	}
-
-// 	this.ContinueDrag = function(roomId,x,y) {
-// 		if (isDragging) {
-// 			this.effect.x = x;
-// 			this.effect.y = y;
-// 		}
-// 	}
-
-// 	this.EndDrag = function() {
-// 		isDragging = false;
-// 	}
-
-// 	this.Remove = function() {
-// 		delete script[this.effect.id];
-// 		var effectIndex = room[this.parentRoom].effects.indexOf(this.effect);
-// 		room[this.parentRoom].effects.splice(effectIndex,1);
-// 	}
-
-// 	this.PlaceMarker = function(placementMode,roomId,x,y) {
-// 		if (placementMode != PlacementMode.None) {
-// 			this.effect.x = x;
-// 			this.effect.y = y;
-// 			if (roomId != this.parentRoom) {
-// 				this.Remove();
-// 				room[roomId].effects.push(this.effect);
-// 				this.parentRoom = roomId;
-// 			}
-// 		}
-// 	}
-
-// 	this.Match = function(otherMarker) {
-// 		return this.type == otherMarker.type && this.effect == otherMarker.effect;
-// 	}
-// }

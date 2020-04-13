@@ -41,13 +41,16 @@ function DrawingId(type,id) { // TODO: is this the right name?
 		return tileTypeToIdPrefix(self.type) + self.id;
 	}
 
+	// note: can't believe I didn't make this before -- where else should I use it?
+	this.getNameOrDescription = function() {
+		console.log("NAME " + self.getEngineObject().name);
+		return self.getEngineObject().name ? self.getEngineObject().name : tileTypeToString(self.type) + " " + self.id;
+	}
+
 	this.getDialogId = function() {
 		var dialogId = null;
 		if(self.type == TileType.Sprite) {
 			dialogId = sprite[self.id].dlg;
-			if(dialogId == null && dialog[self.id] != null) {
-				dialogId = self.id;
-			}
 		}
 		else if(self.type == TileType.Item) {
 			dialogId = item[self.id].dlg;

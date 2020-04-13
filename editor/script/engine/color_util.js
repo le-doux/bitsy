@@ -18,7 +18,7 @@ function componentToHex(c) {
     return hex.length == 1 ? "0" + hex : hex;
 }
 function rgbToHex(r, g, b) {
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+    return "#" + componentToHex(Math.floor(r)) + componentToHex(Math.floor(g)) + componentToHex(Math.floor(b));
 }
 
 function hslToHex(h,s,l) {

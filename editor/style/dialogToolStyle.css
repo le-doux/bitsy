@@ -1,0 +1,560 @@
+.dialogContentViewport {
+	min-width: 410px;
+	height: 450px;
+	overflow: scroll;
+	display: block;
+	border: solid 1px #ccccff;
+	border-radius: 2px;
+	margin-bottom: 10px;
+	line-height: 1;
+	resize: both;
+	background: #e8e8ff;
+	white-space: normal;
+}
+
+.largeDialogPlaintextArea {
+	background: black;
+	color: white;
+	border: none;
+	resize: both;
+	min-width: 410px;
+	min-height: 450px; /* todo : taller? */
+}
+
+.miniDialogPlaintextArea {
+	background: black;
+	color: white;
+	border: none;
+	resize: vertical;
+}
+
+.blockEditor {
+	background: #e8e8ff;
+	padding: 5px;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+@keyframes actionEditorDelete {
+	0% { transform:translateX(0px); opacity:1; }
+	100% { transform:translateX(30px); opacity:0; }
+}
+
+.actionEditorDelete {
+	opacity: 0;
+	animation-name: actionEditorDelete;
+	animation-duration: 0.2s;
+}
+
+.actionEditor {
+	background: white;
+	padding: 10px;
+	/*margin-bottom: 5px;*/
+	border: solid 1px #ccccff;
+	border-radius: 2px;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+.actionTitle {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.executing.actionEditor {
+	background: #6767b2;
+	color: white;
+}
+
+.actionEditor.inline {
+	display: inline;
+	padding: 0px;
+	padding-top: 2px;
+	padding-bottom: 4px; /* hack - useful??? */
+	border: none;
+}
+
+.conditionalComparisonEditor > .actionEditor.inline {
+	padding-right: 2px;
+	padding-left: 2px;
+}
+
+@keyframes executingLeaveAnimation {
+	from { background: #6767b2; }
+	to { background: white; }	
+}
+
+.executingLeave.actionEditor {
+	animation-name: executingLeaveAnimation;
+	animation-duration: 1s;
+}
+
+.selectedEditor.actionEditor {
+	border: solid 2px #6767b2;
+}
+
+.selectedEditor.actionEditor.inline {
+	border: none;
+}
+
+.dialogEditor textarea {
+	background: black;
+	color: white;
+	/*width: 96%;*/
+	border: none;
+	resize: vertical;
+}
+
+.sequenceDescription {
+	margin-bottom: 10px;
+}
+
+.optionEditor {
+	background: #e8e8ff;
+	margin-bottom: 5px;
+	padding: 5px;
+	border-radius: 2px;
+}
+
+.optionControls {
+}
+
+.optionControls button {
+	background: #ccccff;
+}
+
+.actionBuilder {
+	/*display: flex;*/
+	display: none;
+	flex-direction: column;
+	margin-top: 5px;
+}
+
+.selectedEditor > .blockEditor > .actionBuilder {
+	display: flex;
+}
+
+.actionBuilder button {
+	flex-grow: 1;
+}
+
+.actionBuilderActive .actionBuilderAdd {
+	display: none;
+}
+
+.actionBuilderButton {
+	background: #ccccff;
+	display: none;
+}
+
+.actionBuilderAdd {
+	background: #ccccff;
+}
+
+.actionBuilderCancel {
+	background: #6767b2;
+	color: white;
+	display: none;
+}
+
+.actionBuilderActive .actionBuilderCancel {
+	display: block;
+}
+
+.actionBuilderRoot .actionBuilderCategory {
+	display: block;
+}
+
+.actionBuilder_dialog .actionBuilderButton_dialog {
+	display: block;
+}
+
+.actionBuilder_flow .actionBuilderButton_flow {
+	display: block;
+}
+
+.actionBuilder_exit .actionBuilderButton_exit {
+	display: block;
+}
+
+.actionBuilder_item .actionBuilderButton_item {
+	display: block;
+}
+
+.actionBuilder_dialog .actionBuilderButton_back {
+	display: block;
+}
+
+.actionBuilder_flow .actionBuilderButton_back {
+	display: block;
+}
+
+.actionBuilder_exit .actionBuilderButton_back {
+	display: block;
+}
+
+.actionBuilder_item .actionBuilderButton_back {
+	display: block;
+}
+
+.orderControls {
+	display: block;
+	margin-bottom: 5px;
+}
+
+.optionEditor.selectedEditor {
+	border: solid 2px #6767b2;
+}
+
+.addOption {
+	display: flex;
+}
+
+.addOption button {
+	display: none;
+	flex-grow: 1;
+}
+
+.selectedEditor > .addOption button {
+	display: block;
+}
+
+.functionEditor input[type="text"] {
+	width: 50px;
+}
+
+.functionEditor input[type="number"] {
+	width: 50px;
+}
+
+.parameterEditor {
+	display: inline-flex;
+}
+
+.parameterEditor input[type="text"] {
+	width: 50px;
+}
+
+.parameterEditor input[type="number"] {
+	width: 50px;
+}
+
+.roomPosParameterEditor {
+	padding: 5px;
+	border-radius: 2px;
+	background: #e8e8ff;
+	display: inline-block;
+}
+
+.roomPosParameterEditor span {
+	margin-right: 5px;
+}
+
+.roomPosParameterEditor button {
+	background: #ccccff;
+}
+
+.parameterUneditable {
+	/*padding: 2px;*/
+	border-radius: 2px;
+	background: #e8e8ff;
+}
+
+.conditionalComparisonEditor {
+	padding: 5px;
+	padding-left: 0px;
+	padding-bottom: 10px;
+	border-bottom: solid 1px #ccccff;
+}
+
+.conditionalComparisonEditor input[type="number"] {
+	width: 50px;
+}
+
+.helpText {
+	padding: 5px;
+	max-width: 350px;
+	background: #ccccff;
+	border-radius: 2px;
+}
+
+.helpTextImg img {
+	width: 36px;
+}
+
+.helpTextContent {
+	flex-grow: 1;
+	margin-left: 10px;
+}
+
+/* dialog box */
+.dialogBoxContainer {
+	background: black;
+	resize: vertical;
+	overflow: hidden;
+	padding: 5px;
+	border-radius: 2px;
+}
+
+.dialogBoxContainer textarea {
+	height: calc(100% - 10px);
+	width: auto;
+	background: black;
+	color: white;
+	resize: none;
+	border: none;
+}
+
+@font-face {
+	font-family: bitsy_ascii;
+	src: url(../font/bitsy_ascii_small.ttf);
+}
+
+.dialogTextboxContainer {
+	background: black;
+	padding: 15px;
+	border-radius: 2px;
+	overflow: hidden;
+/*	resize: vertical;
+	overflow: scroll;*/
+}
+
+.dialogTextboxContent {
+	background: black;
+	color: white;
+	font-family: bitsy_ascii, monospace;
+	font-size: 18px;
+	width: 32ch;
+	min-height: 2ch;
+	word-wrap: break-word;
+	white-space: pre-wrap;
+}
+
+.dialogTextboxContent div {
+	padding-left: 4px;
+	padding-top: 4px;
+	min-height: 18px;
+}
+
+.dialogTextboxContent div:nth-child(odd) {
+	border-left: solid 4px #222;
+	padding-bottom: 5px;
+}
+
+.dialogTextboxContent div:nth-child(even) {
+	border-left: solid 4px #444;
+	border-bottom: dashed 1px #666;
+	padding-bottom: 10px;
+}
+
+.textboxCodeSpan {
+	color: yellow; /* TODO : pick color */
+}
+
+.textboxCharacterSpan {
+	display: inline-block;
+}
+
+@keyframes textEffectWvy {
+	/*0% { transform:translateY(0px); }*/
+	0% { transform:translateY(25%); }
+	/*50% { transform:translateY(0px); }*/
+	50% { transform:translateY(-25%); }
+	/*100% { transform:translateY(0px); }*/
+	100% { transform:translateY(25%); }
+}
+
+.textEffectWvy {
+	animation-name: textEffectWvy;
+	animation-duration: 2s;
+	animation-iteration-count: infinite;
+}
+
+@keyframes textEffectShk {
+	0% { transform:translate(10%,0%); }
+	20% { transform:translate(10%,10%); }
+	40% { transform:translate(0%,10%); }
+	60% { transform:translate(-10%,-10%); }
+	80% { transform:translate(-10%,10%); }
+}
+
+.textEffectShk {
+	animation-name: textEffectShk;
+	animation-duration: 0.2s;
+	animation-iteration-count: infinite;
+}
+
+@keyframes textEffectRbw {
+	0% { color:hsl(0,100%,50%); }
+	10% { color:hsl(35,100%,50%); }
+	20% { color:hsl(70,100%,50%); }
+	30% { color:hsl(105,100%,50%); }
+	40% { color:hsl(140,100%,50%); }
+	50% { color:hsl(175,100%,50%); }
+	60% { color:hsl(210,100%,50%); }
+	70% { color:hsl(245,100%,50%); }
+	80% { color:hsl(280,100%,50%); }
+	90% { color:hsl(315,100%,50%); }
+	100% { color:hsl(355,100%,50%); }
+}
+
+.textEffectRbw {
+	animation-name: textEffectRbw;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+}
+
+/* todo: move into own file?*/
+/* TITLE WIDGET */
+.titleWidget {
+	display: flex;
+}
+
+.titleWidget .textInputField {
+	flex-grow: 1;
+}
+
+.titleOpenDialog {
+	display: none;
+	margin-left: 5px;
+}
+
+/* expression builder styles */
+@keyframes expressionBuilderEnter {
+	0% { margin-top: 10px; opacity: 0; }
+	100% { margin-top: 0px; opacity: 1; }
+}
+
+@keyframes expressionBuilderExit {
+	0% { margin-top: 0px; opacity: 1; }
+	100% { margin-top: 10px; opacity: 0; }
+}
+
+@keyframes expressionBuilderSaveFlash {
+	0% { color:white; background:#6767b2; }
+	50% { color:#6767b2; background:white; }
+	100% { color:white; background:#6767b2; }
+}
+
+@keyframes expressionBuilderClearShake {
+	0% { transform:translate(5px,0px); }
+	20% { transform:translate(3px,5px); }
+	40% { transform:translate(0px,4px); }
+	60% { transform:translate(-5px,-3px); }
+	80% { transform:translate(-2px,5px); }
+	100% { transform:translate(0px,0px); }
+}
+
+.dialogExpressionBuilderHolder {
+	background: #e8e8ff;
+	padding: 10px;
+	border: solid 1px #ccccff;
+	border-radius: 2px;
+	margin-bottom: 10px;
+	height: 450px;
+}
+
+.expressionBuilder {
+	background: white;
+	padding: 15px;
+
+	animation-name: expressionBuilderEnter;
+	animation-duration: 0.25s;
+}
+
+.expressionBuilderCancel {
+	animation-name: expressionBuilderExit;
+	animation-duration: 0.25s;
+}
+
+.expressionBuilderSave {
+	animation-name: expressionBuilderExit;
+	animation-delay: 0.5s;
+	animation-duration: 0.25s;
+}
+
+.expressionBuilderSaveFlash {
+	animation-name: expressionBuilderSaveFlash;
+	animation-duration: 0.2s;
+	animation-iteration-count: 2;
+}
+
+.expressionBuilderClearShake {
+	animation-name: expressionBuilderClearShake;
+	animation-duration: 0.2s;
+}
+
+.expressionEditorRoot {
+	padding: 8px;
+	border: solid 1px #ccccff;
+	border-radius: 2px;
+	margin-bottom: 10px;
+	line-height: 100%; /* hacks upon hacks */
+}
+
+.expressionBuilderInputs {
+	display: flex;
+	margin-bottom: 10px;
+}
+
+.expressionBuilderInputs button {
+	font-family: monospace;
+}
+
+.expressionBuilder .parameterEditor input[type="text"] {
+	width: auto;
+}
+
+.expressionBuilder .parameterEditor input[type="number"] {
+	width: auto;
+}
+
+.addNonNumericControlBox {
+	padding: 2px;
+	border-radius: 2px;
+	margin-bottom: 5px;
+}
+
+/* alternate colors */
+.reverseColors {
+	background: #6767b2;
+	color: white;
+}
+
+.greenColor {
+	background: #cfffcf;
+	color: #4d824d;
+}
+
+.pinkColor {
+	background: #facdf2;
+	color: #91237e;
+}
+
+.goldColor {
+	background: #ffe98f;
+	color: #917d29;
+}
+
+.goldColorBackground {
+	background: #fff8de;
+}
+
+.greenColorBackground {
+	background: #edffed;
+}
+
+.greenColorText {
+	color: #4d824d;
+}
+
+/* misc */
+.inlineEditButtonHolder {
+	margin-left: 5px;
+}
+
+.inlineEditButtonHolder button {
+	padding: 0px;
+}

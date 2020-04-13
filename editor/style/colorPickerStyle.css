@@ -7,24 +7,24 @@
 }
 
 #colorPickerWheel {
-	width: 200px;
+	width: 215px;
 	/*height: 200px;*/
 	display: block;
 	background: transparent;
 }
 
 #colorPickerSelect {
-	width: 200px;
+	width: 215px;
 	/*height: 200px;*/
 	display: block;
-	margin-top: -200px;
+	margin-top: -215px;
 	cursor: pointer;
 	background: transparent;
 }
 
 #colorPickerHexText {
 	display: block;
-	width: 130px;
+	width: 140px;
 	margin-left: 30px;
 	margin-top: 10px;
 }
@@ -36,7 +36,7 @@
 	margin-left: 30px;
 	margin-top: 5px;
 	border-radius: 4px;
-	width: 120px;
+	width: 140px;
 }
 
 #colorPaletteForm input[type=radio] + label {

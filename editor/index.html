@@ -13,7 +13,9 @@
 		<link rel="stylesheet" type="text/css" href="style/editorAnimations.css">
 		<link rel="stylesheet" type="text/css" href="style/colorPickerStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/markerToolStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/dialogToolStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/responsiveStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/navControlStyle.css">
 
 		<!-- GENERATED -->
 		<script src="script/generated/resources.js"></script>
@@ -39,8 +41,8 @@
 		<script src="script/color_picker.js"></script>
 		<script src="script/gif.js"></script>
 		<script src="script/exporter.js"></script>
-		<script src="script/editor.js"></script>
 		<script src="script/dialog_editor.js"></script>
+		<script src="script/editor.js"></script>
 		<script src="script/inventory.js"></script>
 
 		<!-- FONTS -->
@@ -67,7 +69,7 @@
 					</div>
 
 					<div id="titleFlexItem">
-						<input title="title text for your game" type="text" id="titleText" class="gameTextDir titleTextBox" onchange="on_change_title(event);" value="Write your game's title here" placeholder="Title" style="width:100%;">
+						<div class="titleWidgetContainer"></div>
 					</div>
 
 					<div id="toolsCheckFlexItem">
@@ -207,7 +209,7 @@
 						</div>
 					</div>
 					<div id="titlePanelInner">
-						<input title="title text for your game" type="text" id="titleTextPanel" class="gameTextDir titleTextBox" onchange="on_change_title(event);" value="Write your game's title here" placeholder="Title">
+						<div class="titleWidgetContainer"></div>
 					</div>
 				</div>
 
@@ -272,95 +274,76 @@
 						</div>
 					</div>
 					
-					<div style="margin-bottom:2px;">			
+					<div id="roomNav" class="navControl">
 						<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" />
 						<label title="play / pause game" for="playModeCheck">
 							<i class="material-icons" id="playModeIcon">play_arrow</i>
 							<span id="playModeText" class="localize play_game">play</span> <!-- TODO LOCALIZE: also stop_game -->
 						</label>
+
+						<span class="spacer"></span>
+
+						<input type="text" id="roomName" title="a name to refer to this room" class="textInputField" onchange="on_room_name_change();" size="10"></input>
+
+						<span class="spacer"></span>
+
+						<button title="previous room" class="color0" onclick="prevRoom();">
+							<i class="navigate_before material-icons"><span>navigate_before</span></i>
+						</button>
+						<button title="next room" class="color0" onclick="nextRoom();">
+							<i class="navigate_next material-icons"><span>navigate_next</span></i>
+						</button>
+
+						<span class="spacer"></span>
+
+						<button title="add new room" class="color0" onclick="newRoom();">
+							<i class="material-icons">add</i>
+						</button>
+						<button title="duplicate room" class="color0" onclick="duplicateRoom();">
+							<i class="material-icons">content_copy</i>
+						</button>
+						<button title="delete room" class="color0" onclick="deleteRoom();">
+							<i class="material-icons">remove_circle</i>
+						</button>
 					</div>
 
 					<canvas id="game"></canvas>
 
-					<div id="roomToolsOuter" class="controlBox">
-
-						<input type="checkbox" id="roomToolsCheck" onclick="toggleRoomTools(event);" />
-						<label title="show / hide additional room tools" for="roomToolsCheck">
-							<span class="localize room_tool_advanced">room tools</span>
-							<i id="roomToolsCheckIcon" class="material-icons">expand_less</i>
-						</label>
-
-						<br>
-						
-						<div id="roomTools" style="display:none;">
-							<div id="roomNav" class="buttonGroup">
-								<span title="a name to refer to this room" class="controlSpan">
-									<span class="localize name_label">name</span>
-									<!-- <span id="roomId">0</span> -->
-									
-									<input type="text" id="roomName" class="nameTextbox" onchange="on_room_name_change();" size="10"></input>
-									
-								</span>
-								<button title="previous room" class="color0" onclick="prevRoom();">
-									<i class="navigate_before material-icons"><span>navigate_before</span></i>
-								</button>
-								<button title="next room" class="color0" onclick="nextRoom();">
-									<i class="navigate_next material-icons"><span>navigate_next</span></i>
-								</button>
-							</div>
-
-							<div id="roomCommands" class="buttonGroup">
-								<button title="add new room" class="color0" onclick="newRoom();">
-									<i class="material-icons">add</i>
-								</button>
-								<button title="duplicate room" class="color0" onclick="duplicateRoom();">
-									<i class="material-icons">content_copy</i>
-								</button>
-								<button title="delete room" class="color0" onclick="deleteRoom();">
-									<i class="material-icons">remove_circle</i>
-								</button>
-							</div>
-
-							<div id="roomColor" class="buttonGroup">
-								<span class="localize palette_tool_name">colors</span>: 
-								<select title="select color palette for room" id="roomPaletteSelect" onchange="roomPaletteChange(event);">
-									<option value="0">palette 0</option> <!-- other options are added dynamically -->
-								</select>
-							</div>
-
-							<br>
-
-							<div id="roomVisibility" class="buttonGroup">
-								<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
-								<label title="show / hide grid" for="roomGridCheck">
-									<i class="material-icons" id="roomGridIcon">visibility</i> 
-									<span class="localize grid_toggle_visible">grid</span>
-								</label>
-
-								<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" />
-								<label title="show / hide walls" for="roomWallsCheck">
-									<i class="material-icons" id="roomWallsIcon">visibility_off</i> 
-									<span class="localize walls_toggle_visible">walls</span>
-								</label>
-
-								<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
-								<label title="show / hide exits & endings" for="roomMarkersCheck">
-									<i class="material-icons" id="roomMarkersIcon">visibility</i> 
-									<span class="localize marker_tool_name">exits & endings</span>
-								</label>
-							</div>
-
-							<div id="roomMarkers" class="buttonGroup">
-								<button title="add exits and endings" class="color0" onclick="showPanel('exitsPanel');">
-									<i class="material-icons">open_in_new</i>
-									<span class="localize room_add_markers">add exits & endings</span>
-								</button>
-							</div>
+					<div style="display: flex;">
+						<!-- these three have hacky extra styles attached -->
+						<div id="roomColor" class="buttonGroup controlBox" style="margin-bottom: 0px; padding: 2px;">
+							<span class="localize palette_tool_name">colors</span>: 
+							<select title="select color palette for room" id="roomPaletteSelect" onchange="roomPaletteChange(event);">
+								<option value="0">palette 0</option> <!-- other options are added dynamically -->
+							</select>
 						</div>
 
+						<div id="roomMarkers" class="buttonGroup controlBox" style="margin-bottom: 0px; padding: 2px;">
+							<span class="localize marker_tool_name">exits & endings</span>:
+
+							<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
+							<label title="show / hide exits & endings" for="roomMarkersCheck" style="padding-bottom: 3px;">
+								<i class="material-icons" id="roomMarkersIcon">visibility</i></label>
+
+							<button title="add exits and endings" class="color0" onclick="showPanel('exitsPanel', 'roomPanel');" style="margin-top:2px;">
+								<i class="material-icons">open_in_new</i>
+							</button>
+						</div>
+
+						<div id="roomVisibility" class="buttonGroup controlBox" style="flex-grow: 1; margin-bottom: 0px; padding: 2px;">
+							<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
+							<label title="show / hide grid" for="roomGridCheck">
+								<i class="material-icons" id="roomGridIcon">visibility</i> 
+								<span class="localize grid_toggle_visible">grid</span>
+							</label>
+
+							<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" />
+							<label title="show / hide walls" for="roomWallsCheck">
+								<i class="material-icons" id="roomWallsIcon">visibility_off</i> 
+								<span class="localize walls_toggle_visible">walls</span>
+							</label>
+						</div>
 					</div>
-
-
 				</div>
 
 				<div id="exitsPanel" class="panel color3" style="display:none;">
@@ -376,29 +359,101 @@
 						</div>
 					</div>
 					<div id="exitsPanelContent">
+						<div id="markersControls" class="navControl">
+							<!-- TODO : hook up to actual "name", resize -->
+							<input type="text" id="markerName" class="textInputField" size="5" readonly></input>
+
+							<span class="spacer"></span>
+
+							<button title="previous" class="color0" onclick="prevMarker();">
+								<i class="navigate_before material-icons"><span>navigate_before</span></i>
+							</button>
+							<button title="next" class="color0" onclick="nextMarker();">
+								<i class="navigate_next material-icons"><span>navigate_next</span></i>
+							</button>
+
+							<span class="spacer"></span>
+
+							<button title="add exit or ending" class="color0" onclick="startAddMarker();">
+								<i class="material-icons">add</i>
+							</button>
+
+							<!-- TODO : implement -->
+							<button title="duplicate exit or ending" class="color0" onclick="duplicateMarker();">
+								<i class="material-icons">content_copy</i>
+							</button>
+
+							<button title="delete" class="color0" onclick="deleteMarker();">
+								<i class="material-icons">remove_circle</i>
+							</button>
+						</div>
+						<!-- todo : move style elsewhere -->
+						<div id="addMarkerOptions" class="controlBox" style="display: flex; flex-direction: column; min-width: 300px">
+							<button title="add two-way exit" onclick="newExit();">
+								<i class="material-icons">add</i> <span id="addExitText" class="localize exit_label">exit</span>
+							</button>
+							<button title="add one-way exit" onclick="newExitOneWay();">
+								<i class="material-icons">add</i> <span id="addExitText" class="localize exit_one_way_label">one-way exit</span>
+							</button>
+							<button title="add ending" onclick="newEnding();">
+								<i class="material-icons">add</i> <span class="localize ending_label">ending</span>
+							</button>
+							<!-- TODO : need a general cancel button style -->
+							<button title="cancel" style="background: #6767b2; color: white;" onclick="cancelAddMarker();">
+								<i class="material-icons">cancel</i> <span class="localize action_cancel">cancel</span>
+							</button>
+						</div>
 						<div id="noMarkerMessage" class="controlBox">
+							<div style="display: flex; flex-direction: row; margin-bottom: 10px;">
+								<span id="spacer" style="flex-grow: 1;"></span>
+								<img src="image/cat.svg" height="64px" width="64px" />
+								<span id="spacer" style="flex-grow: 1;"></span>
+							</div>
 							<span class="localize marker_tool_empty">There are no exits or endings in this room yet! You can add one with this tool. :)</span>
 						</div>
 						<div id="markersSelect">
 							<div id="markerControl1" class="controlBox">
 								<span id="markerName1">marker 1</span>
-								<canvas id="markerCanvas1" title="location of marker (click to go to room)" onclick="selectMarkerRoom1();"></canvas>
+								<canvas id="markerCanvas1" title="location of marker (click to go to room)" onclick="selectMarkerRoom1();" style="margin-top: 5px;"></canvas>
 								<div class="markerPosControl">
-									<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
-									<label for="toggleMoveMarker1" title="click to move marker">
-										<i class="material-icons">location_searching</i>
-										<span id="textMoveMarker1" class="localize marker_move">move</span>
-									</label>
-									<button id="cancelMoveMarker1" title="cancel move" onclick="cancelMoveMarker1();">
-										<i class="material-icons">cancel</i>
-									</button>
-									<div title="marker coordinates">
+									<div class="markerCoordinatesHolder" title="marker coordinates">
 										<span id="textMarkerPos1">room 0 (0,0)</span>
-									</div>
-									<div>
 										<span id="textMoveMessage1">
 											<i class="localize marker_move_click">click in room</i>
 										</span>
+									</div>
+									<div title="marker controls">
+										<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
+										<label for="toggleMoveMarker1" title="click to place marker in current room">
+											<i class="material-icons" id="toggleMoveMarkerIcon1">location_searching</i>
+											<span class="localize marker_move">move</span>
+										</label>
+
+										<input type="checkbox" id="toggleEditMarker1" />
+										<label for="toggleEditMarker1" title="edit coordinates">
+											<i class="material-icons">edit</i>
+										</label>
+
+										<span id="exitOptionsToggle1">
+											<input type="checkbox" id="exitOptionsToggleCheck1" onclick="toggleExitOptions(0, event.target.checked);" />
+											<label title="show / hide exit options" for="exitOptionsToggleCheck1">
+												<i class="material-icons">settings</i>
+											</label>
+										</span>
+									</div>
+									<div id="editControlsMarker1" title="edit coordinates" style="margin-top: 5px; display: none;">
+										<div>
+											<span class="localize room_label">room</span>: 
+											<select id="editRoomMarker1"></select>
+										</div>
+										<div>
+											<span class="localize axis_x_label">x</span>: 
+											<input id="editPosXMarker1" type="number" style="width:6ch;"></input>
+										</div>
+										<div>
+											<span class="localize axis_y_label">y</span>: 
+											<input id="editPosYMarker1" type="number" style="width:6ch;"></input>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -410,144 +465,107 @@
 							</div>
 							<div id="markerControl2" class="controlBox" style="display: flex; flex-direction: column;">
 								<span id="markerName2">marker 2</span>
-								<canvas id="markerCanvas2" title="location of marker (click to go to room)" onclick="selectMarkerRoom2();"></canvas>
+								<canvas id="markerCanvas2" title="location of marker (click to go to room)" onclick="selectMarkerRoom2();" style="margin-top: 5px;"></canvas>
 								<div class="markerPosControl">
-									<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" />
-									<label for="toggleMoveMarker2" title="click to move marker">
-										<i class="material-icons">location_searching</i>
-										<span id="textMoveMarker2"class="localize marker_move">move</span>
-									</label>
-									<button id="cancelMoveMarker2" title="cancel move" onclick="cancelMoveMarker2();">
-										<i class="material-icons">cancel</i>
-									</button>
-									<div title="marker coordinates">
+									<div class="markerCoordinatesHolder" title="marker coordinates">
 										<span id="textMarkerPos2">room 0 (0,0)</span>
-									</div>
-									<div>
 										<span id="textMoveMessage2">
 											<i class="localize marker_move_click">click in room</i>
 										</span>
 									</div>
+									<div title="marker controls">
+										<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" />
+										<label for="toggleMoveMarker2" title="click to move marker">
+											<i class="material-icons" id="toggleMoveMarkerIcon2">location_searching</i>
+											<span>move</span> <!-- todo : localize -->
+										</label>
+
+										<input type="checkbox" id="toggleEditMarker2" />
+										<label for="toggleEditMarker2" title="edit coordinates">
+											<i class="material-icons">edit</i>
+										</label>
+
+										<span id="exitOptionsToggle2">
+											<input type="checkbox" id="exitOptionsToggleCheck2" onclick="toggleExitOptions(1, event.target.checked);" />
+											<label title="show / hide exit options" for="exitOptionsToggleCheck2">
+												<i class="material-icons">settings</i>
+											</label>
+										</span>
+
+										<span id="exitOptionsToggle1_alt">
+											<input type="checkbox" id="exitOptionsToggleCheck1_alt" onclick="toggleExitOptions(0, event.target.checked);" />
+											<label title="show / hide exit options" for="exitOptionsToggleCheck1_alt">
+												<i class="material-icons">settings</i>
+											</label>
+										</span>
+									</div>
+									<div id="editControlsMarker2" title="edit coordinates" style="margin-top: 5px; display: none;">
+										<div>
+											<span class="localize room_label">room</span>: 
+											<select id="editRoomMarker2"></select>
+										</div>
+										<div>
+											<span class="localize axis_x_label">x</span>: 
+											<input id="editPosXMarker2" type="number" style="width:6ch;"></input>
+										</div>
+										<div>
+											<span class="localize axis_y_label">y</span>: 
+											<input id="editPosYMarker2" type="number" style="width:6ch;"></input>
+										</div>
+									</div>
 								</div>
-							</div>
-						</div>
-						<div id="markersControls" class="controlBox">
-							<div id="markersNav" class="buttonGroup">
-								<button title="previous" class="color0" onclick="prevMarker();">
-									<i class="navigate_before material-icons"><span>navigate_before</span></i>
-								</button>
-								<button title="next" class="color0" onclick="nextMarker();" style="margin-left:-5px;">
-									<i class="navigate_next material-icons"><span>navigate_next</span></i>
-								</button>
-								<button title="delete" class="color0" onclick="deleteMarker();">
-									<i class="material-icons">remove_circle</i>
-								</button>
-							</div>
-							<div id="markersAddCommands" class="buttonGroup">
-								<button title="add exit" class="color0" onclick="newExit();">
-									<i class="material-icons">add</i> <span class="localize exit_label">exit</span>
-								</button>
-								<button title="add ending" class="color0" onclick="newEnding();">
-									<i class="material-icons">add</i> <span class="localize ending_label">ending</span>
-								</button>
-								<!-- <button title="add scripted effect" class="color0" onclick="newEffect();">
-									<i class="material-icons">add</i> effect
-								</button> -->
 							</div>
 						</div>
 						<div id="markerOptions">
-							<div id="endingOptions" class="controlBox">
-								<span class="localize ending_dialog">ending dialog</span>
-								<br/>
-								<textarea title="text to show on ending" id="endingText" onchange="onEndingTextChange(event);" onkeydown="onEndingTextChange(event);" onkeyup="onEndingTextChange(event);"></textarea>
+							<div id="endingOptions">
+								<div id="endingDialogWidget">
+								</div>
 							</div>
-							<!-- <div id="effectOptions" class="controlBox">
-								<span>effect script</span>
-								<br/>
-								<textarea id="effectText" onchange="onEffectTextChange(event);" onkeydown="onEffectTextChange(event);" onkeyup="onEffectTextChange(event);" style="resize: vertical; width: 32ch;"></textarea>
-							</div> -->
-							<div id="exitOptions" class="controlBox">
-								<input type="checkbox" id="showExitOptionsCheck" onclick="onToggleExitOptions();" />
-								<label title="show / hide exit options" for="showExitOptionsCheck">
-									<span class="localize exit_options">exit options</span>
-									<i class="material-icons" id="showExitOptionsCheckIcon">expand_less</i>
-								</label>
-
-								<div id="exitOptionsInner">
-									<form id="exitOptionsRadio">
-										<input type="radio" name="exit options select" value="exit1" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions1" checked>
-										<label title="show exit 1 options" for="exitOptions1" class="left">
-											<span class="localize exit_label">exit</span>
-										</label>
-
-										<input type="radio" name="exit options select" value="exit2" onclick="onChangeExitOptionsSelect(event.target.value);" id="exitOptions2">
-										<label title="show exit 2 options" for="exitOptions2" class="right">
-											<span class="localize exit_return_label">return exit</span>
-										</label>
-									</form>
-
-									<div style="padding:4px;">
-										<div title="select transition effect" class="controlBox" style="font-size:80%;">
-											<span class="localize exit_transition_label">transition effect</span>: 
-											<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value);">
-												<option value="none">none</option>
-												<option value="fade_w">fade (white)</option>
-												<option value="fade_b">fade (black)</option>
-												<option value="wave">wave</option>
-												<option value="tunnel">tunnel</option>
-												<option value="slide_u">slide up</option>
-												<option value="slide_d">slide down</option>
-												<option value="slide_l">slide left</option>
-												<option value="slide_r">slide right</option>
-											</select>
-										</div>
-
-										<!-- <div style="margin-bottom: 5px; margin-top: 12px;">
-											<span id="exitScriptOptions">
-												<input type="checkbox" id="exitDialogCheck" onchange="setElementClass('exitScriptControls','exitDialogActive',event.target.checked);"/>
-												<label for="exitDialogCheck">
-													<i class="material-icons">chat</i>
-													dialog
-												</label>
-
-												<input type="checkbox" id="exitChangeAvatarCheck" onchange="setElementClass('exitScriptControls','exitAvatarActive',event.target.checked);"/>
-												<label for="exitChangeAvatarCheck">
-													<i class="material-icons">nature_people</i>
-													change avatar
-												</label>
-
-												<input type="checkbox" id="exitLockCheck" onchange="setElementClass('exitScriptControls','exitLockActive',event.target.checked);"/>
-												<label for="exitLockCheck">
-													<i class="material-icons">vpn_key</i>
-													lock
-												</label>
-											</span>
-										</div> -->
-
-										<!-- <div id="exitScriptControls" class="controlBox">
-											<span class="exitLockControl">unlock door if:</span>
-											<br class="exitLockControl"/>
-
-											<span class="exitDialogAndLockControl">dialog when door is locked:</span>
-											<br class="exitDialogAndLockControl"/>
-											<textarea class="exitDialogAndLockControl" style="resize: vertical; width: 32ch;"></textarea>
-											<br class="exitDialogAndLockControl"/>
-
-											<span class="exitDialogControl">dialog</span><span class="exitDialogAndLockControl"> when door is unlocked</span><span class="exitDialogControl">:</span>
-											<br class="exitDialogControl"/>
-											<textarea class="exitDialogControl" style="resize: vertical; width: 32ch;"></textarea>
-											<br class="exitDialogControl"/>
-
-											<span class="exitAvatarControl">on enter, change avatar sprite to:</span>
-											<br class="exitAvatarControl"/>
-											<select class="exitAvatarControl">
-												<option>sprite A</option>
-												<option>sprite a</option>
-											</select>
-										</div> -->
-									</div>
+							<div id="exitOptions">
+								<div>
+									<span>exit options:</span> <!-- TODO : localize -->
 								</div>
 
+								<div title="select transition effect" class="controlBox">
+									<span class="localize exit_transition_label">transition effect</span>: 
+									<select id="exitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value, 0);">
+										<option value="none">none</option>
+										<option value="fade_w">fade (white)</option>
+										<option value="fade_b">fade (black)</option>
+										<option value="wave">wave</option>
+										<option value="tunnel">tunnel</option>
+										<option value="slide_u">slide up</option>
+										<option value="slide_d">slide down</option>
+										<option value="slide_l">slide left</option>
+										<option value="slide_r">slide right</option>
+									</select>
+								</div>
+
+								<div id="exitDialogControls">
+								</div>
+							</div>
+							<div id="returnExitOptions" style="margin-top: 10px">
+								<div>
+									<span>return exit options:</span> <!-- TODO : localize -->
+								</div>
+
+								<div title="select transition effect" class="controlBox">
+									<span class="localize exit_transition_label">transition effect</span>: 
+									<select id="returnExitTransitionEffectSelect" onchange="onChangeExitTransitionEffect(event.target.value, 1);">
+										<option value="none">none</option>
+										<option value="fade_w">fade (white)</option>
+										<option value="fade_b">fade (black)</option>
+										<option value="wave">wave</option>
+										<option value="tunnel">tunnel</option>
+										<option value="slide_u">slide up</option>
+										<option value="slide_d">slide down</option>
+										<option value="slide_l">slide left</option>
+										<option value="slide_r">slide right</option>
+									</select>
+								</div>
+
+								<div id="returnExitDialogControls">
+								</div>
 							</div>
 						</div>
 					</div>
@@ -565,7 +583,7 @@
 							<span class="localize paint_tool_name">paint</span>
 						</div>
 					</div>
-					<form>
+					<form id="paintModeRadio" style="margin-bottom: 5px;">
 						<input type="radio" name="paint mode" value="avatar" onclick="on_paint_avatar();" id="paintOptionAvatar" checked>
 						<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
 							<i class="material-icons">perm_identity</i>
@@ -591,50 +609,50 @@
 						</label>
 						
 					</form>
-					<canvas id="paint"></canvas>
-					<br>
+					<div id="paintNavigationControls" class="navControl">
+						<input title="a name to refer to this drawing" type="text" id="drawingName" class="textInputField" onchange="on_drawing_name_change();" size="10"></input>
+
+						<span class="spacer"></span>
+
+						<button title="previous drawing" class="color0 disableForAvatar" onclick="prev();">
+							<i class="navigate_before material-icons"><span>navigate_before</span></i>
+						</button>
+						<button title="next drawing" class="color0 disableForAvatar" onclick="next();">
+							<i class="navigate_next material-icons"><span>navigate_next</span></i>
+						</button>
+
+						<span class="spacer"></span>
+
+						<button title="add drawing" class="color0 disableForAvatar" onclick="newDrawing();">
+							<i class="material-icons">add</i>
+						</button>
+						<button title="duplicate drawing" class="color0 disableForAvatar" onclick="duplicateDrawing();">
+							<i class="material-icons">content_copy</i>
+						</button>
+						<button title="delete drawing" class="color0 disableForAvatar" onclick="deleteDrawing();">
+							<i class="material-icons">remove_circle</i>
+						</button>
+
+						<span class="spacer"></span>
+
+						<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('paintExplorerPanel', 'paintPanel');">
+							<i class="material-icons">search</i>
+						</button>
+					</div>
+					<div style="margin-bottom: 5px;">
+						<canvas id="paint"></canvas>
+					</div>
 					<div id="paintEditMain">
-						<div id="paintNav" class="buttonGroup">
-							<button title="previous drawing" class="color0" onclick="prev();">
-								<i class="navigate_before material-icons"><span>navigate_before</span></i>
-							</button>
-							<button title="next drawing" class="color0" onclick="next();" style="margin-left:-5px;">
-								<i class="navigate_next material-icons"><span>navigate_next</span></i>
-							</button>
-							<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('paintExplorerPanel');">
-								<i class="material-icons">search</i>
-							</button>
-						</div>
-						<div id="paintCommands" class="buttonGroup">
-							<button title="add drawing" class="color0" onclick="newDrawing();">
-								<i class="material-icons">add</i>
-							</button>
-							<button title="duplicate drawing" class="color0" onclick="duplicateDrawing();">
-								<i class="material-icons">content_copy</i>
-							</button>
-							<button title="delete drawing" class="color0" onclick="deleteDrawing();">
-								<i class="material-icons">remove_circle</i>
-							</button>
-						</div>
-						<div class="buttonGroup">
+						<div class="buttonGroup" style="margin-bottom: 10px;">
 							<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" checked/>
 							<label title="show / hide grid" for="paintGridCheck">
 								<i class="material-icons" id="paintGridIcon">visibility</i> 
 								<span class="localize grid_toggle_visible">grid</span>
 							</label>
-						</div>
-						<div style="margin-bottom: 5px;">
-							
-							<span id="drawingNameUI" title="a name to refer to this drawing" class="controlSpan">
-								<span class="localize name_label">name</span>
-								<input type="text" id="drawingName" class="nameTextbox" onchange="on_drawing_name_change();" size="10"></input>
-							</span>
-
-							<button id="showInventoryButton" title="show inventory" onclick="showPanel('inventoryPanel');">
+							<button id="showInventoryButton" title="show inventory" onclick="showPanel('inventoryPanel', 'paintPanel');">
 								<i class="material-icons">vpn_key</i> 
 								<span class="localize inventory_tool_name">inventory</span>
 							</button>
-							
 						</div>
 					</div>
 
@@ -645,15 +663,7 @@
 							<span class="localize wall_toggle">wall</span>
 						</label>
 					</div>
-					<div id="dialog" class="controlBox" style="display:none;">
-						<span style="float:left;">
-							<span class="localize dialog_tool_name">dialog</span>
-						</span>
-						<button title="open in advanced dialog editor" style="float:right;" onclick="showPanel('dialogPanel');">
-							<i class="material-icons">open_in_new</i>
-						</button>
-						<br>
-						<textarea title="dialog text will be displayed when player approaches this sprite" id="dialogText" class="dialogTextArea gameTextDir" onkeydown="on_change_dialog();" onkeyup="on_change_dialog();" onchange="on_change_dialog_finished();"></textarea> <!-- rows="2" cols="32" -->
+					<div id="dialog" style="display:none;">
 					</div>
 
 					<div id="animationOuter" class="controlBox">
@@ -765,6 +775,31 @@
 						</div>
 					</div>
 
+					<div class="navControl">
+						<input type="text" id="paletteName" title="a name to refer to this color palette" class="textInputField" onchange="on_palette_name_change(event);" size="10"></input>
+
+						<span class="spacer"></span>
+
+						<button title="previous color palette" class="color0" onclick="prevPalette();">
+							<i class="navigate_before material-icons"><span>navigate_before</span></i>
+						</button>
+						<button title="next color palette" class="color0" onclick="nextPalette();">
+							<i class="navigate_next material-icons"><span>navigate_next</span></i>
+						</button>
+
+						<span class="spacer"></span>
+
+						<button title="add new color palette" class="color0" onclick="newPalette();">
+							<i class="material-icons">add</i>
+						</button>
+						<button title="duplicate palette" class="color0" onclick="duplicatePalette();">
+							<i class="material-icons">content_copy</i>
+						</button>
+						<button title="delete palette" class="color0" onclick="deletePalette();">
+							<i class="material-icons">remove_circle</i>
+						</button>
+					</div>
+
 					<form id="colorPaletteForm">
 						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionBackground" onclick="changeColorPickerIndex(0);" checked>
 						<label id="colorPaletteLabelBackground" for="colorPaletteOptionBackground" title="pick background color">
@@ -791,44 +826,7 @@
 						<div id="colorPickerSliderBg" title="color picker darkness / lightness slider">
 							<div id="colorPickerSliderThumb"></div>
 						</div>
-						<input id="colorPickerHexText" title="color picker hex code" type="text" />
-					</div>
-
-					<div id="paletteToolsOuter" class="controlBox">
-
-						<input type="checkbox" id="paletteToolsCheck" onclick="togglePaletteTools(event);" />
-						<label title="show / hide additional palette tools" for="paletteToolsCheck">
-							<span class="localize palette_tool_advanced">palette select</span>
-							<i id="paletteToolsCheckIcon" class="material-icons">expand_less</i>
-						</label>
-
-						<br>
-						
-						<div id="paletteTools" style="display:none;">
-							<span id="paletteNameUI" title="a name to refer to this drawing" class="controlSpan">
-								<span class="localize name_label">name</span>
-								<input type="text" id="paletteName" class="nameTextbox" onchange="on_palette_name_change(event);" size="10"></input>
-							</span>
-							<br>
-							
-							<div class="buttonGroup" id="paletteNav">
-								<button title="previous color palette" class="color0" onclick="prevPalette();">
-									<i class="navigate_before material-icons"><span>navigate_before</span></i>
-								</button>
-								<button title="next color palette" class="color0" onclick="nextPalette();">
-									<i class="navigate_next material-icons"><span>navigate_next</span></i>
-								</button>
-								<button title="add new color palette" class="color0" onclick="newPalette();">
-									<i class="material-icons">add</i>
-								</button>
-								<button title="duplicate palette" class="color0" onclick="duplicatePalette();">
-									<i class="material-icons">content_copy</i>
-								</button>
-								<button title="delete palette" class="color0" onclick="deletePalette();">
-									<i class="material-icons">remove_circle</i>
-								</button>
-							</div>
-						</div>
+						<input id="colorPickerHexText" class="textInputField" title="color picker hex code" type="text" />
 					</div>
 				</div>
 
@@ -846,83 +844,56 @@
 					</div>
 
 					<div id="dialogEditorHasContent">
-						<div id="dialogTop">
-							<span style="float:left">
-								<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
-								<label title="preview dialog" for="previewDialogCheck">
-									<i class="material-icons" id="previewDialogIcon">play_arrow</i>
-									<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
-								</label>
-							</span>
+						<div class="navControl">
+							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
+							<label title="preview dialog" for="previewDialogCheck">
+								<i class="material-icons" id="previewDialogIcon">play_arrow</i>
+								<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
+							</label>
 
-							<span style="float:right">
-								<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);" />
-								<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
-									<i class="material-icons">code</i> 
-									<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
-									<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
-								</label>
-							</span>
-						</div>
+							<span class="spacer"></span>
 
-						<div id="dialogTools" class="controlBox">
-							<form style="display:inline;">
-								<input type="radio" name="dialogTools" value="section" id="dialogToolsOptionSection" onclick="showDialogToolsSection();" checked>
-								<label for="dialogToolsOptionSection" class="left" onmousedown="preventTextDeselectAndClick(event);" title="add new dialog sections">
-									<i class="material-icons">add_circle</i> 
-									<span class="localize dialog_block_new">new section</span>
-								</label>
-								<input type="radio" name="dialogTools" value="format" id="dialogToolsOptionEffects" onclick="showDialogToolsEffects();">
-								<label for="dialogToolsOptionEffects" class="right" onmousedown="preventTextDeselectAndClick(event);" title="add special effects to selected text">
-									<i class="material-icons">text_format</i> 
-									<span class="localize dialog_effect_new">text effects</span>
-								</label>
-							</form>
+							<input type="text" id="dialogName" title="a name to refer to this dialog" class="textInputField" onchange="onDialogNameChange(event);" size="10"></input>
 
-							<hr style="background:#6767b2;border:0px;height:1px;margin:4px;margin-left:0px;margin-right:0px;">
-							<div id="dialogToolsSection">
-								<button onclick="addDialogBlockUI();" title="add new dialog: the same line is said each time">
-									<i class="material-icons">subject</i>
-									<span class="localize dialog_block_basic">dialog</span>
-								</button>
-								<button onclick="addSeqBlockUI();" title="add new dialog list: different lines said each time, in the order you choose">
-									<i class="material-icons">list</i>
-									<span class="localize dialog_block_list">list</span>
-								</button>
-								<button onclick="addIfBlockUI();" title="add new conditional dialog: what option is said is determined by conditions you define">
-									<i class="material-icons">call_split</i>
-									<span class="localize dialog_block_conditional">conditional</span>
-								</button>
-							</div>
-							<div id="dialogToolsEffects" style="display:none;">
-								<button onclick="wrapTextSelection('{clr1}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 1st color in the palette">
-									<span class="localize dialog_effect_color1">color 1</span>
-								</button>
-								<button onclick="wrapTextSelection('{clr2}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 2nd color in the palette">
-									<span class="localize dialog_effect_color2">color 2</span>
-								</button>
-								<button onclick="wrapTextSelection('{clr3}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags matches the 3rd color in the palette">
-									<span class="localize dialog_effect_color3">color 3</span>
-								</button>
-								<button onclick="wrapTextSelection('{wvy}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags waves up and down">
-									<span class="localize dialog_effect_wavy">wavy</span>
-								</button>
-								<button onclick="wrapTextSelection('{shk}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags shakes constantly">
-									<span class="localize dialog_effect_shaky">shaky</span>
-								</button>
-								<button onclick="wrapTextSelection('{rbw}');" onmousedown="preventTextDeselect(event);" class="dialogEffectButton" disabled title="text in tags is rainbow colored">
-									<span class="localize dialog_effect_rainbow">rainbow</span>
-								</button>
-							</div>
-						</div>
+							<span class="spacer"></span>
 
-						<div id="dialogCode" style="display:none;">
-							<textarea id="dialogCodeText" onkeydown="on_change_adv_dialog();" onkeyup="on_change_adv_dialog();" onchange="on_change_adv_dialog();"></textarea>
+							<button title="previous dialog" class="color0" onclick="prevDialog();">
+								<i class="navigate_before material-icons"><span>navigate_before</span></i>
+							</button>
+							<button title="next dialog" class="color0" onclick="nextDialog();">
+								<i class="navigate_next material-icons"><span>navigate_next</span></i>
+							</button>
+
+							<span class="spacer"></span>
+
+							<button title="add new dialog" class="color0" onclick="addNewDialog();">
+								<i class="material-icons">add</i>
+							</button>
+							<button title="duplicate dialog" class="color0" onclick="duplicateDialog();">
+								<i class="material-icons">content_copy</i>
+							</button>
+							<button id="deleteDialogButton" title="delete dialog" class="color0" onclick="deleteDialog();">
+								<i class="material-icons">remove_circle</i>
+							</button>
 						</div>
 
 						<div id="dialogEditor">
-							<div id="advDialogViewport">
-							</div>
+						</div>
+
+						<div id="dialogOptions">
+							<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);">
+							<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
+								<i class="material-icons">code</i> 
+								<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
+								<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
+							</label>
+
+							<input type="checkbox" id="dialogAlwaysShowDrawingCheck" onclick="toggleAlwaysShowDrawingDialog(event);" checked>
+							<label title="always show dialog of selected drawing" for="dialogAlwaysShowDrawingCheck">
+								<i class="material-icons">brush</i> 
+								<!-- todo : localize -->
+								<!-- <span id="dialogToggleCodeShowText"></span> --> <!-- TODO ?? --> 
+							</label>
 						</div>
 					</div>
 

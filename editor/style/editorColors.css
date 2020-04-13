@@ -29,6 +29,10 @@ button {
 .controlBox button {
 	background: #ccccff;
 }
+/* this is a bit hacky -- I probably should have a more consistent style for nested controls */
+.controlBox .controlBox button {
+	border: solid 1px #6767b2;
+}
 button:active {
 	background: #6767b2;
 	color:white;

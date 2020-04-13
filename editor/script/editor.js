@@ -71,10 +71,6 @@ function nextRoomId() {
 	return nextObjectId( sortedRoomIdList() );
 }
 
-function nextEndingId() {
-	return nextObjectId( sortedEndingIdList() );
-}
-
 function nextPaletteId() {
 	return nextObjectId( sortedPaletteIdList() );
 }
@@ -106,19 +102,26 @@ function sortedRoomIdList() {
 	return sortedBase36IdList( room );
 }
 
-function sortedEndingIdList() {
-	return sortedBase36IdList( ending );
-}
-
-function sortedPaletteIdList() {
-	var keyList = Object.keys(palette);
-	keyList.splice(keyList.indexOf("default"),1);
+function sortedDialogIdList() {
+	var keyList = Object.keys(dialog);
+	keyList.splice(keyList.indexOf("title"), 1);
 	var keyObj = {};
 	for (var i = 0; i < keyList.length; i++) {
 		keyObj[keyList[i]] = {};
 	}
 
-	return sortedBase36IdList( keyObj );
+	return sortedBase36IdList(keyObj);
+}
+
+function sortedPaletteIdList() {
+	var keyList = Object.keys(palette);
+	keyList.splice(keyList.indexOf("default"), 1);
+	var keyObj = {};
+	for (var i = 0; i < keyList.length; i++) {
+		keyObj[keyList[i]] = {};
+	}
+
+	return sortedBase36IdList(keyObj);
 }
 
 function sortedBase36IdList( objHolder ) {
@@ -126,25 +129,8 @@ function sortedBase36IdList( objHolder ) {
 }
 
 function nextAvailableDialogId(prefix) {
-	if(prefix === undefined || prefix === null) prefix = "";
-	var i = 0;
-	var id = prefix + i.toString(36);
-	while( dialog[id] != null ) {
-		i++;
-		id = prefix + i.toString(36);
-	}
-	return id;
+	return nextObjectId(sortedDialogIdList());
 }
-
-/* NEW HEX ID SYSTEM HELPERS */
-// TODO : vNext
-// function nextScriptHexId() {
-// 	return nextObjectHexId( sortedScriptHexIdList() );
-// }
-
-// function sortedScriptHexIdList() {
-// 	return sortedHexIdList( script );
-// }
 
 function nextObjectHexId(idList) {
 	if (idList.length <= 0) {
@@ -280,19 +266,12 @@ function makeDrawing(id,imageData) {
 
 /* EVENTS */
 function on_change_title(e) {
-	title = e.target.value;
+	setTitle(e.target.value);
 	refreshGameData();
-	tryWarnAboutMissingCharacters(title);
+	tryWarnAboutMissingCharacters(getTitle());
 
-	// hacky way to make sure ALL title textboxes remain up-to-date
-	updateTitleTextBox(title);
-}
-
-function updateTitleTextBox(titleString) {
-	var titleTextBoxes = document.getElementsByClassName("titleTextBox");
-	for (var i = 0; i < titleTextBoxes.length; i++) {
-		titleTextBoxes[i].value = titleString;
-	}
+	// make sure all editors with a title know to update
+	events.Raise("dialog_update", { dialogId:titleDialogId, editorId:null });
 }
 
 /* MOBILE */
@@ -325,72 +304,284 @@ function mobileOffsetCorrection(off,e,innerSize) {
 	return off;
 }
 
+// todo : seems like this could be used several places...
+// todo : localize
+function tileTypeToString(type) {
+	if (type == TileType.Tile) {
+		return "tile";
+	}
+	else if (type == TileType.Sprite) {
+		return "sprite";
+	}
+	else if (type == TileType.Avatar) {
+		return "avatar";
+	}
+	else if (type == TileType.Item) {
+		return "item";
+	}
+}
+
 function tileTypeToIdPrefix(type) {
-	if( type == TileType.Tile )
+	if (type == TileType.Tile) {
 		return "TIL_";
-	else if( type == TileType.Sprite || type == TileType.Avatar )
+	}
+	else if (type == TileType.Sprite || type == TileType.Avatar) {
 		return "SPR_";
-	else if( type == TileType.Item )
+	}
+	else if (type == TileType.Item) {
 		return "ITM_";
+	}
 }
 
 /* DIALOG UI 
-- needs a better home
-	- into paint object?
-	- needs its own controller?
+- hacky to make this all global
+- some of this should be folded into paint tool later
 */
-function reloadDialogUI() {
-	reloadDialogUICore();
-	reloadAdvDialogUI();
-}
+var dialogTool = new DialogTool();
+var curDialogEditorId = null; // can I wrap this all up somewhere? -- feels a bit hacky to have all these globals
+var curDialogEditor = null;
+var curPlaintextDialogEditor = null; // the duplication is a bit weird, but better than recreating editors all the time?
+function openDialogTool(dialogId, insertNextToId, showIfHidden) { // todo : rename since it doesn't always "open" it?
+	if (showIfHidden === undefined || showIfHidden === null) {
+		showIfHidden = true;
+	}
 
-// TODO : default paint and room tools tied to editor state object??? (or is that bad?)
-function reloadDialogUICore() { // TODO: name is terrible
-	var dialogId = getCurDialogId(); // hacky
+	document.getElementById("deleteDialogButton").disabled = dialogId === titleDialogId;
 
-	if (dialogId in dialog) {
-		var dialogSource = dialog[dialogId];
-		var dialogStr = scriptUtils.RemoveDialogBlockFormat(dialogSource);
-		document.getElementById("dialogText").value = dialogStr;
+	var showCode = document.getElementById("dialogShowCodeCheck").checked;
+
+	// clean up any existing editors -- is there a more "automagical" way to do this???
+	if (curDialogEditor) {
+		curDialogEditor.OnDestroy();
+		delete curDialogEditor;
+	}
+
+	if (curPlaintextDialogEditor) {
+		curPlaintextDialogEditor.OnDestroy();
+		delete curPlaintextDialogEditor;
+	}
+	
+
+	curDialogEditorId = dialogId;
+	curDialogEditor = dialogTool.CreateEditor(dialogId);
+	curPlaintextDialogEditor = dialogTool.CreatePlaintextEditor(dialogId, "largeDialogPlaintextArea");
+
+	var dialogEditorViewport = document.getElementById("dialogEditor");
+	dialogEditorViewport.innerHTML = "";
+
+	if (showCode) {
+		dialogEditorViewport.appendChild(curPlaintextDialogEditor.GetElement());
 	}
 	else {
-		document.getElementById("dialogText").value = "";
+		dialogEditorViewport.appendChild(curDialogEditor.GetElement());
+	}
+
+	document.getElementById("dialogName").placeholder = "dialog " + dialogId;
+	if (dialogId === titleDialogId) {
+		document.getElementById("dialogName").readOnly = true;
+		document.getElementById("dialogName").value = titleDialogId;
+	}
+	else {
+		document.getElementById("dialogName").readOnly = false;
+		if (dialog[dialogId].name != null) {
+			document.getElementById("dialogName").value = dialog[dialogId].name;
+		}
+		else {
+			document.getElementById("dialogName").value = "";
+		}
+	}
+
+	var isHiddenOrShouldMove = (document.getElementById("dialogPanel").style.display === "none") ||
+		(insertNextToId != undefined && insertNextToId != null);
+
+	if (isHiddenOrShouldMove && showIfHidden) {
+		console.log("insert next to : " + insertNextToId);
+		showPanel("dialogPanel", insertNextToId);
+	}
+}
+
+// TODO : probably this should be incorporated into the dialog editor main code somehow
+function onDialogNameChange(event) {
+	if (event.target.value != null && event.target.value.length > 0) {
+		dialog[curDialogEditorId].name = event.target.value;
+	}
+	else {
+		dialog[curDialogEditorId].name = null;
+	}
+	refreshGameData();
+}
+
+function nextDialog() {
+	var id = titleDialogId; // the title is safe as a default choice
+
+	if (curDialogEditorId != null) {
+		var dialogIdList = sortedDialogIdList();
+		var dialogIndex = dialogIdList.indexOf(curDialogEditorId);
+
+		// pick the index of the next dialog to open
+		dialogIndex++;
+		if (dialogIndex >= dialogIdList.length) {
+			dialogIndex = -1; // hacky: I'm using -1 to denote the title
+		}
+
+		// turn the index into an ID
+		if (dialogIndex < 0) {
+			id = titleDialogId;
+		}
+		else {
+			id = dialogIdList[dialogIndex];
+		}
+	}
+
+	openDialogTool(id);
+
+	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
+}
+
+function prevDialog() {
+	var id = titleDialogId; // the title is safe as a default choice
+
+	if (curDialogEditorId != null) {
+		var dialogIdList = sortedDialogIdList();
+		var dialogIndex = dialogIdList.indexOf(curDialogEditorId);
+
+		// pick the index of the next dialog to open
+		if (dialogIndex === -1) {
+			dialogIndex = dialogIdList.length - 1;
+		}
+		else {
+			dialogIndex--;
+		}
+
+		// turn the index into an ID
+		if (dialogIndex < 0) {
+			id = titleDialogId;
+		}
+		else {
+			id = dialogIdList[dialogIndex];
+		}
+	}
+
+	console.log("PREV DIALOG " + id);
+
+	openDialogTool(id);
+
+	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
+}
+
+function addNewDialog() {
+	var id = nextAvailableDialogId();
+
+	dialog[id] = { src:" ", name:null };
+	refreshGameData();
+
+	openDialogTool(id);
+
+	events.Raise("new_dialog", { id:id });
+
+	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
+}
+
+function duplicateDialog() {
+	if (curDialogEditorId != null) {
+		var id = nextAvailableDialogId();
+		dialog[id] = { src:dialog[curDialogEditorId].slice(), name:null };
+		refreshGameData();
+
+		openDialogTool(id);
+
+		alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
+	}
+}
+
+function deleteDialog() {
+	if (curDialogEditorId != null && curDialogEditorId != titleDialogId) {
+		var tempDialogId = curDialogEditorId;
+
+		nextDialog();
+
+		// delete all references to deleted dialog (TODO : should this go in a wrapper function somewhere?)
+		for (id in sprite) {
+			if (sprite[id].dlg === tempDialogId) {
+				sprite[id].dlg = null;
+			}
+		}
+
+		for (id in item) {
+			if (item[id].dlg === tempDialogId) {
+				item[id].dlg = null;
+			}
+		}
+
+		for (id in room) {
+			for (var i = 0; i < room[id].exits.length; i++) {
+				var exit = room[id].exits[i];
+				if (exit.dlg === tempDialogId) {
+					exit.dlg = null;
+				}
+			}
+
+			for (var i = 0; i < room[id].endings.length; i++) {
+				var end = room[id].endings[i];
+				if (end.id === tempDialogId) {
+					room[id].endings.splice(i, 1);
+					i--;
+				}
+			}
+		}
+
+		delete dialog[tempDialogId];
+		refreshGameData();
+
+		alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
+
+		events.Raise("dialog_update", { dialogId:tempDialogId, editorId:null });
+	}
+}
+
+// TODO : move into the paint tool
+var paintDialogWidget = null;
+function reloadDialogUI() {
+	var dialogContent = document.getElementById("dialog");
+	dialogContent.innerHTML = "";
+
+	var obj = paintTool.drawing.getEngineObject();
+
+	// clean up previous widget
+	if (paintDialogWidget) {
+		paintDialogWidget.OnDestroy();
+		delete paintDialogWidget;
+	}
+
+	paintDialogWidget = dialogTool.CreateWidget(
+		"dialog",
+		"paintPanel",
+		obj.dlg,
+		true,
+		function(id) {
+			obj.dlg = id;
+		},
+		{
+			CreateFromEmptyTextBox: true,
+			OnCreateNewDialog: function(id) {
+				obj.dlg = id;
+				refreshGameData();
+			},
+			GetDefaultName: function() {
+				var desc = paintTool.drawing.getNameOrDescription();
+				return CreateDefaultName(desc + " dialog", dialog, true); // todo : localize
+			}, // todo : localize
+		});
+	dialogContent.appendChild(paintDialogWidget.GetElement());
+
+	if (alwaysShowDrawingDialog && dialog[obj.dlg]) {
+		openDialogTool(obj.dlg, null, false);
 	}
 }
 
 // hacky - assumes global paintTool object
 function getCurDialogId() {
 	return paintTool.drawing.getDialogId();
-}
-
-function on_change_dialog_finished() {
-	on_change_dialog();
-	tryWarnAboutMissingCharacters( document.getElementById("dialogText").value );
-}
-
-// hacky - assumes global paintTool object
-function on_change_dialog() {
-	var dialogId = getCurDialogId();
-
-	var dialogStr = document.getElementById("dialogText").value;
-	if(dialogStr.length <= 0){
-		if(dialogId) {
-			paintTool.getCurObject().dlg = null;
-			delete dialog[dialogId];
-		}
-	}
-	else {
-		if(!dialogId) {
-			var prefix = (paintTool.drawing.type == TileType.Item) ? "ITM_" : "SPR_";
-			dialogId = nextAvailableDialogId( prefix );
-			paintTool.getCurObject().dlg = dialogId;
-		}
-		dialog[dialogId] = scriptUtils.EnsureDialogBlockFormat(dialogStr);
-	}
-
-	reloadAdvDialogUI();
-
-	refreshGameData();
 }
 
 function setDefaultGameState() {
@@ -416,9 +607,15 @@ function resetGameData() {
 	setDefaultGameState();
 
 	// TODO : localize default_title
-	title = localization.GetStringOrFallback("default_title", "Write your game's title here");
-	dialog["SPR_0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"); // hacky to do this in two places :(
-	dialog["ITM_0"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
+	setTitle(localization.GetStringOrFallback("default_title", "Write your game's title here"));
+	dialog["0"] = {
+		src: localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"), // hacky to do this in two places :(
+		name: "cat dialog", // todo : localize
+	};
+	dialog["1"] = {
+		src: localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea"),
+		name: "tea dialog", // todo : localize
+	};
 
 	pickDefaultFontForLanguage(localization.GetLanguage());
 
@@ -442,8 +639,6 @@ function resetGameData() {
 	markerTool.SetRoom(curRoom);
 	markerTool.Refresh();
 	roomTool.drawEditMap();
-
-	updateTitleTextBox(title);
 
 	events.Raise("game_data_change"); // TODO -- does this need to have a specific reset event or flag?
 }
@@ -495,9 +690,6 @@ var itemIndex = 0;
 
 /* ROOM */
 var roomIndex = 0;
-
-/* ENDINGS */
-var endingIndex = 0;
 
 /* BROWSER COMPATIBILITY */
 var browserFeatures = {
@@ -746,16 +938,6 @@ function start() {
 		}
 	}
 
-	// Automatically open tool trays that are needed
-	if( sortedRoomIdList().length > 1 )
-	{
-		toggleRoomToolsCore( true );
-	}
-	if( sortedPaletteIdList().length > 1 )
-	{
-		togglePaletteToolsCore( true );
-	}
-
 	//draw everything
 	on_paint_avatar();
 	paintTool.updateCanvas();
@@ -860,6 +1042,17 @@ function start() {
 	// 	}
 	// }
 
+	// create title widgets
+	var titleTextWidgets = document.getElementsByClassName("titleWidgetContainer");
+	for (var i = 0; i < titleTextWidgets.length; i++) {
+		var widget = dialogTool.CreateTitleWidget();
+		titleTextWidgets[i].appendChild(widget.GetElement());
+	}
+
+	// prepare dialog tool
+	openDialogTool(titleDialogId); // start with the title open
+	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked;
+
 	initLanguageOptions();
 }
 
@@ -924,6 +1117,9 @@ function on_drawing_name_change() {
 	else
 		obj.name = null;
 
+	console.log("NEW NAME!");
+	console.log(obj);
+
 	updateNamesFromCurData()
 
 	// update display name for thumbnail
@@ -964,15 +1160,15 @@ function on_drawing_name_change() {
 		if(newName != oldName) {
 			for(dlgId in dialog) {
 				// console.log("DLG " + dlgId);
-				var dialogScript = scriptInterpreter.Parse( dialog[dlgId] );
+				var dialogScript = scriptInterpreter.Parse(dialog[dlgId].src);
 				var visitor = new ItemNameSwapVisitor();
-				dialogScript.VisitAll( visitor );
-				if( visitor.DidSwap() ) {
+				dialogScript.VisitAll(visitor);
+				if (visitor.DidSwap()) {
 					var newDialog = dialogScript.Serialize();
-					if(newDialog.indexOf("\n") > -1) {
+					if (newDialog.indexOf("\n") > -1) {
 						newDialog = '"""\n' + newDialog + '\n"""';
 					}
-					dialog[dlgId] = newDialog;
+					dialog[dlgId].src = newDialog;
 				}
 			}
 		}
@@ -1090,6 +1286,7 @@ function duplicateRoom() {
 
 	curRoom = newRoomId;
 	//console.log(curRoom);
+	markerTool.SetRoom(curRoom); // hack to re-find all the markers
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
@@ -1113,7 +1310,9 @@ function duplicateExit(exit) {
 			room : exit.dest.room,
 			x : exit.dest.x,
 			y : exit.dest.y
-		}
+		},
+		transition_effect : exit.transition_effect,
+		dlg: exit.dlg,
 	}
 	return newExit;
 }
@@ -1370,28 +1569,6 @@ function updateWallCheckboxOnCurrentTile() {
 	}
 }
 
-// TODO : better name?
-function reloadAdvDialogUI() {
-	// var dialogId = getCurDialogId(); // necessary?
-	if( drawing.type === TileType.Sprite || drawing.type === TileType.Item ) {
-
-		document.getElementById("dialogEditorHasContent").style.display = "block";
-		document.getElementById("dialogEditorNoContent").style.display = "none";
-
-		var dialogStr = document.getElementById("dialogText").value;
-		document.getElementById("dialogCodeText").value = dialogStr;
-		var scriptTree = scriptInterpreter.Parse( dialogStr );
-		console.log("~~~~ RELOAD ADV DIALOG UI ~~~~~");
-		console.log(scriptTree);
-		createAdvDialogEditor(scriptTree);
-		previewDialogScriptTree = scriptTree;
-	}
-	else {
-		document.getElementById("dialogEditorHasContent").style.display = "none";
-		document.getElementById("dialogEditorNoContent").style.display = "block";
-	}
-}
-
 function reloadSprite() {
 	// animation UI
 	if ( sprite[drawing.id] && sprite[drawing.id].animation.isAnimated ) {
@@ -1484,38 +1661,6 @@ function toggleToolBar(e) {
 	}
 }
 
-function toggleRoomTools(e) {
-	toggleRoomToolsCore( e.target.checked );
-}
-
-function toggleRoomToolsCore(visible) {
-	if( visible ) {
-		document.getElementById("roomTools").style.display = "block";
-		document.getElementById("roomToolsCheck").checked = true;
-		document.getElementById("roomToolsCheckIcon").innerHTML = "expand_more";
-	}
-	else {
-		document.getElementById("roomTools").style.display = "none";
-		document.getElementById("roomToolsCheck").checked = false;
-		document.getElementById("roomToolsCheckIcon").innerHTML = "expand_less";
-	}
-}
-
-function togglePaletteTools(e) {
-	togglePaletteToolsCore( e.target.checked );
-}
-
-function togglePaletteToolsCore(visible) {
-	if( visible ) {
-		document.getElementById("paletteTools").style.display = "block";
-		document.getElementById("paletteToolsCheckIcon").innerHTML = "expand_more";
-	}
-	else {
-		document.getElementById("paletteTools").style.display = "none";
-		document.getElementById("paletteToolsCheckIcon").innerHTML = "expand_less";
-	}
-}
-
 function toggleDownloadOptions(e) {
 	if( e.target.checked ) {
 		document.getElementById("downloadOptions").style.display = "block";
@@ -1546,11 +1691,14 @@ function on_edit_mode() {
 		isPreviewDialogMode = false;
 		updatePreviewDialogButton();
 
-		for(var i = 0; i < advDialogUIComponents.length; i++) {
-			advDialogUIComponents[i].GetEl().classList.remove("highlighted");
-		}
+		// TODO : rework dialog highlighting
+		// for(var i = 0; i < advDialogUIComponents.length; i++) {
+		// 	advDialogUIComponents[i].GetEl().classList.remove("highlighted");
+		// }
 	}
 	document.getElementById("previewDialogCheck").disabled = false;
+
+	events.Raise("on_edit_mode");
 }
 
 // hacky - part of hiding font data from the game data
@@ -1693,16 +1841,22 @@ function roomPaletteChange(event) {
 	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 }
 
-function updateDrawingNameUI(visible) {
-	document.getElementById("drawingNameUI").setAttribute("style", visible ? "display:initial;" : "display:none;");
+function updateDrawingNameUI() {
 	var obj = paintTool.getCurObject();
-	console.log("update drawing name ui");
-	console.log(obj);
-	if( obj.name != null )
+
+	if (drawing.type == TileType.Avatar) { // hacky
+		document.getElementById("drawingName").value = "avatar"; // TODO: localize
+	}
+	else if (obj.name != null) {
 		document.getElementById("drawingName").value = obj.name;
-	else
+	}
+	else {
 		document.getElementById("drawingName").value = "";
+	}
+
 	document.getElementById("drawingName").placeholder = getCurPaintModeStr() + " " + drawing.id;
+
+	document.getElementById("drawingName").readOnly = (drawing.type == TileType.Avatar);
 }
 
 function on_paint_avatar() {
@@ -1720,18 +1874,19 @@ function on_paint_avatar() {
 function on_paint_avatar_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:none;");
-	document.getElementById("paintNav").setAttribute("style","display:none;");
-	document.getElementById("paintCommands").setAttribute("style","display:none;");
+	// TODO : make navigation commands un-clickable
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(false);
-	//document.getElementById("animation").setAttribute("style","display:none;");
 	document.getElementById("paintOptionAvatar").checked = true;
 	document.getElementById("paintExplorerOptionAvatar").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:none;");
 	document.getElementById("paintExplorerFilterInput").value = "";
 
-	reloadAdvDialogUI();
+	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
+	for (var i = 0; i < disableForAvatarElements.length; i++) {
+		disableForAvatarElements[i].disabled = true;
+	}
 }
 
 function on_paint_tile() {
@@ -1748,8 +1903,6 @@ function on_paint_tile() {
 function on_paint_tile_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:none;");
 	document.getElementById("wall").setAttribute("style","display:block;");
-	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
-	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
@@ -1759,7 +1912,10 @@ function on_paint_tile_ui_update() {
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerFilterInput").value = "";
 
-	reloadAdvDialogUI();
+	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
+	for (var i = 0; i < disableForAvatarElements.length; i++) {
+		disableForAvatarElements[i].disabled = false;
+	}
 }
 
 function on_paint_sprite() {
@@ -1783,8 +1939,6 @@ function on_paint_sprite() {
 function on_paint_sprite_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
-	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
-	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
@@ -1794,7 +1948,10 @@ function on_paint_sprite_ui_update() {
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerFilterInput").value = "";
 
-	reloadAdvDialogUI();
+	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
+	for (var i = 0; i < disableForAvatarElements.length; i++) {
+		disableForAvatarElements[i].disabled = false;
+	}
 }
 
 function on_paint_item() {
@@ -1814,8 +1971,6 @@ function on_paint_item() {
 function on_paint_item_ui_update() {
 	document.getElementById("dialog").setAttribute("style","display:block;");
 	document.getElementById("wall").setAttribute("style","display:none;");
-	document.getElementById("paintNav").setAttribute("style","display:inline-block;");
-	document.getElementById("paintCommands").setAttribute("style","display:inline-block;");
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
@@ -1825,7 +1980,10 @@ function on_paint_item_ui_update() {
 	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
 	document.getElementById("paintExplorerFilterInput").value = "";
 
-	reloadAdvDialogUI();
+	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
+	for (var i = 0; i < disableForAvatarElements.length; i++) {
+		disableForAvatarElements[i].disabled = false;
+	}
 }
 
 function paintExplorerFilterChange( e ) {
@@ -1885,8 +2043,8 @@ function renderAnimationPreview(id) {
 }
 
 function selectPaint() {
-	if(drawing.id === this.value && document.getElementById("paintPanel").style.display === "none") {
-		togglePanelCore("paintPanel", true /*visible*/); // animate?
+	if (drawing.id === this.value) {
+		showPanel("paintPanel", "paintExplorerPanel");
 	}
 
 	drawing.id = this.value;
@@ -1917,7 +2075,6 @@ function getCurPaintModeStr() {
 }
 
 function on_change_adv_dialog() {
-	document.getElementById("dialogText").value = document.getElementById("dialogCodeText").value;
 	on_change_dialog();
 }
 
@@ -1932,58 +2089,11 @@ function on_game_data_change() {
 	refreshGameData();
 }
 
-function convertGameDataToCurVersion(importVersion) {
-	if (importVersion < 5.0) {
-		console.log("version under 5!!!!");
-
-		var PrintFunctionVisitor = function() {
-			var didChange = false;
-			this.DidChange = function() { return didChange; };
-
-			this.Visit = function(node) {
-				if ( node.type != "function" )
-					return;
-
-				// console.log("VISIT " + node.name);
-
-				if ( node.name === "say" ) {
-					node.name = "print";
-					didChange = true;
-				}
-			};
-		};
-
-		for(dlgId in dialog) {
-			var dialogScript = scriptInterpreter.Parse( dialog[dlgId] );
-			var visitor = new PrintFunctionVisitor();
-			dialogScript.VisitAll( visitor );
-			if( visitor.DidChange() ) {
-				var newDialog = dialogScript.Serialize();
-				if(newDialog.indexOf("\n") > -1) {
-					newDialog = '"""\n' + newDialog + '\n"""';
-				}
-				dialog[dlgId] = newDialog;
-			}
-		}
-
-		{
-			var titleScript = scriptInterpreter.Parse( title );
-			var visitor = new PrintFunctionVisitor();
-			titleScript.VisitAll( visitor );
-			if( visitor.DidChange() ) {
-				title = titleScript.Serialize();
-			}
-		}
-	}
-}
-
 function on_game_data_change_core() {
 	console.log(document.getElementById("game_data").value);
 
 	clearGameData();
 	var version = parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
-
-	convertGameDataToCurVersion(version);
 
 	var curPaintMode = drawing.type; //save current paint mode (hacky)
 
@@ -2068,8 +2178,6 @@ function on_game_data_change_core() {
 
 	markerTool.SetRoom(curRoom);
 
-	updateTitleTextBox(title);
-
 	// TODO -- start using this for more things
 	events.Raise("game_data_change");
 }
@@ -2123,7 +2231,7 @@ function toggleWallUI(checked) {
 }
 
 function filenameFromGameTitle() {
-	var filename = title.replace(/[^a-zA-Z]/g, "_"); // replace non alphabet characters
+	var filename = getTitle().replace(/[^a-zA-Z]/g, "_"); // replace non alphabet characters
 	filename = filename.toLowerCase();
 	filename = filename.substring(0,32); // keep it from getting too long
 	return filename;
@@ -2134,14 +2242,21 @@ function exportGame() {
 	// var gameData = document.getElementById("game_data").value; //grab game data
 	var gameData = getFullGameData();
 	var size = document.getElementById("exportSizeFixedInput").value;
-	exporter.exportGame( gameData, title, export_settings.page_color, filenameFromGameTitle() + ".html", isFixedSize, size ); //download as html file
+	//download as html file
+	exporter.exportGame(
+		gameData,
+		getTitle(),
+		export_settings.page_color,
+		filenameFromGameTitle() + ".html",
+		isFixedSize,
+		size);
 }
 
 function exportGameData() {
 	refreshGameData(); //just in case
 	// var gameData = document.getElementById("game_data").value; //grab game data
 	var gameData = getFullGameData();
-	ExporterUtils.DownloadFile( filenameFromGameTitle() + ".bitsy", gameData );
+	ExporterUtils.DownloadFile(filenameFromGameTitle() + ".bitsy", gameData);
 }
 
 function exportFont() {
@@ -2179,8 +2294,21 @@ function toggleVersionNotes(e) {
 /* MARKERS (exits & endings) */
 var markerTool;
 
+function startAddMarker() {
+	markerTool.StartAdd();
+}
+
+function cancelAddMarker() {
+	markerTool.CancelAdd();
+}
+
 function newExit() {
-	markerTool.AddExit();
+	markerTool.AddExit(false);
+	roomTool.drawEditMap();
+}
+
+function newExitOneWay() {
+	markerTool.AddExit(true);
 	roomTool.drawEditMap();
 }
 
@@ -2189,9 +2317,9 @@ function newEnding() {
 	roomTool.drawEditMap();
 }
 
-function newEffect() {
-	markerTool.AddEffect();
-	roomTool.drawEditMap();
+function duplicateMarker() {
+	markerTool.DuplicateSelected();
+	roomTool.drawEditMap(); // TODO : this should be triggered by an event really
 }
 
 function deleteMarker() {
@@ -2213,20 +2341,12 @@ function toggleMoveMarker1(e) {
 	markerTool.TogglePlacingFirstMarker(e.target.checked);
 }
 
-function cancelMoveMarker1() {
-	markerTool.TogglePlacingFirstMarker(false);
-}
-
 function selectMarkerRoom1() {
 	markerTool.SelectMarkerRoom1();
 }
 
 function toggleMoveMarker2(e) {
 	markerTool.TogglePlacingSecondMarker(e.target.checked);
-}
-
-function cancelMoveMarker2() {
-	markerTool.TogglePlacingSecondMarker(false);
 }
 
 function selectMarkerRoom2() {
@@ -2236,10 +2356,6 @@ function selectMarkerRoom2() {
 function changeExitDirection() {
 	markerTool.ChangeExitLink();
 	roomTool.drawEditMap();
-}
-
-function onEndingTextChange(event) {
-	markerTool.ChangeEndingText(event.target.value);
 }
 
 function onEffectTextChange(event) {
@@ -2264,16 +2380,17 @@ function toggleRoomMarkers(visible) {
 	document.getElementById("roomMarkersIcon").innerHTML = visible ? "visibility" : "visibility_off";
 }
 
-function onToggleExitOptions() {
-	markerTool.SetExitOptionsVisibility(document.getElementById("showExitOptionsCheck").checked);
+function onChangeExitTransitionEffect(effectId, exitIndex) {
+	markerTool.ChangeExitTransitionEffect(effectId, exitIndex);
 }
 
-function onChangeExitOptionsSelect(exitSelectId) {
-	markerTool.UpdateExitOptions(exitSelectId);
-}
-
-function onChangeExitTransitionEffect(effectId) {
-	markerTool.ChangeExitTransitionEffect(effectId);
+function toggleExitOptions(exitIndex, visibility) {
+	if (exitIndex == 0) {
+		// hacky way to keep these in syncs!!!
+		document.getElementById("exitOptionsToggleCheck1").checked = visibility;
+		document.getElementById("exitOptionsToggleCheck1_alt").checked = visibility;
+	}
+	markerTool.ToggleExitOptions(exitIndex, visibility);
 }
 
 // TODO : put helper method somewhere more.. helpful
@@ -2311,8 +2428,8 @@ function togglePanel(e) {
 	togglePanelCore( e.target.value, e.target.checked );
 }
 
-function showPanel(id) {
-	togglePanelCore( id, true /*visible*/ );
+function showPanel(id, insertNextToId) {
+	togglePanelCore(id, true /*visible*/, true /*doUpdatePrefs*/, insertNextToId);
 }
 
 function hidePanel(id) {
@@ -2333,23 +2450,38 @@ function hidePanel(id) {
 	);
 }
 
-function togglePanelCore(id,visible,doUpdatePrefs=true) {
+function togglePanelCore(id, visible, doUpdatePrefs, insertNextToId) {
+	if (doUpdatePrefs === undefined || doUpdatePrefs === null) {
+		doUpdatePrefs = true;
+	}
+
 	//hide/show panel
-	togglePanelUI( id, visible );
+	togglePanelUI(id, visible, insertNextToId);
 	//any side effects
-	afterTogglePanel( id, visible );
+	afterTogglePanel(id, visible);
 	//save panel preferences
 	// savePanelPref( id, visible );
-	if(doUpdatePrefs) {
+	if (doUpdatePrefs) {
 		updatePanelPrefs();
 	}
 }
 
-function togglePanelUI(id,visible) {
-	if( visible ) {
+function togglePanelUI(id, visible, insertNextToId) {
+	if (visible) {
 		var editorContent = document.getElementById("editorContent");
 		var cardElement = document.getElementById(id);
-		editorContent.appendChild(cardElement);
+
+		if (insertNextToId === undefined || insertNextToId === null) {
+			editorContent.appendChild(cardElement);
+		}
+		else {
+			var insertNextToElement = document.getElementById(insertNextToId);
+			editorContent.insertBefore(cardElement, insertNextToElement.nextSibling);
+
+			// hack - activate animation if using insert next to?
+			cardElement.classList.add("drop");
+			setTimeout( function() { cardElement.classList.remove("drop"); }, 300 );
+		}
 	}
 
 	document.getElementById(id).style.display = visible ? "inline-block" : "none";
@@ -2373,6 +2505,7 @@ function afterTogglePanel(id,visible) {
 	}
 }
 
+// TODO : change into event!
 function afterShowPanel(id) {
 	if (id === "exitsPanel") {
 		showMarkers();
@@ -3070,47 +3203,35 @@ function blockScrollBackpage(e) {
 	// }
 }
 
+
 function toggleDialogCode(e) {
-	console.log("DIALOG CODE");
-	console.log(e.target.checked);
-	if (e.target.checked) {
-		showDialogCode();
+	var showCode = e.target.checked;
+
+	// toggle button text
+	document.getElementById("dialogToggleCodeShowText").style.display = showCode ? "none" : "inline";
+	document.getElementById("dialogToggleCodeHideText").style.display = showCode ? "inline" : "none";
+
+	// update editor
+	var dialogEditorViewport = document.getElementById("dialogEditor");
+	dialogEditorViewport.innerHTML = "";
+	if (showCode) {
+		dialogEditorViewport.appendChild(curPlaintextDialogEditor.GetElement());
 	}
 	else {
-		hideDialogCode();
+		dialogEditorViewport.appendChild(curDialogEditor.GetElement());
 	}
 }
 
-function showDialogCode() {
-	document.getElementById("dialogCode").style.display = "block";
-	document.getElementById("dialogEditor").style.display = "none";
-	// document.getElementById("dialogShowCode").style.display = "none";
-	// document.getElementById("dialogHideCode").style.display = "block";
-	document.getElementById("dialogTools").style.display = "none";
+var alwaysShowDrawingDialog = true;
+function toggleAlwaysShowDrawingDialog(e) {
+	alwaysShowDrawingDialog = e.target.checked;
 
-	document.getElementById("dialogToggleCodeShowText").style.display = "none";
-	document.getElementById("dialogToggleCodeHideText").style.display = "inline";
-}
-
-function hideDialogCode() {
-	document.getElementById("dialogCode").style.display = "none";
-	document.getElementById("dialogEditor").style.display = "block";
-	// document.getElementById("dialogShowCode").style.display = "block";
-	// document.getElementById("dialogHideCode").style.display = "none";
-	document.getElementById("dialogTools").style.display = "block";
-
-	document.getElementById("dialogToggleCodeShowText").style.display = "inline";
-	document.getElementById("dialogToggleCodeHideText").style.display = "none";
-}
-
-function showDialogToolsSection() {
-	document.getElementById("dialogToolsSection").style.display = "block";
-	document.getElementById("dialogToolsEffects").style.display = "none";
-}
-
-function showDialogToolsEffects() {
-	document.getElementById("dialogToolsSection").style.display = "none";
-	document.getElementById("dialogToolsEffects").style.display = "block";
+	if (alwaysShowDrawingDialog) {
+		var dlg = getCurDialogId();
+		if (dialog[dlg]) {
+			openDialogTool(dlg);
+		}
+	}
 }
 
 function showInventoryItem() {
@@ -3124,30 +3245,29 @@ function showInventoryVariable() {
 }
 
 var isPreviewDialogMode = false;
-var previewDialogScriptTree = null;
 function togglePreviewDialog(event) {
-	console.log("TOGGLE PREVIEW " + event.target.checked);
-	if(event.target.checked) {
-		isPreviewDialogMode = true;
-		console.log(isPreviewDialogMode);
+	if (event.target.checked) {
+		if (curDialogEditor != null) {
+			isPreviewDialogMode = true;
 
-		if(previewDialogScriptTree != null) {
-			if (document.getElementById("roomPanel").style.display === "none")
+			if (document.getElementById("roomPanel").style.display === "none") {
 				showPanel("roomPanel");
+			}
 
-			console.log("PLAY MODE");
 			on_play_mode();
 		
-			startPreviewDialog( previewDialogScriptTree, function() {
-				console.log("CALLBACK!!!");
-				togglePreviewDialog( { target : { checked : false } } );
-			});
+			startPreviewDialog(
+				curDialogEditor.GetNode(), 
+				function() {
+					togglePreviewDialog({ target : { checked : false } });
+				});
 		}
 	}
 	else {
 		on_edit_mode();
 		isPreviewDialogMode = false;
 	}
+
 	updatePlayModeButton();
 	updatePreviewDialogButton();
 }
@@ -3180,22 +3300,29 @@ function on_change_language_inner(language) {
 	hackyUpdatePlaceholderText();
 
 	// update title in new language IF the user hasn't made any changes to the default title
-	if (localization.LocalizationContains("default_title", title)) {
-		title = localization.GetStringOrFallback("default_title", "Write your game's title here");
-		updateTitleTextBox(title);
+	if (localization.LocalizationContains("default_title", getTitle())) {
+		setTitle(localization.GetStringOrFallback("default_title", "Write your game's title here"));
+		// make sure all editors with a title know to update
+		events.Raise("dialog_update", { dialogId:titleDialogId, editorId:null });
 	}
 
 	// update default sprite
-	var defaultSpriteDlgExists = dialog["SPR_0"] != null && localization.LocalizationContains("default_sprite_dlg", dialog["SPR_0"]);
+	var defaultSpriteDlgExists = dialog["0"] != null && localization.LocalizationContains("default_sprite_dlg", dialog["0"]);
 	if (defaultSpriteDlgExists) {
-		dialog["SPR_0"] = localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat");
+		dialog["0"] = {
+			src: localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"),
+			name: null,
+		};
 		paintTool.reloadDrawing();
 	}
 
 	// update default item
-	var defaultItemDlgExists = dialog["ITM_0"] != null && localization.LocalizationContains("default_item_dlg", dialog["ITM_0"]);
+	var defaultItemDlgExists = dialog["1"] != null && localization.LocalizationContains("default_item_dlg", dialog["1"]);
 	if (defaultItemDlgExists) {
-		dialog["ITM_0"] = localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea");
+		dialog["1"] = {
+			src: localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea"),
+			name: null,
+		};
 		paintTool.reloadDrawing(); // hacky to do this twice
 	}
 
@@ -3325,6 +3452,37 @@ function updateTextDirectionSelectUI() {
 		var option = textDirSelect.options[i];
 		option.selected = (option.value === textDirection);
 	}
+}
+
+/* UTILS (todo : move into utils.js after merge) */
+function CreateDefaultName(defaultNamePrefix, objectStore, ignoreNumberIfFirstName) {
+	if (ignoreNumberIfFirstName === undefined || ignoreNumberIfFirstName === null) {
+		ignoreNumberIfFirstName = false;
+	}
+
+	var nameCount = ignoreNumberIfFirstName ? -1 : 0; // hacky :(
+	for (id in objectStore) {
+		if (objectStore[id].name) {
+			if (objectStore[id].name.indexOf(defaultNamePrefix) === 0) {
+				var nameCountStr = objectStore[id].name.slice(defaultNamePrefix.length);
+
+				var nameCountInt = 0;
+				if (nameCountStr.length > 0) {
+					nameCountInt = parseInt(nameCountStr);
+				}
+
+				if (!isNaN(nameCountInt) && nameCountInt > nameCount) {
+					nameCount = nameCountInt;
+				}
+			}
+		}
+	}
+
+	if (ignoreNumberIfFirstName && nameCount < 0) {
+		return defaultNamePrefix;
+	}
+
+	return defaultNamePrefix + " " + (nameCount + 1);
 }
 
 /* DOCS */

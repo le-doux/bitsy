@@ -14,18 +14,24 @@
 
 #markerControl1 {
 	display: flex; flex-direction: column;
+	padding: 10px;
 }
 
 #markerName1 {
-	font-size: 90%; line-height: 12px;
+	line-height: 12px;
 }
 
 #markerCanvas1 {
-	width:114px; height:114px;
+	width:120px; height:120px;
 }
 
 .markerPosControl {
 	margin-top: 4px;
+}
+
+.markerCoordinatesHolder {
+	max-width: 120px;
+	overflow: hidden;
 }
 
 #textMarkerPos1 {
@@ -44,12 +50,16 @@
 	margin-top: 70px;
 }
 
+#markerControl2 {
+	padding: 10px;
+}
+
 #markerName2 {
-	font-size: 90%; line-height: 12px;
+	line-height: 12px;
 }
 
 #markerCanvas2 {
-	width:114px; height:114px;
+	width:120px; height:120px;
 }
 
 #textMarkerPos2 {
@@ -74,56 +84,4 @@
 
 #exitOptionsRadio label {
 	flex: 1; font-size: 100%;
-}
-
-/* TODO : continue on to marker control 2 etc */
-
-/* TODO : vNext */
-#exitScriptControls {
-	display: none;
-}
-
-#exitScriptControls.exitLockActive {
-	display: block;
-}
-
-#exitScriptControls.exitDialogActive {
-	display: block;
-}
-
-#exitScriptControls.exitAvatarActive {
-	display: block;
-}
-
-.exitLockControl {
-	display: none;
-}
-
-.exitLockActive .exitLockControl {
-	display: inline-block;
-}
-
-.exitDialogControl {
-	display: none;
-}
-
-.exitDialogActive .exitDialogControl {
-	display: inline-block;
-}
-
-.exitDialogAndLockControl {
-	display: none;
-}
-
-.exitDialogActive.exitLockActive .exitDialogAndLockControl {
-	display: inline-block;
-}
-
-
-.exitAvatarControl {
-	display: none;
-}
-
-.exitAvatarActive .exitAvatarControl {
-	display: inline-block;
 }

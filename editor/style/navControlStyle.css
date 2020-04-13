@@ -1,0 +1,21 @@
+.navControl {
+	display: flex;
+	margin-bottom: 10px;
+	font-size: 100%;
+}
+
+.navControl .textInputField {
+	margin-right: 2px;
+	flex-grow: 1;
+	margin-bottom: 2px;
+}
+
+.navControl input[type="checkbox"] + label {
+	margin-right: 2px;
+	font-size: 100%;
+	padding-right: 8px;
+}
+
+.navControl .spacer {
+	width: 4px;
+}

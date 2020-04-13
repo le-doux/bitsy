@@ -14,7 +14,7 @@ body {
 }
 canvas {
 	background: black;
-	margin-top: 4px;
+	/*margin-top: 4px;*/
 }
 
 input[type=text] {
@@ -77,20 +77,14 @@ input[type=text] {
 	border-radius: 4px;
 }
 .panel .bar {
-	padding: 5px;
-	padding-left: 10px;
-	padding-right: 10px;
-	padding-bottom: 2px;
+	padding: 8px;
 	margin: -10px;
 	margin-bottom: 10px;
-	font-size: 125%;
-	line-height: 150%;
+	font-size: 115%;
 	border-radius: 4px 4px 0px 0px;
 }
 .panel .bar .material-icons {
-	line-height: 150%;
 	vertical-align: middle;
-	font-size: 150%;
 }
 .panelShadow {
 	display: inline-block;
@@ -184,6 +178,12 @@ input {
 	padding: 5px;
 	margin-bottom: 5px;
 	border-radius: 2px;
+}
+
+.controlBox .material-icons {
+	font-size: 110%;
+	vertical-align: middle;
+	line-height: 100%;
 }
 
 .controlSpan {
@@ -360,107 +360,29 @@ input {
 	/*background: red;*/
 }
 
-/* ADVANCED DIALOG */
-.advDialogTextBlock {
-	width: 300px;
-	height: 60px;
-	resize: vertical;
+#paintModeRadio {
+	display: flex;
 }
 
-.advDialogOptionDiv {
-	width: 300px;
-	/*height: 40px;*/
-	padding: 5px;
-	margin: 5px;
-	margin-left: 0px;
-	/*border: 1px solid #6767b2;*/
-	background: #ccccff;
-	border-radius: 2px;
+#paintModeRadio label {
+	flex-grow: 1;
 }
 
-.advDialogOptionDiv button {
-	height: 35px;
-	/*margin-top: -12px;*/
-	margin-left: 5px;
-	/*border: solid 1px black;*/
-	/*float: right;*/
-	display: inline-block;
-	vertical-align: top;
+#paint {
+	width: 256px;
+
+	/* keep this centered in div */
+	padding-left: 0;
+	padding-right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
 }
 
-.advDialogOptionDiv button:hover {
-	background: #6767b2;
-	color: white;
-	opacity: 0.5;
-}
-
-.advDialogOptionDiv button .material-icons {
-	font-size: 80%;
-}
-
-.advDialogConditionDiv {
-	width: 300px;
-	/*height: 100px;*/
-	padding: 5px;
-	margin: 5px;
-	margin-left: 0px;
-	/*border: 1px solid #6767b2;*/
-	background: #ccccff;
-	border-radius: 2px;
-}
-
-.advDialogConditionDiv button {
-	height: 35px;
-	/*margin-top: -12px;*/
-	margin-left: 5px;
-	/*border: solid 1px black;*/
-	/*float: right;*/
-	display: inline-block;
-	vertical-align: top;
-}
-
-.advDialogConditionDiv button:hover {
-	background: #6767b2;
-	color: white;
-	opacity: 0.5;
-}
-
-.advDialogConditionDiv button .material-icons {
-	font-size: 80%;
-}
-
-/*.advDialogOptionDiv .light:hover {
-	background: #6767b2;
-}*/
-
-.advDialogTextOption {
-	width: 270px;
-	/*width: 290px;*/
-
-	/*width: 250px;*/
-	height: 30px;
-	resize: vertical;
-	/*margin-right: 0px;*/
-}
-
-#advDialogViewport {
-	padding: 12px;
-	/*width:340px;*/
-	min-width: 340px;
-	height:450px;
-	overflow:scroll;
-	display:block;
-	border: solid 1px #ccccff;
-	border-radius: 2px;
-	margin-bottom: 10px;
-	line-height: 1;
-}
-
-#advDialogViewport .controlBox {
-	margin-bottom: 5px;
-	border: solid 1px #6767b2;
-	padding: 10px;
-	line-height: 170%;
+/* kind of hacky way to condense ui in the paint tool */
+#paintPanel .buttonGroup {
+	padding: 0px;
+	margin: 0px;
 }
 
 #dialogCodeText {
@@ -470,26 +392,6 @@ input {
 	resize: none;
 	background: black;
 	color: white;
-}
-
-.advDialogTop {
-	margin-bottom: 10px;
-	overflow: auto;
-}
-
-.advDialogBlockName {
-	float: left;
-}
-
-.advDialogBlockDelete {
-	float: right;
-}
-
-.advDialogIcon {
-	line-height: 150%;
-	vertical-align: middle;
-	font-size: 150%;
-	margin-right: 10px;
 }
 
 .inventoryViewport {
@@ -612,4 +514,31 @@ input {
 
 #dialogTop {
 	height: 30px; margin-bottom: 5px;
+}
+
+.textInputField {
+	flex-grow: 1;
+	border-radius: 5px;
+	padding: 5px;
+	line-height: 100%;
+	color: #6767b2;
+	background: #e8e8ff;
+	border: solid 1px #e8e8ff;
+}
+
+.textInputField:not([readonly]) {
+	color: black;
+	background: #eee;
+	border: solid 1px #eee;
+}
+
+.textInputField:hover:not([readonly]) {
+	text-decoration: underline;
+	border: solid 1px #ccc;
+}
+
+.textInputField:focus:not([readonly]) {
+	background: white;
+	border: solid 1px #ccc;
+	text-decoration: none;
 }

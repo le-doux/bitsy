@@ -374,7 +374,7 @@ function ThumbnailRenderer() {
 	var thumbnailRenderEncoders = {};
 	var cache = {};
 
-	function render(imgId,drawingId,frameIndex) {
+	function render(imgId,drawingId,frameIndex,imgElement) {
 		var isAnimated = (frameIndex === undefined || frameIndex === null) ? true : false;
 
 		var hexPalette = []; // TODO this is a bit repetitive to do all the time, huh?
@@ -417,11 +417,13 @@ function ThumbnailRenderer() {
 		thumbnailRenderEncoders[imgId] = encoder;
 
 		// start encoding new GIF
-		var img = document.getElementById(imgId);
-		encoder.encode( gifData, createThumbnailRenderCallback(img) );
+		if (imgElement === undefined || imgElement === null) {
+			imgElement = document.getElementById(imgId);
+		}
+		encoder.encode( gifData, createThumbnailRenderCallback(imgElement) );
 	}
-	this.Render = function(imgId,drawingId,frameIndex) {
-		render(imgId,drawingId,frameIndex);
+	this.Render = function(imgId,drawingId,frameIndex,imgElement) {
+		render(imgId,drawingId,frameIndex,imgElement);
 	};
 
 	function createThumbnailRenderCallback(img) {

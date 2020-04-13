@@ -174,20 +174,22 @@ var DialogRenderer = function() {
 	};
 
 	var effectTime = 0; // TODO this variable should live somewhere better
-	this.Draw = function(buffer,dt) {
+	this.Draw = function(buffer, dt) {
 		effectTime += dt;
 
 		this.ClearTextbox();
 
-		buffer.ForEachActiveChar( this.DrawChar );
+		buffer.ForEachActiveChar(this.DrawChar);
 
-		if( buffer.CanContinue() )
+		if (buffer.CanContinue()) {
 			this.DrawNextArrow();
+		}
 
 		this.DrawTextbox();
 
-		if( buffer.DidPageFinishThisFrame() && onPageFinish != null )
+		if (buffer.DidPageFinishThisFrame() && onPageFinish != null) {
 			onPageFinish();
+		}
 	};
 
 	/* this is a hook for GIF rendering */
@@ -269,6 +271,8 @@ var DialogBuffer = function() {
 		charIndex = 0;
 		isDialogReadyToContinue = false;
 
+		afterManualPagebreak = false;
+
 		activeTextEffects = [];
 
 		onDialogEndCallbacks = [];
@@ -277,8 +281,6 @@ var DialogBuffer = function() {
 	};
 
 	this.DoNextChar = function() {
-		// console.log("DO NEXT CHAR");
-
 		nextCharTimer = 0; //reset timer
 
 		//time to update characters
@@ -295,13 +297,17 @@ var DialogBuffer = function() {
 			//the page is full!
 			isDialogReadyToContinue = true;
 			didPageFinishThisFrame = true;
-
-			// console.log("WAITING FOR INPUT");
 		}
 
-		// console.log(this.CurChar());
-		if(this.CurChar() != null)
+		if (this.CurChar() != null) {
+			if (this.CurChar().isPageBreak) {
+				// special case for page break marker character!
+				isDialogReadyToContinue = true;
+				didPageFinishThisFrame = true;
+			}
+			
 			this.CurChar().OnPrint(); // make sure we hit the callback before we run out of text
+		}
 	};
 
 	this.Update = function(dt) {
@@ -353,14 +359,29 @@ var DialogBuffer = function() {
 		}
 	}
 
+	var afterManualPagebreak = false; // is it bad to track this state like this?
+
 	this.Continue = function() {
 		console.log("CONTINUE");
+
+		// if we used a page break character to continue we need
+		// to run whatever is in the script afterwards! // TODO : make this comment better
+		if (this.CurChar().isPageBreak) {
+			// hacky: always treat a page break as the end of dialog
+			// if there's more dialog later we re-activate the dialog buffer
+			this.EndDialog();
+			afterManualPagebreak = true;
+			this.CurChar().OnContinue();
+			return false;
+		}
 		if (pageIndex + 1 < this.CurPageCount()) {
+			console.log("FLIP PAGE!");
 			//start next page
 			this.FlipPage();
 			return true; /* hasMoreDialog */
 		}
 		else {
+			console.log("END DIALOG!");
 			//end dialog mode
 			this.EndDialog();
 			return false; /* hasMoreDialog */
@@ -412,7 +433,7 @@ var DialogBuffer = function() {
 		}
 		this.OnPrint = function() {
 			if (printHandler != null) {
-				console.log("PRINT HANDLER ---- DIALOG BUFFER");
+				// console.log("PRINT HANDLER ---- DIALOG BUFFER");
 				printHandler();
 				printHandler = null; // only call handler once (hacky)
 			}
@@ -456,6 +477,37 @@ var DialogBuffer = function() {
 		this.spacing = 8;
 	}
 
+	function DialogScriptControlChar() {
+		Object.assign(this, new DialogChar([]));
+
+		this.width = 0;
+		this.height = 0;
+		this.spacing = 0;
+	}
+
+	// is a control character really the best way to handle page breaks?
+	function DialogPageBreakChar() {
+		Object.assign(this, new DialogChar([]));
+
+		this.width = 0;
+		this.height = 0;
+		this.spacing = 0;
+
+		this.isPageBreak = true;
+
+		var continueHandler = null;
+
+		this.SetContinueHandler = function(handler) {
+			continueHandler = handler;
+		}
+
+		this.OnContinue = function() {
+			if (continueHandler) {
+				continueHandler();
+			}
+		}
+	}
+
 	function AddWordToCharArray(charArray,word,effectList) {
 		for(var i = 0; i < word.length; i++) {
 			charArray.push( new DialogFontChar( font, word[i], effectList ) );
@@ -482,50 +534,73 @@ var DialogBuffer = function() {
 
 	var pixelsPerRow = 192; // hard-coded fun times!!!
 
-	this.AddDrawing = function(drawingId, onFinishHandler) {
+	this.AddScriptReturn = function(onReturnHandler) {
+		var curPageIndex = buffer.length - 1;
+		var curRowIndex = buffer[curPageIndex].length - 1;
+		var curRowArr = buffer[curPageIndex][curRowIndex];
+
+		var controlChar = new DialogScriptControlChar();
+		controlChar.SetPrintHandler(onReturnHandler);
+
+		curRowArr.push(controlChar);
+
+		isActive = true;
+	}
+
+	this.AddDrawing = function(drawingId) {
 		// console.log("DRAWING ID " + drawingId);
 
 		var curPageIndex = buffer.length - 1;
 		var curRowIndex = buffer[curPageIndex].length - 1;
 		var curRowArr = buffer[curPageIndex][curRowIndex];
 
-		var drawingChar = new DialogDrawingChar(drawingId, activeTextEffects)
-		drawingChar.SetPrintHandler( onFinishHandler );
+		var drawingChar = new DialogDrawingChar(drawingId, activeTextEffects);
 
 		var rowLength = GetCharArrayWidth(curRowArr);
 
 		// TODO : clean up copy-pasted code here :/
-		if (rowLength + drawingChar.spacing  <= pixelsPerRow || rowLength <= 0)
-		{
-			//stay on same row
-			curRowArr.push( drawingChar );
+		if (afterManualPagebreak) {
+			this.FlipPage(); // hacky
+
+			buffer[curPageIndex][curRowIndex] = curRowArr;
+			buffer.push([]);
+			curPageIndex++;
+			buffer[curPageIndex].push([]);
+			curRowIndex = 0;
+			curRowArr = buffer[curPageIndex][curRowIndex];
+			curRowArr.push(drawingChar);
+
+			afterManualPagebreak = false;
 		}
-		else if (curRowIndex == 0)
-		{
+		else if (rowLength + drawingChar.spacing  <= pixelsPerRow || rowLength <= 0) {
+			//stay on same row
+			curRowArr.push(drawingChar);
+		}
+		else if (curRowIndex == 0) {
 			//start next row
-			buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
-			buffer[ curPageIndex ].push( [] );
+			buffer[curPageIndex][curRowIndex] = curRowArr;
+			buffer[curPageIndex].push([]);
 			curRowIndex++;
-			curRowArr = buffer[ curPageIndex ][ curRowIndex ];
-			curRowArr.push( drawingChar );
+			curRowArr = buffer[curPageIndex][curRowIndex];
+			curRowArr.push(drawingChar);
 		}
 		else {
 			//start next page
-			buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
-			buffer.push( [] );
+			buffer[curPageIndex][curRowIndex] = curRowArr;
+			buffer.push([]);
 			curPageIndex++;
-			buffer[ curPageIndex ].push( [] );
+			buffer[curPageIndex].push([]);
 			curRowIndex = 0;
-			curRowArr = buffer[ curPageIndex ][ curRowIndex ];
-			curRowArr.push( drawingChar );
+			curRowArr = buffer[curPageIndex][curRowIndex];
+			curRowArr.push(drawingChar);
 		}
 
 		isActive = true; // this feels like a bad way to do this???
 	}
 
 	// TODO : convert this into something that takes DialogChar arrays
-	this.AddText = function(textStr,onFinishHandler) {
-		// console.log("ADD TEXT " + textStr);
+	this.AddText = function(textStr) {
+		console.log("ADD TEXT " + textStr);
 
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
@@ -545,69 +620,106 @@ var DialogBuffer = function() {
 			}
 
 			var wordWithPrecedingSpace = ((i == 0) ? "" : " ") + word;
-			var wordLength = GetStringWidth( wordWithPrecedingSpace );
+			var wordLength = GetStringWidth(wordWithPrecedingSpace);
 
 			var rowLength = GetCharArrayWidth(curRowArr);
 
-			if (rowLength + wordLength <= pixelsPerRow || rowLength <= 0) {
+			if (afterManualPagebreak) {
+				this.FlipPage();
+
+				// hacky copied bit for page breaks
+				buffer[curPageIndex][curRowIndex] = curRowArr;
+				buffer.push([]);
+				curPageIndex++;
+				buffer[curPageIndex].push([]);
+				curRowIndex = 0;
+				curRowArr = buffer[curPageIndex][curRowIndex];
+				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects);
+
+				afterManualPagebreak = false;
+			}
+			else if (rowLength + wordLength <= pixelsPerRow || rowLength <= 0) {
 				//stay on same row
-				curRowArr = AddWordToCharArray( curRowArr, wordWithPrecedingSpace, activeTextEffects );
+				curRowArr = AddWordToCharArray(curRowArr, wordWithPrecedingSpace, activeTextEffects);
 			}
 			else if (curRowIndex == 0) {
 				//start next row
-				buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
-				buffer[ curPageIndex ].push( [] );
+				buffer[curPageIndex][curRowIndex] = curRowArr;
+				buffer[curPageIndex].push([]);
 				curRowIndex++;
-				curRowArr = buffer[ curPageIndex ][ curRowIndex ];
-				curRowArr = AddWordToCharArray( curRowArr, word, activeTextEffects );
+				curRowArr = buffer[curPageIndex][curRowIndex];
+				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects);
 			}
 			else {
 				//start next page
-				buffer[ curPageIndex ][ curRowIndex ] = curRowArr;
-				buffer.push( [] );
+				buffer[curPageIndex][curRowIndex] = curRowArr;
+				buffer.push([]);
 				curPageIndex++;
-				buffer[ curPageIndex ].push( [] );
+				buffer[curPageIndex].push([]);
 				curRowIndex = 0;
-				curRowArr = buffer[ curPageIndex ][ curRowIndex ];
-				curRowArr = AddWordToCharArray( curRowArr, word, activeTextEffects );
+				curRowArr = buffer[curPageIndex][curRowIndex];
+				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects);
 			}
 		}
 
 		//destroy any empty stuff
-		var lastPage = buffer[ buffer.length-1 ];
-		var lastRow = lastPage[ lastPage.length-1 ];
-		if( lastRow.length == 0 )
-			lastPage.splice( lastPage.length-1, 1 );
-		if( lastPage.length == 0 )
-			buffer.splice( buffer.length-1, 1 );
-
-		//finish up 
-		lastPage = buffer[ buffer.length-1 ];
-		lastRow = lastPage[ lastPage.length-1 ];
-		if( lastRow.length > 0 ) {
-			var lastChar = lastRow[ lastRow.length-1 ];
-			lastChar.SetPrintHandler( onFinishHandler );
+		var lastPage = buffer[buffer.length-1];
+		var lastRow = lastPage[lastPage.length-1];
+		if (lastRow.length == 0) {
+			lastPage.splice(lastPage.length-1, 1);
+		}
+		if (lastPage.length == 0) {
+			buffer.splice(buffer.length-1, 1);
 		}
 
-		console.log(buffer);
+		//finish up 
+		lastPage = buffer[buffer.length-1];
+		lastRow = lastPage[lastPage.length-1];
+		if (lastRow.length > 0) {
+			var lastChar = lastRow[lastRow.length-1];
+		}
+
+		// console.log(buffer);
 
 		isActive = true;
 	};
 
 	this.AddLinebreak = function() {
-		var lastPage = buffer[ buffer.length-1 ];
-		if( lastPage.length <= 1 ) {
-			console.log("LINEBREAK - NEW ROW ");
+		var lastPage = buffer[buffer.length-1];
+		if (lastPage.length <= 1) {
+			// console.log("LINEBREAK - NEW ROW ");
 			// add new row
-			lastPage.push( [] );
+			lastPage.push([]);
 		}
 		else {
 			// add new page
-			buffer.push( [[]] );
+			buffer.push([[]]);
 		}
-		console.log(buffer);
+		// console.log(buffer);
 
 		isActive = true;
+	}
+
+	this.AddPagebreak = function(onReturnHandler) {
+		var curPageIndex = buffer.length - 1;
+		var curRowIndex = buffer[curPageIndex].length - 1;
+		var curRowArr = buffer[curPageIndex][curRowIndex];
+
+		// need to actually create a whole new page if following another pagebreak character
+		if (this.CurChar() && this.CurChar().isPageBreak) {
+			buffer.push([]);
+			curPageIndex++;
+			buffer[curPageIndex].push([]);
+			curRowIndex = 0;
+			curRowArr = buffer[curPageIndex][curRowIndex];
+		}
+
+		var pagebreakChar = new DialogPageBreakChar();
+		pagebreakChar.SetContinueHandler(onReturnHandler);
+
+		curRowArr.push(pagebreakChar);
+
+		isActive = true;		
 	}
 
 	/* new text effects */
@@ -849,5 +961,15 @@ var ShakyEffect = function() {
 	}
 };
 TextEffects["shk"] = new ShakyEffect();
+
+var DebugHighlightEffect = function() {
+	this.DoEffect = function(char) {
+		char.color.r = 255;
+		char.color.g = 255;
+		char.color.b = 0;
+		char.color.a = 255;
+	}
+}
+TextEffects["_debug_highlight"] = new DebugHighlightEffect();
 
 } // Dialog()

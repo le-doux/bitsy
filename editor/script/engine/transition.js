@@ -87,11 +87,24 @@ var TransitionManager = function() {
 			transitionEnd = null;
 			effectImage = null;
 			prevStep = -1;
+
+			if (transitionCompleteCallback != null) {
+				transitionCompleteCallback();
+			}
+			transitionCompleteCallback = null;
 		}
 	}
 
 	this.IsTransitionActive = function() {
 		return isTransitioning;
+	}
+
+	// todo : should this be part of the constructor?
+	var transitionCompleteCallback = null;
+	this.OnTransitionComplete = function(callback) {
+		if (isTransitioning) { // TODO : safety check necessary?
+			transitionCompleteCallback = callback;
+		}
 	}
 
 	var transitionEffects = {};

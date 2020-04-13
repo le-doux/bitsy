@@ -1,10 +1,11 @@
 Write your game's title here
 
-# BITSY VERSION 6.5
+# BITSY VERSION 7.0
 
 ! ROOM_FORMAT 1
 
 PAL 0
+NAME blueprint
 0,82,204
 128,159,255
 255,255,255
@@ -26,6 +27,7 @@ ROOM 0
 0,a,0,0,0,0,0,0,0,0,0,0,0,0,a,0
 0,a,a,a,a,a,a,a,a,a,a,a,a,a,a,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+NAME example room
 PAL 0
 
 TIL a
@@ -37,6 +39,7 @@ TIL a
 10000001
 10000001
 11111111
+NAME block
 
 SPR A
 00011000
@@ -58,7 +61,8 @@ SPR a
 01111100
 00111100
 00100100
-DLG SPR_0
+NAME cat
+DLG 0
 POS 0 8,12
 
 ITM 0
@@ -71,13 +75,31 @@ ITM 0
 00011000
 00000000
 NAME tea
-DLG ITM_0
+DLG 1
 
-DLG SPR_0
+ITM 1
+00000000
+00111100
+00100100
+00111100
+00010000
+00011000
+00010000
+00011000
+NAME key
+DLG 2
+
+DLG 0
 I'm a cat
+NAME cat dialog
 
-DLG ITM_0
+DLG 1
 You found a nice warm cup of tea
+NAME tea dialog
+
+DLG 2
+A key! {wvy}What does it open?{wvy}
+NAME key dialog
 
 VAR a
 42

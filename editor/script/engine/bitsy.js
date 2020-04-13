@@ -3,7 +3,6 @@ var canvas;
 var context; // TODO : remove if safe?
 var ctx;
 
-var title = "";
 var room = {};
 var tile = {};
 var sprite = {};
@@ -15,9 +14,16 @@ var palette = { //start off with a default palette
 			colors : [[0,0,0],[255,255,255],[255,255,255]]
 		}
 	};
-var ending = {};
 var variable = {}; // these are starting variable values -- they don't update (or I don't think they will)
 var playerId = "A";
+
+var titleDialogId = "title";
+function getTitle() {
+	return dialog[titleDialogId].src;
+}
+function setTitle(titleSrc) {
+	dialog[titleDialogId] = { src:titleSrc, name:null };
+}
 
 var defaultFontName = "ascii_small";
 var fontName = defaultFontName;
@@ -32,42 +38,34 @@ var names = {
 	tile : new Map(), // Note: Not currently enabled in the UI
 	sprite : new Map(),
 	item : new Map(),
-	/*dialog : new Map()*/ // TODO
-	/*ending : new Map()*/ // TODO
+	dialog : new Map(),
 };
 function updateNamesFromCurData() {
-	names.room = new Map();
-	for(id in room) {
-		if(room[id].name != undefined && room[id].name != null) {
-			names.room.set( room[id].name, id );
+
+	function createNameMap(objectStore) {
+		var map = new Map();
+		for (id in objectStore) {
+			if (objectStore[id].name != undefined && objectStore[id].name != null) {
+				map.set(objectStore[id].name, id);
+			}
 		}
+		return map;
 	}
-	names.tile = new Map();
-	for(id in tile) {
-		if(tile[id].name != undefined && tile[id].name != null) {
-			names.tile.set( tile[id].name, id );
-		}
-	}
-	names.sprite = new Map();
-	for(id in sprite) {
-		if(sprite[id].name != undefined && sprite[id].name != null) {
-			names.sprite.set( sprite[id].name, id );
-		}
-	}
-	names.item = new Map();
-	for(id in item) {
-		if(item[id].name != undefined && item[id].name != null) {
-			names.item.set( item[id].name, id );
-		}
-	}
+
+	names.room = createNameMap(room);
+	names.tile = createNameMap(tile);
+	names.sprite = createNameMap(sprite);
+	names.item = createNameMap(item);
+	names.dialog = createNameMap(dialog);
 }
 
 var spriteStartLocations = {};
 
 /* VERSION */
 var version = {
-	major: 6, // major changes
-	minor: 5 // smaller changes
+	major: 7, // major changes
+	minor: 0, // smaller changes
+	devBuildPhase: "BETA",
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
@@ -88,7 +86,6 @@ var editorDevFlags = {
 };
 
 function clearGameData() {
-	title = "";
 	room = {};
 	tile = {};
 	sprite = {};
@@ -100,7 +97,6 @@ function clearGameData() {
 			colors : [[0,0,0],[255,255,255],[255,255,255]]
 		}
 	};
-	ending = {};
 	isEnding = false; //todo - correct place for this?
 	variable = {};
 
@@ -108,11 +104,13 @@ function clearGameData() {
 
 	spriteStartLocations = {};
 
+	// hacky to have this multiple times...
 	names = {
 		room : new Map(),
 		tile : new Map(),
 		sprite : new Map(),
-		item : new Map()
+		item : new Map(),
+		dialog : new Map(),
 	};
 
 	fontName = defaultFontName; // TODO : reset font manager too?
@@ -259,7 +257,7 @@ function onready(startWithTitle) {
 	update_interval = setInterval(update,16);
 
 	if(startWithTitle) { // used by editor 
-		startNarrating(title);
+		startNarrating(getTitle());
 	}
 }
 
@@ -278,112 +276,6 @@ function setInitialVariables() {
 		scriptInterpreter.SetVariable(id,value);
 	}
 	scriptInterpreter.SetOnVariableChangeHandler( onVariableChanged );
-}
-
-// TODO: this is likely broken
-function breadthFirstSearch(map, from, to) {
-	from.trail = [];
-	var visited = [];
-	var queue = [from];
-	visited.push( posToString(from) );
-
-	//console.log( "~ bfs ~");
-	//console.log( posToString(from) + " to " + posToString(to) );
-
-	while ( queue.length > 0 ) {
-
-		//grab pos from queue and mark as visited
-		var curPos = queue.shift();
-
-		//console.log( posToString(curPos) );
-		//console.log( ".. " + pathToString(curPos.trail) );
-		//console.log( visited );
-
-		if (curPos.x == to.x && curPos.y == to.y) {
-			//found a path!
-			var path = curPos.trail.splice(0);
-			path.push( curPos );
-			return path;
-		}
-
-		//look at neighbors
-		neighbors(curPos).forEach( function(n) {
-			var inBounds = (n.x >= 0 && n.x < 16 && n.y >= 0 && n.y < 16);
-			if (inBounds) {
-				var noCollision = map[n.y][n.x] <= 0;
-				var notVisited = visited.indexOf( posToString(n) ) == -1;
-				if (noCollision && notVisited) {
-					n.trail = curPos.trail.slice();
-					n.trail.push(curPos);
-					queue.push( n );
-					visited.push( posToString(n) );
-				}
-			}
-		});
-
-	}
-
-	return []; // no path found
-}
-
-function posToString(pos) {
-	return pos.x + "," + pos.y;
-}
-
-function pathToString(path) {
-	var s = "";
-	for (i in path) {
-		s += posToString(path[i]) + " ";
-	}
-	return s;
-}
-
-function neighbors(pos) {
-	var neighborList = [];
-	neighborList.push( {x:pos.x+1, y:pos.y+0} );
-	neighborList.push( {x:pos.x-1, y:pos.y+0} );
-	neighborList.push( {x:pos.x+0, y:pos.y+1} );
-	neighborList.push( {x:pos.x+0, y:pos.y-1} );
-	return neighborList;
-}
-
-function collisionMap(roomId) {
-	var map = [
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	];
-
-	for (r in room[roomId].tilemap) {
-		var row = room[roomId].tilemap[r];
-		for (var c = 0; c < row.length; c++) {
-			if (room[roomId].walls.indexOf( row[x] ) != -1) {
-				map[r][c] = 1;
-			}
-		}
-	}
-
-	for (id in sprite) {
-		var spr = sprite[id];
-		if (spr.room === roomId) {
-			map[spr.y][spr.x] = 2;
-		}
-	}
-
-	return map;
 }
 
 function getOffset(evt) {
@@ -557,9 +449,6 @@ function update() {
 			dialogRenderer.Draw( dialogBuffer, deltaTime );
 			dialogBuffer.Update( deltaTime );
 		}
-		else if (!isEnding) {
-			moveSprites(); // TODO : I probably need to remove this..
-		}
 
 		// keep moving avatar if player holds down button
 		if( !dialogBuffer.IsActive() && !isEnding )
@@ -700,71 +589,6 @@ function resetAllAnimations() {
 			itm.animation.frameIndex = 0;
 		}
 	}
-}
-
-var moveCounter = 0;
-var moveTime = 200;
-function moveSprites() {
-	moveCounter += deltaTime;
-
-	if (moveCounter >= moveTime) {
-
-		for (id in sprite) {
-			var spr = sprite[id];
-			if (spr.walkingPath.length > 0) {
-				//move sprite
-				var nextPos = spr.walkingPath.shift();
-				spr.x = nextPos.x;
-				spr.y = nextPos.y;
-
-
-				var end = getEnding( spr.room, spr.x, spr.y );
-				var ext = getExit( spr.room, spr.x, spr.y );
-				var itmIndex = getItemIndex( spr.room, spr.x, spr.y );
-				if (end) { //if the sprite hits an ending
-					if (id === playerId) { // only the player can end the game
-						startNarrating( ending[end.id], true /*isEnding*/ );
-					}
-				}
-				else if (ext) { //if the sprite hits an exit
-					//move it to another scene
-					spr.room = ext.dest.room;
-					spr.x = ext.dest.x;
-					spr.y = ext.dest.y;
-					if (id === playerId) {
-						//if the player changes scenes, change the visible scene
-						curRoom = ext.dest.room;
-					}
-				}
-				else if(itmIndex > -1) {
-					var itm = room[ spr.room ].items[ itmIndex ];
-					room[ spr.room ].items.splice( itmIndex, 1 );
-					if( spr.inventory[ itm.id ] ) {
-						spr.inventory[ itm.id ] += 1;
-					}
-					else {
-						spr.inventory[ itm.id ] = 1;
-					}
-
-					if (onInventoryChanged != null) {
-						onInventoryChanged( itm.id );
-					}
-
-					if (id === playerId) {
-						startItemDialog( itm.id  /*itemId*/ );
-					}
-
-					// stop moving : is this a good idea?
-					spr.walkingPath = [];
-				}
-
-				if (id === playerId) didPlayerMoveThisFrame = true;
-			}
-		}
-
-		moveCounter = 0;
-	}
-
 }
 
 function getSpriteAt(x,y) {
@@ -1009,46 +833,40 @@ function movePlayer(direction) {
 	
 	var ext = getExit( player().room, player().x, player().y );
 	var end = getEnding( player().room, player().x, player().y );
-	// TODO : vNext
-	// var eff = getEffect( player().room, player().x, player().y );
 	var itmIndex = getItemIndex( player().room, player().x, player().y );
 
 	// do items first, because you can pick up an item AND go through a door
 	if (itmIndex > -1) {
-		// TODO pick up items (what about touch?)
-		// console.log("HIT ITM ");
-		// console.log( itmIndex );
-		var itm = room[ player().room ].items[ itmIndex ];
-		// console.log(itm);
-		room[ player().room ].items.splice( itmIndex, 1 );
-		if( player().inventory[ itm.id ] ) {
-			player().inventory[ itm.id ] += 1;
-		}
-		else {
-			player().inventory[ itm.id ] = 1;
-		}
+		var itm = room[player().room].items[itmIndex];
+		var itemRoom = player().room;
 
-		if(onInventoryChanged != null) {
-			onInventoryChanged( itm.id );
-		}
+		startItemDialog(itm.id, function() {
+			// remove item from room
+			room[itemRoom].items.splice(itmIndex, 1);
 
-		startItemDialog( itm.id  /*itemId*/ );
+			// update player inventory
+			if (player().inventory[itm.id]) {
+				player().inventory[itm.id] += 1;
+			}
+			else {
+				player().inventory[itm.id] = 1;
+			}
 
-		// console.log( player().inventory );
+			// show inventory change in UI
+			if (onInventoryChanged != null) {
+				onInventoryChanged(itm.id);
+			}
+		});
 	}
 
 	if (end) {
-		startNarrating( ending[end.id], true /*isEnding*/ );
+		startEndingDialog(end);
 	}
 	else if (ext) {
 		movePlayerThroughExit(ext);
 	}
-	// TODO : vNext
-	// else if (eff) {
-	// 	startDialog( script[eff.id].source, eff.id );
-	// }
 	else if (spr) {
-		startSpriteDialog( spr /*spriteId*/ );
+		startSpriteDialog(spr /*spriteId*/);
 	}
 }
 
@@ -1065,22 +883,40 @@ function movePlayerThroughExit(ext) {
 		player().x = ext.dest.x;
 		player().y = ext.dest.y;
 		curRoom = ext.dest.room;
+
+		initRoom(curRoom);
 	};
 
-	// TODO : vNext
-	// if(ext.script_id != null && script[ext.script_id]){
-	// 	var scriptSourceStr = script[ext.script_id].source;
-	// 	startDialog(scriptSourceStr, ext.script_id, function(isExitUnlocked) {
-	// 		if (isExitUnlocked == true) {
-	// 			GoToDest();
-	// 		}
-	// 	});
-	// }
-	// else {
-	// 	GoToDest();
-	// }
+	if (ext.dlg != undefined && ext.dlg != null) {
+		// TODO : I need to simplify dialog code,
+		// so I don't have to get the ID and the source str
+		// every time!
+		startDialog(
+			dialog[ext.dlg].src,
+			ext.dlg,
+			function(result) {
+				var isLocked = ext.property && ext.property.locked === true;
+				if (!isLocked) {
+					GoToDest();
+				}
+			},
+			ext);
+	}
+	else {
+		GoToDest();
+	}
+}
 
-	GoToDest();
+function initRoom(roomId) {
+	// init exit properties
+	for (var i = 0; i < room[roomId].exits.length; i++) {
+		room[roomId].exits[i].property = { locked:false };
+	}
+
+	// init ending properties
+	for (var i = 0; i < room[roomId].endings.length; i++) {
+		room[roomId].endings[i].property = { locked:false };
+	}
 }
 
 function getItemIndex( roomId, x, y ) {
@@ -1173,17 +1009,6 @@ function getEnding(roomId,x,y) {
 	return null;
 }
 
-// TODO : vNext
-// function getEffect(roomId,x,y) {
-// 	for (i in room[roomId].effects) {
-// 		var e = room[roomId].effects[i];
-// 		if (x == e.x && y == e.y) {
-// 			return e;
-// 		}
-// 	}
-// 	return null;
-// }
-
 function getTile(x,y) {
 	// console.log(x + " " + y);
 	var t = getRoom().tilemap[y][x];
@@ -1212,16 +1037,19 @@ function isSpriteOffstage(id) {
 }
 
 function parseWorld(file) {
-	// console.log("~~~ PARSE WORLD ~~~");
-	// console.log(file);
-
-	// var parseTimer = new Timer();
-
 	spriteStartLocations = {};
 
 	resetFlags();
 
 	var versionNumber = 0;
+
+	// flags to keep track of which compatibility conversions
+	// need to be applied to this game data
+	var compatibilityFlags = {
+		convertSayToPrint : false,
+		combineEndingsWithDialog : false,
+		convertImplicitSpriteDialogIds : false,
+	};
 
 	var lines = file.split("\n");
 	var i = 0;
@@ -1237,6 +1065,15 @@ function parseWorld(file) {
 			// collect version number (from a comment.. hacky I know)
 			if (curLine.indexOf("# BITSY VERSION ") != -1) {
 				versionNumber = parseFloat(curLine.replace("# BITSY VERSION ", ""));
+
+				if (versionNumber < 5.0) {
+					compatibilityFlags.convertSayToPrint = true;
+				}
+
+				if (versionNumber < 7.0) {
+					compatibilityFlags.combineEndingsWithDialog = true;
+					compatibilityFlags.convertImplicitSpriteDialogIds = true;
+				}
 			}
 
 			//skip blank lines & comments
@@ -1246,7 +1083,7 @@ function parseWorld(file) {
 			i = parsePalette(lines, i);
 		}
 		else if (getType(curLine) === "ROOM" || getType(curLine) === "SET") { //SET for back compat
-			i = parseRoom(lines, i);
+			i = parseRoom(lines, i, compatibilityFlags);
 		}
 		else if (getType(curLine) === "TIL") {
 			i = parseTile(lines, i);
@@ -1261,15 +1098,12 @@ function parseWorld(file) {
 			i = parseDrawing(lines, i);
 		}
 		else if (getType(curLine) === "DLG") {
-			i = parseDialog(lines, i);
+			i = parseDialog(lines, i, compatibilityFlags);
 		}
-		else if (getType(curLine) === "END") {
-			i = parseEnding(lines, i);
+		else if (getType(curLine) === "END" && compatibilityFlags.combineEndingsWithDialog) {
+			// parse endings for back compat
+			i = parseEnding(lines, i, compatibilityFlags);
 		}
-		// TODO: vNext
-		// else if (getType(curLine) === "PRG") {
-		// 	i = parseScript(lines, i);
-		// }
 		else if (getType(curLine) === "VAR") {
 			i = parseVariable(lines, i);
 		}
@@ -1306,15 +1140,50 @@ function parseWorld(file) {
 		curRoom = null;
 	}
 
-	console.log("START ROOM " + curRoom);
+	if (curRoom != null) {
+		initRoom(curRoom);
+	}
 
 	renderer.SetPalettes(palette);
 
-	// console.log(names);
-
-	// console.log("~~~~~ PARSE TIME " + parseTimer.Milliseconds());
+	scriptCompatibility(compatibilityFlags);
 
 	return versionNumber;
+}
+
+function scriptCompatibility(compatibilityFlags) {
+	if (compatibilityFlags.convertSayToPrint) {
+		console.log("CONVERT SAY TO PRINT!");
+
+		var PrintFunctionVisitor = function() {
+			var didChange = false;
+			this.DidChange = function() { return didChange; };
+
+			this.Visit = function(node) {
+				if (node.type != "function") {
+					return;
+				}
+
+				if (node.name === "say") {
+					node.name = "print";
+					didChange = true;
+				}
+			};
+		};
+
+		for (dlgId in dialog) {
+			var dialogScript = scriptInterpreter.Parse(dialog[dlgId].src);
+			var visitor = new PrintFunctionVisitor();
+			dialogScript.VisitAll(visitor);
+			if (visitor.DidChange()) {
+				var newDialog = dialogScript.Serialize();
+				if (newDialog.indexOf("\n") > -1) {
+					newDialog = '"""\n' + newDialog + '\n"""';
+				}
+				dialog[dlgId].src = newDialog;
+			}
+		}
+	}
 }
 
 //TODO this is in progress and doesn't support all features
@@ -1324,10 +1193,13 @@ function serializeWorld(skipFonts) {
 
 	var worldStr = "";
 	/* TITLE */
-	worldStr += title + "\n";
+	worldStr += getTitle() + "\n";
 	worldStr += "\n";
 	/* VERSION */
 	worldStr += "# BITSY VERSION " + getEngineVersion() + "\n"; // add version as a comment for debugging purposes
+	if (version.devBuildPhase != "RELEASE") {
+		worldStr += "# DEVELOPMENT BUILD -- " + version.devBuildPhase;
+	}
 	worldStr += "\n";
 	/* FLAGS */
 	for (f in flags) {
@@ -1413,10 +1285,9 @@ function serializeWorld(skipFonts) {
 					if (e.transition_effect != undefined && e.transition_effect != null) {
 						worldStr += " FX " + e.transition_effect;
 					}
-					// TODO : vNext
-					// if (e.script_id != undefined && e.script_id != null) {
-					// 	worldStr += " PRG " + e.script_id;
-					// }
+					if (e.dlg != undefined && e.dlg != null) {
+						worldStr += " DLG " + e.dlg;
+					}
 					worldStr += "\n";
 				}
 			}
@@ -1430,15 +1301,6 @@ function serializeWorld(skipFonts) {
 				worldStr += "\n";
 			}
 		}
-		// TODO : vNext
-		// if (room[id].effects.length > 0) {
-		// 	/* EFFECTS */
-		// 	for (j in room[id].effects) {
-		// 		var e = room[id].effects[j];
-		// 		worldStr += "EFF " + e.id + " " + e.x + "," + e.y;
-		// 		worldStr += "\n";
-		// 	}
-		// }
 		if (room[id].pal != null && room[id].pal != "default") {
 			/* PALETTE */
 			worldStr += "PAL " + room[id].pal + "\n";
@@ -1508,31 +1370,15 @@ function serializeWorld(skipFonts) {
 	}
 	/* DIALOG */
 	for (id in dialog) {
-		worldStr += "DLG " + id + "\n";
-		worldStr += dialog[id] + "\n";
-		worldStr += "\n";
+		if (id != titleDialogId) {
+			worldStr += "DLG " + id + "\n";
+			worldStr += dialog[id].src + "\n";
+			if (dialog[id].name != null) {
+				worldStr += "NAME " + dialog[id].name + "\n";
+			}
+			worldStr += "\n";
+		}
 	}
-	/* ENDINGS */
-	for (id in ending) {
-		worldStr += "END " + id + "\n";
-		worldStr += ending[id] + "\n";
-		worldStr += "\n";
-	}
-	// TODO : vNext
-	// /* SCRIPTS */
-	// for (id in script) {
-	// 	if (script[id].type == ScriptType.Dialogue) {
-	// 		worldStr += "DLG " + id + "\n";
-	// 	}
-	// 	else if (script[id].type == ScriptType.Ending) {
-	// 		worldStr += "END " + id + "\n";
-	// 	}
-	// 	else {
-	// 		worldStr += "PRG " + id + "\n";
-	// 	}
-	// 	worldStr += script[id].source + "\n";
-	// 	worldStr += "\n";
-	// }
 	/* VARIABLES */
 	for (id in variable) {
 		worldStr += "VAR " + id + "\n";
@@ -1601,12 +1447,16 @@ function getCoord(line,arg) {
 }
 
 function parseTitle(lines, i) {
-	title = lines[i];
+	var results = scriptUtils.ReadDialogScript(lines,i);
+	setTitle(results.script);
+	i = results.index;
+
 	i++;
+
 	return i;
 }
 
-function parseRoom(lines, i) {
+function parseRoom(lines, i, compatibilityFlags) {
 	var id = getId(lines[i]);
 	room[id] = {
 		id : id,
@@ -1614,7 +1464,6 @@ function parseRoom(lines, i) {
 		walls : [],
 		exits : [],
 		endings : [],
-		// effects : [], // TODO vNext
 		items : [],
 		pal : null,
 		name : null
@@ -1712,8 +1561,7 @@ function parseRoom(lines, i) {
 					y : parseInt(destCoords[1])
 				},
 				transition_effect : null,
-				// TODO : vNext
-				// script_id : null,
+				dlg: null,
 			};
 
 			// optional arguments
@@ -1723,11 +1571,10 @@ function parseRoom(lines, i) {
 					ext.transition_effect = exitArgs[exitArgIndex+1];
 					exitArgIndex += 2;
 				}
-				// TODO : vNext
-				// else if (exitArgs[exitArgIndex] == "PRG") {
-				// 	ext.script_id = exitArgs[exitArgIndex+1];
-				// 	exitArgIndex += 2;
-				// }
+				else if (exitArgs[exitArgIndex] == "DLG") {
+					ext.dlg = exitArgs[exitArgIndex+1];
+					exitArgIndex += 2;
+				}
 				else {
 					exitArgIndex += 1;
 				}
@@ -1737,27 +1584,22 @@ function parseRoom(lines, i) {
 		}
 		else if (getType(lines[i]) === "END") {
 			/* ADD ENDING */
-			var endId = getId( lines[i] );
-			var endCoords = getCoord( lines[i], 2 );
+			var endId = getId(lines[i]);
+
+			// compatibility with when endings were stored separate from other dialog
+			if (compatibilityFlags.combineEndingsWithDialog) {
+				endId = "end_" + endId;
+			}
+
+			var endCoords = getCoord(lines[i], 2);
 			var end = {
 				id : endId,
-				x : parseInt( endCoords[0] ),
-				y : parseInt( endCoords[1] )
+				x : parseInt(endCoords[0]),
+				y : parseInt(endCoords[1])
 			};
+
 			room[id].endings.push(end);
 		}
-		// TODO : vNext
-		// else if (getType(lines[i]) === "EFF") {
-		// 	/* ADD EFFECT */
-		// 	var effectId = getId( lines[i] );
-		// 	var effectCoords = getCoord( lines[i], 2 );
-		// 	var effect = {
-		// 		id : effectId,
-		// 		x : parseInt( effectCoords[0] ),
-		// 		y : parseInt( effectCoords[1] ),
-		// 	};
-		// 	room[id].effects.push(effect);
-		// }
 		else if (getType(lines[i]) === "PAL") {
 			/* CHOOSE PALETTE (that's not default) */
 			room[id].pal = getId(lines[i]);
@@ -1765,10 +1607,12 @@ function parseRoom(lines, i) {
 		else if (getType(lines[i]) === "NAME") {
 			var name = lines[i].split(/\s(.+)/)[1];
 			room[id].name = name;
-			names.room.set( name, id);
+			names.room.set(name, id);
 		}
+
 		i++;
 	}
+
 	return i;
 }
 
@@ -1779,7 +1623,7 @@ function parsePalette(lines,i) { //todo this has to go first right now :(
 	var name = null;
 	while (i < lines.length && lines[i].length > 0) { //look for empty line
 		var args = lines[i].split(" ");
-		if(args[0] === "NAME") {
+		if (args[0] === "NAME") {
 			name = lines[i].split(/\s(.+)/)[1];
 		}
 		else {
@@ -1920,7 +1764,6 @@ function parseSprite(lines, i) {
 		room : null, //default location is "offstage"
 		x : -1,
 		y : -1,
-		walkingPath : [], //tile by tile movement path (isn't saved)
 		animation : {
 			isAnimated : (renderer.GetFrameCount(drwId) > 1),
 			frameIndex : 0,
@@ -2040,43 +1883,48 @@ function parseDrawingCore(lines, i, drwId) {
 	return i;
 }
 
-// TODO : vNext
-// var ScriptType = {
-// 	Script : 0,
-// 	Dialogue : 1, // TODO : move everything to this spelling?
-// 	Ending : 2,
-// };
-
-function parseScript(lines, i, objectStore) {
-	// TODO : vNext
-	// if (scriptType === undefined || scriptType === null) {
-	// 	scriptType = ScriptType.Script;
-	// }
-
+function parseScript(lines, i, backCompatPrefix, compatibilityFlags) {
 	var id = getId(lines[i]);
+	id = backCompatPrefix + id;
 	i++;
 
 	var results = scriptUtils.ReadDialogScript(lines,i);
 
-	// TODO : vNext
-	// script[id] = {
-	// 	source: results.script,
-	// 	type: scriptType,
-	// };
+	dialog[id] = { src:results.script, name:null };
 
-	objectStore[id] = results.script;
+	if (compatibilityFlags.convertImplicitSpriteDialogIds) {
+		// explicitly hook up dialog that used to be implicitly
+		// connected by sharing sprite and dialog IDs in old versions
+		if (sprite[id]) {
+			if (sprite[id].dlg === undefined || sprite[id].dlg === null) {
+				sprite[id].dlg = id;
+			}
+		}
+	}
 
 	i = results.index;
 
 	return i;
 }
 
-function parseDialog(lines, i) {
-	return parseScript(lines, i, dialog);
+function parseDialog(lines, i, compatibilityFlags) {
+	// hacky but I need to store this so I can set the name below
+	var id = getId(lines[i]);
+
+	i = parseScript(lines, i, "", compatibilityFlags);
+
+	if (lines[i].length > 0 && getType(lines[i]) === "NAME") {
+		dialog[id].name = lines[i].split(/\s(.+)/)[1]; // TODO : hacky to keep copying this regex around...
+		names.dialog.set(dialog[id].name, id);
+		i++;
+	}
+
+	return i;
 }
 
-function parseEnding(lines, i) {
-	return parseScript(lines, i, ending);
+// keeping this around to parse old files where endings were separate from dialogs
+function parseEnding(lines, i, compatibilityFlags) {
+	return parseScript(lines, i, "end_", compatibilityFlags);
 }
 
 function parseVariable(lines, i) {
@@ -2254,12 +2102,20 @@ var dialogBuffer = dialogModule.CreateBuffer();
 var fontManager = new FontManager();
 
 function onExitDialog(scriptResult, dialogCallback) {
+	console.log("EXIT DIALOG!");
+
 	isDialogMode = false;
-	if (isNarrating) isNarrating = false;
+
+	if (isNarrating) {
+		isNarrating = false;
+	}
+
 	if (isDialogPreview) {
 		isDialogPreview = false;
-		if (onDialogPreviewEnd != null)
+
+		if (onDialogPreviewEnd != null) {
 			onDialogPreviewEnd();
+		}
 	}
 
 	if (dialogCallback != undefined && dialogCallback != null) {
@@ -2277,35 +2133,57 @@ TODO
 function startNarrating(dialogStr,end) {
 	console.log("NARRATE " + dialogStr);
 
-	if(end === undefined) end = false;
+	if(end === undefined) {
+		end = false;
+	}
 
 	isNarrating = true;
 	isEnding = end;
+
 	startDialog(dialogStr);
 }
 
-function startItemDialog(itemId) {
+function startEndingDialog(ending) {
+	isNarrating = true;
+	isEnding = true;
+
+	startDialog(
+		dialog[ending.id].src,
+		ending.id,
+		function() {
+			var isLocked = ending.property && ending.property.locked === true;
+			if (isLocked) {
+				isEnding = false;
+			}
+		},
+		ending);
+}
+
+function startItemDialog(itemId, dialogCallback) {
 	var dialogId = item[itemId].dlg;
 	// console.log("START ITEM DIALOG " + dialogId);
-	if(dialog[dialogId]){
-		var dialogStr = dialog[dialogId];
-		startDialog(dialogStr,dialogId);
+	if (dialog[dialogId]) {
+		var dialogStr = dialog[dialogId].src;
+		startDialog(dialogStr, dialogId, dialogCallback);
+	}
+	else {
+		dialogCallback();
 	}
 }
 
 function startSpriteDialog(spriteId) {
 	var spr = sprite[spriteId];
-	var dialogId = spr.dlg ? spr.dlg : spriteId;
+	var dialogId = spr.dlg;
 	// console.log("START SPRITE DIALOG " + dialogId);
-	if(dialog[dialogId]){
-		var dialogStr = dialog[dialogId];
+	if (dialog[dialogId]){
+		var dialogStr = dialog[dialogId].src;
 		startDialog(dialogStr,dialogId);
 	}
 }
 
-function startDialog(dialogStr,scriptId,dialogCallback) {
+function startDialog(dialogStr, scriptId, dialogCallback, objectContext) {
 	// console.log("START DIALOG ");
-	if(dialogStr.length <= 0) {
+	if (dialogStr.length <= 0) {
 		// console.log("ON EXIT DIALOG -- startDialog 1");
 		onExitDialog(dialogCallback);
 		return;
@@ -2314,9 +2192,9 @@ function startDialog(dialogStr,scriptId,dialogCallback) {
 	isDialogMode = true;
 
 	dialogRenderer.Reset();
-	dialogRenderer.SetCentered( isNarrating /*centered*/ );
+	dialogRenderer.SetCentered(isNarrating /*centered*/);
 	dialogBuffer.Reset();
-	scriptInterpreter.SetDialogBuffer( dialogBuffer );
+	scriptInterpreter.SetDialogBuffer(dialogBuffer);
 
 	var onScriptEnd = function(scriptResult) {
 		dialogBuffer.OnDialogEnd(function() {
@@ -2324,21 +2202,21 @@ function startDialog(dialogStr,scriptId,dialogCallback) {
 		});
 	};
 
-	if(scriptId === undefined) {
-		scriptInterpreter.Interpret( dialogStr, onScriptEnd );
+	if (scriptId === undefined) { // TODO : what's this for again?
+		scriptInterpreter.Interpret(dialogStr, onScriptEnd);
 	}
 	else {
-		if( !scriptInterpreter.HasScript(scriptId) ) {
-			scriptInterpreter.Compile( scriptId, dialogStr );
+		if (!scriptInterpreter.HasScript(scriptId)) {
+			scriptInterpreter.Compile(scriptId, dialogStr);
 		}
-		scriptInterpreter.DebugVisualizeScriptTree(scriptId);
-		scriptInterpreter.Run( scriptId, onScriptEnd );
+		// scriptInterpreter.DebugVisualizeScript(scriptId);
+		scriptInterpreter.Run(scriptId, onScriptEnd, objectContext);
 	}
 
 }
 
 var isDialogPreview = false;
-function startPreviewDialog(script, onScriptEnd) {
+function startPreviewDialog(script, dialogCallback) {
 	isNarrating = true;
 
 	isDialogMode = true;
@@ -2346,13 +2224,20 @@ function startPreviewDialog(script, onScriptEnd) {
 	isDialogPreview = true;
 
 	dialogRenderer.Reset();
-	dialogRenderer.SetCentered( true );
+	dialogRenderer.SetCentered(true);
 	dialogBuffer.Reset();
-	scriptInterpreter.SetDialogBuffer( dialogBuffer );
+	scriptInterpreter.SetDialogBuffer(dialogBuffer);
 
-	onDialogPreviewEnd = onScriptEnd;
+	// TODO : do I really need a seperate callback for this debug mode??
+	onDialogPreviewEnd = dialogCallback;
 
-	scriptInterpreter.Eval( script, null );
+	var onScriptEndCallback = function(scriptResult) {
+		dialogBuffer.OnDialogEnd(function() {
+			onExitDialog(scriptResult, null);
+		});
+	};
+
+	scriptInterpreter.Eval(script, onScriptEndCallback);
 }
 
 /* NEW SCRIPT STUFF */
