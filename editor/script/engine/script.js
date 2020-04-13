@@ -1028,7 +1028,7 @@ function isUndefinedBlock(node) {
 	return node.type === "code_block" && node.children.length > 0 && node.children[0].type === "undefined";
 }
 
-var textEffectBlockNames = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw", "printSprite", "printItem", "printTile", "print", "say"];
+var textEffectBlockNames = ["clr1", "clr2", "clr3", "wvy", "shk", "rbw", "printSprite", "printItem", "printTile", "print", "say", "br"];
 function isTextEffectBlock(node) {
 	if (node.type === "code_block") {
 		if (node.children.length > 0 && node.children[0].type === "function") {
@@ -1637,7 +1637,7 @@ var Parser = function(env) {
 		The parsing of those code blocks is handled by ParseCode.
 
 		Note on parsing newline characters:
-		- there should be a linebreak {br} inbetween each pair of dialog lines
+		- there should be an implicit linebreak {br} after each dialog line
 		- a "dialog line" is defined as any line that either:
 			- 1) contains dialog text (any text outside of a code block)
 			- 2) is entirely empty (no text, no code)
@@ -1694,7 +1694,7 @@ var Parser = function(env) {
 		}
 
 		var tryAddLinebreakNodeToList = function() {
-			if (prevLineIsDialogLine && curLineIsDialogLine()) {
+			if (prevLineIsDialogLine) {
 				var linebreakNode = new FuncNode("br", []);
 				curLineNodeList.unshift(linebreakNode);
 			}
