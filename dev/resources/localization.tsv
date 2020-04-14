@@ -7,7 +7,7 @@ author_by	by	par	de	por	di	от	av	von	بواسطة	eftir	készítette:	de	autor
 author_twitter	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux	@adamledoux
 about_tool_name	about	à propos	sobre	sobre	A proposito di 	о битси	info	Über	عن	upplýsingar	a bitsyről	pri	bitsy kohta	相关	info	説明	ikta bitsy?
 room_tool_name	room	salle	sala	room	stanza	пространство	rum	Räume	غرفة	rými	szoba	ĉambro	tuba	房间	pomieszczenie	ルーム	loom
-exits_tool_name	exits	sorties	saídas	salidas	uscite	точки выхода	utgång	Übergänge	مخارج	útgangar	kijáratok	pordoj	väljapääsud	出口	wyjścia	出口	lapot
+exits_tool_name	exits	sorties	saídas	salidas	uscite	точки выхода	utgång	Übergänge	مخارج	útgangar	kijáratok	pordoj	väljapääsud	出口	przejścia	出口	lapot
 endings_tool_name	endings	fins	finais	finales	finali	концовки	slut	Enden	نهايات	endar	befejezések	ludofinoj	lõpud	结局	zakończenia	エンディング	kopit
 paint_tool_name	paint	dessin	desenhar	dibujar	disegna	рисовать	rita	Zeichnen	أرسم	teikna	rajz	desegnejo	joonista	画图	rysowanie	ペイント	pint
 explorer_tool_name	find drawing	trouver un dessin	procurar desenho	buscar dibujo	cerca disegno	найти рисунок	hitta bilder	Alle Zeichnungen	أبحث عن رسم	teikningar	rajz keresése	trovu desegnon	otsi joonistusi	素材库	znajdź rysunek	絵を探す	tlap picha
@@ -73,11 +73,11 @@ palette_tile	tile color	couleur des tiles	côr das tiles	color del tile	colore d
 palette_sprite	sprite color	couleur du sprite	côr das sprites	color del sprite	colore dello sprite	цвет спрайта	sprite-färg	Sprite Farbe	لون الرسمة التفاعلية	sprotalitur	sprite színe	enludana koloro	kujude värv	精灵颜色	kolor sprite'a	スプライト色	tilikum tsum
 palette_tool_advanced	palette select	sélectionner une palette	escolher uma palete	selecciona una paleta	selezionare una palette	выбрать палитру	välj palett	Ausgewählte Farbpalette	أختيار لوحة الألوان	litaval	színpaletta kiválasztása	elektu koloraron	vali palett	调色板选择	wybór palety	パレット選択	pik loom tsum-hayu
 name_label	name	nom	nome	nombre	nome	имя	namn	Name	الأسم	nafn	név	nomo	nimi	名字	nazwa	名前	nim
-exit_new	place new exit	ajouter une nouvelle sortie	colocar uma nova saída	coloca una nueva salida	piazza una nuova uscita	расположить новую точку выхода	placera ny utgång	Platziere neuen Ausgang	وضع مخرج جديد	setja nýja útgönguleið	új kijárat elhelyezése	metu novan pordon	aseta uus väljapääs	放置新出口	umieść nowe wyjście	新規出口の配置	munk-mitlait chi lapot
-exit_selected	selected exit	sortie sélectionnée	saída selecionada	salida seleccionada	uscita selezionata	выбрать точку выхода	vald utgång	Ausgewählter Ausgang	المخرج المختار	valin útgönguleið	kiválasztott kijárat	ĉi pordo	hetkel valitud väljapääs	已选中的出口	wybrane wyjście	出口選択中	okok lapot
-exit_selected_none	no exit selected	pas de sortie sélectionnée	não há uma saída selecionada	no has seleccionado una salida	non hai selezionato nessuna uscita	ни одна точка выхода не выбрана	ingen vald utgång	Kein Ausgang ausgewählt	لم يتم إختيار مخرج	engin útgönguleið valin	nincs kijárat kiválasztva	elektu pordon	hetkel pole ühtki väljapääsu valitud	没有出口被选中	nie wybrano żadnego wyjścia	出口未選択	ikta lapot?
-exit_destination	this exit goes to	cette sortie va à	esta saída leva-te a	esta salida te lleva a	questa uscita ti porta a	эта точка выхода ведет к	denna utgång leder till	Dieser Ausgang führt zu	هذا المخرج يؤدي إلى	þessi útgönguleið fer til	kijárat ide	ĉi pordo iras al	see väljapääs viib	这个出口去向	to wyjście prowadzi do	この出口はここに向かいます	okok lapot tlatawa
-exit_delete	delete selected exit	supprimer la sortie sélectionnée	apagar saída selecionada	borrar salida seleccionada	cancella uscita selezionata	удалить выбранную точку выхода	ta bort den valda utgången	Ausgewählten Ausgang löschen	إزالة المخرج المختار	eyða valdri útgönguleið	kiválasztott kijárat törlése	forigu ĉi pordon	kustuta valitud väljapääs	删除已选中的出口	usuń wybrane wyjście	選択中の出口の削除	munk-heilo okok lapot
+exit_new	place new exit	ajouter une nouvelle sortie	colocar uma nova saída	coloca una nueva salida	piazza una nuova uscita	расположить новую точку выхода	placera ny utgång	Platziere neuen Ausgang	وضع مخرج جديد	setja nýja útgönguleið	új kijárat elhelyezése	metu novan pordon	aseta uus väljapääs	放置新出口	umieść nowe przejście	新規出口の配置	munk-mitlait chi lapot
+exit_selected	selected exit	sortie sélectionnée	saída selecionada	salida seleccionada	uscita selezionata	выбрать точку выхода	vald utgång	Ausgewählter Ausgang	المخرج المختار	valin útgönguleið	kiválasztott kijárat	ĉi pordo	hetkel valitud väljapääs	已选中的出口	wybrane przejście	出口選択中	okok lapot
+exit_selected_none	no exit selected	pas de sortie sélectionnée	não há uma saída selecionada	no has seleccionado una salida	non hai selezionato nessuna uscita	ни одна точка выхода не выбрана	ingen vald utgång	Kein Ausgang ausgewählt	لم يتم إختيار مخرج	engin útgönguleið valin	nincs kijárat kiválasztva	elektu pordon	hetkel pole ühtki väljapääsu valitud	没有出口被选中	nie wybrano żadnego przejścia	出口未選択	ikta lapot?
+exit_destination	this exit goes to	cette sortie va à	esta saída leva-te a	esta salida te lleva a	questa uscita ti porta a	эта точка выхода ведет к	denna utgång leder till	Dieser Ausgang führt zu	هذا المخرج يؤدي إلى	þessi útgönguleið fer til	kijárat ide	ĉi pordo iras al	see väljapääs viib	这个出口去向	to przejście prowadzi do	この出口はここに向かいます	okok lapot tlatawa
+exit_delete	delete selected exit	supprimer la sortie sélectionnée	apagar saída selecionada	borrar salida seleccionada	cancella uscita selezionata	удалить выбранную точку выхода	ta bort den valda utgången	Ausgewählten Ausgang löschen	إزالة المخرج المختار	eyða valdri útgönguleið	kiválasztott kijárat törlése	forigu ĉi pordon	kustuta valitud väljapääs	删除已选中的出口	usuń wybrane przejście	選択中の出口の削除	munk-heilo okok lapot
 language_label	language	langue	linguagem	idioma	lingua	язык	språk	Sprache	اللغة	tungumál	nyelv	lingvo	keel	语言	język	言語	le-lang
 gif_start	start recording	commencer l'enregistrement	começar gravação	empezar grabación	inizia la registrazione	начать запись	starta inspelning	Aufnahme starten	أبدأ التسجيل	hefja upptöku	felvétel indítása	komencu krei	alusta lindistamist	开始录制	nagrywaj	録画開始	mamook chi GIF
 gif_stop	stop recording	arrêter l'enregistrement 	parar gravação	parar grabación	ferma la registrazione	остановить запись	stoppa inspelning	Aufnahme stoppen	أوقف التسجيل	stöðva upptöku	felvétel leállítása	malkomencu krei	lõpeta lindistamine	停止录制	zatrzymaj nagrywanie	録画停止	kopit mamook GIF
@@ -98,7 +98,7 @@ animation_frame2	frame 2	calque 2	frame 2	frame 2	frame 2	кадр 2	bild 2	Fram
 play_game	play	jouer	jogar	jugar	gioca	играть	spela	Spielen	ألعب	spila	lejátszás	provu la ludon	mängi	玩	graj	プレイ	nanich hihi
 room_tool_advanced	room tools	outils d'édition de salle	outras ferramentas para a edição de sala	herramientas de juego	strumenti della stanza	настройки пространства	rum-verktyg	Raum-Werkzeuge	أدوات الغرفة	rýmistól	szoba eszközök	ĉambraĵoj	toa tööriistad	房间工具	narzędzia pomieszczenia	ルームツール	loom iktas
 walls_toggle_visible	walls	murs	paredes	muros	muri	стены	väggar	Wände	حوائط	veggir	falak	muroj	seinad	墙	ściany	壁	kalahan
-room_add_exits	add exits	ajouter une sortie	adicionar saídas	añadir salidas	aggiungi uscite	добавить точку выхода	lägg till utgångar	Ausgang hinzufügen	إضافة المخارج	bæta við útgönguleiðum	kijárat hozzáadása	aldonu pordojn	lisa väljapääsud	增加出口	dodaj wyjścia	出口追加	mash lapot
+room_add_exits	add exits	ajouter une sortie	adicionar saídas	añadir salidas	aggiungi uscite	добавить точку выхода	lägg till utgångar	Ausgang hinzufügen	إضافة المخارج	bæta við útgönguleiðum	kijárat hozzáadása	aldonu pordojn	lisa väljapääsud	增加出口	dodaj przejścia	出口追加	mash lapot
 room_add_endings	add endings	ajouter une fin	adicionar finais	añadir finales	aggiungi finali	добавить концовку	lägg till slut	Ende hinzufügen	إضافة النهايات	bæta við endalokum	befejezés hozzáadása	aldonu ludofinojn	lisa lõpud	增加结局	dodaj zakończenia	エンディング追加	mash kopit-skwil
 items_label	items	items	items	items	oggetti	предметы	föremål	Objekte	أدوات	hlutir	tárgyak	objektoj	esemed	物品	przedmioty	アイテム	iktas
 variables_label	variables	variables	variáveis	variables	variabili	переменные	variabler	Variablen	متغيرات	breytur	változók	ŝanĝeblaj numeroj	muutujad	变量	zmienne	変数	huyhuy-nampa
@@ -146,7 +146,7 @@ default_title	Write your game's title here	Ecris le nom de ton jeu ici	Escreve o
 font_missing_character	The current font is missing some of the characters used in your dialog. Not all text in your game will display correctly. Consider picking a different font in the settings.	Certains caractères utilisés dans tes dialogues ne sont pas présents dans la police d'écriture sélectionnée. Certains textes ne s'afficheront pas correctement. Peut-être devrais-tu changer de police d'écriture dans les paramètres.	A fonte actual não possui alguns dos caracteres usados no teu diálogo. Partes do texto no teu jogo podem não aparecer correctamente. Considera escolher uma fonte diferente nas definições.		Al font attuale mancano alcuni caratteri usati nel tuo dialogo. Il testo del tuo gioco non apparità correttamente. Prova a scegliere un font diverso nelle impostazioni. 	выбранный шрифт не поддерживает некоторые символы, использованные в диалогах. не весь текст в игре будет отображён правильным образом. вы можете выбрать другой шрифт в настройках.	Det valda typsnittet saknar vissa tecken du har använt. En del av texten kommer inte att se rätt ut. Ett annat typsnitt kan väljas i inställningarna.	Die aktuelle Schriftart unterstützt nicht alle Zeichen aus deinem Dialog. Das kann merkwürdig aussehen. Wähle lieber eine andere Schriftart in den Einstellungen.	هذا الخط ينقصة بعض الرموز التي تستخدمها في حوارك. بعض الجمل قد تظهر بشكل خاطئ. يفضل أن تختار خط أخر من الإعدادات	Valið letur inniheldur ekki alla stafi sem koma fyrir í textanum þínum. Stafir sem eru ekki til staðir verða ekki sýnilegir í leiknum. Þú getur prófað að velja annað letur í leikjastillingunum.	A kiválasztott betűtípus nem tartalmazza az összes betűt, amit használsz. Válassz egy másik betűtípust a beálllításoknál!	La nuna tiparo mankas kelkajn literojn de viaj skriboj, do kiam la ludo ludiĝas oni ne vidos ĉion el via skribo. Pensu pri elekti alian tiparon je la elektaro.	Valitud fondil puudub mõned tähed, mida oled kasutanud oma dialoogis. Osa sinu mängu tekstist ei ilmu õigesti. Ehk tahad valida teist fonti seadetes.	使用在你对话中的当前字体中有一些字母丢失。你的游戏中的文字不能完全显示正确。请考虑在设置中选一个不同的字体。	Bieżąca czcionka nie posiada niektórych znaków, użytych w twoim dialogu. Nie wszystkie teksty w twojej grze zostaną wyświetlone prawidłowo. Rozważ wybranie innej czcionki, w panelu ustawienia.		alta maika tsum pipa kopa maika hihi, pi olo iht tsum ("character") kopa maika pipa-tsum ("font"). spos tilikum nanich maika hihi, wik kata nanich kanawei maika pipa. tlosh spos maika pik huloima pipa-tsum.
 open_settings	open settings	ouvrir les paramètres	abrir definições		apri le impostazioni	открыть настройки	öppna inställningar	Öffne Einstellungen	أفتح الإعدادات	opna stillingar	beállítások megnyitása	vidu la elektaron	ava seaded	开启设置	otwórz ustawienia		nanich setins
 close_label	close	fermer	fechar		chiudi	закрыть	stäng	Schließen	أغلق	loka	bezárás	malvidu	sulge	关闭	zamknij		ipui
-exit_click_add	click space in room to add exit	Cliquer un espace dans la salle pour ajouter une sortie	clica num espaço da sala para adicionar uma saída		clicca nella stanza per aggiungere l'uscita	кликните в панели пространства, чтобы добавить точку выхода	klicka i rummet för att lägga till en utgång	Drücke Leertaste im Raum um einen Ausgang hinzuzufügen	حدد فراغ في الغرفة لوضع النهاية	smelltu á reit í rýminu til að bæta við útgönguleið	kattints valahova a szobában a kijárat elhelyezéséhez	klaku spacon enĉambre por aldoni pordon		在房间中选中格子增加出口	kliknij na wolnym miejscu w pomieszczeniu, aby dodać wyjście		spos maika tiki mash lapot, kwutl skwil (lapot-ilahi) kopa loom.
+exit_click_add	click space in room to add exit	Cliquer un espace dans la salle pour ajouter une sortie	clica num espaço da sala para adicionar uma saída		clicca nella stanza per aggiungere l'uscita	кликните в панели пространства, чтобы добавить точку выхода	klicka i rummet för att lägga till en utgång	Drücke Leertaste im Raum um einen Ausgang hinzuzufügen	حدد فراغ في الغرفة لوضع النهاية	smelltu á reit í rýminu til að bæta við útgönguleið	kattints valahova a szobában a kijárat elhelyezéséhez	klaku spacon enĉambre por aldoni pordon		在房间中选中格子增加出口	kliknij na wolnym miejscu w pomieszczeniu, aby dodać przejście		spos maika tiki mash lapot, kwutl skwil (lapot-ilahi) kopa loom.
 font_data_toggle_visible	font data	Donnée de police d'écriture	data da fonte		dati del font	данные шрифта	typsnittsdata	Schrift Daten sichtbar 	بيانات الخط	sýna letur upplýsingar	betűtípus adatok	tipara dosiero		字体数据	dane czcionki		pipa-tsum kod
 font_arabic	Arabic	Arabe	Árabe		Arabo	арабский шрифт	Arabiska	Arabische Schrift	العربية	Arabískt	arab	la araba		Arabic	Arabska		alab wawa
 font_arabic_description	Pixel font with Arabic characters	Police d'écriture avec l'alphabet arabe 	fonte pixelizada com caracteres árabes		Font pixel con caratteri arabi	описание арабского шрифта	Pixel-typsnitt med Arabiska tecken	Pixel-Schrift mit arabischen Buchstaben	خط بكسل يحتوي على الحروف العربية	Smátt letur sem inniheldur stafi fyrir arabísku.	pixelbetűtípus arab karakterekkel	tiparo por la araba lingvo		使用 Arabic 字母的像素字体	Czcionka pikselowa ze znakami Arabskimi		piksel pipa-tsum kopa alab wawa
@@ -164,88 +164,88 @@ default_sprite_dlg	I'm a cat	Je suis un chat	Sou um gato		Sono un gatto	я ко�
 default_item_dlg	You found a nice warm cup of tea	Vous avez trouvé une bonne tasse de thé chaud	Encontraste um copo com chá quentinho		Hai trovato una buona tazza di tè caldo	вы нашли чашку тёплого чая	du hittade en varm kopp te	Du hast einen schönen warmen Tee gefunden	لقد وجدت كوب دافئ من الشاي	Þú fannst heitann bolla af te	Találtál egy bögre forró teát	Vi trovis belan, varman tason da teo		你找到了一杯暖心的茶	Znajdujesz kubek ciepłej herbaty		naika tlap 1 uskan wam tipso-chuk!
 room_label	room	salle	sala	room	stanza	пространство	rum	Räume	غرفة	rými	szoba	ĉambro	tuba	房间	pomieszczenie		loom
 palette_label	palette	palette	palete de cores		palette	палитра	palett	Palette	لوحة الألوان	litaval	színpaletta	koloraro		调色板	paleta		loom tsum-hayu
-marker_tool_name	exits & endings	sorties & fins	saídas e finais		finali e uscite	точки выхода и концовки	utgångar och slut	Übergänge & Enden	مخارج و نهايات	útgönguleiðir og endalok	kijáratok és befejezések	pordoj k ludofinoj		退出&结局	wyjścia i zakończenia		lapot pi kopit-skwil
-room_add_markers	add exits & endings	ajouter des sorties & des fins	adicionar saídas e finais		aggiungi finali e uscite	добавить точки выхода и концовки	lägg till utgångar och slut	Füge Übergänge & Enden hinzu	إضافة مخارج و نهايات	bæta við útgönguleiðum og endalokum	kijárat vagy befejezés hozzáadása	aldonu pordojn k ludofinojn		加入退出&结局	dodaj wyjścia i zakończenia		mash lapot pi kopit-skwil
+marker_tool_name	exits & endings	sorties & fins	saídas e finais		finali e uscite	точки выхода и концовки	utgångar och slut	Übergänge & Enden	مخارج و نهايات	útgönguleiðir og endalok	kijáratok és befejezések	pordoj k ludofinoj		退出&结局	przejścia i zakończenia		lapot pi kopit-skwil
+room_add_markers	add exits & endings	ajouter des sorties & des fins	adicionar saídas e finais		aggiungi finali e uscite	добавить точки выхода и концовки	lägg till utgångar och slut	Füge Übergänge & Enden hinzu	إضافة مخارج و نهايات	bæta við útgönguleiðum og endalokum	kijárat vagy befejezés hozzáadása	aldonu pordojn k ludofinojn		加入退出&结局	dodaj przejścia i zakończenia		mash lapot pi kopit-skwil
 marker_tool_empty	There are no exits or endings in this room yet! You can add one with this tool. :)	Il n'y a pas encore de sorties ou de fins dans cette salle! Tu peux en ajouter une avec cet outil :)	Não existem saídas ou finais nesta sala! Podes adicioná-los com esta ferramenta :)		In questa stanza non ci sono ancora uscite o finali! Puoi aggiungerli da qui :)	в этом пространстве ещё нет точек выхода или концовок! вы можете добавить их в этой панели :)	Det finns inga utgångar eller slut i det här rummet! Du kan lägga till dem med det här verktyget	Bisher gibt es in diesem Raum keine Übergänge oder Enden. Füge sie hier hinzu!	لا يوجد اي مخارج أو نهايات! يمكنك إضافة إحداها عن طريق هذة الأداة. :)	Það er engar útgönguleiðir né endalok	Még nincs kijárat vagy befejezés ebben a szobában. Ezzel az eszközzel adhatod hozzá :)	Ne ekzistas pordoj kaj ludofinoj en ĉi ludo! Vi povas aldoni iom per ĉi ilo. :)		这个房间中还没有出口或者结局！你可以用这个工具添加。 :)	W tym pomieszczeniu nie ma jeszcze wyjść ani zakończeń! Możesz je dodać tym narzędziem. :)		wik mitlait lapot pi kopit-skwil kopa okok loom! spos maika tiki, mamook iht yakwa. :)
 marker_move	move	bouger	mover		muovi	переместить	flytta	Verschieben	تحريك	hreyfa	mozgatás	movu		移动	zmień pozycję		tlatawa
 marker_move_click	click in room	cliquer dans la salle	clicar numa sala		clicca nella stanza	кликните в панели пространства	clicka i rummet	Klicke in gewünschten Raum	إضغط في الغرفة	smelltu innan svæðis	kattints a szobába	klaku enĉambre		点击房间中的一格	kliknij wewnątrz pomieszczenia		kwutl kopa loom
-exit_label	exit	sortie	saída		uscita	точка выхода	utgång	Eingang	مخرج	útgönguleið	kijárat	pordo		退出	wyjście		lapot
+exit_label	exit	sortie	saída		uscita	точка выхода	utgång	Eingang	مخرج	útgönguleið	kijárat	pordo		退出	przejście		lapot
 ending_dialog	ending dialog	fin de dialogue	diálogo de final		dialogo del finale	текст концовки	slut-dialog	End-Nachricht	حوار النهاية	enda samtal	befejező párbeszéd	finluda parolo		结局对话	dialog zakończenia		kopit-hihi taim wawa
-exit_options	exit options	options de sortie	opções de saída		opzioni dell'uscita	опции точки выхода	utgångs-inställningar	Übergangs-Optionen	خيارات المخرج	útgöngu valmöguleikar	kijárat beállítások	pordaj elektaroj		对出选项	opcje wyjścia		kata lapot?
+exit_options	exit options	options de sortie	opções de saída		opzioni dell'uscita	опции точки выхода	utgångs-inställningar	Übergangs-Optionen	خيارات المخرج	útgöngu valmöguleikar	kijárat beállítások	pordaj elektaroj		对出选项	opcje przejścia		kata lapot?
 exit_transition_label	transition effect	effet de transition	efeito de transição		effetto di transizione	эффект перехода	övergångseffekt	Übergangs-Effekt	المؤثرات الإنتقالية	umskipti	áttűnések	porda-al-porda stilo		转场效果	efekt przejścia		kata tlatawa chi loom
 exit_return_label	return exit		saída de retorno		uscita di ritorno	точка возвращения	retur	Ausgang	إعادة المخرج	baka til útgangs	visszaút	revenila pordo		返回退出	przejście powrotne		kilapi lapot
 marker_moving	moving	en train de bouger	movendo		muovendo	перемещаю	flyttar	verschiebe...	يتحرك	hreyfing	ezt mozgatod	movanta		移动	przesuwanie...		hayu-tlatawa
 default_end_dlg	The end	Fin	Fim		Fine	конец	slut	Ende	النهاية	Endir	Itt a vége, fuss el véle!	Ludofino		结束	Koniec		alta kopit hihi
-destination_label	destination	destination	destino		destinazione	точка прибытия	destination	Ausgang	المقصد	ákvörðunarstaður	érkezés	celo		目的地	cel wyjścia		ko
-dialog_effect_drawing	insert drawing				inserisci disegno			Zeichnung einfügen	إضافة رسم		rajz beillesztése						
-sequence_name	sequence				sequenza			Reihe	تسلسل		sorozat						
-sequence_list_name	sequence list				lista sequesnza			Reihen-Liste	قائمة التسلسل		sorozat lista						
-sequence_list_description	go through each item once in _:				ogni frase una volta sola in _:			gehe durch jedes Objekt einmal in _:	زيارة كل بند مرة واحدة في ــــ:		menj végig a tárgyakon ebben: _						
-cycle_name	cycle				serie			Schleife			ismétlés						
-cycle_list_name	cycle list				lista serie			Schleifen-Liste			ismétlés lista						
-cycle_list_description	repeat items in a _:				frasi in _ che si ripetono:			Wiederhole Objekte mit _:	تكرار البنود في ــــ:		ismételd a tárgyakat ebben: _						
-shuffle_name	shuffle				casuale			Zufall	عشوائي		véletlen						
-shuffle_list_name	shuffle list				lista casuale			Zufalls-Liste	قائمة عشوائية		véletlen lista						
-shuffle_list_description	_ items in a random order:				frasi in ordine _:			_ Objekte in zufälliger Reihenfolge:			_ tárgy véletlen sorrendben:						
-branching_list_name	branching list							Pfad-Liste			szétágazó lista						
-branching_list_description	go to the first branch whose condition is true:				segui il primo bivio la cui condizione è vera:			Gehe zum ersten Pfad in dem diese Bedingung erfüllt ist:			menj az első elágazáshoz, ami igaz:						
-branch_add	add branch				aggiungi bivio			Pfad hinzufügen	إضافة فرع		elágazás hozzáadása						
-branch_type_item	item branch							Objekt Pfad			tárgy elágazás						
-branch_type_variable	variable branch							Variablen Pfad			változó elágazás						
-branch_type_default	default branch							Standart Pfad			alapértelmezett elágazás						
-action_cancel	cancel				cancella			Abbrechen	إلغاء		mégsem						
-condition_if_label	if				se			Wenn	if		ha						
-condition_else_label	else				altrimenti			sonst	else		különben						
-condition_else_if_label	else if				altrimenti se			sonst wenn	else if		különben, ha						
-condition_then_label	then				allora			dann	then		akkor						
-exit_destination_move	move destination				muovi destinazione			Ausgang verschieben	تحريك المقصد		érkezés mozgatása						
-transition_fade_w	fade (white)				dissolvenza (bianco)			Verblassen (weiß)			áttűnés (fehér)						
-transition_fade_b	fade (black)				dissolvenza (nero)			Verblassen (schwarz)			áttűnés (fekete)						
-transition_wave	wave				onda			Welle	موجي		hullám						
-transition_tunnel	tunnel				tunnel			Tunnel			alagút						
-transition_slide_u	slide up				scorri verso l'alto			Hochschieben	الزحف للأعلى		felcsúszás						
-transition_slide_d	slide down				scorri verso il basso			Runterschieben	الزحف للأسفل		lecsúszás						
-transition_slide_l	slide left				scorri a sinistra			Nach Links schieben	الزحف لليسار		balra csúszás						
-transition_slide_r	slide right				scorri a destra			Nach Rechts schieben	الزحف لليمين		jobbra csúszás						
-function_end_name	end				fine			Ende			vége						
-function_end_description	stop the game				ferma il gioco			Stoppe das Spiel	إيقاف اللعبة		játék leálltása						
-function_end_help	the game stops immediately, but if there is dialog after this action, it will still play				il gioco si ferma immediatamente, ma se c'è un dialogo dopo questa azione, apparirà			Das Spiel endet sofort, aber Dialog nach dieser Handlung wird noch angezeigt			a játék azonnal leáll, de ha még van párbeszéd, az még lemegy						
-function_exit_name	exit				uscita			Übergang			kijárat						
-function_exit_description	move player to _ at (_,_)[ with effect _]				sposta giocatore a _ a (_,_)[con effetto _]			Bewege Avatar zu _ auf (_,_)[ mit Effekt  _]			játékos mozgatása ide: _ innen (_,_)[ ezzel az effekttel _]						
-function_pg_name	pagebreak				interruzione di pagina			Seitenumbruch			oldaltörés						
-function_pg_description	start a new page of dialog				comincia una nuova pagina di dialogo			Beginne eine neue Dialogs-Seite			kezdj egy új párbeszédoldalt						
-function_pg_help	if there are actions after this one, they will start after the player presses continue				se ci sono altre azioni dopo questa, si attiveranno dopo che il giocatore sceglie "continua"			Wenn es noch nachfolgende Handlungen gibt, werden sie starten nachdem Fortsetzen gedrückt wurde			ha vannak akciók még ez után, azok akkor játszódnak le, ha a játléos a folytatásra kattint						
-function_item_name	item				oggetto			Objekt			tárgy						
-function_item_description	_ in inventory[ = _]				_ nell'inventario [ = _]			_ im Inventar [ =_]			_ a leltárban[ = _]						
-function_property_name	property				proprietà			Eigenschaft			tulajdonság						
-function_property_description	property _[ = _]				proprietà _[ = _]			Eigenschaft _[ = _]			tulajdonság _[ = _]						
-function_property_locked_example_help	change the value of a property: for example, set the locked property to true to stop an exit from changing rooms, or to prevent an ending from stopping the game				cambia il valore di una proprietà: ad esempio, imposta la proprietà bloccata come "vero" per impedire ad un'uscita di far cambiare stanza, o impedisci ad un finale di far finire il gioco			Ändere den Wert einer Eigenschaft: z.B. setze "verschlossen" auf "wahr", um einen Übergang zu deaktivieren oder zu verhindern, dass ein Ende das Spiel beendet.			a tulajdonság értékének megváltoztatása: például, állítsd a zárt tulajdonságot igazra, hogy megakadályozz egy kijáratot, hogy szobát változtasson, vagy egy befejezést, hogy megállítsa a játékot						
-function_print_name	print							schreibe			kiírás						
-function_print_description	print _ in the dialog box							schreibe _ in die Dialog Box			írd ki, hogy _ a párbeszédablakba						
-function_say_name	say							sage			mondd						
-expression_builder_all_clear	AC							Leer			összes törlése						
-value_type_text	text	texte			testo			Text			szöveg						
-action_save	save	sauvegarder			salva			Speichern			mentés						
-action_add_new	add	ajouter			aggiungi			Hinzufügen			hozzáadás						
-action_back	back	retour			indietro			Zurück			vissza						
-dialog_action_category_dialog	dialog	dialogue			dialogo			Dialog			párbeszéd						
-dialog_action_category_list	lists	listes			liste			Listen			listák						
-dialog_action_category_exit	exit and ending actions				azioni di uscita e finale			Übergang & End - Aktionen			kijárat és befejezés akciók						
-dialog_action_category_item	item and variable actions				azioni di variabili e oggetti			Objekt & Variablen - Aktionen			tárgy és változó akciók						
-dialog_action_locked_set	lock / unlock	verrouiller/déverrouiller			blocca/sblocca			öffnen / schließen			nyitás / zárás						
-dialog_action_item_set	set item count				imposta conteggio oggetti			Objekt-Anzahl festlegen			tárgyak számának beálltása						
-dialog_action_item_increase	increase item count				aumenta conteggio oggetti			Objekt-Anzahl erhöhen			tárgyak számának növelése						
-dialog_action_item_decrease	decrease item count				diminuisci conteggio oggetti			Objekt-Anzahl verringern			tárgyak számának csökkentése						
-dialog_action_variable_set	set variable value				imposta valore variabile			Variablen-Wert festlegen			változó értékének beálltása						
-dialog_action_variable_change	change variable value				cambia valore variabile			Variablen-Wert ändern			változó értékének módoítása						
-exit_one_way_label	one-way exit				uscita a senso unico			Einseitiger Übergang			egyirányú kijárat						
-axis_x_label	x	x			x			x			x						
-axis_y_label	y	y			y			y			y						
-exit_dialog	exit dialog	fermer le dialogue			interrompi il dialogo			Dialog beenden			kilépés a párbeszédből 						
-exit_dialog_narration_add	add narration				aggiungi narrazione			Erzählung hinzufügen			narráció hozzáadása						
-exit_dialog_narration_name	exit narration				interrompi narrazione			Erzählung beenden			kilépés a narrációból						
-exit_dialog_narration_default_text	You walk through the doorway				Attraversi la porta			Du gehst durch die Tür			Átmész az ajtón						
-exit_dialog_lock_add	add lock	ajouter un verrou			Aggiungi blocco			Schloss hinzufügen			zár hozzáadása						
-exit_dialog_lock_name	locked exit	sortie verrouillée			Uscita bloccata			Verschlossener Übergang			zárt kijárat						
-exit_dialog_lock_default_text1	The key opens the door!	La clé ouvre la porte!			La chiave apre la porta!			Der Schlüssel öffnet die Tür!			A kulcs nyitja az ajtót.						
-exit_dialog_lock_default_text2	The door is locked...	La porte est verrouillée...			La porta è chiusa a chiave...			Die Tür ist verschlossen...			Az ajtó zárva...						
+destination_label	destination	destination	destino		destinazione	точка прибытия	destination	Ausgang	المقصد	ákvörðunarstaður	érkezés	celo		目的地	cel przejścia		ko
+dialog_effect_drawing	insert drawing																
+sequence_name	sequence																
+sequence_list_name	sequence list																
+sequence_list_description	go through each item once in _:																
+cycle_name	cycle																
+cycle_list_name	cycle list																
+cycle_list_description	repeat items in a _:																
+shuffle_name	shuffle																
+shuffle_list_name	shuffle list																
+shuffle_list_description	_ items in a random order:																
+branching_list_name	branching list																
+branching_list_description	go to the first branch whose condition is true:																
+branch_add	add branch																
+branch_type_item	item branch																
+branch_type_variable	variable branch																
+branch_type_default	default branch																
+action_cancel	cancel																
+condition_if_label	if																
+condition_else_label	else																
+condition_else_if_label	else if																
+condition_then_label	then																
+exit_destination_move	move destination																
+transition_fade_w	fade (white)																
+transition_fade_b	fade (black)																
+transition_wave	wave																
+transition_tunnel	tunnel																
+transition_slide_u	slide up																
+transition_slide_d	slide down																
+transition_slide_l	slide left																
+transition_slide_r	slide right																
+function_end_name	end																
+function_end_description	stop the game																
+function_end_help	the game stops immediately, but if there is dialog after this action, it will still play																
+function_exit_name	exit																
+function_exit_description	move player to _ at (_,_)[ with effect _]																
+function_pg_name	pagebreak																
+function_pg_description	start a new page of dialog																
+function_pg_help	if there are actions after this one, they will start after the player presses continue																
+function_item_name	item																
+function_item_description	_ in inventory[ = _]																
+function_property_name	property																
+function_property_description	property _[ = _]																
+function_property_locked_example_help	change the value of a property: for example, set the locked property to true to stop an exit from changing rooms, or to prevent an ending from stopping the game																
+function_print_name	print																
+function_print_description	print _ in the dialog box																
+function_say_name	say																
+expression_builder_all_clear	AC																
+value_type_text	text																
+action_save	save																
+action_add_new	add																
+action_back	back																
+dialog_action_category_dialog	dialog																
+dialog_action_category_list	lists																
+dialog_action_category_exit	exit and ending actions																
+dialog_action_category_item	item and variable actions																
+dialog_action_locked_set	lock / unlock																
+dialog_action_item_set	set item count																
+dialog_action_item_increase	increase item count																
+dialog_action_item_decrease	decrease item count																
+dialog_action_variable_set	set variable value																
+dialog_action_variable_change	change variable value																
+exit_one_way_label	one-way exit																
+axis_x_label	x																
+axis_y_label	y																
+exit_dialog	exit dialog																
+exit_dialog_narration_add	add narration																
+exit_dialog_narration_name	exit narration																
+exit_dialog_narration_default_text	You walk through the doorway																
+exit_dialog_lock_add	add lock																
+exit_dialog_lock_name	locked exit																
+exit_dialog_lock_default_text1	The key opens the door!																
+exit_dialog_lock_default_text2	The door is locked...																
