@@ -1,3 +1,18 @@
+v7.0:
+- updated dialog panel:
+-- supports nested lists and dialogs
+-- set & update variable values with the expression builder
+-- more functions!
+- add dialogs to exits
+- lock exits and endings from dialog
+- exit and end from dialog
+- pagebreak function
+- titles can have multiple lines of dialog
+- bugfixes:
+-- spaces work inside nexted dialog
+-- functions support multiple parameters
+-- unknown functions aren't deleted
+
 v6.5:
 - bugfixes:
 -- @zachThePerson fixed room tool adding phantom tiles to room
