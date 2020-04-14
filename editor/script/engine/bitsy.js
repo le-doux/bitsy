@@ -65,7 +65,7 @@ var spriteStartLocations = {};
 var version = {
 	major: 7, // major changes
 	minor: 0, // smaller changes
-	devBuildPhase: "BETA",
+	devBuildPhase: "RELEASE",
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
