@@ -1,3 +1,8 @@
+v7.1:
+- bugfixes:
+-- old dialog doesn't override imported dialog
+-- typing in the ending dialog doesn't deselect it
+
 v7.0:
 - updated dialog panel:
 -- supports nested lists and dialogs
