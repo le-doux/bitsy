@@ -946,7 +946,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		RenderMarkerSelection();
 	});
 
-	events.Listen("dialog_update", function(event) {
+	events.Listen("dialog_delete", function(event) {
 		if (curMarker != null && curMarker.type === MarkerType.Ending) {
 			if (curMarker.ending.id === event.dialogId) {
 				curMarker = null;

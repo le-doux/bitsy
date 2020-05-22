@@ -535,7 +535,7 @@ function deleteDialog() {
 
 		alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
 
-		events.Raise("dialog_update", { dialogId:tempDialogId, editorId:null });
+		events.Raise("dialog_delete", { dialogId:tempDialogId, editorId:null });
 	}
 }
 
