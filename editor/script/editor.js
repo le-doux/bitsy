@@ -535,7 +535,7 @@ function deleteDialog() {
 
 		alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
 
-		events.Raise("dialog_update", { dialogId:tempDialogId, editorId:null });
+		events.Raise("dialog_delete", { dialogId:tempDialogId, editorId:null });
 	}
 }
 
@@ -856,6 +856,9 @@ function start() {
 
 		// TODO -- over time I can move more things in here
 		// on the other hand this is still sort of global thing that we don't want TOO much of
+
+		// force re-load the dialog tool
+		openDialogTool(titleDialogId);
 	});
 
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
