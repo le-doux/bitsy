@@ -1,4 +1,5 @@
 v7.1:
+- updated localization text
 - bugfixes:
 -- old dialog doesn't override imported dialog
 -- typing in the ending dialog doesn't deselect it
