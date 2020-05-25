@@ -2,6 +2,7 @@ v7.2:
 - dialog panel textboxes are sized to fit text
 - bugfixes:
 -- disable importing/exporting games while the game is playing
+-- items with empty dialog can be picked up
 
 v7.1:
 - updated localization text

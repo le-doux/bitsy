@@ -2101,6 +2101,7 @@ var dialogRenderer = dialogModule.CreateRenderer();
 var dialogBuffer = dialogModule.CreateBuffer();
 var fontManager = new FontManager();
 
+// TODO : is this scriptResult thing being used anywhere???
 function onExitDialog(scriptResult, dialogCallback) {
 	console.log("EXIT DIALOG!");
 
@@ -2185,7 +2186,7 @@ function startDialog(dialogStr, scriptId, dialogCallback, objectContext) {
 	// console.log("START DIALOG ");
 	if (dialogStr.length <= 0) {
 		// console.log("ON EXIT DIALOG -- startDialog 1");
-		onExitDialog(dialogCallback);
+		onExitDialog(null, dialogCallback);
 		return;
 	}
 
