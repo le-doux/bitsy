@@ -1,3 +1,6 @@
+v7.2:
+- dialog panel textboxes are sized to fit text
+
 v7.1:
 - updated localization text
 - bugfixes:
