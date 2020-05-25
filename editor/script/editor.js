@@ -2241,6 +2241,11 @@ function filenameFromGameTitle() {
 }
 
 function exportGame() {
+	if (isPlayMode) {
+		alert("You can't download your game while you're playing it! Sorry :(");
+		return;
+	}
+
 	refreshGameData(); //just in case
 	// var gameData = document.getElementById("game_data").value; //grab game data
 	var gameData = getFullGameData();
@@ -2708,9 +2713,12 @@ function finishRecordingGif(gif) {
 
 /* LOAD FROM FILE */
 function importGameFromFile(e) {
-	resetGameData();
+	if (isPlayMode) {
+		alert("You can't upload a game while you're playing one! Sorry :(");
+		return;
+	}
 
-	console.log("IMPORT START");
+	resetGameData();
 
 	// load file chosen by user
 	var files = e.target.files;
@@ -2722,9 +2730,6 @@ function importGameFromFile(e) {
 		var fileText = reader.result;
 		gameDataStr = exporter.importGame( fileText );
 
-		console.log("import load end");
-		// console.log(gameDataStr);
-		
 		// change game data & reload everything
 		document.getElementById("game_data").value = gameDataStr;
 		on_game_data_change();
