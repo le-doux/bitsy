@@ -4,6 +4,7 @@ v7.2:
 -- disable importing/exporting games while the game is playing
 -- items with empty dialog can be picked up
 -- stop exits from getting moved off-screen
+-- dialog selection stopped working after playing the game
 
 v7.1:
 - updated localization text

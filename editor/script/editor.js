@@ -1688,6 +1688,8 @@ function on_edit_mode() {
 
 	markerTool.RefreshKeepSelection();
 
+	reloadDialogUI();
+
 	updateInventoryUI();
 
 	if(isPreviewDialogMode) {
