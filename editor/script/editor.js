@@ -495,7 +495,9 @@ function duplicateDialog() {
 }
 
 function deleteDialog() {
-	if (curDialogEditorId != null && curDialogEditorId != titleDialogId) {
+	var shouldDelete = confirm("Are you sure you want to delete this dialog?");
+
+	if (shouldDelete && curDialogEditorId != null && curDialogEditorId != titleDialogId) {
 		var tempDialogId = curDialogEditorId;
 
 		nextDialog();

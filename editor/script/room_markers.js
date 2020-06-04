@@ -594,6 +594,18 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			return;
 		}
 
+		var shouldDeleteMarker = false;
+		if (curMarker.type === MarkerType.Exit) {
+			shouldDeleteMarker = confirm("Are you sure you want to delete this exit?");
+		}
+		else {
+			shouldDeleteMarker = confirm("Are you sure you want to delete this ending?");
+		}
+
+		if (!shouldDeleteMarker) {
+			return;
+		}
+
 		curMarker.Remove();
 
 		markerList = GatherMarkerList();
