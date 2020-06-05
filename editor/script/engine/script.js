@@ -372,6 +372,7 @@ function deprecatedFunc(environment,parameters,onReturn) {
 function printFunc(environment, parameters, onReturn) {
 	if (parameters[0] != undefined && parameters[0] != null) {
 		var textStr = "" + parameters[0];
+		console.log(">>> PRINT {" + textStr + "}");
 		environment.GetDialogBuffer().AddText(textStr);
 		environment.GetDialogBuffer().AddScriptReturn(function() { onReturn(null); });
 	}
@@ -387,7 +388,8 @@ function linebreakFunc(environment, parameters, onReturn) {
 }
 
 function pagebreakFunc(environment, parameters, onReturn) {
-	environment.GetDialogBuffer().AddPagebreak(function() { onReturn(null); });
+	environment.GetDialogBuffer().AddPagebreak();
+	environment.GetDialogBuffer().AddScriptReturn(function() { onReturn(null); });
 }
 
 function printDrawingFunc(environment, parameters, onReturn) {
