@@ -1057,6 +1057,15 @@ function start() {
 	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked;
 
 	initLanguageOptions();
+
+	// HACK: experiment icon loading
+	var elements = document.getElementsByClassName("bitsy_icon");
+	for(var i = 0; i < elements.length; i++) {
+		var el = elements[i];
+		var iconId = el.innerText;
+		var iconResource = Resources["icon_" + iconId + ".svg"];
+		el.innerHTML = iconResource;
+	}
 }
 
 function newDrawing() {

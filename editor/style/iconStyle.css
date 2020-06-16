@@ -1,0 +1,35 @@
+.bitsy_icon {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	fill: #6767b2;
+}
+
+.icon_large {
+	width: 24px;
+	height: 24px;
+}
+
+.icon_space_right {
+	margin-right: 2px;
+}
+
+.icon_large .icon_space_right {
+	margin-right: 5px;
+}
+
+.panelBarTitle .bitsy_icon {
+	vertical-align: middle;
+}
+
+button .bitsy_icon {
+	vertical-align: middle;
+}
+
+input[type=radio] + label .bitsy_icon {
+	vertical-align: middle;
+}
+
+input[type=radio]:checked + label .bitsy_icon {
+	fill: white;
+}

@@ -16,6 +16,7 @@
 		<link rel="stylesheet" type="text/css" href="style/dialogToolStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/responsiveStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/navControlStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/iconStyle.css">
 
 		<!-- GENERATED -->
 		<script src="script/generated/resources.js"></script>
@@ -574,37 +575,37 @@
 				<div id="paintPanel" class="panel color1">
 					<div class="bar color1">
 
-						<button title="minimize paint window" class="light panelBarClose" onclick="hidePanel('paintPanel');">
-							<i class="material-icons">close</i>
+						<button title="minimize paint window" class="light panelBarClose" onclick="hidePanel('paintPanel');" style="line-height: 100%; margin-top: 2px;">
+							<span class="bitsy_icon">close</span>
 						</button>
 
 						<div title="paint window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<i class="material-icons">brush</i>
+							<span class="bitsy_icon icon_large icon_space_right">draw</span>
 							<span class="localize paint_tool_name">paint</span>
 						</div>
 					</div>
 					<form id="paintModeRadio" style="margin-bottom: 5px;">
 						<input type="radio" name="paint mode" value="avatar" onclick="on_paint_avatar();" id="paintOptionAvatar" checked>
 						<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
-							<i class="material-icons">perm_identity</i>
+							<span class="bitsy_icon icon_space_right">avatar</span>
 							<span class="localize avatar_label">avatar</span>
 						</label>
 
 						<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();" id="paintOptionTile">
 						<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
-							<i class="material-icons">terrain</i>
+							<span class="bitsy_icon icon_space_right">tile</span>
 							<span class="localize tile_label">tile</span>
 						</label>
 
 						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite">
 						<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
-							<i class="material-icons">nature_people</i>
+							<span class="bitsy_icon icon_space_right">sprite</span>
 							<span class="localize sprite_label">sprite</span>
 						</label>
 
 						<input type="radio" name="paint mode" value="item" onclick="on_paint_item();" id="paintOptionItem">
 						<label title="edit items: things the player can pick up" for="paintOptionItem" class="right">
-							<i class="material-icons">vpn_key</i>
+							<span class="bitsy_icon icon_space_right">item</span>
 							<span class="localize item_label">item</span>
 						</label>
 						
