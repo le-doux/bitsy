@@ -326,7 +326,7 @@ TIL q
 00000000
 00000000
 00000000
-NAME record_start
+NAME record
 
 TIL r
 00000000
@@ -469,7 +469,7 @@ TIL 1d
 00000000
 00000000
 00000000
-NAME record_stop
+NAME record_on
 
 TIL 1e
 00000000
@@ -480,7 +480,7 @@ TIL 1e
 00000000
 00000000
 00000000
-NAME recording
+NAME record_stop
 
 TIL 1f
 00000000
@@ -491,7 +491,7 @@ TIL 1f
 00000000
 00000000
 00000000
-NAME record_saving
+NAME record_processing
 
 TIL 1g
 00000000
