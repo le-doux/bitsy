@@ -76,9 +76,9 @@
 					<div id="toolsCheckFlexItem">
 						<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" />
 						<label title="show / hide toolbar" for="toolsCheck" id="toolsCheckLabel">
-							<i class="material-icons">settings</i>
+							<span class="bitsy_icon">settings</span>
 							<span class="localize tools_label">tools</span>
-							<i id="toolsCheckIcon" class="material-icons">expand_less</i>
+							<span id="toolsCheckIcon" class="bitsy_icon">expand_less</span>
 						</label>
 					</div>
 
@@ -93,78 +93,78 @@
 
 				<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanelAnimated(event);" checked/>
 				<label title="show / hide about window" for="aboutCheck">
-					<i class="material-icons">favorite</i> 
+					<span class="bitsy_icon">about</span>
 					<span class="localize about_tool_name">about</span>
 				</label>
 				
 				<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanelAnimated(event);" checked/>
 				<label title="show / hide room window" for="roomCheck">
-					<i class="material-icons">grid_on</i>
+					<span class="bitsy_icon">room</span>
 					<span class="localize room_tool_name">room</span>
 				</label>
 
 				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanelAnimated(event);" />
 				<label title="show / hide exits & endings window" for="exitsCheck">
-					<i class="material-icons">directions</i>
+					<span class="bitsy_icon">exits_endings</span>
 					<span class="localize marker_tool_name">exits & endings</span>
 				</label>
 
 				<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide paint window" for="paintCheck">
-					<i class="material-icons">brush</i>
+					<span class="bitsy_icon">paint</span>
 					<span class="localize paint_tool_name">paint</span>
 				</label>
 				
 				<input type="checkbox" value="paintExplorerPanel" id="paintExplorerCheck" onclick="togglePanelAnimated(event);" />
 				<label title="show / hide find drawing window" for="paintExplorerCheck">
-					<i class="material-icons">brush</i>
+					<span class="bitsy_icon">search</span>
 					<span class="localize explorer_tool_name">find drawing</span>
 				</label>
 				
 				<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide color palette window" for="colorsCheck">
-					<i class="material-icons">palette</i>
+					<span class="bitsy_icon">colors</span>
 					<span class="localize palette_tool_name">colors</span>
 				</label>
 
 				<input type="checkbox" value="dialogPanel" id="dialogCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide dialog window" for="dialogCheck">
-					<i class="material-icons">chat</i>
+					<span class="bitsy_icon">dialog</span>
 					<span class="localize dialog_tool_name">dialog</span>
 				</label>
 
 				<input type="checkbox" value="inventoryPanel" id="inventoryCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide inventory window" for="inventoryCheck">
-					<i class="material-icons">vpn_key</i>
+					<span class="bitsy_icon">item</span>
 					<span class="localize inventory_tool_name">inventory</span>
 				</label>
 				
 				<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide download window" for="downloadCheck">
-					<i class="material-icons">file_download</i>
+					<span class="bitsy_icon">download</span>
 					<span class="localize download_tool_name">download</span>
 				</label>
 				
 				<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanelAnimated(event);" />
 				<label title="show / hide gif recording window" for="gifCheck">
-					<i class="material-icons">videocam</i>
+					<span class="bitsy_icon">record</span>
 					<span class="localize gif_tool_name">record gif</span>
 				</label>
 				
 				<input type="checkbox" value="dataPanel" onclick="togglePanelAnimated(event);" id="dataCheck"/>
 				<label title="show / hide game data window" for="dataCheck">
-					<i class="material-icons">save</i>
+					<span class="bitsy_icon">game_data</span>
 					<span class="localize data_tool_name">game data</span>
 				</label>
 
 				<input type="checkbox" value="settingsPanel" onclick="togglePanelAnimated(event);" id="settingsCheck"/>
 				<label title="show / hide settings window" for="settingsCheck">
-					<i class="material-icons">settings</i>
+					<span class="bitsy_icon">settings</span>
 					<span class="localize settings_tool_name">settings</span>
 				</label>
 
 				<button title="reset everything and start new game" class="color0" onclick="newGameDialog();" style="margin-left:20px;">
-					<i class="material-icons">restore_page</i>
+					<span class="bitsy_icon">new_game</span>
 					<span class="localize reset_game">new game</span>
 				</button>
 			</div>
@@ -189,11 +189,11 @@
 			</div>
 			<div>
 				<button onclick="showPanel('settingsPanel');">
-					<i class="material-icons">open_in_new</i>
+					<span class="bitsy_icon">open_tool</span>
 					<span class="localize open_settings">open settings</span>
 				</button>
 				<button onclick="hideFontMissingCharacterWarning();">
-					<i class="material-icons">close</i>
+					<span class="bitsy_icon">close</span>
 					<span class="localize close_label">close</span>
 				</button>
 			</div>
@@ -205,7 +205,7 @@
 				<div id="titlePanel" class="panel color0">
 					<div class="bar color0">
 						<div title="title window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<i class="material-icons">edit</i>
+							<span class="bitsy_icon">text_edit</span>
 							<span class="localize title_tool_title">title</span>
 						</div>
 					</div>
@@ -217,10 +217,10 @@
 				<div id="aboutPanel" class="panel color0">
 					<div class="bar color0">
 						<button title="minimize about window" class="light panelBarClose" onclick="hidePanel('aboutPanel');">
-							<i class="material-icons">close</i>
+							<span class="bitsy_icon">close</span>
 						</button>
 						<div title="about window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<i class="material-icons">favorite</i>
+							<span class="bitsy_icon">about</span>
 							<span class="localize about_tool_title">about bitsy</span>
 							 <span class="curVersionLabel"></span>
 						</div>
@@ -266,11 +266,11 @@
 				<div id="roomPanel" class="panel">
 					<div class="bar">
 						<button title="minimize room editing window" class="light panelBarClose" onclick="hidePanel('roomPanel');">
-							<i class="material-icons">close</i>
+							<span class="bitsy_icon">close</span>
 						</button>
 
 						<div title="room window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<i class="material-icons">grid_on</i>
+							<span class="bitsy_icon">room</span>
 							<span class="localize room_tool_name">room</span>
 						</div>
 					</div>
@@ -278,7 +278,7 @@
 					<div id="roomNav" class="navControl">
 						<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" />
 						<label title="play / pause game" for="playModeCheck">
-							<i class="material-icons" id="playModeIcon">play_arrow</i>
+							<span id="playModeIcon" class="bitsy_icon">play</span>
 							<span id="playModeText" class="localize play_game">play</span> <!-- TODO LOCALIZE: also stop_game -->
 						</label>
 
@@ -289,22 +289,22 @@
 						<span class="spacer"></span>
 
 						<button title="previous room" class="color0" onclick="prevRoom();">
-							<i class="navigate_before material-icons"><span>navigate_before</span></i>
+							<span class="navigate_before bitsy_icon">previous</span>
 						</button>
 						<button title="next room" class="color0" onclick="nextRoom();">
-							<i class="navigate_next material-icons"><span>navigate_next</span></i>
+							<span class="navigate_next bitsy_icon">next</span>
 						</button>
 
 						<span class="spacer"></span>
 
 						<button title="add new room" class="color0" onclick="newRoom();">
-							<i class="material-icons">add</i>
+							<span class="bitsy_icon">add</span>
 						</button>
 						<button title="duplicate room" class="color0" onclick="duplicateRoom();">
-							<i class="material-icons">content_copy</i>
+							<span class="bitsy_icon">copy</span>
 						</button>
 						<button title="delete room" class="color0" onclick="deleteRoom();">
-							<i class="material-icons">remove_circle</i>
+							<span class="bitsy_icon">delete</span>
 						</button>
 					</div>
 
@@ -324,23 +324,23 @@
 
 							<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
 							<label title="show / hide exits & endings" for="roomMarkersCheck" style="padding-bottom: 3px;">
-								<i class="material-icons" id="roomMarkersIcon">visibility</i></label>
+								<span id="roomMarkersIcon" class="bitsy_icon">visibility</span></label>
 
 							<button title="add exits and endings" class="color0" onclick="showPanel('exitsPanel', 'roomPanel');" style="margin-top:2px;">
-								<i class="material-icons">open_in_new</i>
+								<span class="bitsy_icon">open_tool</span>
 							</button>
 						</div>
 
 						<div id="roomVisibility" class="buttonGroup controlBox" style="flex-grow: 1; margin-bottom: 0px; padding: 2px;">
 							<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
 							<label title="show / hide grid" for="roomGridCheck">
-								<i class="material-icons" id="roomGridIcon">visibility</i> 
+								<span id="roomGridIcon" class="bitsy_icon">visibility</span>
 								<span class="localize grid_toggle_visible">grid</span>
 							</label>
 
 							<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" />
 							<label title="show / hide walls" for="roomWallsCheck">
-								<i class="material-icons" id="roomWallsIcon">visibility_off</i> 
+								<span id="roomWallsIcon" class="bitsy_icon">visibility_off</span>
 								<span class="localize walls_toggle_visible">walls</span>
 							</label>
 						</div>
@@ -351,11 +351,11 @@
 					<div class="bar color3">
 
 						<button title="minimize exits & endings window" class="light panelBarClose" onclick="hidePanel('exitsPanel');">
-							<i class="material-icons">close</i>
+							<span class="bitsy_icon">close</span>
 						</button>
 
 						<div title="exits & endings window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<i class="material-icons">directions</i>
+							<span class="bitsy_icon">exits_endings</span>
 							<span class="localize marker_tool_name">exits & endings</span>
 						</div>
 					</div>
@@ -367,25 +367,25 @@
 							<span class="spacer"></span>
 
 							<button title="previous" class="color0" onclick="prevMarker();">
-								<i class="navigate_before material-icons"><span>navigate_before</span></i>
+								<span class="navigate_before bitsy_icon">previous</span>
 							</button>
 							<button title="next" class="color0" onclick="nextMarker();">
-								<i class="navigate_next material-icons"><span>navigate_next</span></i>
+								<span class="navigate_next bitsy_icon">next</span>
 							</button>
 
 							<span class="spacer"></span>
 
 							<button title="add exit or ending" class="color0" onclick="startAddMarker();">
-								<i class="material-icons">add</i>
+								<span class="bitsy_icon">add</span>
 							</button>
 
 							<!-- TODO : implement -->
 							<button title="duplicate exit or ending" class="color0" onclick="duplicateMarker();">
-								<i class="material-icons">content_copy</i>
+								<span class="bitsy_icon">copy</span>
 							</button>
 
 							<button title="delete" class="color0" onclick="deleteMarker();">
-								<i class="material-icons">remove_circle</i>
+								<span class="bitsy_icon">delete</span>
 							</button>
 						</div>
 						<!-- todo : move style elsewhere -->
