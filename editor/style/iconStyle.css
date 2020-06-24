@@ -33,3 +33,11 @@ input[type=radio] + label .bitsy_icon {
 input[type=radio]:checked + label .bitsy_icon {
 	fill: white;
 }
+
+input[type=checkbox] + label .bitsy_icon {
+	vertical-align: middle;
+}
+
+input[type=checkbox]:checked + label .bitsy_icon {
+	fill: white;
+}
