@@ -76,7 +76,7 @@
 					<div id="toolsCheckFlexItem">
 						<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" />
 						<label title="show / hide toolbar" for="toolsCheck" id="toolsCheckLabel">
-							<span class="bitsy_icon">settings</span>
+							<span class="bitsy_icon">tool</span>
 							<span class="localize tools_label">tools</span>
 							<span id="toolsCheckIcon" class="bitsy_icon">expand_less</span>
 						</label>
@@ -141,7 +141,7 @@
 				
 				<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanelAnimated(event);"  checked/>
 				<label title="show / hide download window" for="downloadCheck">
-					<span class="bitsy_icon">download</span>
+					<span class="bitsy_icon">file</span>
 					<span class="localize download_tool_name">download</span>
 				</label>
 				
@@ -220,7 +220,7 @@
 							<span class="bitsy_icon">close</span>
 						</button>
 						<div title="about window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">about</span>
+							<span class="bitsy_icon icon_large icon_space_right">about</span>
 							<span class="localize about_tool_title">about bitsy</span>
 							 <span class="curVersionLabel"></span>
 						</div>
@@ -270,7 +270,7 @@
 						</button>
 
 						<div title="room window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">room</span>
+							<span class="bitsy_icon icon_large icon_space_right">room</span>
 							<span class="localize room_tool_name">room</span>
 						</div>
 					</div>
@@ -355,7 +355,7 @@
 						</button>
 
 						<div title="exits & endings window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">exits_endings</span>
+							<span class="bitsy_icon icon_large icon_space_right">exits_endings</span>
 							<span class="localize marker_tool_name">exits & endings</span>
 						</div>
 					</div>
@@ -711,7 +711,7 @@
 						</button>
 
 						<div title="find drawing window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">search</span>
+							<span class="bitsy_icon icon_large icon_space_right">search</span>
 							<span class="localize explorer_tool_name">find drawing</span>
 						</div>
 					</div>
@@ -773,7 +773,7 @@
 						</button>
 
 						<div title="color palette window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">colors</span>
+							<span class="bitsy_icon icon_large icon_space_right">colors</span>
 							<span class="localize palette_tool_name">colors</span>
 						</div>
 					</div>
@@ -842,7 +842,7 @@
 						</button>
 
 						<div title="dialog window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">dialog</span>
+							<span class="bitsy_icon icon_large icon_space_right">dialog</span>
 							<span class="localize dialog_tool_name">dialog</span>
 						</div>
 					</div>
@@ -887,7 +887,7 @@
 						<div id="dialogOptions">
 							<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);">
 							<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
-								<span class="bitsy_icon">edit_code</span>
+								<span class="bitsy_icon">code_edit</span>
 								<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
 								<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
 							</label>
@@ -915,7 +915,7 @@
 						</button>
 
 						<div title="inventory window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">item</span>
+							<span class="bitsy_icon icon_large icon_space_right">item</span>
 							<span class="localize inventory_tool_name">inventory</span>
 						</div>
 					</div>
@@ -931,7 +931,7 @@
 							<input type="radio" name="inventory mode" value="variable" onclick="showInventoryVariable()" id="inventoryOptionVariable">
 							<label title="variables: set initial values of variables" for="inventoryOptionVariable" class="right">
 								<!-- TODO : bitsy_icon -- does this need its own special icon? -->
-								<span class="bitsy_icon">edit_code</span>
+								<span class="bitsy_icon">code_edit</span>
 								<span class="localize variables_label">variables</span>
 							</label>
 						</form>
@@ -953,7 +953,7 @@
 
 						<div title="download window" class="panelBarTitle" onmousedown="grabCard(event);">
 							<!-- TODO : bitsy_icon -- seperate "file" and "download" icons -->
-							<span class="bitsy_icon">download</span>
+							<span class="bitsy_icon icon_large icon_space_right">file</span>
 							<span class="localize download_tool_name">download</span>
 						</div>
 					</div>
@@ -998,7 +998,7 @@
 						</button>
 
 						<div title="gif recording window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">record</span>
+							<span class="bitsy_icon icon_large icon_space_right">record</span>
 							<span class="localize gif_tool_name">record gif</span>
 						</div>
 					</div>
@@ -1046,7 +1046,7 @@
 						</button>
 
 						<div title="game data window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">game_data</span>
+							<span class="bitsy_icon icon_large icon_space_right">game_data</span>
 							<span class="localize data_tool_name">game data</span>
 						</div>
 					</div>
@@ -1076,7 +1076,7 @@
 						</button>
 
 						<div title="settings window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">settings</span>
+							<span class="bitsy_icon icon_large icon_space_right">settings</span>
 							<span class="localize settings_tool_name">settings</span>
 						</div>
 					</div>
