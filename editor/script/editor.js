@@ -1665,11 +1665,9 @@ function deleteDrawing() {
 function toggleToolBar(e) {
 	if( e.target.checked ) {
 		document.getElementById("toolsPanel").style.display = "flex";
-		document.getElementById("toolsCheckIcon").innerHTML = "expand_more";
 	}
 	else {
 		document.getElementById("toolsPanel").style.display = "none";
-		document.getElementById("toolsCheckIcon").innerHTML = "expand_less";
 	}
 }
 
