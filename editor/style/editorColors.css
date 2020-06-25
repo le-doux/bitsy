@@ -26,6 +26,7 @@ button {
 	background: #e8e8ff;
 	color: #6767b2;
 }
+
 .controlBox button {
 	background: #ccccff;
 }
@@ -33,6 +34,19 @@ button {
 .controlBox .controlBox button {
 	border: solid 1px #6767b2;
 }
+
+
+.controlBox .cancelButton {
+	background: #6767b2;
+	color: white;
+}
+
+.controlBox .cancelButton button {
+	background: #6767b2;
+	color: white;
+}
+
+
 button:active {
 	background: #6767b2;
 	color:white;

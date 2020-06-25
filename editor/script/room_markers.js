@@ -695,27 +695,27 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// hackily relies on global UI names oh well D:
 		if (placementMode == PlacementMode.FirstMarker) {
 			document.getElementById("toggleMoveMarker1").checked = true;
-			document.getElementById("toggleMoveMarkerIcon1").innerText = "cancel";
+			iconUtils.LoadIcon(document.getElementById("toggleMoveMarkerIcon1"), "cancel");
 			document.getElementById("textMoveMessage1").style.display = "inline";
 			document.getElementById("textMarkerPos1").style.display = "none";
 		}
 		else {
 			// var markerPos1 = curMarker.GetMarkerPos(0);
 			document.getElementById("toggleMoveMarker1").checked = false;
-			document.getElementById("toggleMoveMarkerIcon1").innerText = "location_searching";
+			iconUtils.LoadIcon(document.getElementById("toggleMoveMarkerIcon1"), "set_exit_location");
 			document.getElementById("textMoveMessage1").style.display = "none";
 			document.getElementById("textMarkerPos1").style.display = "inline";
 		}
 
 		if (placementMode == PlacementMode.SecondMarker) {
 			document.getElementById("toggleMoveMarker2").checked = true;
-			document.getElementById("toggleMoveMarkerIcon2").innerText = "cancel";
+			iconUtils.LoadIcon(document.getElementById("toggleMoveMarkerIcon2"), "cancel");
 			document.getElementById("textMoveMessage2").style.display = "inline";
 			document.getElementById("textMarkerPos2").style.display = "none";
 		}
 		else {
 			document.getElementById("toggleMoveMarker2").checked = false;
-			document.getElementById("toggleMoveMarkerIcon2").innerText = "location_searching";
+			iconUtils.LoadIcon(document.getElementById("toggleMoveMarkerIcon2"), "set_exit_location");
 			document.getElementById("textMoveMessage2").style.display = "none";
 			document.getElementById("textMarkerPos2").style.display = "inline";
 		}
@@ -922,22 +922,19 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		//hacky globals again
 		if (curMarker == null || curMarker.type != MarkerType.Exit) {
 			document.getElementById("markerLinkControl").style.visibility = "hidden";
-			document.getElementById("exitDirectionBackIcon").style.visibility = "hidden";
-			document.getElementById("exitDirectionForwardIcon").style.visibility = "hidden";
+			document.getElementById("exitDirectionIcon").style.visibility = "hidden";
 		}
 		else {
 			document.getElementById("markerLinkControl").style.visibility = "visible";
+			document.getElementById("exitDirectionIcon").style.visibility = "visible";
 			if (curMarker.linkState == LinkState.TwoWay) {
-				document.getElementById("exitDirectionBackIcon").style.visibility = "visible";
-				document.getElementById("exitDirectionForwardIcon").style.visibility = "visible";
+				iconUtils.LoadIcon(document.getElementById("exitDirectionIcon"), "exit_two_way");
 			}
 			else if (curMarker.linkState == LinkState.OneWayOriginal) {
-				document.getElementById("exitDirectionBackIcon").style.visibility = "hidden";
-				document.getElementById("exitDirectionForwardIcon").style.visibility = "visible";
+				iconUtils.LoadIcon(document.getElementById("exitDirectionIcon"), "exit_one_way");
 			}
 			else if (curMarker.linkState == LinkState.OneWaySwapped) {
-				document.getElementById("exitDirectionBackIcon").style.visibility = "visible";
-				document.getElementById("exitDirectionForwardIcon").style.visibility = "hidden";
+				iconUtils.LoadIcon(document.getElementById("exitDirectionIcon"), "exit_one_way_reverse");
 			}
 		}
 	}

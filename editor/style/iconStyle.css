@@ -41,3 +41,11 @@ input[type=checkbox] + label .bitsy_icon {
 input[type=checkbox]:checked + label .bitsy_icon {
 	fill: white;
 }
+
+.cancelButton .bitsy_icon {
+	fill: white;
+}
+
+.reverseColors .bitsy_icon {
+	fill: white;
+}

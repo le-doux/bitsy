@@ -32,6 +32,7 @@
 
 		<!-- EDITOR SCRIPTS -->
 		<script src="script/util.js"></script>
+		<script src="script/icons.js"></script>
 		<script src="script/paint.js"></script>
 		<script src="script/room.js"></script>
 		<script src="script/room_markers.js"></script>
@@ -399,7 +400,7 @@
 								<span class="bitsy_icon">add</span> <span class="localize ending_label">ending</span>
 							</button>
 							<!-- TODO : need a general cancel button style -->
-							<button title="cancel" style="background: #6767b2; color: white;" onclick="cancelAddMarker();">
+							<button title="cancel" class="cancelButton" onclick="cancelAddMarker();">
 								<span class="bitsy_icon">cancel</span> <span class="localize action_cancel">cancel</span>
 							</button>
 						</div>
@@ -459,10 +460,7 @@
 							</div>
 							<div id="markerLinkControl">
 								<button title="change exit direction" onclick="changeExitDirection();">
-									<!-- TODO : bitsy_icon -- implement new exit direction icons -->
-									<span class="bitsy_icon">exit_one_way</span>
-									<i id="exitDirectionBackIcon"></i> <!-- TODO : remove -->
-									<i id="exitDirectionForwardIcon"></i> <!-- TODO : remove -->
+									<span id="exitDirectionIcon" class="bitsy_icon">exit_one_way</span>
 								</button>
 							</div>
 							<div id="markerControl2" class="controlBox" style="display: flex; flex-direction: column;">

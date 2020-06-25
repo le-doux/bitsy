@@ -165,7 +165,7 @@ function updateInventoryVariableUI(){
 		varDiv.appendChild( varValueInput );
 
 		var deleteVarEl = document.createElement("button");
-		deleteVarEl.appendChild( createIconElement("clear") );
+		deleteVarEl.appendChild(iconUtils.CreateIcon("delete"));
 		deleteVarEl.addEventListener('click', createOnVariableDelete(varInfo));
 		deleteVarEl.title = "delete this variable";
 		varDiv.appendChild(deleteVarEl);	
@@ -187,7 +187,7 @@ function updateInventoryVariableUI(){
 	function createAddButton() {
 		var addVarEl = document.createElement("button");
 		addVarEl.title = "add new variable";
-		addVarEl.appendChild( createIconElement("add") );
+		addVarEl.appendChild(iconUtils.CreateIcon("add"));
 		var addVarText = document.createElement("span");
 		addVarText.innerText = localization.GetStringOrFallback("variable_add", "add variable");
 		console.log("CREATE ADD BUTTON " + addVarText.innerText);
