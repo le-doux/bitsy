@@ -49,3 +49,11 @@ input[type=checkbox]:checked + label .bitsy_icon {
 .reverseColors .bitsy_icon {
 	fill: white;
 }
+
+#colorPaletteForm input[type="radio"] + label.colorPaletteLabelDark .bitsy_icon {
+	fill: white; /* white text for dark backgrounds */
+}
+
+#colorPaletteForm input[type="radio"] + label.colorPaletteLabelLight .bitsy_icon {
+	fill: black; /* black text for light backgrounds */
+}
