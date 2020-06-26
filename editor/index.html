@@ -340,23 +340,20 @@
 
 								<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
 								<label title="show / hide grid" for="roomGridCheck">
-									<span class="bitsy_icon icon_space_right">room</span>
+									<span id="roomGridIcon" class="bitsy_icon icon_space_right">visibility</span>
 									<span class="localize grid_toggle_visible">grid</span>
-									<span id="roomGridIcon" class="bitsy_icon">visibility</span>
 								</label>
 
 								<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" />
 								<label title="show / hide walls" for="roomWallsCheck">
-									<span class="bitsy_icon icon_space_right">wall_on</span>
+									<span id="roomWallsIcon" class="bitsy_icon icon_space_right">visibility_off</span>
 									<span class="localize walls_toggle_visible">walls</span>
-									<span id="roomWallsIcon" class="bitsy_icon">visibility_off</span>
 								</label>
 
 								<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
 								<label title="show / hide exits & endings" for="roomMarkersCheck">
-									<span class="bitsy_icon icon_space_right">exits_endings</span>
+									<span id="roomMarkersIcon" class="bitsy_icon icon_space_right">visibility</span>
 									<span class="localize marker_tool_name">exits & endings</span>
-									<span id="roomMarkersIcon" class="bitsy_icon">visibility</span>
 								</label>
 							</div>
 						</div>
@@ -662,7 +659,7 @@
 						<div class="buttonGroup" style="margin-bottom: 10px;">
 							<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" checked/>
 							<label title="show / hide grid" for="paintGridCheck">
-								<span id="paintGridIcon" class="bitsy_icon">visibility</span>
+								<span id="paintGridIcon" class="bitsy_icon icon_space_right">visibility</span>
 								<span class="localize grid_toggle_visible">grid</span>
 							</label>
 							<button id="showInventoryButton" title="show inventory" onclick="showPanel('inventoryPanel', 'paintPanel');">
