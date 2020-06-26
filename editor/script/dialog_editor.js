@@ -1357,7 +1357,7 @@ function DialogTool() {
 
 		var editExpressionButton = document.createElement("button");
 		editExpressionButton.title = "edit expression"; // TODO : localize
-		editExpressionButton.appendChild(iconUtils.CreateIcon("edit"));
+		editExpressionButton.appendChild(iconUtils.CreateIcon("expression_edit"));
 		editExpressionButton.onclick = function() {
 			parentEditor.OpenExpressionBuilder(
 				expressionRootNode.Serialize(),

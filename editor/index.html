@@ -310,39 +310,55 @@
 
 					<canvas id="game"></canvas>
 
-					<div style="display: flex;">
-						<!-- these three have hacky extra styles attached -->
-						<div id="roomColor" class="buttonGroup controlBox" style="margin-bottom: 0px; padding: 2px;">
-							<span class="localize palette_tool_name">colors</span>: 
-							<select title="select color palette for room" id="roomPaletteSelect" onchange="roomPaletteChange(event);">
-								<option value="0">palette 0</option> <!-- other options are added dynamically -->
-							</select>
+					<div class="controlBox">
+						<div>
+							<span>
+								<span class="bitsy_icon icon_space_right">colors</span>
+								<span class="localize palette_tool_name">colors</span>: 
+								<select title="select color palette for room" id="roomPaletteSelect" onchange="roomPaletteChange(event);">
+									<option value="0">palette 0</option> <!-- other options are added dynamically -->
+								</select>
+							</span>
+
+							<span style="float: right;">
+								<button title="add exits and endings" class="color0" onclick="showPanel('exitsPanel', 'roomPanel');" style="margin-top:2px;">
+									<span class="localize marker_tool_name">exits & endings</span>
+									<span class="bitsy_icon">open_tool</span>
+								</button>
+
+								<input type="checkbox" id="roomVisibilityControlsCheck" onclick="document.getElementById('roomVisibilityControls').style.display = event.target.checked ? 'flex' : 'none';" />
+								<label title="show visibility controls" for="roomVisibilityControlsCheck">
+									<span class="bitsy_icon">visibility</span>
+									<span>visibility</span> <!-- TODO : localize -->
+								</label>
+							</span>
 						</div>
 
-						<div id="roomMarkers" class="buttonGroup controlBox" style="margin-bottom: 0px; padding: 2px;">
-							<span class="localize marker_tool_name">exits & endings</span>:
+						<div id="roomVisibilityControls" class="buttonGroup" style="display: none; flex-grow: 1;">
+							<div style="margin-top: 5px;" id="roomVisibility">
+								<span>visibility:</span> <!-- TODO : localize -->
 
-							<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
-							<label title="show / hide exits & endings" for="roomMarkersCheck" style="padding-bottom: 3px;">
-								<span id="roomMarkersIcon" class="bitsy_icon">visibility</span></label>
+								<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
+								<label title="show / hide grid" for="roomGridCheck">
+									<span class="bitsy_icon icon_space_right">room</span>
+									<span class="localize grid_toggle_visible">grid</span>
+									<span id="roomGridIcon" class="bitsy_icon">visibility</span>
+								</label>
 
-							<button title="add exits and endings" class="color0" onclick="showPanel('exitsPanel', 'roomPanel');" style="margin-top:2px;">
-								<span class="bitsy_icon">open_tool</span>
-							</button>
-						</div>
+								<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" />
+								<label title="show / hide walls" for="roomWallsCheck">
+									<span class="bitsy_icon icon_space_right">wall_on</span>
+									<span class="localize walls_toggle_visible">walls</span>
+									<span id="roomWallsIcon" class="bitsy_icon">visibility_off</span>
+								</label>
 
-						<div id="roomVisibility" class="buttonGroup controlBox" style="flex-grow: 1; margin-bottom: 0px; padding: 2px;">
-							<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
-							<label title="show / hide grid" for="roomGridCheck">
-								<span id="roomGridIcon" class="bitsy_icon">visibility</span>
-								<span class="localize grid_toggle_visible">grid</span>
-							</label>
-
-							<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" />
-							<label title="show / hide walls" for="roomWallsCheck">
-								<span id="roomWallsIcon" class="bitsy_icon">visibility_off</span>
-								<span class="localize walls_toggle_visible">walls</span>
-							</label>
+								<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
+								<label title="show / hide exits & endings" for="roomMarkersCheck">
+									<span class="bitsy_icon icon_space_right">exits_endings</span>
+									<span class="localize marker_tool_name">exits & endings</span>
+									<span id="roomMarkersIcon" class="bitsy_icon">visibility</span>
+								</label>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -756,7 +772,7 @@
 
 					<div class="controlBox" id="paintExplorerFilter">
 						<span id="paintExplorerFilterIcon">
-							<span class="bitsy_icon">search</span>
+							<span class="bitsy_icon icon_space_right">search</span>
 						</span>
 						<input id="paintExplorerFilterInput" type="text" onkeyup="paintExplorerFilterChange(event);" onchange="paintExplorerFilterChange(event);" placeholder="filter drawings" title="filter drawings by name" size="30">
 					</div>
