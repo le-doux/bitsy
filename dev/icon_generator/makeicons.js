@@ -51,7 +51,14 @@ for (var t in tile) {
 
 	console.log(name);
 
-	var frame0 = renderer.GetImageSource(drwId)[0];
+	var imageSource = renderer.GetImageSource(drwId);
+
+	var frame0 = imageSource[0];
 
 	drawingToSvg(frame0, 8, 8, "../resources/icons/icon_" + name + ".svg");
+
+	if (imageSource.length > 1) {
+		var frame1 = imageSource[1];
+		drawingToSvg(frame1, 8, 8, "../resources/icons/icon_" + name + "_f1.svg");
+	}
 }

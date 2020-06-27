@@ -57,3 +57,27 @@ input[type=checkbox]:checked + label .bitsy_icon {
 #colorPaletteForm input[type="radio"] + label.colorPaletteLabelLight .bitsy_icon {
 	fill: black; /* black text for light backgrounds */
 }
+
+.icon_anim_frame0 {
+	display: none;
+}
+
+.bitsy_icon_anim.icon_anim0 .icon_anim_frame0 {
+	display: inline-block;
+}
+
+.icon_anim_frame1 {
+	display: none;
+}
+
+.bitsy_icon_anim.icon_anim1 .icon_anim_frame1 {
+	display: inline-block;
+}
+
+#gifRecordingText .bitsy_icon {
+	fill: red;
+}
+
+#gifEncodingText .bitsy_icon {
+	fill: green;
+}

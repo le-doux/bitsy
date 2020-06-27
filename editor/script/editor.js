@@ -879,6 +879,11 @@ function start() {
 		iconUtils.LoadIcon(elements[i]);
 	}
 
+	var elements = document.getElementsByClassName("bitsy_icon_anim");
+	for(var i = 0; i < elements.length; i++) {
+		iconUtils.LoadIconAnimated(elements[i]);
+	}
+
 	// localization
 	if (urlFlags["lang"] != null) {
 		localStorage.editor_language = urlFlags["lang"]; // need to verify this is real language?
