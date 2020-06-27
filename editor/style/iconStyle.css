@@ -81,3 +81,12 @@ input[type=checkbox]:checked + label .bitsy_icon {
 #gifEncodingText .bitsy_icon {
 	fill: green;
 }
+
+.actionBuilderCancel .bitsy_icon {
+	fill: white;
+}
+
+/* kind of specific here */
+.inventoryVariableBox button:hover .bitsy_icon {
+	fill: white;
+}
