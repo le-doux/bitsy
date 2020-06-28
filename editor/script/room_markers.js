@@ -431,6 +431,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 			markerInputName.value = localization.GetStringOrFallback("ending_label", "ending") + " " + (endingIndex + 1) + "/" + endingCount;
 			markerName1.innerText = localization.GetStringOrFallback("ending_label", "ending");
+
+			markerIcon1.appendChild(iconUtils.CreateIcon("ending"));
 		}
 	}
 
