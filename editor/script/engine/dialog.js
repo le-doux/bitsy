@@ -151,26 +151,9 @@ var DialogRenderer = function() {
 						}
 					}
 				}
-				// else {
-				// 	// DEBUG
-
-				// 	//scaling nonsense
-				// 	for (var sy = 0; sy < text_scale; sy++) {
-				// 		for (var sx = 0; sx < text_scale; sx++) {
-				// 			var pxl = 4 * ( ((top+(y*text_scale)+sy) * (textboxInfo.width*scale)) + (left+(x*text_scale)+sx) );
-				// 			textboxInfo.img.data[pxl+0] = debug_r;
-				// 			textboxInfo.img.data[pxl+1] = 0;
-				// 			textboxInfo.img.data[pxl+2] = 0;
-				// 			textboxInfo.img.data[pxl+3] = 255;
-				// 		}
-				// 	}
-				// }
 
 			}
 		}
-		
-		// call printHandler for character
-		char.OnPrint();
 	};
 
 	var effectTime = 0; // TODO this variable should live somewhere better
@@ -186,16 +169,6 @@ var DialogRenderer = function() {
 		}
 
 		this.DrawTextbox();
-
-		if (buffer.DidPageFinishThisFrame() && onPageFinish != null) {
-			onPageFinish();
-		}
-	};
-
-	/* this is a hook for GIF rendering */
-	var onPageFinish = null;
-	this.SetPageFinishHandler = function(handler) {
-		onPageFinish = handler;
 	};
 
 	this.Reset = function() {
@@ -210,51 +183,106 @@ var DialogRenderer = function() {
 
 
 var DialogBuffer = function() {
-	var buffer = [[[]]]; // holds dialog in an array buffer
+	var buffer = []; // holds dialog in an array buffer
+
 	var pageIndex = 0;
 	var rowIndex = 0;
 	var charIndex = 0;
+
 	var nextCharTimer = 0;
 	var nextCharMaxTime = 50; // in milliseconds
-	var isDialogReadyToContinue = false;
+
 	var activeTextEffects = [];
+
 	var font = null;
 	var arabicHandler = new ArabicHandler();
+
 	var onDialogEndCallbacks = [];
+
+	// TODO : these seem like good reasons to combine the buffer and the renderer
+	var maxRowCount = 2;
+	var pixelsPerRow = 192; // hard-coded fun times!!!
+
+	function AddPage() {
+		var page = {
+			rows : [],
+			isFinished : false,
+			postPageScriptHandlers : [],
+		};
+
+		buffer.push(page);
+
+		AddRow();
+	}
+
+	function AddRow() {
+		var row = {
+			chars : [],
+			isFinished : false,
+		};
+
+		LastPage().rows.push(row);
+	}
 
 	this.SetFont = function(f) {
 		font = f;
 	}
 
-	this.CurPage = function() { return buffer[ pageIndex ]; };
-	this.CurRow = function() { return this.CurPage()[ rowIndex ]; };
-	this.CurChar = function() { return this.CurRow()[ charIndex ]; };
-	this.CurPageCount = function() { return buffer.length; };
-	this.CurRowCount = function() { return this.CurPage().length; };
-	this.CurCharCount = function() { return this.CurRow().length; };
+	function CurPage() {
+		return buffer[pageIndex];
+	};
 
-	this.ForEachActiveChar = function(handler) { // Iterates over visible characters on the active page
+	function CurRow() {
+		return CurPage().rows[rowIndex];
+	};
+
+	function CurChar() {
+		return CurRow().chars[charIndex];
+	}
+
+	function CurPageCount() {
+		return buffer.length;
+	};
+
+	function CurRowCount() {
+		return CurPage().rows.length;
+	}
+
+	function CurCharCount() {
+		return CurRow().chars.length;
+	}
+
+	function LastPage() {
+		return buffer[buffer.length - 1];
+	}
+
+	function LastRow() {
+		var rows = LastPage().rows;
+		return rows[rows.length - 1];
+	}
+
+	// Iterates over visible characters on the active page
+	this.ForEachActiveChar = function(handler) {
 		var rowCount = rowIndex + 1;
+
 		for (var i = 0; i < rowCount; i++) {
-			var row = this.CurPage()[i];
-			var charCount = (i == rowIndex) ? charIndex+1 : row.length;
-			// console.log(charCount);
+			var row = CurPage().rows[i];
+
+			var charCount = (i == rowIndex) ? (charIndex + 1) : row.chars.length;
 
 			var leftPos = 0;
 			if (textDirection === TextDirection.RightToLeft) {
 				leftPos = 24 * 8; // hack -- I think this is correct?
 			}
 
-			for(var j = 0; j < charCount; j++) {
-				var char = row[j];
-				if(char) {
+			for (var j = 0; j < charCount; j++) {
+				var char = row.chars[j];
+				if (char) {
 					if (textDirection === TextDirection.RightToLeft) {
 						leftPos -= char.spacing;
 					}
-					// console.log(j + " " + leftPos);
 
-					// handler( char, i /*rowIndex*/, j /*colIndex*/ );
-					handler(char, i /*rowIndex*/, j /*colIndex*/, leftPos)
+					handler(char, i, /*rowIndex*/ j, /*colIndex*/ leftPos);
 
 					if (textDirection === TextDirection.LeftToRight) {
 						leftPos += char.spacing;
@@ -265,141 +293,95 @@ var DialogBuffer = function() {
 	}
 
 	this.Reset = function() {
-		buffer = [[[]]];
+		buffer = [];
 		pageIndex = 0;
 		rowIndex = 0;
 		charIndex = 0;
-		isDialogReadyToContinue = false;
-
-		forceLineBreak = false;
-		forcePageBreak = false;
-
 		activeTextEffects = [];
-
 		onDialogEndCallbacks = [];
-
-		isActive = false;
 	};
 
-	this.DoNextChar = function() {
+	function DoNextChar() {
 		nextCharTimer = 0; //reset timer
 
-		// TODO : comment to explain this better
-		// TODO: while loop feels hacky...
-		console.log((charIndex + 1) + "/" + (this.CurCharCount()) + " " + (rowIndex + 1) + "/" + this.CurRowCount());
-		var isLastCharInBuffer = charIndex + 1 >= this.CurCharCount() && rowIndex + 1 >= this.CurRowCount();
-		while (isLastCharInBuffer && scriptReturnHandler != null && !scriptReturnHandler.WaitForPageComplete) {
-			var onReturnFunc = scriptReturnHandler.Handler; // ok this is awkward
-			scriptReturnHandler = null;
-			onReturnFunc();
-			isLastCharInBuffer = charIndex + 1 >= this.CurCharCount() && rowIndex + 1 >= this.CurRowCount();
-		}
-
 		//time to update characters
-		if (charIndex + 1 < this.CurCharCount()) {
+		if (charIndex + 1 < CurCharCount()) {
 			//add char to current row
 			charIndex++;
 		}
-		else if (rowIndex + 1 < this.CurRowCount()) {
+		else if (rowIndex + 1 < CurRowCount()) {
 			//start next row
 			rowIndex++;
 			charIndex = 0;
 		}
-		else {
-			//the page is full!
-			isDialogReadyToContinue = true;
-			didPageFinishThisFrame = true;
-		}
 
-		if (this.CurChar() != null) {
-			if (this.CurChar().isPageBreak) {
-				// special case for page break marker character!
-				isDialogReadyToContinue = true;
-				didPageFinishThisFrame = true;
+		if (CurChar() != null) {
+			if (CurChar().isScriptControlChar) {
+				CurChar().ContinueScriptExecution();
+				nextCharTimer = nextCharMaxTime; // forces us to continue immediately to next char
 			}
-			
-			this.CurChar().OnPrint(); // make sure we hit the callback before we run out of text
 		}
 	};
 
 	this.Update = function(dt) {
-		didPageFinishThisFrame = false;
-		didFlipPageThisFrame = false;
 		// this.Draw(dt); // TODO move into a renderer object
-		if (isDialogReadyToContinue) {
+		if (this.CanContinue()) {
 			return; //waiting for dialog to be advanced by player
 		}
 
 		nextCharTimer += dt; //tick timer
 
-		if (nextCharTimer > nextCharMaxTime) {
-			this.DoNextChar();
+		while (nextCharTimer >= nextCharMaxTime && !this.CanContinue()) {
+			DoNextChar();
 		}
 	};
 
 	this.Skip = function() {
-		console.log("SKIPPP");
-		didPageFinishThisFrame = false;
-		didFlipPageThisFrame = false;
 		// add new characters until you get to the end of the current line of dialog
-		while (rowIndex < this.CurRowCount()) {
-			this.DoNextChar();
+		while (rowIndex < CurRowCount()) {
+			DoNextChar();
 
-			if(isDialogReadyToContinue) {
+			if (this.CanContinue()) {
 				//make sure to push the rowIndex past the end to break out of the loop
 				rowIndex++;
 				charIndex = 0;
 			}
 		}
-		rowIndex = this.CurRowCount()-1;
-		charIndex = this.CurCharCount()-1;
+
+		rowIndex = CurRowCount()-1;
+		charIndex = CurCharCount()-1;
 	};
-
-	this.FlipPage = function() {
-		didFlipPageThisFrame = true;
-		isDialogReadyToContinue = false;
-		pageIndex++;
-		rowIndex = 0;
-		charIndex = 0;
-	}
-
-	this.EndDialog = function() {
-		isActive = false; // no more text to show... this should be a sign to stop rendering dialog
-
-		for (var i = 0; i < onDialogEndCallbacks.length; i++) {
-			onDialogEndCallbacks[i]();
-		}
-	}
 
 	this.Continue = function() {
-		console.log("CONTINUE");
-
-		// TODO : comment to explain how this works
-		while (scriptReturnHandler != null && scriptReturnHandler.WaitForPageComplete) {
-			var onReturnFunc = scriptReturnHandler.Handler; // ok this is awkward
-			scriptReturnHandler = null;
-			onReturnFunc();
+		for (var i = 0; i < CurPage().postPageScriptHandlers.length; i++) {
+			CurPage().postPageScriptHandlers[i].ContinueScriptExecution();
 		}
 
-		if (pageIndex + 1 < this.CurPageCount()) {
-			console.log("FLIP PAGE!");
-			//start next page
-			this.FlipPage();
-			return true; /* hasMoreDialog */
+		pageIndex++;
+
+		if (pageIndex < CurPageCount()) {
+			// flip page!
+			rowIndex = 0;
+			charIndex = 0;
+			nextCharTimer = 0;
 		}
 		else {
-			console.log("END DIALOG!");
-			//end dialog mode
-			this.EndDialog();
-			return false; /* hasMoreDialog */
+			// end of dialog
+			for (var i = 0; i < onDialogEndCallbacks.length; i++) {
+				onDialogEndCallbacks[i]();
+			}
 		}
+
+		return IsActive(); // hasMoreDialog
 	};
 
-	var isActive = false;
-	this.IsActive = function() { return isActive; };
+	function IsActive() {
+		return pageIndex < CurPageCount();
+	}
+	this.IsActive = IsActive;
 
 	this.OnDialogEnd = function(callback) {
-		if (!isActive) {
+		if (!IsActive()) {
 			callback();
 		}
 		else {
@@ -407,7 +389,9 @@ var DialogBuffer = function() {
 		}
 	}
 
-	this.CanContinue = function() { return isDialogReadyToContinue; };
+	this.CanContinue = function() {
+		return charIndex + 1 >= CurCharCount() && rowIndex + 1 >= CurRowCount();
+	};
 
 	function DialogChar(effectList) {
 		this.effectList = effectList.slice(); // clone effect list (since it can change between chars)
@@ -431,18 +415,6 @@ var DialogBuffer = function() {
 				var effectName = this.effectList[i];
 				// console.log("FX " + effectName);
 				TextEffects[ effectName ].DoEffect( this, time );
-			}
-		}
-
-		var printHandler = null; // optional function to be called once on printing character
-		this.SetPrintHandler = function(handler) {
-			printHandler = handler;
-		}
-		this.OnPrint = function() {
-			if (printHandler != null) {
-				// console.log("PRINT HANDLER ---- DIALOG BUFFER");
-				printHandler();
-				printHandler = null; // only call handler once (hacky)
 			}
 		}
 
@@ -490,35 +462,29 @@ var DialogBuffer = function() {
 		this.width = 0;
 		this.height = 0;
 		this.spacing = 0;
-	}
 
-	// is a control character really the best way to handle page breaks?
-	function DialogPageBreakChar() {
-		Object.assign(this, new DialogChar([]));
+		this.isScriptControlChar = true;
 
-		this.width = 0;
-		this.height = 0;
-		this.spacing = 0;
+		var handlerFunc = null;
 
-		this.isPageBreak = true;
-
-		var continueHandler = null;
-
-		this.SetContinueHandler = function(handler) {
-			continueHandler = handler;
+		this.SetHandler = function(handler) {
+			handlerFunc = handler;
 		}
 
-		this.OnContinue = function() {
-			if (continueHandler) {
-				continueHandler();
+		this.ContinueScriptExecution = function() {
+			if (handlerFunc != null) {
+				handlerFunc();
 			}
 		}
 	}
 
-	function AddWordToCharArray(charArray,word,effectList) {
-		for(var i = 0; i < word.length; i++) {
-			charArray.push( new DialogFontChar( font, word[i], effectList ) );
+	function CreateCharArray(word, effectList) {
+		var charArray = [];
+
+		for (var i = 0; i < word.length; i++) {
+			charArray.push(new DialogFontChar(font, word[i], effectList));
 		}
+
 		return charArray;
 	}
 
@@ -539,83 +505,75 @@ var DialogBuffer = function() {
 		return width;
 	}
 
-	var pixelsPerRow = 192; // hard-coded fun times!!!
-
-	// TODO : replace this with buffer of non-inline script return control characters --- will that work???
-	var scriptReturnHandler = null;
-
 	this.AddScriptReturn = function(onReturnHandler) {
-		// var curPageIndex = buffer.length - 1;
-		// var curRowIndex = buffer[curPageIndex].length - 1;
-		// var curRowArr = buffer[curPageIndex][curRowIndex];
+		var controlChar = new DialogScriptControlChar();
+		controlChar.SetHandler(onReturnHandler);
 
-		// var controlChar = new DialogScriptControlChar();
-		// controlChar.SetPrintHandler(onReturnHandler);
+		if (IsActive() && LastPage().isFinished) {
+			// add script return after page ends
+			LastPage().postPageScriptHandlers.push(controlChar);
+		}
+		else if (IsActive()) {
+			// add inline script return
+			LastRow().chars.push(controlChar);
+		}
+		else {
+			// TODO
+			console.log("OH NO NOTHING IS ACTIVE!!!");
+		}
+	}
 
-		// curRowArr.push(controlChar);
+	function AddWord(wordCharArray, prependSpaceChar) {
+		if (prependSpaceChar === undefined || prependSpaceChar === null) {
+			prependSpaceChar = false;
+		}
 
-		// isActive = true;
+		var spaceCharArray = CreateCharArray(" ", activeTextEffects);
 
-		scriptReturnHandler = {
-			Handler : onReturnHandler,
-			WaitForPageComplete : forcePageBreak, // TODO : handle final line break case too!
-		};
+		// figure out if the word fits on the current row
+		var wordLength = prependSpaceChar ?
+			GetCharArrayWidth(spaceCharArray.concat(wordCharArray)) : GetCharArrayWidth(wordCharArray);
+		var rowLength = IsActive() ? GetCharArrayWidth(LastRow().chars) : 0;
+		var doesWordFitOnRow = rowLength + wordLength <= pixelsPerRow || rowLength <= 0;
+
+		// mark whether the current row and/or page will now be finished
+		if (IsActive()) {
+			LastRow().isFinished = LastRow().isFinished || !doesWordFitOnRow;
+
+			var finalRowFinished = (LastRow().isFinished && LastPage().rows.length + 1 > maxRowCount);
+			LastPage().isFinished = LastPage().isFinished || finalRowFinished;
+		}
+
+		// do we need to start a new page or row?
+		var isNewLine = !IsActive() || LastRow().isFinished;
+		var isNewPage = !IsActive() || LastPage().isFinished;
+
+		// add the word
+		if (isNewPage) {
+			//start next page
+			AddPage();
+			LastRow().chars = LastRow().chars.concat(wordCharArray);
+		}
+		else if (isNewLine) {
+			//start next row
+			AddRow();
+			LastRow().chars = LastRow().chars.concat(wordCharArray);
+		}
+		else {
+			//stay on same row
+			wordCharArray = prependSpaceChar ? spaceCharArray.concat(wordCharArray) : wordCharArray;
+			LastRow().chars = LastRow().chars.concat(wordCharArray);
+		}
 	}
 
 	this.AddDrawing = function(drawingId) {
-		// console.log("DRAWING ID " + drawingId);
-
-		var curPageIndex = buffer.length - 1;
-		var curRowIndex = buffer[curPageIndex].length - 1;
-		var curRowArr = buffer[curPageIndex][curRowIndex];
-
 		var drawingChar = new DialogDrawingChar(drawingId, activeTextEffects);
-
-		var rowLength = GetCharArrayWidth(curRowArr);
-
-		if (rowLength + drawingChar.spacing  <= pixelsPerRow || rowLength <= 0) {
-			//stay on same row
-			curRowArr.push(drawingChar);
-		}
-		else if (curRowIndex == 0) {
-			//start next row
-			buffer[curPageIndex][curRowIndex] = curRowArr;
-			buffer[curPageIndex].push([]);
-			curRowIndex++;
-			curRowArr = buffer[curPageIndex][curRowIndex];
-			curRowArr.push(drawingChar);
-		}
-		else {
-			//start next page
-			buffer[curPageIndex][curRowIndex] = curRowArr;
-			buffer.push([]);
-			curPageIndex++;
-			buffer[curPageIndex].push([]);
-			curRowIndex = 0;
-			curRowArr = buffer[curPageIndex][curRowIndex];
-			curRowArr.push(drawingChar);
-		}
-
-		isActive = true; // this feels like a bad way to do this???
+		AddWord([drawingChar]);
 	}
 
-	var forceLineBreak = false;
-	var forcePageBreak = false;
-
-	// TODO : convert this into something that takes DialogChar arrays
 	this.AddText = function(textStr) {
-		console.log("ADD TEXT " + textStr);
-
-		//process dialog so it's easier to display
+		// add text to page buffer, one word at a time
 		var words = textStr.split(" ");
-
-		// var curPageIndex = this.CurPageCount() - 1;
-		// var curRowIndex = this.CurRowCount() - 1;
-		// var curRowArr = this.CurRow();
-
-		var curPageIndex = buffer.length - 1;
-		var curRowIndex = buffer[curPageIndex].length - 1;
-		var curRowArr = buffer[curPageIndex][curRowIndex];
 
 		for (var i = 0; i < words.length; i++) {
 			var word = words[i];
@@ -623,73 +581,39 @@ var DialogBuffer = function() {
 				word = arabicHandler.ShapeArabicCharacters(word);
 			}
 
-			var wordWithPrecedingSpace = ((i == 0) ? "" : " ") + word;
-			var wordLength = GetStringWidth(wordWithPrecedingSpace);
+			var wordCharArray = CreateCharArray(word, activeTextEffects);
+			var prependSpaceChar = i != 0;
 
-			var rowLength = GetCharArrayWidth(curRowArr);
-
-			var doesWordFitOnRow = rowLength + wordLength <= pixelsPerRow || rowLength <= 0;
-			var isNewLine = forceLineBreak || !doesWordFitOnRow;
-			var isNewPage = forcePageBreak || (isNewLine && curRowIndex >= 1);
-
-			if (isNewPage) {
-				//start next page
-				buffer[curPageIndex][curRowIndex] = curRowArr;
-				buffer.push([]);
-				curPageIndex++;
-				buffer[curPageIndex].push([]);
-				curRowIndex = 0;
-				curRowArr = buffer[curPageIndex][curRowIndex];
-				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects);
-
-				forceLineBreak = false;
-				forcePageBreak = false;
-			}
-			else if (isNewLine) {
-				//start next row
-				buffer[curPageIndex][curRowIndex] = curRowArr;
-				buffer[curPageIndex].push([]);
-				curRowIndex++;
-				curRowArr = buffer[curPageIndex][curRowIndex];
-				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects);
-
-				forceLineBreak = false;
-			}
-			else {
-				//stay on same row
-				curRowArr = AddWordToCharArray(curRowArr, wordWithPrecedingSpace, activeTextEffects);
-			}
+			AddWord(wordCharArray, prependSpaceChar);
 		}
-
-		//destroy any empty stuff
-		var lastPage = buffer[buffer.length-1];
-		var lastRow = lastPage[lastPage.length-1];
-		if (lastRow.length == 0) {
-			lastPage.splice(lastPage.length-1, 1);
-		}
-		if (lastPage.length == 0) {
-			buffer.splice(buffer.length-1, 1);
-		}
-
-		//finish up 
-		lastPage = buffer[buffer.length-1];
-		lastRow = lastPage[lastPage.length-1];
-		if (lastRow.length > 0) {
-			var lastChar = lastRow[lastRow.length-1];
-		}
-
-		// console.log(buffer);
-
-		isActive = true;
 	};
 
 	this.AddLinebreak = function() {
-		console.log(">>> LINE BREAK");
-		forceLineBreak = true;
+		// TODO : decide if this is the right behavior
+		// // Ensure there is a row to mark as finished
+		// if (!IsActive() || LastPage().rows.length + 1 > maxRowCount) {
+		// 	// todo : mark last page finished
+		// 	AddPage();
+		// }
+		// else if (LastRow().isFinished) {
+		// 	AddRow();
+		// }
+
+		if (IsActive()) {
+			LastRow().isFinished = true;
+		}
 	}
 
 	this.AddPagebreak = function() {
-		forcePageBreak = true;
+		// TODO : decide if this is the right behavior
+		// // Ensure there is a page to mark as finished
+		// if (!IsActive() || LastPage().isFinished) {
+		// 	AddPage();
+		// }
+
+		if (IsActive()) {
+			LastPage().isFinished = true;
+		}
 	}
 
 	/* new text effects */
@@ -702,13 +626,6 @@ var DialogBuffer = function() {
 	this.RemoveTextEffect = function(name) {
 		activeTextEffects.splice( activeTextEffects.indexOf( name ), 1 );
 	}
-
-	/* this is a hook for GIF rendering */
-	var didPageFinishThisFrame = false;
-	this.DidPageFinishThisFrame = function(){ return didPageFinishThisFrame; };
-
-	var didFlipPageThisFrame = false;
-	this.DidFlipPageThisFrame = function(){ return didFlipPageThisFrame; };
 
 	// this.SetCharsPerRow = function(num){ charsPerRow = num; }; // hacky
 };

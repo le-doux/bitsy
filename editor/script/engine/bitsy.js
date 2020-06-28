@@ -146,12 +146,6 @@ var key = {
 var prevTime = 0;
 var deltaTime = 0;
 
-//methods used to trigger gif recording
-var didPlayerMoveThisFrame = false;
-var onPlayerMoved = null;
-// var didDialogUpdateThisFrame = false;
-var onDialogUpdate = null;
-
 //inventory update UI handles
 var onInventoryChanged = null;
 var onVariableChanged = null;
@@ -466,17 +460,6 @@ function update() {
 	}
 
 	prevTime = curTime;
-
-	//for gif recording
-	if (didPlayerMoveThisFrame && onPlayerMoved != null) {
-		onPlayerMoved();
-	}
-	didPlayerMoveThisFrame = false;
-
-	/* hacky replacement */
-	if (onDialogUpdate != null) {
-		dialogRenderer.SetPageFinishHandler( onDialogUpdate );
-	}
 
 	input.resetKeyPressed();
 	input.resetTapReleased();
@@ -816,19 +799,15 @@ function movePlayer(direction) {
 
 	if ( curPlayerDirection == Direction.Left && !(spr = getSpriteLeft()) && !isWallLeft()) {
 		player().x -= 1;
-		didPlayerMoveThisFrame = true;
 	}
 	else if ( curPlayerDirection == Direction.Right && !(spr = getSpriteRight()) && !isWallRight()) {
 		player().x += 1;
-		didPlayerMoveThisFrame = true;
 	}
 	else if ( curPlayerDirection == Direction.Up && !(spr = getSpriteUp()) && !isWallUp()) {
 		player().y -= 1;
-		didPlayerMoveThisFrame = true;
 	}
 	else if ( curPlayerDirection == Direction.Down && !(spr = getSpriteDown()) && !isWallDown()) {
 		player().y += 1;
-		didPlayerMoveThisFrame = true;
 	}
 	
 	var ext = getExit( player().room, player().x, player().y );
