@@ -1041,16 +1041,22 @@
 						<span class="localize gif_encoding">encoding...</span> <span id="gifEncodingProgress">0</span>%
 					</span>
 
-					<button title="make screenshot of current room" class="color0" id="gifSnapshotButton" onclick="takeSnapshotGif(event);">
+					<button title="make screenshot of current room" class="color0" id="gifSnapshotButton" onclick="takeSnapshotGif(event);"  style="margin-left: 10px;">
 						<span class="bitsy_icon">record_snapshot</span>
 						<span class="localize gif_snapshot">snapshot</span>
 					</button>
-					
+
+					<button title="snapshot mode: square" id="gifSnapshotModeButton" onclick="toggleSnapshotMode();">
+						<span id="gifSnapshotModeIcon" class="bitsy_icon">pagesize_full</span>
+					</button>
+
 					<br/>
-					
-					<img id="gifPreview" style="display:none;" />
-					<div id="gifPlaceholder"></div>
-					
+
+					<div style="margin-top: 5px;">
+						<img id="gifPreview" style="display:none;" />
+						<div id="gifPlaceholder"></div>
+					</div>
+
 					<br/>
 
 					<span class="bitsy_icon icon_space_right">download</span>

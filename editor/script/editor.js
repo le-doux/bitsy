@@ -2572,6 +2572,7 @@ function startRecordingGif() {
 
 	document.getElementById("gifStartButton").style.display="none";
 	document.getElementById("gifSnapshotButton").style.display="none";
+	document.getElementById("gifSnapshotModeButton").style.display="none";
 	document.getElementById("gifStopButton").style.display="inline";
 	document.getElementById("gifRecordingText").style.display="inline";
 	document.getElementById("gifPreview").style.display="none";
@@ -2588,6 +2589,17 @@ var gifCaptureWidescreenSize = {
 	width : 726, // height * 1.26
 	height : 576
 };
+
+var isGifSnapshotLandscape = false;
+function toggleSnapshotMode() {
+	isGifSnapshotLandscape = !isGifSnapshotLandscape;
+
+	var modeDesc = isGifSnapshotLandscape ? "snapshot mode: landscape" : "snapshot mode: square";
+	document.getElementById("gifSnapshotModeButton").title = modeDesc;
+
+	var iconName = isGifSnapshotLandscape ? "pagesize_landscape" : "pagesize_full";
+	iconUtils.LoadIcon(document.getElementById("gifSnapshotModeIcon"), iconName);
+}
 
 function takeSnapshotGif(e) {
 	var gif = {
@@ -2607,7 +2619,7 @@ function takeSnapshotGif(e) {
 	drawRoom( room[curRoom], gifCaptureCtx, 1 );
 	var frame1 = gifCaptureCtx.getImageData(0,0,512,512);
 
-	if(e.altKey) {
+	if (isGifSnapshotLandscape) {
 		/* widescreen */
 		gif.width = gifCaptureWidescreenSize.width;
 		gif.height = gifCaptureWidescreenSize.height;
@@ -2654,6 +2666,7 @@ function finishRecordingGif(gif) {
 
 	document.getElementById("gifStartButton").style.display="none";
 	document.getElementById("gifSnapshotButton").style.display="none";
+	document.getElementById("gifSnapshotModeButton").style.display="none";
 	document.getElementById("gifStopButton").style.display="none";
 	document.getElementById("gifRecordingText").style.display="none";
 	document.getElementById("gifEncodingText").style.display="inline";
@@ -2699,6 +2712,7 @@ function finishRecordingGif(gif) {
 				document.getElementById("gifPreview").style.display="block";
 				document.getElementById("gifPlaceholder").style.display="none";
 				document.getElementById("gifSnapshotButton").style.display="inline";
+				document.getElementById("gifSnapshotModeButton").style.display="inline";
 
 				if( browserFeatures.blobURL ) {
 					document.getElementById("gifDownload").href = makeURL.createObjectURL( blob );
