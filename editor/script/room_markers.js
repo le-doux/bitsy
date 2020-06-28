@@ -376,6 +376,11 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		var markerName1 = document.getElementById("markerName1");
 		var markerName2 = document.getElementById("markerName2");
 
+		var markerIcon1 = document.getElementById("markerIcon1");
+		markerIcon1.innerHTML = "";
+		var markerIcon2 = document.getElementById("markerIcon2");
+		markerIcon2.innerHTML = "";
+
 		if (curMarker.type == MarkerType.Exit) {
 			// TODO : why are the counts backwards?
 			// kind of a long-winded way to figure out a number for this exit in this room
@@ -394,14 +399,21 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			if (curMarker.linkState == LinkState.TwoWay) {
 				markerName1.innerText = localization.GetStringOrFallback("exit_label", "exit");
 				markerName2.innerText = localization.GetStringOrFallback("exit_return_label", "return exit");
+
+				markerIcon1.appendChild(iconUtils.CreateIcon("exit_one_way"));
+				markerIcon2.appendChild(iconUtils.CreateIcon("exit_one_way_reverse"));
 			}
 			else if (curMarker.linkState == LinkState.OneWayOriginal) {
 				markerName1.innerText = localization.GetStringOrFallback("exit_label", "exit");
 				markerName2.innerText = localization.GetStringOrFallback("destination_label", "destination");
+
+				markerIcon1.appendChild(iconUtils.CreateIcon("exit_one_way"));
 			}
 			else if (curMarker.linkState == LinkState.OneWaySwapped) {
 				markerName1.innerText = localization.GetStringOrFallback("destination_label", "destination");
 				markerName2.innerText = localization.GetStringOrFallback("exit_label", "exit");
+
+				markerIcon2.appendChild(iconUtils.CreateIcon("exit_one_way"));
 			}
 		}
 		else if (curMarker.type == MarkerType.Ending) {
