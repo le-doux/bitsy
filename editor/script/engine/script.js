@@ -1155,7 +1155,13 @@ var FuncNode = function(name,args) {
 	}
 
 	this.ToString = function() {
-		return this.type + " " + this.name + " " + this.GetId();
+		var str = this.type + " " + this.name + " " + this.GetId();
+
+		if (this.name === "print") {
+			str += " <<" + this.args[0].value + ">>";
+		}
+
+		return str;
 	};
 }
 
@@ -1552,6 +1558,15 @@ var Parser = function(env) {
 			state = ParseDialog(state);
 		}
 
+		// hack test
+		var printVisitor = {
+			Visit : function(node,depth) {
+				console.log("-".repeat(depth) + "- " + node.ToString());
+			},
+		};
+
+		state.rootNode.VisitAll( printVisitor );
+
 		return state.rootNode;
 	};
 
@@ -1718,6 +1733,13 @@ var Parser = function(env) {
 				// add any buffered text to a print node, 
 				// and add a linebreak if we are between two dialog lines
 				tryAddTextNodeToList();
+
+				// empty lines need a trick print node to trigger the buffer
+				if (curLineIsEmpty) {
+					var printNode = new FuncNode("print", [new LiteralNode(curText)]);
+					curLineNodeList.push(printNode);
+				}
+
 				tryAddLinebreakNodeToList();
 
 				// since we've reached the end of a line

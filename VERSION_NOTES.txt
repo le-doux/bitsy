@@ -5,6 +5,7 @@ v7.2:
 -- items with empty dialog can be picked up
 -- stop exits from getting moved off-screen
 -- dialog selection stopped working after playing the game
+-- gif thumbnails don't break with large # of colors
 
 v7.1:
 - updated localization text

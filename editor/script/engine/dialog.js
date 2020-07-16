@@ -237,6 +237,10 @@ var DialogBuffer = function() {
 	};
 
 	function CurChar() {
+		if (CurRow() == null) {
+			return null;
+		}
+
 		return CurRow().chars[charIndex];
 	}
 
@@ -249,6 +253,10 @@ var DialogBuffer = function() {
 	}
 
 	function CurCharCount() {
+		if (CurRow() == null) {
+			return -1;
+		}
+
 		return CurRow().chars.length;
 	}
 
@@ -263,10 +271,10 @@ var DialogBuffer = function() {
 
 	// Iterates over visible characters on the active page
 	this.ForEachActiveChar = function(handler) {
-		var rowCount = rowIndex + 1;
+		var rowArray = CurPage().rows;
 
-		for (var i = 0; i < rowCount; i++) {
-			var row = CurPage().rows[i];
+		for (var i = 0; i < rowArray.length; i++) {
+			var row = rowArray[i];
 
 			var charCount = (i == rowIndex) ? (charIndex + 1) : row.chars.length;
 
@@ -302,37 +310,50 @@ var DialogBuffer = function() {
 	};
 
 	function DoNextChar() {
-		nextCharTimer = 0; //reset timer
+		console.log("NEXT CHAR!!");
 
-		//time to update characters
-		if (charIndex + 1 < CurCharCount()) {
+		nextCharTimer = 0; // reset timer
+
+		// first, if this is an inline script control char,
+		// make sure to execute the next part of the script
+		if (CurChar() != null && CurChar().isScriptControlChar) {
+			CurChar().ContinueScriptExecution();
+			nextCharTimer = nextCharMaxTime; // forces us to continue immediately to next char
+		}
+
+		// then update the current character location
+		if (charIndex < CurCharCount()) {
 			//add char to current row
 			charIndex++;
 		}
-		else if (rowIndex + 1 < CurRowCount()) {
+		else if (rowIndex < CurRowCount()) {
 			//start next row
 			rowIndex++;
 			charIndex = 0;
 		}
 
-		if (CurChar() != null) {
-			if (CurChar().isScriptControlChar) {
-				CurChar().ContinueScriptExecution();
-				nextCharTimer = nextCharMaxTime; // forces us to continue immediately to next char
-			}
-		}
+		console.log(CurChar());
 	};
 
 	this.Update = function(dt) {
-		// this.Draw(dt); // TODO move into a renderer object
-		if (this.CanContinue()) {
-			return; //waiting for dialog to be advanced by player
-		}
+		console.log("UPDATE -- " + pageIndex + "/" + CurPageCount() + " " + rowIndex + "/" + CurRowCount() + " " + charIndex + "/" + CurCharCount());
+
+		// if (this.CanContinue()) {
+		// 	return; //waiting for dialog to be advanced by player
+		// }
 
 		nextCharTimer += dt; //tick timer
 
+		var count = 0;
+
 		while (nextCharTimer >= nextCharMaxTime && !this.CanContinue()) {
 			DoNextChar();
+
+			// if (this.CanContinue()) {
+			// 	break;
+			// }
+
+			count++;
 		}
 	};
 
@@ -390,7 +411,7 @@ var DialogBuffer = function() {
 	}
 
 	this.CanContinue = function() {
-		return charIndex + 1 >= CurCharCount() && rowIndex + 1 >= CurRowCount();
+		return charIndex >= CurCharCount() && rowIndex >= CurRowCount();
 	};
 
 	function DialogChar(effectList) {
@@ -507,13 +528,19 @@ var DialogBuffer = function() {
 
 	this.AddScriptReturn = function(onReturnHandler) {
 		var controlChar = new DialogScriptControlChar();
-		controlChar.SetHandler(onReturnHandler);
+		controlChar.SetHandler(function() {
+			console.log("RETURN TO SCRIPT EXECUTION!");
+			onReturnHandler();
+		});
 
 		if (IsActive() && LastPage().isFinished) {
+			console.log("ADD SCRIPT RETURN -- post page");
 			// add script return after page ends
 			LastPage().postPageScriptHandlers.push(controlChar);
 		}
 		else if (IsActive()) {
+			console.log("ADD SCRIPT RETURN -- inline");
+			console.log(LastPage());
 			// add inline script return
 			LastRow().chars.push(controlChar);
 		}
@@ -599,8 +626,14 @@ var DialogBuffer = function() {
 		// 	AddRow();
 		// }
 
+		console.log("ADD LINEBREAK");
+
 		if (IsActive()) {
+			console.log(LastPage());
+
 			LastRow().isFinished = true;
+
+			console.log(LastPage());
 		}
 	}
 
@@ -611,8 +644,14 @@ var DialogBuffer = function() {
 		// 	AddPage();
 		// }
 
+		console.log("ADD PAGEBREAK");
+
 		if (IsActive()) {
+			console.log(LastPage());
+
 			LastPage().isFinished = true;
+
+			console.log(LastPage());
 		}
 	}
 

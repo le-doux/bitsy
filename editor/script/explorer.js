@@ -377,15 +377,14 @@ function ThumbnailRenderer() {
 	function render(imgId,drawingId,frameIndex,imgElement) {
 		var isAnimated = (frameIndex === undefined || frameIndex === null) ? true : false;
 
-		var hexPalette = []; // TODO this is a bit repetitive to do all the time, huh?
-		for (pal in palette) {
-			for (i in getPal(pal)){
-				var hexStr = rgbToHex( getPal(pal)[i][0], getPal(pal)[i][1], getPal(pal)[i][2] ).slice(1);
-				hexPalette.push( hexStr );
-			}
-		}
-
 		var palId = getRoomPal(curRoom); // TODO : should NOT be hardcoded like this
+
+		var hexPalette = [];
+		var roomColors = getPal(palId);
+		for (i in roomColors) {
+			var hexStr = rgbToHex(roomColors[i][0], roomColors[i][1], roomColors[i][2]).slice(1);
+			hexPalette.push(hexStr);
+		}
 
 		// console.log(id);
 
