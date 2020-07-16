@@ -396,8 +396,8 @@ var PostProcessUtilities = {
 		return { r:r, g:g, b:b, a:a };
 	},
 	SetPixelColor : function(image,x,y,colorRgba) {
-		for (var yDelta = 0; yDelta <= scale; yDelta++) {
-			for (var xDelta = 0; xDelta <= scale; xDelta++) {
+		for (var yDelta = 0; yDelta < scale; yDelta++) {
+			for (var xDelta = 0; xDelta < scale; xDelta++) {
 				var pixelIndex = (((y * scale) + yDelta) * image.width * 4) + (((x * scale) + xDelta) * 4);
 				image.data[pixelIndex + 0] = colorRgba.r;
 				image.data[pixelIndex + 1] = colorRgba.g;
