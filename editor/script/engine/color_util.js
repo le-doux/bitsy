@@ -138,7 +138,7 @@ function hslToRgb(h, s, l) {
     b = hue2rgb(p, q, h - 1/3);
   }
 
-  return [ r * 255, g * 255, b * 255 ];
+  return [ Math.floor(r * 255), Math.floor(g * 255), Math.floor(b * 255) ];
 }
 
 /**
