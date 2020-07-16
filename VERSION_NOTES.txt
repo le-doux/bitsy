@@ -6,6 +6,8 @@ v7.2:
 -- stop exits from getting moved off-screen
 -- dialog selection stopped working after playing the game
 -- gif thumbnails don't break with large # of colors
+-- @sean fixed float bug with randomly generated colors
+-- @sean fixed transition pixel overflow bug
 
 v7.1:
 - updated localization text
