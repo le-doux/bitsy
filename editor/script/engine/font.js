@@ -54,7 +54,10 @@ function Font(fontData) {
 	var width = 6; // default size so if you have NO font or an invalid font it displays boxes
 	var height = 8;
 	var chardata = {};
+
+	// create invalid char data at default size in case the font is missing
 	var invalidCharData = {};
+	updateInvalidCharData();
 
 	this.getName = function() {
 		return name;
@@ -97,9 +100,37 @@ function Font(fontData) {
 		return codeList;
 	}
 
+	function createCharData() {
+		return { 
+			width: width,
+			height: height,
+			offset: {
+				x: 0,
+				y: 0
+			},
+			spacing: width,
+			data: [],
+		};
+	}
+
+	function updateInvalidCharData() {
+		invalidCharData = createCharData();
+		for (var y = 0; y < height; y++) {
+			for (var x = 0; x < width; x++) {
+				if (x < width-1 && y < height-1) {
+					invalidCharData.data.push(1);
+				}
+				else {
+					invalidCharData.data.push(0);
+				}
+			}
+		}
+	}
+
 	function parseFont(fontData) {
-		if (fontData == null)
+		if (fontData == null) {
 			return;
+		}
 
 		var lines = fontData.split("\n");
 
@@ -131,16 +162,7 @@ function Font(fontData) {
 
 					curCharLineCount = 0;
 					curCharCode = parseInt(args[1]);
-					chardata[curCharCode] = { 
-						width: width,
-						height: height,
-						offset: {
-							x: 0,
-							y: 0
-						},
-						spacing: width,
-						data: []
-					};
+					chardata[curCharCode] = createCharData();
 				}
 			}
 			else {
@@ -187,27 +209,8 @@ function Font(fontData) {
 			}
 		}
 
-		// init invalid character box
-		invalidCharData = { 
-			width: width,
-			height: height,
-			offset: {
-				x: 0,
-				y: 0
-			},
-			spacing: width, // TODO : name?
-			data: []
-		};
-		for (var y = 0; y < height; y++) {
-			for (var x = 0; x < width; x++) {
-				if (x < width-1 && y < height-1) {
-					invalidCharData.data.push(1);
-				}
-				else {
-					invalidCharData.data.push(0);
-				}
-			}
-		}
+		// re-init invalid character box at the actual font size once it's loaded
+		updateInvalidCharData();
 	}
 
 	parseFont(fontData);
