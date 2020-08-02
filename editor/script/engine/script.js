@@ -372,7 +372,6 @@ function deprecatedFunc(environment,parameters,onReturn) {
 function printFunc(environment, parameters, onReturn) {
 	if (parameters[0] != undefined && parameters[0] != null) {
 		var textStr = "" + parameters[0];
-		console.log(">>> PRINT {" + textStr + "}");
 		environment.GetDialogBuffer().AddText(textStr);
 		environment.GetDialogBuffer().AddScriptReturn(function() { onReturn(null); });
 	}
@@ -388,8 +387,7 @@ function linebreakFunc(environment, parameters, onReturn) {
 }
 
 function pagebreakFunc(environment, parameters, onReturn) {
-	environment.GetDialogBuffer().AddPagebreak();
-	environment.GetDialogBuffer().AddScriptReturn(function() { onReturn(null); });
+	environment.GetDialogBuffer().AddPagebreak(function() { onReturn(null); });
 }
 
 function printDrawingFunc(environment, parameters, onReturn) {
@@ -1155,13 +1153,7 @@ var FuncNode = function(name,args) {
 	}
 
 	this.ToString = function() {
-		var str = this.type + " " + this.name + " " + this.GetId();
-
-		if (this.name === "print") {
-			str += " <<" + this.args[0].value + ">>";
-		}
-
-		return str;
+		return this.type + " " + this.name + " " + this.GetId();
 	};
 }
 
@@ -1558,15 +1550,6 @@ var Parser = function(env) {
 			state = ParseDialog(state);
 		}
 
-		// hack test
-		var printVisitor = {
-			Visit : function(node,depth) {
-				console.log("-".repeat(depth) + "- " + node.ToString());
-			},
-		};
-
-		state.rootNode.VisitAll( printVisitor );
-
 		return state.rootNode;
 	};
 
@@ -1733,13 +1716,6 @@ var Parser = function(env) {
 				// add any buffered text to a print node, 
 				// and add a linebreak if we are between two dialog lines
 				tryAddTextNodeToList();
-
-				// empty lines need a trick print node to trigger the buffer
-				if (curLineIsEmpty) {
-					var printNode = new FuncNode("print", [new LiteralNode(curText)]);
-					curLineNodeList.push(printNode);
-				}
-
 				tryAddLinebreakNodeToList();
 
 				// since we've reached the end of a line
