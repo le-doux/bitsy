@@ -594,6 +594,18 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			return;
 		}
 
+		var shouldDeleteMarker = false;
+		if (curMarker.type === MarkerType.Exit) {
+			shouldDeleteMarker = confirm("Are you sure you want to delete this exit?");
+		}
+		else {
+			shouldDeleteMarker = confirm("Are you sure you want to delete this ending?");
+		}
+
+		if (!shouldDeleteMarker) {
+			return;
+		}
+
 		curMarker.Remove();
 
 		markerList = GatherMarkerList();
@@ -873,6 +885,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	var dragMarker = null;
 
 	this.StartDrag = function(x,y) {
+		x = clamp(x, 0, mapsize - 1);
+		y = clamp(y, 0, mapsize - 1);
+
 		dragMarker = FindMarkerAtLocation(x,y);
 
 		if (dragMarker != null) {
@@ -881,6 +896,9 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	}
 
 	this.ContinueDrag = function(x,y) {
+		x = clamp(x, 0, mapsize - 1);
+		y = clamp(y, 0, mapsize - 1);
+
 		if (dragMarker == null) {
 			return;
 		}

@@ -495,7 +495,9 @@ function duplicateDialog() {
 }
 
 function deleteDialog() {
-	if (curDialogEditorId != null && curDialogEditorId != titleDialogId) {
+	var shouldDelete = confirm("Are you sure you want to delete this dialog?");
+
+	if (shouldDelete && curDialogEditorId != null && curDialogEditorId != titleDialogId) {
 		var tempDialogId = curDialogEditorId;
 
 		nextDialog();
@@ -1688,6 +1690,8 @@ function on_edit_mode() {
 
 	markerTool.RefreshKeepSelection();
 
+	reloadDialogUI();
+
 	updateInventoryUI();
 
 	if(isPreviewDialogMode) {
@@ -2241,6 +2245,11 @@ function filenameFromGameTitle() {
 }
 
 function exportGame() {
+	if (isPlayMode) {
+		alert("You can't download your game while you're playing it! Sorry :(");
+		return;
+	}
+
 	refreshGameData(); //just in case
 	// var gameData = document.getElementById("game_data").value; //grab game data
 	var gameData = getFullGameData();
@@ -2658,16 +2667,11 @@ function finishRecordingGif(gif) {
 
 	setTimeout( function() {
 		var hexPalette = [];
+
 		// add black & white
 		hexPalette.push( rgbToHex(0,0,0).slice(1) ); // need to slice off leading # (should that safeguard go in gif.js?)
 		hexPalette.push( rgbToHex(255,255,255).slice(1) );
-		// add all user defined palette colors
-		for (id in palette) {
-			for (i in getPal(id)){
-				var hexStr = rgbToHex( getPal(id)[i][0], getPal(id)[i][1], getPal(id)[i][2] ).slice(1);
-				hexPalette.push( hexStr );
-			}
-		}
+
 		// add rainbow colors (for rainbow text effect)
 		hexPalette.push( hslToHex(0.0,1,0.5).slice(1) );
 		hexPalette.push( hslToHex(0.1,1,0.5).slice(1) );
@@ -2679,6 +2683,20 @@ function finishRecordingGif(gif) {
 		hexPalette.push( hslToHex(0.7,1,0.5).slice(1) );
 		hexPalette.push( hslToHex(0.8,1,0.5).slice(1) );
 		hexPalette.push( hslToHex(0.9,1,0.5).slice(1) );
+
+		// add all user defined palette colors
+		for (id in palette) {
+			for (i in getPal(id)){
+				var hexStr = rgbToHex( getPal(id)[i][0], getPal(id)[i][1], getPal(id)[i][2] ).slice(1);
+
+				// gif palettes max out at 256 colors
+				// this avoids totally breaking the gif if a game has more colors than that
+				// TODO : make this smarter by keeping track palettes of visited rooms
+				if (hexPalette.length < 256) {
+					hexPalette.push( hexStr );
+				}
+			}
+		}
 
 		gif.palette = hexPalette; // hacky
 
@@ -2708,9 +2726,12 @@ function finishRecordingGif(gif) {
 
 /* LOAD FROM FILE */
 function importGameFromFile(e) {
-	resetGameData();
+	if (isPlayMode) {
+		alert("You can't upload a game while you're playing one! Sorry :(");
+		return;
+	}
 
-	console.log("IMPORT START");
+	resetGameData();
 
 	// load file chosen by user
 	var files = e.target.files;
@@ -2722,9 +2743,6 @@ function importGameFromFile(e) {
 		var fileText = reader.result;
 		gameDataStr = exporter.importGame( fileText );
 
-		console.log("import load end");
-		// console.log(gameDataStr);
-		
 		// change game data & reload everything
 		document.getElementById("game_data").value = gameDataStr;
 		on_game_data_change();

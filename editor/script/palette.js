@@ -152,10 +152,10 @@ function PaletteTool(colorPicker,labelIds,nameFieldId) {
 	}
 
 	this.DeleteSelected = function() {
-		if ( sortedPaletteIdList().length <= 1 ) {
+		if (sortedPaletteIdList().length <= 1) {
 			alert("You can't delete your only palette!");
 		}
-		else {
+		else if (confirm("Are you sure you want to delete this palette?")) {
 			delete palette[curPaletteId];
 
 			// replace palettes for rooms using the current palette

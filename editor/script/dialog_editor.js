@@ -1045,25 +1045,35 @@ function DialogTool() {
 			dialogNodeList = tempDialogNode.children;
 			parentEditor.NotifyUpdate(true);
 		}
+
 		var textSelectionChangeHandler = createOnTextSelectionChange(OnDialogTextChange);
 
 		if (!useExperimentalTextEditor) {
+			var dialogText = scriptUtils.SerializeDialogNodeList(dialogNodeList);
+
 			var textHolderDiv = document.createElement("div");
 			textHolderDiv.classList.add("dialogBoxContainer");
+
 			var textArea = document.createElement("textarea");
-			textArea.value = scriptUtils.SerializeDialogNodeList(dialogNodeList);
+			textArea.value = dialogText;
+
 			textArea.onchange = OnDialogTextChange;
 			textArea.onkeyup = OnDialogTextChange;
 			textArea.onblur = OnDialogTextChange;
-			textArea.rows = 2;
+
+			textArea.rows = Math.max(2, dialogText.split("\n").length + 1);
 			textArea.cols = 32;
+
 			textArea.addEventListener('click', textSelectionChangeHandler);
 			textArea.addEventListener('select', textSelectionChangeHandler);
 			textArea.addEventListener('blur', textSelectionChangeHandler);
+
 			textHolderDiv.appendChild(textArea);
+
 			textHolderDiv.onclick = function() {
 				textArea.focus(); // hijack focus into the actual textarea
 			}
+
 			div.appendChild(textHolderDiv);
 		}
 		else {

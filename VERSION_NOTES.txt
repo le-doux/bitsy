@@ -1,3 +1,16 @@
+v7.2:
+- new icons!
+- dialog panel textboxes are sized to fit text
+- bugfixes:
+-- disable importing/exporting games while the game is playing
+-- empty dialog doesn't break items and exits
+-- stop exits from getting moved off-screen
+-- dialog selection stopped working after playing the game
+-- gif thumbnails don't break with large # of colors
+-- invalid character boxes render for missing fonts
+-- @seansleblanc fixed float bug with randomly generated colors
+-- @seansleblanc fixed transition pixel overflow bug
+
 v7.1:
 - updated localization text
 - bugfixes:
