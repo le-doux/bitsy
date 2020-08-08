@@ -1,6 +1,7 @@
 v7.2:
 - new icons!
 - dialog panel textboxes are sized to fit text
+- localization updates
 - bugfixes:
 -- disable importing/exporting games while the game is playing
 -- empty dialog doesn't break items and exits
