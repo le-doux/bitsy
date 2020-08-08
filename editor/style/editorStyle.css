@@ -180,6 +180,11 @@ input {
 	border-radius: 2px;
 }
 
+span.controlBox {
+	padding: 3px;
+	margin-bottom: 0px;
+}
+
 .controlBox .material-icons {
 	font-size: 110%;
 	vertical-align: middle;

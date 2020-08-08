@@ -115,7 +115,7 @@ input[type=radio] + label.right {
 
 /*hack*/
 #toolsCheckFlexItem label {
-	/*border-radius: 4px;*/
+	border-radius: 4px;
 	/*font-size: 16px;*/
 }
 

@@ -41,7 +41,7 @@ function DialogTool() {
 		var openButton = document.createElement("button");
 		openButton.classList.add("titleOpenDialog");
 		openButton.title = "open title in dialog editor"; // todo : localize
-		openButton.innerHTML = '<i class="material-icons">open_in_new</i>';
+		openButton.appendChild(iconUtils.CreateIcon("open_tool"));
 		openButton.onclick = function() {
 			openDialogTool(titleDialogId);
 			alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked = false;
@@ -131,16 +131,16 @@ function DialogTool() {
 
 		var labelSpan = document.createElement("span");
 		labelSpan.style.flexGrow = 1;
-		labelSpan.innerHTML = '<i class="material-icons">chat</i> ' + label;
+		labelSpan.innerHTML = iconUtils.CreateIcon("dialog").outerHTML + ' ' + label;
 		controlDiv.appendChild(labelSpan);
 
 		var settingsButton = document.createElement("button");
-		settingsButton.innerHTML = '<i class="material-icons">settings</i>';
+		settingsButton.appendChild(iconUtils.CreateIcon("settings"));
 		controlDiv.appendChild(settingsButton);
 
 		var openButton = document.createElement("button");
 		openButton.title = "open in dialog editor"; // todo : localize
-		openButton.innerHTML = '<i class="material-icons">open_in_new</i>';
+		openButton.appendChild(iconUtils.CreateIcon("open_tool"));
 		openButton.onclick = function() {
 			// create an empty dialog if none exists to open in the editor
 			if (!DoesDialogExist()) {
@@ -202,7 +202,7 @@ function DialogTool() {
 					var preset = creationOptions.Presets[i];
 					var presetButton = document.createElement("button");
 					presetButton.style.flexGrow = 1; // TODO : style?
-					presetButton.innerHTML = '<i class="material-icons">add</i>' + preset.Name;
+					presetButton.innerHTML = iconUtils.CreateIcon("add").outerHTML + preset.Name;
 					presetButton.onclick = CreatePresetHandler(preset.Script, preset.GetDefaultName);
 					editorDiv.appendChild(presetButton);
 				}
@@ -282,7 +282,7 @@ function DialogTool() {
 
 		function ChangeSettingsVisibility(visible) {
 			showSettings = visible;
-			settingsButton.innerHTML = '<i class="material-icons">' + (showSettings ? "text_fields" : "settings") + '</i>';
+			settingsButton.innerHTML = iconUtils.CreateIcon(showSettings ? "text_edit" : "settings").outerHTML;
 			editorDiv.style.display = showSettings ? "none" : "flex";
 			dialogIdSelect.style.display = showSettings ? "flex" : "none";
 		}
@@ -780,7 +780,7 @@ function DialogTool() {
 
 		var addButton = document.createElement("button");
 		addButton.classList.add("actionBuilderAdd");
-		addButton.innerHTML = '<i class="material-icons">add</i>' + " "
+		addButton.innerHTML = iconUtils.CreateIcon("add").outerHTML + " "
 			+ localization.GetStringOrFallback("action_add_new", "add");
 		addButton.onclick = function() {
 			div.classList.add("actionBuilderActive");
@@ -791,7 +791,7 @@ function DialogTool() {
 		var backButton = document.createElement("button");
 		backButton.classList.add("actionBuilderButton");
 		backButton.classList.add("actionBuilderButton_back");
-		backButton.innerHTML = '<i class="material-icons">arrow_back_ios</i>' + " "
+		backButton.innerHTML = iconUtils.CreateIcon("previous").outerHTML + " "
 			+ localization.GetStringOrFallback("action_back", "back");
 		backButton.onclick = function() {
 			div.classList.add("actionBuilderRoot");
@@ -805,7 +805,7 @@ function DialogTool() {
 			var actionCategoryButton = document.createElement("button");
 			actionCategoryButton.classList.add("actionBuilderButton");
 			actionCategoryButton.classList.add("actionBuilderCategory");
-			actionCategoryButton.innerHTML = text + '<i class="material-icons">arrow_forward_ios</i>';
+			actionCategoryButton.innerHTML = text + iconUtils.CreateIcon("next").outerHTML;
 			actionCategoryButton.onclick = function() {
 				div.classList.remove("actionBuilderRoot");
 				activeCategoryClass = "actionBuilder_" + categoryName;
@@ -831,7 +831,7 @@ function DialogTool() {
 			var actionBuilderButton = document.createElement("button");
 			actionBuilderButton.classList.add("actionBuilderButton");
 			actionBuilderButton.classList.add("actionBuilderButton_" + categoryName);
-			actionBuilderButton.innerHTML = '<i class="material-icons">add</i>' + " " + text;
+			actionBuilderButton.innerHTML = iconUtils.CreateIcon("add").outerHTML + " " + text;
 			actionBuilderButton.onclick = function() {
 				var editor = createEditorFunc();
 				parentEditor.AppendChild(editor);
@@ -1004,7 +1004,7 @@ function DialogTool() {
 		var cancelButton = document.createElement("button");
 		cancelButton.classList.add("actionBuilderButton");
 		cancelButton.classList.add("actionBuilderCancel");
-		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " "
+		cancelButton.innerHTML = iconUtils.CreateIcon("cancel").outerHTML + " "
 			+ localization.GetStringOrFallback("action_cancel", "cancel");
 		cancelButton.onclick = function() {
 			div.classList.remove("actionBuilderActive");
@@ -1185,7 +1185,7 @@ function DialogTool() {
 		div.appendChild(textEffectsDiv);
 
 		var toggleTextEffectsButton = document.createElement("button");
-		toggleTextEffectsButton.innerHTML = '<i class="material-icons">text_format</i>';
+		toggleTextEffectsButton.appendChild(iconUtils.CreateIcon("text_effects"));
 		toggleTextEffectsButton.title = "show/hide text effects controls";
 		toggleTextEffectsButton.onclick = function() {
 			globalShowTextEffectsControls = !globalShowTextEffectsControls;
@@ -1195,7 +1195,7 @@ function DialogTool() {
 
 		var textEffectsTitleDiv = document.createElement("div");
 		textEffectsTitleDiv.style.marginBottom = "5px";
-		textEffectsTitleDiv.innerHTML = '<i class="material-icons">text_format</i>' + " " + localization.GetStringOrFallback("dialog_effect_new", "text effects");
+		textEffectsTitleDiv.innerHTML = iconUtils.CreateIcon("text_effects").outerHTML + " " + localization.GetStringOrFallback("dialog_effect_new", "text effects");
 		textEffectsDiv.appendChild(textEffectsTitleDiv);
 
 		var textEffectsControlsDiv = document.createElement("div");
@@ -1239,7 +1239,7 @@ function DialogTool() {
 		textEffectsDiv.appendChild(textEffectsPrintDrawingDiv);
 
 		var textEffectsPrintDrawingButton = document.createElement("button");
-		textEffectsPrintDrawingButton.innerHTML = '<i class="material-icons">add</i>' + " "
+		textEffectsPrintDrawingButton.innerHTML = iconUtils.CreateIcon("add").outerHTML + " "
 			+ localization.GetStringOrFallback("dialog_effect_drawing", "insert drawing");
 		textEffectsPrintDrawingButton.title = "draw a sprite, tile, or item in your dialog";
 		textEffectsPrintDrawingDiv.appendChild(textEffectsPrintDrawingButton);
@@ -1367,7 +1367,7 @@ function DialogTool() {
 
 		var editExpressionButton = document.createElement("button");
 		editExpressionButton.title = "edit expression"; // TODO : localize
-		editExpressionButton.innerHTML = '<i class="material-icons">edit</i>';
+		editExpressionButton.appendChild(iconUtils.CreateIcon("expression_edit"));
 		editExpressionButton.onclick = function() {
 			parentEditor.OpenExpressionBuilder(
 				expressionRootNode.Serialize(),
@@ -1390,7 +1390,7 @@ function DialogTool() {
 		var editParameterTypes = false;
 		var toggleParameterTypesButton = document.createElement("button");
 		toggleParameterTypesButton.title = "toggle editing parameter types";
-		toggleParameterTypesButton.innerHTML = '<i class="material-icons">settings</i>';
+		toggleParameterTypesButton.appendChild(iconUtils.CreateIcon("settings"));
 		toggleParameterTypesButton.onclick = function() {
 			editParameterTypes = !editParameterTypes;
 			CreateExpressionControls(true);
@@ -1680,7 +1680,7 @@ function DialogTool() {
 		div.appendChild(addOptionRootDiv);
 
 		var addOptionButton = document.createElement("button");
-		addOptionButton.innerHTML = '<i class="material-icons">add</i>' + " "
+		addOptionButton.innerHTML = iconUtils.CreateIcon("add").outerHTML + " "
 			+ localization.GetStringOrFallback("dialog_conditional_add", "add option"); // TODO : funny that this is the old conditional text
 		addOptionButton.onclick = function() {
 			var optionNode = scriptUtils.CreateOptionBlock();
@@ -1884,7 +1884,7 @@ function DialogTool() {
 		div.appendChild(addConditionRootDiv);
 
 		var addButton = document.createElement("button");
-		addButton.innerHTML = '<i class="material-icons">add</i>' + " "
+		addButton.innerHTML = iconUtils.CreateIcon("add").outerHTML + " "
 			+ localization.GetStringOrFallback("branch_add", "add branch");
 		addButton.onclick = function() {
 			addButton.style.display = "none";
@@ -1896,7 +1896,7 @@ function DialogTool() {
 		addConditionRootDiv.appendChild(addButton);
 
 		var addItemCondition = document.createElement("button");
-		addItemCondition.innerHTML = '<i class="material-icons">add</i>' + " "
+		addItemCondition.innerHTML = iconUtils.CreateIcon("add").outerHTML + " "
 			+ localization.GetStringOrFallback("branch_type_item", "item branch");
 		addItemCondition.style.display = "none";
 		addItemCondition.onclick = function() {
@@ -1917,7 +1917,7 @@ function DialogTool() {
 		addConditionRootDiv.appendChild(addItemCondition);
 
 		var addVariableCondition = document.createElement("button");
-		addVariableCondition.innerHTML = '<i class="material-icons">add</i>' + " "
+		addVariableCondition.innerHTML = iconUtils.CreateIcon("add").outerHTML + " "
 			+ localization.GetStringOrFallback("branch_type_variable", "variable branch");
 		addVariableCondition.style.display = "none";
 		addVariableCondition.onclick = function() {
@@ -1938,7 +1938,7 @@ function DialogTool() {
 		addConditionRootDiv.appendChild(addVariableCondition);
 
 		var addDefaultCondition = document.createElement("button");
-		addDefaultCondition.innerHTML = '<i class="material-icons">add</i>' + " "
+		addDefaultCondition.innerHTML = iconUtils.CreateIcon("add").outerHTML + " "
 			+ localization.GetStringOrFallback("branch_type_default", "default branch");
 		addDefaultCondition.style.display = "none";
 		addDefaultCondition.onclick = function() {
@@ -1961,7 +1961,7 @@ function DialogTool() {
 		var cancelButton = document.createElement("button");
 		cancelButton.classList.add("actionBuilderButton");
 		cancelButton.classList.add("actionBuilderCancel");
-		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " "
+		cancelButton.innerHTML = iconUtils.CreateIcon("cancel").outerHTML + " "
 			+ localization.GetStringOrFallback("action_cancel", "cancel");;
 		cancelButton.style.display = "none";
 		cancelButton.onclick = function() {
@@ -2232,7 +2232,7 @@ function DialogTool() {
 
 		var isMoving = false;
 
-		var commandDescription = '<i class="material-icons">location_searching</i>' + " "
+		var commandDescription = iconUtils.CreateIcon("set_exit_location").outerHTML + " "
 			+ localization.GetStringOrFallback("exit_destination_move", "move destination");
 
 		var moveCommand = document.createElement("div");
@@ -2248,7 +2248,7 @@ function DialogTool() {
 
 			if (isMoving) {
 				moveMessageSpan.innerHTML = "<i>" + localization.GetStringOrFallback("marker_move_click", "click in room") + "</i> ";
-				moveButton.innerHTML = '<i class="material-icons">cancel</i>' + " "
+				moveButton.innerHTML = iconUtils.CreateIcon("cancel").outerHTML + " "
 					+ localization.GetStringOrFallback("action_cancel", "cancel");
 				events.Raise("disable_room_tool"); // TODO : don't know if I like this design
 			}
@@ -2433,7 +2433,7 @@ function DialogTool() {
 		var editParameterTypes = false;
 		var toggleParameterTypesButton = document.createElement("button");
 		toggleParameterTypesButton.title = "toggle editing parameter types";
-		toggleParameterTypesButton.innerHTML = '<i class="material-icons">settings</i>';
+		toggleParameterTypesButton.appendChild(iconUtils.CreateIcon("settings"));
 		toggleParameterTypesButton.onclick = function() {
 			editParameterTypes = !editParameterTypes;
 			CreateFunctionDescription(true);
@@ -2470,7 +2470,7 @@ function DialogTool() {
 
 			var toggleHelpButton = document.createElement("button");
 			toggleHelpButton.title = "turn help text on/off";
-			toggleHelpButton.innerHTML = '<i class="material-icons">help</i>';
+			toggleHelpButton.appendChild(iconUtils.CreateIcon("help"));
 			toggleHelpButton.onclick = function() {
 				isHelpTextOn = !isHelpTextOn;
 
@@ -2569,7 +2569,7 @@ function DialogTool() {
 						}
 
 						var addParameterButton = document.createElement('button');
-						addParameterButton.innerHTML = '<i class="material-icons">add</i>' + parameterInfo.name;
+						addParameterButton.innerHTML = iconUtils.CreateIcon("add").outerHTML + parameterInfo.name;
 						addParameterButton.onclick = createAddParameterHandler(functionNode, parameterInfo);
 						addParameterDiv.appendChild(addParameterButton);
 					}
@@ -3133,7 +3133,7 @@ function DialogTool() {
 
 		var moveUpButton = document.createElement("button");
 		// moveUpButton.innerText = "up";
-		moveUpButton.innerHTML = '<i class="material-icons">expand_less</i>';
+		moveUpButton.appendChild(iconUtils.CreateIcon("arrow_up"));
 		moveUpButton.onclick = function() {
 			var insertIndex = parentEditor.IndexOfChild(editor);
 			parentEditor.RemoveChild(editor);
@@ -3144,7 +3144,7 @@ function DialogTool() {
 
 		var moveDownButton = document.createElement("button");
 		// moveDownButton.innerText = "down";
-		moveDownButton.innerHTML = '<i class="material-icons">expand_more</i>';
+		moveDownButton.appendChild(iconUtils.CreateIcon("arrow_down"));
 		moveDownButton.onclick = function() {
 			var insertIndex = parentEditor.IndexOfChild(editor);
 			parentEditor.RemoveChild(editor);
@@ -3160,7 +3160,7 @@ function DialogTool() {
 
 		var deleteButton = document.createElement("button");
 		// deleteButton.innerText = "delete";
-		deleteButton.innerHTML = '<i class="material-icons">clear</i>';
+		deleteButton.appendChild(iconUtils.CreateIcon("delete"));
 		deleteButton.style.float = "right";
 		deleteButton.onclick = function() {
 			editor.GetElement().classList.add("actionEditorDelete");
@@ -3418,7 +3418,7 @@ function DialogTool() {
 		numericInputRoot.appendChild(backInputDiv);
 
 		var backButton = document.createElement("button");
-		backButton.innerHTML = '<i class="material-icons">backspace</i>';
+		backButton.appendChild(iconUtils.CreateIcon("backspace"));
 		backButton.onclick = function() {
 			var expressionString = expressionRootNode.Serialize();
 			var rightNode = GetRightmostNode(expressionRootNode);
@@ -3469,7 +3469,7 @@ function DialogTool() {
 
 		var addVariableButton = document.createElement("button");
 		addVariableButton.classList.add(GetColorClassForParameterType("variable"));
-		addVariableButton.innerHTML = '<i class="material-icons">add</i>' + " "
+		addVariableButton.innerHTML = iconUtils.CreateIcon("add").outerHTML + " "
 			+ localization.GetStringOrFallback("variable_label", "variable");;
 		addVariableButton.style.flexGrow = "1";
 		addVariableButton.style.marginRight = "5px";
@@ -3505,7 +3505,7 @@ function DialogTool() {
 
 		var addItemButton = document.createElement("button");
 		addItemButton.classList.add(GetColorClassForParameterType("item"));
-		addItemButton.innerHTML = '<i class="material-icons">add</i>' + " "
+		addItemButton.innerHTML = iconUtils.CreateIcon("add").outerHTML + " "
 			+ localization.GetStringOrFallback("item_label", "item");
 		addItemButton.style.flexGrow = "1";
 		addItemButton.style.marginRight = "5px";
@@ -3541,7 +3541,7 @@ function DialogTool() {
 
 		var addTextButton = document.createElement("button");
 		addTextButton.classList.add(GetColorClassForParameterType("text"));
-		addTextButton.innerHTML = '<i class="material-icons">add</i>' + " "
+		addTextButton.innerHTML = iconUtils.CreateIcon("add").outerHTML + " "
 			+ localization.GetStringOrFallback("value_type_text", "text");
 		addTextButton.style.flexGrow = "1";
 		addTextButton.style.marginRight = "5px";
@@ -3597,7 +3597,7 @@ function DialogTool() {
 
 		var cancelButton = document.createElement("button");
 		cancelButton.style.flexGrow = "1";
-		cancelButton.innerHTML = '<i class="material-icons">cancel</i>' + " "
+		cancelButton.innerHTML = iconUtils.CreateIcon("cancel").outerHTML + " "
 			+ localization.GetStringOrFallback("action_cancel", "cancel");
 		cancelButton.onclick = function() {
 			div.classList.add("expressionBuilderCancel");
@@ -3607,7 +3607,7 @@ function DialogTool() {
 
 		var acceptButton = document.createElement("button");
 		acceptButton.style.flexGrow = "2";
-		acceptButton.innerHTML = '<i class="material-icons">check_circle</i>' + " "
+		acceptButton.innerHTML = iconUtils.CreateIcon("checkmark").outerHTML + " "
 			+ localization.GetStringOrFallback("action_save", "save");
 		acceptButton.classList.add("reverseColors");
 		acceptButton.onclick = function() {
@@ -3698,14 +3698,6 @@ function ConvertNumberStringToArabic(numberString) {
 	}
 
 	return arabicNumberString;
-}
-
-// TODO : what is this used for?
-function createIconElement(iconName) {
-	var icon = document.createElement("i");
-	icon.classList.add('material-icons');
-	icon.innerText = iconName;
-	return icon;
 }
 
 var dialogSel = {
