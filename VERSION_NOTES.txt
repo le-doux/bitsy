@@ -1,4 +1,5 @@
 v7.2:
+- new icons!
 - dialog panel textboxes are sized to fit text
 - bugfixes:
 -- disable importing/exporting games while the game is playing
