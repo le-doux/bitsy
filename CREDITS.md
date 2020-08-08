@@ -2,14 +2,35 @@
 
 Adam Le Doux - Project Lead
 
-@aloelazoe - Contributor
-
 @ayolland - Contributor
+
+Elkie - Contributor
 
 @ragzouken - Contributor
 
+Sean S. LeBlanc - Contributor
+
 @zachThePerson - Contributor
 
+**Icons**
+
+Adam Le Doux
+
+Annie Zhang
+
+Ash
+
+cecile richard
+
+Dana Holdampf
+
+Elkie
+
+Freya Campbell
+
+max
+
+@ragzouken
 
 **Localization**
 
@@ -26,6 +47,8 @@ Dorian Beaugendre - French translation
 Elkie - Russian translation
 
 Em - Swedish translation
+
+enui - Italian translation
 
 Game Makers Iceland - Icelandic translation
 
