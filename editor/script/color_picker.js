@@ -216,14 +216,20 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 		if (isMouseDown) {
 			e.preventDefault();
-			pickColor(e.touches[0], false);
+			// update event to translate from touch-style to mouse-style structure
+			e.clientX = e.touches[0].clientX;
+			e.clientY = e.touches[0].clientY;
+			pickColor(e, false);
 		}
 	}
 
 	function pickColorTouchStart(e) {
 		// console.log(e.touches[0]);
 		e.preventDefault();
-		pickColorStart(e.touches[0]);
+		// update event to translate from touch-style to mouse-style structure
+		e.clientX = e.touches[0].clientX;
+		e.clientY = e.touches[0].clientY;
+		pickColorStart(e);
 	}
 
 	function pickColorTouchEnd(e) {
@@ -289,13 +295,19 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 	function pickValueTouchMove(e) {
 		if (isSliderMouseDown) {
 			e.preventDefault();
-			pickValue(e.touches[0], false);
+			// update event to translate from touch-style to mouse-style structure
+			e.clientX = e.touches[0].clientX;
+			e.clientY = e.touches[0].clientY;
+			pickValue(e, false);
 		}
 	}
 
 	function pickValueTouchStart(e) {
 		e.preventDefault();
-		pickValueStart(e.touches[0]);
+		// update event to translate from touch-style to mouse-style structure
+		e.clientX = e.touches[0].clientX;
+		e.clientY = e.touches[0].clientY;
+		pickValueStart(e);
 	}
 
 	function pickValueTouchEnd(e) {
