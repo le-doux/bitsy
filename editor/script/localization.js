@@ -11,7 +11,7 @@ X get translation volunteers
 X how to handle multi-paragraph text (for now: lots of strings)
 X how to handle dynamic text
 X find instances of dynamic text
-- how to handle alt text & pladeholder text (other special cases)
+- how to handle alt text & placeholder text (other special cases)
 - dynamic text like "I'm a cat" "tea" and "Write your game's title here"
 */
 
