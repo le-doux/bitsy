@@ -23,6 +23,8 @@ var localizationStrings = null;
 
 var currentLanguage;
 
+var defaultLanguage = "en";
+
 var initialize = function() { // why does this happen multiple times?
 	var csv = Resources["localization.tsv"];
 	// console.log(csv);
@@ -86,8 +88,8 @@ function localize(language) {
 		if (locString) {
 			el.innerText = locString;
 		}
-		else if (localizationStrings["en"][localizationId] != null) {
-			el.innerText = localizationStrings["en"][localizationId]; // fall back to english
+		else if (localizationStrings[defaultLanguage][localizationId] != null) {
+			el.innerText = localizationStrings[defaultLanguage][localizationId]; // fall back to english
 		}
 	}
 }
@@ -103,7 +105,7 @@ function getEditorLanguage() {
 
 	// fallback to english
 	if(!localizationStrings[language]) {
-		language = "en";
+		language = defaultLanguage;
 	}
 
 	return language;
@@ -206,7 +208,7 @@ this.ExportMissingEnglishStrings = function() {
 	for(var i = 0; i < elements.length; i++) {
 		var el = elements[i];
 		var localizationId = getLocalizationId(el);
-		if(!localizationStrings["en"][localizationId])
+		if(!localizationStrings[defaultLanguage][localizationId])
 			englishStrings[localizationId] = el.innerText;
 	}
 	exportEnglishStringsDictionary(englishStrings);
