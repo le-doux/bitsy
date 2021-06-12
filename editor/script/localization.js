@@ -159,7 +159,7 @@ function getStringOrFallback(id, englishFallback) {
 		return englishFallback;
 
 	var locString = getString(id);
-	if(locString == null || locString.length <= 0) {
+	if(!locString) {
 		locString = englishFallback;
 		unlocalizedDynamicStrings[id] = englishFallback; // record use of unlocalized strings
 	}
