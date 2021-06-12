@@ -143,7 +143,8 @@ this.ChangeLanguage = function(newLanguage) {
 }
 
 function getString(id) {
-	return localizationStrings[getEditorLanguage()][id];
+	var langStrings = localizationStrings[getEditorLanguage()];
+	return langStrings && langStrings[id];
 }
 this.GetString = function(id) {
 	return getString(id);
