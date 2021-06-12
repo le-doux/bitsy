@@ -21,6 +21,8 @@ var self = this;
 
 var localizationStrings = null;
 
+var currentLanguage;
+
 var initialize = function() { // why does this happen multiple times?
 	var csv = Resources["localization.tsv"];
 	// console.log(csv);
@@ -49,6 +51,8 @@ var initialize = function() { // why does this happen multiple times?
 			localizationStrings[languageId][lineId] = lineSplit[j]; // TOOD - protect against empty lines
 		}
 	}
+
+	currentLanguage = localStorage.editor_language;
 
 	// console.log(localizationStrings);
 	// localize( getEditorLanguage() );
@@ -92,17 +96,17 @@ this.Localize = function() {
 }
 
 function getEditorLanguage() {
-	if(localStorage.editor_language == null) {
-		var browserLanguage = (navigator.languages ? navigator.languages[0] : navigator.language).split("-")[0];
-		localStorage.editor_language = browserLanguage;
+	var language = currentLanguage;
+	if(!language) {
+		language = (navigator.languages ? navigator.languages[0] : navigator.language).split("-")[0];
 	}
 
 	// fallback to english
-	if(localizationStrings[localStorage.editor_language] == null) {
-		localStorage.editor_language = "en";
+	if(!localizationStrings[language]) {
+		language = "en";
 	}
 
-	return localStorage.editor_language;
+	return language;
 }
 this.GetLanguage = function() {
 	return getEditorLanguage();
@@ -131,8 +135,10 @@ this.GetLanguageList = function() {
 	return getLanguageList();
 }
 
-this.ChangeLanguage = function(language) {
-	saveEditorLanguage(language);
+this.ChangeLanguage = function(newLanguage) {
+	currentLanguage = newLanguage;
+	currentLanguage = getEditorLanguage();
+	saveEditorLanguage(currentLanguage);
 	localize( getEditorLanguage() );
 }
 
