@@ -54,7 +54,7 @@ var initialize = function() { // why does this happen multiple times?
 		}
 	}
 
-	currentLanguage = initialLanguage || localStorage.editor_language || defaultLanguage;
+	currentLanguage = initialLanguage || Store.get('editor_language', defaultLanguage);
 
 	// console.log(localizationStrings);
 	// localize( getEditorLanguage() );
@@ -120,7 +120,7 @@ this.GetLanguage = function() {
 }
 
 function saveEditorLanguage(language) {
-	localStorage.editor_language = language;
+	Store.set('editor_language', language);
 }
 
 function getLanguageList() {
