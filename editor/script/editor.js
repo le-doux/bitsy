@@ -2174,6 +2174,7 @@ function on_game_data_change_core() {
 
 	// TODO RENDERER : refresh images
 
+	roomIndex = 0;
 	roomTool.drawEditMap();
 
 	drawing.type = curPaintMode;

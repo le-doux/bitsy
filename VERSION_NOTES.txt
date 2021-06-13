@@ -4,6 +4,7 @@ v7.3:
 - bugfix: extra newlines were added in dialog
 - bugfix: return exit's "move" button wasn't localized
 - bugfix: checkbox states were wrong on page load
+- bugfix: room nav controls were broken after game data edits
 
 v7.2:
 - new icons!
