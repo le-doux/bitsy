@@ -11,7 +11,7 @@ X get translation volunteers
 X how to handle multi-paragraph text (for now: lots of strings)
 X how to handle dynamic text
 X find instances of dynamic text
-- how to handle alt text & pladeholder text (other special cases)
+- how to handle alt text & placeholder text (other special cases)
 - dynamic text like "I'm a cat" "tea" and "Write your game's title here"
 */
 
@@ -20,6 +20,10 @@ function Localization() {
 var self = this;
 
 var localizationStrings = null;
+
+var currentLanguage;
+
+var defaultLanguage = "en";
 
 var initialize = function() { // why does this happen multiple times?
 	var csv = Resources["localization.tsv"];
@@ -50,6 +54,8 @@ var initialize = function() { // why does this happen multiple times?
 		}
 	}
 
+	currentLanguage = localStorage.editor_language;
+
 	// console.log(localizationStrings);
 	// localize( getEditorLanguage() );
 };
@@ -68,6 +74,11 @@ function getLocalizationId(element) { // the localization id is the class AFTER 
 	return null; // oops
 }
 
+function getLocaleString(locale, id) {
+	var localeStrings = localizationStrings[locale];
+	return localeStrings && localeStrings[id];
+}
+
 function localize(language) {
 	if(localizationStrings == null)
 		return;
@@ -78,12 +89,12 @@ function localize(language) {
 	for(var i = 0; i < elements.length; i++) {
 		var el = elements[i];
 		var localizationId = getLocalizationId(el);
-		var locString = localizationStrings[language][localizationId];
+		var locString = getLocaleString(language, localizationId);
+		if (!locString) {
+			locString = getLocaleString(defaultLanguage, localizationId);
+		}
 		if (locString) {
 			el.innerText = locString;
-		}
-		else if (localizationStrings["en"][localizationId] != null) {
-			el.innerText = localizationStrings["en"][localizationId]; // fall back to english
 		}
 	}
 }
@@ -92,17 +103,17 @@ this.Localize = function() {
 }
 
 function getEditorLanguage() {
-	if(localStorage.editor_language == null) {
-		var browserLanguage = (navigator.languages ? navigator.languages[0] : navigator.language).split("-")[0];
-		localStorage.editor_language = browserLanguage;
+	var language = currentLanguage;
+	if(!language) {
+		language = (navigator.languages ? navigator.languages[0] : navigator.language).split("-")[0];
 	}
 
 	// fallback to english
-	if(localizationStrings[localStorage.editor_language] == null) {
-		localStorage.editor_language = "en";
+	if(!localizationStrings[language]) {
+		language = defaultLanguage;
 	}
 
-	return localStorage.editor_language;
+	return language;
 }
 this.GetLanguage = function() {
 	return getEditorLanguage();
@@ -131,13 +142,15 @@ this.GetLanguageList = function() {
 	return getLanguageList();
 }
 
-this.ChangeLanguage = function(language) {
-	saveEditorLanguage(language);
+this.ChangeLanguage = function(newLanguage) {
+	currentLanguage = newLanguage;
+	currentLanguage = getEditorLanguage();
+	saveEditorLanguage(currentLanguage);
 	localize( getEditorLanguage() );
 }
 
 function getString(id) {
-	return localizationStrings[getEditorLanguage()][id];
+	return getLocaleString(getEditorLanguage(), id);
 }
 this.GetString = function(id) {
 	return getString(id);
@@ -150,9 +163,9 @@ function getStringOrFallback(id, englishFallback) {
 		return englishFallback;
 
 	var locString = getString(id);
-	if(locString == null || locString.length <= 0) {
-		locString = englishFallback;
-		unlocalizedDynamicStrings[id] = englishFallback; // record use of unlocalized strings
+	if(!locString) {
+		locString =  getLocaleString(defaultLanguage, id) || englishFallback || id;
+		unlocalizedDynamicStrings[id] = locString; // record use of unlocalized strings
 	}
 	return locString;
 }
@@ -162,7 +175,7 @@ this.GetStringOrFallback = function(id, englishFallback) {
 
 function localizationContains(id, text) { // TODO : rename to be more descriptive?
 	for (lang in localizationStrings) {
-		var locString = localizationStrings[lang][id];
+		var locString = getLocaleString(lang, id);
 		if (locString != null && locString.length > 0 && locString === text) {
 			return true;
 		}
@@ -199,7 +212,7 @@ this.ExportMissingEnglishStrings = function() {
 	for(var i = 0; i < elements.length; i++) {
 		var el = elements[i];
 		var localizationId = getLocalizationId(el);
-		if(!localizationStrings["en"][localizationId])
+		if(!getLocaleString(defaultLanguage, localizationId))
 			englishStrings[localizationId] = el.innerText;
 	}
 	exportEnglishStringsDictionary(englishStrings);
@@ -210,7 +223,7 @@ this.ExportDynamicEnglishStrings = function() {
 }
 
 this.GetStringCount = function(langId) {
-	return Object.keys(localizationStrings[langId]).length;
+	return localizationStrings[langId] ? Object.keys(localizationStrings[langId]).length : 0;
 }
 
 initialize();
