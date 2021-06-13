@@ -887,6 +887,10 @@ function start() {
 
 	// localization
 	localization = new Localization(urlFlags["lang"]);
+	Store.init(function () {
+		// TODO: localize
+		window.alert('A storage error occurred: The editor will continue to work, but data may not be saved/loaded. Make sure to export a local copy after making changes, or your gamedata may be lost!');
+	});
 
 	//game canvas & context (also the map editor)
 	attachCanvas( document.getElementById("game") );
