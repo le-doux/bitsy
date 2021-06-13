@@ -1758,14 +1758,26 @@ function updatePreviewDialogButton() {
 
 function togglePaintGrid(e) {
 	paintTool.drawPaintGrid = e.target.checked;
-	iconUtils.LoadIcon(document.getElementById("paintGridIcon"), paintTool.drawPaintGrid ? "visibility" : "visibility_off");
+	updatePaintGridCheck(paintTool.drawPaintGrid);
 	paintTool.updateCanvas();
+	setPanelSetting("paintPanel", "grid", paintTool.drawPaintGrid);
+}
+
+function updatePaintGridCheck(checked) {
+	document.getElementById("paintGridCheck").checked = checked;
+	iconUtils.LoadIcon(document.getElementById("paintGridIcon"), checked ? "visibility" : "visibility_off");
 }
 
 function toggleMapGrid(e) {
 	roomTool.drawMapGrid = e.target.checked;
-	iconUtils.LoadIcon(document.getElementById("roomGridIcon"), roomTool.drawMapGrid ? "visibility" : "visibility_off");
+	updateRoomGridCheck(roomTool.drawMapGrid);
 	roomTool.drawEditMap();
+	setPanelSetting("roomPanel", "grid", roomTool.drawMapGrid);
+}
+
+function updateRoomGridCheck(checked) {
+	document.getElementById("roomGridCheck").checked = checked;
+	iconUtils.LoadIcon(document.getElementById("roomGridIcon"), checked ? "visibility" : "visibility_off");
 }
 
 function toggleCollisionMap(e) {
@@ -2539,13 +2551,6 @@ function afterHidePanel(id) {
 	}
 }
 
-// DEPRECATED
-function savePanelPref(id,visible) {
-	var prefs = localStorage.panel_prefs == null ? {} : JSON.parse( localStorage.panel_prefs );
-	prefs[id] = visible;
-	localStorage.setItem( "panel_prefs", JSON.stringify(prefs) );
-}
-
 function updatePanelPrefs() {
 	// console.log("UPDATE PREFS");
 
@@ -2574,6 +2579,37 @@ function updatePanelPrefs() {
 	// console.log(localStorage.panel_prefs);
 }
 
+function getPanelSetting(panelId, settingId) {
+	var settingValue = null;
+
+	var prefs = getPanelPrefs();
+
+	for (var i = 0; i < prefs.workspace.length; i++ ) {
+		if (prefs.workspace[i].id === panelId) {
+			if (prefs.workspace[i].setting != undefined && prefs.workspace[i].setting != null) {
+				settingValue = prefs.workspace[i].setting[settingId];
+			}
+		}
+	}
+
+	return settingValue;
+}
+
+function setPanelSetting(panelId, settingId, settingValue) {
+	var prefs = getPanelPrefs();
+
+	for (var i = 0; i < prefs.workspace.length; i++ ) {
+		if (prefs.workspace[i].id === panelId) {
+			if (prefs.workspace[i].setting === undefined || prefs.workspace[i].setting === null) {
+				prefs.workspace[i].setting = {};
+			}
+
+			prefs.workspace[i].setting[settingId] = settingValue;
+		}
+	}
+
+	localStorage.panel_prefs = JSON.stringify(prefs);
+}
 
 var gifRecordingInterval = null;
 function startRecordingGif() {

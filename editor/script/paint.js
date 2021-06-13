@@ -115,7 +115,8 @@ function PaintTool(canvas, roomTool) {
 	var isPainting = false;
 	this.isCurDrawingAnimated = false; // TODO eventually this can be internal
 	this.curDrawingFrameIndex = 0; // TODO eventually this can be internal
-	this.drawPaintGrid = true;
+	this.drawPaintGrid = (getPanelSetting("paintPanel", "grid") != false);
+	updatePaintGridCheck(this.drawPaintGrid);
 
 	console.log("NEW PAINT TOOL");
 	console.log(renderer);

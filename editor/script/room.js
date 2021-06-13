@@ -23,9 +23,10 @@ function RoomTool(canvas) {
 	var isDragDeletingTiles = false;
 
 	// render flags
-	this.drawMapGrid = true;
 	this.drawCollisionMap = false;
 	this.areMarkersVisible = false;
+	this.drawMapGrid = (getPanelSetting("roomPanel", "grid") != false);
+	updateRoomGridCheck(this.drawMapGrid);
 
 	this.markers = null;
 
