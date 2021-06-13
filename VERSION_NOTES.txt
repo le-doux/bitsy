@@ -1,7 +1,8 @@
 v7.3:
 - bugfix: Samuel Fine fixed mobile touch controls
-- bugfix: extra newlines in dialog
+- bugfix: extra newlines were added in dialog
 - bugfix: return exit's "move" button wasn't localized
+- bugfix: checkbox states were wrong on page load
 
 v7.2:
 - new icons!
