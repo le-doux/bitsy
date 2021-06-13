@@ -15,7 +15,7 @@ X find instances of dynamic text
 - dynamic text like "I'm a cat" "tea" and "Write your game's title here"
 */
 
-function Localization() {
+function Localization(initialLanguage) {
 
 var self = this;
 
@@ -54,7 +54,7 @@ var initialize = function() { // why does this happen multiple times?
 		}
 	}
 
-	currentLanguage = localStorage.editor_language;
+	currentLanguage = initialLanguage || localStorage.editor_language;
 
 	// console.log(localizationStrings);
 	// localize( getEditorLanguage() );

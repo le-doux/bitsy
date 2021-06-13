@@ -887,10 +887,7 @@ function start() {
 	}
 
 	// localization
-	if (urlFlags["lang"] != null) {
-		localStorage.editor_language = urlFlags["lang"]; // need to verify this is real language?
-	}
-	localization = new Localization();
+	localization = new Localization(urlFlags["lang"]);
 
 	//game canvas & context (also the map editor)
 	attachCanvas( document.getElementById("game") );
