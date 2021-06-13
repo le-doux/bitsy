@@ -590,7 +590,7 @@ function setDefaultGameState() {
 	var defaultData = Resources["defaultGameData.bitsy"];
 	// console.log("DEFAULT DATA \n" + defaultData);
 	document.getElementById("game_data").value = defaultData;
-	localStorage.game_data = document.getElementById("game_data").value; // save game
+	Store.set('game_data', document.getElementById("game_data").value); // save game
 	clearGameData();
 	parseWorld(document.getElementById("game_data").value); // load game
 
@@ -659,9 +659,9 @@ function refreshGameData() {
 	var gameDataNoFonts = serializeWorld(true);
 	document.getElementById("game_data").value = showFontDataInGameData ? serializeWorld() : gameDataNoFonts;
 
-	// localStorage.setItem("game_data", gameData); //auto-save
+	// Store.set("game_data", gameData); //auto-save
 
-	localStorage.setItem("game_data", gameDataNoFonts);
+	Store.set("game_data", gameDataNoFonts);
 }
 
 /* TIMER */
@@ -797,12 +797,11 @@ var defaultPanelPrefs = {
 
 function getPanelPrefs() {
 	// (TODO: weird that engine version and editor version are the same??)
-	var useDefaultPrefs = ( localStorage.engine_version == null ) ||
-							( localStorage.panel_prefs == null ) ||
-							( JSON.parse(localStorage.engine_version).major < 6 ) ||
-							( JSON.parse(localStorage.engine_version).minor < 0 );
-
-	var prefs = useDefaultPrefs ? defaultPanelPrefs : JSON.parse( localStorage.panel_prefs );
+	var storedEngineVersion = Store.get('engine_version');
+	var useDefaultPrefs = (!storedEngineVersion) ||
+	                      (storedEngineVersion.major < 6) ||
+	                      (storedEngineVersion.minor < 0);
+	var prefs = useDefaultPrefs ? defaultPanelPrefs : Store.get('panel_prefs', defaultPanelPrefs);
 
 	// add missing panel prefs (if any)
 	// console.log(defaultPanelPrefs);
@@ -916,17 +915,18 @@ function start() {
 	drawingThumbnailCtx = drawingThumbnailCanvas.getContext("2d");
 
 	// load custom font
-	if (localStorage.custom_font != null) {
-		var fontStorage = JSON.parse(localStorage.custom_font);
+	var fontStorage = Store.get('custom_font');
+	if (fontStorage) {
 		fontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
 	}
 	resetMissingCharacterWarning();
 
 	//load last auto-save
-	if (localStorage.game_data) {
+	var gamedataStorage = Store.get('game_data');
+	if (gamedataStorage) {
 		//console.log("~~~ found old save data! ~~~");
-		//console.log(localStorage.game_data);
-		document.getElementById("game_data").value = localStorage.game_data;
+		//console.log(gamedataStorage);
+		document.getElementById("game_data").value = gamedataStorage;
 		on_game_data_change_core();
 	}
 	else {
@@ -939,7 +939,7 @@ function start() {
 
 	// load panel preferences
 	var prefs = getPanelPrefs();
-	localStorage.panel_prefs = JSON.stringify(prefs); // save loaded prefs
+	Store.set('panel_prefs', prefs); // save loaded prefs
 	var sortedWorkspace = prefs.workspace.sort( function(a,b) { return a.position - b.position; } );
 	var editorContent = document.getElementById("editorContent");
 	for(i in sortedWorkspace) {
@@ -1034,11 +1034,11 @@ function start() {
 	// on_change_color_sprite();
 
 	// save latest version used by editor (for compatibility)
-	localStorage.engine_version = JSON.stringify( version );
+	Store.set('engine_version', version);
 
 	// load saved export settings
-	if( localStorage.export_settings ) {
-		export_settings = JSON.parse( localStorage.export_settings );
+	export_settings = Store.get('export_settings', export_settings);
+	if (export_settings) {
 		document.getElementById("pageColor").value = export_settings.page_color;
 	}
 
@@ -2195,7 +2195,7 @@ function on_game_data_change_core() {
 			name : fontName,
 			fontdata : fontManager.GetData(fontName)
 		};
-		localStorage.custom_font = JSON.stringify(fontStorage);
+		Store.set('custom_font', fontStorage);
 	}
 
 	updateInventoryUI();
@@ -2209,10 +2209,7 @@ function on_game_data_change_core() {
 }
 
 function updateFontSelectUI() {
-	var fontStorage = null;
-	if (localStorage.custom_font != null) {
-		fontStorage = JSON.parse(localStorage.custom_font);
-	}
+	var fontStorage = Store.get('custom_font', null);
 
 	var fontSelect = document.getElementById("fontSelect");
 
@@ -2573,8 +2570,8 @@ function updatePanelPrefs() {
 	}
 
 	// console.log(prefs);
-	localStorage.panel_prefs = JSON.stringify( prefs );
-	// console.log(localStorage.panel_prefs);
+	Store.set('panel_prefs', prefs);
+	// console.log(Store.get('panel_prefs'));
 }
 
 function getPanelSetting(panelId, settingId) {
@@ -2606,7 +2603,7 @@ function setPanelSetting(panelId, settingId, settingValue) {
 		}
 	}
 
-	localStorage.panel_prefs = JSON.stringify(prefs);
+	Store.set('panel_prefs', prefs);
 }
 
 var gifRecordingInterval = null;
@@ -2828,7 +2825,7 @@ function importFontFromFile(e) {
 			name : customFontName,
 			fontdata : fileText
 		};
-		localStorage.custom_font = JSON.stringify(fontStorage);
+		Store.set('custom_font', fontStorage);
 
 		refreshGameData();
 		updateFontSelectUI();
@@ -3094,7 +3091,7 @@ function on_change_color_page() {
 	document.getElementById("roomPanel").style.background = hex;
 	export_settings.page_color = hex;
 
-	localStorage.export_settings = JSON.stringify( export_settings );
+	Store.set('export_settings', export_settings);
 }
 
 function getComplimentingColor(palId) {
@@ -3449,14 +3446,8 @@ function on_change_font(e) {
 		switchFont(e.target.value, true /*doPickTextDirection*/);
 	}
 	else {
-		if (localStorage.custom_font != null) {
-			var fontStorage = JSON.parse(localStorage.custom_font);
-			switchFont(fontStorage.name, true /*doPickTextDirection*/);
-		}
-		else {
-			// fallback
-			switchFont("ascii_small", true /*doPickTextDirection*/);
-		}
+		var fontStorage = Store.get('custom_font', { name: 'ascii_small' });
+		switchFont(fontStorage.name, true /*doPickTextDirection*/);
 	}
 	updateFontDescriptionUI();
 	// updateEditorTextDirection();
