@@ -75,7 +75,7 @@
 					</div>
 
 					<div id="toolsCheckFlexItem">
-						<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" />
+						<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" autocomplete="off" />
 						<label title="show / hide toolbar" for="toolsCheck" id="toolsCheckLabel">
 							<span class="bitsy_icon icon_space_right">tool</span>
 							<span class="localize tools_label">tools</span>
@@ -91,73 +91,73 @@
 
 			<div id="toolsPanel">
 
-				<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanelAnimated(event);" checked/>
+				<input type="checkbox" value="aboutPanel" id="aboutCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
 				<label title="show / hide about window" for="aboutCheck">
 					<span class="bitsy_icon icon_space_right">about</span>
 					<span class="localize about_tool_name">about</span>
 				</label>
 				
-				<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanelAnimated(event);" checked/>
+				<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
 				<label title="show / hide room window" for="roomCheck">
 					<span class="bitsy_icon icon_space_right">room</span>
 					<span class="localize room_tool_name">room</span>
 				</label>
 
-				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanelAnimated(event);" />
+				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanelAnimated(event);" autocomplete="off" />
 				<label title="show / hide exits & endings window" for="exitsCheck">
 					<span class="bitsy_icon icon_space_right">exits_endings</span>
 					<span class="localize marker_tool_name">exits & endings</span>
 				</label>
 
-				<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanelAnimated(event);"  checked/>
+				<input type="checkbox" value="paintPanel" id="paintCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
 				<label title="show / hide paint window" for="paintCheck">
 					<span class="bitsy_icon icon_space_right">paint</span>
 					<span class="localize paint_tool_name">paint</span>
 				</label>
 				
-				<input type="checkbox" value="paintExplorerPanel" id="paintExplorerCheck" onclick="togglePanelAnimated(event);" />
+				<input type="checkbox" value="paintExplorerPanel" id="paintExplorerCheck" onclick="togglePanelAnimated(event);" autocomplete="off" />
 				<label title="show / hide find drawing window" for="paintExplorerCheck">
 					<span class="bitsy_icon icon_space_right">search</span>
 					<span class="localize explorer_tool_name">find drawing</span>
 				</label>
 				
-				<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanelAnimated(event);"  checked/>
+				<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
 				<label title="show / hide color palette window" for="colorsCheck">
 					<span class="bitsy_icon icon_space_right">colors</span>
 					<span class="localize palette_tool_name">colors</span>
 				</label>
 
-				<input type="checkbox" value="dialogPanel" id="dialogCheck" onclick="togglePanelAnimated(event);"  checked/>
+				<input type="checkbox" value="dialogPanel" id="dialogCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
 				<label title="show / hide dialog window" for="dialogCheck">
 					<span class="bitsy_icon icon_space_right">dialog</span>
 					<span class="localize dialog_tool_name">dialog</span>
 				</label>
 
-				<input type="checkbox" value="inventoryPanel" id="inventoryCheck" onclick="togglePanelAnimated(event);"  checked/>
+				<input type="checkbox" value="inventoryPanel" id="inventoryCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
 				<label title="show / hide inventory window" for="inventoryCheck">
 					<span class="bitsy_icon icon_space_right">item</span>
 					<span class="localize inventory_tool_name">inventory</span>
 				</label>
 				
-				<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanelAnimated(event);"  checked/>
+				<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
 				<label title="show / hide download window" for="downloadCheck">
 					<span class="bitsy_icon icon_space_right">file</span>
 					<span class="localize download_tool_name">download</span>
 				</label>
 				
-				<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanelAnimated(event);" />
+				<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanelAnimated(event);" autocomplete="off" />
 				<label title="show / hide gif recording window" for="gifCheck">
 					<span class="bitsy_icon icon_space_right">record</span>
 					<span class="localize gif_tool_name">record gif</span>
 				</label>
 				
-				<input type="checkbox" value="dataPanel" onclick="togglePanelAnimated(event);" id="dataCheck"/>
+				<input type="checkbox" value="dataPanel" onclick="togglePanelAnimated(event);" id="dataCheck" autocomplete="off" />
 				<label title="show / hide game data window" for="dataCheck">
 					<span class="bitsy_icon icon_space_right">game_data</span>
 					<span class="localize data_tool_name">game data</span>
 				</label>
 
-				<input type="checkbox" value="settingsPanel" onclick="togglePanelAnimated(event);" id="settingsCheck"/>
+				<input type="checkbox" value="settingsPanel" onclick="togglePanelAnimated(event);" id="settingsCheck" autocomplete="off" />
 				<label title="show / hide settings window" for="settingsCheck">
 					<span class="bitsy_icon icon_space_right">settings</span>
 					<span class="localize settings_tool_name">settings</span>
@@ -276,7 +276,7 @@
 					</div>
 					
 					<div id="roomNav" class="navControl">
-						<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" />
+						<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" autocomplete="off" />
 						<label title="play / pause game" for="playModeCheck">
 							<span id="playModeIcon" class="bitsy_icon">play</span>
 							<span id="playModeText" class="localize play_game">play</span> <!-- TODO LOCALIZE: also stop_game -->
@@ -326,7 +326,7 @@
 									<span class="bitsy_icon">open_tool</span>
 								</button>
 
-								<input type="checkbox" id="roomVisibilityControlsCheck" onclick="document.getElementById('roomVisibilityControls').style.display = event.target.checked ? 'flex' : 'none';" />
+								<input type="checkbox" id="roomVisibilityControlsCheck" onclick="document.getElementById('roomVisibilityControls').style.display = event.target.checked ? 'flex' : 'none';" autocomplete="off" />
 								<label title="show visibility controls" for="roomVisibilityControlsCheck">
 									<span class="bitsy_icon">visibility</span>
 									<span>visibility</span> <!-- TODO : localize -->
@@ -338,19 +338,19 @@
 							<div style="margin-top: 5px;" id="roomVisibility">
 								<span>visibility:</span> <!-- TODO : localize -->
 
-								<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" checked/>
+								<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" autocomplete="off" checked/>
 								<label title="show / hide grid" for="roomGridCheck">
 									<span id="roomGridIcon" class="bitsy_icon icon_space_right">visibility</span>
 									<span class="localize grid_toggle_visible">grid</span>
 								</label>
 
-								<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" />
+								<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" autocomplete="off" />
 								<label title="show / hide walls" for="roomWallsCheck">
 									<span id="roomWallsIcon" class="bitsy_icon icon_space_right">visibility_off</span>
 									<span class="localize walls_toggle_visible">walls</span>
 								</label>
 
-								<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" checked/>
+								<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" autocomplete="off" checked/>
 								<label title="show / hide exits & endings" for="roomMarkersCheck">
 									<span id="roomMarkersIcon" class="bitsy_icon icon_space_right">visibility</span>
 									<span class="localize marker_tool_name">exits & endings</span>
@@ -442,19 +442,19 @@
 										</span>
 									</div>
 									<div title="marker controls">
-										<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" />
+										<input type="checkbox" id="toggleMoveMarker1" onclick="toggleMoveMarker1(event);" autocomplete="off" />
 										<label for="toggleMoveMarker1" title="click to place marker in current room">
 											<span id="toggleMoveMarkerIcon1" class="bitsy_icon">set_exit_location</span>
 											<span class="localize marker_move">move</span>
 										</label>
 
-										<input type="checkbox" id="toggleEditMarker1" />
+										<input type="checkbox" id="toggleEditMarker1" autocomplete="off" />
 										<label for="toggleEditMarker1" title="edit coordinates">
 											<span class="bitsy_icon">edit</span>
 										</label>
 
 										<span id="exitOptionsToggle1">
-											<input type="checkbox" id="exitOptionsToggleCheck1" onclick="toggleExitOptions(0, event.target.checked);" />
+											<input type="checkbox" id="exitOptionsToggleCheck1" onclick="toggleExitOptions(0, event.target.checked);" autocomplete="off" />
 											<label title="show / hide exit options" for="exitOptionsToggleCheck1">
 												<span class="bitsy_icon">settings</span>
 											</label>
@@ -497,26 +497,26 @@
 										</span>
 									</div>
 									<div title="marker controls">
-										<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" />
+										<input type="checkbox" id="toggleMoveMarker2" onclick="toggleMoveMarker2(event);" autocomplete="off" />
 										<label for="toggleMoveMarker2" title="click to move marker">
 											<span id="toggleMoveMarkerIcon2" class="bitsy_icon">set_exit_location</span>
-											<span>move</span> <!-- todo : localize -->
+											<span class="localize marker_move">move</span>
 										</label>
 
-										<input type="checkbox" id="toggleEditMarker2" />
+										<input type="checkbox" id="toggleEditMarker2" autocomplete="off" />
 										<label for="toggleEditMarker2" title="edit coordinates">
 											<span class="bitsy_icon">edit</span>
 										</label>
 
 										<span id="exitOptionsToggle2">
-											<input type="checkbox" id="exitOptionsToggleCheck2" onclick="toggleExitOptions(1, event.target.checked);" />
+											<input type="checkbox" id="exitOptionsToggleCheck2" onclick="toggleExitOptions(1, event.target.checked);" autocomplete="off" />
 											<label title="show / hide exit options" for="exitOptionsToggleCheck2">
 												<span class="bitsy_icon">settings</span>
 											</label>
 										</span>
 
 										<span id="exitOptionsToggle1_alt">
-											<input type="checkbox" id="exitOptionsToggleCheck1_alt" onclick="toggleExitOptions(0, event.target.checked);" />
+											<input type="checkbox" id="exitOptionsToggleCheck1_alt" onclick="toggleExitOptions(0, event.target.checked);" autocomplete="off" />
 											<label title="show / hide exit options" for="exitOptionsToggleCheck1_alt">
 												<span class="bitsy_icon">settings</span>
 											</label>
@@ -671,7 +671,7 @@
 					</div>
 					<div id="paintEditMain">
 						<div class="buttonGroup" style="margin-bottom: 10px;">
-							<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" checked/>
+							<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" autocomplete="off" checked/>
 							<label title="show / hide grid" for="paintGridCheck">
 								<span id="paintGridIcon" class="bitsy_icon icon_space_right">visibility</span>
 								<span class="localize grid_toggle_visible">grid</span>
@@ -684,7 +684,7 @@
 					</div>
 
 					<div id="wall" class="controlBox" style="display:none;">
-						<input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall(event);">
+						<input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall(event);" autocomplete="off" >
 						<label title="make tile an impassible wall" for="wallCheckbox">
 							<span id="wallCheckboxIcon" class="bitsy_icon">wall_off</span>
 							<span class="localize wall_toggle">wall</span>
@@ -695,7 +695,7 @@
 
 					<div id="animationOuter" class="controlBox">
 						<div id="isAnimated">
-							<input type="checkbox" id="animatedCheckbox" onchange="on_toggle_animated();">
+							<input type="checkbox" id="animatedCheckbox" onchange="on_toggle_animated();" autocomplete="off" >
 							<label title="add animation to drawing" for="animatedCheckbox">
 								<span class="localize animation_title">animation</span>
 								<span id="animatedCheckboxIcon" class="bitsy_icon">expand_less</span>
@@ -872,7 +872,7 @@
 
 					<div id="dialogEditorHasContent">
 						<div class="navControl">
-							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" />
+							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" autocomplete="off" />
 							<label title="preview dialog" for="previewDialogCheck">
 								<span id="previewDialogIcon" class="bitsy_icon">play</span>
 								<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
@@ -908,14 +908,14 @@
 						</div>
 
 						<div id="dialogOptions">
-							<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);">
+							<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);" autocomplete="off">
 							<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
 								<span class="bitsy_icon">code_edit</span>
 								<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
 								<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
 							</label>
 
-							<input type="checkbox" id="dialogAlwaysShowDrawingCheck" onclick="toggleAlwaysShowDrawingDialog(event);" checked>
+							<input type="checkbox" id="dialogAlwaysShowDrawingCheck" onclick="toggleAlwaysShowDrawingDialog(event);" autocomplete="off" checked>
 							<label title="always show dialog of selected drawing" for="dialogAlwaysShowDrawingCheck">
 								<!-- TODO : bitsy_icon --- need a special icon for this case -->
 								<span class="bitsy_icon">paint</span>
@@ -1090,7 +1090,7 @@
 						<span class="localize download_data">download data</span>
 					</button>
 					<br/>
-					<input type="checkbox" id="fontDataCheck" onclick="toggleFontDataVisibility(event);" />
+					<input type="checkbox" id="fontDataCheck" onclick="toggleFontDataVisibility(event);" autocomplete="off" />
 					<label title="show / hide font data (WARNING: can be very slow for large fonts)" for="fontDataCheck">
 						<span id="fontDataIcon" class="bitsy_icon">visibility_off</span>
 						<span class="localize font_data_toggle_visible">font data</span>

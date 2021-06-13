@@ -115,7 +115,8 @@ function PaintTool(canvas, roomTool) {
 	var isPainting = false;
 	this.isCurDrawingAnimated = false; // TODO eventually this can be internal
 	this.curDrawingFrameIndex = 0; // TODO eventually this can be internal
-	this.drawPaintGrid = true;
+	this.drawPaintGrid = (getPanelSetting("paintPanel", "grid") != false);
+	updatePaintGridCheck(this.drawPaintGrid);
 
 	console.log("NEW PAINT TOOL");
 	console.log(renderer);
@@ -433,11 +434,11 @@ function PaintTool(canvas, roomTool) {
 				if ( Object.keys( sprite ).length <= 2 ) { alert("You can't delete your last sprite!"); return; }
 
 				// todo: share with items
-				var dlgId = sprite[ self.drawing.id ].dlg == null ? self.drawing.id : sprite[ self.drawing.id ].dlg;
-				if( dlgId && dialog[ dlgId ] )
-					delete dialog[ dlgId ];
+				var dlgId = (sprite[self.drawing.id].dlg == null) ? self.drawing.id : sprite[self.drawing.id].dlg;
 
-				delete sprite[ self.drawing.id ];
+				delete sprite[self.drawing.id];
+
+				deleteUnreferencedDialog(dlgId);
 
 				refreshGameData();
 				// TODO RENDERER : refresh images
@@ -447,13 +448,13 @@ function PaintTool(canvas, roomTool) {
 			else if( self.drawing.type == TileType.Item ){
 				if ( Object.keys( item ).length <= 1 ) { alert("You can't delete your last item!"); return; }
 
-				var dlgId = item[ self.drawing.id ].dlg;
-				if( dlgId && dialog[ dlgId ] )
-					delete dialog[ dlgId ];
+				var dlgId = item[self.drawing.id].dlg;
 
-				delete item[ self.drawing.id ];
+				delete item[self.drawing.id];
 
-				removeAllItems( self.drawing.id );
+				deleteUnreferencedDialog(dlgId);
+
+				removeAllItems(self.drawing.id);
 				refreshGameData();
 				// TODO RENDERER : refresh images
 				roomTool.drawEditMap();

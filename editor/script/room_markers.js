@@ -1461,9 +1461,10 @@ function EndingMarker(parentRoom, ending) {
 	}
 
 	this.Remove = function() {
-		delete dialog[this.ending.id];
+		var tempDlgId = this.ending.id;
 		var endingIndex = room[this.parentRoom].endings.indexOf(this.ending);
 		room[this.parentRoom].endings.splice(endingIndex, 1);
+		deleteUnreferencedDialog(tempDlgId);
 	}
 
 	this.Match = function(otherMarker) {

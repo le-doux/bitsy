@@ -927,21 +927,11 @@ var DialogBlockNode = function(doIndentFirstLine) {
 			var shouldIndentCodeBlock = i > 0 && curNodeIsNonInlineCode;
 			var shouldIndentAfterCodeBlock = prevNodeIsNonInlineCode;
 
-			// need to insert a newline before the first block of non-inline code that isn't 
-			// preceded by a {br}, since those will create their own newline
-			if (i > 0 && curNodeIsNonInlineCode && !prevNodeIsNonInlineCode && !shouldIndentAfterLinebreak) {
-				str += "\n";
-			}
-
 			if (shouldIndentFirstLine || shouldIndentAfterLinebreak || shouldIndentCodeBlock || shouldIndentAfterCodeBlock) {
 				str += leadingWhitespace(depth);
 			}
 
 			str += curNode.Serialize(depth);
-
-			if (i < this.children.length-1 && curNodeIsNonInlineCode) {
-				str += "\n";
-			}
 
 			lastNode = curNode;
 		}
