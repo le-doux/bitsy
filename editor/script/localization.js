@@ -74,6 +74,11 @@ function getLocalizationId(element) { // the localization id is the class AFTER 
 	return null; // oops
 }
 
+function getLocaleString(locale, id) {
+	var localeStrings = localizationStrings[locale];
+	return localeStrings && localeStrings[id];
+}
+
 function localize(language) {
 	if(localizationStrings == null)
 		return;
@@ -84,12 +89,12 @@ function localize(language) {
 	for(var i = 0; i < elements.length; i++) {
 		var el = elements[i];
 		var localizationId = getLocalizationId(el);
-		var locString = localizationStrings[language][localizationId];
+		var locString = getLocaleString(language, localizationId);
+		if (!locString) {
+			locString = getLocaleString(defaultLanguage, localizationId);
+		}
 		if (locString) {
 			el.innerText = locString;
-		}
-		else if (localizationStrings[defaultLanguage][localizationId] != null) {
-			el.innerText = localizationStrings[defaultLanguage][localizationId]; // fall back to english
 		}
 	}
 }
@@ -145,8 +150,7 @@ this.ChangeLanguage = function(newLanguage) {
 }
 
 function getString(id) {
-	var langStrings = localizationStrings[getEditorLanguage()];
-	return langStrings && langStrings[id];
+	return getLocaleString(getEditorLanguage(), id);
 }
 this.GetString = function(id) {
 	return getString(id);
@@ -171,7 +175,7 @@ this.GetStringOrFallback = function(id, englishFallback) {
 
 function localizationContains(id, text) { // TODO : rename to be more descriptive?
 	for (lang in localizationStrings) {
-		var locString = localizationStrings[lang][id];
+		var locString = getLocaleString(lang, id);
 		if (locString != null && locString.length > 0 && locString === text) {
 			return true;
 		}
@@ -208,7 +212,7 @@ this.ExportMissingEnglishStrings = function() {
 	for(var i = 0; i < elements.length; i++) {
 		var el = elements[i];
 		var localizationId = getLocalizationId(el);
-		if(!localizationStrings[defaultLanguage][localizationId])
+		if(!getLocaleString(defaultLanguage, localizationId))
 			englishStrings[localizationId] = el.innerText;
 	}
 	exportEnglishStringsDictionary(englishStrings);
@@ -219,7 +223,7 @@ this.ExportDynamicEnglishStrings = function() {
 }
 
 this.GetStringCount = function(langId) {
-	return Object.keys(localizationStrings[langId]).length;
+	return localizationStrings[langId] ? Object.keys(localizationStrings[langId]).length : 0;
 }
 
 initialize();
