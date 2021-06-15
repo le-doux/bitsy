@@ -796,17 +796,16 @@
 					</div>
 				</div>
 
-				<div id="findPanel" class="bitsy-card bitsy-card-m panel color1">
-					<div class="bitsy-card-titlebar bar color1">
+				<!-- todo : add back grabbability -->
+				<div id="findPanel" class="bitsy-card bitsy-card-m">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">search</span>
 
-						<button title="minimize find window" class="light panelBarClose" onclick="hidePanel('findPanel');">
+						<span class="bitsy-card-title" title="find window" onmousedown="grabCard(event);">find</span> <!-- todo : localize -->
+
+						<button title="minimize find window" onclick="hidePanel('findPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
-
-						<div title="find window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon icon_large icon_space_right">search</span>
-							<span>find</span> <!-- todo : localize -->
-						</div>
 					</div>
 
 					<div class="bitsy-card-main">

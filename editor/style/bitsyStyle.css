@@ -14,8 +14,23 @@
 	--bitsy-size-l: 32rem;
 }
 
-.bitsy-card {
+/* icons */
+.bitsy_icon svg {
+	width: 1em;
+	height: 1em;
+	fill: currentColor;
+}
 
+/* cards */
+.bitsy-card {
+	background: var(--bitsy-color-main-1);
+	margin: var(--bitsy-space-m);
+	/*margin-left: 0;*/
+	display: inline-flex;
+	flex-direction: column;
+	max-height: 100%;
+	border-radius: var(--bitsy-space-s);
+	border-bottom: solid var(--bitsy-space-xs) var(--bitsy-color-main-2);
 }
 
 .bitsy-card-xs .bitsy-card-main {
@@ -35,5 +50,16 @@
 }
 
 .bitsy-card-titlebar {
+	display: flex;
+	padding: var(--bitsy-space-s);
+	background: var(--bitsy-color-accent-1);
+	border-radius: var(--bitsy-space-s) var(--bitsy-space-s) 0 0;
+}
 
+.bitsy-card-title {
+	flex-grow: 1;
+	/*justify-content: center;*/
+	text-align: center;
+	margin: var(--bitsy-margin-s);
+	user-select: none;
 }
