@@ -4,8 +4,36 @@
 	--bitsy-color-main-2: #6767b2;
 	--bitsy-color-accent-1: #e8e8ff;
 	--bitsy-color-accent-2: #ccccff;
-	--bitsy-margin-xs: 0.125rem;
-	--bitsy-margin-s: 0.25rem;
-	--bitsy-margin-m: 0.5rem;
-	--bitsy-margin-l: 1.0rem;
+	--bitsy-space-xs: 0.125rem;
+	--bitsy-space-s: 0.25rem;
+	--bitsy-space-m: 0.5rem;
+	--bitsy-space-l: 1.0rem;
+	--bitsy-size-xs: 8rem;
+	--bitsy-size-s: 16rem;
+	--bitsy-size-m: 24rem;
+	--bitsy-size-l: 32rem;
+}
+
+.bitsy-card {
+
+}
+
+.bitsy-card-xs .bitsy-card-main {
+	width: var(--bitsy-size-xs);
+}
+
+.bitsy-card-s .bitsy-card-main {
+	width: var(--bitsy-size-s);
+}
+
+.bitsy-card-m .bitsy-card-main {
+	width: var(--bitsy-size-m);
+}
+
+.bitsy-card-l .bitsy-card-main {
+	width: var(--bitsy-size-l);
+}
+
+.bitsy-card-titlebar {
+
 }
