@@ -1,0 +1,11 @@
+/* theme */
+:root {
+	--bitsy-color-main-1: #ffffff;
+	--bitsy-color-main-2: #6767b2;
+	--bitsy-color-accent-1: #e8e8ff;
+	--bitsy-color-accent-2: #ccccff;
+	--bitsy-margin-xs: 0.125rem;
+	--bitsy-margin-s: 0.25rem;
+	--bitsy-margin-m: 0.5rem;
+	--bitsy-margin-l: 1.0rem;
+}
