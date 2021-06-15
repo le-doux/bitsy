@@ -120,7 +120,13 @@
 					<span class="bitsy_icon icon_space_right">search</span>
 					<span class="localize explorer_tool_name">find drawing</span>
 				</label>
-				
+
+				<input type="checkbox" value="findPanel" id="findCheck" onclick="togglePanelAnimated(event);" autocomplete="off" />
+				<label title="show / hide find window" for="findCheck">
+					<span class="bitsy_icon icon_space_right">search</span>
+					<span>find</span> <!-- todo : localize -->
+				</label>
+
 				<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
 				<label title="show / hide color palette window" for="colorsCheck">
 					<span class="bitsy_icon icon_space_right">colors</span>
@@ -786,6 +792,20 @@
 							<span class="bitsy_icon icon_space_right">search</span>
 						</span>
 						<input id="paintExplorerFilterInput" type="text" onkeyup="paintExplorerFilterChange(event);" onchange="paintExplorerFilterChange(event);" placeholder="filter drawings" title="filter drawings by name" size="30">
+					</div>
+				</div>
+
+				<div id="findPanel" class="panel color1">
+					<div class="bar color1">
+
+						<button title="minimize find window" class="light panelBarClose" onclick="hidePanel('findPanel');">
+							<span class="bitsy_icon">close</span>
+						</button>
+
+						<div title="find window" class="panelBarTitle" onmousedown="grabCard(event);">
+							<span class="bitsy_icon icon_large icon_space_right">search</span>
+							<span>find</span> <!-- todo : localize -->
+						</div>
 					</div>
 				</div>
 
