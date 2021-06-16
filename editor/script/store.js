@@ -24,7 +24,7 @@ var Store = {
 	 * use to signal lack of storage to user
 	 */
 	init: function (onFirstError) {
-		this.onFirstError = function(err) {
+		this.onFirstError = function (err) {
 			this.error = true;
 			console.warn('Storage error', err);
 			if (onFirstError) onFirstError(err);
@@ -35,9 +35,7 @@ var Store = {
 			var testValue = 'test';
 			driver.setItem('_test_key_', testValue);
 			if (driver.getItem('_test_key_') !== testValue) {
-				throw('Storage access fails silently. This might be caused by ' +
-					  'a browser extension that blocks third-party cookies.'
-				);
+				throw new Error('Storage access fails silently. This might be caused by a browser extension that blocks third-party cookies.');
 			}
 			driver.removeItem('_test_key_');
 		} catch (err) {
