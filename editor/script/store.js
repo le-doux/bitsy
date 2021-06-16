@@ -29,8 +29,14 @@ var Store = {
 		};
 		try {
 			// test that storage driver is available and working
-			this.driver.setItem('_test_key_', 'test');
-			this.driver.getItem('_test_key_');
+			this.driver = localStorage;
+			var testValue = 'test';
+			this.driver.setItem('_test_key_', testValue);
+			if (this.driver.getItem('_test_key_') !== testValue) {
+				throw('Storage access fails silently. This might be caused by ' +
+					  'a browser extension that blocks third-party cookies.'
+				);
+			}
 			this.driver.removeItem('_test_key_');
 		} catch (err) {
 			this.onFirstError(err);
