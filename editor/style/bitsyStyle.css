@@ -59,7 +59,7 @@
 .bitsy-card-title {
 	flex-grow: 1;
 	/*justify-content: center;*/
-	text-align: center;
+	/*text-align: center;*/
 	margin: var(--bitsy-margin-s);
 	user-select: none;
 }

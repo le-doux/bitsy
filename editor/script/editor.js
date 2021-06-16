@@ -2559,7 +2559,7 @@ function updatePanelPrefs() {
 	// console.log(prefs);
 
 	var editorContent = document.getElementById("editorContent");
-	var cards = editorContent.getElementsByClassName("panel");
+	var cards = editorContent.getElementsByClassName("bitsy-workbench-item");
 
 	for(var i = 0; i < cards.length; i++) {
 		var card = cards[i];
@@ -3135,7 +3135,7 @@ function grabCard(e) {
 	if (grabbedPanel.card != null) return;
 
 	grabbedPanel.card = e.target;
-	while(!grabbedPanel.card.classList.contains("panel") && !(grabbedPanel.card == null)) {
+	while(!grabbedPanel.card.classList.contains("bitsy-workbench-item") && !(grabbedPanel.card == null)) {
 		grabbedPanel.card = grabbedPanel.card.parentElement;
 	}
 
@@ -3186,23 +3186,7 @@ function panel_onMouseMove(e) {
 
 	var editorContent = document.getElementById("editorContent");
 	var editorContentWidth = editorContent.getBoundingClientRect().width;
-	var otherCards = editorContent.getElementsByClassName("panel");
-
-	// var cardCollection = editorContent.getElementsByClassName("panel");
-	// var otherCards = [];
-	// for (var i = 0; i < cardCollection.length; i++) {
-	// 	otherCards.push(cardCollection[i]);
-	// }
-	// // console.log(otherCards);
-
-	// // hacky fix for arabic -- need better solution
-	// if (curEditorLanguageCode === "ar") {
-	// 	// otherCards.reverse();
-	// 	cardCenter.x = editorContentWidth - cardCenter.x;
-	// }
-
-	// console.log(cardCenter);
-	// console.log("---");
+	var otherCards = editorContent.getElementsByClassName("bitsy-workbench-item");
 
 	for(var j = 0; j < otherCards.length; j++) {
 		var other = otherCards[j];
