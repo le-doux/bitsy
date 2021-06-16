@@ -13,7 +13,9 @@
  */
 var Store = {
 	/** storage driver (must implement `getItem`, `setItem`, `removeItem`) */
-	driver: localStorage,
+	getDriver: function () {
+		return localStorage;
+	},
 	/** whether storage has failed */
 	error: false,
 	/**
@@ -29,15 +31,15 @@ var Store = {
 		};
 		try {
 			// test that storage driver is available and working
-			this.driver = localStorage;
+			var driver = this.getDriver();
 			var testValue = 'test';
-			this.driver.setItem('_test_key_', testValue);
-			if (this.driver.getItem('_test_key_') !== testValue) {
+			driver.setItem('_test_key_', testValue);
+			if (driver.getItem('_test_key_') !== testValue) {
 				throw('Storage access fails silently. This might be caused by ' +
 					  'a browser extension that blocks third-party cookies.'
 				);
 			}
-			this.driver.removeItem('_test_key_');
+			driver.removeItem('_test_key_');
 		} catch (err) {
 			this.onFirstError(err);
 		}
@@ -49,7 +51,7 @@ var Store = {
 	 */
 	get: function (name, fallback) {
 		try {
-			var value = this.driver.getItem(name);
+			var value = this.getDriver().getItem(name);
 			if (typeof value === 'string') {
 				try {
 					return JSON.parse(value);
@@ -71,9 +73,9 @@ var Store = {
 	set: function (name, value) {
 		try {
 			if (value === undefined) {
-				this.driver.removeItem(name);
+				this.getDriver().removeItem(name);
 			} else {
-				this.driver.setItem(name, JSON.stringify(value));
+				this.getDriver().setItem(name, JSON.stringify(value));
 			}
 		} catch (err) {
 			if (!this.error && this.onFirstError) {
