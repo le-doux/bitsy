@@ -25,12 +25,21 @@
 .bitsy-card {
 	background: var(--bitsy-color-main-1);
 	margin: var(--bitsy-space-m);
+	margin-right: 0;
 	/*margin-left: 0;*/
 	display: inline-flex;
 	flex-direction: column;
 	max-height: 100%;
 	border-radius: var(--bitsy-space-s);
 	border-bottom: solid var(--bitsy-space-xs) var(--bitsy-color-main-2);
+}
+
+.bitsy-card-main {
+	flex-grow: 1;
+	padding: var(--bitsy-space-m);
+	max-height: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .bitsy-card-xs .bitsy-card-main {
@@ -58,8 +67,7 @@
 
 .bitsy-card-title {
 	flex-grow: 1;
-	/*justify-content: center;*/
-	/*text-align: center;*/
-	margin: var(--bitsy-margin-s);
+	margin: var(--bitsy-space-s);
+	margin-left: var(--bitsy-space-m);
 	user-select: none;
 }
