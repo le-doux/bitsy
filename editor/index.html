@@ -797,7 +797,7 @@
 				</div>
 
 				<!-- todo : add back grabbability -->
-				<div id="findPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item">
+				<div id="findPanel" class="bitsy-card bitsy-card-l bitsy-workbench-item">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">search</span>
 
@@ -809,7 +809,69 @@
 					</div>
 
 					<div class="bitsy-card-main">
-						test
+						<span>
+							<span class="bitsy_icon">search</span>
+							<input type="text" placeholder="search by name" />
+						</span>
+
+						<form>
+							<input type="radio" name="findFilter" id="findCategoryFilterAll" />
+							<label for="findCategoryFilterAll">
+								<span class="bitsy_icon">game_data</span>
+								<span>all</span>
+							</label>
+
+							<input type="radio" name="findFilter" id="findCategoryFilterInRoom" />
+							<label for="findCategoryFilterInRoom">
+								<span class="bitsy_icon">set_exit_location</span>
+								<span>in room</span>
+							</label>
+
+							<input type="radio" name="findFilter" id="findCategoryFilterAvatar" />
+							<label for="findCategoryFilterAvatar">
+								<span class="bitsy_icon">avatar</span>
+								<span>avatar</span>
+							</label>
+
+							<input type="radio" name="findFilter" id="findCategoryFilterTile" />
+							<label for="findCategoryFilterTile">
+								<span class="bitsy_icon">tile</span>
+								<span>tile</span>
+							</label>
+
+							<input type="radio" name="findFilter" id="findCategoryFilterSprite" />
+							<label for="findCategoryFilterSprite">
+								<span class="bitsy_icon">sprite</span>
+								<span>sprite</span>
+							</label>
+
+							<input type="radio" name="findFilter" id="findCategoryFilterItem" />
+							<label for="findCategoryFilterItem">
+								<span class="bitsy_icon">item</span>
+								<span>item</span>
+							</label>
+
+							<input type="radio" name="findFilter" id="findCategoryFilterRoom" />
+							<label for="findCategoryFilterRoom">
+								<span class="bitsy_icon">room</span>
+								<span>room</span>
+							</label>
+
+							<input type="radio" name="findFilter" id="findCategoryFilterColors" />
+							<label for="findCategoryFilterColors">
+								<span class="bitsy_icon">colors</span>
+								<span>colors</span>
+							</label>
+
+							<input type="radio" name="findFilter" id="findCategoryFilterDialog" />
+							<label for="findCategoryFilterDialog">
+								<span class="bitsy_icon">dialog</span>
+								<span>dialog</span>
+							</label>
+						</form>
+
+						<div class="bitsy-menu-scrollview" style="height: 300px;">
+						</div>
 					</div>
 				</div>
 

@@ -71,3 +71,14 @@
 	margin-left: var(--bitsy-space-m);
 	user-select: none;
 }
+
+/* menu */
+.bitsy-menu-scrollview {
+	flex-grow: 1;
+	flex-basis: 100%;
+	border: solid var(--bitsy-space-xs);
+	border-color: var(--bitsy-color-accent-1);
+	padding: var(--bitsy-space-m);
+	overflow-y: auto;
+	border-radius: var(--bitsy-space-s);
+}
