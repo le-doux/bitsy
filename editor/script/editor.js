@@ -1071,6 +1071,11 @@ function start() {
 	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked;
 
 	initLanguageOptions();
+
+	// find tool
+	findTool = new FindTool({
+		mainElement : document.getElementById("findPanelMain"),
+	});
 }
 
 function newDrawing() {
@@ -3602,3 +3607,6 @@ function hideFontMissingCharacterWarning() {
 
 /* ICONS */
 var iconUtils = new IconUtils(); // TODO : move?
+
+/* NEW FIND TOOL */
+var findTool = null;
