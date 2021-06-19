@@ -1,5 +1,5 @@
 function FindTool(options) {
-	var categories = [
+	var categoryDefinitions = [
 		{
 			icon: "avatar",
 			getIdList: function() { return ["A"]; },
@@ -65,9 +65,14 @@ function FindTool(options) {
 
 	options.mainElement.appendChild(filterTabs);
 
-	var scrollview = createScrollview();
+	var scrollviewDiv = document.createElement("div");
+	scrollviewDiv.classList.add("bitsy-menu-scrollview");
 
-	options.mainElement.appendChild(scrollview);
+	options.mainElement.appendChild(scrollviewDiv);
+
+	var scrollcontentDiv = document.createElement("div");
+	scrollcontentDiv.classList.add("bitsy-menu-scrollcontent");
+	scrollviewDiv.appendChild(scrollcontentDiv);
 
 	// function createOnClickHandler(id) {
 	// 	return function() {
@@ -82,8 +87,8 @@ function FindTool(options) {
 	// 	scrollview.appendChild(itemIcon);
 	// }
 
-	for (var i = 0; i < categories.length; i++) {
-		var category = categories[i];
+	for (var i = 0; i < categoryDefinitions.length; i++) {
+		var category = categoryDefinitions[i];
 
 		var idList = category.getIdList()
 
@@ -91,7 +96,7 @@ function FindTool(options) {
 			var id = idList[j];
 			var icon = createIconElement(category.icon);
 			icon.title = id;
-			scrollview.appendChild(icon);
+			scrollcontentDiv.appendChild(icon);
 		}
 	}
 }

@@ -90,9 +90,3 @@ function createTabs(options) {
 
 	return tabForm;
 }
-
-function createScrollview() {
-	var scrollviewDiv = document.createElement("div");
-	scrollviewDiv.classList.add("bitsy-menu-scrollview");
-	return scrollviewDiv;
-}
