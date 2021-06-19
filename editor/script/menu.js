@@ -78,15 +78,10 @@ function createTabs(options) {
 		tabLabel.setAttribute("for", tabInput.id);
 		tabForm.appendChild(tabLabel);
 
-		if (tabInfo.icon) {
-			tabLabel.appendChild(createIconElement(tabInfo.icon));
-		}
-
-		if (tabInfo.text) {
-			var tabName = document.createElement("span");
-			tabName.innerText = tabInfo.text;
-			tabLabel.appendChild(tabName);
-		}
+		tabLabel.appendChild(createLabel({
+			icon: tabInfo.icon,
+			text: tabInfo.text,
+		}));
 	}
 
 	return tabForm;

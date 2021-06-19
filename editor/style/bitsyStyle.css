@@ -80,6 +80,10 @@
 	align-items: center;
 }
 
+.bitsy-menu-label .bitsy_icon {
+	margin-right: var(--bitsy-space-s);
+}
+
 .bitsy-menu-scrollview {
 	flex-grow: 1;
 	flex-basis: 100%;
@@ -100,7 +104,11 @@
 	display: inline-flex;
 	margin: var(--bitsy-space-s);
 	flex-direction: column;
-	width: 4em;
+	width: 5em;
+}
+
+.bitsy-thumbnail-image-container {
+	align-self: center;
 }
 
 .bitsy-thumbnail-image-container .bitsy_icon svg {
