@@ -205,10 +205,11 @@ function FindTool(options) {
 						curSearchText.length <= 0 || displayName.indexOf(curSearchText) != -1);
 
 					if (isSearchTextInName) {
-						var icon = createIconElement(category.icon);
-						icon.onclick = createOnClick(category, id);
-						icon.title = displayName;
-						scrollcontentDiv.appendChild(icon);
+						scrollcontentDiv.appendChild(createThumbnail({
+							icon: category.icon,
+							text: displayName,
+							onclick: createOnClick(category, id),
+						}));
 					}
 				}
 			}

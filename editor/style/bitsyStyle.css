@@ -94,3 +94,15 @@
 .bitsy-menu-scrollcontent {
 	white-space: normal;
 }
+
+/* thumbnail */
+.bitsy-thumbnail {
+	display: inline-flex;
+	margin: var(--bitsy-space-s);
+	flex-direction: column;
+}
+
+.bitsy-thumbnail-image-container .bitsy_icon svg {
+	width: 4em;
+	height: 4em;
+}
