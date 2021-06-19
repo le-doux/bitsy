@@ -100,9 +100,15 @@
 	display: inline-flex;
 	margin: var(--bitsy-space-s);
 	flex-direction: column;
+	width: 4em;
 }
 
 .bitsy-thumbnail-image-container .bitsy_icon svg {
 	width: 4em;
 	height: 4em;
+}
+
+.bitsy-thumbnail .bitsy-menu-label {
+	overflow: hidden;
+	white-space: nowrap;
 }

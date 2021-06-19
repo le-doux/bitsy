@@ -15,6 +15,7 @@ function createIconElement(id) {
 
 function createLabel(options) {
 	var label = document.createElement("span");
+	label.classList.add("bitsy-menu-label");
 
 	if (options.icon) {
 		label.appendChild(createIconElement(options.icon));
