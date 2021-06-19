@@ -104,9 +104,10 @@ function createThumbnail(options) {
 	var icon = createIconElement(options.icon);
 	thumbnailContainer.appendChild(icon);
 
-	var caption = document.createElement("figcaption");
-	caption.innerText = options.text;
-	div.appendChild(caption);
+	div.appendChild(createLabel({
+		icon: options.icon,
+		text: options.text,
+	}));
 
 	return div;
 }
