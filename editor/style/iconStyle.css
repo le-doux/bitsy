@@ -1,10 +1,10 @@
-.bitsy_icon {
+/*.bitsy_icon {
 	display: inline-block;
-/*	width: 16px;
-	height: 16px;*/
+	width: 16px;
+	height: 16px;
 	fill: #6767b2;
 }
-
+*/
 .icon_large {
 	width: 24px;
 	height: 24px;
@@ -22,9 +22,9 @@
 	vertical-align: middle;
 }
 
-button .bitsy_icon {
+/*button .bitsy_icon {
 	vertical-align: middle;
-}
+}*/
 
 input[type=radio] + label .bitsy_icon {
 	vertical-align: middle;

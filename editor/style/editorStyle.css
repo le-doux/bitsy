@@ -1,24 +1,6 @@
-html {
-	height: 100%;
-}
-
-body {
-	margin: 0 !important;
-	padding: 0 !important;
-	line-height: 170%;
-	font-family: "Nunito", Helvetica, Arial, sans-serif;
-
-	font-size: 16px;
-
-	height: 100%;
-}
 canvas {
 	background: black;
 	/*margin-top: 4px;*/
-}
-
-input[type=text] {
-	font-size: 80%;
 }
 
 #appRoot {
@@ -350,14 +332,6 @@ span.controlBox {
 	color: #6767b2;
 }
 
-.left {
-	border-radius: 2px 0px 0px 2px;
-}
-
-.right {
-	border-radius: 0px 2px 2px 0px;
-}
-
 #paintEditMain {
 	white-space:initial;
 	padding:none;
@@ -519,31 +493,4 @@ span.controlBox {
 
 #dialogTop {
 	height: 30px; margin-bottom: 5px;
-}
-
-.textInputField {
-	flex-grow: 1;
-	border-radius: 5px;
-	padding: 5px;
-	line-height: 100%;
-	color: #6767b2;
-	background: #e8e8ff;
-	border: solid 1px #e8e8ff;
-}
-
-.textInputField:not([readonly]) {
-	color: black;
-	background: #eee;
-	border: solid 1px #eee;
-}
-
-.textInputField:hover:not([readonly]) {
-	text-decoration: underline;
-	border: solid 1px #ccc;
-}
-
-.textInputField:focus:not([readonly]) {
-	background: white;
-	border: solid 1px #ccc;
-	text-decoration: none;
 }

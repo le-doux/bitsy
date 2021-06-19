@@ -134,10 +134,12 @@ function FindTool(options) {
 
 	searchGroup.appendChild(createLabel({
 		icon: "search",
+		style: "badge",
 	}));
 
 	searchGroup.appendChild(createTextInput({
-		placeholder: "find by name or id",
+		placeholder: "find by name or ID", // todo : localize
+		style: "with-badge",
 		onchange: function(e) {
 			curSearchText = e.target.value;
 			GenerateItems();

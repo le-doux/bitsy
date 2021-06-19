@@ -14,8 +14,12 @@ function createIconElement(id) {
 }
 
 function createLabel(options) {
-	var label = document.createElement("span");
+	var label = document.createElement("label");
 	label.classList.add("bitsy-menu-label");
+
+	if (options.style) {
+		label.classList.add("bitsy-label-style-" + options.style);
+	}
 
 	if (options.icon) {
 		label.appendChild(createIconElement(options.icon));
@@ -27,12 +31,20 @@ function createLabel(options) {
 		label.appendChild(textSpan);
 	}
 
+	if (options.for) {
+		label.setAttribute("for", options.for);
+	}
+
 	return label;
 }
 
 function createTextInput(options) {
 	var input = document.createElement("input");
 	input.type = "text";
+
+	if (options.style) {
+		input.classList.add("bitsy-input-style-" + options.style);
+	}
 
 	if (options.value) {
 		input.value = options.value;
@@ -74,13 +86,10 @@ function createTabs(options) {
 			}
 		};
 
-		var tabLabel = document.createElement("label");
-		tabLabel.setAttribute("for", tabInput.id);
-		tabForm.appendChild(tabLabel);
-
-		tabLabel.appendChild(createLabel({
+		tabForm.appendChild(createLabel({
 			icon: tabInfo.icon,
 			text: tabInfo.text,
+			for: tabInput.id,
 		}));
 	}
 

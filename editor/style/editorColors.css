@@ -71,12 +71,6 @@ input[type=checkbox]:checked + label {
 	background: #6767b2;
 	color: white;
 }
-input[type=radio] + label.left {
-	border-right: solid 1px #6767b2;
-}
-input[type=radio] + label.middle {
-	border-right: solid 1px #6767b2;
-}
 
 input[type=radio] + label {
 	background: #e8e8ff;
