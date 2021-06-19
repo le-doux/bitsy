@@ -204,7 +204,6 @@ input[type=radio] + label.right {
 	display: flex;
 	flex-wrap: wrap;
 	margin-bottom: var(--bitsy-space-s);
-	/*align-items: center;*/
 }
 
 .bitsy-menu-label .bitsy_icon {
