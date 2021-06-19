@@ -662,6 +662,8 @@ function refreshGameData() {
 	// Store.set("game_data", gameData); //auto-save
 
 	Store.set("game_data", gameDataNoFonts);
+
+	events.Raise("game_data_refresh");
 }
 
 /* TIMER */

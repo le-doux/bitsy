@@ -3,10 +3,20 @@ function FindTool(options) {
 		{
 			icon: "avatar",
 			getIdList: function() { return ["A"]; },
+			openTool: function(id) {
+				paintTool.selectDrawing(new DrawingId(TileType.Avatar, id));
+				on_paint_avatar_ui_update();
+				showPanel("paintPanel", "findPanel");
+			},
 		},
 		{
 			icon: "tile",
 			getIdList: function() { return sortedTileIdList(); },
+			openTool: function(id) {
+				paintTool.selectDrawing(new DrawingId(TileType.Tile, id));
+				on_paint_tile_ui_update();
+				showPanel("paintPanel", "findPanel");
+			},
 		},
 		{
 			icon: "sprite",
@@ -15,22 +25,44 @@ function FindTool(options) {
 				idList.splice(idList.indexOf("A"), 1);
 				return idList;
 			},
+			openTool: function(id) {
+				paintTool.selectDrawing(new DrawingId(TileType.Sprite, id));
+				on_paint_sprite_ui_update();
+				showPanel("paintPanel", "findPanel");
+			},
 		},
 		{
 			icon: "item",
 			getIdList: function() { return sortedItemIdList(); },
+			openTool: function(id) {
+				paintTool.selectDrawing(new DrawingId(TileType.Item, id));
+				on_paint_item_ui_update();
+				showPanel("paintPanel", "findPanel");
+			},
 		},
 		{
 			icon: "room",
 			getIdList: function() { return sortedRoomIdList(); },
+			openTool: function(id) {
+				selectRoom(id);
+				showPanel("roomPanel", "findPanel");
+			},
 		},
 		{
 			icon: "colors",
 			getIdList: function() { return sortedPaletteIdList(); },
+			openTool: function(id) {
+				paletteTool.Select(id);
+				showPanel("colorsPanel", "findPanel");
+			},
 		},
 		{
 			icon: "dialog",
 			getIdList: function() { return [titleDialogId].concat(sortedDialogIdList()); },
+			openTool: function(id) {
+				openDialogTool(id);
+				showPanel("dialogPanel", "findPanel");
+			},
 		},
 	];
 
@@ -41,7 +73,7 @@ function FindTool(options) {
 	}));
 
 	searchGroup.appendChild(createTextInput({
-		placeholder: "search by name",
+		placeholder: "find by name or id",
 	}));
 
 	options.mainElement.appendChild(searchGroup);
@@ -74,29 +106,38 @@ function FindTool(options) {
 	scrollcontentDiv.classList.add("bitsy-menu-scrollcontent");
 	scrollviewDiv.appendChild(scrollcontentDiv);
 
-	// function createOnClickHandler(id) {
-	// 	return function() {
-	// 		paintTool.selectDrawing(new DrawingId(TileType.Item, id));
-	// 		on_paint_item_ui_update();
-	// 	}
-	// }
+	function GenerateItems() {
+		function createOnClick(category, id) {
+			return function() {
+				category.openTool(id);
+			}
+		}
 
-	// for (var id in item) {
-	// 	var itemIcon = createIconElement("item");
-	// 	itemIcon.onclick = createOnClickHandler(id);
-	// 	scrollview.appendChild(itemIcon);
-	// }
+		scrollcontentDiv.innerHTML = "";
 
-	for (var i = 0; i < categoryDefinitions.length; i++) {
-		var category = categoryDefinitions[i];
+		for (var i = 0; i < categoryDefinitions.length; i++) {
+			var category = categoryDefinitions[i];
 
-		var idList = category.getIdList()
+			var idList = category.getIdList()
 
-		for (var j in idList) {
-			var id = idList[j];
-			var icon = createIconElement(category.icon);
-			icon.title = id;
-			scrollcontentDiv.appendChild(icon);
+			for (var j = 0; j < idList.length; j++) {
+				var id = idList[j];
+				var icon = createIconElement(category.icon);
+				icon.onclick = createOnClick(category, id);
+				icon.title = id;
+				scrollcontentDiv.appendChild(icon);
+			}
 		}
 	}
+
+	GenerateItems();
+
+	events.Listen("game_data_change", function(event) {
+		GenerateItems();
+	});
+
+	// todo : the naming of these events is confusing
+	events.Listen("game_data_refresh", function(event) {
+		GenerateItems();
+	});
 }

@@ -86,6 +86,11 @@ function PaletteTool(colorPicker,labelIds,nameFieldId) {
 		}
 	});
 
+	this.Select = function(id) {
+		curPaletteId = id;
+		UpdatePaletteUI();
+	};
+
 	function SelectPrev() {
 		var idList = sortedPaletteIdList();
 		var index = idList.indexOf(curPaletteId);
