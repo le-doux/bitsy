@@ -1,19 +1,16 @@
-/*
-	Shared functions for creating controls for tool menus
-*/
+/* shared HTML element creation functions */
 
-function createGroupContainer() {
+function createGroupElement() {
 	var groupDiv = document.createElement("div");
 	groupDiv.classList.add("bitsy-menu-group");
 	return groupDiv;
 }
 
 function createIconElement(id) {
-	// todo : supply this externally?
 	return iconUtils.CreateIcon(id);
 }
 
-function createLabel(options) {
+function createLabelElement(options) {
 	var label = document.createElement("label");
 	label.classList.add("bitsy-menu-label");
 
@@ -38,7 +35,7 @@ function createLabel(options) {
 	return label;
 }
 
-function createTextInput(options) {
+function createTextInputElement(options) {
 	var input = document.createElement("input");
 	input.type = "text";
 
@@ -61,7 +58,7 @@ function createTextInput(options) {
 	return input;
 }
 
-function createTabs(options) {
+function createTabSelectElement(options) {
 	var tabForm = document.createElement("form");
 
 	for (var i = 0; i < options.tabs.length; i++) {
@@ -86,7 +83,7 @@ function createTabs(options) {
 			}
 		};
 
-		tabForm.appendChild(createLabel({
+		tabForm.appendChild(createLabelElement({
 			icon: tabInfo.icon,
 			text: tabInfo.text,
 			for: tabInput.id,
@@ -109,7 +106,7 @@ function createThumbnail(options) {
 	var icon = createIconElement(options.icon);
 	thumbnailContainer.appendChild(icon);
 
-	div.appendChild(createLabel({
+	div.appendChild(createLabelElement({
 		icon: options.icon,
 		text: options.text,
 	}));

@@ -130,14 +130,14 @@ function FindTool(options) {
 	var curFilter = "all";
 	var curSearchText = "";
 
-	var searchGroup = createGroupContainer();
+	var searchGroup = createGroupElement();
 
-	searchGroup.appendChild(createLabel({
+	searchGroup.appendChild(createLabelElement({
 		icon: "search",
 		style: "badge",
 	}));
 
-	searchGroup.appendChild(createTextInput({
+	searchGroup.appendChild(createTextInputElement({
 		placeholder: "find by name or ID", // todo : localize
 		style: "with-badge",
 		onchange: function(e) {
@@ -162,7 +162,7 @@ function FindTool(options) {
 		});
 	}
 
-	var filterSelect = createTabs({
+	var filterSelect = createTabSelectElement({
 		name: "findFilter",
 		value: curFilter,
 		tabs: filterTabList,
