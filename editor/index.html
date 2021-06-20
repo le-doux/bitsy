@@ -16,7 +16,6 @@
 		<link rel="stylesheet" type="text/css" href="style/markerToolStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/dialogToolStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/responsiveStyle.css">
-		<link rel="stylesheet" type="text/css" href="style/navControlStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/iconStyle.css">
 
 		<!-- GENERATED -->
@@ -281,7 +280,7 @@
 					<div class="bitsy-card-main">
 						<div id="roomNav" class="navControl">
 							<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" autocomplete="off" />
-							<label title="play / pause game" for="playModeCheck">
+							<label title="play / pause game" for="playModeCheck" class="bitsy-menu-label">
 								<span id="playModeIcon" class="bitsy_icon">play</span>
 								<span id="playModeText" class="localize play_game">play</span> <!-- TODO LOCALIZE: also stop_game -->
 							</label>
@@ -359,22 +358,23 @@
 					</div>
 				</div>
 
-				<div id="exitsPanel" class="panel color3 bitsy-workbench-item" style="display:none;">
-					<div class="bar color3">
+				<div id="exitsPanel" class="bitsy-card bitsy-workbench-item" style="display:none;">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">exits_endings</span>
 
-						<button title="minimize exits & endings window" class="light panelBarClose" onclick="hidePanel('exitsPanel');">
+						<span class="bitsy-card-title" title="exits & endings window" onmousedown="grabCard(event);">
+							<span class="localize marker_tool_name">exits & endings</span>
+						</span>
+
+						<button title="minimize exits & endings window" onclick="hidePanel('exitsPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
-
-						<div title="exits & endings window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon icon_large icon_space_right">exits_endings</span>
-							<span class="localize marker_tool_name">exits & endings</span>
-						</div>
 					</div>
-					<div id="exitsPanelContent">
+
+					<div id="exitsPanelContent" class="bitsy-card-main">
 						<div id="markersControls" class="navControl">
 							<!-- TODO : hook up to actual "name", resize -->
-							<input type="text" id="markerName" class="textInputField" size="5" readonly></input>
+							<input type="text" id="markerName" size="5" readonly></input>
 
 							<span class="spacer"></span>
 
@@ -402,18 +402,22 @@
 						</div>
 						<!-- todo : move style elsewhere -->
 						<div id="addMarkerOptions" class="controlBox" style="display: flex; flex-direction: column; min-width: 300px">
-							<button title="add two-way exit" onclick="newExit();">
-								<span class="bitsy_icon">add</span> <span id="addExitText" class="localize exit_label">exit</span>
+							<button title="add two-way exit" class="bitsy-menu-label" onclick="newExit();">
+								<span class="bitsy_icon">add</span>
+								<span id="addExitText" class="localize exit_label">exit</span>
 							</button>
-							<button title="add one-way exit" onclick="newExitOneWay();">
-								<span class="bitsy_icon">add</span> <span id="addExitText" class="localize exit_one_way_label">one-way exit</span>
+							<button title="add one-way exit" class="bitsy-menu-label" onclick="newExitOneWay();">
+								<span class="bitsy_icon">add</span>
+								<span id="addExitText" class="localize exit_one_way_label">one-way exit</span>
 							</button>
-							<button title="add ending" onclick="newEnding();">
-								<span class="bitsy_icon">add</span> <span class="localize ending_label">ending</span>
+							<button title="add ending" class="bitsy-menu-label" onclick="newEnding();">
+								<span class="bitsy_icon">add</span>
+								<span class="localize ending_label">ending</span>
 							</button>
 							<!-- TODO : need a general cancel button style -->
-							<button title="cancel" class="cancelButton" onclick="cancelAddMarker();">
-								<span class="bitsy_icon">cancel</span> <span class="localize action_cancel">cancel</span>
+							<button title="cancel" class="cancelButton bitsy-menu-label" onclick="cancelAddMarker();">
+								<span class="bitsy_icon">cancel</span>
+								<span class="localize action_cancel">cancel</span>
 							</button>
 						</div>
 						<div id="noMarkerMessage" class="controlBox">

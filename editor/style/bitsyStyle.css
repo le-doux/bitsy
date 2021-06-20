@@ -18,7 +18,7 @@
 }
 
 /* remove browser default styles */
-button, input {
+button, input[type=text], input[type=radio], input[type=checkmark] {
 	font-size: inherit;
 	font-family: inherit;
 	line-height: inherit;
@@ -61,6 +61,7 @@ button {
 	border-radius: var(--bitsy-space-s);
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
 }
 
 button:active {
@@ -84,13 +85,14 @@ label {
 
 /* text input */
 input[type=text] {
+	font-family: monospace;
 	flex-grow: 1;
 	border-radius: var(--bitsy-space-s);
 	padding: var(--bitsy-space-s);
-	margin: var(--bitsy-space-s);
+	margin: var(--bitsy-space-xs);
 	color: var(--bitsy-color-main-2);
 	background: var(--bitsy-color-accent-1);
-	border: solid var(--bitsy-space-xxs) var(--bitsy-color-main-1);
+	border: solid var(--bitsy-space-xxs) var(--bitsy-color-accent-1);
 }
 
 input[type=text]:not([readonly]) {
@@ -216,6 +218,17 @@ input[type=checkbox] + label:hover {
 	user-select: none;
 }
 
+/* nav control */
+.navControl {
+	display: flex;
+	margin-bottom: var(--bitsy-space-m);
+	align-items: stretch;
+}
+
+.navControl .spacer {
+	width: var(--bitsy-space-s);
+}
+
 /* menu */
 .bitsy-menu-group {
 	display: flex;
@@ -291,4 +304,29 @@ input[type=checkbox] + label:hover {
 .bitsy-thumbnail .bitsy-menu-label {
 	overflow: hidden;
 	white-space: nowrap;
+}
+
+/* SPECIAL CASES */
+#markersSelect {
+	margin-bottom: var(--bitsy-space-s);
+}
+
+#markersSelect .controlBox {
+	align-items: start;
+}
+
+#endingOptions .controlBox {
+	display: block;
+}
+
+#exitOptions .controlBox {
+	display: block;
+}
+
+#returnExitOptions .controlBox {
+	display: block;
+}
+
+#addMarkerOptions button {
+	width: 100%;
 }
