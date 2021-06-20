@@ -141,6 +141,24 @@ input[type=radio] + label.right {
 	border-bottom-left-radius: 0;
 }
 
+input[type=radio] + label:hover {
+	text-decoration: underline;
+}
+
+/* checkbox */
+input[type=checkbox] {
+	display: none;
+}
+
+input[type=checkbox] + label {
+	align-content: center;
+	justify-content: center;
+}
+
+input[type=checkbox] + label:hover {
+	text-decoration: underline;
+}
+
 /* icons */
 .bitsy_icon svg {
 	width: 1em;

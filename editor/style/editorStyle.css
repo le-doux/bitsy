@@ -1,14 +1,11 @@
 canvas {
 	background: black;
-	/*margin-top: 4px;*/
 }
 
 #appRoot {
 	display: flex;
 	flex-flow: column;
 	height: 100%;
-
-	/*border: solid 2px red;*/
 }
 
 #topbar {
@@ -18,29 +15,20 @@ canvas {
 	padding-left: 20px;
 	padding-right: 20px;
 	box-sizing: border-box;
-	font-size: 125%;
-
 	flex: 0 1 auto;
+	align-items: center;
 }
 
 #topbarMain {
 	width: 100%;
-
-	/*border: solid 2px red;*/
 }
 
 #editorWindow {
 	width:100%;
-	/*height:750px;*/
-
 	overflow:scroll;
 	-webkit-overflow-scrolling: touch;
-
 	box-sizing: border-box;
-
 	flex: 1 1 auto;
-
-	/*border: solid 2px red;*/
 }
 #editorContent {
 	height:100%;
@@ -194,7 +182,6 @@ span.controlBox {
 /*toolbar*/
 #toolsPanel {
 	padding-top: 5px;
-	font-size: 80%;
 	width:100%;
 	overflow:auto;
 	display:none;
@@ -436,17 +423,13 @@ span.controlBox {
 	flex: 1 0 auto;
 }
 
-#topbarSpaceFlexItem {
-	flex: 1 1 400px;
-}
-
 #bylineFlexItem {
 	flex: 1 0 auto;
 	font-size: 80%;
 }
 
 #bitsyLogoTitle {
-	font-size: 125%;
+	font-size: 1.5em;
 }
 
 #paintExplorerFilter {

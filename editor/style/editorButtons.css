@@ -7,33 +7,6 @@
 	line-height: 100%;
 }
 
-/* checkbox */
-input[type=checkbox] {
-	display: none;
-}
-input[type=checkbox] + label {
-	font-family: "Nunito", Helvetica, Arial, sans-serif;
-	font-size: 90%;
-	padding: 4px;
-	margin: 0px;
-	margin-top: 0px;
-	margin-right: 2px;
-	margin-bottom: 2px;
-	margin-left: none;
-	vertical-align: middle;
-	line-height: 100%;
-	border:none;
-	border-radius: 2px;
-}
-input[type=checkbox] + label .material-icons {
-	font-size: 110%;
-	vertical-align: middle;
-	line-height: 100%;
-}
-input[type=checkbox] + label:hover {
-	text-decoration: underline;
-}
-
 #paintExplorerContent input[type=radio] + label {
 	padding: 0px;
 	background: none;
