@@ -1,4 +1,8 @@
 function FindTool(options) {
+	var spriteThumbnailRenderer = createSpriteThumbnailRenderer();
+	var tileThumbnailRenderer = createTileThumbnailRenderer();
+	var itemThumbnailRenderer = createItemThumbnailRenderer();
+
 	var categoryDefinitions = [
 		{
 			name: "avatar",
@@ -12,6 +16,7 @@ function FindTool(options) {
 				on_paint_avatar_ui_update();
 				showPanel("paintPanel", "findPanel");
 			},
+			renderer: spriteThumbnailRenderer,
 		},
 		{
 			name: "tile",
@@ -30,6 +35,7 @@ function FindTool(options) {
 				on_paint_tile_ui_update();
 				showPanel("paintPanel", "findPanel");
 			},
+			renderer: tileThumbnailRenderer,
 		},
 		{
 			name: "sprite",
@@ -52,6 +58,7 @@ function FindTool(options) {
 				on_paint_sprite_ui_update();
 				showPanel("paintPanel", "findPanel");
 			},
+			renderer: spriteThumbnailRenderer,
 		},
 		{
 			name: "item",
@@ -70,6 +77,7 @@ function FindTool(options) {
 				on_paint_item_ui_update();
 				showPanel("paintPanel", "findPanel");
 			},
+			renderer: itemThumbnailRenderer,
 		},
 		{
 			name: "room",
@@ -87,6 +95,7 @@ function FindTool(options) {
 				selectRoom(id);
 				showPanel("roomPanel", "findPanel");
 			},
+			renderer: spriteThumbnailRenderer,
 		},
 		{
 			name: "colors",
@@ -104,6 +113,7 @@ function FindTool(options) {
 				paletteTool.Select(id);
 				showPanel("colorsPanel", "findPanel");
 			},
+			renderer: spriteThumbnailRenderer,
 		},
 		{
 			name: "dialog",
@@ -124,6 +134,7 @@ function FindTool(options) {
 				openDialogTool(id);
 				showPanel("dialogPanel", "findPanel");
 			},
+			renderer: spriteThumbnailRenderer,
 		},
 	];
 
@@ -207,11 +218,17 @@ function FindTool(options) {
 						curSearchText.length <= 0 || displayName.indexOf(curSearchText) != -1);
 
 					if (isSearchTextInName) {
-						scrollcontentDiv.appendChild(createThumbnail({
-							icon: category.icon,
-							text: displayName,
-							onclick: createOnClick(category, id),
-						}));
+						var thumbnailControl = new ThumbnailControl(
+							id,
+							category.renderer,
+							{
+								icon: category.icon,
+								text: displayName,
+								onclick: createOnClick(category, id),
+								renderOptions: { isAnimated: true },
+							});
+
+						scrollcontentDiv.appendChild(thumbnailControl.GetElement());
 					}
 				}
 			}

@@ -92,24 +92,3 @@ function createTabSelectElement(options) {
 
 	return tabForm;
 }
-
-function createThumbnail(options) {
-	var div = document.createElement("div");
-	div.classList.add("bitsy-thumbnail");
-	div.onclick = options.onclick;
-	div.title = options.text;
-
-	var thumbnailContainer = document.createElement("div");
-	thumbnailContainer.classList.add("bitsy-thumbnail-image-container");
-	div.appendChild(thumbnailContainer);
-
-	var icon = createIconElement(options.icon);
-	thumbnailContainer.appendChild(icon);
-
-	div.appendChild(createLabelElement({
-		icon: options.icon,
-		text: options.text,
-	}));
-
-	return div;
-}

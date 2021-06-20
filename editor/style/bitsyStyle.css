@@ -252,6 +252,11 @@ input[type=radio] + label.right {
 	height: 4em;
 }
 
+.bitsy-thumbnail-image-container img {
+	width: 4em;
+	height: 4em;
+}
+
 .bitsy-thumbnail .bitsy-menu-label {
 	overflow: hidden;
 	white-space: nowrap;
