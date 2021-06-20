@@ -1037,34 +1037,37 @@
 					</div>
 				</div>
 
-				<div id="dataPanel" class="panel color0 bitsy-workbench-item" style="display:none;">
-					<div class="bar color0">
+				<div id="dataPanel" class="bitsy-card bitsy-workbench-item" style="display:none;">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">game_data</span>
 
-						<button title="minimize game data window" class="light panelBarClose" onclick="hidePanel('dataPanel');">
+						<span class="bitsy-card-title" title="game data window" onmousedown="grabCard(event);">
+							<span class="localize data_tool_name">game data</span>
+						</span>
+
+						<button title="minimize game data window" onclick="hidePanel('dataPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
-
-						<div title="game data window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon icon_large icon_space_right">game_data</span>
-							<span class="localize data_tool_name">game data</span>
-						</div>
 					</div>
-					<textarea title="raw text of the bitsy game data file (be careful when editing)" id="game_data" onchange="on_game_data_change();"></textarea>
-					<br>
-					<button title="reset everything and start new game" class="color0" onclick="newGameDialog();">
-						<span class="bitsy_icon">new_game</span>
-						<span class="localize reset_data">reset game data</span>
-					</button>
-					<button title="download game data" class="color0" onclick="exportGameData();">
-						<span class="bitsy_icon">download</span>
-						<span class="localize download_data">download data</span>
-					</button>
-					<br/>
-					<input type="checkbox" id="fontDataCheck" onclick="toggleFontDataVisibility(event);" autocomplete="off" />
-					<label title="show / hide font data (WARNING: can be very slow for large fonts)" for="fontDataCheck">
-						<span id="fontDataIcon" class="bitsy_icon">visibility_off</span>
-						<span class="localize font_data_toggle_visible">font data</span>
-					</label>
+
+					<div class="bitsy-card-main">
+						<textarea title="raw text of the bitsy game data file (be careful when editing)" id="game_data" onchange="on_game_data_change();"></textarea>
+						<br>
+						<button title="reset everything and start new game" class="bitsy-menu-label" onclick="newGameDialog();">
+							<span class="bitsy_icon">new_game</span>
+							<span class="localize reset_data">reset game data</span>
+						</button>
+						<button title="download game data" class="bitsy-menu-label" onclick="exportGameData();">
+							<span class="bitsy_icon">download</span>
+							<span class="localize download_data">download data</span>
+						</button>
+						<br/>
+						<input type="checkbox" id="fontDataCheck" onclick="toggleFontDataVisibility(event);" autocomplete="off" />
+						<label title="show / hide font data (WARNING: can be very slow for large fonts)" for="fontDataCheck" class="bitsy-menu-label">
+							<span id="fontDataIcon" class="bitsy_icon">visibility_off</span>
+							<span class="localize font_data_toggle_visible">font data</span>
+						</label>
+					</div>
 				</div>
 
 				<div id="settingsPanel" class="panel color0 bitsy-workbench-item" style="display:none;">
