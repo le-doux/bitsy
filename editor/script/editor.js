@@ -1203,8 +1203,6 @@ function on_palette_name_change(event) {
 }
 
 function selectRoom(roomId) {
-	console.log("SELECT ROOM " + roomId);
-
 	// ok watch out this is gonna be hacky
 	var ids = sortedRoomIdList();
 
@@ -1312,13 +1310,7 @@ function duplicateRoom() {
 
 	updateRoomName();
 
-	// add new exit destination option to exits panel
-	var select = document.getElementById("exitDestinationSelect");
-	var option = document.createElement("option");
-	var roomLabel = localization.GetStringOrFallback("room_label", "room");
-	option.text = roomLabel + " " + newRoomId;
-	option.value = newRoomId;
-	select.add(option);
+	events.Raise("select_room", { id: curRoom });
 }
 
 function duplicateExit(exit) {
@@ -1389,6 +1381,8 @@ function newRoom() {
 	// option.text = roomLabel + " " + roomId;
 	// option.value = roomId;
 	// select.add(option);
+
+	events.Raise("select_room", { id: curRoom });
 }
 
 function deleteRoom() {
