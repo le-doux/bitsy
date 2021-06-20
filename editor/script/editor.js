@@ -398,6 +398,8 @@ function openDialogTool(dialogId, insertNextToId, showIfHidden) { // todo : rena
 		console.log("insert next to : " + insertNextToId);
 		showPanel("dialogPanel", insertNextToId);
 	}
+
+	events.Raise("select_dialog", { id: curDialogEditorId });
 }
 
 // TODO : probably this should be incorporated into the dialog editor main code somehow
@@ -485,7 +487,7 @@ function addNewDialog() {
 function duplicateDialog() {
 	if (curDialogEditorId != null) {
 		var id = nextAvailableDialogId();
-		dialog[id] = { src:dialog[curDialogEditorId].slice(), name:null };
+		dialog[id] = { src: dialog[curDialogEditorId].src.slice(), name: null, id: id, };
 		refreshGameData();
 
 		openDialogTool(id);

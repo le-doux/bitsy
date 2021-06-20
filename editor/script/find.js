@@ -407,6 +407,10 @@ function FindTool(options) {
 		UpdateSelectedItems();
 	});
 
+	events.Listen("select_dialog", function(event) {
+		UpdateSelectedItems();
+	});
+
 	var scrollEndTimer = null;
 	scrollviewDiv
 		.addEventListener("scroll", function() {

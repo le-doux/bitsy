@@ -1872,7 +1872,7 @@ function parseScript(lines, i, backCompatPrefix, compatibilityFlags) {
 
 	var results = scriptUtils.ReadDialogScript(lines,i);
 
-	dialog[id] = { src:results.script, name:null };
+	dialog[id] = { src: results.script, name: null, id: id, };
 
 	if (compatibilityFlags.convertImplicitSpriteDialogIds) {
 		// explicitly hook up dialog that used to be implicitly
