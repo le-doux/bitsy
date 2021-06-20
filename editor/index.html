@@ -40,7 +40,6 @@
 		<script src="script/room.js"></script>
 		<script src="script/room_markers.js"></script>
 		<script src="script/thumbnail.js"></script>
-		<script src="script/explorer.js"></script>
 		<script src="script/find.js"></script>
 		<script src="script/localization.js"></script>
 		<script src="script/event_manager.js"></script>
@@ -119,18 +118,6 @@
 					<span class="bitsy_icon icon_space_right">paint</span>
 					<span class="localize paint_tool_name">paint</span>
 				</label>
-				
-				<input type="checkbox" value="paintExplorerPanel" id="paintExplorerCheck" onclick="togglePanelAnimated(event);" autocomplete="off" />
-				<label title="show / hide find drawing window" for="paintExplorerCheck">
-					<span class="bitsy_icon icon_space_right">search</span>
-					<span class="localize explorer_tool_name">find drawing</span>
-				</label>
-
-				<input type="checkbox" value="findPanel" id="findCheck" onclick="togglePanelAnimated(event);" autocomplete="off" />
-				<label title="show / hide find window" for="findCheck">
-					<span class="bitsy_icon icon_space_right">search</span>
-					<span>find</span> <!-- todo : localize -->
-				</label>
 
 				<input type="checkbox" value="colorsPanel" id="colorsCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
 				<label title="show / hide color palette window" for="colorsCheck">
@@ -142,6 +129,12 @@
 				<label title="show / hide dialog window" for="dialogCheck">
 					<span class="bitsy_icon icon_space_right">dialog</span>
 					<span class="localize dialog_tool_name">dialog</span>
+				</label>
+
+				<input type="checkbox" value="findPanel" id="findCheck" onclick="togglePanelAnimated(event);" autocomplete="off" />
+				<label title="show / hide find window" for="findCheck">
+					<span class="bitsy_icon icon_space_right">search</span>
+					<span>find</span> <!-- todo : localize -->
 				</label>
 
 				<input type="checkbox" value="inventoryPanel" id="inventoryCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
@@ -673,7 +666,7 @@
 
 						<span class="spacer"></span>
 
-						<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('paintExplorerPanel', 'paintPanel');">
+						<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('findPanel', 'paintPanel');">
 							<span class="bitsy_icon">search</span>
 						</button>
 					</div>
@@ -738,69 +731,6 @@
 					
 				</div>
 
-				<div id="paintExplorerPanel" class="panel color1 bitsy-workbench-item">
-					<div class="bar color1">
-
-						<button title="minimize find drawing window" class="light panelBarClose" onclick="hidePanel('paintExplorerPanel');">
-							<span class="bitsy_icon">close</span>
-						</button>
-
-						<div title="find drawing window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon icon_large icon_space_right">search</span>
-							<span class="localize explorer_tool_name">find drawing</span>
-						</div>
-					</div>
-
-					<form>
-						<input type="radio" name="paint explorer mode" value="avatar" onclick="on_paint_avatar();" id="paintExplorerOptionAvatar" checked>
-						<label title="find the avatar: the player's character" for="paintExplorerOptionAvatar" class="left">
-							<span class="bitsy_icon">avatar</span>
-							<span class="localize avatar_label">avatar</span>
-						</label>
-
-						<input type="radio" name="paint explorer mode" value="tile" onclick="on_paint_tile();" id="paintExplorerOptionTile">
-						<label title="find tiles: pieces of scenery" for="paintExplorerOptionTile" class="middle">
-							<span class="bitsy_icon">tile</span>
-							<span class="localize tile_label">tile</span>
-						</label>
-
-						<input type="radio" name="paint explorer mode" value="sprite" onclick="on_paint_sprite();" id="paintExplorerOptionSprite">
-						<label title="find sprites: non-player characters and interactive objects" for="paintExplorerOptionSprite" class="middle">
-							<span class="bitsy_icon">sprite</span>
-							<span class="localize sprite_label">sprite</span>
-						</label>
-
-						<input type="radio" name="paint explorer mode" value="item" onclick="on_paint_item();" id="paintExplorerOptionItem">
-						<label title="find items: things the player can pick up" for="paintExplorerOptionItem" class="right">
-							<span class="bitsy_icon">item</span>
-							<span class="localize item_label">item</span>
-						</label>
-					</form>
-
-					<div id="paintExplorerViewport">
-						<div id="paintExplorerContent">
-
-							<form id="paintExplorerForm">
-								<span id="paintExplorerFormInner">
-								</span>
-								<div id="paintExplorerAdd">
-									<button title="add drawing" onclick="newDrawing(); return false;">
-										<span class="bitsy_icon">add</span>
-									</button>
-								</div>
-							</form>
-						</div>
-					</div>
-
-					<div class="controlBox" id="paintExplorerFilter">
-						<span id="paintExplorerFilterIcon">
-							<span class="bitsy_icon icon_space_right">search</span>
-						</span>
-						<input id="paintExplorerFilterInput" type="text" onkeyup="paintExplorerFilterChange(event);" onchange="paintExplorerFilterChange(event);" placeholder="filter drawings" title="filter drawings by name" size="30">
-					</div>
-				</div>
-
-				<!-- todo : add back grabbability -->
 				<div id="findPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">search</span>

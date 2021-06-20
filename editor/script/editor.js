@@ -789,10 +789,10 @@ var defaultPanelPrefs = {
 		{ id:"gifPanel", 			visible:false, 	position:5  },
 		{ id:"dataPanel", 			visible:false, 	position:6  },
 		{ id:"exitsPanel", 			visible:false, 	position:7  },
-		{ id:"paintExplorerPanel",	visible:false,	position:9  },
-		{ id:"dialogPanel",			visible:false,	position:10 },
-		{ id:"inventoryPanel",		visible:false,	position:11 },
-		{ id:"settingsPanel",		visible:false,	position:12 },
+		{ id:"dialogPanel",			visible:false,	position:8 },
+		{ id:"findPanel",			visible:false,	position:9  },
+		{ id:"inventoryPanel",		visible:false,	position:10 },
+		{ id:"settingsPanel",		visible:false,	position:11 },
 	]
 };
 // console.log(defaultPanelPrefs);
@@ -981,13 +981,6 @@ function start() {
 		updatePaletteOptionsFromGameData();
 	});
 
-	// init paint explorer
-	paintExplorer = new PaintExplorer("paintExplorer",selectPaint);
-	paintExplorer.Refresh(TileType.Avatar);
-	paintExplorer.ChangeSelection("A");
-	paintTool.explorer = paintExplorer;
-	paintExplorer.SetDisplayCaptions( true );
-
 	//unsupported feature stuff
 	if (hasUnsupportedFeatures() && !isPortraitOrientation()) {
 		showUnsupportedFeatureWarning();
@@ -1148,7 +1141,6 @@ function on_drawing_name_change() {
 
 	// update display name for thumbnail
 	var displayName = obj.name ? obj.name : getCurPaintModeStr() + " " + drawing.id;
-	paintExplorer.ChangeThumbnailCaption(drawing.id, displayName);
 
 	// make sure items referenced in scripts update their names
 	if(drawing.type === TileType.Item) {
@@ -1230,7 +1222,6 @@ function selectRoom(roomId) {
 		roomTool.drawEditMap();
 		paintTool.updateCanvas();
 		updateRoomPaletteSelect();
-		paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 
 		if (drawing.type === TileType.Tile) {
 			updateWallCheckboxOnCurrentTile();
@@ -1250,7 +1241,6 @@ function nextRoom() {
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
-	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 
 	if (drawing.type === TileType.Tile) {
 		updateWallCheckboxOnCurrentTile();
@@ -1270,7 +1260,6 @@ function prevRoom() {
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 	updateRoomPaletteSelect();
-	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 
 	if (drawing.type === TileType.Tile) {
 		updateWallCheckboxOnCurrentTile();
@@ -1483,7 +1472,6 @@ function next() {
 	else if( drawing.type == TileType.Item ) {
 		nextItem();
 	}
-	paintExplorer.ChangeSelection( drawing.id );
 }
 
 function prev() {
@@ -1496,7 +1484,6 @@ function prev() {
 	else if( drawing.type == TileType.Item ) {
 		prevItem();
 	}
-	paintExplorer.ChangeSelection( drawing.id );
 }
 
 function copyDrawingData(sourceDrawingData) {
@@ -1810,7 +1797,6 @@ function toggleFontDataVisibility(e) {
 /* PALETTE STUFF */
 var colorPicker = null;
 var paletteTool = null;
-var paintExplorer = null;
 
 function updateRoomPaletteSelect() {
 	var palOptions = document.getElementById("roomPaletteSelect").options;
@@ -1880,7 +1866,6 @@ function roomPaletteChange(event) {
 	markerTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
-	paintExplorer.Refresh( paintTool.drawing.type, true /*doKeepOldThumbnails*/ );
 }
 
 function updateDrawingNameUI() {
@@ -1905,10 +1890,6 @@ function on_paint_avatar() {
 	drawing.type = TileType.Avatar;
 	drawing.id = "A";
 	paintTool.reloadDrawing();
-	if(paintExplorer != null) { 
-		paintExplorer.Refresh( paintTool.drawing.type );
-		paintExplorer.ChangeSelection( paintTool.drawing.id );
-	}
 
 	on_paint_avatar_ui_update();
 }
@@ -1920,10 +1901,7 @@ function on_paint_avatar_ui_update() {
 	document.getElementById("animationOuter").setAttribute("style","display:block;");
 	updateDrawingNameUI(false);
 	document.getElementById("paintOptionAvatar").checked = true;
-	document.getElementById("paintExplorerOptionAvatar").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
-	document.getElementById("paintExplorerAdd").setAttribute("style","display:none;");
-	document.getElementById("paintExplorerFilterInput").value = "";
 
 	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
 	for (var i = 0; i < disableForAvatarElements.length; i++) {
@@ -1936,8 +1914,6 @@ function on_paint_tile() {
 	tileIndex = 0;
 	drawing.id = sortedTileIdList()[tileIndex];
 	paintTool.reloadDrawing();
-	paintExplorer.Refresh( paintTool.drawing.type );
-	paintExplorer.ChangeSelection( paintTool.drawing.id );
 
 	on_paint_tile_ui_update();
 }
@@ -1949,10 +1925,7 @@ function on_paint_tile_ui_update() {
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	document.getElementById("paintOptionTile").checked = true;
-	document.getElementById("paintExplorerOptionTile").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
-	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
-	document.getElementById("paintExplorerFilterInput").value = "";
 
 	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
 	for (var i = 0; i < disableForAvatarElements.length; i++) {
@@ -1972,8 +1945,6 @@ function on_paint_sprite() {
 	drawing.id = sortedSpriteIdList()[spriteIndex];
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
-	paintExplorer.Refresh( paintTool.drawing.type );
-	paintExplorer.ChangeSelection( paintTool.drawing.id );
 
 	on_paint_sprite_ui_update();
 }
@@ -1985,10 +1956,7 @@ function on_paint_sprite_ui_update() {
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	document.getElementById("paintOptionSprite").checked = true;
-	document.getElementById("paintExplorerOptionSprite").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:none;");
-	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
-	document.getElementById("paintExplorerFilterInput").value = "";
 
 	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
 	for (var i = 0; i < disableForAvatarElements.length; i++) {
@@ -2004,8 +1972,6 @@ function on_paint_item() {
 	console.log(drawing.id);
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
-	paintExplorer.Refresh( paintTool.drawing.type );
-	paintExplorer.ChangeSelection( paintTool.drawing.id );
 
 	on_paint_item_ui_update();
 }
@@ -2017,20 +1983,12 @@ function on_paint_item_ui_update() {
 	updateDrawingNameUI(true);
 	//document.getElementById("animation").setAttribute("style","display:block;");
 	document.getElementById("paintOptionItem").checked = true;
-	document.getElementById("paintExplorerOptionItem").checked = true;
 	document.getElementById("showInventoryButton").setAttribute("style","display:inline-block;");
-	document.getElementById("paintExplorerAdd").setAttribute("style","display:inline-block;");
-	document.getElementById("paintExplorerFilterInput").value = "";
 
 	var disableForAvatarElements = document.getElementsByClassName("disableForAvatar");
 	for (var i = 0; i < disableForAvatarElements.length; i++) {
 		disableForAvatarElements[i].disabled = false;
 	}
-}
-
-function paintExplorerFilterChange( e ) {
-	console.log("paint explorer filter : " + e.target.value);
-	paintExplorer.Refresh( paintTool.drawing.type, true, e.target.value );
 }
 
 function editDrawingAtCoordinate(x,y) {
@@ -2046,7 +2004,6 @@ function editDrawingAtCoordinate(x,y) {
 
 		var drawing = new DrawingId( spriteId === "A" ? TileType.Avatar : TileType.Sprite, spriteId );
 		paintTool.selectDrawing( drawing );
-		paintExplorer.RefreshAndChangeSelection( drawing );
 		return;
 	}
 
@@ -2056,7 +2013,6 @@ function editDrawingAtCoordinate(x,y) {
 		on_paint_item_ui_update();
 		var drawing = new DrawingId( TileType.Item, item.id );
 		paintTool.selectDrawing( drawing );
-		paintExplorer.RefreshAndChangeSelection( drawing );
 		return;
 	}
 
@@ -2066,7 +2022,6 @@ function editDrawingAtCoordinate(x,y) {
 		on_paint_tile_ui_update(); // really wasteful probably
 		var drawing = new DrawingId( TileType.Tile, tileId );
 		paintTool.selectDrawing( drawing );
-		paintExplorer.RefreshAndChangeSelection( drawing );
 		return;
 	}
 }
@@ -2085,10 +2040,6 @@ function renderAnimationPreview(id) {
 }
 
 function selectPaint() {
-	if (drawing.id === this.value) {
-		showPanel("paintPanel", "paintExplorerPanel");
-	}
-
 	drawing.id = this.value;
 	if( drawing.type === TileType.Tile ) {
 		tileIndex = sortedTileIdList().indexOf( drawing.id );
@@ -2817,8 +2768,6 @@ function importGameFromFile(e) {
 		// change game data & reload everything
 		document.getElementById("game_data").value = gameDataStr;
 		on_game_data_change();
-
-		paintExplorer.Refresh(drawing.type);
 	}
 }
 
@@ -3412,9 +3361,6 @@ function hackyUpdatePlaceholderText() {
 	for (var i = 0; i < titleTextBoxes.length; i++) {
 		titleTextBoxes[i].placeholder = titlePlaceholder;
 	}
-
-	var filterPlaceholder = localization.GetStringOrFallback("filter_placeholder", "filter drawings");
-	document.getElementById("paintExplorerFilterInput").placeholder = filterPlaceholder;
 }
 
 var curEditorLanguageCode = "en";

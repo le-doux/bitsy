@@ -122,8 +122,6 @@ function PaintTool(canvas, roomTool) {
 	console.log(renderer);
 	this.drawing = new DrawingId( TileType.Avatar, "A" );
 
-	this.explorer = null; // TODO: hacky way to tie this to a paint explorer -- should use events instead
-
 	//paint canvas & context
 	canvas.width = tilesize * paint_scale;
 	canvas.height = tilesize * paint_scale;
@@ -192,9 +190,6 @@ function PaintTool(canvas, roomTool) {
 			refreshGameData();
 			roomTool.drawEditMap(); // TODO : events instead of direct coupling
 
-			if(self.explorer != null) {
-				self.explorer.RenderThumbnail( self.drawing.id );
-			}
 			if( self.isCurDrawingAnimated ) {
 				renderAnimationPreview( roomTool.drawing.id );
 			}
@@ -347,12 +342,6 @@ function PaintTool(canvas, roomTool) {
 		else if( self.drawing.type == TileType.Item ) {
 			newItem(imageData);
 		}
-
-		// update paint explorer
-		self.explorer.AddThumbnail( self.drawing.id );
-		self.explorer.ChangeSelection( self.drawing.id );
-		document.getElementById("paintExplorerFilterInput").value = ""; // super hacky
-		self.explorer.Refresh( self.drawing.type, true /*doKeepOldThumbnails*/, document.getElementById("paintExplorerFilterInput").value /*filterString*/, true /*skipRenderStep*/ ); // this is a bit hacky feeling
     }
     
     this.duplicateDrawing = function() {
@@ -419,8 +408,6 @@ function PaintTool(canvas, roomTool) {
 		shouldDelete = confirm("Are you sure you want to delete this drawing?");
 
 		if ( shouldDelete ) {
-			self.explorer.DeleteThumbnail( self.drawing.id );
-
 			if (self.drawing.type == TileType.Tile) {
 				if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
 				delete tile[ self.drawing.id ];
@@ -461,8 +448,6 @@ function PaintTool(canvas, roomTool) {
 				nextItem();
 				updateInventoryItemUI();
 			}
-
-			self.explorer.ChangeSelection( self.drawing.id );
 		}
 	}
 
