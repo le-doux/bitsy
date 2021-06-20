@@ -933,49 +933,50 @@
 					</div>
 				</div>
 
-				<div id="downloadPanel" class="panel color2 bitsy-workbench-item">
-					<div class="bar color2">
+				<div id="downloadPanel" class="bitsy-card bitsy-workbench-item">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">file</span>
 
-						<button title="minimize download window" class="light panelBarClose" onclick="hidePanel('downloadPanel');">
+						<span class="bitsy-card-title" title="download window" onmousedown="grabCard(event);">
+							<span class="localize download_tool_name">download</span>
+						</span>
+
+						<button title="minimize download window" onclick="hidePanel('downloadPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
+					</div>
 
-						<div title="download window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<!-- TODO : bitsy_icon -- seperate "file" and "download" icons -->
-							<span class="bitsy_icon icon_large icon_space_right">file</span>
-							<span class="localize download_tool_name">download</span>
+					<div class="bitsy-card-main">
+						<div style="margin-bottom: var(--bitsy-space-s);">
+							<span class="localize download_html" style="margin-bottom: var(--bitsy-space-s);">download game as html file:</span>
+							<br>
+							<button title="download game as html file" class="color0" onclick="exportGame();">
+								<span class="bitsy_icon">download</span>
+								<span class="localize download_game">download game</span>
+							</button>
 						</div>
-					</div>
 
-					<div>
-						<span class="localize download_html">download game as html file:</span>
-						<br>
-						<button title="download game as html file" class="color0" onclick="exportGame();">
-							<span class="bitsy_icon">download</span>
-							<span class="localize download_game">download game</span>
-						</button>
-					</div>
+						<div style="margin-bottom: var(--bitsy-space-s);">
+							<span class="localize import_html" style="margin-bottom: var(--bitsy-space-s);">import game from html file:</span>
+							<br style="margin-bottom: var(--bitsy-space-s);">
+							<label for="importGamePicker" class="filePickerLabel" title="import game from html file on your computer">
+								<span class="bitsy_icon">upload</span>
+								<span class="localize upload_game">upload game</span>
+							</label>
+							<input type="file" id="importGamePicker" style="display:none;" onchange="importGameFromFile(event);"/>
+						</div>
 
-					<div>
-						<span class="localize import_html">import game from html file:</span>
-						<br>
-						<label for="importGamePicker" class="filePickerLabel" title="import game from html file on your computer">
-							<span class="bitsy_icon">upload</span>
-							<span class="localize upload_game">upload game</span>
-						</label>
-						<input type="file" id="importGamePicker" style="display:none;" onchange="importGameFromFile(event);"/>
-					</div>
-
-					<!-- TODO LOCALIZE - word wrap -->
-					<div id="downloadHelp" class="helpMessage" style="display:none;">
-						Note: your browser doesn't support<br>
-						direct downloads, so sharing requires<br>
-						some extra steps:<br>
-						- press share <br>
-						- a new tab will open <br>
-						- save that tab <br>
-						- name it "mygame.html" <br>
-						- share your game as a web page!
+						<!-- TODO LOCALIZE - word wrap -->
+						<div id="downloadHelp" class="helpMessage" style="display:none;">
+							Note: your browser doesn't support<br>
+							direct downloads, so sharing requires<br>
+							some extra steps:<br>
+							- press share <br>
+							- a new tab will open <br>
+							- save that tab <br>
+							- name it "mygame.html" <br>
+							- share your game as a web page!
+						</div>
 					</div>
 				</div>
 
