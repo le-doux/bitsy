@@ -1064,7 +1064,7 @@ function start() {
 	}
 
 	// prepare dialog tool
-	openDialogTool(titleDialogId); // start with the title open
+	openDialogTool(titleDialogId, undefined, false); // start with the title open
 	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked;
 
 	initLanguageOptions();

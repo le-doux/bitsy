@@ -3,6 +3,7 @@ v7.4:
 - @seansleblanc: improved stability of persistent data storage
 - bugfix: duplicating dialog fixed
 - bugfix: duplicating palettes fixed
+- bugfix: stop dialog tool from always opening at start
 
 v7.3:
 - save grid on/off settings between sessions

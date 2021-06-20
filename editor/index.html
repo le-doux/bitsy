@@ -896,20 +896,20 @@
 					</div>
 				</div>
 
-				<div id="inventoryPanel" class="panel color3 bitsy-workbench-item">
-					<div class="bar color3">
+				<div id="inventoryPanel" class="bitsy-card bitsy-workbench-item">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">item</span>
 
-						<button title="minimize inventory window" class="light panelBarClose" onclick="hidePanel('inventoryPanel');">
+						<span class="bitsy-card-title" title="inventory window" onmousedown="grabCard(event);">
+							<span class="localize inventory_tool_name">inventory</span>
+						</span>
+
+						<button title="minimize inventory window" onclick="hidePanel('inventoryPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
-
-						<div title="inventory window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon icon_large icon_space_right">item</span>
-							<span class="localize inventory_tool_name">inventory</span>
-						</div>
 					</div>
 
-					<div>
+					<div class="bitsy-card-main">
 						<!-- TODO -->
 						<form>
 							<input type="radio" name="inventory mode" value="item" onclick="showInventoryItem();" id="inventoryOptionItem" checked>
