@@ -821,76 +821,78 @@
 					</div>
 				</div>
 
-				<div id="dialogPanel" class="panel color3 bitsy-workbench-item">
-					<div class="bar color3">
+				<div id="dialogPanel" class="bitsy-card bitsy-workbench-item">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">dialog</span>
 
-						<button title="minimize dialog window" class="light panelBarClose" onclick="hidePanel('dialogPanel');">
+						<span class="bitsy-card-title" title="dialog window" onmousedown="grabCard(event);">
+							<span class="localize dialog_tool_name">dialog</span>
+						</span>
+
+						<button title="minimize dialog window" onclick="hidePanel('dialogPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
-
-						<div title="dialog window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon icon_large icon_space_right">dialog</span>
-							<span class="localize dialog_tool_name">dialog</span>
-						</div>
 					</div>
 
-					<div id="dialogEditorHasContent">
-						<div class="navControl">
-							<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" autocomplete="off" />
-							<label title="preview dialog" for="previewDialogCheck">
-								<span id="previewDialogIcon" class="bitsy_icon">play</span>
-								<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
-							</label>
+					<div class="bitsy-card-main">
+						<div id="dialogEditorHasContent">
+							<div class="navControl">
+								<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" autocomplete="off" />
+								<label title="preview dialog" for="previewDialogCheck">
+									<span id="previewDialogIcon" class="bitsy_icon">play</span>
+									<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
+								</label>
 
-							<span class="spacer"></span>
+								<span class="spacer"></span>
 
-							<input type="text" id="dialogName" title="a name to refer to this dialog" class="textInputField" onchange="onDialogNameChange(event);" size="10"></input>
+								<input type="text" id="dialogName" title="a name to refer to this dialog" class="textInputField" onchange="onDialogNameChange(event);" size="10"></input>
 
-							<span class="spacer"></span>
+								<span class="spacer"></span>
 
-							<button title="previous dialog" class="color0" onclick="prevDialog();">
-								<span class="bitsy_icon">previous</span>
-							</button>
-							<button title="next dialog" class="color0" onclick="nextDialog();">
-								<span class="bitsy_icon">next</span>
-							</button>
+								<button title="previous dialog" class="color0" onclick="prevDialog();">
+									<span class="bitsy_icon">previous</span>
+								</button>
+								<button title="next dialog" class="color0" onclick="nextDialog();">
+									<span class="bitsy_icon">next</span>
+								</button>
 
-							<span class="spacer"></span>
+								<span class="spacer"></span>
 
-							<button title="add new dialog" class="color0" onclick="addNewDialog();">
-								<span class="bitsy_icon">add</span>
-							</button>
-							<button title="duplicate dialog" class="color0" onclick="duplicateDialog();">
-								<span class="bitsy_icon">copy</span>
-							</button>
-							<button id="deleteDialogButton" title="delete dialog" class="color0" onclick="deleteDialog();">
-								<span class="bitsy_icon">delete</span>
-							</button>
+								<button title="add new dialog" class="color0" onclick="addNewDialog();">
+									<span class="bitsy_icon">add</span>
+								</button>
+								<button title="duplicate dialog" class="color0" onclick="duplicateDialog();">
+									<span class="bitsy_icon">copy</span>
+								</button>
+								<button id="deleteDialogButton" title="delete dialog" class="color0" onclick="deleteDialog();">
+									<span class="bitsy_icon">delete</span>
+								</button>
+							</div>
+
+							<div id="dialogEditor">
+							</div>
+
+							<div id="dialogOptions">
+								<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);" autocomplete="off">
+								<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
+									<span class="bitsy_icon">code_edit</span>
+									<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
+									<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
+								</label>
+
+								<input type="checkbox" id="dialogAlwaysShowDrawingCheck" onclick="toggleAlwaysShowDrawingDialog(event);" autocomplete="off" checked>
+								<label title="always show dialog of selected drawing" for="dialogAlwaysShowDrawingCheck">
+									<!-- TODO : bitsy_icon --- need a special icon for this case -->
+									<span class="bitsy_icon">paint</span>
+									<!-- todo : localize -->
+									<!-- <span id="dialogToggleCodeShowText"></span> --> <!-- TODO ?? --> 
+								</label>
+							</div>
 						</div>
 
-						<div id="dialogEditor">
+						<div id="dialogEditorNoContent" class="controlBox" style="display:none;">
+							<span class="localize dialog_no_selection">Select a sprite or item to edit its dialog.</span>
 						</div>
-
-						<div id="dialogOptions">
-							<input type="checkbox" id="dialogShowCodeCheck" onclick="toggleDialogCode(event);" autocomplete="off">
-							<label title="show / hide the code for this dialog" for="dialogShowCodeCheck">
-								<span class="bitsy_icon">code_edit</span>
-								<span id="dialogToggleCodeShowText" class="localize dialog_show_code">show code</span> 
-								<span id="dialogToggleCodeHideText" class="localize dialog_hide_code" style="display:none;">hide code</span>
-							</label>
-
-							<input type="checkbox" id="dialogAlwaysShowDrawingCheck" onclick="toggleAlwaysShowDrawingDialog(event);" autocomplete="off" checked>
-							<label title="always show dialog of selected drawing" for="dialogAlwaysShowDrawingCheck">
-								<!-- TODO : bitsy_icon --- need a special icon for this case -->
-								<span class="bitsy_icon">paint</span>
-								<!-- todo : localize -->
-								<!-- <span id="dialogToggleCodeShowText"></span> --> <!-- TODO ?? --> 
-							</label>
-						</div>
-					</div>
-
-					<div id="dialogEditorNoContent" class="controlBox" style="display:none;">
-						<span class="localize dialog_no_selection">Select a sprite or item to edit its dialog.</span>
 					</div>
 				</div>
 
