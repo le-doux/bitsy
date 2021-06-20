@@ -232,9 +232,9 @@ function createPaletteThumbnailRenderer() {
 		return hexPalette;
 	}
 
-	var onRender = function(obj, ctx, options) {
-		if (obj) {
-			var hexPalette = getHexPalette(obj);
+	var onRender = function(pal, ctx, options) {
+		if (pal) {
+			var hexPalette = getHexPalette(pal);
 
 			ctx.fillStyle = "black";
 			ctx.fillRect(0, 0, 8 * scale, 8 * scale);
@@ -250,6 +250,55 @@ function createPaletteThumbnailRenderer() {
 		}
 
 		return [ctx.getImageData(0, 0, 8 * scale, 8 * scale).data];
+	}
+
+	return new ThumbnailRendererBase(getRenderable, getHexPalette, onRender);
+}
+
+function createRoomThumbnailRenderer() {
+	var getRenderable = function(id) {
+		return room[id];
+	}
+
+	var getHexPalette = function(r) {
+		var palId = getRoomPal(r.id);
+
+		var hexPalette = [];
+		var colors = getPal(palId);
+		for (i in colors) {
+			var hexStr = rgbToHex(colors[i][0], colors[i][1], colors[i][2]).slice(1);
+			hexPalette.push(hexStr);
+		}
+
+		return hexPalette;
+	}
+
+	function onRender(r, ctx, options) {
+		var roomRenderSize = 8 * scale;
+		var tileRenderSize = roomRenderSize / 16;
+
+		var roomId = r.id;
+		var hexPalette = getHexPalette(r);
+
+		console.log(hexPalette);
+
+		ctx.fillStyle = "#" + hexPalette[0];
+		ctx.fillRect(0, 0, roomRenderSize, roomRenderSize);
+
+		for (var ry = 0; ry < 16; ry++) {
+			for (var rx = 0; rx < 16; rx++) {
+				var tileId = r.tilemap[ry][rx];
+
+				if (tileId != "0" && (tileId in tile)) {
+					ctx.fillStyle = "#" + hexPalette[parseInt(tile[tileId].col)];
+					ctx.fillRect(rx * tileRenderSize, ry * tileRenderSize, tileRenderSize, tileRenderSize);
+				}
+			}
+		}
+
+		// todo : sprites and items
+
+		return [ctx.getImageData(0, 0, roomRenderSize, roomRenderSize).data];
 	}
 
 	return new ThumbnailRendererBase(getRenderable, getHexPalette, onRender);

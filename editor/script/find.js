@@ -3,6 +3,7 @@ function FindTool(options) {
 	var tileThumbnailRenderer = createTileThumbnailRenderer();
 	var itemThumbnailRenderer = createItemThumbnailRenderer();
 	var paletteThumbnailRenderer = createPaletteThumbnailRenderer();
+	var roomThumbnailRenderer = createRoomThumbnailRenderer();
 
 	var categoryDefinitions = [
 		{
@@ -96,7 +97,7 @@ function FindTool(options) {
 				selectRoom(id);
 				showPanel("roomPanel", "findPanel");
 			},
-			renderer: spriteThumbnailRenderer,
+			renderer: roomThumbnailRenderer,
 		},
 		{
 			name: "colors",
