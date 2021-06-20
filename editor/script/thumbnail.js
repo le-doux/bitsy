@@ -145,22 +145,15 @@ function ThumbnailRendererBase(getRenderable, getHexPalette, onRender) {
 		}
 
 		return cache[id];
-	};
+	}
 	this.GetCacheEntry = getCacheEntry;
 
-	function getOrRender(id, options) {
-		var entry = getCacheEntry(id);
-
-		if (entry.outOfDate) {
-			render(id, options);
+	function invalidateCache() {
+		for (var id in cache) {
+			cache[id].outOfDate = true;
 		}
-		else {
-			if (options && options.callback) {
-				options.callback(entry.uri);
-			}
-		}
-	};
-	this.GetOrRender = getOrRender;
+	}
+	this.InvalidateCache = invalidateCache;
 }
 
 function createDrawingThumbnailRenderer(source) {
@@ -222,12 +215,16 @@ function createPaletteThumbnailRenderer() {
 	var getHexPalette = function(pal) {
 		var palId = pal.id;
 
+		console.log(palId);
+
 		var hexPalette = [];
 		var colors = getPal(palId);
 		for (i in colors) {
 			var hexStr = rgbToHex(colors[i][0], colors[i][1], colors[i][2]).slice(1);
 			hexPalette.push(hexStr);
 		}
+
+		console.log(hexPalette);
 
 		return hexPalette;
 	}

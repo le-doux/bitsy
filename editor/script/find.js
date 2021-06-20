@@ -276,7 +276,11 @@ function FindTool(options) {
 	scrollcontentDiv.classList.add("bitsy-menu-scrollcontent");
 	scrollviewDiv.appendChild(scrollcontentDiv);
 
+	var items = [];
+
 	function GenerateItems() {
+		items = [];
+
 		function createOnClick(category, id) {
 			return function() {
 				category.openTool(id);
@@ -308,23 +312,70 @@ function FindTool(options) {
 								renderOptions: { isAnimated: true },
 							});
 
-						thumbnailControl.LoadThumbnailImage();
+						items.push(thumbnailControl);
 
 						scrollcontentDiv.appendChild(thumbnailControl.GetElement());
 					}
 				}
 			}
 		}
+
+		UpdateVisibleItems();
 	}
 
-	GenerateItems();
+	function UpdateVisibleItems() {
+		var viewportRect = scrollviewDiv.getBoundingClientRect();
+
+		for (var i = 0; i < items.length; i++) {
+			var thumbnailControl = items[i];
+			var thumbRect = thumbnailControl.GetElement().getBoundingClientRect();
+			var isInViewport = !(thumbRect.bottom < viewportRect.top || thumbRect.top > viewportRect.bottom);
+
+			if (isInViewport) {
+				thumbnailControl.LoadThumbnailImage();
+			}
+		}
+	}
 
 	events.Listen("game_data_change", function(event) {
+		spriteThumbnailRenderer.InvalidateCache();
+		tileThumbnailRenderer.InvalidateCache();
+		itemThumbnailRenderer.InvalidateCache();
+		paletteThumbnailRenderer.InvalidateCache();
+		roomThumbnailRenderer.InvalidateCache();
 		GenerateItems();
 	});
 
 	// todo : the naming of these events is confusing
 	events.Listen("game_data_refresh", function(event) {
+		spriteThumbnailRenderer.InvalidateCache();
+		tileThumbnailRenderer.InvalidateCache();
+		itemThumbnailRenderer.InvalidateCache();
+		paletteThumbnailRenderer.InvalidateCache();
+		roomThumbnailRenderer.InvalidateCache();
 		GenerateItems();
 	});
+
+	events.Listen("select_room", function(event) {
+		console.log("select???");
+		spriteThumbnailRenderer.InvalidateCache();
+		tileThumbnailRenderer.InvalidateCache();
+		itemThumbnailRenderer.InvalidateCache();
+		UpdateVisibleItems();
+	});
+
+	var scrollEndTimer = null;
+	scrollviewDiv
+		.addEventListener("scroll", function() {
+			if (scrollEndTimer != null) {
+				clearTimeout(scrollEndTimer);
+			}
+
+			scrollEndTimer = setTimeout(function() {
+				UpdateVisibleItems();
+			}, 100);
+		});
+
+	// init
+	GenerateItems();
 }

@@ -126,6 +126,7 @@ function PaletteTool(colorPicker,labelIds,nameFieldId) {
 
 		palette[ id ] = {
 			name : null,
+			id : id,
 			colors : [
 			hslToRgb(Math.random(), 1.0, 0.5),
 			hslToRgb(Math.random(), 1.0, 0.5),

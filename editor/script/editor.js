@@ -1237,6 +1237,8 @@ function selectRoom(roomId) {
 		}
 
 		updateRoomName();
+
+		events.Raise("select_room", { id: roomId });
 	}
 }
 
@@ -1255,6 +1257,8 @@ function nextRoom() {
 	}
 
 	updateRoomName();
+
+	events.Raise("select_room", { id: curRoom });
 }
 
 function prevRoom() {
@@ -1273,6 +1277,8 @@ function prevRoom() {
 	}
 
 	updateRoomName();
+
+	events.Raise("select_room", { id: curRoom });
 }
 
 function duplicateRoom() {
