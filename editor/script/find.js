@@ -7,9 +7,12 @@ function FindTool(options) {
 
 	var categoryDefinitions = [
 		{
-			name: "avatar",
+			id: "avatar",
 			icon: "avatar",
 			getIdList: function() { return ["A"]; },
+			getCategoryName: function() {
+				return localization.GetStringOrFallback("avatar_label", "avatar");
+			},
 			getDisplayName: function(id) {
 				return localization.GetStringOrFallback("avatar_label", "avatar");
 			},
@@ -21,9 +24,12 @@ function FindTool(options) {
 			renderer: spriteThumbnailRenderer,
 		},
 		{
-			name: "tile",
+			id: "tile",
 			icon: "tile",
 			getIdList: function() { return sortedTileIdList(); },
+			getCategoryName: function() {
+				return localization.GetStringOrFallback("tile_label", "tile");
+			},
 			getDisplayName: function(id) {
 				if (tile[id].name) {
 					return tile[id].name;
@@ -40,12 +46,15 @@ function FindTool(options) {
 			renderer: tileThumbnailRenderer,
 		},
 		{
-			name: "sprite",
+			id: "sprite",
 			icon: "sprite",
 			getIdList: function() {
 				var idList = sortedSpriteIdList();
 				idList.splice(idList.indexOf("A"), 1);
 				return idList;
+			},
+			getCategoryName: function() {
+				return localization.GetStringOrFallback("sprite_label", "sprite");
 			},
 			getDisplayName: function(id) {
 				if (sprite[id].name) {
@@ -63,9 +72,12 @@ function FindTool(options) {
 			renderer: spriteThumbnailRenderer,
 		},
 		{
-			name: "item",
+			id: "item",
 			icon: "item",
 			getIdList: function() { return sortedItemIdList(); },
+			getCategoryName: function() {
+				return localization.GetStringOrFallback("item_label", "item");
+			},
 			getDisplayName: function(id) {
 				if (item[id].name) {
 					return item[id].name;
@@ -82,9 +94,12 @@ function FindTool(options) {
 			renderer: itemThumbnailRenderer,
 		},
 		{
-			name: "room",
+			id: "room",
 			icon: "room",
 			getIdList: function() { return sortedRoomIdList(); },
+			getCategoryName: function() {
+				return localization.GetStringOrFallback("room_label", "room");
+			},
 			getDisplayName: function(id) {
 				if (room[id].name) {
 					return room[id].name;
@@ -100,9 +115,12 @@ function FindTool(options) {
 			renderer: roomThumbnailRenderer,
 		},
 		{
-			name: "colors",
+			id: "colors",
 			icon: "colors",
 			getIdList: function() { return sortedPaletteIdList(); },
+			getCategoryName: function() {
+				return localization.GetStringOrFallback("palette_tool_name", "colors");
+			},
 			getDisplayName: function(id) {
 				if (palette[id].name) {
 					return palette[id].name;
@@ -118,9 +136,12 @@ function FindTool(options) {
 			renderer: paletteThumbnailRenderer,
 		},
 		{
-			name: "dialog",
+			id: "dialog",
 			icon: "dialog",
 			getIdList: function() { return [titleDialogId].concat(sortedDialogIdList()); },
+			getCategoryName: function() {
+				return localization.GetStringOrFallback("dialog_label", "dialog");
+			},
 			getDisplayName: function(id) {
 				if (id === titleDialogId) {
 					return titleDialogId; // todo : localize
@@ -161,15 +182,19 @@ function FindTool(options) {
 	options.mainElement.appendChild(searchGroup);
 
 	var filterTabList = [
-		{ text: "all", value: "all", icon: "game_data", },
+		{
+			text: "all", // todo : localize
+			value: "all",
+			icon: "game_data",
+		},
 	];
 
 	for (var i = 0; i < categoryDefinitions.length; i++) {
 		var category = categoryDefinitions[i];
 
 		filterTabList.push({
-			text: category.name,
-			value: category.name,
+			text: category.getCategoryName(),
+			value: category.id,
 			icon: category.icon,
 		});
 	}
@@ -209,7 +234,7 @@ function FindTool(options) {
 		for (var i = 0; i < categoryDefinitions.length; i++) {
 			var category = categoryDefinitions[i];
 
-			if (curFilter === "all" || curFilter === category.name) {
+			if (curFilter === "all" || curFilter === category.id) {
 				var idList = category.getIdList()
 
 				for (var j = 0; j < idList.length; j++) {
