@@ -980,58 +980,61 @@
 					</div>
 				</div>
 
-				<div id="gifPanel" class="panel color2 bitsy-workbench-item" style="display:none;">
-					<div class="bar color2">
+				<div id="gifPanel" class="bitsy-card bitsy-workbench-item" style="display:none;">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">record</span>
 
-						<button title="minimize gif recording window" class="light panelBarClose" onclick="hidePanel('gifPanel');">
+						<span class="bitsy-card-title" title="gif recording window" onmousedown="grabCard(event);">
+							<span class="localize gif_tool_name">record gif</span>
+						</span>
+
+						<button title="minimize gif recording window" onclick="hidePanel('gifPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
+					</div>
 
-						<div title="gif recording window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon icon_large icon_space_right">record</span>
-							<span class="localize gif_tool_name">record gif</span>
+					<div class="bitsy-card-main">
+						<button title="start recording a gif of your game" class="color0" id="gifStartButton" onclick="startRecordingGif();">
+							<span class="bitsy_icon">record</span>
+							<span class="localize gif_start">start recording</span>
+						</button>
+						<button title="stop recording a gif of your game" class="color0" id="gifStopButton" onclick="stopRecordingGif();" style="display:none;">
+							<span class="bitsy_icon">record_stop</span>
+							<span class="localize gif_stop">stop recording</span>
+						</button>
+						<span id="gifRecordingText" style="display:none;">
+							<span class="bitsy_icon_anim">record_on</span>
+							<span class="localize gif_recording">recording...</span>
+						</span>
+						<span id="gifEncodingText" style="display:none;">
+							<span class="bitsy_icon_anim">record_processing</span>
+							<span class="localize gif_encoding">encoding...</span> <span id="gifEncodingProgress">0</span>%
+						</span>
+
+						<button title="make screenshot of current room" class="color0" id="gifSnapshotButton" onclick="takeSnapshotGif(event);"  style="margin-left: 10px;">
+							<span class="bitsy_icon">record_snapshot</span>
+							<span class="localize gif_snapshot">snapshot</span>
+						</button>
+
+						<button title="snapshot mode: square" id="gifSnapshotModeButton" onclick="toggleSnapshotMode();">
+							<span id="gifSnapshotModeIcon" class="bitsy_icon">pagesize_full</span>
+						</button>
+
+						<br/>
+
+						<div style="margin-top: 5px;">
+							<img id="gifPreview" style="display:none;" />
+							<div id="gifPlaceholder"></div>
 						</div>
+
+						<br/>
+
+						<span class="bitsy_icon icon_space_right">download</span>
+						<a title="download latest gif recording of your game" href="" download="recording.gif" id="gifDownload">
+							<span class="localize gif_download">download gif</span>
+						</a>
+
 					</div>
-					
-					<button title="start recording a gif of your game" class="color0" id="gifStartButton" onclick="startRecordingGif();">
-						<span class="bitsy_icon">record</span>
-						<span class="localize gif_start">start recording</span>
-					</button>
-					<button title="stop recording a gif of your game" class="color0" id="gifStopButton" onclick="stopRecordingGif();" style="display:none;">
-						<span class="bitsy_icon">record_stop</span>
-						<span class="localize gif_stop">stop recording</span>
-					</button>
-					<span id="gifRecordingText" style="display:none;">
-						<span class="bitsy_icon_anim">record_on</span>
-						<span class="localize gif_recording">recording...</span>
-					</span>
-					<span id="gifEncodingText" style="display:none;">
-						<span class="bitsy_icon_anim">record_processing</span>
-						<span class="localize gif_encoding">encoding...</span> <span id="gifEncodingProgress">0</span>%
-					</span>
-
-					<button title="make screenshot of current room" class="color0" id="gifSnapshotButton" onclick="takeSnapshotGif(event);"  style="margin-left: 10px;">
-						<span class="bitsy_icon">record_snapshot</span>
-						<span class="localize gif_snapshot">snapshot</span>
-					</button>
-
-					<button title="snapshot mode: square" id="gifSnapshotModeButton" onclick="toggleSnapshotMode();">
-						<span id="gifSnapshotModeIcon" class="bitsy_icon">pagesize_full</span>
-					</button>
-
-					<br/>
-
-					<div style="margin-top: 5px;">
-						<img id="gifPreview" style="display:none;" />
-						<div id="gifPlaceholder"></div>
-					</div>
-
-					<br/>
-
-					<span class="bitsy_icon icon_space_right">download</span>
-					<a title="download latest gif recording of your game" href="" download="recording.gif" id="gifDownload">
-						<span class="localize gif_download">download gif</span>
-					</a>
 				</div>
 
 				<div id="dataPanel" class="panel color0 bitsy-workbench-item" style="display:none;">
