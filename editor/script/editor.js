@@ -1468,6 +1468,8 @@ function next() {
 	else if( drawing.type == TileType.Item ) {
 		nextItem();
 	}
+
+	events.Raise("select_drawing", { id: drawing.id, type: drawing.type });
 }
 
 function prev() {
@@ -1480,6 +1482,8 @@ function prev() {
 	else if( drawing.type == TileType.Item ) {
 		prevItem();
 	}
+
+	events.Raise("select_drawing", { id: drawing.id, type: drawing.type });
 }
 
 function copyDrawingData(sourceDrawingData) {
@@ -1661,6 +1665,7 @@ function reloadItem() {
 
 function deleteDrawing() {
 	paintTool.deleteDrawing();
+	events.Raise("select_drawing", { id: paintTool.drawing.id, type: paintTool.drawing.type });
 }
 
 function toggleToolBar(e) {
