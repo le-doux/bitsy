@@ -145,9 +145,11 @@ input {
 }
 
 .controlBox {
-	padding: 5px;
-	margin-bottom: 5px;
-	border-radius: 2px;
+	padding: var(--bitsy-space-s);
+	margin: var(--bitsy-space-xs);
+	border-radius: var(--bitsy-space-s);
+	display: flex;
+	align-items: center;
 }
 
 span.controlBox {
