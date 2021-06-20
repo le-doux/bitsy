@@ -416,7 +416,9 @@ span.controlBox {
 }
 
 #titleFlexItem {
-	flex: 1 100%; padding-left: 10px; padding-right: 20px;
+	flex: 1 100%;
+	padding-left: var(--bitsy-space-m);
+	padding-right: var(--bitsy-space-m);
 }
 
 #toolsCheckFlexItem {

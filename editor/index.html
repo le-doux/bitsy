@@ -213,18 +213,21 @@
 					</div>
 				</div>
 
-				<div id="aboutPanel" class="panel color0 bitsy-workbench-item">
-					<div class="bar color0">
-						<button title="minimize about window" class="light panelBarClose" onclick="hidePanel('aboutPanel');">
-							<span class="bitsy_icon">close</span>
-						</button>
-						<div title="about window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon icon_large icon_space_right">about</span>
+				<div id="aboutPanel" class="bitsy-card bitsy-workbench-item">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">about</span>
+
+						<span class="bitsy-card-title" title="about window" onmousedown="grabCard(event);">
 							<span class="localize about_tool_title">about bitsy</span>
 							 <span class="curVersionLabel"></span>
-						</div>
+						</span>
+
+						<button title="minimize find window" onclick="hidePanel('aboutPanel');">
+							<span class="bitsy_icon">close</span>
+						</button>
 					</div>
-					<div id="aboutInner">
+
+					<div id="aboutInner" class="bitsy-card-main">
 						<p>
 							<span class="localize about1">hi! bitsy is a little editor for little games or worlds. the goal is to make it easy to make games where you can walk around and talk to people and be somewhere.</span>
 						</p>

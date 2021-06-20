@@ -2481,7 +2481,7 @@ function togglePanelUI(id, visible, insertNextToId) {
 		}
 	}
 
-	document.getElementById(id).style.display = visible ? "inline-block" : "none";
+	document.getElementById(id).style.display = visible ? "inline-flex" : "none";
 
 	if (visible) {
 		cardElement.scrollIntoView();
