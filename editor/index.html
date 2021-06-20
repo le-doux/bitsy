@@ -1070,19 +1070,20 @@
 					</div>
 				</div>
 
-				<div id="settingsPanel" class="panel color0 bitsy-workbench-item" style="display:none;">
-					<div class="bar color0">
+				<div id="settingsPanel" class="bitsy-card bitsy-workbench-item" style="display:none;">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">settings</span>
 
-						<button title="minimize settings window" class="light panelBarClose" onclick="hidePanel('settingsPanel');">
+						<span class="bitsy-card-title" title="settings window" onmousedown="grabCard(event);">
+							<span class="localize settings_tool_name">settings</span>
+						</span>
+
+						<button title="minimize settings window" onclick="hidePanel('settingsPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
-
-						<div title="settings window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon icon_large icon_space_right">settings</span>
-							<span class="localize settings_tool_name">settings</span>
-						</div>
 					</div>
-					<div id="settingsInner">
+
+					<div id="settingsInner" class="bitsy-card-main">
 						<div>
 							<span class="localize editor_settings">editor settings</span>
 						</div>

@@ -340,3 +340,7 @@ input[type=checkbox] + label:hover {
 #dialog .controlBox {
 	display: block;
 }
+
+#settingsInner .controlBox {
+	display: block;
+}
