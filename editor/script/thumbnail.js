@@ -285,6 +285,7 @@ function createRoomThumbnailRenderer() {
 		ctx.fillStyle = "#" + hexPalette[0];
 		ctx.fillRect(0, 0, roomRenderSize, roomRenderSize);
 
+		// tiles
 		for (var ry = 0; ry < 16; ry++) {
 			for (var rx = 0; rx < 16; rx++) {
 				var tileId = r.tilemap[ry][rx];
@@ -296,7 +297,28 @@ function createRoomThumbnailRenderer() {
 			}
 		}
 
-		// todo : sprites and items
+		// items
+		for (var i = 0; i < r.items.length; i++) {
+			var itm = r.items[i];
+
+			if (itm.id in item) {
+				var rx = itm.x;
+				var ry = itm.y;
+				ctx.fillStyle = "#" + hexPalette[parseInt(item[itm.id].col)];
+				ctx.fillRect(rx * tileRenderSize, ry * tileRenderSize, tileRenderSize, tileRenderSize);
+			}
+		}
+
+		// sprites
+		for (id in sprite) {
+			var spr = sprite[id];
+			if (spr.room === r.id) {
+				var rx = spr.x;
+				var ry = spr.y;
+				ctx.fillStyle = "#" + hexPalette[parseInt(spr.col)];
+				ctx.fillRect(rx * tileRenderSize, ry * tileRenderSize, tileRenderSize, tileRenderSize);
+			}
+		}
 
 		return [ctx.getImageData(0, 0, roomRenderSize, roomRenderSize).data];
 	}
