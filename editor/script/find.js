@@ -387,11 +387,24 @@ function FindTool(options) {
 		GenerateItems();
 	});
 
+	events.Listen("select_drawing", function(event) {
+		UpdateSelectedItems();
+	});
+
 	events.Listen("select_room", function(event) {
 		spriteThumbnailRenderer.InvalidateCache();
 		tileThumbnailRenderer.InvalidateCache();
 		itemThumbnailRenderer.InvalidateCache();
 		UpdateVisibleItems();
+		UpdateSelectedItems();
+	});
+
+	events.Listen("select_palette", function(event) {
+		UpdateSelectedItems();
+	});
+
+	events.Listen("select_color", function(event) {
+		UpdateSelectedItems();
 	});
 
 	var scrollEndTimer = null;
