@@ -136,7 +136,7 @@ function ThumbnailRendererBase(getRenderable, getHexPalette, onRender) {
 	}
 	this.Render = render;
 
-	this.GetCacheEntry = function(id) {
+	function getCacheEntry(id) {
 		if (!cache[id]) {
 			cache[id] = {
 				uri : null,
@@ -145,7 +145,22 @@ function ThumbnailRendererBase(getRenderable, getHexPalette, onRender) {
 		}
 
 		return cache[id];
-	}
+	};
+	this.GetCacheEntry = getCacheEntry;
+
+	function getOrRender(id, options) {
+		var entry = getCacheEntry(id);
+
+		if (entry.outOfDate) {
+			render(id, options);
+		}
+		else {
+			if (options && options.callback) {
+				options.callback(entry.uri);
+			}
+		}
+	};
+	this.GetOrRender = getOrRender;
 }
 
 function createDrawingThumbnailRenderer(source) {
@@ -220,7 +235,7 @@ function ThumbnailControl(id, renderer, options) {
 		thumbnailContainer.appendChild(thumbnailImg);
 	};
 
-	renderer.Render(id, renderOptions);
+	renderer.GetOrRender(id, renderOptions);
 
 	div.appendChild(createLabelElement({
 		icon: options.icon,
