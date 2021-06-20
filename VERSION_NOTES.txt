@@ -1,3 +1,10 @@
+v7.4:
+- new find tool!
+- @seansleblanc: improved stability of persistent data storage
+- bugfix: duplicating dialog fixed
+- bugfix: duplicating palettes fixed
+- bugfix: stop dialog tool from always opening at start
+
 v7.3:
 - save grid on/off settings between sessions
 - bugfix: Samuel Fine fixed mobile touch controls

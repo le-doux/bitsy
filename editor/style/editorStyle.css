@@ -1,32 +1,11 @@
-html {
-	height: 100%;
-}
-
-body {
-	margin: 0 !important;
-	padding: 0 !important;
-	line-height: 170%;
-	font-family: "Nunito", Helvetica, Arial, sans-serif;
-
-	font-size: 16px;
-
-	height: 100%;
-}
 canvas {
 	background: black;
-	/*margin-top: 4px;*/
-}
-
-input[type=text] {
-	font-size: 80%;
 }
 
 #appRoot {
 	display: flex;
 	flex-flow: column;
 	height: 100%;
-
-	/*border: solid 2px red;*/
 }
 
 #topbar {
@@ -36,29 +15,20 @@ input[type=text] {
 	padding-left: 20px;
 	padding-right: 20px;
 	box-sizing: border-box;
-	font-size: 125%;
-
 	flex: 0 1 auto;
+	align-items: center;
 }
 
 #topbarMain {
 	width: 100%;
-
-	/*border: solid 2px red;*/
 }
 
 #editorWindow {
 	width:100%;
-	/*height:750px;*/
-
 	overflow:scroll;
 	-webkit-overflow-scrolling: touch;
-
 	box-sizing: border-box;
-
 	flex: 1 1 auto;
-
-	/*border: solid 2px red;*/
 }
 #editorContent {
 	height:100%;
@@ -93,10 +63,7 @@ input[type=text] {
 	margin-right: 0px;
 	border-radius: 4px;
 }
-textarea {
-	font-family: monospace;
-	font-size: 80%;
-}
+
 input {
 	font-family: monospace;
 }
@@ -175,9 +142,11 @@ input {
 }
 
 .controlBox {
-	padding: 5px;
-	margin-bottom: 5px;
-	border-radius: 2px;
+	padding: var(--bitsy-space-s);
+	margin: var(--bitsy-space-xs);
+	border-radius: var(--bitsy-space-s);
+	display: flex;
+	align-items: center;
 }
 
 span.controlBox {
@@ -212,7 +181,6 @@ span.controlBox {
 /*toolbar*/
 #toolsPanel {
 	padding-top: 5px;
-	font-size: 80%;
 	width:100%;
 	overflow:auto;
 	display:none;
@@ -330,10 +298,9 @@ span.controlBox {
 }
 
 .animationThumbnail {
-	display:inline-block;
-	padding: 4px;
-	margin:0px;
-	margin-left:-4px; /*why?*/
+	display: inline-block;
+	padding: var(--bitsy-space-s);
+	border-radius: var(--bitsy-space-s);
 }
 
 .animationThumbnail.preview {
@@ -348,14 +315,6 @@ span.controlBox {
 .animationThumbnail.unselected {
 	background: #ccccff;
 	color: #6767b2;
-}
-
-.left {
-	border-radius: 2px 0px 0px 2px;
-}
-
-.right {
-	border-radius: 0px 2px 2px 0px;
 }
 
 #paintEditMain {
@@ -455,15 +414,13 @@ span.controlBox {
 }
 
 #titleFlexItem {
-	flex: 1 100%; padding-left: 10px; padding-right: 20px;
+	flex: 1 100%;
+	padding-left: var(--bitsy-space-m);
+	padding-right: var(--bitsy-space-m);
 }
 
 #toolsCheckFlexItem {
 	flex: 1 0 auto;
-}
-
-#topbarSpaceFlexItem {
-	flex: 1 1 400px;
 }
 
 #bylineFlexItem {
@@ -472,7 +429,7 @@ span.controlBox {
 }
 
 #bitsyLogoTitle {
-	font-size: 125%;
+	font-size: 1.5em;
 }
 
 #paintExplorerFilter {
@@ -519,31 +476,4 @@ span.controlBox {
 
 #dialogTop {
 	height: 30px; margin-bottom: 5px;
-}
-
-.textInputField {
-	flex-grow: 1;
-	border-radius: 5px;
-	padding: 5px;
-	line-height: 100%;
-	color: #6767b2;
-	background: #e8e8ff;
-	border: solid 1px #e8e8ff;
-}
-
-.textInputField:not([readonly]) {
-	color: black;
-	background: #eee;
-	border: solid 1px #eee;
-}
-
-.textInputField:hover:not([readonly]) {
-	text-decoration: underline;
-	border: solid 1px #ccc;
-}
-
-.textInputField:focus:not([readonly]) {
-	background: white;
-	border: solid 1px #ccc;
-	text-decoration: none;
 }
