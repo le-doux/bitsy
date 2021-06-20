@@ -13,7 +13,10 @@ function FindTool(options) {
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("avatar_label", "avatar");
 			},
-			getDisplayName: function(id) {
+			getItemName: function(id) {
+				return localization.GetStringOrFallback("avatar_label", "avatar");
+			},
+			getItemDescription: function(id) {
 				return localization.GetStringOrFallback("avatar_label", "avatar");
 			},
 			openTool: function(id) {
@@ -30,9 +33,17 @@ function FindTool(options) {
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("tile_label", "tile");
 			},
-			getDisplayName: function(id) {
+			getItemName: function(id) {
 				if (tile[id].name) {
 					return tile[id].name;
+				}
+				else {
+					return id;
+				}
+			},
+			getItemDescription: function(id) {
+				if (tile[id].name) {
+					return localization.GetStringOrFallback("tile_label", "tile") + " " + tile[id].name;
 				}
 				else {
 					return localization.GetStringOrFallback("tile_label", "tile") + " " + id;
@@ -56,9 +67,17 @@ function FindTool(options) {
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("sprite_label", "sprite");
 			},
-			getDisplayName: function(id) {
+			getItemName: function(id) {
 				if (sprite[id].name) {
 					return sprite[id].name;
+				}
+				else {
+					return id;
+				}
+			},
+			getItemDescription: function(id) {
+				if (sprite[id].name) {
+					return localization.GetStringOrFallback("sprite_label", "sprite") + " " + sprite[id].name;
 				}
 				else {
 					return localization.GetStringOrFallback("sprite_label", "sprite") + " " + id;
@@ -78,9 +97,17 @@ function FindTool(options) {
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("item_label", "item");
 			},
-			getDisplayName: function(id) {
+			getItemName: function(id) {
 				if (item[id].name) {
 					return item[id].name;
+				}
+				else {
+					return id;
+				}
+			},
+			getItemDescription: function(id) {
+				if (item[id].name) {
+					return localization.GetStringOrFallback("item_label", "item") + " " + item[id].name;
 				}
 				else {
 					return localization.GetStringOrFallback("item_label", "item") + " " + id;
@@ -100,9 +127,17 @@ function FindTool(options) {
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("room_label", "room");
 			},
-			getDisplayName: function(id) {
+			getItemName: function(id) {
 				if (room[id].name) {
 					return room[id].name;
+				}
+				else {
+					return id;
+				}
+			},
+			getItemDescription: function(id) {
+				if (room[id].name) {
+					return localization.GetStringOrFallback("room_label", "room") + " " + room[id].name;
 				}
 				else {
 					return localization.GetStringOrFallback("room_label", "room") + " " + id;
@@ -121,9 +156,17 @@ function FindTool(options) {
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("palette_tool_name", "colors");
 			},
-			getDisplayName: function(id) {
+			getItemName: function(id) {
 				if (palette[id].name) {
 					return palette[id].name;
+				}
+				else {
+					return id;
+				}
+			},
+			getItemDescription: function(id) {
+				if (palette[id].name) {
+					return localization.GetStringOrFallback("palette_label", "palette") + " " + palette[id].name;
 				}
 				else {
 					return localization.GetStringOrFallback("palette_label", "palette") + " " + id;
@@ -142,12 +185,23 @@ function FindTool(options) {
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("dialog_label", "dialog");
 			},
-			getDisplayName: function(id) {
+			getItemName: function(id) {
 				if (id === titleDialogId) {
 					return titleDialogId; // todo : localize
 				}
 				else if (dialog[id].name) {
 					return dialog[id].name;
+				}
+				else {
+					return id;
+				}
+			},
+			getItemDescription: function(id) {
+				if (id === titleDialogId) {
+					return titleDialogId; // todo : localize
+				}
+				else if (dialog[id].name) {
+					return localization.GetStringOrFallback("dialog_label", "dialog") + " " + dialog[id].name;
 				}
 				else {
 					return localization.GetStringOrFallback("dialog_label", "dialog") + " " + id;
@@ -239,7 +293,7 @@ function FindTool(options) {
 
 				for (var j = 0; j < idList.length; j++) {
 					var id = idList[j];
-					var displayName = category.getDisplayName(id);
+					var displayName = category.getItemName(id);
 					var isSearchTextInName = (curSearchText === undefined || curSearchText === null ||
 						curSearchText.length <= 0 || displayName.indexOf(curSearchText) != -1);
 
@@ -249,6 +303,7 @@ function FindTool(options) {
 								renderer: category.renderer,
 								icon: category.icon,
 								text: displayName,
+								tooltip: category.getItemDescription(id),
 								onclick: createOnClick(category, id),
 								renderOptions: { isAnimated: true },
 							});

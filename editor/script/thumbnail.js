@@ -330,7 +330,7 @@ function ThumbnailControl(options) {
 	var div = document.createElement("div");
 	div.classList.add("bitsy-thumbnail");
 	div.onclick = options.onclick;
-	div.title = options.text;
+	div.title = options.tooltip;
 
 	var thumbnailContainer = document.createElement("div");
 	thumbnailContainer.classList.add("bitsy-thumbnail-image-container");
