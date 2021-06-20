@@ -19,6 +19,9 @@ function FindTool(options) {
 			getItemDescription: function(id) {
 				return localization.GetStringOrFallback("avatar_label", "avatar");
 			},
+			isItemSelected: function(id) {
+				return (paintTool.drawing.type === TileType.Avatar) && (paintTool.drawing.id === id);
+			},
 			openTool: function(id) {
 				paintTool.selectDrawing(new DrawingId(TileType.Avatar, id));
 				on_paint_avatar_ui_update();
@@ -38,7 +41,7 @@ function FindTool(options) {
 					return tile[id].name;
 				}
 				else {
-					return id;
+					return "#" + id;
 				}
 			},
 			getItemDescription: function(id) {
@@ -48,6 +51,9 @@ function FindTool(options) {
 				else {
 					return localization.GetStringOrFallback("tile_label", "tile") + " " + id;
 				}
+			},
+			isItemSelected: function(id) {
+				return (paintTool.drawing.type === TileType.Tile) && (paintTool.drawing.id === id);
 			},
 			openTool: function(id) {
 				paintTool.selectDrawing(new DrawingId(TileType.Tile, id));
@@ -72,7 +78,7 @@ function FindTool(options) {
 					return sprite[id].name;
 				}
 				else {
-					return id;
+					return "#" + id;
 				}
 			},
 			getItemDescription: function(id) {
@@ -82,6 +88,9 @@ function FindTool(options) {
 				else {
 					return localization.GetStringOrFallback("sprite_label", "sprite") + " " + id;
 				}
+			},
+			isItemSelected: function(id) {
+				return (paintTool.drawing.type === TileType.Sprite) && (paintTool.drawing.id === id);
 			},
 			openTool: function(id) {
 				paintTool.selectDrawing(new DrawingId(TileType.Sprite, id));
@@ -102,7 +111,7 @@ function FindTool(options) {
 					return item[id].name;
 				}
 				else {
-					return id;
+					return "#" + id;
 				}
 			},
 			getItemDescription: function(id) {
@@ -112,6 +121,9 @@ function FindTool(options) {
 				else {
 					return localization.GetStringOrFallback("item_label", "item") + " " + id;
 				}
+			},
+			isItemSelected: function(id) {
+				return (paintTool.drawing.type === TileType.Item) && (paintTool.drawing.id === id);
 			},
 			openTool: function(id) {
 				paintTool.selectDrawing(new DrawingId(TileType.Item, id));
@@ -132,7 +144,7 @@ function FindTool(options) {
 					return room[id].name;
 				}
 				else {
-					return id;
+					return "#" + id;
 				}
 			},
 			getItemDescription: function(id) {
@@ -142,6 +154,9 @@ function FindTool(options) {
 				else {
 					return localization.GetStringOrFallback("room_label", "room") + " " + id;
 				}
+			},
+			isItemSelected: function(id) {
+				return curRoom === id;
 			},
 			openTool: function(id) {
 				selectRoom(id);
@@ -161,7 +176,7 @@ function FindTool(options) {
 					return palette[id].name;
 				}
 				else {
-					return id;
+					return "#" + id;
 				}
 			},
 			getItemDescription: function(id) {
@@ -171,6 +186,9 @@ function FindTool(options) {
 				else {
 					return localization.GetStringOrFallback("palette_label", "palette") + " " + id;
 				}
+			},
+			isItemSelected: function(id) {
+				return id === selectedColorPal();
 			},
 			openTool: function(id) {
 				paletteTool.Select(id);
@@ -193,7 +211,7 @@ function FindTool(options) {
 					return dialog[id].name;
 				}
 				else {
-					return id;
+					return "#" + id;
 				}
 			},
 			getItemDescription: function(id) {
@@ -206,6 +224,9 @@ function FindTool(options) {
 				else {
 					return localization.GetStringOrFallback("dialog_label", "dialog") + " " + id;
 				}
+			},
+			isItemSelected: function(id) {
+				return id === curDialogEditorId;
 			},
 			openTool: function(id) {
 				openDialogTool(id);
@@ -284,6 +305,7 @@ function FindTool(options) {
 		function createOnClick(category, id) {
 			return function() {
 				category.openTool(id);
+				UpdateSelectedItems();
 			}
 		}
 
@@ -308,6 +330,7 @@ function FindTool(options) {
 								icon: category.icon,
 								text: displayName,
 								tooltip: category.getItemDescription(id),
+								isSelectedFunc: category.isItemSelected,
 								onclick: createOnClick(category, id),
 								renderOptions: { isAnimated: true },
 							});
@@ -321,6 +344,7 @@ function FindTool(options) {
 		}
 
 		UpdateVisibleItems();
+		UpdateSelectedItems();
 	}
 
 	function UpdateVisibleItems() {
@@ -334,6 +358,13 @@ function FindTool(options) {
 			if (isInViewport) {
 				thumbnailControl.LoadThumbnailImage();
 			}
+		}
+	}
+
+	function UpdateSelectedItems() {
+		for (var i = 0; i < items.length; i++) {
+			var thumbnailControl = items[i];
+			thumbnailControl.UpdateSelected();
 		}
 	}
 
@@ -357,7 +388,6 @@ function FindTool(options) {
 	});
 
 	events.Listen("select_room", function(event) {
-		console.log("select???");
 		spriteThumbnailRenderer.InvalidateCache();
 		tileThumbnailRenderer.InvalidateCache();
 		itemThumbnailRenderer.InvalidateCache();

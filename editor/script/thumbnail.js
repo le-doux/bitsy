@@ -329,8 +329,16 @@ function ThumbnailControl(options) {
 
 	var div = document.createElement("div");
 	div.classList.add("bitsy-thumbnail");
-	div.onclick = options.onclick;
 	div.title = options.tooltip;
+
+	if (options.onclick) {
+		div.onclick = options.onclick;
+	}
+
+	var isSelected = options.isSelectedFunc;
+	if (isSelected(id)) {
+		div.classList.add("bitsy-thumbnail-selected");
+	}
 
 	var thumbnailContainer = document.createElement("div");
 	thumbnailContainer.classList.add("bitsy-thumbnail-image-container");
@@ -367,6 +375,15 @@ function ThumbnailControl(options) {
 			if (entry.outOfDate) {
 				renderer.Render(id, renderOptions);
 			}
+		}
+	};
+
+	this.UpdateSelected = function() {
+		if (isSelected(id)) {
+			div.classList.add("bitsy-thumbnail-selected");
+		}
+		else {
+			div.classList.remove("bitsy-thumbnail-selected");
 		}
 	};
 }

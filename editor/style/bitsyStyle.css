@@ -243,8 +243,22 @@ input[type=radio] + label.right {
 	image-rendering: pixelated;
 }
 
+.bitsy-thumbnail.bitsy-thumbnail-selected .bitsy-thumbnail-image-container {
+	border-color: var(--bitsy-color-main-2);
+}
+
+.bitsy-thumbnail.bitsy-thumbnail-selected .bitsy-menu-label {
+	color: var(--bitsy-color-main-1);
+	background: var(--bitsy-color-main-2);
+}
+
 .bitsy-thumbnail-image-container {
+	display: inline-flex;
 	align-self: center;
+	align-items: center;
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-main-1);
+	border-radius: var(--bitsy-space-xs);
+	padding: var(--bitsy-space-s);
 }
 
 .bitsy-thumbnail-image-container .bitsy_icon svg {
