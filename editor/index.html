@@ -751,71 +751,73 @@
 					</div>
 				</div>
 
-				<div id="colorsPanel" class="panel color1 bitsy-workbench-item">
-					<div class="bar color1">
+				<div id="colorsPanel" class="bitsy-card bitsy-workbench-item">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">colors</span>
 
-						<button title="minimize color palette window" class="light panelBarClose" onclick="hidePanel('colorsPanel');">
+						<span class="bitsy-card-title" title="color palette window" onmousedown="grabCard(event);">
+							<span class="localize palette_tool_name">colors</span>
+						</span>
+
+						<button title="minimize color palette window" onclick="hidePanel('colorsPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
-
-						<div title="color palette window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon icon_large icon_space_right">colors</span>
-							<span class="localize palette_tool_name">colors</span>
-						</div>
 					</div>
 
-					<div class="navControl">
-						<input type="text" id="paletteName" title="a name to refer to this color palette" class="textInputField" onchange="on_palette_name_change(event);" size="10"></input>
+					<div class="bitsy-card-main">
+						<div class="navControl">
+							<input type="text" id="paletteName" title="a name to refer to this color palette" class="textInputField" onchange="on_palette_name_change(event);" size="10"></input>
 
-						<span class="spacer"></span>
+							<span class="spacer"></span>
 
-						<button title="previous color palette" class="color0" onclick="prevPalette();">
-							<span class="bitsy_icon">previous</span>
-						</button>
-						<button title="next color palette" class="color0" onclick="nextPalette();">
-							<span class="bitsy_icon">next</span>
-						</button>
+							<button title="previous color palette" class="color0" onclick="prevPalette();">
+								<span class="bitsy_icon">previous</span>
+							</button>
+							<button title="next color palette" class="color0" onclick="nextPalette();">
+								<span class="bitsy_icon">next</span>
+							</button>
 
-						<span class="spacer"></span>
+							<span class="spacer"></span>
 
-						<button title="add new color palette" class="color0" onclick="newPalette();">
-							<span class="bitsy_icon">add</span>
-						</button>
-						<button title="duplicate palette" class="color0" onclick="duplicatePalette();">
-							<span class="bitsy_icon">copy</span>
-						</button>
-						<button title="delete palette" class="color0" onclick="deletePalette();">
-							<span class="bitsy_icon">delete</span>
-						</button>
-					</div>
-
-					<form id="colorPaletteForm">
-						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionBackground" onclick="changeColorPickerIndex(0);" checked>
-						<label id="colorPaletteLabelBackground" for="colorPaletteOptionBackground" title="pick background color">
-							<span class="bitsy_icon icon_space_right">room</span>
-							<span class="localize palette_background">background color</span>
-						</label>
-
-						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionTile" onclick="changeColorPickerIndex(1);">
-						<label id="colorPaletteLabelTile" for="colorPaletteOptionTile" title="pick tile color">
-							<span class="bitsy_icon icon_space_right">tile</span>
-							<span class="localize palette_tile">tile color</span>
-						</label>
-
-						<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionSprite" onclick="changeColorPickerIndex(2);">
-						<label id="colorPaletteLabelSprite" for="colorPaletteOptionSprite" title="pick sprite / avatar / item color">
-							<span class="bitsy_icon icon_space_right">sprite</span>
-							<span class="localize palette_sprite">sprite color</span>
-						</label>
-					</form>
-
-					<div id="colorPicker" title="color picker">
-						<canvas id="colorPickerWheel"></canvas>
-						<canvas id="colorPickerSelect" title="color picker wheel"></canvas>
-						<div id="colorPickerSliderBg" title="color picker darkness / lightness slider">
-							<div id="colorPickerSliderThumb"></div>
+							<button title="add new color palette" class="color0" onclick="newPalette();">
+								<span class="bitsy_icon">add</span>
+							</button>
+							<button title="duplicate palette" class="color0" onclick="duplicatePalette();">
+								<span class="bitsy_icon">copy</span>
+							</button>
+							<button title="delete palette" class="color0" onclick="deletePalette();">
+								<span class="bitsy_icon">delete</span>
+							</button>
 						</div>
-						<input id="colorPickerHexText" class="textInputField" title="color picker hex code" type="text" />
+
+						<form id="colorPaletteForm">
+							<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionBackground" onclick="changeColorPickerIndex(0);" checked>
+							<label id="colorPaletteLabelBackground" for="colorPaletteOptionBackground" title="pick background color">
+								<span class="bitsy_icon icon_space_right">room</span>
+								<span class="localize palette_background">background color</span>
+							</label>
+
+							<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionTile" onclick="changeColorPickerIndex(1);">
+							<label id="colorPaletteLabelTile" for="colorPaletteOptionTile" title="pick tile color">
+								<span class="bitsy_icon icon_space_right">tile</span>
+								<span class="localize palette_tile">tile color</span>
+							</label>
+
+							<input type="radio" name="colorPalette" value="background" id="colorPaletteOptionSprite" onclick="changeColorPickerIndex(2);">
+							<label id="colorPaletteLabelSprite" for="colorPaletteOptionSprite" title="pick sprite / avatar / item color">
+								<span class="bitsy_icon icon_space_right">sprite</span>
+								<span class="localize palette_sprite">sprite color</span>
+							</label>
+						</form>
+
+						<div id="colorPicker" title="color picker">
+							<canvas id="colorPickerWheel"></canvas>
+							<canvas id="colorPickerSelect" title="color picker wheel"></canvas>
+							<div id="colorPickerSliderBg" title="color picker darkness / lightness slider">
+								<div id="colorPickerSliderThumb"></div>
+							</div>
+							<input id="colorPickerHexText" class="textInputField" title="color picker hex code" type="text" />
+						</div>
 					</div>
 				</div>
 
