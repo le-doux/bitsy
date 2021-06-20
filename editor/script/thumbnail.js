@@ -327,6 +327,9 @@ function createRoomThumbnailRenderer() {
 }
 
 function ThumbnailControl(options) {
+	var id = options.id;
+	var renderer = options.renderer;
+
 	var div = document.createElement("div");
 	div.classList.add("bitsy-thumbnail");
 	div.onclick = options.onclick;
@@ -337,26 +340,36 @@ function ThumbnailControl(options) {
 	thumbnailContainer.appendChild(createIconElement(options.icon));
 	div.appendChild(thumbnailContainer);
 
-	if (options.id && options.renderer) {
-		var renderOptions = options.renderOptions ? options.renderOptions : {};
-		renderOptions.callback = function(uri) {
-			thumbnailContainer.innerHTML = "";
-
-			var thumbnailImg = document.createElement("img");
-			thumbnailImg.src = uri;
-
-			thumbnailContainer.appendChild(thumbnailImg);
-		};
-
-		options.renderer.GetOrRender(options.id, renderOptions);
-	}
-
 	div.appendChild(createLabelElement({
 		icon: options.icon,
 		text: options.text,
 	}));
 
+	var renderOptions = options.renderOptions ? options.renderOptions : {};
+	renderOptions.callback = function(uri) {
+		thumbnailContainer.innerHTML = "";
+
+		var thumbnailImg = document.createElement("img");
+		thumbnailImg.src = uri;
+
+		thumbnailContainer.appendChild(thumbnailImg);
+	};
+
 	this.GetElement = function() {
 		return div;
+	};
+
+	this.LoadThumbnailImage = function() {
+		if (id && renderer) {
+			var entry = renderer.GetCacheEntry(id);
+
+			if (entry.uri != null) {
+				renderOptions.callback(entry.uri);
+			}
+
+			if (entry.outOfDate) {
+				renderer.Render(id, renderOptions);
+			}
+		}
 	};
 }

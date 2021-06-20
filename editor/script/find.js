@@ -308,6 +308,8 @@ function FindTool(options) {
 								renderOptions: { isAnimated: true },
 							});
 
+						thumbnailControl.LoadThumbnailImage();
+
 						scrollcontentDiv.appendChild(thumbnailControl.GetElement());
 					}
 				}
