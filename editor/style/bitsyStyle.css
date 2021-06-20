@@ -83,6 +83,12 @@ label {
 	align-items: center;
 }
 
+/* textarea */
+textarea {
+	font-family: monospace;
+	font-size: 100%;
+}
+
 /* text input */
 input[type=text] {
 	font-family: monospace;
@@ -329,4 +335,8 @@ input[type=checkbox] + label:hover {
 
 #addMarkerOptions button {
 	width: 100%;
+}
+
+#dialog .controlBox {
+	display: block;
 }

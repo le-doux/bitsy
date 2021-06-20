@@ -601,133 +601,139 @@
 					</div>
 				</div>
 
-				<div id="paintPanel" class="panel color1 bitsy-workbench-item">
-					<div class="bar color1">
+				<div id="paintPanel" class="bitsy-card bitsy-workbench-item">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">paint</span>
 
-						<button title="minimize paint window" class="light panelBarClose" onclick="hidePanel('paintPanel');" style="line-height: 100%; margin-top: 2px;">
+						<span class="bitsy-card-title" title="paint window" onmousedown="grabCard(event);">
+							<span class="localize paint_tool_name">paint</span>
+						</span>
+
+						<button title="minimize paint window" onclick="hidePanel('paintPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
-
-						<div title="paint window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon icon_large icon_space_right">paint</span>
-							<span class="localize paint_tool_name">paint</span>
-						</div>
 					</div>
-					<form id="paintModeRadio" style="margin-bottom: 5px;">
-						<input type="radio" name="paint mode" value="avatar" onclick="on_paint_avatar();" id="paintOptionAvatar" checked>
-						<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
-							<span class="bitsy_icon icon_space_right">avatar</span>
-							<span class="localize avatar_label">avatar</span>
-						</label>
 
-						<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();" id="paintOptionTile">
-						<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
-							<span class="bitsy_icon icon_space_right">tile</span>
-							<span class="localize tile_label">tile</span>
-						</label>
-
-						<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite">
-						<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
-							<span class="bitsy_icon icon_space_right">sprite</span>
-							<span class="localize sprite_label">sprite</span>
-						</label>
-
-						<input type="radio" name="paint mode" value="item" onclick="on_paint_item();" id="paintOptionItem">
-						<label title="edit items: things the player can pick up" for="paintOptionItem" class="right">
-							<span class="bitsy_icon icon_space_right">item</span>
-							<span class="localize item_label">item</span>
-						</label>
-						
-					</form>
-					<div id="paintNavigationControls" class="navControl">
-						<input title="a name to refer to this drawing" type="text" id="drawingName" class="textInputField" onchange="on_drawing_name_change();" size="10"></input>
-
-						<span class="spacer"></span>
-
-						<button title="previous drawing" class="color0 disableForAvatar" onclick="prev();">
-							<span class="bitsy_icon">previous</span>
-						</button>
-						<button title="next drawing" class="color0 disableForAvatar" onclick="next();">
-							<span class="bitsy_icon">next</span>
-						</button>
-
-						<span class="spacer"></span>
-
-						<button title="add drawing" class="color0 disableForAvatar" onclick="newDrawing();">
-							<span class="bitsy_icon">add</span>
-						</button>
-						<button title="duplicate drawing" class="color0 disableForAvatar" onclick="duplicateDrawing();">
-							<span class="bitsy_icon">copy</span>
-						</button>
-						<button title="delete drawing" class="color0 disableForAvatar" onclick="deleteDrawing();">
-							<span class="bitsy_icon">delete</span>
-						</button>
-
-						<span class="spacer"></span>
-
-						<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('findPanel', 'paintPanel');">
-							<span class="bitsy_icon">search</span>
-						</button>
-					</div>
-					<div style="margin-bottom: 5px;">
-						<canvas id="paint"></canvas>
-					</div>
-					<div id="paintEditMain">
-						<div class="buttonGroup" style="margin-bottom: 10px;">
-							<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" autocomplete="off" checked/>
-							<label title="show / hide grid" for="paintGridCheck">
-								<span id="paintGridIcon" class="bitsy_icon icon_space_right">visibility</span>
-								<span class="localize grid_toggle_visible">grid</span>
+					<div class="bitsy-card-main">
+						<form id="paintModeRadio" style="margin-bottom: 5px;">
+							<input type="radio" name="paint mode" value="avatar" onclick="on_paint_avatar();" id="paintOptionAvatar" checked>
+							<label title="edit the avatar: the player's character" for="paintOptionAvatar" class="left">
+								<span class="bitsy_icon icon_space_right">avatar</span>
+								<span class="localize avatar_label">avatar</span>
 							</label>
-							<button id="showInventoryButton" title="show inventory" onclick="showPanel('inventoryPanel', 'paintPanel');">
-								<span class="bitsy_icon">item</span>
-								<span class="localize inventory_tool_name">inventory</span>
+
+							<input type="radio" name="paint mode" value="tile" onclick="on_paint_tile();" id="paintOptionTile">
+							<label title="edit tiles: pieces of scenery" for="paintOptionTile" class="middle">
+								<span class="bitsy_icon icon_space_right">tile</span>
+								<span class="localize tile_label">tile</span>
+							</label>
+
+							<input type="radio" name="paint mode" value="sprite" onclick="on_paint_sprite();" id="paintOptionSprite">
+							<label title="edit sprites: non-player characters and interactive objects" for="paintOptionSprite" class="middle">
+								<span class="bitsy_icon icon_space_right">sprite</span>
+								<span class="localize sprite_label">sprite</span>
+							</label>
+
+							<input type="radio" name="paint mode" value="item" onclick="on_paint_item();" id="paintOptionItem">
+							<label title="edit items: things the player can pick up" for="paintOptionItem" class="right">
+								<span class="bitsy_icon icon_space_right">item</span>
+								<span class="localize item_label">item</span>
+							</label>
+							
+						</form>
+
+						<div id="paintNavigationControls" class="navControl">
+							<input title="a name to refer to this drawing" type="text" id="drawingName" class="textInputField" onchange="on_drawing_name_change();" size="10"></input>
+
+							<span class="spacer"></span>
+
+							<button title="previous drawing" class="color0 disableForAvatar" onclick="prev();">
+								<span class="bitsy_icon">previous</span>
+							</button>
+							<button title="next drawing" class="color0 disableForAvatar" onclick="next();">
+								<span class="bitsy_icon">next</span>
+							</button>
+
+							<span class="spacer"></span>
+
+							<button title="add drawing" class="color0 disableForAvatar" onclick="newDrawing();">
+								<span class="bitsy_icon">add</span>
+							</button>
+							<button title="duplicate drawing" class="color0 disableForAvatar" onclick="duplicateDrawing();">
+								<span class="bitsy_icon">copy</span>
+							</button>
+							<button title="delete drawing" class="color0 disableForAvatar" onclick="deleteDrawing();">
+								<span class="bitsy_icon">delete</span>
+							</button>
+
+							<span class="spacer"></span>
+
+							<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('findPanel', 'paintPanel');">
+								<span class="bitsy_icon">search</span>
 							</button>
 						</div>
-					</div>
 
-					<div id="wall" class="controlBox" style="display:none;">
-						<input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall(event);" autocomplete="off" >
-						<label title="make tile an impassible wall" for="wallCheckbox">
-							<span id="wallCheckboxIcon" class="bitsy_icon">wall_off</span>
-							<span class="localize wall_toggle">wall</span>
-						</label>
-					</div>
-					<div id="dialog" style="display:none;">
-					</div>
+						<div style="margin-bottom: 5px;">
+							<canvas id="paint"></canvas>
+						</div>
 
-					<div id="animationOuter" class="controlBox">
-						<div id="isAnimated">
-							<input type="checkbox" id="animatedCheckbox" onchange="on_toggle_animated();" autocomplete="off" >
-							<label title="add animation to drawing" for="animatedCheckbox">
-								<span class="localize animation_title">animation</span>
-								<span id="animatedCheckboxIcon" class="bitsy_icon">expand_less</span>
+						<div id="paintEditMain">
+							<div class="buttonGroup">
+								<input type="checkbox" id="paintGridCheck" onclick="togglePaintGrid(event);" autocomplete="off" checked/>
+								<label title="show / hide grid" for="paintGridCheck" class="bitsy-menu-label">
+									<span id="paintGridIcon" class="bitsy_icon">visibility</span>
+									<span class="localize grid_toggle_visible">grid</span>
+								</label>
+								<button id="showInventoryButton" title="show inventory" class="bitsy-menu-label" onclick="showPanel('inventoryPanel', 'paintPanel');">
+									<span class="bitsy_icon">item</span>
+									<span class="localize inventory_tool_name">inventory</span>
+								</button>
+							</div>
+						</div>
+
+						<div id="wall" class="controlBox" style="display:none;">
+							<input type="checkbox" id="wallCheckbox" onchange="on_toggle_wall(event);" autocomplete="off" >
+							<label title="make tile an impassible wall" for="wallCheckbox" class="bitsy-menu-label">
+								<span id="wallCheckboxIcon" class="bitsy_icon">wall_off</span>
+								<span class="localize wall_toggle">wall</span>
 							</label>
 						</div>
-						<div id="animation" style="display:none;">
-							<div class="buttonGroup">
-								<div class="animationThumbnail preview">
-									<img id="animationThumbnailPreview" />
-									<div>
-										<span class="localize animation_preview">preview</span>
+
+						<div id="dialog" style="display:none;">
+						</div>
+
+						<div id="animationOuter" class="controlBox">
+							<div id="isAnimated">
+								<input type="checkbox" id="animatedCheckbox" onchange="on_toggle_animated();" autocomplete="off" >
+								<label title="add animation to drawing" for="animatedCheckbox">
+									<span class="localize animation_title">animation</span>
+									<span id="animatedCheckboxIcon" class="bitsy_icon" style="margin-left: var(--bitsy-space-s);">expand_less</span>
+								</label>
+							</div>
+							<div id="animation" style="display:none;">
+								<div class="buttonGroup">
+									<div class="animationThumbnail preview">
+										<img id="animationThumbnailPreview" />
+										<div>
+											<span class="localize animation_preview">preview</span>
+										</div>
 									</div>
-								</div>
-								<div id="animationKeyframe1" class="animationThumbnail left selected" onclick="on_paint_frame1();">
-									<img id="animationThumbnailFrame1" />
-									<div>
-										<span class="localize animation_frame1">frame 1</span>
+									<div id="animationKeyframe1" class="animationThumbnail left selected" onclick="on_paint_frame1();">
+										<img id="animationThumbnailFrame1" />
+										<div>
+											<span class="localize animation_frame1">frame 1</span>
+										</div>
 									</div>
-								</div>
-								<div id="animationKeyframe2" class="animationThumbnail right unselected" onclick="on_paint_frame2();">
-									<img id="animationThumbnailFrame2" />
-									<div>
-										<span class="localize animation_frame2">frame 2</span>
+									<div id="animationKeyframe2" class="animationThumbnail right unselected" onclick="on_paint_frame2();">
+										<img id="animationThumbnailFrame2" />
+										<div>
+											<span class="localize animation_frame2">frame 2</span>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					
 				</div>
 
 				<div id="findPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item">

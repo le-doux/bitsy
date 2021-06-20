@@ -63,10 +63,7 @@ canvas {
 	margin-right: 0px;
 	border-radius: 4px;
 }
-textarea {
-	font-family: monospace;
-	font-size: 80%;
-}
+
 input {
 	font-family: monospace;
 }
@@ -301,10 +298,9 @@ span.controlBox {
 }
 
 .animationThumbnail {
-	display:inline-block;
-	padding: 4px;
-	margin:0px;
-	margin-left:-4px; /*why?*/
+	display: inline-block;
+	padding: var(--bitsy-space-s);
+	border-radius: var(--bitsy-space-s);
 }
 
 .animationThumbnail.preview {
