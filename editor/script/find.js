@@ -2,6 +2,7 @@ function FindTool(options) {
 	var spriteThumbnailRenderer = createSpriteThumbnailRenderer();
 	var tileThumbnailRenderer = createTileThumbnailRenderer();
 	var itemThumbnailRenderer = createItemThumbnailRenderer();
+	var paletteThumbnailRenderer = createPaletteThumbnailRenderer();
 
 	var categoryDefinitions = [
 		{
@@ -113,7 +114,7 @@ function FindTool(options) {
 				paletteTool.Select(id);
 				showPanel("colorsPanel", "findPanel");
 			},
-			renderer: spriteThumbnailRenderer,
+			renderer: paletteThumbnailRenderer,
 		},
 		{
 			name: "dialog",
@@ -134,7 +135,6 @@ function FindTool(options) {
 				openDialogTool(id);
 				showPanel("dialogPanel", "findPanel");
 			},
-			renderer: spriteThumbnailRenderer,
 		},
 	];
 
@@ -218,10 +218,9 @@ function FindTool(options) {
 						curSearchText.length <= 0 || displayName.indexOf(curSearchText) != -1);
 
 					if (isSearchTextInName) {
-						var thumbnailControl = new ThumbnailControl(
-							id,
-							category.renderer,
-							{
+						var thumbnailControl = new ThumbnailControl({
+								id: id,
+								renderer: category.renderer,
 								icon: category.icon,
 								text: displayName,
 								onclick: createOnClick(category, id),

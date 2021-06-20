@@ -214,7 +214,48 @@ function createItemThumbnailRenderer() {
 	return createDrawingThumbnailRenderer(item);
 }
 
-function ThumbnailControl(id, renderer, options) {
+function createPaletteThumbnailRenderer() {
+	var getRenderable = function(id) {
+		return palette[id];
+	}
+
+	var getHexPalette = function(pal) {
+		var palId = pal.id;
+
+		var hexPalette = [];
+		var colors = getPal(palId);
+		for (i in colors) {
+			var hexStr = rgbToHex(colors[i][0], colors[i][1], colors[i][2]).slice(1);
+			hexPalette.push(hexStr);
+		}
+
+		return hexPalette;
+	}
+
+	var onRender = function(obj, ctx, options) {
+		if (obj) {
+			var hexPalette = getHexPalette(obj);
+
+			ctx.fillStyle = "black";
+			ctx.fillRect(0, 0, 8 * scale, 8 * scale);
+
+			ctx.fillStyle = "#" + hexPalette[0];
+			ctx.fillRect(1 * scale, 1 * scale, 6 * scale, 2 * scale);
+
+			ctx.fillStyle = "#" + hexPalette[1];
+			ctx.fillRect(1 * scale, 3 * scale, 6 * scale, 2 * scale);
+
+			ctx.fillStyle = "#" + hexPalette[2];
+			ctx.fillRect(1 * scale, 5 * scale, 6 * scale, 2 * scale);
+		}
+
+		return [ctx.getImageData(0, 0, 8 * scale, 8 * scale).data];
+	}
+
+	return new ThumbnailRendererBase(getRenderable, getHexPalette, onRender);
+}
+
+function ThumbnailControl(options) {
 	var div = document.createElement("div");
 	div.classList.add("bitsy-thumbnail");
 	div.onclick = options.onclick;
@@ -225,17 +266,19 @@ function ThumbnailControl(id, renderer, options) {
 	thumbnailContainer.appendChild(createIconElement(options.icon));
 	div.appendChild(thumbnailContainer);
 
-	var renderOptions = options.renderOptions ? options.renderOptions : {};
-	renderOptions.callback = function(uri) {
-		thumbnailContainer.innerHTML = "";
+	if (options.id && options.renderer) {
+		var renderOptions = options.renderOptions ? options.renderOptions : {};
+		renderOptions.callback = function(uri) {
+			thumbnailContainer.innerHTML = "";
 
-		var thumbnailImg = document.createElement("img");
-		thumbnailImg.src = uri;
+			var thumbnailImg = document.createElement("img");
+			thumbnailImg.src = uri;
 
-		thumbnailContainer.appendChild(thumbnailImg);
-	};
+			thumbnailContainer.appendChild(thumbnailImg);
+		};
 
-	renderer.GetOrRender(id, renderOptions);
+		options.renderer.GetOrRender(options.id, renderOptions);
+	}
 
 	div.appendChild(createLabelElement({
 		icon: options.icon,
