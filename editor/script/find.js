@@ -399,13 +399,10 @@ function FindTool(options) {
 		UpdateSelectedItems();
 	});
 
-	events.Listen("select_palette", function(event) {
-		UpdateSelectedItems();
-	});
-
-	events.Listen("select_color", function(event) {
-		UpdateSelectedItems();
-	});
+	// TODO : somehow palette selection works already??? find out why.. (is it triggering a game data refresh?)
+	// events.Listen("select_palette", function(event) {
+	// 	UpdateSelectedItems();
+	// });
 
 	events.Listen("select_dialog", function(event) {
 		UpdateSelectedItems();

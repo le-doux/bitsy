@@ -145,8 +145,9 @@ function PaletteTool(colorPicker,labelIds,nameFieldId) {
 
 		var id = nextPaletteId();
 		palette[ id ] = {
+			id : id,
 			name : null,
-			colors : []
+			colors : [],
 		};
 
 		for (var i = 0; i < curColors.length; i++) {

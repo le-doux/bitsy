@@ -2,6 +2,7 @@ v7.4:
 - new find tool!
 - @seansleblanc: improved stability of persistent data storage
 - bugfix: duplicating dialog fixed
+- bugfix: duplicating palettes fixed
 
 v7.3:
 - save grid on/off settings between sessions
