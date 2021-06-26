@@ -2807,7 +2807,7 @@ function DialogTool() {
 						itemThumbnail.id = "param_item_" + curValue;
 						itemThumbnail.style.width = "16px";
 						itemThumbnail.style.marginLeft = "4px";
-						thumbnailRenderer.Render(itemThumbnail.id, new DrawingId(TileType.Item, curValue), 0, itemThumbnail);
+						thumbnailRenderer.Render(itemThumbnail.id, item[curValue], 0, itemThumbnail);
 					}
 				}
 				else if (type === "transition") {

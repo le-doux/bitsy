@@ -20,10 +20,10 @@ function FindTool(options) {
 				return localization.GetStringOrFallback("avatar_label", "avatar");
 			},
 			isItemSelected: function(id) {
-				return (paintTool.drawing.type === TileType.Avatar) && (paintTool.drawing.id === id);
+				return (drawing.type === TileType.Avatar) && (drawing.id === id);
 			},
 			openTool: function(id) {
-				paintTool.selectDrawing(new DrawingId(TileType.Avatar, id));
+				paintTool.selectDrawing(sprite[id]);
 				on_paint_avatar_ui_update();
 				showPanel("paintPanel", "findPanel");
 			},
@@ -53,10 +53,10 @@ function FindTool(options) {
 				}
 			},
 			isItemSelected: function(id) {
-				return (paintTool.drawing.type === TileType.Tile) && (paintTool.drawing.id === id);
+				return (drawing.type === TileType.Tile) && (drawing.id === id);
 			},
 			openTool: function(id) {
-				paintTool.selectDrawing(new DrawingId(TileType.Tile, id));
+				paintTool.selectDrawing(tile[id]);
 				on_paint_tile_ui_update();
 				showPanel("paintPanel", "findPanel");
 			},
@@ -90,10 +90,10 @@ function FindTool(options) {
 				}
 			},
 			isItemSelected: function(id) {
-				return (paintTool.drawing.type === TileType.Sprite) && (paintTool.drawing.id === id);
+				return (drawing.type === TileType.Sprite) && (drawing.id === id);
 			},
 			openTool: function(id) {
-				paintTool.selectDrawing(new DrawingId(TileType.Sprite, id));
+				paintTool.selectDrawing(sprite[id]);
 				on_paint_sprite_ui_update();
 				showPanel("paintPanel", "findPanel");
 			},
@@ -123,10 +123,10 @@ function FindTool(options) {
 				}
 			},
 			isItemSelected: function(id) {
-				return (paintTool.drawing.type === TileType.Item) && (paintTool.drawing.id === id);
+				return (drawing.type === TileType.Item) && (drawing.id === id);
 			},
 			openTool: function(id) {
-				paintTool.selectDrawing(new DrawingId(TileType.Item, id));
+				paintTool.selectDrawing(item[id]);
 				on_paint_item_ui_update();
 				showPanel("paintPanel", "findPanel");
 			},

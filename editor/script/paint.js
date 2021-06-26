@@ -1,111 +1,6 @@
 /*
 	PAINT
 */
-
-// TODO --- this object kind of sucks????
-function DrawingId(type,id) { // TODO: is this the right name?
-	var self = this;
-
-	this.type = type;
-	this.id = id;
-
-	var imageSource = null;
-
-	this.getFrameData = function(frameIndex) {
-		if (imageSource === null || imageSource === undefined) {
-			self.reloadImageSource();
-		}
-
-		return imageSource[ frameIndex ];
-	}
-
-	this.reloadImageSource = function() {
-		if (renderer === null || renderer === undefined) {
-			return;
-		}
-
-		// TODO RENDERER : pass in renderer?
-		imageSource = (renderer.GetImageSource( self.toString() )).slice();
-		console.log(imageSource);
-	}
-
-	this.updateImageSource = function() {
-		if (imageSource === null || imageSource === undefined) {
-			return;
-		}
-
-		renderer.SetImageSource(self.toString(), imageSource);
-	}
-
-	this.toString = function() {
-		return tileTypeToIdPrefix(self.type) + self.id;
-	}
-
-	// note: can't believe I didn't make this before -- where else should I use it?
-	this.getNameOrDescription = function() {
-		console.log("NAME " + self.getEngineObject().name);
-		return self.getEngineObject().name ? self.getEngineObject().name : tileTypeToString(self.type) + " " + self.id;
-	}
-
-	this.getDialogId = function() {
-		var dialogId = null;
-		if(self.type == TileType.Sprite) {
-			dialogId = sprite[self.id].dlg;
-		}
-		else if(self.type == TileType.Item) {
-			dialogId = item[self.id].dlg;
-		}
-		return dialogId;
-	}
-
-	this.getEngineObject = function() {
-		if(self.type == TileType.Sprite || self.type == TileType.Avatar) {
-			return sprite[self.id];
-		}
-		else if(self.type == TileType.Item) {
-			return item[self.id];
-		}
-		else if(self.type == TileType.Tile) {
-			return tile[self.id];
-		}
-		return null;
-	}
-
-	// TODO : these methods should really be moved DOWN an abstraction level into a core DRAWING object in bitsy.js
-	this.getImage = function(palId,frameIndex) {
-		if(self.type == TileType.Sprite || self.type == TileType.Avatar) {
-			return getSpriteImage(sprite[self.id],palId,frameIndex);
-		}
-		else if(self.type == TileType.Item) {
-			return getItemImage(item[self.id],palId,frameIndex);
-		}
-		else if(self.type == TileType.Tile) {
-			return getTileImage(tile[self.id],palId,frameIndex);
-		}
-		return null;
-	}
-
-	this.draw = function(context,x,y,palId,frameIndex) {
-		if(self.type == TileType.Sprite || self.type == TileType.Avatar) {
-			return drawSprite(self.getImage(palId,frameIndex),x,y,context);
-		}
-		else if(self.type == TileType.Item) {
-			return drawItem(self.getImage(palId,frameIndex),x,y,context);
-		}
-		else if(self.type == TileType.Tile) {
-			return drawTile(self.getImage(palId,frameIndex),x,y,context);
-		}
-	}
-
-	this.isWallTile = function() {
-		if(self.type != TileType.Tile)
-			return false;
-
-		// TODO
-	}
-}
-
-// TODO
 function PaintTool(canvas, roomTool) {
 	// TODO : variables
 	var self = this; // feels a bit hacky
@@ -117,10 +12,6 @@ function PaintTool(canvas, roomTool) {
 	this.curDrawingFrameIndex = 0; // TODO eventually this can be internal
 	this.drawPaintGrid = (getPanelSetting("paintPanel", "grid") != false);
 	updatePaintGridCheck(this.drawPaintGrid);
-
-	console.log("NEW PAINT TOOL");
-	console.log(renderer);
-	this.drawing = new DrawingId( TileType.Avatar, "A" );
 
 	//paint canvas & context
 	canvas.width = tilesize * paint_scale;
@@ -188,10 +79,12 @@ function PaintTool(canvas, roomTool) {
 			isPainting = false;
 			updateDrawingData();
 			refreshGameData();
+
+			self.updateCanvas();
 			roomTool.drawEditMap(); // TODO : events instead of direct coupling
 
-			if( self.isCurDrawingAnimated ) {
-				renderAnimationPreview( roomTool.drawing.id );
+			if (self.isCurDrawingAnimated) {
+				renderAnimationPreview(drawing);
 			}
 		}
 	}
@@ -223,10 +116,10 @@ function PaintTool(canvas, roomTool) {
 		ctx.fillRect(0,0,canvas.width,canvas.height);
 
 		//pixel color
-		if (self.drawing.type == TileType.Tile) {
+		if (drawing.type === TileType.Tile) {
 			ctx.fillStyle = "rgb("+getPal(curPal())[1][0]+","+getPal(curPal())[1][1]+","+getPal(curPal())[1][2]+")";
 		}
-		else if (self.drawing.type == TileType.Sprite || self.drawing.type == TileType.Avatar || self.drawing.type == TileType.Item) {
+		else if (drawing.type === TileType.Sprite || drawing.type === TileType.Avatar || drawing.type === TileType.Item) {
 			ctx.fillStyle = "rgb("+getPal(curPal())[2][0]+","+getPal(curPal())[2][1]+","+getPal(curPal())[2][2]+")";
 		}
 
@@ -261,18 +154,19 @@ function PaintTool(canvas, roomTool) {
 
 	function curDrawingData() {
 		var frameIndex = (self.isCurDrawingAnimated ? self.curDrawingFrameIndex : 0);
-		return self.drawing.getFrameData(frameIndex);
+		return getDrawingFrameData(drawing, frameIndex);
 	}
 
 	// todo: assumes 2 frames
 	function curDrawingAltFrameData() {
 		var frameIndex = (self.curDrawingFrameIndex === 0 ? 1 : 0);
-		return self.drawing.getFrameData(frameIndex);
+		return getDrawingFrameData(drawing, frameIndex);
 	}
 
 	// TODO : rename?
 	function updateDrawingData() {
-		self.drawing.updateImageSource();
+		// this forces a renderer cache refresh but it's kind of wonky
+		renderer.SetImageSource(drawing.drw, getDrawingImageSource(drawing));
 	}
 
 	// methods for updating the UI
@@ -280,95 +174,97 @@ function PaintTool(canvas, roomTool) {
 	this.onReloadSprite = null;
 	this.onReloadItem = null;
 	this.reloadDrawing = function() {
-		self.drawing.reloadImageSource();
-
-		if ( self.drawing.type === TileType.Tile) {
-			if(self.onReloadTile) {
+		if (drawing.type === TileType.Tile) {
+			if (self.onReloadTile) {
 				self.onReloadTile();
 			}
 		}
-		else if( self.drawing.type === TileType.Avatar || self.drawing.type === TileType.Sprite ) {
-			if(self.onReloadSprite) {
+		else if (drawing.type === TileType.Avatar || drawing.type === TileType.Sprite) {
+			if (self.onReloadSprite) {
 				self.onReloadSprite();
 			}
 		}
-		else if( self.drawing.type === TileType.Item ) {
-			if(self.onReloadItem) {
+		else if (drawing.type === TileType.Item) {
+			if (self.onReloadItem) {
 				self.onReloadItem();
 			}
 		}
 	}
 
-	this.selectDrawing = function(drawingId) {
-		self.drawing.id = drawingId.id; // have to do this hack because I'm relying on aliasing (not good!)
-		self.drawing.type = drawingId.type;
+	this.selectDrawing = function(drawing) {
+		drawing = drawing; // todo : will this work?
 		self.reloadDrawing();
 		self.updateCanvas();
 	}
 
 	this.toggleWall = function(checked) {
-		if( self.drawing.type != TileType.Tile )
+		if (drawing.type != TileType.Tile) {
 			return;
+		}
 
-		if( tile[ self.drawing.id ].isWall == undefined || tile[ self.drawing.id ].isWall == null ) {
+		if (drawing.isWall == undefined || drawing.isWall == null) {
 			// clear out any existing wall settings for this tile in any rooms
 			// (this is back compat for old-style wall settings)
-			for( roomId in room ) {
-				var i = room[ roomId ].walls.indexOf( self.drawing.id );
-				if( i > -1 )
-					room[ roomId ].walls.splice( i , 1 );
+			for (roomId in room) {
+				var i = room[roomId].walls.indexOf(drawing.id);
+
+				if (i > -1) {
+					room[roomId].walls.splice(i, 1);
+				}
 			}
 		}
 
-		tile[ self.drawing.id ].isWall = checked;
+		drawing.isWall = checked;
 
 		refreshGameData();
 
-		if(toggleWallUI != null && toggleWallUI != undefined) // a bit hacky
+		if (toggleWallUI != null && toggleWallUI != undefined) { // a bit hacky
 			toggleWallUI(checked);
+		}
 	}
 
 	this.getCurObject = function() {
-		return self.drawing.getEngineObject();
+		return drawing;
 	}
 
 	this.newDrawing = function(imageData) {
-		if ( self.drawing.type == TileType.Tile ) {
+		if (drawing.type === TileType.Tile) {
 			newTile(imageData);
 		}
-		else if( self.drawing.type == TileType.Avatar || self.drawing.type == TileType.Sprite ) {
+		else if (drawing.type === TileType.Avatar || drawing.type === TileType.Sprite) {
 			newSprite(imageData);
 		}
-		else if( self.drawing.type == TileType.Item ) {
+		else if (drawing.type === TileType.Item) {
 			newItem(imageData);
 		}
-    }
-    
-    this.duplicateDrawing = function() {
-        var sourceImageData = renderer.GetImageSource(self.drawing.toString());
-        var copiedImageData = copyDrawingData(sourceImageData);
+	}
+	
+	this.duplicateDrawing = function() {
+		var sourceImageData = getDrawingImageSource(drawing);
+		var copiedImageData = copyDrawingData(sourceImageData);
 
-        // tiles have extra data to copy
-        var tileIsWall = false;
-        if (self.drawing.type === TileType.Tile) {
-            tileIsWall = tile[self.drawing.id].isWall;
-        }
+		// tiles have extra data to copy
+		var tileIsWall = false;
+		if (drawing.type === TileType.Tile) {
+			tileIsWall = drawing.isWall;
+		}
 
-        this.newDrawing(copiedImageData);
+		this.newDrawing(copiedImageData);
 
-        // tiles have extra data to copy
-        if (self.drawing.type === TileType.Tile) {
-            tile[self.drawing.id].isWall = tileIsWall;
-            // make sure the wall toggle gets updated
-            self.reloadDrawing();
-        }
-    }
+		// tiles have extra data to copy
+		if (drawing.type === TileType.Tile) {
+			drawing.isWall = tileIsWall;
+			// make sure the wall toggle gets updated
+			self.reloadDrawing();
+		}
+	}
 
 	// TODO -- sould these newDrawing methods be internal to PaintTool?
 	function newTile(imageData) {
-		self.drawing.id = nextTileId();
+		var id = nextTileId();
+		makeTile(id, imageData);
 
-		makeTile(self.drawing.id, imageData);
+		drawing = tile[id];
 		self.reloadDrawing(); //hack for ui consistency (hack x 2: order matters for animated tiles)
 
 		self.updateCanvas();
@@ -378,9 +274,10 @@ function PaintTool(canvas, roomTool) {
 	}
 
 	function newSprite(imageData) {
-		self.drawing.id = nextSpriteId();
+		var id = nextSpriteId();
+		makeSprite(id, imageData);
 
-		makeSprite(self.drawing.id, imageData);
+		drawing = sprite[id];
 		self.reloadDrawing(); //hack (order matters for animated tiles)
 
 		self.updateCanvas();
@@ -390,9 +287,10 @@ function PaintTool(canvas, roomTool) {
 	}
 
 	function newItem(imageData) {
-		self.drawing.id = nextItemId();
+		var id = nextItemId();
+		makeItem(id, imageData);
 
-		makeItem(self.drawing.id, imageData);
+		drawing = item[id];
 		self.reloadDrawing(); //hack (order matters for animated tiles)
 
 		self.updateCanvas();
@@ -407,43 +305,52 @@ function PaintTool(canvas, roomTool) {
 		var shouldDelete = true;
 		shouldDelete = confirm("Are you sure you want to delete this drawing?");
 
-		if ( shouldDelete ) {
-			if (self.drawing.type == TileType.Tile) {
-				if ( Object.keys( tile ).length <= 1 ) { alert("You can't delete your last tile!"); return; }
-				delete tile[ self.drawing.id ];
-				findAndReplaceTileInAllRooms( self.drawing.id, "0" );
+		if (shouldDelete) {
+			if (drawing.type === TileType.Tile) {
+				if (Object.keys( tile ).length <= 1) {
+					alert("You can't delete your last tile!"); // todo : localize
+					return;
+				}
+
+				delete tile[drawing.id];
+
+				findAndReplaceTileInAllRooms(drawing.id, "0");
 				refreshGameData();
-				// TODO RENDERER : refresh images
+
 				roomTool.drawEditMap();
 				nextTile();
 			}
-			else if( self.drawing.type == TileType.Avatar || self.drawing.type == TileType.Sprite ){
-				if ( Object.keys( sprite ).length <= 2 ) { alert("You can't delete your last sprite!"); return; }
+			else if (drawing.type === TileType.Avatar || drawing.type === TileType.Sprite) {
+				if (Object.keys(sprite).length <= 2) {
+					alert("You can't delete your last sprite!"); // todo : localize
+					return;
+				}
 
 				// todo: share with items
-				var dlgId = (sprite[self.drawing.id].dlg == null) ? self.drawing.id : sprite[self.drawing.id].dlg;
+				var dlgId = (drawing.dlg === null) ? drawing.id : drawing.dlg;
 
-				delete sprite[self.drawing.id];
+				delete sprite[drawing.id];
 
 				deleteUnreferencedDialog(dlgId);
-
 				refreshGameData();
-				// TODO RENDERER : refresh images
+
 				roomTool.drawEditMap();
 				nextSprite();
 			}
-			else if( self.drawing.type == TileType.Item ){
-				if ( Object.keys( item ).length <= 1 ) { alert("You can't delete your last item!"); return; }
+			else if (drawing.type === TileType.Item) {
+				if (Object.keys(item).length <= 1) {
+					alert("You can't delete your last item!"); // todo : localize
+					return;
+				}
 
-				var dlgId = item[self.drawing.id].dlg;
+				var dlgId = drawing.dlg;
 
-				delete item[self.drawing.id];
+				delete item[drawing.id];
 
 				deleteUnreferencedDialog(dlgId);
-
-				removeAllItems(self.drawing.id);
+				removeAllItems(drawing.id);
 				refreshGameData();
-				// TODO RENDERER : refresh images
+
 				roomTool.drawEditMap();
 				nextItem();
 				updateInventoryItemUI();
@@ -454,9 +361,9 @@ function PaintTool(canvas, roomTool) {
 	events.Listen("palette_change", function(event) {
 		self.updateCanvas();
 
-		if( self.isCurDrawingAnimated ) {
+		if (self.isCurDrawingAnimated) {
 			// TODO -- this animation stuff needs to be moved in here I think?
-			renderAnimationPreview( drawing.id );
+			renderAnimationPreview(drawing);
 		}
 	});
 }
