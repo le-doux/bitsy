@@ -3565,3 +3565,29 @@ var iconUtils = new IconUtils(); // TODO : move?
 
 /* NEW FIND TOOL */
 var findTool = null;
+
+function openFindTool(categoryId, insertNextToId) {
+	if (findTool) {
+		findTool.SelectCategory(categoryId);
+	}
+
+	showPanel("findPanel", insertNextToId);
+}
+
+function openFindToolWithCurrentPaintCategory() {
+	var categoryId = "avatar";
+
+	if (paintTool) {
+		if (paintTool.drawing.type === TileType.Tile) {
+			categoryId = "tile";
+		}
+		else if (paintTool.drawing.type === TileType.Sprite) {
+			categoryId = "sprite";
+		}
+		else if (paintTool.drawing.type === TileType.Item) {
+			categoryId = "item";
+		}
+	}
+
+	openFindTool(categoryId, "paintPanel");
+}

@@ -274,13 +274,26 @@ function FindTool(options) {
 		});
 	}
 
+	function selectCategory(categoryId) {
+		curFilter = categoryId;
+		GenerateItems();
+	}
+
+	function selectCategoryAndUpdateUI(categoryId) {
+		selectCategory(categoryId);
+
+		// hack! ..I'd prefer not to be directly manipulating the document here
+		document.getElementById("findFilter-" + categoryId).checked = true;
+	}
+
+	this.SelectCategory = selectCategoryAndUpdateUI;
+
 	var filterSelect = createTabSelectElement({
 		name: "findFilter",
 		value: curFilter,
 		tabs: filterTabList,
 		onclick: function(e) {
-			curFilter = e.target.value;
-			GenerateItems();
+			selectCategory(e.target.value);
 		},
 	});
 
