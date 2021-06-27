@@ -161,77 +161,48 @@ function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
 }
 
 /* MAKE DRAWING OBJECTS */
-function makeTile(id,imageData) {
-	var drwId = "TIL_" + id;
-	tile[id] = {
-		id : id,
-		drw : drwId,
-		col : 1,
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1),
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : (imageData.length),
-		},
-		name : null
-	};
-	makeDrawing(drwId,imageData);
+function makeTile(id, imageData) {
+	var tileData = createDrawingData("TIL", id);
+	tileData.frameCount = (!imageData) ? 1 : (imageData.length);
+	tileData.isAnimated = tileData.frameCount > 1;
+	tile[id] = tileData;
+	makeDrawing(tileData.drw, imageData);
 }
 
-function makeSprite(id,imageData) {
-	var drwId = "SPR_" + id;
-	sprite[id] = { //todo create default sprite creation method
-		id : id,
-		drw : drwId,
-		col : 2,
-		room : null,
-		x : -1,
-		y : -1,
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : (imageData.length),
-		},
-		dlg : null,
-		name : null
-	};
-	makeDrawing(drwId,imageData);
+function makeSprite(id, imageData) {
+	var spriteData = createDrawingData("SPR", id);
+	spriteData.frameCount = (!imageData) ? 1 : (imageData.length);
+	spriteData.isAnimated = spriteData.frameCount > 1;
+	sprite[id] = spriteData;
+	makeDrawing(spriteData.drw, imageData);
 }
 
-function makeItem(id,imageData) { // NOTE : same as tile right now? make more like sprite?
-	// console.log(id);
-	var drwId = "ITM_" + id;
-	// console.log(drwId);
-	item[id] = {
-		id : id,
-		drw : drwId,
-		col : 2, // TODO color not column (bad name)
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : (imageData.length),
-		},
-		dlg : null,
-		name : null
-	};
-	makeDrawing(drwId,imageData);
+function makeItem(id, imageData) {
+	var itemData = createDrawingData("ITM", id);
+	itemData.frameCount = (!imageData) ? 1 : (imageData.length);
+	itemData.isAnimated = itemData.frameCount > 1;
+	item[id] = itemData;
+	makeDrawing(itemData.drw, imageData);
 }
 
-function makeDrawing(id,imageData) {
+function makeDrawing(id, imageData) {
 	if (!imageData) {
-		imageData = [[
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0]
-		]];
+		// if there's no image data, initialize with one empty frame
+		imageData = [
+			[
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+			],
+		];
 	}
-	// TODO RENDERER : stop using global renderer
-	renderer.SetImageSource(id,imageData);
-	// TODO RENDERER : re-render images?
+
+	renderer.SetImageSource(id, imageData);
 }
 
 /* EVENTS */
