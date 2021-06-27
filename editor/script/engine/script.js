@@ -919,15 +919,10 @@ var DialogBlockNode = function(doIndentFirstLine) {
 
 			var curNode = this.children[i];
 
-			var curNodeIsNonInlineCode = curNode.type === "code_block" && !isInlineCode(curNode);
-			var prevNodeIsNonInlineCode = lastNode && lastNode.type === "code_block" && !isInlineCode(lastNode);
-
 			var shouldIndentFirstLine = (i == 0 && doIndentFirstLine);
 			var shouldIndentAfterLinebreak = (lastNode && lastNode.type === "function" && lastNode.name === "br");
-			var shouldIndentCodeBlock = i > 0 && curNodeIsNonInlineCode;
-			var shouldIndentAfterCodeBlock = prevNodeIsNonInlineCode;
 
-			if (shouldIndentFirstLine || shouldIndentAfterLinebreak || shouldIndentCodeBlock || shouldIndentAfterCodeBlock) {
+			if (shouldIndentFirstLine || shouldIndentAfterLinebreak) {
 				str += leadingWhitespace(depth);
 			}
 

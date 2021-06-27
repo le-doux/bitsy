@@ -1,34 +1,4 @@
-/*
-leftover todos:
-- add "direct edit" dropdowns for exits when in "move" mode
-- try another orientation on android fix
-- need to update the instructions panel
-- tool positioning in portrait mode
-- encapsulate adv dialog logic and inventory logic
-- encapsulate editor.js and bitsy.js
-	- create separate runtime game data and editor game data
-- should top bar go away on scroll down? (like some web apps do)
-- should tools toggles go in a side-bar?
-- saving and loading games in mobile
-	- downloading blobs is not supported
-	- thought: create "cartridges" out of GIFs (multiple frames means no limit on size even if dimensions are static)
-	- store game data text in one byte per RGB pixel (reserve last 85 values in each color value: 85 * 3 = 255)
-	- require implementation of lzw decompression and GIF decoding
-	- should I create a standalone "bitsy player" page too that takes in the carts?
-
-new notes from forum
-- new game+
-- process tags in "say" function
-*/
-
 /* MODES */
-var TileType = {
-	Tile : 0,
-	Sprite : 1,
-	Avatar : 2,
-	Item : 3
-};
-
 var EditMode = {
 	Edit : 0,
 	Play : 1
@@ -191,77 +161,48 @@ function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
 }
 
 /* MAKE DRAWING OBJECTS */
-function makeTile(id,imageData) {
-	var drwId = "TIL_" + id;
-	tile[id] = {
-		id : id,
-		drw : drwId,
-		col : 1,
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1),
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : (imageData.length),
-		},
-		name : null
-	};
-	makeDrawing(drwId,imageData);
+function makeTile(id, imageData) {
+	var tileData = createDrawingData("TIL", id);
+	tileData.frameCount = (!imageData) ? 1 : (imageData.length);
+	tileData.isAnimated = tileData.frameCount > 1;
+	tile[id] = tileData;
+	makeDrawing(tileData.drw, imageData);
 }
 
-function makeSprite(id,imageData) {
-	var drwId = "SPR_" + id;
-	sprite[id] = { //todo create default sprite creation method
-		id : id,
-		drw : drwId,
-		col : 2,
-		room : null,
-		x : -1,
-		y : -1,
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : (imageData.length),
-		},
-		dlg : null,
-		name : null
-	};
-	makeDrawing(drwId,imageData);
+function makeSprite(id, imageData) {
+	var spriteData = createDrawingData("SPR", id);
+	spriteData.frameCount = (!imageData) ? 1 : (imageData.length);
+	spriteData.isAnimated = spriteData.frameCount > 1;
+	sprite[id] = spriteData;
+	makeDrawing(spriteData.drw, imageData);
 }
 
-function makeItem(id,imageData) { // NOTE : same as tile right now? make more like sprite?
-	// console.log(id);
-	var drwId = "ITM_" + id;
-	// console.log(drwId);
-	item[id] = {
-		id : id,
-		drw : drwId,
-		col : 2, // TODO color not column (bad name)
-		animation : { //todo
-			isAnimated : (!imageData) ? false : (imageData.length>1), // more duplication :(
-			frameIndex : 0,
-			frameCount : (!imageData) ? 2 : (imageData.length),
-		},
-		dlg : null,
-		name : null
-	};
-	makeDrawing(drwId,imageData);
+function makeItem(id, imageData) {
+	var itemData = createDrawingData("ITM", id);
+	itemData.frameCount = (!imageData) ? 1 : (imageData.length);
+	itemData.isAnimated = itemData.frameCount > 1;
+	item[id] = itemData;
+	makeDrawing(itemData.drw, imageData);
 }
 
-function makeDrawing(id,imageData) {
+function makeDrawing(id, imageData) {
 	if (!imageData) {
-		imageData = [[
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0],
-			[0,0,0,0,0,0,0,0]
-		]];
+		// if there's no image data, initialize with one empty frame
+		imageData = [
+			[
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0],
+			],
+		];
 	}
-	// TODO RENDERER : stop using global renderer
-	renderer.SetImageSource(id,imageData);
-	// TODO RENDERER : re-render images?
+
+	renderer.SetImageSource(id, imageData);
 }
 
 /* EVENTS */
@@ -549,7 +490,7 @@ function reloadDialogUI() {
 	var dialogContent = document.getElementById("dialog");
 	dialogContent.innerHTML = "";
 
-	var obj = paintTool.drawing.getEngineObject();
+	var obj = drawing;
 
 	// clean up previous widget
 	if (paintDialogWidget) {
@@ -572,7 +513,7 @@ function reloadDialogUI() {
 				refreshGameData();
 			},
 			GetDefaultName: function() {
-				var desc = paintTool.drawing.getNameOrDescription();
+				var desc = getDrawingNameOrDescription(drawing);
 				return CreateDefaultName(desc + " dialog", dialog, true); // todo : localize
 			}, // todo : localize
 		});
@@ -585,7 +526,7 @@ function reloadDialogUI() {
 
 // hacky - assumes global paintTool object
 function getCurDialogId() {
-	return paintTool.drawing.getDialogId();
+	return getDrawingDialogId(drawing);
 }
 
 function setDefaultGameState() {
@@ -645,6 +586,11 @@ function resetGameData() {
 	roomTool.drawEditMap();
 
 	events.Raise("game_data_change"); // TODO -- does this need to have a specific reset event or flag?
+
+	// reset find tool (a bit heavy handed?)
+	findTool = new FindTool({
+		mainElement : document.getElementById("findPanelMain"),
+	});
 }
 
 function refreshGameData() {
@@ -688,7 +634,7 @@ var roomTool;
 var paintTool;
 
 /* CUR DRAWING */
-var drawing = new DrawingId(TileType.Avatar,"A");
+var drawing;
 
 var tileIndex = 0;
 var spriteIndex = 0;
@@ -902,11 +848,9 @@ function start() {
 	//init tool controllers
 	roomTool = new RoomTool(canvas);
 	roomTool.listenEditEvents()
-	roomTool.drawing = drawing;
 	roomTool.editDrawingAtCoordinateCallback = editDrawingAtCoordinate;
 
 	paintTool = new PaintTool(document.getElementById("paint"),roomTool);
-	paintTool.drawing = drawing;
 	paintTool.onReloadTile = function(){ reloadTile() };
 	paintTool.onReloadSprite = function(){ reloadSprite() };
 	paintTool.onReloadItem = function(){ reloadItem() };
@@ -940,6 +884,8 @@ function start() {
 	else {
 		setDefaultGameState();
 	}
+
+	drawing = sprite["A"]; // will this break?
 
 	roomIndex = sortedRoomIdList().indexOf(curRoom);
 
@@ -1082,16 +1028,25 @@ function newDrawing() {
 function nextTile() {
 	var ids = sortedTileIdList();
 	tileIndex = (tileIndex + 1) % ids.length;
-	drawing.id = ids[tileIndex];
+
+	var tileId = ids[tileIndex];
+	drawing = tile[tileId];
+
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
 }
 
 function prevTile() {
 	var ids = sortedTileIdList();
+
 	tileIndex = (tileIndex - 1) % ids.length;
-	if (tileIndex < 0) tileIndex = (ids.length-1);
-	drawing.id = ids[tileIndex];
+	if (tileIndex < 0) {
+		tileIndex = (ids.length - 1);
+	}
+
+	var tileId = ids[tileIndex];
+	drawing = tile[tileId];
+
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
 }
@@ -1426,34 +1381,55 @@ function deleteRoom() {
 function nextItem() {
 	var ids = sortedItemIdList();
 	itemIndex = (itemIndex + 1) % ids.length;
-	drawing.id = ids[itemIndex];
+
+	var itemId = ids[itemIndex];
+	drawing = item[itemId];
+
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
 }
 
 function prevItem() {
 	var ids = sortedItemIdList();
+
 	itemIndex = (itemIndex - 1) % ids.length;
-	if (itemIndex < 0) itemIndex = (ids.length-1); // loop
-	drawing.id = ids[itemIndex];
+	if (itemIndex < 0) {
+		itemIndex = (ids.length - 1); // loop
+	}
+
+	var itemId = ids[itemIndex];
+	drawing = item[itemId];
+
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
 }
 
 function nextSprite() {
 	var ids = sortedSpriteIdList();
+
 	spriteIndex = (spriteIndex + 1) % ids.length;
-	if (spriteIndex === 0) spriteIndex = 1; //skip avatar
-	drawing.id = ids[spriteIndex];
+	if (spriteIndex === 0) {
+		spriteIndex = 1; //skip avatar
+	}
+
+	var spriteId = ids[spriteIndex];
+	drawing = sprite[spriteId];
+
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
 }
 
 function prevSprite() {
 	var ids = sortedSpriteIdList();
+
 	spriteIndex = (spriteIndex - 1) % ids.length;
-	if (spriteIndex <= 0) spriteIndex = (ids.length-1); //loop and skip avatar
-	drawing.id = ids[spriteIndex];
+	if (spriteIndex <= 0) {
+		spriteIndex = (ids.length - 1); //loop and skip avatar
+	}
+
+	var spriteId = ids[spriteIndex];
+	drawing = sprite[spriteId];
+
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
 }
@@ -1547,7 +1523,7 @@ function reloadTile() {
 
 		document.getElementById("animation").setAttribute("style","display:block;");
 		iconUtils.LoadIcon(document.getElementById("animatedCheckboxIcon"), "expand_more");
-		renderAnimationPreview( drawing.id );
+		renderAnimationPreview(drawing);
 	}
 	else {
 		paintTool.isCurDrawingAnimated = false;
@@ -1605,7 +1581,7 @@ function reloadSprite() {
 
 		document.getElementById("animation").setAttribute("style","display:block;");
 		iconUtils.LoadIcon(document.getElementById("animatedCheckboxIcon"), "expand_more");
-		renderAnimationPreview( drawing.id );
+		renderAnimationPreview(drawing);
 	}
 	else {
 		paintTool.isCurDrawingAnimated = false;
@@ -1644,7 +1620,7 @@ function reloadItem() {
 
 		document.getElementById("animation").setAttribute("style","display:block;");
 		iconUtils.LoadIcon(document.getElementById("animatedCheckboxIcon"), "expand_more");
-		renderAnimationPreview( drawing.id );
+		renderAnimationPreview(drawing);
 	}
 	else {
 		paintTool.isCurDrawingAnimated = false;
@@ -1665,7 +1641,7 @@ function reloadItem() {
 
 function deleteDrawing() {
 	paintTool.deleteDrawing();
-	events.Raise("select_drawing", { id: paintTool.drawing.id, type: paintTool.drawing.type });
+	events.Raise("select_drawing", { id: drawing.id, type: drawing.type });
 }
 
 function toggleToolBar(e) {
@@ -1888,11 +1864,13 @@ function updateDrawingNameUI() {
 }
 
 function on_paint_avatar() {
-	drawing.type = TileType.Avatar;
-	drawing.id = "A";
-	paintTool.reloadDrawing();
+	spriteIndex = 0;
+	drawing = sprite["A"];
 
+	paintTool.reloadDrawing();
 	on_paint_avatar_ui_update();
+
+	events.Raise("select_drawing", { id: drawing.id, type: drawing.type });
 }
 
 function on_paint_avatar_ui_update() {
@@ -1911,12 +1889,14 @@ function on_paint_avatar_ui_update() {
 }
 
 function on_paint_tile() {
-	drawing.type = TileType.Tile;
 	tileIndex = 0;
-	drawing.id = sortedTileIdList()[tileIndex];
-	paintTool.reloadDrawing();
+	var tileId = sortedTileIdList()[tileIndex];
+	drawing = tile[tileId];
 
+	paintTool.reloadDrawing();
 	on_paint_tile_ui_update();
+
+	events.Raise("select_drawing", { id: drawing.id, type: drawing.type });
 }
 
 function on_paint_tile_ui_update() {
@@ -1935,7 +1915,6 @@ function on_paint_tile_ui_update() {
 }
 
 function on_paint_sprite() {
-	drawing.type = TileType.Sprite;
 	if (sortedSpriteIdList().length > 1)
 	{
 		spriteIndex = 1;
@@ -1943,11 +1922,15 @@ function on_paint_sprite() {
 	else {
 		spriteIndex = 0; //fall back to avatar if no other sprites exist
 	}
-	drawing.id = sortedSpriteIdList()[spriteIndex];
+
+	var spriteId = sortedSpriteIdList()[spriteIndex];
+	drawing = sprite[spriteId];
+
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
-
 	on_paint_sprite_ui_update();
+
+	events.Raise("select_drawing", { id: drawing.id, type: drawing.type });
 }
 
 function on_paint_sprite_ui_update() {
@@ -1966,15 +1949,15 @@ function on_paint_sprite_ui_update() {
 }
 
 function on_paint_item() {
-	console.log("PAINT ITEM");
-	drawing.type = TileType.Item;
 	itemIndex = 0;
-	drawing.id = sortedItemIdList()[itemIndex];
-	console.log(drawing.id);
+	var itemId = sortedItemIdList()[itemIndex];
+	drawing = item[itemId];
+
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
-
 	on_paint_item_ui_update();
+
+	events.Raise("select_drawing", { id: drawing.id, type: drawing.type });
 }
 
 function on_paint_item_ui_update() {
@@ -2003,8 +1986,7 @@ function editDrawingAtCoordinate(x,y) {
 			on_paint_sprite_ui_update();
 		}
 
-		var drawing = new DrawingId( spriteId === "A" ? TileType.Avatar : TileType.Sprite, spriteId );
-		paintTool.selectDrawing( drawing );
+		paintTool.selectDrawing(sprite[spriteId]);
 		return;
 	}
 
@@ -2012,8 +1994,7 @@ function editDrawingAtCoordinate(x,y) {
 	// console.log(item);
 	if(item) {
 		on_paint_item_ui_update();
-		var drawing = new DrawingId( TileType.Item, item.id );
-		paintTool.selectDrawing( drawing );
+		paintTool.selectDrawing(item[item.id]);
 		return;
 	}
 
@@ -2021,39 +2002,24 @@ function editDrawingAtCoordinate(x,y) {
 	// console.log(tileId);
 	if(tileId != 0) {
 		on_paint_tile_ui_update(); // really wasteful probably
-		var drawing = new DrawingId( TileType.Tile, tileId );
-		paintTool.selectDrawing( drawing );
+		paintTool.selectDrawing(tile[tileId]);
 		return;
 	}
 }
 
 var animationThumbnailRenderer = new ThumbnailRenderer();
-function renderAnimationThumbnail(imgId,id,frameIndex) {
-	var drawingId = new DrawingId(drawing.type,id); // HACK!!! - need consistency on how type + id should be coupled
-	animationThumbnailRenderer.Render(imgId,drawingId,frameIndex);
+function renderAnimationThumbnail(imgId, drawing, frameIndex) {
+	animationThumbnailRenderer.Render(imgId, drawing, frameIndex);
 }
 
-function renderAnimationPreview(id) {
-	// console.log("RENDRE ANIM PREVIW");
-	renderAnimationThumbnail( "animationThumbnailPreview", id );
-	renderAnimationThumbnail( "animationThumbnailFrame1", id, 0 );
-	renderAnimationThumbnail( "animationThumbnailFrame2", id, 1 );
+function renderAnimationPreview(drawing) {
+	renderAnimationThumbnail("animationThumbnailPreview", drawing);
+	renderAnimationThumbnail("animationThumbnailFrame1", drawing, 0);
+	renderAnimationThumbnail("animationThumbnailFrame2", drawing, 1);
 }
 
-function selectPaint() {
-	drawing.id = this.value;
-	if( drawing.type === TileType.Tile ) {
-		tileIndex = sortedTileIdList().indexOf( drawing.id );
-		paintTool.reloadDrawing();
-	}
-	else if( drawing.type === TileType.Item ) {
-		itemIndex = sortedItemIdList().indexOf( drawing.id );
-		paintTool.reloadDrawing();
-	}
-	else {
-		spriteIndex = sortedSpriteIdList().indexOf( drawing.id );
-		paintTool.reloadDrawing();
-	}
+function renderPaintThumbnail(drawing) {
+	renderAnimationThumbnail("animationThumbnailPreview", drawing);
 }
 
 function getCurPaintModeStr() {
@@ -2089,53 +2055,28 @@ function on_game_data_change_core() {
 	clearGameData();
 	var version = parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
 
-	var curPaintMode = drawing.type; //save current paint mode (hacky)
+	var curPaintMode = TileType.Avatar;
+
+	if (drawing) {
+		curPaintMode = drawing.type;
+	}
 
 	//fallback if there are no tiles, sprites, map
 	// TODO : switch to using stored default file data (requires separated parser / game data code)
 	if (Object.keys(sprite).length == 0) {
-		drawing.type = TileType.Avatar;
-		drawing.id = "A";
-		makeSprite(drawing.id);
+		makeSprite("A");
 		sprite["A"].room = null;
 		sprite["A"].x = -1;
 		sprite["A"].y = -1;
 	}
 	if (Object.keys(tile).length == 0) {
-		drawing.type = TileType.Tile;
-		drawing.id = "a";
-		makeTile(drawing.id);
+		makeTile("a");
 	}
-	// if (Object.keys(room).length == 0) {
-	// 	room["0"] = {
-	// 		id : "0",
-	// 		tilemap : [
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-	// 				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"]
-	// 			],
-	// 		walls : [],
-	// 		exits : [],
-	// 		pal : "0"
-	// 	};
-	// }
+	if (Object.keys(room).length == 0) {
+		// TODO : ?
+	}
 	if (Object.keys(item).length == 0) {
-		drawing.type = TileType.Item;
-		drawing.id = "0";
-		makeItem( drawing.id );
+		makeItem("0");
 	}
 
 	// TODO RENDERER : refresh images
@@ -2143,19 +2084,19 @@ function on_game_data_change_core() {
 	roomIndex = 0;
 	roomTool.drawEditMap();
 
-	drawing.type = curPaintMode;
-	if (drawing.type == TileType.Tile) {
-		drawing.id = sortedTileIdList()[0];
+	if (curPaintMode === TileType.Tile) {
+		drawing = tile[sortedTileIdList()[0]];
 	}
-	else if (drawing.type === TileType.Item) {
-		drawing.id = sortedItemIdList()[0];
+	else if (curPaintMode === TileType.Item) {
+		drawing = item[sortedItemIdList()[0]];
 	}
-	else if (drawing.type === TileType.Avatar) {
-		drawing.id = "A";
+	else if (curPaintMode === TileType.Avatar) {
+		drawing = sprite["A"];
 	}
-	else if (drawing.type === TileType.Sprite) {
-		drawing.id = sortedSpriteIdList().filter(function (id) { return id != "A"; })[0];
+	else if (curPaintMode === TileType.Sprite) {
+		drawing = sprite[sortedSpriteIdList().filter(function (id) { return id != "A"; })[0]];
 	}
+
 	paintTool.reloadDrawing();
 
 	// if user pasted in a custom font into game data - update the stored custom font
@@ -2769,6 +2710,11 @@ function importGameFromFile(e) {
 		// change game data & reload everything
 		document.getElementById("game_data").value = gameDataStr;
 		on_game_data_change();
+
+		// reset find tool (a bit heavy handed?)
+		findTool = new FindTool({
+			mainElement : document.getElementById("findPanelMain"),
+		});
 	}
 }
 
@@ -2821,14 +2767,14 @@ function on_toggle_animated() {
 		document.getElementById("animation").setAttribute("style","display:block;");
 		iconUtils.LoadIcon(document.getElementById("animatedCheckboxIcon"), "expand_more");
 		console.log(drawing.id);
-		renderAnimationPreview( drawing.id );
+		renderAnimationPreview(drawing);
 	}
 	else {
 		if ( drawing.type === TileType.Sprite || drawing.type === TileType.Avatar ) {
 			removeSpriteAnimation();
 		}
 		else if ( drawing.type === TileType.Tile ) {
-			removeTileAnimation();			
+			removeTileAnimation();
 		}
 		else if ( drawing.type === TileType.Item ) {
 			console.log("REMOVE ITEM ANIMATION");
@@ -2837,7 +2783,6 @@ function on_toggle_animated() {
 		document.getElementById("animation").setAttribute("style","display:none;");
 		iconUtils.LoadIcon(document.getElementById("animatedCheckboxIcon"), "expand_less");
 	}
-	renderPaintThumbnail( drawing.id );
 }
 
 function addSpriteAnimation() {
@@ -3565,3 +3510,29 @@ var iconUtils = new IconUtils(); // TODO : move?
 
 /* NEW FIND TOOL */
 var findTool = null;
+
+function openFindTool(categoryId, insertNextToId) {
+	if (findTool) {
+		findTool.SelectCategory(categoryId);
+	}
+
+	showPanel("findPanel", insertNextToId);
+}
+
+function openFindToolWithCurrentPaintCategory() {
+	var categoryId = "avatar";
+
+	if (drawing) {
+		if (drawing.type === TileType.Tile) {
+			categoryId = "tile";
+		}
+		else if (drawing.type === TileType.Sprite) {
+			categoryId = "sprite";
+		}
+		else if (drawing.type === TileType.Item) {
+			categoryId = "item";
+		}
+	}
+
+	openFindTool(categoryId, "paintPanel");
+}

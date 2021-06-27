@@ -1,3 +1,4 @@
+// todo : deprecate this old version of the thumbnail renderer
 function ThumbnailRenderer() {
 	console.log("NEW THUMB RENDERER");
 
@@ -10,7 +11,32 @@ function ThumbnailRenderer() {
 	var thumbnailRenderEncoders = {};
 	var cache = {};
 
-	function render(imgId,drawingId,frameIndex,imgElement) {
+	function thumbnailGetImage(drawing, palId, frameIndex) {
+		if(drawing.type === TileType.Sprite || drawing.type === TileType.Avatar) {
+			return getSpriteImage(sprite[drawing.id],palId,frameIndex);
+		}
+		else if(drawing.type === TileType.Item) {
+			return getItemImage(item[drawing.id],palId,frameIndex);
+		}
+		else if(drawing.type === TileType.Tile) {
+			return getTileImage(tile[drawing.id],palId,frameIndex);
+		}
+		return null;
+	}
+
+	function thumbnailDraw(drawing, context, x, y, palId, frameIndex) {
+		if(drawing.type === TileType.Sprite || drawing.type === TileType.Avatar) {
+			return drawSprite(thumbnailGetImage(drawing,palId,frameIndex),x,y,context);
+		}
+		else if(drawing.type === TileType.Item) {
+			return drawItem(thumbnailGetImage(drawing,palId,frameIndex),x,y,context);
+		}
+		else if(drawing.type === TileType.Tile) {
+			return drawTile(thumbnailGetImage(drawing,palId,frameIndex),x,y,context);
+		}
+	}
+
+	function render(imgId,drawing,frameIndex,imgElement) {
 		var isAnimated = (frameIndex === undefined || frameIndex === null) ? true : false;
 
 		var palId = getRoomPal(curRoom); // TODO : should NOT be hardcoded like this
@@ -27,11 +53,11 @@ function ThumbnailRenderer() {
 		var drawingFrameData = [];
 
 		if( isAnimated || frameIndex == 0 ) {
-			drawingId.draw( drawingThumbnailCtx, 0, 0, palId, 0 /*frameIndex*/ );
+			thumbnailDraw(drawing, drawingThumbnailCtx, 0, 0, palId, 0 /*frameIndex*/);
 			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 		}
 		if( isAnimated || frameIndex == 1 ) {
-			drawingId.draw( drawingThumbnailCtx, 0, 0, palId, 1 /*frameIndex*/ );
+			thumbnailDraw(drawing, drawingThumbnailCtx, 0, 0, palId, 1 /*frameIndex*/);
 			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 		}
 
@@ -57,8 +83,8 @@ function ThumbnailRenderer() {
 		}
 		encoder.encode( gifData, createThumbnailRenderCallback(imgElement) );
 	}
-	this.Render = function(imgId,drawingId,frameIndex,imgElement) {
-		render(imgId,drawingId,frameIndex,imgElement);
+	this.Render = function(imgId,drawing,frameIndex,imgElement) {
+		render(imgId,drawing,frameIndex,imgElement);
 	};
 
 	function createThumbnailRenderCallback(img) {

@@ -1,3 +1,9 @@
+v7.5:
+- add find tool shortcut to room, color, & dialog tools
+- bugfix: stop adding extra spaces between code and text
+- bugfix: thumbnails weren't generating after new game or import game
+- refactor to share drawing data code between editor and engine
+
 v7.4:
 - new find tool!
 - @seansleblanc: improved stability of persistent data storage

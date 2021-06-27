@@ -190,4 +190,8 @@ this.AttachContext = function(ctx) {
 	context = ctx;
 }
 
+this.ClearCache = function() {
+	imageStore.render = {};
+}
+
 } // Renderer()
