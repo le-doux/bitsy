@@ -191,8 +191,8 @@ function PaintTool(canvas, roomTool) {
 		}
 	}
 
-	this.selectDrawing = function(drawing) {
-		drawing = drawing; // todo : will this work?
+	this.selectDrawing = function(drawingData) {
+		drawing = drawingData; // ok this global variable is weird imo
 		self.reloadDrawing();
 		self.updateCanvas();
 	}
