@@ -1624,88 +1624,67 @@ function parsePalette(lines,i) { //todo this has to go first right now :(
 
 function parseTile(lines, i) {
 	var id = getId(lines[i]);
-	var drwId = null;
-	var name = null;
+	var tileData = createDrawingData("TIL", id);
 
 	i++;
 
-	if (getType(lines[i]) === "DRW") { //load existing drawing
-		drwId = getId(lines[i]);
-		i++;
-	}
-	else {
-		// store tile source
-		drwId = "TIL_" + id;
-		i = parseDrawingCore( lines, i, drwId );
-	}
+	// read & store tile image source
+	i = parseDrawingCore(lines, i, tileData.drw);
 
-	//other properties
-	var colorIndex = 1; // default palette color index is 1
-	var isWall = null; // null indicates it can vary from room to room (original version)
-	while (i < lines.length && lines[i].length > 0) { //look for empty line
+	// update animation info
+	tileData.animation.frameCount = renderer.GetFrameCount(tileData.drw);
+	tileData.animation.isAnimated = tileData.animation.frameCount > 1;
+
+	// read other properties
+	while (i < lines.length && lines[i].length > 0) { // look for empty line
 		if (getType(lines[i]) === "COL") {
-			colorIndex = parseInt( getId(lines[i]) );
+			tileData.col = parseInt(getId(lines[i]));
 		}
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
-			name = lines[i].split(/\s(.+)/)[1];
-			names.tile.set( name, id );
+			tileData.name = lines[i].split(/\s(.+)/)[1];
+			names.tile.set(tileData.name, id);
 		}
 		else if (getType(lines[i]) === "WAL") {
-			var wallArg = getArg( lines[i], 1 );
-			if( wallArg === "true" ) {
-				isWall = true;
+			var wallArg = getArg(lines[i], 1);
+			if (wallArg === "true") {
+				tileData.isWall = true;
 			}
-			else if( wallArg === "false" ) {
-				isWall = false;
+			else if (wallArg === "false") {
+				tileData.isWall = false;
 			}
 		}
+
 		i++;
 	}
 
-	//tile data
-	tile[id] = {
-		id : id,
-		type : "TIL",
-		drw : drwId, //drawing id
-		col : colorIndex,
-		animation : {
-			isAnimated : (renderer.GetFrameCount(drwId) > 1),
-			frameIndex : 0,
-			frameCount : renderer.GetFrameCount(drwId)
-		},
-		name : name,
-		isWall : isWall
-	};
+	// store tile data
+	tile[id] = tileData;
 
 	return i;
 }
 
 function parseSprite(lines, i) {
 	var id = getId(lines[i]);
-	var drwId = null;
-	var name = null;
+	var type = (id === "A") ? "AVA" : "SPR";
+	var spriteData = createDrawingData(type, id);
+
+	console.log(spriteData);
 
 	i++;
 
-	if (getType(lines[i]) === "DRW") { //load existing drawing
-		drwId = getId(lines[i]);
-		i++;
-	}
-	else {
-		// store sprite source
-		drwId = "SPR_" + id;
-		i = parseDrawingCore( lines, i, drwId );
-	}
+	// read & store sprite image source
+	i = parseDrawingCore(lines, i, spriteData.drw);
 
-	//other properties
-	var colorIndex = 2; //default palette color index is 2
-	var dialogId = null;
-	var startingInventory = {};
-	while (i < lines.length && lines[i].length > 0) { //look for empty line
+	// update animation info
+	spriteData.animation.frameCount = renderer.GetFrameCount(spriteData.drw);
+	spriteData.animation.isAnimated = spriteData.animation.frameCount > 1;
+
+	// read other properties
+	while (i < lines.length && lines[i].length > 0) { // look for empty line
 		if (getType(lines[i]) === "COL") {
 			/* COLOR OFFSET INDEX */
-			colorIndex = parseInt( getId(lines[i]) );
+			spriteData.col = parseInt(getId(lines[i]));
 		}
 		else if (getType(lines[i]) === "POS") {
 			/* STARTING POSITION */
@@ -1719,110 +1698,62 @@ function parseSprite(lines, i) {
 			};
 		}
 		else if(getType(lines[i]) === "DLG") {
-			dialogId = getId(lines[i]);
+			spriteData.dlg = getId(lines[i]);
 		}
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
-			name = lines[i].split(/\s(.+)/)[1];
-			names.sprite.set( name, id );
+			spriteData.name = lines[i].split(/\s(.+)/)[1];
+			names.sprite.set(spriteData.name, id);
 		}
 		else if (getType(lines[i]) === "ITM") {
 			/* ITEM STARTING INVENTORY */
 			var itemId = getId(lines[i]);
-			var itemCount = parseFloat( getArg(lines[i], 2) );
-			startingInventory[itemId] = itemCount;
+			var itemCount = parseFloat(getArg(lines[i], 2));
+			spriteData.inventory[itemId] = itemCount;
 		}
+
 		i++;
 	}
 
-	//sprite data
-	sprite[id] = {
-		id : id,
-		type : (id === "A") ? "AVA" : "SPR",
-		drw : drwId, //drawing id
-		col : colorIndex,
-		dlg : dialogId,
-		room : null, //default location is "offstage"
-		x : -1,
-		y : -1,
-		animation : {
-			isAnimated : (renderer.GetFrameCount(drwId) > 1),
-			frameIndex : 0,
-			frameCount : renderer.GetFrameCount(drwId)
-		},
-		inventory : startingInventory,
-		name : name
-	};
+	// store sprite data
+	sprite[id] = spriteData;
+
 	return i;
 }
 
 function parseItem(lines, i) {
 	var id = getId(lines[i]);
-	var drwId = null;
-	var name = null;
+	var itemData = createDrawingData("ITM", id);
 
 	i++;
 
-	if (getType(lines[i]) === "DRW") { //load existing drawing
-		drwId = getId(lines[i]);
-		i++;
-	}
-	else {
-		// store item source
-		drwId = "ITM_" + id; // these prefixes are maybe a terrible way to differentiate drawing tyepes :/
-		i = parseDrawingCore( lines, i, drwId );
-	}
+	// read & store item image source
+	i = parseDrawingCore(lines, i, itemData.drw);
 
-	//other properties
-	var colorIndex = 2; //default palette color index is 2
-	var dialogId = null;
-	while (i < lines.length && lines[i].length > 0) { //look for empty line
+	// update animation info
+	itemData.animation.frameCount = renderer.GetFrameCount(itemData.drw);
+	itemData.animation.isAnimated = itemData.animation.frameCount > 1;
+
+	// read other properties
+	while (i < lines.length && lines[i].length > 0) { // look for empty line
 		if (getType(lines[i]) === "COL") {
 			/* COLOR OFFSET INDEX */
-			colorIndex = parseInt( getArg( lines[i], 1 ) );
+			itemData.col = parseInt(getArg(lines[i], 1));
 		}
-		// else if (getType(lines[i]) === "POS") {
-		// 	/* STARTING POSITION */
-		// 	var posArgs = lines[i].split(" ");
-		// 	var roomId = posArgs[1];
-		// 	var coordArgs = posArgs[2].split(",");
-		// 	spriteStartLocations[id] = {
-		// 		room : roomId,
-		// 		x : parseInt(coordArgs[0]),
-		// 		y : parseInt(coordArgs[1])
-		// 	};
-		// }
-		else if(getType(lines[i]) === "DLG") {
-			dialogId = getId(lines[i]);
+		else if (getType(lines[i]) === "DLG") {
+			itemData.dlg = getId(lines[i]);
 		}
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
-			name = lines[i].split(/\s(.+)/)[1];
-			names.item.set( name, id );
+			itemData.name = lines[i].split(/\s(.+)/)[1];
+			names.item.set(itemData.name, id);
 		}
+
 		i++;
 	}
 
-	//item data
-	item[id] = {
-		id : id,
-		type : "ITM",
-		drw : drwId, //drawing id
-		col : colorIndex,
-		dlg : dialogId,
-		// room : null, //default location is "offstage"
-		// x : -1,
-		// y : -1,
-		animation : {
-			isAnimated : (renderer.GetFrameCount(drwId) > 1),
-			frameIndex : 0,
-			frameCount : renderer.GetFrameCount(drwId)
-		},
-		name : name
-	};
-
-	// console.log("ITM " + id);
-	// console.log(item[id]);
+	// store item data
+	item[id] = itemData;
 
 	return i;
 }
@@ -1863,6 +1794,45 @@ function parseDrawingCore(lines, i, drwId) {
 	renderer.SetImageSource(drwId, frameList);
 
 	return i;
+}
+
+// creates a drawing data structure with default property values for the type
+function createDrawingData(type, id) {
+	// the avatar's drawing id still uses the sprite prefix (for back compat)
+	var drwId = (type === "AVA" ? "SPR" : type) + "_" + id;
+
+	var drawingData = {
+		type : type,
+		id : id,
+		name : null,
+		drw : drwId,
+		col : (type === "TIL") ? 1 : 2,
+		animation : {
+			isAnimated : false,
+			frameIndex : 0,
+			frameCount : 1,
+		},
+	};
+
+	// add type specific properties
+	if (type === "TIL") {
+		// default null value indicates it can vary from room to room (original version)
+		drawingData.isWall = null;
+	}
+
+	if (type === "AVA" || type === "SPR") {
+		// default sprite location is "offstage"
+		drawingData.room = null;
+		drawingData.x = -1;
+		drawingData.y = -1;
+		drawingData.inventory = {};
+	}
+
+	if (type === "AVA" || type === "SPR" || type === "ITM") {
+		drawingData.dlg = null;
+	}
+
+	return drawingData;
 }
 
 function parseScript(lines, i, backCompatPrefix, compatibilityFlags) {
