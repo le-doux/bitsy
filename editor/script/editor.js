@@ -586,6 +586,11 @@ function resetGameData() {
 	roomTool.drawEditMap();
 
 	events.Raise("game_data_change"); // TODO -- does this need to have a specific reset event or flag?
+
+	// reset find tool (a bit heavy handed?)
+	findTool = new FindTool({
+		mainElement : document.getElementById("findPanelMain"),
+	});
 }
 
 function refreshGameData() {
@@ -2705,6 +2710,11 @@ function importGameFromFile(e) {
 		// change game data & reload everything
 		document.getElementById("game_data").value = gameDataStr;
 		on_game_data_change();
+
+		// reset find tool (a bit heavy handed?)
+		findTool = new FindTool({
+			mainElement : document.getElementById("findPanelMain"),
+		});
 	}
 }
 

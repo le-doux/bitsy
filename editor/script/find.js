@@ -1,4 +1,6 @@
 function FindTool(options) {
+	options.mainElement.innerHTML = "";
+
 	var spriteThumbnailRenderer = createSpriteThumbnailRenderer();
 	var tileThumbnailRenderer = createTileThumbnailRenderer();
 	var itemThumbnailRenderer = createItemThumbnailRenderer();
