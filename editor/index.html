@@ -308,6 +308,12 @@
 							<button title="delete room" class="color0" onclick="deleteRoom();">
 								<span class="bitsy_icon">delete</span>
 							</button>
+
+							<span class="spacer"></span>
+
+							<button title="open find tool: rooms" onclick="openFindTool('room', 'roomPanel');">
+								<span class="bitsy_icon">search</span>
+							</button>
 						</div>
 
 						<canvas id="game"></canvas>
@@ -667,7 +673,7 @@
 
 							<span class="spacer"></span>
 
-							<button title="find drawing: browse list of all drawings" class="color0" onclick="showPanel('findPanel', 'paintPanel');">
+							<button title="open find tool: drawings" onclick="openFindToolWithCurrentPaintCategory();">
 								<span class="bitsy_icon">search</span>
 							</button>
 						</div>
@@ -787,6 +793,12 @@
 							<button title="delete palette" class="color0" onclick="deletePalette();">
 								<span class="bitsy_icon">delete</span>
 							</button>
+
+							<span class="spacer"></span>
+
+							<button title="open find tool: colors" onclick="openFindTool('colors', 'colorsPanel');">
+								<span class="bitsy_icon">search</span>
+							</button>
 						</div>
 
 						<form id="colorPaletteForm">
@@ -865,6 +877,12 @@
 								</button>
 								<button id="deleteDialogButton" title="delete dialog" class="color0" onclick="deleteDialog();">
 									<span class="bitsy_icon">delete</span>
+								</button>
+
+								<span class="spacer"></span>
+
+								<button title="open find tool: dialog" onclick="openFindTool('dialog', 'dialogPanel');">
+									<span class="bitsy_icon">search</span>
 								</button>
 							</div>
 

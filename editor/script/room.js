@@ -2,21 +2,8 @@
 	ROOM
 */
 
-/*
-TODO:
-drawingId -> drawingId.id
-paintMode -> drawingId.type
-
-what other methods do I need to move into this class? exit stuff??
-- exits
-- endings
-- items
-- etc.
-*/
 function RoomTool(canvas) {
 	var self = this; // feels a bit hacky
-
-	this.drawing = new DrawingId( TileType.Avatar, "A" );
 
 	// edit flags
 	var isDragAddingTiles = false;
@@ -75,15 +62,15 @@ function RoomTool(canvas) {
 			}
 		}
 
-		if (!isEditingMarker && self.drawing.id != null) {
+		if (!isEditingMarker && drawing.id != null) {
 			//add tiles/sprites to map
-			if (self.drawing.type == TileType.Tile) {
+			if (drawing.type == TileType.Tile) {
 				if ( room[curRoom].tilemap[y][x] === "0" ) {
 					console.log("ADD");
 					//add
 					//row = row.substr(0, x) + drawingId + row.substr(x+1);
 					console.log( room[curRoom].tilemap );
-					room[curRoom].tilemap[y][x] = self.drawing.id;
+					room[curRoom].tilemap[y][x] = drawing.id;
 					isDragAddingTiles = true;
 				}
 				else {
@@ -94,11 +81,11 @@ function RoomTool(canvas) {
 				}
 				//room[curRoom].tilemap[y] = row;
 			}
-			else if( self.drawing.type == TileType.Avatar || self.drawing.type == TileType.Sprite ) {
+			else if( drawing.type == TileType.Avatar || drawing.type == TileType.Sprite ) {
 				var otherSprite = getSpriteAt(x,y);
-				var isThisSpriteAlreadyHere = sprite[self.drawing.id].room === curRoom &&
-											sprite[self.drawing.id].x === x &&
-											sprite[self.drawing.id].y === y;
+				var isThisSpriteAlreadyHere = sprite[drawing.id].room === curRoom &&
+											sprite[drawing.id].x === x &&
+											sprite[drawing.id].y === y;
 
 				if (otherSprite) {
 					//remove other sprite from map
@@ -109,30 +96,30 @@ function RoomTool(canvas) {
 
 				if (!isThisSpriteAlreadyHere) {
 					//add sprite to map
-					sprite[self.drawing.id].room = curRoom;
-					sprite[self.drawing.id].x = x;
-					sprite[self.drawing.id].y = y;
+					sprite[drawing.id].room = curRoom;
+					sprite[drawing.id].x = x;
+					sprite[drawing.id].y = y;
 					//row = row.substr(0, x) + "0" + row.substr(x+1); //is this necessary? no
 				}
 				else {
 					//remove sprite from map
-					sprite[self.drawing.id].room = null;
-					sprite[self.drawing.id].x = -1;
-					sprite[self.drawing.id].y = -1;
+					sprite[drawing.id].room = null;
+					sprite[drawing.id].x = -1;
+					sprite[drawing.id].y = -1;
 				}
 			}
-			else if(self.drawing.type == TileType.Item ) {
+			else if(drawing.type == TileType.Item ) {
 				// TODO : is this the final behavior I want?
 
 				var otherItem = getItem(curRoom,x,y);
-				var isThisItemAlreadyHere = otherItem != null && otherItem.id === self.drawing.id;
+				var isThisItemAlreadyHere = otherItem != null && otherItem.id === drawing.id;
 
 				if(otherItem) {
 					getRoom().items.splice( getRoom().items.indexOf(otherItem), 1 );
 				}
 
 				if(!isThisItemAlreadyHere) {
-					getRoom().items.push( {id:self.drawing.id, x:x, y:y} );
+					getRoom().items.push( {id:drawing.id, x:x, y:y} );
 				}
 			}
 			refreshGameData();
@@ -179,10 +166,10 @@ function RoomTool(canvas) {
 		var y = clamp(Math.floor(off.y / (tilesize*scale)), 0, mapsize - 1);
 		// var row = room[curRoom].tilemap[y];
 		if (isDragAddingTiles) {
-			if ( room[curRoom].tilemap[y][x] != self.drawing.id ) {
+			if ( room[curRoom].tilemap[y][x] != drawing.id ) {
 				// row = row.substr(0, x) + drawingId + row.substr(x+1);
 				// room[curRoom].tilemap[y] = row;
-				room[curRoom].tilemap[y][x] = self.drawing.id;
+				room[curRoom].tilemap[y][x] = drawing.id;
 				refreshGameData();
 				self.drawEditMap();
 			}
