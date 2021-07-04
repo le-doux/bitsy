@@ -416,7 +416,7 @@ input[type=checkbox] + label:hover {
 
 #topbar {
 	width: 100%;
-	background: white;
+	background: var(--bitsy-color-main-1);
 	padding: var(--bitsy-space-m);
 	padding-left: var(--bitsy-space-l);
 	padding-right: var(--bitsy-space-l);
