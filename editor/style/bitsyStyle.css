@@ -89,7 +89,17 @@ textarea {
 	font-size: 100%;
 }
 
+/* form */
+.bitsy-menu-group form {
+	display: flex;
+	flex-grow: 1;
+}
+
 /* input */
+input {
+	font-family: monospace;
+}
+
 input:checked + label {
 	background: var(--bitsy-color-main-2);
 	color: var(--bitsy-color-main-1);
@@ -180,11 +190,28 @@ input[type=checkbox] + label:hover {
 	fill: currentColor;
 }
 
+.icon_anim_frame0 {
+	display: none;
+}
+
+.bitsy_icon_anim.icon_anim0 .icon_anim_frame0 {
+	display: inherit;
+}
+
+.icon_anim_frame1 {
+	display: none;
+}
+
+.bitsy_icon_anim.icon_anim1 .icon_anim_frame1 {
+	display: inherit;
+}
+
 /* cards */
 .bitsy-card {
 	background: var(--bitsy-color-main-1);
 	margin: var(--bitsy-space-m);
 	margin-right: 0;
+	margin-top: 0;
 	display: inline-flex;
 	flex-direction: column;
 	/*max-height: 100%;*/
@@ -228,6 +255,16 @@ input[type=checkbox] + label:hover {
 	flex-grow: 1;
 	margin-left: var(--bitsy-space-m);
 	user-select: none;
+}
+
+.panelShadow { /* TODO : rename */
+	display: inline-block;
+	vertical-align: top;
+	border-radius: var(--bitsy-space-s);
+	margin: var(--bitsy-space-m);
+	margin-top: 0;
+	margin-right: 0;
+	background: var(--bitsy-color-main-2);
 }
 
 /* nav control */
@@ -318,9 +355,83 @@ input[type=checkbox] + label:hover {
 	white-space: nowrap;
 }
 
+/* app root container */
+/* TODO : can this be removed? */
+#appRoot {
+	display: flex;
+	flex-flow: column;
+	height: 100%;
+}
+
 /* main menu */
+/* TODO
+ - share more with other styles?
+ - turn IDs into classes?
+*/
 #topbar {
 	border-bottom: solid var(--bitsy-space-xs) var(--bitsy-color-main-2);
+}
+
+#topbar {
+	width: 100%;
+	background: white;
+	padding: var(--bitsy-space-m);
+	padding-left: var(--bitsy-space-l);
+	padding-right: var(--bitsy-space-l);
+	box-sizing: border-box;
+	flex: 0 1 auto;
+	align-items: center;
+}
+
+#topbarFlexContainer {
+	width: 100%;
+	display: flex;
+	flex-flow: row;
+	overflow: hidden;
+}
+
+#logoFlexItem {
+	flex: 1 0 auto;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+#titleFlexItem {
+	flex: 1 100%;
+	padding-left: var(--bitsy-space-m);
+	padding-right: var(--bitsy-space-m);
+}
+
+#toolsCheckFlexItem {
+	flex: 1 0 auto;
+}
+
+#bitsyLogoTitle {
+	font-size: 150%;
+}
+
+#toolsPanel { /* TODO : rename */
+	padding-top: var(--bitsy-space-m);
+	display: none;
+}
+
+/* workbench */
+/* TODO 
+  - rename stuff to be more consistent
+*/
+#editorWindow {
+	width: 100%;
+	overflow: scroll;
+	-webkit-overflow-scrolling: touch;
+	box-sizing: border-box;
+	flex: 1 1 auto;
+}
+
+#editorContent {
+	height: 100%;
+	white-space: nowrap;
+	display: inline-block;
+	padding: var(--bitsy-space-m);
 }
 
 /* control box */
@@ -336,6 +447,11 @@ input[type=checkbox] + label:hover {
 
 .controlBox button {
 	background: var(--bitsy-color-accent-2);
+}
+
+.controlBox .cancelButton {
+	background: var(--bitsy-color-main-2);
+	color: var(--bitsy-color-main-1);
 }
 
 .controlBox input + label {
@@ -377,4 +493,58 @@ input[type=checkbox] + label:hover {
 
 #settingsInner .controlBox {
 	display: block;
+}
+
+#paintModeRadio {
+	display: flex;
+}
+
+#paint {
+	width: var(--bitsy-size-s); /* should be roughly 256px */
+
+	/* keep this centered in div */
+	padding-left: 0;
+	padding-right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+}
+
+#gifPlaceholder {
+	background: var(--bitsy-color-neutral-1);
+	width: calc(var(--bitsy-size-s) * 1.25); /* this is a little bespoke */
+	height: calc(var(--bitsy-size-s) * 1.25);
+	display: block;
+}
+
+#gifPreview {
+	width: calc(var(--bitsy-size-s) * 1.25);
+}
+
+#gifRecordingText {
+	color: red; /* TODO : putin a variable? currently not used elsewhere... */
+}
+
+#gifEncodingText {
+	color: green;
+}
+
+/* TODO : create a shared textarea style? */
+#game_data {
+	width: calc(100% - var(--bitsy-space-m));
+	height: var(--bitsy-size-m);
+	margin-bottom: var(--bitsy-space-m);
+	resize: none; /* TODO : turn back on? */
+}
+
+#settingsInner {
+	white-space: normal;
+}
+
+#aboutPanel {
+	white-space: normal;
+}
+
+#aboutInner {
+	font-size: 80%; /* TODO : keep this? */
 }

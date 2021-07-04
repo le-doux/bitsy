@@ -7,7 +7,7 @@
 
 		<!-- STYLES -->
 		<link rel="stylesheet" type="text/css" href="style/bitsyStyle.css">
-		<link rel="stylesheet" type="text/css" href="style/editorStyle.css">
+		<!-- <link rel="stylesheet" type="text/css" href="style/editorStyle.css"> -->
 		<!-- <link rel="stylesheet" type="text/css" href="style/editorButtons.css"> -->
 		<!-- <link rel="stylesheet" type="text/css" href="style/editorColors.css"> -->
 		<!-- <link rel="stylesheet" type="text/css" href="style/editorLanguageStyles.css"> -->
@@ -218,7 +218,7 @@
 					</div>
 				</div>
 
-				<div id="aboutPanel" class="bitsy-card bitsy-workbench-item">
+				<div id="aboutPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">about</span>
 
@@ -920,7 +920,7 @@
 					</div>
 				</div>
 
-				<div id="inventoryPanel" class="bitsy-card bitsy-workbench-item">
+				<div id="inventoryPanel" class="bitsy-card bitsy-card-s bitsy-workbench-item">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">item</span>
 
@@ -935,24 +935,26 @@
 
 					<div class="bitsy-card-main">
 						<!-- TODO -->
-						<form>
-							<input type="radio" name="inventory mode" value="item" onclick="showInventoryItem();" id="inventoryOptionItem" checked>
-							<label title="items: set count of items the player starts with" for="inventoryOptionItem" class="left">
-								<span class="bitsy_icon">item</span>
-								<span class="localize items_label">items</span>
-							</label>
-							<input type="radio" name="inventory mode" value="variable" onclick="showInventoryVariable()" id="inventoryOptionVariable">
-							<label title="variables: set initial values of variables" for="inventoryOptionVariable" class="right">
-								<!-- TODO : bitsy_icon -- does this need its own special icon? -->
-								<span class="bitsy_icon">code_edit</span>
-								<span class="localize variables_label">variables</span>
-							</label>
-						</form>
-
-						<div id="inventoryItem" class="inventoryViewport">
+						<div class="bitsy-menu-group">
+							<form>
+								<input type="radio" name="inventory mode" value="item" onclick="showInventoryItem();" id="inventoryOptionItem" checked>
+								<label title="items: set count of items the player starts with" for="inventoryOptionItem" class="left">
+									<span class="bitsy_icon">item</span>
+									<span class="localize items_label">items</span>
+								</label>
+								<input type="radio" name="inventory mode" value="variable" onclick="showInventoryVariable()" id="inventoryOptionVariable">
+								<label title="variables: set initial values of variables" for="inventoryOptionVariable" class="right">
+									<!-- TODO : bitsy_icon -- does this need its own special icon? -->
+									<span class="bitsy_icon">code_edit</span>
+									<span class="localize variables_label">variables</span>
+								</label>
+							</form>
 						</div>
 
-						<div id="inventoryVariable" class="inventoryViewport" style="display:none;">
+						<div id="inventoryItem" class="bitsy-menu-scrollview">
+						</div>
+
+						<div id="inventoryVariable" class="bitsy-menu-scrollview" style="display:none;">
 						</div>
 					</div>
 				</div>
@@ -1061,7 +1063,7 @@
 					</div>
 				</div>
 
-				<div id="dataPanel" class="bitsy-card bitsy-workbench-item" style="display:none;">
+				<div id="dataPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item" style="display:none;">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">game_data</span>
 
@@ -1094,7 +1096,7 @@
 					</div>
 				</div>
 
-				<div id="settingsPanel" class="bitsy-card bitsy-workbench-item" style="display:none;">
+				<div id="settingsPanel" class="bitsy-card bitsy-card-s bitsy-workbench-item" style="display:none;">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">settings</span>
 
