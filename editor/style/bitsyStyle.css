@@ -40,7 +40,7 @@ html {
 	line-height: 100%;
 	width: 100%;
 	height: 100%;
-	background: var(--bitsy-color-main-1);
+	background: var(--bitsy-color-accent-2);
 	color: var(--bitsy-color-main-2);
 	overscroll-behavior: none;
 	scrollbar-color: var(--bitsy-color-main-2) var(--bitsy-color-accent-1);
@@ -87,6 +87,12 @@ label {
 textarea {
 	font-family: monospace;
 	font-size: 100%;
+}
+
+/* input */
+input:checked + label {
+	background: var(--bitsy-color-main-2);
+	color: var(--bitsy-color-main-1);
 }
 
 /* text input */
@@ -310,6 +316,34 @@ input[type=checkbox] + label:hover {
 .bitsy-thumbnail .bitsy-menu-label {
 	overflow: hidden;
 	white-space: nowrap;
+}
+
+/* main menu */
+#topbar {
+	border-bottom: solid var(--bitsy-space-xs) var(--bitsy-color-main-2);
+}
+
+/* control box */
+/* TODO : I think I want to deprecate this sometime soon */
+.controlBox {
+	padding: var(--bitsy-space-s);
+	margin: var(--bitsy-space-xs);
+	border-radius: var(--bitsy-space-s);
+	display: flex;
+	align-items: center;
+	background: var(--bitsy-color-accent-1);
+}
+
+.controlBox button {
+	background: var(--bitsy-color-accent-2);
+}
+
+.controlBox input + label {
+	background: var(--bitsy-color-accent-2);
+}
+
+.controlBox input:checked + label {
+	background: var(--bitsy-color-main-2);
 }
 
 /* SPECIAL CASES */

@@ -8,14 +8,14 @@
 		<!-- STYLES -->
 		<link rel="stylesheet" type="text/css" href="style/bitsyStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/editorStyle.css">
-		<link rel="stylesheet" type="text/css" href="style/editorButtons.css">
-		<link rel="stylesheet" type="text/css" href="style/editorColors.css">
-		<link rel="stylesheet" type="text/css" href="style/editorLanguageStyles.css">
-		<link rel="stylesheet" type="text/css" href="style/editorAnimations.css">
+		<!-- <link rel="stylesheet" type="text/css" href="style/editorButtons.css"> -->
+		<!-- <link rel="stylesheet" type="text/css" href="style/editorColors.css"> -->
+		<!-- <link rel="stylesheet" type="text/css" href="style/editorLanguageStyles.css"> -->
+		<!-- <link rel="stylesheet" type="text/css" href="style/editorAnimations.css"> -->
 		<link rel="stylesheet" type="text/css" href="style/colorPickerStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/markerToolStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/dialogToolStyle.css">
-		<link rel="stylesheet" type="text/css" href="style/iconStyle.css">
+		<!-- <link rel="stylesheet" type="text/css" href="style/iconStyle.css"> -->
 
 		<!-- GENERATED -->
 		<script src="script/generated/resources.js"></script>
@@ -199,14 +199,21 @@
 		<div id="editorWindow" onmousewheel="blockScrollBackpage(event);">
 			<div id="editorContent">
 
-				<div id="titlePanel" class="panel color0">
-					<div class="bar color0">
-						<div title="title window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">text_edit</span>
+				<div id="titlePanel" class="bitsy-card bitsy-card-s bitsy-workbench-item">
+					<div class="bitsy-card-titlebar">
+						<span class="bitsy_icon">text_edit</span>
+
+						<span class="bitsy-card-title" title="title window">
 							<span class="localize title_tool_title">title</span>
-						</div>
+						</span>
+
+						<!-- todo : remove? -->
+						<button title="minimize title window" onclick="hidePanel('titlePanel');">
+							<span class="bitsy_icon">close</span>
+						</button>
 					</div>
-					<div id="titlePanelInner">
+
+					<div id="titlePanelInner" class="bitsy-card-main">
 						<div class="titleWidgetContainer"></div>
 					</div>
 				</div>
