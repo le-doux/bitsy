@@ -1,0 +1,18 @@
+#gifPlaceholder {
+	background: var(--bitsy-color-neutral-1);
+	width: calc(var(--bitsy-size-s) * 1.25); /* this is a little bespoke */
+	height: calc(var(--bitsy-size-s) * 1.25);
+	display: block;
+}
+
+#gifPreview {
+	width: calc(var(--bitsy-size-s) * 1.25);
+}
+
+#gifRecordingText {
+	color: red; /* TODO : putin a variable? currently not used elsewhere... */
+}
+
+#gifEncodingText {
+	color: green;
+}

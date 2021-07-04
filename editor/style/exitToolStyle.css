@@ -85,3 +85,28 @@
 #exitOptionsRadio label {
 	flex: 1; font-size: 100%;
 }
+
+/* NEW STYLE FIXES */
+#markersSelect {
+	margin-bottom: var(--bitsy-space-s);
+}
+
+#markersSelect .controlBox {
+	align-items: start;
+}
+
+#endingOptions .controlBox {
+	display: block;
+}
+
+#exitOptions .controlBox {
+	display: block;
+}
+
+#returnExitOptions .controlBox {
+	display: block;
+}
+
+#addMarkerOptions button {
+	width: 100%;
+}

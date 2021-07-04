@@ -558,3 +558,8 @@
 .inlineEditButtonHolder button {
 	padding: 0px;
 }
+
+/* NEW STYLE FIXES */
+#dialog .controlBox {
+	display: block;
+}

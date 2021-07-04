@@ -1,0 +1,14 @@
+#paintModeRadio {
+	display: flex;
+}
+
+#paint {
+	width: var(--bitsy-size-s); /* should be roughly 256px */
+
+	/* keep this centered in div */
+	padding-left: 0;
+	padding-right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+}
