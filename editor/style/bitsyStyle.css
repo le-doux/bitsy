@@ -505,10 +505,6 @@ input[type=checkbox] + label:hover {
 }
 
 /* language styles */
-#editorWindow {
-	direction: ltr;
-}
-
 .lang_ar {
 	direction: rtl;
 }
@@ -536,7 +532,12 @@ input[type=checkbox] + label:hover {
 	unicode-bidi: bidi-override;
 }
 
-#game_data { /* LTR overrides */
+/* TODO : this is supposed to maintain tool order, but it's not working */
+/*#editorWindow {
+	direction: ltr;
+}*/
+
+#game_data {
 	direction: ltr;
 }
 
