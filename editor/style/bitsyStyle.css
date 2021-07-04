@@ -504,6 +504,46 @@ input[type=checkbox] + label:hover {
 	background: var(--bitsy-color-main-2);
 }
 
+/* language styles */
+#editorWindow {
+	direction: ltr;
+}
+
+.lang_ar {
+	direction: rtl;
+}
+
+/* flip the directional radio buttons for arabic */
+.lang_ar input[type=radio] + label.left {
+	border-radius: var(--bitsy-space-s);
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+.lang_ar input[type=radio] + label.right {
+	border-radius: var(--bitsy-space-s);
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.dir_ltr .gameTextDir { /* TODO : is this working? */
+	direction: ltr;
+	unicode-bidi: bidi-override;
+}
+
+.dir_rtl .gameTextDir {
+	direction: rtl;
+	unicode-bidi: bidi-override;
+}
+
+#game_data { /* LTR overrides */
+	direction: ltr;
+}
+
+#dialogCodeText {
+	direction: ltr;
+}
+
 /* SPECIAL CASES */
 #markersSelect {
 	margin-bottom: var(--bitsy-space-s);
