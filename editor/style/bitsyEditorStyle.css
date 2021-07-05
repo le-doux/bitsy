@@ -210,6 +210,8 @@ input[type=checkbox] + label:hover {
 .bitsy-card {
 	background: var(--bitsy-color-main-1);
 	margin: var(--bitsy-space-m);
+/*	margin-right: var(--bitsy-space-s);
+	margin-left: var(--bitsy-space-s);*/
 	margin-right: 0;
 	display: inline-flex;
 	flex-direction: column;
@@ -264,6 +266,22 @@ input[type=checkbox] + label:hover {
 	margin-top: 0;
 	margin-right: 0;
 	background: var(--bitsy-color-main-2);
+}
+
+/* card mobile */
+@media (max-aspect-ratio: 3/4) {
+	#editorWindow {
+		scroll-snap-type: x mandatory;
+	}
+
+	.bitsy-card {
+		scroll-snap-align: center;
+		width: calc(100vw - (4 * var(--bitsy-space-m)));
+	}
+
+	.bitsy-card .bitsy-card-main {
+		width: calc(100% - (2 * var(--bitsy-space-m)));
+	}
 }
 
 /* card animations */
@@ -461,11 +479,10 @@ input[type=checkbox] + label:hover {
   - rename stuff to be more consistent
 */
 #editorWindow {
-	width: 100%;
-	overflow: scroll;
-	-webkit-overflow-scrolling: touch;
-	box-sizing: border-box;
-	flex: 1 1 auto;
+	overscroll-behavior: none;
+	overflow-x: scroll;
+	display: flex;
+	flex-grow: 1;
 }
 
 #editorContent {
