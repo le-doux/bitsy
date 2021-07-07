@@ -210,8 +210,6 @@ input[type=checkbox] + label:hover {
 .bitsy-card {
 	background: var(--bitsy-color-main-1);
 	margin: var(--bitsy-space-m);
-/*	margin-right: var(--bitsy-space-s);
-	margin-left: var(--bitsy-space-s);*/
 	margin-right: 0;
 	display: inline-flex;
 	flex-direction: column;
@@ -277,6 +275,7 @@ input[type=checkbox] + label:hover {
 	.bitsy-card {
 		scroll-snap-align: center;
 		width: calc(100vw - (4 * var(--bitsy-space-m)));
+		/*height: 100%;*/ /* FOR FULL HEIGHT CARDS */
 	}
 
 	.bitsy-card .bitsy-card-main {
