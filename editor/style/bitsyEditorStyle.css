@@ -220,7 +220,7 @@ input[type=checkbox] + label:hover {
 
 .bitsy-card-main {
 	flex-grow: 1;
-	padding: var(--bitsy-space-m);
+	margin: var(--bitsy-space-m);
 	max-height: 100%;
 	overflow-y: auto;
 	overflow-x: hidden;
