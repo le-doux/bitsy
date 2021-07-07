@@ -489,6 +489,7 @@ input[type=checkbox] + label:hover {
 	height: 100%;
 	white-space: nowrap;
 	display: inline-block;
+	padding-right: var(--bitsy-space-m);
 }
 
 /* control box */
