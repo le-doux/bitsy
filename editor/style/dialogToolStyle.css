@@ -14,7 +14,7 @@
 	height: 450px;
 	overflow: scroll;
 	display: block;
-	border: solid 1px #ccccff;
+	border: solid 1px var(--bitsy-color-accent-2);
 	border-radius: 2px;
 	margin-bottom: 10px;
 	line-height: 1;
@@ -25,7 +25,7 @@
 
 .largeDialogPlaintextArea {
 	background: var(--bitsy-color-dialog-text-background);
-	color: white;
+	color: var(--bitsy-color-dialog-text-color);
 	border: none;
 	resize: both;
 	min-width: 410px;
@@ -34,7 +34,7 @@
 
 .miniDialogPlaintextArea {
 	background: var(--bitsy-color-dialog-text-background);
-	color: white;
+	color: var(--bitsy-color-dialog-text-color);
 	border: none;
 	resize: vertical;
 }
@@ -76,7 +76,7 @@
 
 .executing.actionEditor {
 	background: var(--bitsy-color-main-2);
-	color: white;
+	color: var(--bitsy-color-main-1);
 }
 
 .actionEditor.inline {
@@ -112,7 +112,7 @@
 
 .dialogEditor textarea {
 	background: var(--bitsy-color-dialog-text-background);
-	color: white;
+	color: var(--bitsy-color-dialog-text-color);
 	/*width: 96%;*/
 	border: none;
 	resize: vertical;
@@ -166,7 +166,7 @@
 
 .actionBuilderCancel {
 	background: var(--bitsy-color-main-2);
-	color: white;
+	color: var(--bitsy-color-main-1);
 	display: none;
 }
 
@@ -313,7 +313,7 @@
 	height: calc(100% - 10px);
 	width: auto;
 	background: var(--bitsy-color-dialog-text-background);
-	color: white;
+	color: var(--bitsy-color-dialog-text-color);
 	resize: none;
 	border: none;
 }
@@ -334,7 +334,7 @@
 
 .dialogTextboxContent {
 	background: var(--bitsy-color-dialog-text-background);
-	color: white;
+	color: var(--bitsy-color-dialog-text-color);
 	font-family: bitsy_ascii, monospace;
 	font-size: 18px;
 	width: 32ch;
@@ -445,15 +445,15 @@
 
 @keyframes expressionBuilderSaveFlash {
 	0% {
-		color:white;
+		color: var(--bitsy-color-main-1);
 		background: var(--bitsy-color-main-2);
 	}
 	50% {
-		color:#6767b2;
+		color: var(--bitsy-color-main-2);
 		background: var(--bitsy-color-main-1);
 	}
 	100% {
-		color:white;
+		color: var(--bitsy-color-main-1);
 		background: var(--bitsy-color-main-2);
 	}
 }
@@ -540,22 +540,22 @@
 /* alternate colors */
 .reverseColors {
 	background: var(--bitsy-color-main-2);
-	color: white;
+	color: var(--bitsy-color-main-1);
 }
 
 .greenColor {
 	background: var(--bitsy-color-dialog-string-background);
-	color: #4d824d;
+	color: var(--bitsy-color-dialog-string-color);
 }
 
 .pinkColor {
 	background: var(--bitsy-color-dialog-number-background);
-	color: #91237e;
+	color: var(--bitsy-color-dialog-number-color);
 }
 
 .goldColor {
 	background: var(--bitsy-color-dialog-variable-background);
-	color: #917d29;
+	color: var(--bitsy-color-dialog-variable-color);
 }
 
 .goldColorBackground {
@@ -567,7 +567,7 @@
 }
 
 .greenColorText {
-	color: #4d824d;
+	color: var(--bitsy-color-dialog-string-color);
 }
 
 /* misc */
