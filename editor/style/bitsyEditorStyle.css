@@ -472,6 +472,7 @@ input[type=checkbox] + label:hover {
 #toolsPanel { /* TODO : rename */
 	padding-top: var(--bitsy-space-m);
 	display: none;
+	flex-wrap: wrap;
 }
 
 /* workbench */
