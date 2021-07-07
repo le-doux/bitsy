@@ -1,3 +1,8 @@
+:root {
+	--bitsy-color-gif-recording: red;
+	--bitsy-color-gif-encoding: green;
+}
+
 #gifPlaceholder {
 	background: var(--bitsy-color-neutral-1);
 	width: calc(var(--bitsy-size-s) * 1.25); /* this is a little bespoke */
@@ -10,9 +15,9 @@
 }
 
 #gifRecordingText {
-	color: red; /* TODO : putin a variable? currently not used elsewhere... */
+	color: var(--bitsy-color-gif-recording);
 }
 
 #gifEncodingText {
-	color: green;
+	color: var(--bitsy-color-gif-encoding);
 }

@@ -129,7 +129,7 @@ input[type=text]:hover:not([readonly]) {
 }
 
 input[type=text]:focus:not([readonly]) {
-	background: white;
+	background: var(--bitsy-color-main-1);
 	border-color: var(--bitsy-color-neutral-2);
 	text-decoration: none;
 }
@@ -286,8 +286,8 @@ input[type=checkbox] + label:hover {
 /* card animations */
 @keyframes flashAnim {
 	50% {
-		background: #6767b2;
-		color: white;
+		background: var(--bitsy-color-main-2);
+		color: var(--bitsy-color-main-1);
 	}
 }
 
@@ -298,7 +298,7 @@ input[type=checkbox] + label:hover {
 
 @keyframes closeAnim {
 	80% {
-		transform: translate(0px,-50px);
+		transform: translate(0px, -50px);
 		opacity: 0;
 	}
 }

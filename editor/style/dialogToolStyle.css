@@ -1,3 +1,14 @@
+:root {
+	--bitsy-color-dialog-text-background: black;
+	--bitsy-color-dialog-text-color: white;
+	--bitsy-color-dialog-string-background: #cfffcf;
+	--bitsy-color-dialog-string-color: #4d824d;
+	--bitsy-color-dialog-number-background: #facdf2;
+	--bitsy-color-dialog-number-color: #91237e;
+	--bitsy-color-dialog-variable-background: #ffe98f;
+	--bitsy-color-dialog-variable-color: #917d29;
+}
+
 .dialogContentViewport {
 	min-width: 410px;
 	height: 450px;
@@ -8,12 +19,12 @@
 	margin-bottom: 10px;
 	line-height: 1;
 	resize: both;
-	background: #e8e8ff;
+	background: var(--bitsy-color-accent-1);
 	white-space: normal;
 }
 
 .largeDialogPlaintextArea {
-	background: black;
+	background: var(--bitsy-color-dialog-text-background);
 	color: white;
 	border: none;
 	resize: both;
@@ -22,14 +33,14 @@
 }
 
 .miniDialogPlaintextArea {
-	background: black;
+	background: var(--bitsy-color-dialog-text-background);
 	color: white;
 	border: none;
 	resize: vertical;
 }
 
 .blockEditor {
-	background: #e8e8ff;
+	background: var(--bitsy-color-accent-1);
 	padding: 5px;
 	display: flex;
 	flex-direction: column;
@@ -48,7 +59,7 @@
 }
 
 .actionEditor {
-	background: white;
+	background: var(--bitsy-color-main-1);
 	padding: 10px;
 	/*margin-bottom: 5px;*/
 	border: solid 1px #ccccff;
@@ -64,7 +75,7 @@
 }
 
 .executing.actionEditor {
-	background: #6767b2;
+	background: var(--bitsy-color-main-2);
 	color: white;
 }
 
@@ -82,8 +93,8 @@
 }
 
 @keyframes executingLeaveAnimation {
-	from { background: #6767b2; }
-	to { background: white; }	
+	from { background: var(--bitsy-color-main-2); }
+	to { background: var(--bitsy-color-main-1); }
 }
 
 .executingLeave.actionEditor {
@@ -100,7 +111,7 @@
 }
 
 .dialogEditor textarea {
-	background: black;
+	background: var(--bitsy-color-dialog-text-background);
 	color: white;
 	/*width: 96%;*/
 	border: none;
@@ -112,7 +123,7 @@
 }
 
 .optionEditor {
-	background: #e8e8ff;
+	background: var(--bitsy-color-accent-1);
 	margin-bottom: 5px;
 	padding: 5px;
 	border-radius: 2px;
@@ -122,7 +133,7 @@
 }
 
 .optionControls button {
-	background: #ccccff;
+	background: var(--bitsy-color-accent-2);
 }
 
 .actionBuilder {
@@ -145,16 +156,16 @@
 }
 
 .actionBuilderButton {
-	background: #ccccff;
+	background: var(--bitsy-color-accent-2);
 	display: none;
 }
 
 .actionBuilderAdd {
-	background: #ccccff;
+	background: var(--bitsy-color-accent-2);
 }
 
 .actionBuilderCancel {
-	background: #6767b2;
+	background: var(--bitsy-color-main-2);
 	color: white;
 	display: none;
 }
@@ -244,7 +255,7 @@
 .roomPosParameterEditor {
 	padding: 5px;
 	border-radius: 2px;
-	background: #e8e8ff;
+	background: var(--bitsy-color-accent-1);
 	display: inline-block;
 }
 
@@ -253,13 +264,13 @@
 }
 
 .roomPosParameterEditor button {
-	background: #ccccff;
+	background: var(--bitsy-color-accent-2);
 }
 
 .parameterUneditable {
 	/*padding: 2px;*/
 	border-radius: 2px;
-	background: #e8e8ff;
+	background: var(--bitsy-color-accent-1);
 }
 
 .conditionalComparisonEditor {
@@ -276,7 +287,7 @@
 .helpText {
 	padding: 5px;
 	max-width: 350px;
-	background: #ccccff;
+	background: var(--bitsy-color-accent-2);
 	border-radius: 2px;
 }
 
@@ -291,7 +302,7 @@
 
 /* dialog box */
 .dialogBoxContainer {
-	background: black;
+	background: var(--bitsy-color-dialog-text-background);
 	resize: vertical;
 	overflow: hidden;
 	padding: 5px;
@@ -301,7 +312,7 @@
 .dialogBoxContainer textarea {
 	height: calc(100% - 10px);
 	width: auto;
-	background: black;
+	background: var(--bitsy-color-dialog-text-background);
 	color: white;
 	resize: none;
 	border: none;
@@ -313,7 +324,7 @@
 }
 
 .dialogTextboxContainer {
-	background: black;
+	background: var(--bitsy-color-dialog-text-background);
 	padding: 15px;
 	border-radius: 2px;
 	overflow: hidden;
@@ -322,7 +333,7 @@
 }
 
 .dialogTextboxContent {
-	background: black;
+	background: var(--bitsy-color-dialog-text-background);
 	color: white;
 	font-family: bitsy_ascii, monospace;
 	font-size: 18px;
@@ -433,9 +444,18 @@
 }
 
 @keyframes expressionBuilderSaveFlash {
-	0% { color:white; background:#6767b2; }
-	50% { color:#6767b2; background:white; }
-	100% { color:white; background:#6767b2; }
+	0% {
+		color:white;
+		background: var(--bitsy-color-main-2);
+	}
+	50% {
+		color:#6767b2;
+		background: var(--bitsy-color-main-1);
+	}
+	100% {
+		color:white;
+		background: var(--bitsy-color-main-2);
+	}
 }
 
 @keyframes expressionBuilderClearShake {
@@ -448,7 +468,7 @@
 }
 
 .dialogExpressionBuilderHolder {
-	background: #e8e8ff;
+	background: var(--bitsy-color-accent-1);
 	padding: 10px;
 	border: solid 1px #ccccff;
 	border-radius: 2px;
@@ -457,7 +477,7 @@
 }
 
 .expressionBuilder {
-	background: white;
+	background: var(--bitsy-color-main-1);
 	padding: 15px;
 
 	animation-name: expressionBuilderEnter;
@@ -519,31 +539,31 @@
 
 /* alternate colors */
 .reverseColors {
-	background: #6767b2;
+	background: var(--bitsy-color-main-2);
 	color: white;
 }
 
 .greenColor {
-	background: #cfffcf;
+	background: var(--bitsy-color-dialog-string-background);
 	color: #4d824d;
 }
 
 .pinkColor {
-	background: #facdf2;
+	background: var(--bitsy-color-dialog-number-background);
 	color: #91237e;
 }
 
 .goldColor {
-	background: #ffe98f;
+	background: var(--bitsy-color-dialog-variable-background);
 	color: #917d29;
 }
 
 .goldColorBackground {
-	background: #fff8de;
+	background: var(--bitsy-color-dialog-variable-background);
 }
 
 .greenColorBackground {
-	background: #edffed;
+	background: var(--bitsy-color-dialog-string-background);
 }
 
 .greenColorText {
