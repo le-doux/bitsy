@@ -8,63 +8,55 @@
 }
 
 #colorPicker {
-	margin-bottom: 10px;
+	display: flex;
+	flex-direction: column;
 }
 
 #colorPickerWheel {
-	width: 215px;
-	/*height: 200px;*/
+	width: 100%;
 	display: block;
 	background: transparent;
 }
 
 #colorPickerSelect {
-	width: 215px;
-	/*height: 200px;*/
+	width: 100%;
+	margin-top: calc(-1 * 100%);
 	display: block;
-	margin-top: -215px;
 	cursor: pointer;
 	background: transparent;
 }
 
 #colorPickerHexText {
-	display: block;
-	width: 140px;
-	margin-left: 30px;
-	margin-top: 10px;
 }
 
 #colorPickerSliderBg {
 	background: linear-gradient(to right, yellow, black);
-	display: inline-block;
-	padding: 4px;
-	margin-left: 30px;
-	margin-top: 5px;
-	border-radius: 4px;
-	width: 140px;
+	margin: var(--bitsy-space-s);
+	padding: var(--bitsy-space-s);
+	border-radius: var(--bitsy-space-s);
 }
 
 #colorPaletteForm input[type=radio] + label {
 	display: block;
-	margin-bottom: 4px;
+	margin-bottom: var(--bitsy-space-s);
 	background: var(--bitsy-color-accent-1);
-	border-radius: 4px;
-	border: solid 1px #ddd;
+	border-radius: var(--bitsy-space-s);
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-neutral-1);
 }
 
 #colorPaletteForm input[type=radio]:checked + label {
-	border: solid 2px black;
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-contrast-with-light);
 	background: var(--bitsy-color-accent-1);
-	padding-top: 10px;
-	padding-bottom: 10px;
+	padding-top: var(--bitsy-space-m);
+	padding-bottom: var(--bitsy-space-m);
 	text-align: middle;
 }
 
 #colorPickerSliderThumb {
-	height: 12px;
-	width: 4px;
+	height: var(--bitsy-space-l);
+	width: var(--bitsy-space-m);
 	background: var(--bitsy-color-contrast-with-dark);
-	border: solid 2px var(--bitsy-color-contrast-with-light);
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-contrast-with-light);
 	pointer-events: none;
 }
 
