@@ -127,14 +127,14 @@
 }
 
 .sequenceDescription {
-	margin-bottom: 10px;
+	margin-bottom: var(--bitsy-space-m);
 }
 
 .optionEditor {
 	background: var(--bitsy-color-accent-1);
-	margin-bottom: 5px;
-	padding: 5px;
-	border-radius: 2px;
+	margin-bottom: var(--bitsy-space-s);
+	padding: var(--bitsy-space-s);
+	border-radius: var(--bitsy-space-xs);
 }
 
 .optionControls {
@@ -145,10 +145,9 @@
 }
 
 .actionBuilder {
-	/*display: flex;*/
 	display: none;
 	flex-direction: column;
-	margin-top: 5px;
+	margin-top: var(--bitsy-space-s);
 }
 
 .selectedEditor > .blockEditor > .actionBuilder {
@@ -220,11 +219,11 @@
 
 .orderControls {
 	display: block;
-	margin-bottom: 5px;
+	margin-bottom: var(--bitsy-space-s);
 }
 
 .optionEditor.selectedEditor {
-	border: solid 2px #6767b2;
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-main-2);
 }
 
 .addOption {
@@ -261,14 +260,14 @@
 }
 
 .roomPosParameterEditor {
-	padding: 5px;
-	border-radius: 2px;
+	padding: var(--bitsy-space-s);
+	border-radius: var(--bitsy-space-xs);
 	background: var(--bitsy-color-accent-1);
 	display: inline-block;
 }
 
 .roomPosParameterEditor span {
-	margin-right: 5px;
+	margin-right: var(--bitsy-space-s);
 }
 
 .roomPosParameterEditor button {
@@ -276,16 +275,15 @@
 }
 
 .parameterUneditable {
-	/*padding: 2px;*/
-	border-radius: 2px;
+	border-radius: var(--bitsy-space-xs);
 	background: var(--bitsy-color-accent-1);
 }
 
 .conditionalComparisonEditor {
-	padding: 5px;
-	padding-left: 0px;
-	padding-bottom: 10px;
-	border-bottom: solid 1px #ccccff;
+	padding: var(--bitsy-space-s);
+	padding-left: 0;
+	padding-bottom: var(--bitsy-space-m);
+	border-bottom: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
 }
 
 .conditionalComparisonEditor input[type="number"] {
@@ -293,10 +291,10 @@
 }
 
 .helpText {
-	padding: 5px;
-	max-width: 350px;
+	padding: var(--bitsy-space-s);
+	max-width: var(--bitsy-size-m);
 	background: var(--bitsy-color-accent-2);
-	border-radius: 2px;
+	border-radius: var(--bitsy-space-xs);
 }
 
 .helpTextImg img {
@@ -305,7 +303,7 @@
 
 .helpTextContent {
 	flex-grow: 1;
-	margin-left: 10px;
+	margin-left: var(--bitsy-space-m);
 }
 
 /* dialog box */
@@ -313,12 +311,12 @@
 	background: var(--bitsy-color-dialog-text-background);
 	resize: vertical;
 	overflow: hidden;
-	padding: 5px;
-	border-radius: 2px;
+	padding: var(--bitsy-space-m);
+	border-radius: var(--bitsy-space-s);
 }
 
 .dialogBoxContainer textarea {
-	height: calc(100% - 10px);
+	height: calc(100% - var(--bitsy-space-m));
 	width: auto;
 	background: var(--bitsy-color-dialog-text-background);
 	color: var(--bitsy-color-dialog-text-color);
@@ -333,18 +331,16 @@
 
 .dialogTextboxContainer {
 	background: var(--bitsy-color-dialog-text-background);
-	padding: 15px;
-	border-radius: 2px;
+	padding: var(--bitsy-space-m);
+	border-radius: var(--bitsy-space-s);
 	overflow: hidden;
-/*	resize: vertical;
-	overflow: scroll;*/
 }
 
 .dialogTextboxContent {
 	background: var(--bitsy-color-dialog-text-background);
 	color: var(--bitsy-color-dialog-text-color);
 	font-family: bitsy_ascii, monospace;
-	font-size: 18px;
+	/*font-size: 18px;*/
 	width: 32ch;
 	min-height: 2ch;
 	word-wrap: break-word;
@@ -352,20 +348,9 @@
 }
 
 .dialogTextboxContent div {
-	padding-left: 4px;
-	padding-top: 4px;
-	min-height: 18px;
-}
-
-.dialogTextboxContent div:nth-child(odd) {
-	border-left: solid 4px #222;
-	padding-bottom: 5px;
-}
-
-.dialogTextboxContent div:nth-child(even) {
-	border-left: solid 4px #444;
-	border-bottom: dashed 1px #666;
-	padding-bottom: 10px;
+	padding-left: var(--bitsy-space-s);
+	padding-top: var(--bitsy-space-s);
+	min-height: var(--bitsy-space-l);
 }
 
 .textboxCodeSpan {
@@ -437,7 +422,7 @@
 
 .titleOpenDialog {
 	display: none;
-	margin-left: 5px;
+	margin-left: var(--bitsy-space-s);
 }
 
 /* expression builder styles */
@@ -477,16 +462,16 @@
 
 .dialogExpressionBuilderHolder {
 	background: var(--bitsy-color-accent-1);
-	padding: 10px;
-	border: solid 1px #ccccff;
-	border-radius: 2px;
-	margin-bottom: 10px;
-	height: 450px;
+	padding: var(--bitsy-space-m);
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
+	border-radius: var(--bitsy-space-s);
+	margin-bottom: var(--bitsy-space-m);
+	height: var(--bitsy-size-m);
 }
 
 .expressionBuilder {
 	background: var(--bitsy-color-main-1);
-	padding: 15px;
+	padding: var(--bitsy-space-m);
 
 	animation-name: expressionBuilderEnter;
 	animation-duration: 0.25s;
@@ -515,16 +500,16 @@
 }
 
 .expressionEditorRoot {
-	padding: 8px;
-	border: solid 1px #ccccff;
-	border-radius: 2px;
-	margin-bottom: 10px;
+	padding: var(--bitsy-space-m);
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
+	border-radius: var(--bitsy-space-s);
+	margin-bottom: var(--bitsy-space-m);
 	line-height: 100%; /* hacks upon hacks */
 }
 
 .expressionBuilderInputs {
 	display: flex;
-	margin-bottom: 10px;
+	margin-bottom: var(--bitsy-space-m);
 }
 
 .expressionBuilderInputs button {
@@ -540,9 +525,9 @@
 }
 
 .addNonNumericControlBox {
-	padding: 2px;
-	border-radius: 2px;
-	margin-bottom: 5px;
+	padding: var(--bitsy-space-xs);
+	border-radius: var(--bitsy-space-xs);
+	margin-bottom: var(--bitsy-space-s);
 }
 
 /* alternate colors */
@@ -580,11 +565,11 @@
 
 /* misc */
 .inlineEditButtonHolder {
-	margin-left: 5px;
+	margin-left: var(--bitsy-space-s);
 }
 
 .inlineEditButtonHolder button {
-	padding: 0px;
+	padding: 0;
 }
 
 /* NEW STYLE FIXES */
