@@ -7,11 +7,12 @@
 	--bitsy-color-dialog-number-color: #91237e;
 	--bitsy-color-dialog-variable-background: #ffe98f;
 	--bitsy-color-dialog-variable-color: #917d29;
+	--bitsy-size-dialog-height: calc(1.2 * var(--bitsy-size-m));
 }
 
 .dialogContentViewport {
-	min-width: var(--bitsy-size-m);
-	height: var(--bitsy-size-m);
+	min-width: calc(var(--bitsy-size-m) + (2 * var(--bitsy-space-m))); /* blech a bit hacky */
+	height: var(--bitsy-size-dialog-height);
 	overflow: scroll;
 	display: block;
 	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
@@ -29,7 +30,7 @@
 	border: none;
 	resize: both;
 	min-width: var(--bitsy-size-m);
-	min-height: var(--bitsy-size-m);
+	min-height: var(--bitsy-size-dialog-height);
 }
 
 .miniDialogPlaintextArea {
@@ -240,11 +241,11 @@
 }
 
 .functionEditor input[type="text"] {
-	width: 50px;
+	width: var(--bitsy-size-xxs);
 }
 
 .functionEditor input[type="number"] {
-	width: 50px;
+	width: var(--bitsy-size-xxs);
 }
 
 .parameterEditor {
@@ -252,11 +253,11 @@
 }
 
 .parameterEditor input[type="text"] {
-	width: 50px;
+	width: var(--bitsy-size-xxs);
 }
 
 .parameterEditor input[type="number"] {
-	width: 50px;
+	width: var(--bitsy-size-xxs);
 }
 
 .roomPosParameterEditor {
@@ -287,7 +288,7 @@
 }
 
 .conditionalComparisonEditor input[type="number"] {
-	width: 50px;
+	width: var(--bitsy-size-xxs);
 }
 
 .helpText {
@@ -298,7 +299,7 @@
 }
 
 .helpTextImg img {
-	width: 36px;
+	width: var(--bitsy-space-xl);
 }
 
 .helpTextContent {
@@ -340,7 +341,6 @@
 	background: var(--bitsy-color-dialog-text-background);
 	color: var(--bitsy-color-dialog-text-color);
 	font-family: bitsy_ascii, monospace;
-	/*font-size: 18px;*/
 	width: 32ch;
 	min-height: 2ch;
 	word-wrap: break-word;
@@ -362,11 +362,8 @@
 }
 
 @keyframes textEffectWvy {
-	/*0% { transform:translateY(0px); }*/
 	0% { transform:translateY(25%); }
-	/*50% { transform:translateY(0px); }*/
 	50% { transform:translateY(-25%); }
-	/*100% { transform:translateY(0px); }*/
 	100% { transform:translateY(25%); }
 }
 
@@ -466,7 +463,8 @@
 	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
 	border-radius: var(--bitsy-space-s);
 	margin-bottom: var(--bitsy-space-m);
-	height: var(--bitsy-size-m);
+	height: var(--bitsy-size-dialog-height);
+	width: var(--bitsy-size-m);
 }
 
 .expressionBuilder {
