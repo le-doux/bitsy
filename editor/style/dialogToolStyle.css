@@ -10,13 +10,13 @@
 }
 
 .dialogContentViewport {
-	min-width: 410px;
-	height: 450px;
+	min-width: var(--bitsy-size-m);
+	height: var(--bitsy-size-m);
 	overflow: scroll;
 	display: block;
-	border: solid 1px var(--bitsy-color-accent-2);
-	border-radius: 2px;
-	margin-bottom: 10px;
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
+	border-radius: var(--bitsy-space-s);
+	margin-bottom: var(--bitsy-space-m);
 	line-height: 1;
 	resize: both;
 	background: var(--bitsy-color-accent-1);
@@ -28,8 +28,8 @@
 	color: var(--bitsy-color-dialog-text-color);
 	border: none;
 	resize: both;
-	min-width: 410px;
-	min-height: 450px; /* todo : taller? */
+	min-width: var(--bitsy-size-m);
+	min-height: var(--bitsy-size-m);
 }
 
 .miniDialogPlaintextArea {
@@ -41,15 +41,21 @@
 
 .blockEditor {
 	background: var(--bitsy-color-accent-1);
-	padding: 5px;
+	padding: var(--bitsy-space-s);
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
 }
 
 @keyframes actionEditorDelete {
-	0% { transform:translateX(0px); opacity:1; }
-	100% { transform:translateX(30px); opacity:0; }
+	0% {
+		transform: translateX(0px);
+		opacity: 1;
+	}
+	100% {
+		transform: translateX(30px);
+		opacity: 0;
+	}
 }
 
 .actionEditorDelete {
@@ -60,10 +66,9 @@
 
 .actionEditor {
 	background: var(--bitsy-color-main-1);
-	padding: 10px;
-	/*margin-bottom: 5px;*/
-	border: solid 1px #ccccff;
-	border-radius: 2px;
+	padding: var(--bitsy-space-m);
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
+	border-radius: var(--bitsy-space-s);
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
@@ -71,7 +76,7 @@
 
 .actionTitle {
 	font-weight: bold;
-	margin-bottom: 5px;
+	margin-bottom: var(--bitsy-space-m);
 }
 
 .executing.actionEditor {
@@ -81,20 +86,24 @@
 
 .actionEditor.inline {
 	display: inline;
-	padding: 0px;
-	padding-top: 2px;
-	padding-bottom: 4px; /* hack - useful??? */
+	padding: 0;
+	padding-top: var(--bitsy-space-xs);
+	padding-bottom: var(--bitsy-space-s); /* hack - useful??? */
 	border: none;
 }
 
 .conditionalComparisonEditor > .actionEditor.inline {
-	padding-right: 2px;
-	padding-left: 2px;
+	padding-right: var(--bitsy-space-xs);
+	padding-left: var(--bitsy-space-xs);
 }
 
 @keyframes executingLeaveAnimation {
-	from { background: var(--bitsy-color-main-2); }
-	to { background: var(--bitsy-color-main-1); }
+	from {
+		background: var(--bitsy-color-main-2);
+	}
+	to {
+		background: var(--bitsy-color-main-1);
+	}
 }
 
 .executingLeave.actionEditor {
@@ -103,7 +112,7 @@
 }
 
 .selectedEditor.actionEditor {
-	border: solid 2px #6767b2;
+	border: solid var(--bitsy-space-s) var(--bitsy-color-main-2);
 }
 
 .selectedEditor.actionEditor.inline {
@@ -113,7 +122,6 @@
 .dialogEditor textarea {
 	background: var(--bitsy-color-dialog-text-background);
 	color: var(--bitsy-color-dialog-text-color);
-	/*width: 96%;*/
 	border: none;
 	resize: vertical;
 }
