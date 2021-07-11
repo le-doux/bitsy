@@ -12,12 +12,14 @@
 #markersSelect {
 	display: flex;
 	margin-bottom: var(--bitsy-space-s);
+	flex-wrap: wrap;
 }
 
 #markerControl1 {
 	display: flex;
 	flex-direction: column;
 	padding: var(--bitsy-space-m);
+	flex-grow: 1;
 }
 
 #markerCanvas1 {
@@ -54,6 +56,7 @@
 
 #markerControl2 {
 	padding: var(--bitsy-space-m);
+	flex-grow: 1;
 }
 
 #markerCanvas2 {
