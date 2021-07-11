@@ -55,6 +55,11 @@ body {
 	height: 100%;
 }
 
+/* canvas */
+canvas {
+	width: 100%;
+}
+
 /* button */
 button {
 	background: var(--bitsy-color-accent-1);

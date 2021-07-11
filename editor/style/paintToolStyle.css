@@ -2,13 +2,18 @@
 	display: flex;
 }
 
-#paint {
-	width: var(--bitsy-size-s); /* should be roughly 256px */
+.animationThumbnail {
+	width: var(--bitsy-size-xxs);
+	padding: var(--bitsy-space-s);
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-1);
+	border-radius: var(--bitsy-space-s);
+}
 
-	/* keep this centered in div */
-	padding-left: 0;
-	padding-right: 0;
-	margin-left: auto;
-	margin-right: auto;
-	display: block;
+/* TODO : actually make this look like the old version? */
+.animationThumbnail.selected {
+	border-color: var(--bitsy-color-main-2);
+}
+
+.animationThumbnail img {
+	width: 100%;
 }

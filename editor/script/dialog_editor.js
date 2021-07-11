@@ -351,7 +351,7 @@ function DialogTool() {
 
 			var codeTextArea = document.createElement("textarea");
 			codeTextArea.rows = 2;
-			codeTextArea.cols = 32;
+			// codeTextArea.cols = 32;
 			codeTextArea.classList.add(style);
 			codeTextArea.value = scriptRootNode.Serialize();
 			function OnTextChangeHandler() {

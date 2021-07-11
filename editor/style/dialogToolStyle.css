@@ -308,21 +308,14 @@
 }
 
 /* dialog box */
-.dialogBoxContainer {
+.dialogBoxContainer { /* TODO : get rid of this whole wrapping thing? */
 	background: var(--bitsy-color-dialog-text-background);
-	resize: vertical;
-	overflow: hidden;
-	padding: var(--bitsy-space-m);
-	border-radius: var(--bitsy-space-s);
 }
 
+/* TODO : combine with same style below */
 .dialogBoxContainer textarea {
-	height: calc(100% - var(--bitsy-space-m));
-	width: auto;
 	background: var(--bitsy-color-dialog-text-background);
 	color: var(--bitsy-color-dialog-text-color);
-	resize: none;
-	border: none;
 }
 
 @font-face {
@@ -573,4 +566,14 @@
 /* NEW STYLE FIXES */
 #dialog .controlBox {
 	display: block;
+}
+
+.dialogBoxContainer {
+	display: flex;
+}
+
+.dialogBoxContainer textarea {
+	flex-grow: 1;
+	resize: vertical;
+	padding: var(--bitsy-space-s);
 }
