@@ -1,0 +1,14 @@
+{
+	"name": "Bitsy",
+	"short_name": "Bitsy",
+	"description": "A little editor for little games or worlds",
+	"start_url": "./index.html",
+	"icons": [{
+		"src": "image/cat5.png",
+		"sizes": "256x256",
+		"type": "image/png"
+	}],
+	"display": "standalone",
+	"background_color": "#6767b2",
+	"theme_color": "#ffffff"
+}
