@@ -351,7 +351,6 @@ function DialogTool() {
 
 			var codeTextArea = document.createElement("textarea");
 			codeTextArea.rows = 2;
-			// codeTextArea.cols = 32;
 			codeTextArea.classList.add(style);
 			codeTextArea.value = scriptRootNode.Serialize();
 			function OnTextChangeHandler() {
@@ -1062,7 +1061,6 @@ function DialogTool() {
 			textArea.onblur = OnDialogTextChange;
 
 			textArea.rows = Math.max(2, dialogText.split("\n").length + 1);
-			textArea.cols = 32;
 
 			textArea.addEventListener('click', textSelectionChangeHandler);
 			textArea.addEventListener('select', textSelectionChangeHandler);
