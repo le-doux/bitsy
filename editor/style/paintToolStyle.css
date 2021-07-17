@@ -2,7 +2,7 @@
 	display: flex;
 }
 
-#animation {
+#animationOuter {
 	margin-top: var(--bitsy-space-s);
 }
 
