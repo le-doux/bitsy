@@ -6,22 +6,14 @@
 	margin-top: var(--bitsy-space-s);
 }
 
-.animationThumbnail {
-	width: var(--bitsy-size-xxs);
-	padding: var(--bitsy-space-s);
-	border-radius: var(--bitsy-space-s);
+#animation .bitsy-thumbnail {
+	font-size: 85%;
 }
 
-.animationThumbnail.preview {
-	margin-right: var(--bitsy-space-m);
+#animation .bitsy-thumbnail .bitsy-thumbnail-image-container {
+	border-color: var(--bitsy-color-accent-1);
 }
 
-.animationThumbnail.selected {
-	background: var(--bitsy-color-main-2);
-	color: var(--bitsy-color-main-1);
-}
-
-.animationThumbnail img {
-	width: calc(100% - var(--bitsy-space-s));
-	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-1);
+#animation .bitsy-thumbnail.bitsy-thumbnail-selected .bitsy-thumbnail-image-container {
+	border-color: var(--bitsy-color-main-2);
 }

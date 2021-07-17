@@ -727,23 +727,29 @@
 							</div>
 							<div id="animation" style="display:none;">
 								<div class="bitsy-menu-group">
-									<div class="animationThumbnail preview">
-										<img id="animationThumbnailPreview" />
-										<div>
+									<div class="bitsy-thumbnail">
+										<div class="bitsy-thumbnail-image-container">
+											<img id="animationThumbnailPreview" />
+										</div>
+										<label class="bitsy-menu-label">
 											<span class="localize animation_preview">preview</span>
-										</div>
+										</label>
 									</div>
-									<div id="animationKeyframe1" class="animationThumbnail left selected" onclick="on_paint_frame1();">
-										<img id="animationThumbnailFrame1" />
-										<div>
+									<div id="animationKeyframe1" class="bitsy-thumbnail" onclick="on_paint_frame1();">
+										<div class="bitsy-thumbnail-image-container">
+											<img id="animationThumbnailFrame1" />
+										</div>
+										<label class="bitsy-menu-label">
 											<span class="localize animation_frame1">frame 1</span>
-										</div>
+										</label>
 									</div>
-									<div id="animationKeyframe2" class="animationThumbnail right unselected" onclick="on_paint_frame2();">
-										<img id="animationThumbnailFrame2" />
-										<div>
-											<span class="localize animation_frame2">frame 2</span>
+									<div id="animationKeyframe2" class="bitsy-thumbnail" onclick="on_paint_frame2();">
+										<div class="bitsy-thumbnail-image-container">
+											<img id="animationThumbnailFrame2" />
 										</div>
+										<label class="bitsy-menu-label">
+											<span class="localize animation_frame2">frame 2</span>
+										</label>
 									</div>
 								</div>
 							</div>

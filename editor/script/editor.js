@@ -1512,13 +1512,13 @@ function reloadTile() {
 
 		if( paintTool.curDrawingFrameIndex == 0)
 		{
-			document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
-			document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
+			document.getElementById("animationKeyframe1").className = "bitsy-thumbnail bitsy-thumbnail-selected";
+			document.getElementById("animationKeyframe2").className = "bitsy-thumbnail";
 		}
 		else if( paintTool.curDrawingFrameIndex == 1 )
 		{
-			document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
-			document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
+			document.getElementById("animationKeyframe1").className = "bitsy-thumbnail";
+			document.getElementById("animationKeyframe2").className = "bitsy-thumbnail bitsy-thumbnail-selected";
 		}
 
 		document.getElementById("animation").setAttribute("style","display:block;");
@@ -1570,13 +1570,13 @@ function reloadSprite() {
 
 		if( paintTool.curDrawingFrameIndex == 0)
 		{
-			document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
-			document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
+			document.getElementById("animationKeyframe1").className = "bitsy-thumbnail bitsy-thumbnail-selected";
+			document.getElementById("animationKeyframe2").className = "bitsy-thumbnail";
 		}
 		else if( paintTool.curDrawingFrameIndex == 1 )
 		{
-			document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
-			document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
+			document.getElementById("animationKeyframe1").className = "bitsy-thumbnail";
+			document.getElementById("animationKeyframe2").className = "bitsy-thumbnail bitsy-thumbnail-selected";
 		}
 
 		document.getElementById("animation").setAttribute("style","display:block;");
@@ -1609,13 +1609,13 @@ function reloadItem() {
 
 		if( paintTool.curDrawingFrameIndex == 0)
 		{
-			document.getElementById("animationKeyframe1").className = "animationThumbnail left selected";
-			document.getElementById("animationKeyframe2").className = "animationThumbnail right unselected";
+			document.getElementById("animationKeyframe1").className = "bitsy-thumbnail bitsy-thumbnail-selected";
+			document.getElementById("animationKeyframe2").className = "bitsy-thumbnail";
 		}
 		else if( paintTool.curDrawingFrameIndex == 1 )
 		{
-			document.getElementById("animationKeyframe1").className = "animationThumbnail left unselected";
-			document.getElementById("animationKeyframe2").className = "animationThumbnail right selected";
+			document.getElementById("animationKeyframe1").className = "bitsy-thumbnail";
+			document.getElementById("animationKeyframe2").className = "bitsy-thumbnail bitsy-thumbnail-selected";
 		}
 
 		document.getElementById("animation").setAttribute("style","display:block;");
