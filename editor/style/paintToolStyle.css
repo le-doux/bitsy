@@ -2,18 +2,26 @@
 	display: flex;
 }
 
+#animation {
+	margin-top: var(--bitsy-space-s);
+}
+
 .animationThumbnail {
 	width: var(--bitsy-size-xxs);
 	padding: var(--bitsy-space-s);
-	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-1);
 	border-radius: var(--bitsy-space-s);
 }
 
-/* TODO : actually make this look like the old version? */
+.animationThumbnail.preview {
+	margin-right: var(--bitsy-space-m);
+}
+
 .animationThumbnail.selected {
-	border-color: var(--bitsy-color-main-2);
+	background: var(--bitsy-color-main-2);
+	color: var(--bitsy-color-main-1);
 }
 
 .animationThumbnail img {
-	width: 100%;
+	width: calc(100% - var(--bitsy-space-s));
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-1);
 }
