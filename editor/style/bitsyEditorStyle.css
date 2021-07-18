@@ -485,6 +485,17 @@ input[type=checkbox] + label:hover {
 	flex-wrap: wrap;
 }
 
+/* main menu mobile */
+@media (max-aspect-ratio: 3/4) {
+	#bitsyTitle {
+		display: none;
+	}
+
+	#toolsCheckLabelText {
+		display: none;
+	}
+}
+
 /* workbench */
 /* TODO 
   - rename stuff to be more consistent
