@@ -268,7 +268,6 @@ input[type=checkbox] + label:hover {
 	vertical-align: top;
 	border-radius: var(--bitsy-space-s);
 	margin: var(--bitsy-space-m);
-	margin-top: 0;
 	margin-right: 0;
 	background: var(--bitsy-color-main-2);
 }
