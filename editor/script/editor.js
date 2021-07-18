@@ -1645,11 +1645,13 @@ function deleteDrawing() {
 }
 
 function toggleToolBar(e) {
-	if( e.target.checked ) {
+	if (e.target.checked) {
 		document.getElementById("toolsPanel").style.display = "flex";
+		document.getElementById("appRoot").classList.add("bitsy-toolbar-open");
 	}
 	else {
 		document.getElementById("toolsPanel").style.display = "none";
+		document.getElementById("appRoot").classList.remove("bitsy-toolbar-open");
 	}
 }
 

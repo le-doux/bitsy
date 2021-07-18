@@ -485,13 +485,38 @@ input[type=checkbox] + label:hover {
 	flex-wrap: wrap;
 }
 
+#resetGameButton {
+	margin-left: var(--bitsy-space-l);
+}
+
 /* main menu mobile */
 @media (max-aspect-ratio: 3/4) {
+	#topbar {
+		flex-grow: 1;
+	}
+
 	#bitsyTitle {
 		display: none;
 	}
 
 	#toolsCheckLabelText {
+		display: none;
+	}
+
+	#toolsPanel {
+		flex-direction: column;
+	}
+
+	#resetGameButton {
+		margin-left: inherit;
+		margin-top: var(--bitsy-space-l);
+	}
+
+	.bitsy-toolbar-open #topbar {
+		margin-bottom: var(--bitsy-space-xl);
+	}
+
+	.bitsy-toolbar-open #editorWindow {
 		display: none;
 	}
 }
