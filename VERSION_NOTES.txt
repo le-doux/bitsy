@@ -1,3 +1,6 @@
+v7.6:
+- new layout for mobile devices
+
 v7.5:
 - add find tool shortcut to room, color, & dialog tools
 - bugfix: stop adding extra spaces between code and text
