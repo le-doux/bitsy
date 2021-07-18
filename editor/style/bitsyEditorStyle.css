@@ -492,7 +492,7 @@ input[type=checkbox] + label:hover {
 /* main menu mobile */
 @media (max-aspect-ratio: 3/4) {
 	#topbar {
-		flex-grow: 1;
+		flex-grow: 0;
 	}
 
 	#bitsyTitle {
@@ -514,6 +514,7 @@ input[type=checkbox] + label:hover {
 
 	.bitsy-toolbar-open #topbar {
 		margin-bottom: var(--bitsy-space-xl);
+		flex-grow: 1;
 	}
 
 	.bitsy-toolbar-open #editorWindow {
