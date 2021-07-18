@@ -1,0 +1,7 @@
+/* TODO : create a shared textarea style? */
+#game_data {
+	width: calc(100% - var(--bitsy-space-m));
+	height: var(--bitsy-size-m);
+	margin-bottom: var(--bitsy-space-m);
+	resize: none; /* TODO : turn back on? */
+}

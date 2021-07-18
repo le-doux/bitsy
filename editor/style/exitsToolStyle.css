@@ -1,0 +1,114 @@
+/* TODO : simplify -> less IDs, more classes */
+
+#noMarkerMessage {
+	width: 100%;
+}
+
+#noMarkerMessage span {
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
+#markersSelect {
+	display: flex;
+	margin-bottom: var(--bitsy-space-s);
+	flex-wrap: wrap;
+}
+
+#markerControl1 {
+	display: flex;
+	flex-direction: column;
+	padding: var(--bitsy-space-m);
+	flex-grow: 1;
+}
+
+#markerCanvas1 {
+	width: var(--bitsy-size-xs);
+	height: var(--bitsy-size-xs);
+}
+
+.markerPosControl {
+	margin-top: var(--bitsy-space-s);
+}
+
+.markerCoordinatesHolder {
+	max-width: var(--bitsy-size-xs);
+	overflow: hidden;
+}
+
+#textMarkerPos1 {
+	font-size: 80%;
+}
+
+#textMoveMessage1 {
+	font-size: 80%;
+}
+
+#markerLinkControl {
+	padding-left: var(--bitsy-space-m);
+	padding-right: var(--bitsy-space-m);
+	display:inline-block;
+}
+
+#markerLinkControl button {
+	margin-top: calc(0.5 * var(--bitsy-size-xs));
+}
+
+#markerControl2 {
+	padding: var(--bitsy-space-m);
+	flex-grow: 1;
+}
+
+#markerCanvas2 {
+	width: var(--bitsy-size-xs);
+	height: var(--bitsy-size-xs);
+}
+
+#textMarkerPos2 {
+	font-size: 80%;
+}
+
+#textMoveMessage2 {
+	font-size: 80%;
+}
+
+#endingText {
+	resize: vertical;
+	width: 32ch;
+}
+
+#exitOptionsInner {
+	display: none;
+}
+
+#exitOptionsRadio {
+	display: flex;
+	flex-direction: row;
+	margin-top: var(--bitsy-space-s);
+	margin-bottom: var(--bitsy-space-s);
+}
+
+#exitOptionsRadio label {
+	flex: 1;
+	font-size: 100%;
+}
+
+#markersSelect .controlBox {
+	align-items: start;
+}
+
+#endingOptions .controlBox {
+	display: block;
+}
+
+#exitOptions .controlBox {
+	display: block;
+}
+
+#returnExitOptions .controlBox {
+	display: block;
+}
+
+#addMarkerOptions button {
+	width: 100%;
+}

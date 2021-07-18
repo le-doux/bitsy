@@ -1,0 +1,33 @@
+:root {
+	--bitsy-color-gif-recording: red;
+	--bitsy-color-gif-encoding: green;
+}
+
+#gifPreviewContainer {
+	margin-bottom: var(--bitsy-space-m);
+}
+
+#gifPlaceholder {
+	background: var(--bitsy-color-neutral-1);
+	width: 100%;
+	height: 0;
+	padding-bottom: 100%; /* forces the height to match the width */
+	display: block;
+}
+
+#gifPreview {
+	background: var(--bitsy-color-neutral-1);
+	width: 100%;
+}
+
+#gifRecordingText {
+	color: var(--bitsy-color-gif-recording);
+}
+
+#gifEncodingText {
+	color: var(--bitsy-color-gif-encoding);
+}
+
+#gifSnapshotButton {
+	margin-left: var(--bitsy-space-m);
+}

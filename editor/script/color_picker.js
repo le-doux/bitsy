@@ -27,7 +27,9 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 		var sliderBounds = sliderBg.getBoundingClientRect();
 		var thumbBounds = slider.getBoundingClientRect();
-		var sliderCenterPos = ((1.0 - curColor.v) * sliderBounds.width);
+		var sliderPosStart = thumbBounds.width;
+		var sliderPosRange = sliderBounds.width - (2 * thumbBounds.width);
+		var sliderCenterPos = sliderPosStart + ((1.0 - curColor.v) * sliderPosRange);
 		var sliderThumbCenterOffset = (thumbBounds.width / 2) + 4; /* + extra for border */
 		var sliderLeftPos = sliderCenterPos - sliderThumbCenterOffset;
 		var sliderLeftStyle = sliderLeftPos + "px";
@@ -258,7 +260,8 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 
 			var containerX = e.clientX - sliderBounds.left;
 			var xPercent = containerX / (sliderBounds.width);
-			// console.log(xPercent);
+
+			// console.log("PERCENT " + xPercent);
 
 			curColor.v = 1.0 - xPercent;
 			if (curColor.v < 0) {
@@ -268,8 +271,12 @@ function ColorPicker( wheelId, selectId, sliderId, sliderBgId, hexTextId ) {
 				curColor.v = 1.0;
 			}
 
-			var sliderCenterPos = ((1.0 - curColor.v) * sliderBounds.width);
-			var sliderThumbCenterOffset = (thumbBounds.width / 2) + 4; /* + extra for border */
+			// console.log("PERCENT " + curColor.v);
+
+			var sliderPosStart = thumbBounds.width;
+			var sliderPosRange = sliderBounds.width - (2 * thumbBounds.width);
+			var sliderCenterPos = sliderPosStart + ((1.0 - curColor.v) * sliderPosRange);
+			var sliderThumbCenterOffset = (thumbBounds.width / 2) * 1.5;
 			var sliderLeftPos = sliderCenterPos - sliderThumbCenterOffset;
 			var sliderLeftStyle = sliderLeftPos + "px";
 			slider.style.marginLeft = sliderLeftStyle;

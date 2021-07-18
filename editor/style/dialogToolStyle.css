@@ -1,44 +1,59 @@
+:root {
+	--bitsy-color-dialog-text-background: black;
+	--bitsy-color-dialog-text-color: white;
+	--bitsy-color-dialog-string-background: #cfffcf;
+	--bitsy-color-dialog-string-color: #4d824d;
+	--bitsy-color-dialog-number-background: #facdf2;
+	--bitsy-color-dialog-number-color: #91237e;
+	--bitsy-color-dialog-variable-background: #ffe98f;
+	--bitsy-color-dialog-variable-color: #917d29;
+	--bitsy-size-dialog-height: calc(1.2 * var(--bitsy-size-m));
+}
+
 .dialogContentViewport {
-	min-width: 410px;
-	height: 450px;
+	height: var(--bitsy-size-dialog-height);
 	overflow: scroll;
 	display: block;
-	border: solid 1px #ccccff;
-	border-radius: 2px;
-	margin-bottom: 10px;
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
+	border-radius: var(--bitsy-space-s);
+	margin-bottom: var(--bitsy-space-m);
 	line-height: 1;
-	resize: both;
-	background: #e8e8ff;
+	background: var(--bitsy-color-accent-1);
 	white-space: normal;
 }
 
 .largeDialogPlaintextArea {
-	background: black;
-	color: white;
+	background: var(--bitsy-color-dialog-text-background);
+	color: var(--bitsy-color-dialog-text-color);
 	border: none;
-	resize: both;
-	min-width: 410px;
-	min-height: 450px; /* todo : taller? */
+	min-width: var(--bitsy-size-m);
+	min-height: var(--bitsy-size-dialog-height);
 }
 
 .miniDialogPlaintextArea {
-	background: black;
-	color: white;
+	background: var(--bitsy-color-dialog-text-background);
+	color: var(--bitsy-color-dialog-text-color);
 	border: none;
 	resize: vertical;
 }
 
 .blockEditor {
-	background: #e8e8ff;
-	padding: 5px;
+	background: var(--bitsy-color-accent-1);
+	padding: var(--bitsy-space-s);
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
 }
 
 @keyframes actionEditorDelete {
-	0% { transform:translateX(0px); opacity:1; }
-	100% { transform:translateX(30px); opacity:0; }
+	0% {
+		transform: translateX(0px);
+		opacity: 1;
+	}
+	100% {
+		transform: translateX(30px);
+		opacity: 0;
+	}
 }
 
 .actionEditorDelete {
@@ -48,11 +63,10 @@
 }
 
 .actionEditor {
-	background: white;
-	padding: 10px;
-	/*margin-bottom: 5px;*/
-	border: solid 1px #ccccff;
-	border-radius: 2px;
+	background: var(--bitsy-color-main-1);
+	padding: var(--bitsy-space-m);
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
+	border-radius: var(--bitsy-space-s);
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
@@ -60,30 +74,34 @@
 
 .actionTitle {
 	font-weight: bold;
-	margin-bottom: 5px;
+	margin-bottom: var(--bitsy-space-m);
 }
 
 .executing.actionEditor {
-	background: #6767b2;
-	color: white;
+	background: var(--bitsy-color-main-2);
+	color: var(--bitsy-color-main-1);
 }
 
 .actionEditor.inline {
 	display: inline;
-	padding: 0px;
-	padding-top: 2px;
-	padding-bottom: 4px; /* hack - useful??? */
+	padding: 0;
+	padding-top: var(--bitsy-space-xs);
+	padding-bottom: var(--bitsy-space-s); /* hack - useful??? */
 	border: none;
 }
 
 .conditionalComparisonEditor > .actionEditor.inline {
-	padding-right: 2px;
-	padding-left: 2px;
+	padding-right: var(--bitsy-space-xs);
+	padding-left: var(--bitsy-space-xs);
 }
 
 @keyframes executingLeaveAnimation {
-	from { background: #6767b2; }
-	to { background: white; }	
+	from {
+		background: var(--bitsy-color-main-2);
+	}
+	to {
+		background: var(--bitsy-color-main-1);
+	}
 }
 
 .executingLeave.actionEditor {
@@ -92,7 +110,7 @@
 }
 
 .selectedEditor.actionEditor {
-	border: solid 2px #6767b2;
+	border: solid var(--bitsy-space-s) var(--bitsy-color-main-2);
 }
 
 .selectedEditor.actionEditor.inline {
@@ -100,36 +118,34 @@
 }
 
 .dialogEditor textarea {
-	background: black;
-	color: white;
-	/*width: 96%;*/
+	background: var(--bitsy-color-dialog-text-background);
+	color: var(--bitsy-color-dialog-text-color);
 	border: none;
 	resize: vertical;
 }
 
 .sequenceDescription {
-	margin-bottom: 10px;
+	margin-bottom: var(--bitsy-space-m);
 }
 
 .optionEditor {
-	background: #e8e8ff;
-	margin-bottom: 5px;
-	padding: 5px;
-	border-radius: 2px;
+	background: var(--bitsy-color-accent-1);
+	margin-bottom: var(--bitsy-space-s);
+	padding: var(--bitsy-space-s);
+	border-radius: var(--bitsy-space-xs);
 }
 
 .optionControls {
 }
 
 .optionControls button {
-	background: #ccccff;
+	background: var(--bitsy-color-accent-2);
 }
 
 .actionBuilder {
-	/*display: flex;*/
 	display: none;
 	flex-direction: column;
-	margin-top: 5px;
+	margin-top: var(--bitsy-space-s);
 }
 
 .selectedEditor > .blockEditor > .actionBuilder {
@@ -145,17 +161,17 @@
 }
 
 .actionBuilderButton {
-	background: #ccccff;
+	background: var(--bitsy-color-accent-2);
 	display: none;
 }
 
 .actionBuilderAdd {
-	background: #ccccff;
+	background: var(--bitsy-color-accent-2);
 }
 
 .actionBuilderCancel {
-	background: #6767b2;
-	color: white;
+	background: var(--bitsy-color-main-2);
+	color: var(--bitsy-color-main-1);
 	display: none;
 }
 
@@ -201,11 +217,11 @@
 
 .orderControls {
 	display: block;
-	margin-bottom: 5px;
+	margin-bottom: var(--bitsy-space-s);
 }
 
 .optionEditor.selectedEditor {
-	border: solid 2px #6767b2;
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-main-2);
 }
 
 .addOption {
@@ -222,11 +238,11 @@
 }
 
 .functionEditor input[type="text"] {
-	width: 50px;
+	width: var(--bitsy-size-xxs);
 }
 
 .functionEditor input[type="number"] {
-	width: 50px;
+	width: var(--bitsy-size-xxs);
 }
 
 .parameterEditor {
@@ -234,77 +250,63 @@
 }
 
 .parameterEditor input[type="text"] {
-	width: 50px;
+	width: var(--bitsy-size-xxs);
 }
 
 .parameterEditor input[type="number"] {
-	width: 50px;
+	width: var(--bitsy-size-xxs);
 }
 
 .roomPosParameterEditor {
-	padding: 5px;
-	border-radius: 2px;
-	background: #e8e8ff;
+	padding: var(--bitsy-space-s);
+	border-radius: var(--bitsy-space-xs);
+	background: var(--bitsy-color-accent-1);
 	display: inline-block;
 }
 
 .roomPosParameterEditor span {
-	margin-right: 5px;
+	margin-right: var(--bitsy-space-s);
 }
 
 .roomPosParameterEditor button {
-	background: #ccccff;
+	background: var(--bitsy-color-accent-2);
 }
 
 .parameterUneditable {
-	/*padding: 2px;*/
-	border-radius: 2px;
-	background: #e8e8ff;
+	border-radius: var(--bitsy-space-xs);
+	background: var(--bitsy-color-accent-1);
 }
 
 .conditionalComparisonEditor {
-	padding: 5px;
-	padding-left: 0px;
-	padding-bottom: 10px;
-	border-bottom: solid 1px #ccccff;
+	padding: var(--bitsy-space-s);
+	padding-left: 0;
+	padding-bottom: var(--bitsy-space-m);
+	border-bottom: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
 }
 
 .conditionalComparisonEditor input[type="number"] {
-	width: 50px;
+	width: var(--bitsy-size-xxs);
 }
 
 .helpText {
-	padding: 5px;
-	max-width: 350px;
-	background: #ccccff;
-	border-radius: 2px;
+	padding: var(--bitsy-space-s);
+	max-width: var(--bitsy-size-m);
+	background: var(--bitsy-color-accent-2);
+	border-radius: var(--bitsy-space-xs);
 }
 
 .helpTextImg img {
-	width: 36px;
+	width: var(--bitsy-space-xl);
 }
 
 .helpTextContent {
 	flex-grow: 1;
-	margin-left: 10px;
+	margin-left: var(--bitsy-space-m);
 }
 
 /* dialog box */
 .dialogBoxContainer {
-	background: black;
-	resize: vertical;
-	overflow: hidden;
-	padding: 5px;
-	border-radius: 2px;
-}
-
-.dialogBoxContainer textarea {
-	height: calc(100% - 10px);
-	width: auto;
-	background: black;
-	color: white;
-	resize: none;
-	border: none;
+	/* TODO : get rid of this whole wrapping thing? */
 }
 
 @font-face {
@@ -313,19 +315,16 @@
 }
 
 .dialogTextboxContainer {
-	background: black;
-	padding: 15px;
-	border-radius: 2px;
+	background: var(--bitsy-color-dialog-text-background);
+	padding: var(--bitsy-space-m);
+	border-radius: var(--bitsy-space-s);
 	overflow: hidden;
-/*	resize: vertical;
-	overflow: scroll;*/
 }
 
 .dialogTextboxContent {
-	background: black;
-	color: white;
+	background: var(--bitsy-color-dialog-text-background);
+	color: var(--bitsy-color-dialog-text-color);
 	font-family: bitsy_ascii, monospace;
-	font-size: 18px;
 	width: 32ch;
 	min-height: 2ch;
 	word-wrap: break-word;
@@ -333,20 +332,9 @@
 }
 
 .dialogTextboxContent div {
-	padding-left: 4px;
-	padding-top: 4px;
-	min-height: 18px;
-}
-
-.dialogTextboxContent div:nth-child(odd) {
-	border-left: solid 4px #222;
-	padding-bottom: 5px;
-}
-
-.dialogTextboxContent div:nth-child(even) {
-	border-left: solid 4px #444;
-	border-bottom: dashed 1px #666;
-	padding-bottom: 10px;
+	padding-left: var(--bitsy-space-s);
+	padding-top: var(--bitsy-space-s);
+	min-height: var(--bitsy-space-l);
 }
 
 .textboxCodeSpan {
@@ -358,11 +346,8 @@
 }
 
 @keyframes textEffectWvy {
-	/*0% { transform:translateY(0px); }*/
 	0% { transform:translateY(25%); }
-	/*50% { transform:translateY(0px); }*/
 	50% { transform:translateY(-25%); }
-	/*100% { transform:translateY(0px); }*/
 	100% { transform:translateY(25%); }
 }
 
@@ -418,7 +403,7 @@
 
 .titleOpenDialog {
 	display: none;
-	margin-left: 5px;
+	margin-left: var(--bitsy-space-s);
 }
 
 /* expression builder styles */
@@ -433,9 +418,18 @@
 }
 
 @keyframes expressionBuilderSaveFlash {
-	0% { color:white; background:#6767b2; }
-	50% { color:#6767b2; background:white; }
-	100% { color:white; background:#6767b2; }
+	0% {
+		color: var(--bitsy-color-main-1);
+		background: var(--bitsy-color-main-2);
+	}
+	50% {
+		color: var(--bitsy-color-main-2);
+		background: var(--bitsy-color-main-1);
+	}
+	100% {
+		color: var(--bitsy-color-main-1);
+		background: var(--bitsy-color-main-2);
+	}
 }
 
 @keyframes expressionBuilderClearShake {
@@ -448,17 +442,17 @@
 }
 
 .dialogExpressionBuilderHolder {
-	background: #e8e8ff;
-	padding: 10px;
-	border: solid 1px #ccccff;
-	border-radius: 2px;
-	margin-bottom: 10px;
-	height: 450px;
+	background: var(--bitsy-color-accent-1);
+	padding: var(--bitsy-space-m);
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
+	border-radius: var(--bitsy-space-s);
+	margin-bottom: var(--bitsy-space-m);
+	height: var(--bitsy-size-dialog-height);
 }
 
 .expressionBuilder {
-	background: white;
-	padding: 15px;
+	background: var(--bitsy-color-main-1);
+	padding: var(--bitsy-space-m);
 
 	animation-name: expressionBuilderEnter;
 	animation-duration: 0.25s;
@@ -487,16 +481,16 @@
 }
 
 .expressionEditorRoot {
-	padding: 8px;
-	border: solid 1px #ccccff;
-	border-radius: 2px;
-	margin-bottom: 10px;
+	padding: var(--bitsy-space-m);
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-accent-2);
+	border-radius: var(--bitsy-space-s);
+	margin-bottom: var(--bitsy-space-m);
 	line-height: 100%; /* hacks upon hacks */
 }
 
 .expressionBuilderInputs {
 	display: flex;
-	margin-bottom: 10px;
+	margin-bottom: var(--bitsy-space-m);
 }
 
 .expressionBuilderInputs button {
@@ -512,49 +506,67 @@
 }
 
 .addNonNumericControlBox {
-	padding: 2px;
-	border-radius: 2px;
-	margin-bottom: 5px;
+	padding: var(--bitsy-space-xs);
+	border-radius: var(--bitsy-space-xs);
+	margin-bottom: var(--bitsy-space-s);
 }
 
 /* alternate colors */
 .reverseColors {
-	background: #6767b2;
-	color: white;
+	background: var(--bitsy-color-main-2);
+	color: var(--bitsy-color-main-1);
 }
 
 .greenColor {
-	background: #cfffcf;
-	color: #4d824d;
+	background: var(--bitsy-color-dialog-string-background);
+	color: var(--bitsy-color-dialog-string-color);
 }
 
 .pinkColor {
-	background: #facdf2;
-	color: #91237e;
+	background: var(--bitsy-color-dialog-number-background);
+	color: var(--bitsy-color-dialog-number-color);
 }
 
 .goldColor {
-	background: #ffe98f;
-	color: #917d29;
+	background: var(--bitsy-color-dialog-variable-background);
+	color: var(--bitsy-color-dialog-variable-color);
 }
 
 .goldColorBackground {
-	background: #fff8de;
+	background: var(--bitsy-color-dialog-variable-background);
 }
 
 .greenColorBackground {
-	background: #edffed;
+	background: var(--bitsy-color-dialog-string-background);
 }
 
 .greenColorText {
-	color: #4d824d;
+	color: var(--bitsy-color-dialog-string-color);
 }
 
 /* misc */
 .inlineEditButtonHolder {
-	margin-left: 5px;
+	margin-left: var(--bitsy-space-s);
 }
 
 .inlineEditButtonHolder button {
-	padding: 0px;
+	padding: 0;
+}
+
+/* NEW STYLE FIXES */
+#dialog .controlBox {
+	display: block;
+}
+
+.dialogBoxContainer {
+	display: flex;
+}
+
+.dialogBoxContainer textarea {
+	background: var(--bitsy-color-dialog-text-background);
+	color: var(--bitsy-color-dialog-text-color);
+	flex-grow: 1;
+	resize: vertical;
+	padding: var(--bitsy-space-s);
+	border-radius: var(--bitsy-space-xs);
 }

@@ -1,22 +1,28 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
+		<!-- META -->
 		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0">
+
+		<!-- TITLE -->
 		<title>Bitsy</title>
-		<link rel="icon" type="image/png" href="image/cat5.png" />
+
+		<!-- APP -->
+		<script src="app.js"></script>
+		<link rel="icon" type="image/png" href="image/cat5.png">
+		<link rel="manifest" href="manifest.json">
 
 		<!-- STYLES -->
-		<link rel="stylesheet" type="text/css" href="style/bitsyStyle.css">
-		<link rel="stylesheet" type="text/css" href="style/editorStyle.css">
-		<link rel="stylesheet" type="text/css" href="style/editorButtons.css">
-		<link rel="stylesheet" type="text/css" href="style/editorColors.css">
-		<link rel="stylesheet" type="text/css" href="style/editorLanguageStyles.css">
-		<link rel="stylesheet" type="text/css" href="style/editorAnimations.css">
-		<link rel="stylesheet" type="text/css" href="style/colorPickerStyle.css">
-		<link rel="stylesheet" type="text/css" href="style/markerToolStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/bitsyEditorStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/aboutToolStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/colorsToolStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/dataToolStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/dialogToolStyle.css">
-		<link rel="stylesheet" type="text/css" href="style/responsiveStyle.css">
-		<link rel="stylesheet" type="text/css" href="style/iconStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/exitsToolStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/gifToolStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/paintToolStyle.css">
+		<link rel="stylesheet" type="text/css" href="style/settingsToolStyle.css">
 
 		<!-- GENERATED -->
 		<script src="script/generated/resources.js"></script>
@@ -52,8 +58,6 @@
 
 		<!-- FONTS -->
 		<link href="style/googleNunito.css" rel="stylesheet">
-		<link href="style/googleMaterialIcons.css" rel="stylesheet">
-
 	</head>
  
 	<body onload="start()">
@@ -68,8 +72,8 @@
 
 					<div id="logoFlexItem">
 						<span title="Bitsy ~ make little worlds ~" id="bitsyLogoTitle">
-							<img src="image/cat.svg" height="24px" width="24px" id="bitsyLogo"/>
-							<span class="localize bitsy_title">Bitsy</span>
+							<img id="bitsyLogo" src="image/cat.svg" />
+							<span id="bitsyTitle" class="localize bitsy_title">Bitsy</span>
 						</span>
 					</div>
 
@@ -80,7 +84,7 @@
 					<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" autocomplete="off" />
 					<label title="show / hide toolbar" for="toolsCheck" id="toolsCheckLabel" class="bitsy-menu-label">
 						<span class="bitsy_icon">tool</span>
-						<span class="localize tools_label">tools</span>
+						<span id="toolsCheckLabelText" class="localize tools_label">tools</span>
 					</label>
 
 				</div>
@@ -161,7 +165,7 @@
 					<span class="localize settings_tool_name">settings</span>
 				</label>
 
-				<button title="reset everything and start new game" class="color0" onclick="newGameDialog();" style="margin-left:20px;">
+				<button id="resetGameButton" title="reset everything and start new game" onclick="newGameDialog();">
 					<span class="bitsy_icon">new_game</span>
 					<span class="localize reset_game">new game</span>
 				</button>
@@ -200,19 +204,7 @@
 		<div id="editorWindow" onmousewheel="blockScrollBackpage(event);">
 			<div id="editorContent">
 
-				<div id="titlePanel" class="panel color0">
-					<div class="bar color0">
-						<div title="title window" class="panelBarTitle" onmousedown="grabCard(event);">
-							<span class="bitsy_icon">text_edit</span>
-							<span class="localize title_tool_title">title</span>
-						</div>
-					</div>
-					<div id="titlePanelInner">
-						<div class="titleWidgetContainer"></div>
-					</div>
-				</div>
-
-				<div id="aboutPanel" class="bitsy-card bitsy-workbench-item">
+				<div id="aboutPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">about</span>
 
@@ -264,7 +256,7 @@
 					</div>
 				</div>
 
-				<div id="roomPanel" class="bitsy-card bitsy-workbench-item">
+				<div id="roomPanel" class="bitsy-card bitsy-card-l bitsy-workbench-item">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">room</span>
 
@@ -319,7 +311,7 @@
 
 						<canvas id="game"></canvas>
 
-						<div class="controlBox">
+						<div class="controlBox bitsy-menu-group">
 							<span class="controlBox">
 								<span class="bitsy_icon icon_space_right">colors</span>
 								<span class="localize palette_tool_name">colors</span>: 
@@ -340,7 +332,7 @@
 							</label>
 						</div>
 
-						<div id="roomVisibilityControls" class="controlBox" style="margin-top: var(--bitsy-space-s); display: none;">
+						<div id="roomVisibilityControls" class="controlBox bitsy-menu-group" style="margin-top: var(--bitsy-space-s); display: none;">
 							<span>visibility:</span> <!-- TODO : localize -->
 
 							<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" autocomplete="off" checked/>
@@ -364,7 +356,7 @@
 					</div>
 				</div>
 
-				<div id="exitsPanel" class="bitsy-card bitsy-workbench-item" style="display:none;">
+				<div id="exitsPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item" style="display:none;">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">exits_endings</span>
 
@@ -607,7 +599,7 @@
 					</div>
 				</div>
 
-				<div id="paintPanel" class="bitsy-card bitsy-workbench-item">
+				<div id="paintPanel" class="bitsy-card bitsy-card-s bitsy-workbench-item">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">paint</span>
 
@@ -679,9 +671,7 @@
 							</button>
 						</div>
 
-						<div style="margin-bottom: 5px;">
-							<canvas id="paint"></canvas>
-						</div>
+						<canvas id="paint"></canvas>
 
 						<div id="paintEditMain">
 							<div class="buttonGroup">
@@ -717,24 +707,30 @@
 								</label>
 							</div>
 							<div id="animation" style="display:none;">
-								<div class="buttonGroup">
-									<div class="animationThumbnail preview">
-										<img id="animationThumbnailPreview" />
-										<div>
+								<div class="bitsy-menu-group">
+									<div class="bitsy-thumbnail">
+										<div class="bitsy-thumbnail-image-container">
+											<img id="animationThumbnailPreview" />
+										</div>
+										<label class="bitsy-menu-label">
 											<span class="localize animation_preview">preview</span>
-										</div>
+										</label>
 									</div>
-									<div id="animationKeyframe1" class="animationThumbnail left selected" onclick="on_paint_frame1();">
-										<img id="animationThumbnailFrame1" />
-										<div>
+									<div id="animationKeyframe1" class="bitsy-thumbnail" onclick="on_paint_frame1();">
+										<div class="bitsy-thumbnail-image-container">
+											<img id="animationThumbnailFrame1" />
+										</div>
+										<label class="bitsy-menu-label">
 											<span class="localize animation_frame1">frame 1</span>
-										</div>
+										</label>
 									</div>
-									<div id="animationKeyframe2" class="animationThumbnail right unselected" onclick="on_paint_frame2();">
-										<img id="animationThumbnailFrame2" />
-										<div>
-											<span class="localize animation_frame2">frame 2</span>
+									<div id="animationKeyframe2" class="bitsy-thumbnail" onclick="on_paint_frame2();">
+										<div class="bitsy-thumbnail-image-container">
+											<img id="animationThumbnailFrame2" />
 										</div>
+										<label class="bitsy-menu-label">
+											<span class="localize animation_frame2">frame 2</span>
+										</label>
 									</div>
 								</div>
 							</div>
@@ -833,7 +829,7 @@
 					</div>
 				</div>
 
-				<div id="dialogPanel" class="bitsy-card bitsy-workbench-item">
+				<div id="dialogPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">dialog</span>
 
@@ -914,7 +910,7 @@
 					</div>
 				</div>
 
-				<div id="inventoryPanel" class="bitsy-card bitsy-workbench-item">
+				<div id="inventoryPanel" class="bitsy-card bitsy-card-s bitsy-workbench-item">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">item</span>
 
@@ -929,24 +925,26 @@
 
 					<div class="bitsy-card-main">
 						<!-- TODO -->
-						<form>
-							<input type="radio" name="inventory mode" value="item" onclick="showInventoryItem();" id="inventoryOptionItem" checked>
-							<label title="items: set count of items the player starts with" for="inventoryOptionItem" class="left">
-								<span class="bitsy_icon">item</span>
-								<span class="localize items_label">items</span>
-							</label>
-							<input type="radio" name="inventory mode" value="variable" onclick="showInventoryVariable()" id="inventoryOptionVariable">
-							<label title="variables: set initial values of variables" for="inventoryOptionVariable" class="right">
-								<!-- TODO : bitsy_icon -- does this need its own special icon? -->
-								<span class="bitsy_icon">code_edit</span>
-								<span class="localize variables_label">variables</span>
-							</label>
-						</form>
-
-						<div id="inventoryItem" class="inventoryViewport">
+						<div class="bitsy-menu-group">
+							<form>
+								<input type="radio" name="inventory mode" value="item" onclick="showInventoryItem();" id="inventoryOptionItem" checked>
+								<label title="items: set count of items the player starts with" for="inventoryOptionItem" class="left">
+									<span class="bitsy_icon">item</span>
+									<span class="localize items_label">items</span>
+								</label>
+								<input type="radio" name="inventory mode" value="variable" onclick="showInventoryVariable()" id="inventoryOptionVariable">
+								<label title="variables: set initial values of variables" for="inventoryOptionVariable" class="right">
+									<!-- TODO : bitsy_icon -- does this need its own special icon? -->
+									<span class="bitsy_icon">code_edit</span>
+									<span class="localize variables_label">variables</span>
+								</label>
+							</form>
 						</div>
 
-						<div id="inventoryVariable" class="inventoryViewport" style="display:none;">
+						<div id="inventoryItem" class="bitsy-menu-scrollview">
+						</div>
+
+						<div id="inventoryVariable" class="bitsy-menu-scrollview" style="display:none;">
 						</div>
 					</div>
 				</div>
@@ -998,7 +996,7 @@
 					</div>
 				</div>
 
-				<div id="gifPanel" class="bitsy-card bitsy-workbench-item" style="display:none;">
+				<div id="gifPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item" style="display:none;">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">record</span>
 
@@ -1012,50 +1010,53 @@
 					</div>
 
 					<div class="bitsy-card-main">
-						<button title="start recording a gif of your game" class="color0" id="gifStartButton" onclick="startRecordingGif();">
-							<span class="bitsy_icon">record</span>
-							<span class="localize gif_start">start recording</span>
-						</button>
-						<button title="stop recording a gif of your game" class="color0" id="gifStopButton" onclick="stopRecordingGif();" style="display:none;">
-							<span class="bitsy_icon">record_stop</span>
-							<span class="localize gif_stop">stop recording</span>
-						</button>
-						<span id="gifRecordingText" style="display:none;">
-							<span class="bitsy_icon_anim">record_on</span>
-							<span class="localize gif_recording">recording...</span>
-						</span>
-						<span id="gifEncodingText" style="display:none;">
-							<span class="bitsy_icon_anim">record_processing</span>
-							<span class="localize gif_encoding">encoding...</span> <span id="gifEncodingProgress">0</span>%
-						</span>
+						<div class="bitsy-menu-group">
+							<button title="start recording a gif of your game" class="color0" id="gifStartButton" onclick="startRecordingGif();">
+								<span class="bitsy_icon">record</span>
+								<span class="localize gif_start">start recording</span>
+							</button>
 
-						<button title="make screenshot of current room" class="color0" id="gifSnapshotButton" onclick="takeSnapshotGif(event);"  style="margin-left: 10px;">
-							<span class="bitsy_icon">record_snapshot</span>
-							<span class="localize gif_snapshot">snapshot</span>
-						</button>
+							<button title="stop recording a gif of your game" class="color0" id="gifStopButton" onclick="stopRecordingGif();" style="display:none;">
+								<span class="bitsy_icon">record_stop</span>
+								<span class="localize gif_stop">stop recording</span>
+							</button>
 
-						<button title="snapshot mode: square" id="gifSnapshotModeButton" onclick="toggleSnapshotMode();">
-							<span id="gifSnapshotModeIcon" class="bitsy_icon">pagesize_full</span>
-						</button>
+							<span id="gifRecordingText" style="display:none;">
+								<span class="bitsy_icon_anim">record_on</span>
+								<span class="localize gif_recording">recording...</span>
+							</span>
 
-						<br/>
+							<span id="gifEncodingText" style="display:none;">
+								<span class="bitsy_icon_anim">record_processing</span>
+								<span class="localize gif_encoding">encoding...</span> <span id="gifEncodingProgress">0</span>%
+							</span>
 
-						<div style="margin-top: 5px;">
-							<img id="gifPreview" style="display:none;" />
+							<button title="make screenshot of current room" class="color0" id="gifSnapshotButton" onclick="takeSnapshotGif(event);">
+								<span class="bitsy_icon">record_snapshot</span>
+								<span class="localize gif_snapshot">snapshot</span>
+							</button>
+
+							<button title="snapshot mode: square" id="gifSnapshotModeButton" onclick="toggleSnapshotMode();">
+								<span id="gifSnapshotModeIcon" class="bitsy_icon">pagesize_full</span>
+							</button>
+						</div>
+
+						<div id="gifPreviewContainer">
+							<img id="gifPreview" style="display: none;" />
 							<div id="gifPlaceholder"></div>
 						</div>
 
-						<br/>
-
-						<span class="bitsy_icon icon_space_right">download</span>
-						<a title="download latest gif recording of your game" href="" download="recording.gif" id="gifDownload">
-							<span class="localize gif_download">download gif</span>
-						</a>
+						<div class="bitsy-menu-group">
+							<span class="bitsy_icon icon_space_right">download</span>
+							<a title="download latest gif recording of your game" href="" download="recording.gif" id="gifDownload">
+								<span class="localize gif_download">download gif</span>
+							</a>
+						</div>
 
 					</div>
 				</div>
 
-				<div id="dataPanel" class="bitsy-card bitsy-workbench-item" style="display:none;">
+				<div id="dataPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item" style="display:none;">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">game_data</span>
 
@@ -1088,7 +1089,7 @@
 					</div>
 				</div>
 
-				<div id="settingsPanel" class="bitsy-card bitsy-workbench-item" style="display:none;">
+				<div id="settingsPanel" class="bitsy-card bitsy-card-s bitsy-workbench-item" style="display:none;">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">settings</span>
 

@@ -1,0 +1,19 @@
+#paintModeRadio {
+	display: flex;
+}
+
+#animationOuter {
+	margin-top: var(--bitsy-space-s);
+}
+
+#animation .bitsy-thumbnail {
+	font-size: 85%;
+}
+
+#animation .bitsy-thumbnail .bitsy-thumbnail-image-container {
+	border-color: var(--bitsy-color-accent-1);
+}
+
+#animation .bitsy-thumbnail.bitsy-thumbnail-selected .bitsy-thumbnail-image-container {
+	border-color: var(--bitsy-color-main-2);
+}

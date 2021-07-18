@@ -1,0 +1,69 @@
+:root {
+	--bitsy-color-contrast-with-light: black;
+	--bitsy-color-contrast-with-dark: white;
+}
+
+#colorPaletteForm input[type=radio] {
+	display: none;
+}
+
+#colorPicker {
+	display: flex;
+	flex-direction: column;
+}
+
+#colorPickerWheel {
+	width: 100%;
+	display: block;
+	background: transparent;
+}
+
+#colorPickerSelect {
+	width: 100%;
+	margin-top: calc(-1 * 100%);
+	display: block;
+	cursor: pointer;
+	background: transparent;
+}
+
+#colorPickerHexText {
+}
+
+#colorPickerSliderBg {
+	background: linear-gradient(to right, yellow, black);
+	margin: var(--bitsy-space-s);
+	padding: var(--bitsy-space-s);
+	border-radius: var(--bitsy-space-s);
+}
+
+#colorPaletteForm input[type=radio] + label {
+	display: block;
+	margin-bottom: var(--bitsy-space-s);
+	background: var(--bitsy-color-accent-1);
+	border-radius: var(--bitsy-space-s);
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-neutral-1);
+}
+
+#colorPaletteForm input[type=radio]:checked + label {
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-contrast-with-light);
+	background: var(--bitsy-color-accent-1);
+	padding-top: var(--bitsy-space-m);
+	padding-bottom: var(--bitsy-space-m);
+	text-align: middle;
+}
+
+#colorPickerSliderThumb {
+	height: var(--bitsy-space-l);
+	width: var(--bitsy-space-m);
+	background: var(--bitsy-color-contrast-with-dark);
+	border: solid var(--bitsy-space-xs) var(--bitsy-color-contrast-with-light);
+	pointer-events: none;
+}
+
+#colorPaletteForm input[type="radio"] + label.colorPaletteLabelDark {
+	color: var(--bitsy-color-contrast-with-dark); /* white text for dark backgrounds */
+}
+
+#colorPaletteForm input[type="radio"] + label.colorPaletteLabelLight {
+	color: var(--bitsy-color-contrast-with-light); /* black text for light backgrounds */
+}

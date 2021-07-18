@@ -1,0 +1,7 @@
+#settingsInner .controlBox {
+	display: block;
+}
+
+#settingsInner {
+	white-space: normal;
+}
