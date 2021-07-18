@@ -533,9 +533,9 @@ input[type=checkbox] + label:hover {
 }
 
 #editorContent {
-	height: 100%;
+	display: flex;
+	align-items: flex-start;
 	white-space: nowrap;
-	display: inline-block;
 	padding-right: var(--bitsy-space-m);
 }
 
