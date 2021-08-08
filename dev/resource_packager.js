@@ -16,6 +16,7 @@ var resourceFiles = [
 	"resources/export/exportStyleFixed.css",
 	"resources/export/exportStyleFull.css",
 	/* engine scripts */
+	"../editor/script/engine/system.js",
 	"../editor/script/engine/bitsy.js",
 	"../editor/script/engine/font.js",
 	"../editor/script/engine/dialog.js",

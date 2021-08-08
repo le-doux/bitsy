@@ -1,7 +1,7 @@
 // store if log categories are enabled
 var DebugLogCategory = {
-	bitsy : true,
-	editor : true,
+	bitsy : false,
+	editor : false,
 };
 
 function bitsyLog(message, category) {

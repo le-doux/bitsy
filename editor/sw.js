@@ -2,7 +2,7 @@
 SERVICE WORKER
 */
 
-var cacheVersionId = "bitsy-cache-v1";
+var cacheVersionId = "bitsy-cache-v7.7";
 
 self.addEventListener("install", function(event) {
 	event.waitUntil(
@@ -36,6 +36,7 @@ self.addEventListener("install", function(event) {
 				"./script/engine/font.js",
 				"./script/engine/renderer.js",
 				"./script/engine/script.js",
+				"./script/engine/system.js",
 				"./script/engine/transition.js",
 				"./script/event_manager.js",
 				"./script/exporter.js",
