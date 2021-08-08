@@ -35,8 +35,8 @@ function PaintTool(canvas, roomTool) {
 			return; //can't paint during play mode
 		}
 
-		console.log("PAINT TOOL!!!");
-		console.log(e);
+		bitsyLog("PAINT TOOL!!!", "editor");
+		bitsyLog(e, "editor");
 
 		var off = getOffset(e);
 
@@ -74,7 +74,7 @@ function PaintTool(canvas, roomTool) {
 	}
 
 	function onMouseUp(e) {
-		console.log("?????");
+		bitsyLog("?????", "editor");
 		if (isPainting) {
 			isPainting = false;
 			updateDrawingData();

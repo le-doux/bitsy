@@ -1,6 +1,6 @@
 // todo : deprecate this old version of the thumbnail renderer
 function ThumbnailRenderer() {
-	console.log("NEW THUMB RENDERER");
+	bitsyLog("NEW THUMB RENDERER", "editor");
 
 	var drawingThumbnailCanvas, drawingThumbnailCtx;
 	drawingThumbnailCanvas = document.createElement("canvas");
@@ -48,7 +48,7 @@ function ThumbnailRenderer() {
 			hexPalette.push(hexStr);
 		}
 
-		// console.log(id);
+		// bitsyLog(id, "editor");
 
 		var drawingFrameData = [];
 
@@ -125,8 +125,19 @@ function ThumbnailRendererBase(getRenderable, getHexPalette, onRender) {
 	function render(id, options) {
 		var renderable = getRenderable(id);
 
+		if (!renderable) {
+			// todo : find and fix the root cause of these render issues
+			bitsyLog("oh no! thumbnail renderer can't get renderable object! :(", "editor");
+			return;
+		}
+
 		var hexPalette = getHexPalette(renderable);
 		var renderFrames = onRender(renderable, renderCtx, options);
+
+		if (renderFrames.length <= 0) {
+			bitsyLog("oh no! the thumbnail frame list is empty >:(", "editor");
+			return;
+		}
 
 		var cacheId = options && options.cacheId ? options.cacheId : id;
 
@@ -208,9 +219,14 @@ function createDrawingThumbnailRenderer(source) {
 			for (var i = 0; i < drawing.animation.frameCount; i++) {
 				if (options.isAnimated || options.frameIndex === i) {
 					var renderedImg = renderer.GetImage(drawing, palId, i);
-					ctx.drawImage(renderedImg, 0, 0, tilesize * scale, tilesize * scale);
 
-					renderFrames.push(ctx.getImageData(0, 0, 8 * scale, 8 * scale).data);
+					if (renderedImg) {
+						ctx.drawImage(renderedImg, 0, 0, tilesize * scale, tilesize * scale);
+						renderFrames.push(ctx.getImageData(0, 0, 8 * scale, 8 * scale).data);
+					}
+					else {
+						bitsyLog("oh no! image render for thumbnail failed", "editor");
+					}
 				}
 			}
 		}
@@ -306,7 +322,7 @@ function createRoomThumbnailRenderer() {
 			var roomId = r.id;
 			var hexPalette = getHexPalette(r);
 
-			console.log(hexPalette);
+			bitsyLog(hexPalette, "editor");
 
 			ctx.fillStyle = "#" + hexPalette[0];
 			ctx.fillRect(0, 0, roomRenderSize, roomRenderSize);

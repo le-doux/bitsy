@@ -91,7 +91,7 @@ var DialogRenderer = function() {
 		0,0,1,0,0
 	];
 	this.DrawNextArrow = function() {
-		// console.log("draw arrow!");
+		// bitsyLog("draw arrow!");
 		var top = (textboxInfo.height-5) * scale;
 		var left = (textboxInfo.width-(5+4)) * scale;
 		if (textDirection === TextDirection.RightToLeft) { // RTL hack
@@ -238,7 +238,7 @@ var DialogBuffer = function() {
 		for (var i = 0; i < rowCount; i++) {
 			var row = this.CurPage()[i];
 			var charCount = (i == rowIndex) ? charIndex+1 : row.length;
-			// console.log(charCount);
+			// bitsyLog(charCount);
 
 			var leftPos = 0;
 			if (textDirection === TextDirection.RightToLeft) {
@@ -251,7 +251,7 @@ var DialogBuffer = function() {
 					if (textDirection === TextDirection.RightToLeft) {
 						leftPos -= char.spacing;
 					}
-					// console.log(j + " " + leftPos);
+					// bitsyLog(j + " " + leftPos);
 
 					// handler( char, i /*rowIndex*/, j /*colIndex*/ );
 					handler(char, i /*rowIndex*/, j /*colIndex*/, leftPos)
@@ -326,7 +326,7 @@ var DialogBuffer = function() {
 	};
 
 	this.Skip = function() {
-		console.log("SKIPPP");
+		bitsyLog("SKIPPP");
 		didPageFinishThisFrame = false;
 		didFlipPageThisFrame = false;
 		// add new characters until you get to the end of the current line of dialog
@@ -362,7 +362,7 @@ var DialogBuffer = function() {
 	var afterManualPagebreak = false; // is it bad to track this state like this?
 
 	this.Continue = function() {
-		console.log("CONTINUE");
+		bitsyLog("CONTINUE");
 
 		// if we used a page break character to continue we need
 		// to run whatever is in the script afterwards! // TODO : make this comment better
@@ -375,13 +375,13 @@ var DialogBuffer = function() {
 			return false;
 		}
 		if (pageIndex + 1 < this.CurPageCount()) {
-			console.log("FLIP PAGE!");
+			bitsyLog("FLIP PAGE!");
 			//start next page
 			this.FlipPage();
 			return true; /* hasMoreDialog */
 		}
 		else {
-			console.log("END DIALOG!");
+			bitsyLog("END DIALOG!");
 			//end dialog mode
 			this.EndDialog();
 			return false; /* hasMoreDialog */
@@ -412,17 +412,17 @@ var DialogBuffer = function() {
 		this.row = 0;
 
 		this.SetPosition = function(row,col) {
-			// console.log("SET POS");
-			// console.log(this);
+			// bitsyLog("SET POS");
+			// bitsyLog(this);
 			this.row = row;
 			this.col = col;
 		}
 
 		this.ApplyEffects = function(time) {
-			// console.log("APPLY EFFECTS! " + time);
+			// bitsyLog("APPLY EFFECTS! " + time);
 			for(var i = 0; i < this.effectList.length; i++) {
 				var effectName = this.effectList[i];
-				// console.log("FX " + effectName);
+				// bitsyLog("FX " + effectName);
 				TextEffects[ effectName ].DoEffect( this, time );
 			}
 		}
@@ -433,7 +433,7 @@ var DialogBuffer = function() {
 		}
 		this.OnPrint = function() {
 			if (printHandler != null) {
-				// console.log("PRINT HANDLER ---- DIALOG BUFFER");
+				// bitsyLog("PRINT HANDLER ---- DIALOG BUFFER");
 				printHandler();
 				printHandler = null; // only call handler once (hacky)
 			}
@@ -467,7 +467,7 @@ var DialogBuffer = function() {
 		var imageData = renderer.GetImageSource(drawingId)[0];
 		var imageDataFlat = [];
 		for (var i = 0; i < imageData.length; i++) {
-			// console.log(imageData[i]);
+			// bitsyLog(imageData[i]);
 			imageDataFlat = imageDataFlat.concat(imageData[i]);
 		}
 
@@ -548,7 +548,7 @@ var DialogBuffer = function() {
 	}
 
 	this.AddDrawing = function(drawingId) {
-		// console.log("DRAWING ID " + drawingId);
+		// bitsyLog("DRAWING ID " + drawingId);
 
 		var curPageIndex = buffer.length - 1;
 		var curRowIndex = buffer[curPageIndex].length - 1;
@@ -600,7 +600,7 @@ var DialogBuffer = function() {
 
 	// TODO : convert this into something that takes DialogChar arrays
 	this.AddText = function(textStr) {
-		console.log("ADD TEXT " + textStr);
+		bitsyLog("ADD TEXT " + textStr);
 
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
@@ -679,7 +679,7 @@ var DialogBuffer = function() {
 			var lastChar = lastRow[lastRow.length-1];
 		}
 
-		// console.log(buffer);
+		// bitsyLog(buffer);
 
 		isActive = true;
 	};
@@ -687,7 +687,7 @@ var DialogBuffer = function() {
 	this.AddLinebreak = function() {
 		var lastPage = buffer[buffer.length-1];
 		if (lastPage.length <= 1) {
-			// console.log("LINEBREAK - NEW ROW ");
+			// bitsyLog("LINEBREAK - NEW ROW ");
 			// add new row
 			lastPage.push([]);
 		}
@@ -695,7 +695,7 @@ var DialogBuffer = function() {
 			// add new page
 			buffer.push([[]]);
 		}
-		// console.log(buffer);
+		// bitsyLog(buffer);
 
 		isActive = true;
 	}
@@ -907,10 +907,10 @@ var TextEffects = new Map();
 
 var RainbowEffect = function() { // TODO - should it be an object or just a method?
 	this.DoEffect = function(char,time) {
-		// console.log("RAINBOW!!!");
-		// console.log(char);
-		// console.log(char.color);
-		// console.log(char.col);
+		// bitsyLog("RAINBOW!!!");
+		// bitsyLog(char);
+		// bitsyLog(char.color);
+		// bitsyLog(char.col);
 
 		var h = Math.abs( Math.sin( (time / 600) - (char.col / 8) ) );
 		var rgb = hslToRgb( h, 1, 0.5 );
@@ -926,7 +926,7 @@ var ColorEffect = function(index) {
 	this.DoEffect = function(char) {
 		var pal = getPal( curPal() );
 		var color = pal[ parseInt( index ) ];
-		// console.log(color);
+		// bitsyLog(color);
 		char.color.r = color[0];
 		char.color.g = color[1];
 		char.color.b = color[2];

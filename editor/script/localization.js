@@ -27,26 +27,26 @@ var defaultLanguage = "en";
 
 var initialize = function() { // why does this happen multiple times?
 	var csv = Resources["localization.tsv"];
-	// console.log(csv);
+	// bitsyLog(csv, "editor");
 
 	localizationStrings = {};
 
 	csv = csv.replace(/\r/g,""); // weird sanitization bug required
-	// console.log(csv);
+	// bitsyLog(csv, "editor");
 	var lines = csv.split("\n");
-	// console.log(lines);
+	// bitsyLog(lines, "editor");
 
 	var columnHeaders = lines[0].split("\t");
-	// console.log(columnHeaders);
+	// bitsyLog(columnHeaders, "editor");
 	for(var i = 1; i < columnHeaders.length; i++) {
-		// console.log(columnHeaders[i]);
+		// bitsyLog(columnHeaders[i], "editor");
 		localizationStrings[columnHeaders[i]] = {};
 	}
 
 	for(var i = 1; i < lines.length; i++) {
-		// console.log(lines[i]);
+		// bitsyLog(lines[i], "editor");
 		var lineSplit = lines[i].split("\t");
-		// console.log(lineSplit);
+		// bitsyLog(lineSplit, "editor");
 		var lineId = lineSplit[0];
 		for(var j = 1; j < lineSplit.length; j++) {
 			var languageId = columnHeaders[j];
@@ -56,7 +56,7 @@ var initialize = function() { // why does this happen multiple times?
 
 	currentLanguage = initialLanguage || Store.get('editor_language', defaultLanguage);
 
-	// console.log(localizationStrings);
+	// bitsyLog(localizationStrings, "editor");
 	// localize( getEditorLanguage() );
 };
 
@@ -83,7 +83,7 @@ function localize(language) {
 	if(localizationStrings == null)
 		return;
 
-	console.log("LANG " + language);
+	bitsyLog("LANG " + language, "editor");
 
 	var elements = document.getElementsByClassName(localizationClass);
 	for(var i = 0; i < elements.length; i++) {
@@ -191,7 +191,7 @@ function exportEnglishStringsDictionary(englishStrings) {
 		englishStringTsv += stringId + "\t" + englishStrings[stringId] + "\n";
 	}
 
-	// console.log(englishStringTsv);
+	// bitsyLog(englishStringTsv, "editor");
 	ExporterUtils.DownloadFile("englishStrings.tsv",englishStringTsv);
 }
 

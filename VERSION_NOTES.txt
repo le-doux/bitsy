@@ -1,5 +1,6 @@
 v7.7:
 - attempt to fix bug where extra frame is added to animation
+- fix bug where games can't be uploaded from HTML
 
 v7.6:
 - new layout for mobile devices

@@ -12,7 +12,7 @@ function EventManager() {
 		callbacks[eventName].push(callback);
 
 		if (isDebug) {
-			console.log("EVENTS >>> " + eventName + " >>> " + callbacks[eventName].length);
+			bitsyLog("EVENTS >>> " + eventName + " >>> " + callbacks[eventName].length, "editor");
 		}
 
 		return callback;
@@ -25,7 +25,7 @@ function EventManager() {
 				callbacks[eventName].splice(i, 1);
 
 				if (isDebug) {
-					console.log("EVENTS >>> " + eventName + " >>> " + callbacks[eventName].length);
+					bitsyLog("EVENTS >>> " + eventName + " >>> " + callbacks[eventName].length, "editor");
 				}
 			}
 		}
@@ -34,14 +34,14 @@ function EventManager() {
 	// this.Remove // TODO (use indexOf)
 
 	this.Raise = function(eventName, eventObj) {
-		// console.log(">>> EVENT > " + eventName);
+		// bitsyLog(">>> EVENT > " + eventName, "editor");
 
 		if (callbacks[eventName] == null) {
 			return;
 		}
 
 		eventStack.push(eventName);
-		// console.log(eventStack);
+		// bitsyLog(eventStack, "editor");
 
 		for (var i = 0; i < callbacks[eventName].length; i++) {
 			callbacks[eventName][i](eventObj);
