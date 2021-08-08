@@ -773,17 +773,28 @@ function getPanelPrefs() {
 	return prefs;
 }
 
-var urlFlags = {};
-function readUrlFlags() {
-	bitsyLog("@@@@@ FLAGGS", "editor")
+var urlParameters = {};
+function readUrlParameters() {
+	bitsyLog(" --- reading url parameters --- ", "editor");
+
 	var urlSplit = window.location.href.split("?");
-	if (urlSplit.length > 1) {
-		for(var i = 1; i < urlSplit.length; i++) {
-			var flagSplit = urlSplit[i].split("=");
-			urlFlags[ flagSplit[0] ] = flagSplit[1];
+
+	if (urlSplit.length >= 2) {
+		var queryString = urlSplit[1];
+		var queryStringSplit = queryString.split("&");
+
+		for (var i = 0; i < queryStringSplit.length; i++) {
+			var parameterSplit = queryStringSplit[i].split("=");
+
+			if (parameterSplit.length >= 2) {
+				var parameterName = parameterSplit[0];
+				var parameterValue = parameterSplit[1];
+
+				bitsyLog("parameter " + parameterName + " = " + parameterValue, "editor");
+				urlParameters[parameterName] = parameterValue;
+			}
 		}
 	}
-	bitsyLog(urlFlags, "editor");
 }
 
 function isPortraitOrientation() {
@@ -822,7 +833,7 @@ function start() {
 
 	detectBrowserFeatures();
 
-	readUrlFlags();
+	readUrlParameters();
 
 	// load icons and replace placeholder elements
 	var elements = document.getElementsByClassName("bitsy_icon");
@@ -836,7 +847,7 @@ function start() {
 	}
 
 	// localization
-	localization = new Localization(urlFlags["lang"]);
+	localization = new Localization(urlParameters["lang"]);
 	Store.init(function () {
 		// TODO: localize
 		window.alert('A storage error occurred: The editor will continue to work, but data may not be saved/loaded. Make sure to export a local copy after making changes, or your gamedata may be lost!');
