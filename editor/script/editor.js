@@ -2799,11 +2799,12 @@ function addSpriteAnimation() {
 
 	//add blank frame to sprite (or restore removed animation)
 	var spriteImageId = "SPR_" + drawing.id;
-	if (sprite[drawing.id].cachedAnimation != null) {
-		restoreDrawingAnimation( spriteImageId, sprite[drawing.id].cachedAnimation )
+
+	if (sprite[drawing.id].cachedAnimation && sprite[drawing.id].cachedAnimation.length >= 1) {
+		addDrawingAnimation(spriteImageId, sprite[drawing.id].cachedAnimation[0]);
 	}
 	else {
-		addNewFrameToDrawing( spriteImageId );
+		addDrawingAnimation(spriteImageId);
 	}
 
 	// TODO RENDERER : refresh images
@@ -2852,11 +2853,11 @@ function addTileAnimation() {
 
 	//add blank frame to tile (or restore removed animation)
 	var tileImageId = "TIL_" + drawing.id;
-	if (tile[drawing.id].cachedAnimation != null) {
-		restoreDrawingAnimation( tileImageId, tile[drawing.id].cachedAnimation )
+	if (tile[drawing.id].cachedAnimation && tile[drawing.id].cachedAnimation.length >= 1) {
+		addDrawingAnimation(tileImageId, tile[drawing.id].cachedAnimation[0]);
 	}
 	else {
-		addNewFrameToDrawing( tileImageId );
+		addDrawingAnimation(tileImageId);
 	}
 
 	// TODO RENDERER : refresh images
@@ -2906,11 +2907,11 @@ function addItemAnimation() {
 
 	//add blank frame to item (or restore removed animation)
 	var itemImageId = "ITM_" + drawing.id;
-	if (item[drawing.id].cachedAnimation != null) {
-		restoreDrawingAnimation( itemImageId, item[drawing.id].cachedAnimation )
+	if (item[drawing.id].cachedAnimation && item[drawing.id].cachedAnimation.length >= 1) {
+		addDrawingAnimation(itemImageId, item[drawing.id].cachedAnimation[0]);
 	}
 	else {
-		addNewFrameToDrawing( itemImageId );
+		addDrawingAnimation(itemImageId);
 	}
 
 	// TODO RENDERER : refresh images
@@ -2947,40 +2948,38 @@ function removeItemAnimation() {
 	resetAllAnimations();
 }
 
-function addNewFrameToDrawing(drwId) {
-	// copy first frame data into new frame
+function addDrawingAnimation(drwId, frameData) {
 	var imageSource = renderer.GetImageSource(drwId);
-	var firstFrame = imageSource[0];
-	var newFrame = [];
-	for (var y = 0; y < tilesize; y++) {
-		newFrame.push([]);
-		for (var x = 0; x < tilesize; x++) {
-			newFrame[y].push( firstFrame[y][x] );
+
+	if (!frameData) {
+		var firstFrame = imageSource[0];
+
+		// copy first frame data into second frame
+		frameData = [];
+		for (var y = 0; y < tilesize; y++) {
+			frameData.push([]);
+			for (var x = 0; x < tilesize; x++) {
+				frameData[y].push(firstFrame[y][x]);
+			}
 		}
 	}
-	imageSource.push( newFrame );
+
+	imageSource[1] = frameData;
+
 	renderer.SetImageSource(drwId, imageSource);
 }
 
 function removeDrawingAnimation(drwId) {
 	var imageSource = renderer.GetImageSource(drwId);
 	var oldImageData = imageSource.slice(0);
-	renderer.SetImageSource( drwId, [ oldImageData[0] ] );
+	renderer.SetImageSource(drwId, [oldImageData[0]]);
 }
 
 // let's us restore the animation during the session if the user wants it back
-function cacheDrawingAnimation(drawing,sourceId) {
+function cacheDrawingAnimation(drawing, sourceId) {
 	var imageSource = renderer.GetImageSource(sourceId);
 	var oldImageData = imageSource.slice(0);
-	drawing.cachedAnimation = [ oldImageData[1] ]; // ah the joys of javascript
-}
-
-function restoreDrawingAnimation(sourceId,cachedAnimation) {
-	var imageSource = renderer.GetImageSource(sourceId);
-	for (f in cachedAnimation) {
-		imageSource.push( cachedAnimation[f] );	
-	}
-	renderer.SetImageSource(sourceId, imageSource);
+	drawing.cachedAnimation = [oldImageData[1]]; // ah the joys of javascript
 }
 
 function on_paint_frame1() {
