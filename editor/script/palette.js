@@ -43,7 +43,7 @@ function PaletteTool(colorPicker,labelIds,nameFieldId) {
 	function changeColorPickerIndex(index) {
 		colorPickerIndex = index;
 		var color = getPal(GetSelectedId())[ index ];
-		// console.log(color);
+		// bitsyLog(color, "editor");
 		colorPicker.setColor( color[0], color[1], color[2] );
 	}
 	this.changeColorPickerIndex = changeColorPickerIndex;

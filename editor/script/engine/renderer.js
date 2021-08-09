@@ -11,7 +11,7 @@ TODO
 
 function Renderer(tilesize, scale) {
 
-console.log("!!!!! NEW RENDERER");
+bitsyLog("!!!!! NEW RENDERER");
 
 var imageStore = { // TODO : rename to imageCache
 	source: {},
@@ -53,7 +53,7 @@ var debugRenderCount = 0;
 // TODO : change image store path from (pal > col > draw) to (draw > pal > col)
 function renderImage(drawing, paletteId) {
 	// debugRenderCount++;
-	// console.log("RENDER COUNT " + debugRenderCount);
+	// bitsyLog("RENDER COUNT " + debugRenderCount);
 
 	var col = drawing.col;
 	var colStr = "" + col;
@@ -81,7 +81,7 @@ function renderImage(drawing, paletteId) {
 }
 
 function imageDataFromImageSource(imageSource, pal, col) {
-	//console.log(imageSource);
+	//bitsyLog(imageSource);
 
 	var img = context.createImageData(tilesize*scale,tilesize*scale);
 

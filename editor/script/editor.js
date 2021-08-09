@@ -138,7 +138,7 @@ function safeParseHex(str) {
 function getContrastingColor(palId) {
 	if (!palId) palId = curPal();
 	var hsl = rgbToHsl( getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2] );
-	// console.log(hsl);
+	// bitsyLog(hsl, "editor");
 	var lightness = hsl[2];
 	if (lightness > 0.5) {
 		return "#000";
@@ -230,17 +230,17 @@ function mobileOffsetCorrection(off,e,innerSize) {
 		off.y -= (bounds.height - bounds.width) / 2;
 	}
 
-	// console.log(off);
+	// bitsyLog(off, "editor");
 
 	// convert container size to internal canvas size
 	var containerRatio = innerSize / Math.min( bounds.width, bounds.height );
 
-	// console.log(containerRatio);
+	// bitsyLog(containerRatio, "editor");
 
 	off.x *= containerRatio;
 	off.y *= containerRatio;
 
-	// console.log(off);
+	// bitsyLog(off, "editor");
 
 	return off;
 }
@@ -336,7 +336,7 @@ function openDialogTool(dialogId, insertNextToId, showIfHidden) { // todo : rena
 		(insertNextToId != undefined && insertNextToId != null);
 
 	if (isHiddenOrShouldMove && showIfHidden) {
-		console.log("insert next to : " + insertNextToId);
+		bitsyLog("insert next to : " + insertNextToId, "editor");
 		showPanel("dialogPanel", insertNextToId);
 	}
 
@@ -405,7 +405,7 @@ function prevDialog() {
 		}
 	}
 
-	console.log("PREV DIALOG " + id);
+	bitsyLog("PREV DIALOG " + id, "editor");
 
 	openDialogTool(id);
 
@@ -531,7 +531,7 @@ function getCurDialogId() {
 
 function setDefaultGameState() {
 	var defaultData = Resources["defaultGameData.bitsy"];
-	// console.log("DEFAULT DATA \n" + defaultData);
+	// bitsyLog("DEFAULT DATA \n" + defaultData, "editor");
 	document.getElementById("game_data").value = defaultData;
 	Store.set('game_data', document.getElementById("game_data").value); // save game
 	clearGameData();
@@ -611,7 +611,7 @@ function refreshGameData() {
 
 	Store.set("game_data", gameDataNoFonts);
 
-	events.Raise("game_data_refresh");
+	// events.Raise("game_data_refresh");
 }
 
 /* TIMER */
@@ -671,7 +671,7 @@ var defaultFonts = [
 fontManager = new FontManager(defaultFonts); // replaces font manager in the engine with one containing all fonts loaded in the editor
 
 function detectBrowserFeatures() {
-	console.log("BROWSER FEATURES");
+	bitsyLog("BROWSER FEATURES", "editor");
 	//test feature support
 	try {
 		var input = document.createElement("input");
@@ -679,15 +679,15 @@ function detectBrowserFeatures() {
 		document.body.appendChild(input);
 
 		if (input.type === "color") {
-			console.log("color picker supported!");
+			bitsyLog("color picker supported!", "editor");
 			browserFeatures.colorPicker = true;
 		} else {
 			browserFeatures.colorPicker = false;
 		}
 
 		if(input.offsetWidth <= 10 && input.offsetHeight <= 10) {
-			// console.log(input.clientWidth);
-			console.log("WEIRD SAFARI COLOR PICKER IS BAD!");
+			// bitsyLog(input.clientWidth, "editor");
+			bitsyLog("WEIRD SAFARI COLOR PICKER IS BAD!", "editor");
 			browserFeatures.colorPicker = false;
 			document.getElementById("pageColor").type = "text";
 		}
@@ -699,7 +699,7 @@ function detectBrowserFeatures() {
 
 	var a = document.createElement('a');
 	if (typeof a.download != "undefined") {
-		console.log("downloads supported!");
+		bitsyLog("downloads supported!", "editor");
 		browserFeatures.fileDownload = true;
 	}
 	else {
@@ -708,7 +708,7 @@ function detectBrowserFeatures() {
 
 	browserFeatures.blobURL = (!!new Blob) && (URL != undefined || webkitURL != undefined);
 	if( browserFeatures.blobURL ) {
-		console.log("blob supported!");
+		bitsyLog("blob supported!", "editor");
 		makeURL = URL || webkitURL;
 	}
 }
@@ -743,7 +743,7 @@ var defaultPanelPrefs = {
 		{ id:"settingsPanel",		visible:false,	position:11 },
 	]
 };
-// console.log(defaultPanelPrefs);
+// bitsyLog(defaultPanelPrefs, "editor");
 
 function getPanelPrefs() {
 	// (TODO: weird that engine version and editor version are the same??)
@@ -754,7 +754,7 @@ function getPanelPrefs() {
 	var prefs = useDefaultPrefs ? defaultPanelPrefs : Store.get('panel_prefs', defaultPanelPrefs);
 
 	// add missing panel prefs (if any)
-	// console.log(defaultPanelPrefs);
+	// bitsyLog(defaultPanelPrefs, "editor");
 	for( var i = 0; i < defaultPanelPrefs.workspace.length; i++ ) {
 		var isMissing = true;
 		var panelPref = defaultPanelPrefs.workspace[i];
@@ -773,17 +773,28 @@ function getPanelPrefs() {
 	return prefs;
 }
 
-var urlFlags = {};
-function readUrlFlags() {
-	console.log("@@@@@ FLAGGS")
+var urlParameters = {};
+function readUrlParameters() {
+	bitsyLog(" --- reading url parameters --- ", "editor");
+
 	var urlSplit = window.location.href.split("?");
-	if (urlSplit.length > 1) {
-		for(var i = 1; i < urlSplit.length; i++) {
-			var flagSplit = urlSplit[i].split("=");
-			urlFlags[ flagSplit[0] ] = flagSplit[1];
+
+	if (urlSplit.length >= 2) {
+		var queryString = urlSplit[1];
+		var queryStringSplit = queryString.split("&");
+
+		for (var i = 0; i < queryStringSplit.length; i++) {
+			var parameterSplit = queryStringSplit[i].split("=");
+
+			if (parameterSplit.length >= 2) {
+				var parameterName = parameterSplit[0];
+				var parameterValue = parameterSplit[1];
+
+				bitsyLog("parameter " + parameterName + " = " + parameterValue, "editor");
+				urlParameters[parameterName] = parameterValue;
+			}
 		}
 	}
-	console.log(urlFlags);
 }
 
 function isPortraitOrientation() {
@@ -822,7 +833,7 @@ function start() {
 
 	detectBrowserFeatures();
 
-	readUrlFlags();
+	readUrlParameters();
 
 	// load icons and replace placeholder elements
 	var elements = document.getElementsByClassName("bitsy_icon");
@@ -836,7 +847,7 @@ function start() {
 	}
 
 	// localization
-	localization = new Localization(urlFlags["lang"]);
+	localization = new Localization(urlParameters["lang"]);
 	Store.init(function () {
 		// TODO: localize
 		window.alert('A storage error occurred: The editor will continue to work, but data may not be saved/loaded. Make sure to export a local copy after making changes, or your gamedata may be lost!');
@@ -856,7 +867,7 @@ function start() {
 	paintTool.onReloadItem = function(){ reloadItem() };
 
 	markerTool = new RoomMarkerTool(document.getElementById("markerCanvas1"), document.getElementById("markerCanvas2") );
-	console.log("MARKER TOOL " + markerTool);
+	bitsyLog("MARKER TOOL " + markerTool, "editor");
 
 	roomTool.markers = markerTool;
 
@@ -876,8 +887,8 @@ function start() {
 	//load last auto-save
 	var gamedataStorage = Store.get('game_data');
 	if (gamedataStorage) {
-		//console.log("~~~ found old save data! ~~~");
-		//console.log(gamedataStorage);
+		//bitsyLog("~~~ found old save data! ~~~", "editor");
+		//bitsyLog(gamedataStorage, "editor");
 		document.getElementById("game_data").value = gamedataStorage;
 		on_game_data_change_core();
 	}
@@ -996,7 +1007,7 @@ function start() {
 	// 	if (inputElements[i].type === "checkbox") {
 	// 		var checkbox = inputElements[i];
 	// 		if (checkbox.checked) {
-	// 			console.log(checkbox);
+	// 			bitsyLog(checkbox, "editor");
 	// 			checkbox.dispatchEvent(new Event("click"));
 	// 		}
 	// 	}
@@ -1091,8 +1102,8 @@ function on_drawing_name_change() {
 	else
 		obj.name = null;
 
-	console.log("NEW NAME!");
-	console.log(obj);
+	bitsyLog("NEW NAME!", "editor");
+	bitsyLog(obj, "editor");
 
 	updateNamesFromCurData()
 
@@ -1101,15 +1112,15 @@ function on_drawing_name_change() {
 
 	// make sure items referenced in scripts update their names
 	if(drawing.type === TileType.Item) {
-		// console.log("SWAP ITEM NAMES");
+		// bitsyLog("SWAP ITEM NAMES", "editor");
 
 		var ItemNameSwapVisitor = function() {
 			var didSwap = false;
 			this.DidSwap = function() { return didSwap; };
 
 			this.Visit = function(node) {
-				// console.log("VISIT!");
-				// console.log(node);
+				// bitsyLog("VISIT!", "editor");
+				// bitsyLog(node, "editor");
 
 				if( node.type != "function" || node.name != "item" )
 					return; // not the right type of node
@@ -1128,11 +1139,11 @@ function on_drawing_name_change() {
 		if(newName === null || newName === undefined) newName = drawing.id;
 		if(oldName === null || oldName === undefined) oldName = drawing.id;
 
-		// console.log(oldName + " <-> " + newName);
+		// bitsyLog(oldName + " <-> " + newName, "editor");
 
 		if(newName != oldName) {
 			for(dlgId in dialog) {
-				// console.log("DLG " + dlgId);
+				// bitsyLog("DLG " + dlgId, "editor");
 				var dialogScript = scriptInterpreter.Parse(dialog[dlgId].src);
 				var visitor = new ItemNameSwapVisitor();
 				dialogScript.VisitAll(visitor);
@@ -1152,7 +1163,7 @@ function on_drawing_name_change() {
 	}
 
 	refreshGameData();
-	console.log(names);
+	bitsyLog(names, "editor");
 }
 
 function on_palette_name_change(event) {
@@ -1232,7 +1243,7 @@ function duplicateRoom() {
 	roomIndex = Object.keys( room ).length;
 	var newRoomId = nextRoomId();
 
-	console.log(newRoomId);
+	bitsyLog(newRoomId, "editor");
 	var duplicateTilemap = [];
 	for (y in roomToCopy.tilemap) {
 		duplicateTilemap.push([]);
@@ -1259,7 +1270,7 @@ function duplicateRoom() {
 	refreshGameData();
 
 	curRoom = newRoomId;
-	//console.log(curRoom);
+	//bitsyLog(curRoom, "editor");
 	markerTool.SetRoom(curRoom); // hack to re-find all the markers
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
@@ -1292,7 +1303,7 @@ function newRoom() {
 	var palIdList = sortedPaletteIdList();
 	var palId = palIdList.length > 0 ? palIdList[0] : "default";
 
-	console.log(roomId);
+	bitsyLog(roomId, "editor");
 	room[roomId] = {
 		id : roomId,
 		tilemap : [
@@ -1323,7 +1334,7 @@ function newRoom() {
 	refreshGameData();
 
 	curRoom = roomId;
-	//console.log(curRoom);
+	//bitsyLog(curRoom, "editor");
 	markerTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
@@ -1711,9 +1722,9 @@ function on_play_mode() {
 	// load_game(document.getElementById("game_data").value, !isPreviewDialogMode /* startWithTitle */);
 	load_game(getFullGameData(), !isPreviewDialogMode /* startWithTitle */);
 
-	console.log("PLAY!! ~~ PREVIEW ? " + isPreviewDialogMode);
+	bitsyLog("PLAY!! ~~ PREVIEW ? " + isPreviewDialogMode, "editor");
 	if(!isPreviewDialogMode) {
-		console.log("DISALBE PREVIEW!!!");
+		bitsyLog("DISALBE PREVIEW!!!", "editor");
 		document.getElementById("previewDialogCheck").disabled = true;
 	}
 }
@@ -1781,7 +1792,7 @@ function updateRoomPaletteSelect() {
 	var palOptions = document.getElementById("roomPaletteSelect").options;
 	for (i in palOptions) {
 		var o = palOptions[i];
-		// console.log(o);
+		// bitsyLog(o, "editor");
 		if (o.value === curPal()) {
 			o.selected = true;
 		}
@@ -1979,7 +1990,7 @@ function on_paint_item_ui_update() {
 
 function editDrawingAtCoordinate(x,y) {
 	var spriteId = getSpriteAt(x,y); // todo: need more consistency with these methods
-	// console.log(spriteId);
+	// bitsyLog(spriteId, "editor");
 	if(spriteId) {
 		if(spriteId === "A") {
 			on_paint_avatar_ui_update();
@@ -1993,7 +2004,7 @@ function editDrawingAtCoordinate(x,y) {
 	}
 
 	var item = getItem(curRoom,x,y);
-	// console.log(item);
+	// bitsyLog(item, "editor");
 	if(item) {
 		on_paint_item_ui_update();
 		paintTool.selectDrawing(item[item.id]);
@@ -2001,7 +2012,7 @@ function editDrawingAtCoordinate(x,y) {
 	}
 
 	var tileId = getTile(x,y);
-	// console.log(tileId);
+	// bitsyLog(tileId, "editor");
 	if(tileId != 0) {
 		on_paint_tile_ui_update(); // really wasteful probably
 		paintTool.selectDrawing(tile[tileId]);
@@ -2052,7 +2063,7 @@ function on_game_data_change() {
 }
 
 function on_game_data_change_core() {
-	console.log(document.getElementById("game_data").value);
+	bitsyLog(document.getElementById("game_data").value, "editor");
 
 	clearGameData();
 	var version = parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
@@ -2145,7 +2156,7 @@ function updateFontDescriptionUI() {
 	for (var i in fontSelect.options) {
 		var fontOption = fontSelect.options[i];
 		var fontDescriptionId = fontOption.value + "_description";
-		// console.log(fontDescriptionId);
+		// bitsyLog(fontDescriptionId, "editor");
 		var fontDescription = document.getElementById(fontDescriptionId);
 		if (fontDescription != null) {
 			fontDescription.style.display = fontOption.selected ? "block" : "none";
@@ -2342,7 +2353,7 @@ function setElementClass(elementId, classId, addClass) {
 	else {
 		el.classList.remove(classId);
 	}
-	console.log(el.classList);
+	bitsyLog(el.classList, "editor");
 }
 
 function togglePanelAnimated(e) {
@@ -2459,10 +2470,10 @@ function afterHidePanel(id) {
 }
 
 function updatePanelPrefs() {
-	// console.log("UPDATE PREFS");
+	// bitsyLog("UPDATE PREFS", "editor");
 
 	var prefs = getPanelPrefs();
-	// console.log(prefs);
+	// bitsyLog(prefs, "editor");
 
 	var editorContent = document.getElementById("editorContent");
 	var cards = editorContent.getElementsByClassName("bitsy-workbench-item");
@@ -2481,9 +2492,9 @@ function updatePanelPrefs() {
 		}
 	}
 
-	// console.log(prefs);
+	// bitsyLog(prefs, "editor");
 	Store.set('panel_prefs', prefs);
-	// console.log(Store.get('panel_prefs'));
+	// bitsyLog(Store.get('panel_prefs'), "editor");
 }
 
 function getPanelSetting(panelId, settingId) {
@@ -2729,7 +2740,7 @@ function importFontFromFile(e) {
 
 	reader.onloadend = function() {
 		var fileText = reader.result;
-		console.log(fileText);
+		bitsyLog(fileText, "editor");
 
 		var customFontName = (fontManager.Create(fileText)).getName();
 
@@ -2752,10 +2763,10 @@ function importFontFromFile(e) {
 
 /* ANIMATION EDITING*/
 function on_toggle_animated() {
-	console.log("ON TOGGLE ANIMATED");
-	console.log(document.getElementById("animatedCheckbox").checked);
-	console.log(drawing.type);
-	console.log("~~~~~");
+	bitsyLog("ON TOGGLE ANIMATED", "editor");
+	bitsyLog(document.getElementById("animatedCheckbox").checked, "editor");
+	bitsyLog(drawing.type, "editor");
+	bitsyLog("~~~~~", "editor");
 	if ( document.getElementById("animatedCheckbox").checked ) {
 		if ( drawing.type === TileType.Sprite || drawing.type === TileType.Avatar ) {
 			addSpriteAnimation();
@@ -2768,7 +2779,7 @@ function on_toggle_animated() {
 		}
 		document.getElementById("animation").setAttribute("style","display:block;");
 		iconUtils.LoadIcon(document.getElementById("animatedCheckboxIcon"), "expand_more");
-		console.log(drawing.id);
+		bitsyLog(drawing.id, "editor");
 		renderAnimationPreview(drawing);
 	}
 	else {
@@ -2779,7 +2790,7 @@ function on_toggle_animated() {
 			removeTileAnimation();
 		}
 		else if ( drawing.type === TileType.Item ) {
-			console.log("REMOVE ITEM ANIMATION");
+			bitsyLog("REMOVE ITEM ANIMATION", "editor");
 			removeItemAnimation();
 		}
 		document.getElementById("animation").setAttribute("style","display:none;");
@@ -2799,11 +2810,12 @@ function addSpriteAnimation() {
 
 	//add blank frame to sprite (or restore removed animation)
 	var spriteImageId = "SPR_" + drawing.id;
-	if (sprite[drawing.id].cachedAnimation != null) {
-		restoreDrawingAnimation( spriteImageId, sprite[drawing.id].cachedAnimation )
+
+	if (sprite[drawing.id].cachedAnimation && sprite[drawing.id].cachedAnimation.length >= 1) {
+		addDrawingAnimation(spriteImageId, sprite[drawing.id].cachedAnimation[0]);
 	}
 	else {
-		addNewFrameToDrawing( spriteImageId );
+		addDrawingAnimation(spriteImageId);
 	}
 
 	// TODO RENDERER : refresh images
@@ -2852,11 +2864,11 @@ function addTileAnimation() {
 
 	//add blank frame to tile (or restore removed animation)
 	var tileImageId = "TIL_" + drawing.id;
-	if (tile[drawing.id].cachedAnimation != null) {
-		restoreDrawingAnimation( tileImageId, tile[drawing.id].cachedAnimation )
+	if (tile[drawing.id].cachedAnimation && tile[drawing.id].cachedAnimation.length >= 1) {
+		addDrawingAnimation(tileImageId, tile[drawing.id].cachedAnimation[0]);
 	}
 	else {
-		addNewFrameToDrawing( tileImageId );
+		addDrawingAnimation(tileImageId);
 	}
 
 	// TODO RENDERER : refresh images
@@ -2906,11 +2918,11 @@ function addItemAnimation() {
 
 	//add blank frame to item (or restore removed animation)
 	var itemImageId = "ITM_" + drawing.id;
-	if (item[drawing.id].cachedAnimation != null) {
-		restoreDrawingAnimation( itemImageId, item[drawing.id].cachedAnimation )
+	if (item[drawing.id].cachedAnimation && item[drawing.id].cachedAnimation.length >= 1) {
+		addDrawingAnimation(itemImageId, item[drawing.id].cachedAnimation[0]);
 	}
 	else {
-		addNewFrameToDrawing( itemImageId );
+		addDrawingAnimation(itemImageId);
 	}
 
 	// TODO RENDERER : refresh images
@@ -2947,40 +2959,38 @@ function removeItemAnimation() {
 	resetAllAnimations();
 }
 
-function addNewFrameToDrawing(drwId) {
-	// copy first frame data into new frame
+function addDrawingAnimation(drwId, frameData) {
 	var imageSource = renderer.GetImageSource(drwId);
-	var firstFrame = imageSource[0];
-	var newFrame = [];
-	for (var y = 0; y < tilesize; y++) {
-		newFrame.push([]);
-		for (var x = 0; x < tilesize; x++) {
-			newFrame[y].push( firstFrame[y][x] );
+
+	if (!frameData) {
+		var firstFrame = imageSource[0];
+
+		// copy first frame data into second frame
+		frameData = [];
+		for (var y = 0; y < tilesize; y++) {
+			frameData.push([]);
+			for (var x = 0; x < tilesize; x++) {
+				frameData[y].push(firstFrame[y][x]);
+			}
 		}
 	}
-	imageSource.push( newFrame );
+
+	imageSource[1] = frameData;
+
 	renderer.SetImageSource(drwId, imageSource);
 }
 
 function removeDrawingAnimation(drwId) {
 	var imageSource = renderer.GetImageSource(drwId);
 	var oldImageData = imageSource.slice(0);
-	renderer.SetImageSource( drwId, [ oldImageData[0] ] );
+	renderer.SetImageSource(drwId, [oldImageData[0]]);
 }
 
 // let's us restore the animation during the session if the user wants it back
-function cacheDrawingAnimation(drawing,sourceId) {
+function cacheDrawingAnimation(drawing, sourceId) {
 	var imageSource = renderer.GetImageSource(sourceId);
 	var oldImageData = imageSource.slice(0);
-	drawing.cachedAnimation = [ oldImageData[1] ]; // ah the joys of javascript
-}
-
-function restoreDrawingAnimation(sourceId,cachedAnimation) {
-	var imageSource = renderer.GetImageSource(sourceId);
-	for (f in cachedAnimation) {
-		imageSource.push( cachedAnimation[f] );	
-	}
-	renderer.SetImageSource(sourceId, imageSource);
+	drawing.cachedAnimation = [oldImageData[1]]; // ah the joys of javascript
 }
 
 function on_paint_frame1() {
@@ -2999,7 +3009,7 @@ var export_settings = {
 
 function on_change_color_page() {
 	var hex = document.getElementById("pageColor").value;
-	//console.log(hex);
+	//bitsyLog(hex, "editor");
 	var rgb = hexToRgb( hex );
 	// document.body.style.background = hex;
 	document.getElementById("roomPanel").style.background = hex;
@@ -3011,7 +3021,7 @@ function on_change_color_page() {
 function getComplimentingColor(palId) {
 	if (!palId) palId = curPal();
 	var hsl = rgbToHsl( getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2] );
-	// console.log(hsl);
+	// bitsyLog(hsl, "editor");
 	var lightness = hsl[2];
 	if (lightness > 0.5) {
 		return "#fff";
@@ -3037,8 +3047,8 @@ function grabCard(e) {
 
 	// e.preventDefault();
 
-	console.log("--- GRAB START");
-	console.log(grabbedPanel.card);
+	bitsyLog("--- GRAB START", "editor");
+	bitsyLog(grabbedPanel.card, "editor");
 
 	if (grabbedPanel.card != null) return;
 
@@ -3049,8 +3059,8 @@ function grabCard(e) {
 
 	if(grabbedPanel.card == null) return; // couldn't find a panel above the handle - abort!
 
-	console.log(grabbedPanel.card);
-	console.log("--")
+	bitsyLog(grabbedPanel.card, "editor");
+	bitsyLog("--", "editor")
 
 	grabbedPanel.size = getElementSize( grabbedPanel.card );
 	var pos = getElementPosition( grabbedPanel.card );
@@ -3060,17 +3070,17 @@ function grabCard(e) {
 	grabbedPanel.shadow.style.width = grabbedPanel.size.x + "px";
 	grabbedPanel.shadow.style.height = grabbedPanel.size.y + "px";
 
-	console.log( document.getElementById("editorContent") );
-	console.log( grabbedPanel.shadow );
-	console.log( grabbedPanel.card );
+	bitsyLog( document.getElementById("editorContent") , "editor");
+	bitsyLog( grabbedPanel.shadow , "editor");
+	bitsyLog( grabbedPanel.card , "editor");
 
 	document.getElementById("editorContent").insertBefore( grabbedPanel.shadow, grabbedPanel.card );
 	grabbedPanel.cursorOffset.x = e.clientX - pos.x;
 	grabbedPanel.cursorOffset.y = e.clientY - pos.y;
-	console.log("client " + e.clientX);
-	console.log("card " + pos.x);
-	console.log("offset " + grabbedPanel.cursorOffset.x);
-	// console.log("screen " + e.screenX);
+	bitsyLog("client " + e.clientX, "editor");
+	bitsyLog("card " + pos.x, "editor");
+	bitsyLog("offset " + grabbedPanel.cursorOffset.x, "editor");
+	// bitsyLog("screen " + e.screenX, "editor");
 	grabbedPanel.card.style.position = "absolute";
 	grabbedPanel.card.style.left = e.clientX - grabbedPanel.cursorOffset.x + "px";
 	grabbedPanel.card.style.top = e.clientY - grabbedPanel.cursorOffset.y + "px";
@@ -3080,8 +3090,8 @@ function grabCard(e) {
 function panel_onMouseMove(e) {
 	if (grabbedPanel.card == null) return;
 
-	console.log("-- PANEL MOVE");
-	console.log(grabbedPanel.card);
+	bitsyLog("-- PANEL MOVE", "editor");
+	bitsyLog(grabbedPanel.card, "editor");
 
 	grabbedPanel.card.style.left = e.clientX - grabbedPanel.cursorOffset.x + "px";
 	grabbedPanel.card.style.top = e.clientY - grabbedPanel.cursorOffset.y + "px";
@@ -3090,7 +3100,7 @@ function panel_onMouseMove(e) {
 	var cardSize = grabbedPanel.size;
 	var cardCenter = { x:cardPos.x+cardSize.x/2, y:cardPos.y+cardSize.y/2 };
 
-	console.log(cardCenter);
+	bitsyLog(cardCenter, "editor");
 
 	var editorContent = document.getElementById("editorContent");
 	var editorContentWidth = editorContent.getBoundingClientRect().width;
@@ -3098,16 +3108,16 @@ function panel_onMouseMove(e) {
 
 	for(var j = 0; j < otherCards.length; j++) {
 		var other = otherCards[j];
-		// console.log(other);
+		// bitsyLog(other, "editor");
 		var otherPos = getElementPosition( other );
 		var otherSize = getElementSize( other );
 		var otherCenter = { x:otherPos.x+otherSize.x/2, y:otherPos.y+otherSize.y/2 };
 
-		// console.log(otherCenter);
+		// bitsyLog(otherCenter, "editor");
 
 		if ( cardCenter.x < otherCenter.x ) {
-			console.log("INSERT " + cardCenter.x + " " + otherCenter.x);
-			console.log(other);
+			bitsyLog("INSERT " + cardCenter.x + " " + otherCenter.x, "editor");
+			bitsyLog(other, "editor");
 
 			editorContent.insertBefore( grabbedPanel.shadow, other );
 			break;
@@ -3118,7 +3128,7 @@ function panel_onMouseMove(e) {
 		}
 	}
 
-	console.log("********")
+	bitsyLog("********", "editor")
 }
 document.addEventListener("mousemove",panel_onMouseMove);
 
@@ -3147,13 +3157,13 @@ document.addEventListener("mouseup",panel_onMouseUp);
 // TODO consolidate these into one function?
 function getElementPosition(e) { /* gets absolute position on page */
 	if (!e.getBoundingClientRect) {
-		console.log("NOOO BOUNDING RECT!!!");
+		bitsyLog("NOOO BOUNDING RECT!!!", "editor");
 		return {x:0,y:0};
 	}
 
 	var rect = e.getBoundingClientRect();
 	var pos = {x:rect.left,y:rect.top};
-	// console.log(pos);
+	// bitsyLog(pos, "editor");
 	return pos;
 }
 
@@ -3357,7 +3367,7 @@ function switchFont(newFontName, doPickTextDirection) {
 	fontName = newFontName;
 
 	if (doPickTextDirection) {
-		console.log("PICK TEXT DIR");
+		bitsyLog("PICK TEXT DIR", "editor");
 		pickDefaultTextDirectionForFont(newFontName);
 	}
 
@@ -3384,7 +3394,7 @@ function initLanguageOptions() {
 }
 
 function on_change_text_direction(e) {
-	console.log("CHANGE TEXT DIR " + e.target.value);
+	bitsyLog("CHANGE TEXT DIR " + e.target.value, "editor");
 	updateEditorTextDirection(e.target.value);
 	refreshGameData();
 }
@@ -3402,7 +3412,7 @@ function updateEditorTextDirection(newTextDirection) {
 	var prevTextDirection = textDirection;
 	textDirection = newTextDirection;
 
-	console.log("TEXT BOX TEXT DIR " + textDirection);
+	bitsyLog("TEXT BOX TEXT DIR " + textDirection, "editor");
 
 	if (prevTextDirection != null) {
 		document.body.classList.remove("dir_" + prevTextDirection.toLowerCase());
@@ -3451,8 +3461,8 @@ function CreateDefaultName(defaultNamePrefix, objectStore, ignoreNumberIfFirstNa
 
 /* DOCS */
 function toggleDialogDocs(e) {
-	console.log("SHOW DOCS");
-	console.log(e.target.checked);
+	bitsyLog("SHOW DOCS", "editor");
+	bitsyLog(e.target.checked, "editor");
 	if (e.target.checked) {
 		document.getElementById("dialogDocs").style.display = "block";
 		document.getElementById("dialogToggleDocsShowText").style.display = "none";
@@ -3484,7 +3494,7 @@ function tryWarnAboutMissingCharacters(text) {
 
 	var hasMissingCharacter = false;
 
-	console.log(missingCharacterWarningState.curFont.getData());
+	bitsyLog(missingCharacterWarningState.curFont.getData(), "editor");
 
 	for (var i = 0; i < text.length; i++) {
 		var character = text[i];

@@ -359,8 +359,8 @@ function DialogTool() {
 
 				// useful debug messages when parsing is broken:
 				// scriptInterpreter.DebugVisualizeScriptTree(scriptRootNode);
-				// console.log(dialogStr);
-				// console.log(scriptRootNode.Serialize());
+				// bitsyLog(dialogStr, "editor");
+				// bitsyLog(scriptRootNode.Serialize(), "editor");
 
 				OnUpdate();
 			}
@@ -509,7 +509,7 @@ function DialogTool() {
 					viewportDiv.style.display = "block";
 				},
 				function(expressionNode) { // accept
-					console.log(expressionNode.Serialize());
+					bitsyLog(expressionNode.Serialize(), "editor");
 					expressionBuilderDiv.style.display = "none";
 					viewportDiv.style.display = "block";
 					onAcceptHandler(expressionNode);
@@ -1171,7 +1171,7 @@ function DialogTool() {
 			textboxContentDiv.contentEditable = true;
 			textboxContentDiv.spellcheck = false;
 			textboxContentDiv.addEventListener("input", function(e) {
-				console.log(textboxContentDiv.innerText);
+				bitsyLog(textboxContentDiv.innerText, "editor");
 			});
 		}
 
@@ -1647,7 +1647,7 @@ function DialogTool() {
 					sequenceTypeSelect.appendChild(sequenceTypeOption);
 				}
 				sequenceTypeSelect.onchange = function() {
-					console.log(sequenceNode);
+					bitsyLog(sequenceNode, "editor");
 					sequenceNode = scriptUtils.ChangeSequenceType(sequenceNode, sequenceTypeSelect.value);
 					node.SetChildren([sequenceNode]);
 					CreateSequenceDescription(true);

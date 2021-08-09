@@ -14,7 +14,7 @@ function replaceTemplateMarker(template, marker, text) {
 
 this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, size) {
 	var html = Resources["exportTemplate.html"].substr(); //copy template
-	// console.log(html);
+	// bitsyLog(html, "editor");
 
 	html = replaceTemplateMarker( html, "@@T", title );
 
@@ -28,6 +28,7 @@ this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, si
 
 	html = replaceTemplateMarker( html, "@@B", pageColor );
 
+	html = replaceTemplateMarker( html, "@@Y", Resources["system.js"] );
 	html = replaceTemplateMarker( html, "@@U", Resources["color_util.js"] );
 	html = replaceTemplateMarker( html, "@@X", Resources["transition.js"] );
 	html = replaceTemplateMarker( html, "@@F", Resources["font.js"] );
@@ -42,7 +43,7 @@ this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, si
 
 	html = replaceTemplateMarker( html, "@@D", gameData );
 
-	// console.log(html);
+	// bitsyLog(html, "editor");
 
 	ExporterUtils.DownloadFile( filename, html );
 }
@@ -56,13 +57,13 @@ function unescapeSpecialCharacters(str) {
 }
 
 this.importGame = function( html ) {
-	console.log("IMPORT!!!");
+	bitsyLog("IMPORT!!!", "editor");
 
 	// IMPORT : old style
 	// find start of game data
 	var i = html.indexOf("var exportedGameData");
 	if(i > -1) {
-		console.log("OLD STYLE");
+		bitsyLog("OLD STYLE", "editor");
 
 		while ( html.charAt(i) != '"' ) {
 			i++; // move to first quote
@@ -121,7 +122,7 @@ this.importGame = function( html ) {
 		return gameStr;
 	}
 
-	console.log("FAIL!!!!");
+	bitsyLog("FAIL!!!!", "editor");
 
 	return "";
 }
