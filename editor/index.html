@@ -278,11 +278,7 @@
 								<span id="playModeText" class="localize play_game">play</span> <!-- TODO LOCALIZE: also stop_game -->
 							</label>
 
-							<span class="spacer"></span>
-
 							<input type="text" id="roomName" title="a name to refer to this room" class="textInputField" onchange="on_room_name_change();" size="10"></input>
-
-							<span class="spacer"></span>
 
 							<button title="previous room" class="color0" onclick="prevRoom();">
 								<span class="bitsy_icon">previous</span>
@@ -290,8 +286,6 @@
 							<button title="next room" class="color0" onclick="nextRoom();">
 								<span class="bitsy_icon">next</span>
 							</button>
-
-							<span class="spacer"></span>
 
 							<button title="add new room" class="color0" onclick="newRoom();">
 								<span class="bitsy_icon">add</span>
@@ -302,8 +296,6 @@
 							<button title="delete room" class="color0" onclick="deleteRoom();">
 								<span class="bitsy_icon">delete</span>
 							</button>
-
-							<span class="spacer"></span>
 
 							<button title="open find tool: rooms" onclick="openFindTool('room', 'roomPanel');">
 								<span class="bitsy_icon">search</span>
@@ -375,16 +367,12 @@
 							<!-- TODO : hook up to actual "name", resize -->
 							<input type="text" id="markerName" size="5" readonly></input>
 
-							<span class="spacer"></span>
-
 							<button title="previous" class="color0" onclick="prevMarker();">
 								<span class="bitsy_icon">previous</span>
 							</button>
 							<button title="next" class="color0" onclick="nextMarker();">
 								<span class="bitsy_icon">next</span>
 							</button>
-
-							<span class="spacer"></span>
 
 							<button title="add exit or ending" class="color0" onclick="startAddMarker();">
 								<span class="bitsy_icon">add</span>
@@ -642,31 +630,32 @@
 						</form>
 
 						<div id="paintNavigationControls" class="navControl">
-							<input title="a name to refer to this drawing" type="text" id="drawingName" class="textInputField" onchange="on_drawing_name_change();" size="10"></input>
+							<!-- name -->
+							<input title="a name to refer to this drawing" type="text" id="drawingName" class="textInputField" onchange="on_drawing_name_change();"></input>
 
-							<span class="spacer"></span>
-
+							<!-- prev / next -->
 							<button title="previous drawing" class="color0 disableForAvatar" onclick="prev();">
 								<span class="bitsy_icon">previous</span>
 							</button>
+
 							<button title="next drawing" class="color0 disableForAvatar" onclick="next();">
 								<span class="bitsy_icon">next</span>
 							</button>
 
-							<span class="spacer"></span>
-
+							<!-- add / copy / delete -->
 							<button title="add drawing" class="color0 disableForAvatar" onclick="newDrawing();">
 								<span class="bitsy_icon">add</span>
 							</button>
+
 							<button title="duplicate drawing" class="color0 disableForAvatar" onclick="duplicateDrawing();">
 								<span class="bitsy_icon">copy</span>
 							</button>
+
 							<button title="delete drawing" class="color0 disableForAvatar" onclick="deleteDrawing();">
 								<span class="bitsy_icon">delete</span>
 							</button>
 
-							<span class="spacer"></span>
-
+							<!-- find -->
 							<button title="open find tool: drawings" onclick="openFindToolWithCurrentPaintCategory();">
 								<span class="bitsy_icon">search</span>
 							</button>
@@ -771,16 +760,12 @@
 						<div class="navControl">
 							<input type="text" id="paletteName" title="a name to refer to this color palette" class="textInputField" onchange="on_palette_name_change(event);" size="10"></input>
 
-							<span class="spacer"></span>
-
 							<button title="previous color palette" class="color0" onclick="prevPalette();">
 								<span class="bitsy_icon">previous</span>
 							</button>
 							<button title="next color palette" class="color0" onclick="nextPalette();">
 								<span class="bitsy_icon">next</span>
 							</button>
-
-							<span class="spacer"></span>
 
 							<button title="add new color palette" class="color0" onclick="newPalette();">
 								<span class="bitsy_icon">add</span>
@@ -791,8 +776,6 @@
 							<button title="delete palette" class="color0" onclick="deletePalette();">
 								<span class="bitsy_icon">delete</span>
 							</button>
-
-							<span class="spacer"></span>
 
 							<button title="open find tool: colors" onclick="openFindTool('colors', 'colorsPanel');">
 								<span class="bitsy_icon">search</span>
@@ -852,11 +835,7 @@
 									<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
 								</label>
 
-								<span class="spacer"></span>
-
 								<input type="text" id="dialogName" title="a name to refer to this dialog" class="textInputField" onchange="onDialogNameChange(event);" size="10"></input>
-
-								<span class="spacer"></span>
 
 								<button title="previous dialog" class="color0" onclick="prevDialog();">
 									<span class="bitsy_icon">previous</span>
@@ -864,8 +843,6 @@
 								<button title="next dialog" class="color0" onclick="nextDialog();">
 									<span class="bitsy_icon">next</span>
 								</button>
-
-								<span class="spacer"></span>
 
 								<button title="add new dialog" class="color0" onclick="addNewDialog();">
 									<span class="bitsy_icon">add</span>
@@ -876,8 +853,6 @@
 								<button id="deleteDialogButton" title="delete dialog" class="color0" onclick="deleteDialog();">
 									<span class="bitsy_icon">delete</span>
 								</button>
-
-								<span class="spacer"></span>
 
 								<button title="open find tool: dialog" onclick="openFindTool('dialog', 'dialogPanel');">
 									<span class="bitsy_icon">search</span>

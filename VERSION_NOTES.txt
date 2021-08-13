@@ -1,3 +1,6 @@
+v7.8:
+- fix bug where find button in paint tool overflows
+
 v7.7:
 - attempt to fix bug where extra frame is added to animation
 - fix bug where games can't be uploaded from HTML

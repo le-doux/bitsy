@@ -115,6 +115,7 @@ input:checked + label {
 /* text input */
 input[type=text] {
 	font-family: monospace;
+	min-width: 0;
 	flex-grow: 1;
 	border-radius: var(--bitsy-space-s);
 	padding: var(--bitsy-space-s);
