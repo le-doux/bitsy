@@ -272,14 +272,17 @@
 
 					<div class="bitsy-card-main">
 						<div id="roomNav" class="navControl">
+							<!-- play -->
 							<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" autocomplete="off" />
 							<label title="play / pause game" for="playModeCheck" class="bitsy-menu-label">
 								<span id="playModeIcon" class="bitsy_icon">play</span>
 								<span id="playModeText" class="localize play_game">play</span> <!-- TODO LOCALIZE: also stop_game -->
 							</label>
 
+							<!-- name -->
 							<input type="text" id="roomName" title="a name to refer to this room" class="textInputField" onchange="on_room_name_change();" size="10"></input>
 
+							<!-- prev / next -->
 							<button title="previous room" class="color0" onclick="prevRoom();">
 								<span class="bitsy_icon">previous</span>
 							</button>
@@ -287,6 +290,7 @@
 								<span class="bitsy_icon">next</span>
 							</button>
 
+							<!-- add / copy / delete -->
 							<button title="add new room" class="color0" onclick="newRoom();">
 								<span class="bitsy_icon">add</span>
 							</button>
@@ -297,6 +301,7 @@
 								<span class="bitsy_icon">delete</span>
 							</button>
 
+							<!-- find -->
 							<button title="open find tool: rooms" onclick="openFindTool('room', 'roomPanel');">
 								<span class="bitsy_icon">search</span>
 							</button>
@@ -364,9 +369,10 @@
 
 					<div id="exitsPanelContent" class="bitsy-card-main">
 						<div id="markersControls" class="navControl">
-							<!-- TODO : hook up to actual "name", resize -->
+							<!-- exit # display -->
 							<input type="text" id="markerName" size="5" readonly></input>
 
+							<!-- prev / next -->
 							<button title="previous" class="color0" onclick="prevMarker();">
 								<span class="bitsy_icon">previous</span>
 							</button>
@@ -374,11 +380,11 @@
 								<span class="bitsy_icon">next</span>
 							</button>
 
+							<!-- add / copy / dlete -->
 							<button title="add exit or ending" class="color0" onclick="startAddMarker();">
 								<span class="bitsy_icon">add</span>
 							</button>
 
-							<!-- TODO : implement -->
 							<button title="duplicate exit or ending" class="color0" onclick="duplicateMarker();">
 								<span class="bitsy_icon">copy</span>
 							</button>
@@ -758,8 +764,10 @@
 
 					<div class="bitsy-card-main">
 						<div class="navControl">
+							<!-- name -->
 							<input type="text" id="paletteName" title="a name to refer to this color palette" class="textInputField" onchange="on_palette_name_change(event);" size="10"></input>
 
+							<!-- prev / next -->
 							<button title="previous color palette" class="color0" onclick="prevPalette();">
 								<span class="bitsy_icon">previous</span>
 							</button>
@@ -767,6 +775,7 @@
 								<span class="bitsy_icon">next</span>
 							</button>
 
+							<!-- add / copy / delete -->
 							<button title="add new color palette" class="color0" onclick="newPalette();">
 								<span class="bitsy_icon">add</span>
 							</button>
@@ -777,6 +786,7 @@
 								<span class="bitsy_icon">delete</span>
 							</button>
 
+							<!-- find -->
 							<button title="open find tool: colors" onclick="openFindTool('colors', 'colorsPanel');">
 								<span class="bitsy_icon">search</span>
 							</button>
@@ -829,14 +839,17 @@
 					<div class="bitsy-card-main">
 						<div id="dialogEditorHasContent">
 							<div class="navControl">
+								<!-- preview -->
 								<input type="checkbox" id="previewDialogCheck" onclick="togglePreviewDialog(event);" autocomplete="off" />
 								<label title="preview dialog" for="previewDialogCheck">
 									<span id="previewDialogIcon" class="bitsy_icon">play</span>
 									<span id="previewDialogText" class="localize dialog_start_preview">preview</span> <!-- TODO LOCALIZE : other state? dialog_stop_preview -->
 								</label>
 
+								<!-- name -->
 								<input type="text" id="dialogName" title="a name to refer to this dialog" class="textInputField" onchange="onDialogNameChange(event);" size="10"></input>
 
+								<!-- prev / next -->
 								<button title="previous dialog" class="color0" onclick="prevDialog();">
 									<span class="bitsy_icon">previous</span>
 								</button>
@@ -844,6 +857,7 @@
 									<span class="bitsy_icon">next</span>
 								</button>
 
+								<!-- add / copy / delete -->
 								<button title="add new dialog" class="color0" onclick="addNewDialog();">
 									<span class="bitsy_icon">add</span>
 								</button>
@@ -854,6 +868,7 @@
 									<span class="bitsy_icon">delete</span>
 								</button>
 
+								<!-- find -->
 								<button title="open find tool: dialog" onclick="openFindTool('dialog', 'dialogPanel');">
 									<span class="bitsy_icon">search</span>
 								</button>
