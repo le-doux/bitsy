@@ -269,9 +269,16 @@ function loadGame(gameData) {
 		onLoadFunction(gameData);
 	}
 
-	if (onUpdateFunction) {
-		updateInterval = setInterval(onUpdateFunction, 16);
-	}
+	updateInterval = setInterval(
+		function() {
+			if (onUpdateFunction) {
+				onUpdateFunction();
+			}
+
+			input.resetKeyPressed();
+			input.resetTapReleased();
+		},
+		16);
 }
 
 function quitGame() {

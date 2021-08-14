@@ -378,9 +378,6 @@ function update() {
 	}
 
 	prevTime = curTime;
-
-	input.resetKeyPressed();
-	input.resetTapReleased();
 }
 
 var isAnyButtonHeld = false;
