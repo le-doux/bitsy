@@ -309,6 +309,7 @@ function bitsyLog(message, category) {
 	}
 }
 
+// todo : should 0 be used for any instead of null/undefined?
 function bitsyButton(buttonCode) {
 	switch (buttonCode) {
 		case 0: // UP
@@ -321,7 +322,12 @@ function bitsyButton(buttonCode) {
 			return ((input.isKeyDown(key.right) || input.isKeyDown(key.d) || input.swipeRight()));
 	}
 
-	return false;
+	// if no code is supplied, check any key
+	return input.isKeyDown(key.up) || input.isKeyDown(key.w) ||
+		input.isKeyDown(key.down) || input.isKeyDown(key.s) ||
+		input.isKeyDown(key.left) || input.isKeyDown(key.a) ||
+		input.isKeyDown(key.right) || input.isKeyDown(key.d) ||
+		input.isTapReleased();
 }
 
 function bitsyOnLoad(fn) {

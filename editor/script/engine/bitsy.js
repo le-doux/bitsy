@@ -391,15 +391,19 @@ function update() {
 	input.resetTapReleased();
 }
 
+var isAnyButtonHeld = false;
+var isIgnoringInput = false;
+
 function updateInput() {
-	if( dialogBuffer.IsActive() ) {
-		if (input.anyKeyPressed() || input.isTapReleased()) {
+	if (dialogBuffer.IsActive()) {
+		if (!isAnyButtonHeld && bitsyButton()) {
 			/* CONTINUE DIALOG */
 			if (dialogBuffer.CanContinue()) {
 				var hasMoreDialog = dialogBuffer.Continue();
-				if(!hasMoreDialog) {
+				if (!hasMoreDialog) {
 					// ignore currently held keys UNTIL they are released (stops player from insta-moving)
-					input.ignoreHeldKeys();
+					isIgnoringInput = true;
+					curPlayerDirection = Direction.None;
 				}
 			}
 			else {
@@ -407,13 +411,13 @@ function updateInput() {
 			}
 		}
 	}
-	else if ( isEnding ) {
-		if (input.anyKeyPressed() || input.isTapReleased()) {
+	else if (isEnding) {
+		if (!isAnyButtonHeld && bitsyButton()) {
 			/* RESTART GAME */
 			reset_cur_game();
 		}
 	}
-	else {
+	else if (!isIgnoringInput) {
 		/* WALK */
 		var prevPlayerDirection = curPlayerDirection;
 
@@ -438,6 +442,12 @@ function updateInput() {
 			playerHoldToMoveTimer = 500;
 		}
 	}
+
+	if (!bitsyButton()) {
+		isIgnoringInput = false;
+	}
+
+	isAnyButtonHeld = bitsyButton();
 }
 
 var animationCounter = 0;
