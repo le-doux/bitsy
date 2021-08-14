@@ -1,35 +1,10 @@
-// store if log categories are enabled
+/* logging */
 var DebugLogCategory = {
 	bitsy : false,
 	editor : false,
 };
 
-function bitsyLog(message, category) {
-	if (!category) {
-		category = "bitsy";
-	}
-
-	if (DebugLogCategory[category] === true) {
-		console.log(category + "::" + message);
-	}
-}
-
-function bitsyButton(buttonCode) {
-	switch (buttonCode) {
-		case 0: // UP
-			return (input.isKeyDown(key.up) || input.isKeyDown(key.w) || input.swipeUp());
-		case 1: // DOWN
-			return (input.isKeyDown(key.down) || input.isKeyDown(key.s) || input.swipeDown());
-		case 2: // LEFT
-			return (input.isKeyDown(key.left) || input.isKeyDown(key.a) || input.swipeLeft());
-		case 3: // RIGHT
-			return ((input.isKeyDown(key.right) || input.isKeyDown(key.d) || input.swipeRight()));
-	}
-
-	return false;
-}
-
-// input
+/* input */
 var key = {
 	left : 37,
 	right : 39,
@@ -249,3 +224,110 @@ var InputManager = function() {
 }
 
 var input = new InputManager();
+
+/* events */
+var onLoadFunction = null;
+var onQuitFunction = null;
+
+function loadGame(gameData) {
+	document.addEventListener('keydown', input.onkeydown);
+	document.addEventListener('keyup', input.onkeyup);
+
+	if (isPlayerEmbeddedInEditor) {
+		canvas.addEventListener('touchstart', input.ontouchstart, {passive:false});
+		canvas.addEventListener('touchmove', input.ontouchmove, {passive:false});
+		canvas.addEventListener('touchend', input.ontouchend, {passive:false});
+	}
+	else {
+		// creates a 'touchTrigger' element that covers the entire screen and can universally have touch event listeners added w/o issue.
+
+		// we're checking for existing touchTriggers both at game start and end, so it's slightly redundant.
+		var existingTouchTrigger = document.querySelector('#touchTrigger');
+
+		if (existingTouchTrigger === null) {
+			var touchTrigger = document.createElement("div");
+			touchTrigger.setAttribute("id","touchTrigger");
+
+			// afaik css in js is necessary here to force a fullscreen element
+			touchTrigger.setAttribute(
+				"style","position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden;"
+			);
+
+			document.body.appendChild(touchTrigger);
+
+			touchTrigger.addEventListener('touchstart', input.ontouchstart);
+			touchTrigger.addEventListener('touchmove', input.ontouchmove);
+			touchTrigger.addEventListener('touchend', input.ontouchend);
+		}
+	}
+
+	window.onblur = input.onblur;
+
+	if (onLoadFunction) {
+		onLoadFunction(gameData);
+	}
+}
+
+function quitGame() {
+	document.removeEventListener('keydown', input.onkeydown);
+	document.removeEventListener('keyup', input.onkeyup);
+
+	if (isPlayerEmbeddedInEditor) {
+		canvas.removeEventListener('touchstart', input.ontouchstart);
+		canvas.removeEventListener('touchmove', input.ontouchmove);
+		canvas.removeEventListener('touchend', input.ontouchend);
+	}
+	else {
+		//check for touchTrigger and removes it
+
+		var existingTouchTrigger = document.querySelector('#touchTrigger');
+
+		if (existingTouchTrigger !== null) {
+			existingTouchTrigger.removeEventListener('touchstart', input.ontouchstart);
+			existingTouchTrigger.removeEventListener('touchmove', input.ontouchmove);
+			existingTouchTrigger.removeEventListener('touchend', input.ontouchend);
+
+			existingTouchTrigger.parentElement.removeChild(existingTouchTrigger);
+		}
+	}
+
+	window.onblur = null;
+
+	if (onQuitFunction) {
+		onQuitFunction();
+	}
+}
+
+/* ==== */
+function bitsyLog(message, category) {
+	if (!category) {
+		category = "bitsy";
+	}
+
+	if (DebugLogCategory[category] === true) {
+		console.log(category + "::" + message);
+	}
+}
+
+function bitsyButton(buttonCode) {
+	switch (buttonCode) {
+		case 0: // UP
+			return (input.isKeyDown(key.up) || input.isKeyDown(key.w) || input.swipeUp());
+		case 1: // DOWN
+			return (input.isKeyDown(key.down) || input.isKeyDown(key.s) || input.swipeDown());
+		case 2: // LEFT
+			return (input.isKeyDown(key.left) || input.isKeyDown(key.a) || input.swipeLeft());
+		case 3: // RIGHT
+			return ((input.isKeyDown(key.right) || input.isKeyDown(key.d) || input.swipeRight()));
+	}
+
+	return false;
+}
+
+function bitsyOnLoad(fn) {
+	onLoadFunction = fn;
+}
+
+function bitsyOnQuit(fn) {
+	onQuitFunction = fn;
+}

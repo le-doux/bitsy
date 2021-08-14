@@ -1679,7 +1679,10 @@ function toggleDownloadOptions(e) {
 
 function on_edit_mode() {
 	isPlayMode = false;
-	stopGame();
+
+	// stopGame();
+	quitGame();
+
 	// TODO I should really do more to separate the editor's game-data from the engine's game-data
 	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
 
@@ -1720,7 +1723,8 @@ function on_play_mode() {
 	roomTool.unlistenEditEvents();
 
 	// load_game(document.getElementById("game_data").value, !isPreviewDialogMode /* startWithTitle */);
-	load_game(getFullGameData(), !isPreviewDialogMode /* startWithTitle */);
+	// load_game(getFullGameData(), !isPreviewDialogMode /* startWithTitle */);
+	loadGame(getFullGameData());
 
 	bitsyLog("PLAY!! ~~ PREVIEW ? " + isPreviewDialogMode, "editor");
 	if(!isPreviewDialogMode) {
