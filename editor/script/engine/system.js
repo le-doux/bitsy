@@ -228,6 +228,8 @@ var input = new InputManager();
 /* events */
 var onLoadFunction = null;
 var onQuitFunction = null;
+var onUpdateFunction = null;
+var updateInterval = null;
 
 function loadGame(gameData) {
 	document.addEventListener('keydown', input.onkeydown);
@@ -266,6 +268,10 @@ function loadGame(gameData) {
 	if (onLoadFunction) {
 		onLoadFunction(gameData);
 	}
+
+	if (onUpdateFunction) {
+		updateInterval = setInterval(onUpdateFunction, 16);
+	}
 }
 
 function quitGame() {
@@ -296,6 +302,8 @@ function quitGame() {
 	if (onQuitFunction) {
 		onQuitFunction();
 	}
+
+	clearInterval(updateInterval);
 }
 
 /* ==== */
@@ -336,4 +344,8 @@ function bitsyOnLoad(fn) {
 
 function bitsyOnQuit(fn) {
 	onQuitFunction = fn;
+}
+
+function bitsyOnUpdate(fn) {
+	onUpdateFunction = fn;
 }

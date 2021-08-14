@@ -172,8 +172,6 @@ function load_game(game_data, startWithTitle) {
 
 	setInitialVariables();
 
-	// setInterval(updateLoadingScreen, 300); // hack test
-
 	onready(startWithTitle);
 }
 
@@ -191,15 +189,12 @@ function reset_cur_game() {
 	}
 }
 
-var update_interval = null;
 function onready(startWithTitle) {
-	if(startWithTitle === undefined || startWithTitle === null) startWithTitle = true;
+	if (startWithTitle === undefined || startWithTitle === null) {
+		startWithTitle = true;
+	}
 
-	clearInterval(loading_interval);
-
-	update_interval = setInterval(update,16);
-
-	if(startWithTitle) { // used by editor 
+	if (startWithTitle) { // used by editor 
 		startNarrating(getTitle());
 	}
 }
@@ -238,8 +233,6 @@ function getOffset(evt) {
 
 function stopGame() {
 	bitsyLog("stop GAME!");
-
-	clearInterval(update_interval);
 }
 
 /* loading animation */
@@ -297,7 +290,6 @@ var loading_anim_data = [
 ];
 var loading_anim_frame = 0;
 var loading_anim_speed = 500;
-var loading_interval = null;
 
 function loadingAnimation() {
 	//create image
@@ -1943,5 +1935,6 @@ var scriptUtils = scriptModule.CreateUtils(); // TODO: move to editor.js?
 // scriptInterpreter.SetDialogBuffer( dialogBuffer );
 
 /* EVENTS */
+bitsyOnUpdate(update);
 bitsyOnQuit(stopGame);
 bitsyOnLoad(load_game);
