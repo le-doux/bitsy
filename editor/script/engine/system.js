@@ -14,6 +14,21 @@ function bitsyLog(message, category) {
 	}
 }
 
+function bitsyButton(buttonCode) {
+	switch (buttonCode) {
+		case 0: // UP
+			return (input.isKeyDown(key.up) || input.isKeyDown(key.w) || input.swipeUp());
+		case 1: // DOWN
+			return (input.isKeyDown(key.down) || input.isKeyDown(key.s) || input.swipeDown());
+		case 2: // LEFT
+			return (input.isKeyDown(key.left) || input.isKeyDown(key.a) || input.swipeLeft());
+		case 3: // RIGHT
+			return ((input.isKeyDown(key.right) || input.isKeyDown(key.d) || input.swipeRight()));
+	}
+
+	return false;
+}
+
 // input
 var key = {
 	left : 37,

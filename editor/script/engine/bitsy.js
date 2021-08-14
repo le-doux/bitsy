@@ -197,8 +197,6 @@ function onready(startWithTitle) {
 
 	clearInterval(loading_interval);
 
-	input = new InputManager();
-
 	document.addEventListener('keydown', input.onkeydown);
 	document.addEventListener('keyup', input.onkeyup);
 
@@ -473,24 +471,24 @@ function updateInput() {
 		/* WALK */
 		var prevPlayerDirection = curPlayerDirection;
 
-		if ( input.isKeyDown( key.left ) || input.isKeyDown( key.a ) || input.swipeLeft() ) {
-			curPlayerDirection = Direction.Left;
-		}
-		else if ( input.isKeyDown( key.right ) || input.isKeyDown( key.d ) || input.swipeRight() ) {
-			curPlayerDirection = Direction.Right;
-		}
-		else if ( input.isKeyDown( key.up ) || input.isKeyDown( key.w ) || input.swipeUp() ) {
+		if (bitsyButton(0)) {
 			curPlayerDirection = Direction.Up;
 		}
-		else if ( input.isKeyDown( key.down ) || input.isKeyDown( key.s ) || input.swipeDown() ) {
+		else if (bitsyButton(1)) {
 			curPlayerDirection = Direction.Down;
+		}
+		else if (bitsyButton(2)) {
+			curPlayerDirection = Direction.Left;
+		}
+		else if (bitsyButton(3)) {
+			curPlayerDirection = Direction.Right;
 		}
 		else {
 			curPlayerDirection = Direction.None;
 		}
 
 		if (curPlayerDirection != Direction.None && curPlayerDirection != prevPlayerDirection) {
-			movePlayer( curPlayerDirection );
+			movePlayer(curPlayerDirection);
 			playerHoldToMoveTimer = 500;
 		}
 	}
