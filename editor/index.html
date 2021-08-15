@@ -257,7 +257,7 @@
 					</div>
 				</div>
 
-				<div id="roomPanel" class="bitsy-card bitsy-card-l bitsy-workbench-item">
+				<div id="roomPanel" class="bitsy-card bitsy-card-l bitsy-workbench-item bitsy-card-playmode-enable">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">room</span>
 
@@ -280,36 +280,39 @@
 							</label>
 
 							<!-- name -->
-							<input type="text" id="roomName" title="a name to refer to this room" class="textInputField" onchange="on_room_name_change();" size="10"></input>
+							<input type="text" id="roomName" title="a name to refer to this room" class="bitsy-playmode-hide" onchange="on_room_name_change();" size="10"></input>
 
 							<!-- prev / next -->
-							<button title="previous room" class="color0" onclick="prevRoom();">
+							<button title="previous room" class="bitsy-playmode-hide" onclick="prevRoom();">
 								<span class="bitsy_icon">previous</span>
 							</button>
-							<button title="next room" class="color0" onclick="nextRoom();">
+
+							<button title="next room" class="bitsy-playmode-hide" onclick="nextRoom();">
 								<span class="bitsy_icon">next</span>
 							</button>
 
 							<!-- add / copy / delete -->
-							<button title="add new room" class="color0" onclick="newRoom();">
+							<button title="add new room" class="bitsy-playmode-hide" onclick="newRoom();">
 								<span class="bitsy_icon">add</span>
 							</button>
-							<button title="duplicate room" class="color0" onclick="duplicateRoom();">
+
+							<button title="duplicate room" class="bitsy-playmode-hide" onclick="duplicateRoom();">
 								<span class="bitsy_icon">copy</span>
 							</button>
-							<button title="delete room" class="color0" onclick="deleteRoom();">
+
+							<button title="delete room" class="bitsy-playmode-hide" onclick="deleteRoom();">
 								<span class="bitsy_icon">delete</span>
 							</button>
 
 							<!-- find -->
-							<button title="open find tool: rooms" onclick="openFindTool('room', 'roomPanel');">
+							<button title="open find tool: rooms" class="bitsy-playmode-hide" onclick="openFindTool('room', 'roomPanel');">
 								<span class="bitsy_icon">search</span>
 							</button>
 						</div>
 
 						<canvas id="game"></canvas>
 
-						<div class="controlBox bitsy-menu-group">
+						<div class="controlBox bitsy-menu-group bitsy-playmode-hide">
 							<span class="controlBox">
 								<span class="bitsy_icon icon_space_right">colors</span>
 								<span class="localize palette_tool_name">colors</span>: 
@@ -330,7 +333,7 @@
 							</label>
 						</div>
 
-						<div id="roomVisibilityControls" class="controlBox bitsy-menu-group" style="margin-top: var(--bitsy-space-s); display: none;">
+						<div id="roomVisibilityControls" class="controlBox bitsy-menu-group bitsy-playmode-hide" style="margin-top: var(--bitsy-space-s); display: none;">
 							<span>visibility:</span> <!-- TODO : localize -->
 
 							<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" autocomplete="off" checked/>
@@ -901,7 +904,7 @@
 					</div>
 				</div>
 
-				<div id="inventoryPanel" class="bitsy-card bitsy-card-s bitsy-workbench-item">
+				<div id="inventoryPanel" class="bitsy-card bitsy-card-s bitsy-workbench-item bitsy-card-playmode-enable">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">item</span>
 

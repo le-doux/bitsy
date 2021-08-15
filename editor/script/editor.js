@@ -1680,6 +1680,8 @@ function toggleDownloadOptions(e) {
 function on_edit_mode() {
 	isPlayMode = false;
 
+	document.getElementById("appRoot").classList.remove("bitsy-playmode");
+
 	// stopGame();
 	quitGame();
 
@@ -1719,6 +1721,8 @@ function getFullGameData() {
 
 function on_play_mode() {
 	isPlayMode = true;
+
+	document.getElementById("appRoot").classList.add("bitsy-playmode");
 
 	roomTool.unlistenEditEvents();
 
