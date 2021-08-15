@@ -1,5 +1,5 @@
 v7.8:
-- play mode is more visually obvious
+- play mode is more visually distinct
 - tools are disabled during play mode
 - show current room location during play mode
 - fix bug where find button in paint tool overflows
