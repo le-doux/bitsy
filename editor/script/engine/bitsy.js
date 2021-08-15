@@ -128,10 +128,11 @@ var curRoom = "0";
 var prevTime = 0;
 var deltaTime = 0;
 
-//inventory update UI handles
+// engine event hooks for the editor
 var onInventoryChanged = null;
 var onVariableChanged = null;
 var onGameReset = null;
+var onInitRoom = null;
 
 var isPlayerEmbeddedInEditor = false;
 
@@ -627,6 +628,10 @@ function initRoom(roomId) {
 	// init ending properties
 	for (var i = 0; i < room[roomId].endings.length; i++) {
 		room[roomId].endings[i].property = { locked:false };
+	}
+
+	if (onInitRoom) {
+		onInitRoom(roomId);
 	}
 }
 

@@ -986,6 +986,20 @@ function start() {
 		updateInventoryUI();
 	}
 
+	onInitRoom = function(id) {
+		var curRoomName = "";
+
+		// basically copied from find tool
+		if (room[id].name) {
+			curRoomName = room[id].name;
+		}
+		else {
+			curRoomName = localization.GetStringOrFallback("room_label", "room") + " " + id;
+		}
+
+		document.getElementById("roomCurLocationText").innerText = curRoomName;
+	}
+
 	//color testing
 	// on_change_color_bg();
 	// on_change_color_tile();

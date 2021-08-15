@@ -282,6 +282,12 @@
 								<span id="playModeText" class="localize play_game">play</span> <!-- TODO LOCALIZE: also stop_game -->
 							</label>
 
+							<!-- current room -->
+							<label class="bitsy-playmode-show" title="current room location" style="flex-grow: 1;">
+								<span class="bitsy_icon">set_exit_location</span>
+								<span id="roomCurLocationText">???</span>
+							</label>
+
 							<!-- name -->
 							<input type="text" id="roomName" title="a name to refer to this room" class="bitsy-playmode-hide" onchange="on_room_name_change();" size="10"></input>
 
