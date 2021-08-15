@@ -78,7 +78,7 @@
 						</span>
 					</div>
 
-					<div id="titleFlexItem">
+					<div id="titleFlexItem" class="bitsy-playmode-disable">
 						<div class="titleWidgetContainer"></div>
 					</div>
 
@@ -257,12 +257,15 @@
 					</div>
 				</div>
 
-				<div id="roomPanel" class="bitsy-card bitsy-card-l bitsy-workbench-item bitsy-card-playmode-enable">
-					<div class="bitsy-card-titlebar">
-						<span class="bitsy_icon">room</span>
+				<div id="roomPanel" class="bitsy-card bitsy-card-l bitsy-workbench-item bitsy-playmode-enable">
+					<div class="bitsy-card-titlebar bitsy-playmode-reverse-color">
+						<span class="bitsy_icon bitsy-playmode-hide">room</span>
+
+						<span class="bitsy_icon bitsy-playmode-show">play</span>
 
 						<span class="bitsy-card-title" title="room window" onmousedown="grabCard(event);">
-							<span class="localize room_tool_name">room</span>
+							<span class="localize room_tool_name bitsy-playmode-hide">room</span>
+							<span class="bitsy-playmode-show">playing...</span>
 						</span>
 
 						<button title="minimize room window" onclick="hidePanel('roomPanel');">
@@ -904,7 +907,7 @@
 					</div>
 				</div>
 
-				<div id="inventoryPanel" class="bitsy-card bitsy-card-s bitsy-workbench-item bitsy-card-playmode-enable">
+				<div id="inventoryPanel" class="bitsy-card bitsy-card-s bitsy-workbench-item bitsy-playmode-enable">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">item</span>
 
