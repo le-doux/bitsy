@@ -64,7 +64,7 @@ var spriteStartLocations = {};
 /* VERSION */
 var version = {
 	major: 7, // major changes
-	minor: 7, // smaller changes
+	minor: 8, // smaller changes
 	devBuildPhase: "RELEASE",
 };
 function getEngineVersion() {
@@ -125,31 +125,14 @@ var mapsize = 16;
 
 var curRoom = "0";
 
-var key = {
-	left : 37,
-	right : 39,
-	up : 38,
-	down : 40,
-	space : 32,
-	enter : 13,
-	w : 87,
-	a : 65,
-	s : 83,
-	d : 68,
-	r : 82,
-	shift : 16,
-	ctrl : 17,
-	alt : 18,
-	cmd : 224
-};
-
 var prevTime = 0;
 var deltaTime = 0;
 
-//inventory update UI handles
+// engine event hooks for the editor
 var onInventoryChanged = null;
 var onVariableChanged = null;
 var onGameReset = null;
+var onInitRoom = null;
 
 var isPlayerEmbeddedInEditor = false;
 
@@ -190,8 +173,6 @@ function load_game(game_data, startWithTitle) {
 
 	setInitialVariables();
 
-	// setInterval(updateLoadingScreen, 300); // hack test
-
 	onready(startWithTitle);
 }
 
@@ -209,48 +190,12 @@ function reset_cur_game() {
 	}
 }
 
-var update_interval = null;
 function onready(startWithTitle) {
-	if(startWithTitle === undefined || startWithTitle === null) startWithTitle = true;
-
-	clearInterval(loading_interval);
-
-	input = new InputManager();
-
-	document.addEventListener('keydown', input.onkeydown);
-	document.addEventListener('keyup', input.onkeyup);
-
-	if (isPlayerEmbeddedInEditor) {
-		canvas.addEventListener('touchstart', input.ontouchstart, {passive:false});
-		canvas.addEventListener('touchmove', input.ontouchmove, {passive:false});
-		canvas.addEventListener('touchend', input.ontouchend, {passive:false});
-	}
-	else {
-		// creates a 'touchTrigger' element that covers the entire screen and can universally have touch event listeners added w/o issue.
-
-		// we're checking for existing touchTriggers both at game start and end, so it's slightly redundant.
-	  	var existingTouchTrigger = document.querySelector('#touchTrigger');
-	  	if (existingTouchTrigger === null){
-	  	  var touchTrigger = document.createElement("div");
-	  	  touchTrigger.setAttribute("id","touchTrigger");
-
-	  	  // afaik css in js is necessary here to force a fullscreen element
-	  	  touchTrigger.setAttribute(
-	  	    "style","position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden;"
-	  	  );
-	  	  document.body.appendChild(touchTrigger);
-
-	  	  touchTrigger.addEventListener('touchstart', input.ontouchstart);
-	  	  touchTrigger.addEventListener('touchmove', input.ontouchmove);
-	  	  touchTrigger.addEventListener('touchend', input.ontouchend);
-	  	}
+	if (startWithTitle === undefined || startWithTitle === null) {
+		startWithTitle = true;
 	}
 
-	window.onblur = input.onblur;
-
-	update_interval = setInterval(update,16);
-
-	if(startWithTitle) { // used by editor 
+	if (startWithTitle) { // used by editor 
 		startNarrating(getTitle());
 	}
 }
@@ -289,31 +234,6 @@ function getOffset(evt) {
 
 function stopGame() {
 	bitsyLog("stop GAME!");
-
-	document.removeEventListener('keydown', input.onkeydown);
-	document.removeEventListener('keyup', input.onkeyup);
-
-	if (isPlayerEmbeddedInEditor) {
-		canvas.removeEventListener('touchstart', input.ontouchstart);
-		canvas.removeEventListener('touchmove', input.ontouchmove);
-		canvas.removeEventListener('touchend', input.ontouchend);
-	}
-	else {
-		//check for touchTrigger and removes it
-
-    		var existingTouchTrigger = document.querySelector('#touchTrigger');
-    		if (existingTouchTrigger !== null){
-    			existingTouchTrigger.removeEventListener('touchstart', input.ontouchstart);
-    			existingTouchTrigger.removeEventListener('touchmove', input.ontouchmove);
-    			existingTouchTrigger.removeEventListener('touchend', input.ontouchend);
-
-    			existingTouchTrigger.parentElement.removeChild(existingTouchTrigger);
-    		}
-	}
-
-	window.onblur = null;
-
-	clearInterval(update_interval);
 }
 
 /* loading animation */
@@ -371,7 +291,6 @@ var loading_anim_data = [
 ];
 var loading_anim_frame = 0;
 var loading_anim_speed = 500;
-var loading_interval = null;
 
 function loadingAnimation() {
 	//create image
@@ -460,20 +379,21 @@ function update() {
 	}
 
 	prevTime = curTime;
-
-	input.resetKeyPressed();
-	input.resetTapReleased();
 }
 
+var isAnyButtonHeld = false;
+var isIgnoringInput = false;
+
 function updateInput() {
-	if( dialogBuffer.IsActive() ) {
-		if (input.anyKeyPressed() || input.isTapReleased()) {
+	if (dialogBuffer.IsActive()) {
+		if (!isAnyButtonHeld && bitsyButton()) {
 			/* CONTINUE DIALOG */
 			if (dialogBuffer.CanContinue()) {
 				var hasMoreDialog = dialogBuffer.Continue();
-				if(!hasMoreDialog) {
+				if (!hasMoreDialog) {
 					// ignore currently held keys UNTIL they are released (stops player from insta-moving)
-					input.ignoreHeldKeys();
+					isIgnoringInput = true;
+					curPlayerDirection = Direction.None;
 				}
 			}
 			else {
@@ -481,37 +401,43 @@ function updateInput() {
 			}
 		}
 	}
-	else if ( isEnding ) {
-		if (input.anyKeyPressed() || input.isTapReleased()) {
+	else if (isEnding) {
+		if (!isAnyButtonHeld && bitsyButton()) {
 			/* RESTART GAME */
 			reset_cur_game();
 		}
 	}
-	else {
+	else if (!isIgnoringInput) {
 		/* WALK */
 		var prevPlayerDirection = curPlayerDirection;
 
-		if ( input.isKeyDown( key.left ) || input.isKeyDown( key.a ) || input.swipeLeft() ) {
-			curPlayerDirection = Direction.Left;
-		}
-		else if ( input.isKeyDown( key.right ) || input.isKeyDown( key.d ) || input.swipeRight() ) {
-			curPlayerDirection = Direction.Right;
-		}
-		else if ( input.isKeyDown( key.up ) || input.isKeyDown( key.w ) || input.swipeUp() ) {
+		if (bitsyButton(0)) {
 			curPlayerDirection = Direction.Up;
 		}
-		else if ( input.isKeyDown( key.down ) || input.isKeyDown( key.s ) || input.swipeDown() ) {
+		else if (bitsyButton(1)) {
 			curPlayerDirection = Direction.Down;
+		}
+		else if (bitsyButton(2)) {
+			curPlayerDirection = Direction.Left;
+		}
+		else if (bitsyButton(3)) {
+			curPlayerDirection = Direction.Right;
 		}
 		else {
 			curPlayerDirection = Direction.None;
 		}
 
 		if (curPlayerDirection != Direction.None && curPlayerDirection != prevPlayerDirection) {
-			movePlayer( curPlayerDirection );
+			movePlayer(curPlayerDirection);
 			playerHoldToMoveTimer = 500;
 		}
 	}
+
+	if (!bitsyButton()) {
+		isIgnoringInput = false;
+	}
+
+	isAnyButtonHeld = bitsyButton();
 }
 
 var animationCounter = 0;
@@ -596,199 +522,6 @@ var Direction = {
 
 var curPlayerDirection = Direction.None;
 var playerHoldToMoveTimer = 0;
-
-var InputManager = function() {
-	var self = this;
-
-	var pressed;
-	var ignored;
-	var newKeyPress;
-	var touchState;
-
-	function resetAll() {
-		pressed = {};
-		ignored = {};
-		newKeyPress = false;
-
-		touchState = {
-			isDown : false,
-			startX : 0,
-			startY : 0,
-			curX : 0,
-			curY : 0,
-			swipeDistance : 30,
-			swipeDirection : Direction.None,
-			tapReleased : false
-		};
-	}
-	resetAll();
-
-	function stopWindowScrolling(e) {
-		if(e.keyCode == key.left || e.keyCode == key.right || e.keyCode == key.up || e.keyCode == key.down || !isPlayerEmbeddedInEditor)
-			e.preventDefault();
-	}
-
-	function tryRestartGame(e) {
-		/* RESTART GAME */
-		if ( e.keyCode === key.r && ( e.getModifierState("Control") || e.getModifierState("Meta") ) ) {
-			if ( confirm("Restart the game?") ) {
-				reset_cur_game();
-			}
-		}
-	}
-
-	function eventIsModifier(event) {
-		return (event.keyCode == key.shift || event.keyCode == key.ctrl || event.keyCode == key.alt || event.keyCode == key.cmd);
-	}
-
-	function isModifierKeyDown() {
-		return ( self.isKeyDown(key.shift) || self.isKeyDown(key.ctrl) || self.isKeyDown(key.alt) || self.isKeyDown(key.cmd) );
-	}
-
-	this.ignoreHeldKeys = function() {
-		for (var key in pressed) {
-			if (pressed[key]) { // only ignore keys that are actually held
-				ignored[key] = true;
-				// bitsyLog("IGNORE -- " + key);
-			}
-		}
-	}
-
-	this.onkeydown = function(event) {
-		// bitsyLog("KEYDOWN -- " + event.keyCode);
-
-		stopWindowScrolling(event);
-
-		tryRestartGame(event);
-
-		// Special keys being held down can interfere with keyup events and lock movement
-		// so just don't collect input when they're held
-		{
-			if (isModifierKeyDown()) {
-				return;
-			}
-
-			if (eventIsModifier(event)) {
-				resetAll();
-			}
-		}
-
-		if (ignored[event.keyCode]) {
-			return;
-		}
-
-		if (!self.isKeyDown(event.keyCode)) {
-			newKeyPress = true;
-		}
-
-		pressed[event.keyCode] = true;
-		ignored[event.keyCode] = false;
-	}
-
-	this.onkeyup = function(event) {
-		// bitsyLog("KEYUP -- " + event.keyCode);
-		pressed[event.keyCode] = false;
-		ignored[event.keyCode] = false;
-	}
-
-	this.ontouchstart = function(event) {
-		event.preventDefault();
-
-		if( event.changedTouches.length > 0 ) {
-			touchState.isDown = true;
-
-			touchState.startX = touchState.curX = event.changedTouches[0].clientX;
-			touchState.startY = touchState.curY = event.changedTouches[0].clientY;
-
-			touchState.swipeDirection = Direction.None;
-		}
-	}
-
-	this.ontouchmove = function(event) {
-		event.preventDefault();
-
-		if( touchState.isDown && event.changedTouches.length > 0 ) {
-			touchState.curX = event.changedTouches[0].clientX;
-			touchState.curY = event.changedTouches[0].clientY;
-
-			var prevDirection = touchState.swipeDirection;
-
-			if( touchState.curX - touchState.startX <= -touchState.swipeDistance ) {
-				touchState.swipeDirection = Direction.Left;
-			}
-			else if( touchState.curX - touchState.startX >= touchState.swipeDistance ) {
-				touchState.swipeDirection = Direction.Right;
-			}
-			else if( touchState.curY - touchState.startY <= -touchState.swipeDistance ) {
-				touchState.swipeDirection = Direction.Up;
-			}
-			else if( touchState.curY - touchState.startY >= touchState.swipeDistance ) {
-				touchState.swipeDirection = Direction.Down;
-			}
-
-			if( touchState.swipeDirection != prevDirection ) {
-				// reset center so changing directions is easier
-				touchState.startX = touchState.curX;
-				touchState.startY = touchState.curY;
-			}
-		}
-	}
-
-	this.ontouchend = function(event) {
-		event.preventDefault();
-
-		touchState.isDown = false;
-
-		if( touchState.swipeDirection == Direction.None ) {
-			// tap!
-			touchState.tapReleased = true;
-		}
-
-		touchState.swipeDirection = Direction.None;
-	}
-
-	this.isKeyDown = function(keyCode) {
-		return pressed[keyCode] != null && pressed[keyCode] == true && (ignored[keyCode] == null || ignored[keyCode] == false);
-	}
-
-	this.anyKeyPressed = function() {
-		return newKeyPress;
-	}
-
-	this.resetKeyPressed = function() {
-		newKeyPress = false;
-	}
-
-	this.swipeLeft = function() {
-		return touchState.swipeDirection == Direction.Left;
-	}
-
-	this.swipeRight = function() {
-		return touchState.swipeDirection == Direction.Right;
-	}
-
-	this.swipeUp = function() {
-		return touchState.swipeDirection == Direction.Up;
-	}
-
-	this.swipeDown = function() {
-		return touchState.swipeDirection == Direction.Down;
-	}
-
-	this.isTapReleased = function() {
-		return touchState.tapReleased;
-	}
-
-	this.resetTapReleased = function() {
-		touchState.tapReleased = false;
-	}
-
-	this.onblur = function() {
-		// bitsyLog("~~~ BLUR ~~");
-		resetAll();
-	}
-}
-var input = null;
 
 function movePlayer(direction) {
 	if (player().room == null || !Object.keys(room).includes(player().room)) {
@@ -895,6 +628,10 @@ function initRoom(roomId) {
 	// init ending properties
 	for (var i = 0; i < room[roomId].endings.length; i++) {
 		room[roomId].endings[i].property = { locked:false };
+	}
+
+	if (onInitRoom) {
+		onInitRoom(roomId);
 	}
 }
 
@@ -2198,3 +1935,8 @@ var scriptModule = new Script();
 var scriptInterpreter = scriptModule.CreateInterpreter();
 var scriptUtils = scriptModule.CreateUtils(); // TODO: move to editor.js?
 // scriptInterpreter.SetDialogBuffer( dialogBuffer );
+
+/* EVENTS */
+bitsyOnUpdate(update);
+bitsyOnQuit(stopGame);
+bitsyOnLoad(load_game);

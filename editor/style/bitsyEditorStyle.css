@@ -115,6 +115,7 @@ input:checked + label {
 /* text input */
 input[type=text] {
 	font-family: monospace;
+	min-width: 0;
 	flex-grow: 1;
 	border-radius: var(--bitsy-space-s);
 	padding: var(--bitsy-space-s);
@@ -606,4 +607,43 @@ input[type=checkbox] + label:hover {
 
 #dialogCodeText {
 	direction: ltr;
+}
+
+/* play mode */
+.bitsy-playmode .bitsy-playmode-hide {
+	display: none !important;
+}
+
+.bitsy-playmode .bitsy-playmode-disable {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.bitsy-playmode-show {
+	display: none;
+}
+
+.bitsy-playmode .bitsy-playmode-show {
+	display: inherit;
+}
+
+.bitsy-playmode .bitsy-card-titlebar.bitsy-playmode-reverse-color {
+	background: var(--bitsy-color-main-2);
+	color: var(--bitsy-color-main-1);
+}
+
+.bitsy-playmode .bitsy-card-titlebar.bitsy-playmode-reverse-color button {
+	background: var(--bitsy-color-main-2);
+	color: var(--bitsy-color-main-1);
+}
+
+.bitsy-playmode .bitsy-card-titlebar.bitsy-playmode-reverse-color button:active {
+	background: var(--bitsy-color-main-1);
+	color: var(--bitsy-color-main-2);
+}
+
+/* all tools are disabled by default during play mode */
+.bitsy-playmode .bitsy-card:not(.bitsy-playmode-enable) .bitsy-card-main {
+	pointer-events: none;
+	opacity: 0.5;
 }

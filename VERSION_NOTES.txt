@@ -1,3 +1,10 @@
+v7.8:
+- play mode is more visually distinct
+- tools are disabled during play mode
+- show current room location during play mode
+- fix bug where find button in paint tool overflows
+- disable broken dialog preview button until I can fix it
+
 v7.7:
 - attempt to fix bug where extra frame is added to animation
 - fix bug where games can't be uploaded from HTML

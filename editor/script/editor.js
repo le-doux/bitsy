@@ -986,6 +986,20 @@ function start() {
 		updateInventoryUI();
 	}
 
+	onInitRoom = function(id) {
+		var curRoomName = "";
+
+		// basically copied from find tool
+		if (room[id].name) {
+			curRoomName = room[id].name;
+		}
+		else {
+			curRoomName = localization.GetStringOrFallback("room_label", "room") + " " + id;
+		}
+
+		document.getElementById("roomCurLocationText").innerText = curRoomName;
+	}
+
 	//color testing
 	// on_change_color_bg();
 	// on_change_color_tile();
@@ -1679,7 +1693,12 @@ function toggleDownloadOptions(e) {
 
 function on_edit_mode() {
 	isPlayMode = false;
-	stopGame();
+
+	document.getElementById("appRoot").classList.remove("bitsy-playmode");
+
+	// stopGame();
+	quitGame();
+
 	// TODO I should really do more to separate the editor's game-data from the engine's game-data
 	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
 
@@ -1717,10 +1736,13 @@ function getFullGameData() {
 function on_play_mode() {
 	isPlayMode = true;
 
+	document.getElementById("appRoot").classList.add("bitsy-playmode");
+
 	roomTool.unlistenEditEvents();
 
 	// load_game(document.getElementById("game_data").value, !isPreviewDialogMode /* startWithTitle */);
-	load_game(getFullGameData(), !isPreviewDialogMode /* startWithTitle */);
+	// load_game(getFullGameData(), !isPreviewDialogMode /* startWithTitle */);
+	loadGame(getFullGameData());
 
 	bitsyLog("PLAY!! ~~ PREVIEW ? " + isPreviewDialogMode, "editor");
 	if(!isPreviewDialogMode) {
