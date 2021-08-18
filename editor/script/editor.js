@@ -1722,7 +1722,6 @@ function on_edit_mode() {
 		// 	advDialogUIComponents[i].GetEl().classList.remove("highlighted");
 		// }
 	}
-	document.getElementById("previewDialogCheck").disabled = false;
 
 	events.Raise("on_edit_mode");
 }
@@ -1743,12 +1742,6 @@ function on_play_mode() {
 	// load_game(document.getElementById("game_data").value, !isPreviewDialogMode /* startWithTitle */);
 	// load_game(getFullGameData(), !isPreviewDialogMode /* startWithTitle */);
 	loadGame(getFullGameData());
-
-	bitsyLog("PLAY!! ~~ PREVIEW ? " + isPreviewDialogMode, "editor");
-	if(!isPreviewDialogMode) {
-		bitsyLog("DISALBE PREVIEW!!!", "editor");
-		document.getElementById("previewDialogCheck").disabled = true;
-	}
 }
 
 function updatePlayModeButton() {
@@ -1761,12 +1754,7 @@ function updatePlayModeButton() {
 }
 
 function updatePreviewDialogButton() {
-	document.getElementById("previewDialogCheck").checked = isPreviewDialogMode;
-	iconUtils.LoadIcon(document.getElementById("previewDialogIcon"), isPreviewDialogMode ? "stop" : "play");
-
-	var stopText = localization.GetStringOrFallback("stop_game", "stop");
-	var previewText = localization.GetStringOrFallback("dialog_start_preview", "preview");
-	document.getElementById("previewDialogText").innerHTML = isPreviewDialogMode ? stopText : previewText;
+	// todo : remove?
 }
 
 function togglePaintGrid(e) {
