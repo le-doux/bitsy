@@ -345,6 +345,19 @@ function bitsyButton(buttonCode) {
 		input.isTapReleased();
 }
 
+// todo : name??
+function bitsySetCanvas(index) {
+	// todo
+}
+
+function bitsyDrawPixel(paletteIndex, x, y) {
+	// todo
+}
+
+function bitsyDrawTile(tileIndex, x, y) {
+	// todo
+}
+
 function bitsyOnLoad(fn) {
 	onLoadFunction = fn;
 }
