@@ -619,7 +619,18 @@ function movePlayerThroughExit(ext) {
 	}
 }
 
+function updatePalette(palId) {
+	var pal = palette[palId];
+
+	for (var i = 0; i < pal.colors.length; i++) {
+		var color = pal.colors[i];
+		bitsySetColor(i, color[0], color[1], color[2]);
+	}
+}
+
 function initRoom(roomId) {
+	updatePalette(curPal());
+
 	// init exit properties
 	for (var i = 0; i < room[roomId].exits.length; i++) {
 		room[roomId].exits[i].property = { locked:false };
@@ -1693,21 +1704,20 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	// 	bitsyLog("DRAW ROOM " + debugLastRoomDrawn);
 	// }
 
+	// clear screen
+	bitsySetDrawBuffer(0);
+	bitsyClearBuffer(0);
+
 	var paletteId = "default";
 
 	if (room === undefined) {
 		// protect against invalid rooms
-		context.fillStyle = "rgb(" + getPal(paletteId)[0][0] + "," + getPal(paletteId)[0][1] + "," + getPal(paletteId)[0][2] + ")";
-		context.fillRect(0,0,canvas.width,canvas.height);
 		return;
 	}
 
-	//clear screen
 	if (room.pal != null && palette[paletteId] != undefined) {
 		paletteId = room.pal;
 	}
-	context.fillStyle = "rgb(" + getPal(paletteId)[0][0] + "," + getPal(paletteId)[0][1] + "," + getPal(paletteId)[0][2] + ")";
-	context.fillRect(0,0,canvas.width,canvas.height);
 
 	//draw tiles
 	for (i in room.tilemap) {

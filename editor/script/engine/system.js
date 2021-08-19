@@ -313,6 +313,10 @@ function quitGame() {
 	clearInterval(updateInterval);
 }
 
+/* graphics */
+var curBufferIndex = 0;
+var systemPalette = [];
+
 /* ==== */
 function bitsyLog(message, category) {
 	if (!category) {
@@ -346,12 +350,31 @@ function bitsyButton(buttonCode) {
 }
 
 // todo : name??
-function bitsySetCanvas(index) {
-	// todo
+function bitsySetDrawBuffer(bufferIndex) {
+	curBufferIndex = bufferIndex;
+}
+
+function bitsySetColor(paletteIndex, r, g, b) {
+	systemPalette[paletteIndex] = [r, g, b];
+}
+
+function bitsyClearBuffer(paletteIndex) {
+	var clearColor = systemPalette[paletteIndex];
+
+	if (curBufferIndex === 0) {
+		// clear screen (todo : should this be disabled in tile mode?)
+		ctx.fillStyle = "rgb(" + clearColor[0] + "," + clearColor[1] + "," + clearColor[2] + ")";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+	}
 }
 
 function bitsyDrawPixel(paletteIndex, x, y) {
 	// todo
+}
+
+// todo : name???
+function bitsyCreateTile() {
+
 }
 
 function bitsyDrawTile(tileIndex, x, y) {

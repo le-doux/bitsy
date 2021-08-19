@@ -1862,7 +1862,12 @@ function deletePalette() {
 function roomPaletteChange(event) {
 	var palId = event.target.value;
 	room[curRoom].pal = palId;
+
+	// hacky?
+	initRoom(curRoom);
+
 	refreshGameData();
+
 	markerTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
