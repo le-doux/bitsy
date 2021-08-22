@@ -344,9 +344,12 @@ function update() {
 
 	if (transition.IsTransitionActive()) {
 		// transition animation takes over everything!
+		bitsySetGraphicsMode(0);
 		transition.UpdateTransition(deltaTime);
 	}
 	else {
+		bitsySetGraphicsMode(1);
+
 		if (!isNarrating && !isEnding) {
 			updateAnimation();
 			drawRoom( room[curRoom] ); // draw world if game has begun

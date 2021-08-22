@@ -276,6 +276,11 @@ function loadGame(gameData) {
 				onUpdateFunction();
 			}
 
+			if (curGraphicsMode === 0) {
+				// show screen buffer
+				ctx.putImageData(drawingBuffers[screenBufferId].img, 0, 0);
+			}
+
 			input.resetTapReleased();
 		},
 		16);
