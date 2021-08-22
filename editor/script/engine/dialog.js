@@ -131,7 +131,7 @@ var DialogRenderer = function() {
 				var i = (y * char.width) + x;
 				if (charData[i] == 1) {
 					// todo : other colors
-					bitsyDrawPixel(1, left + x, top + y);
+					bitsyDrawPixel(char.color, left + x, top + y);
 				}
 			}
 		}
@@ -372,7 +372,7 @@ var DialogBuffer = function() {
 	function DialogChar(effectList) {
 		this.effectList = effectList.slice(); // clone effect list (since it can change between chars)
 
-		this.color = { r:255, g:255, b:255, a:255 };
+		this.color = 1; // white
 		this.offset = { x:0, y:0 }; // in pixels (screen pixels?)
 
 		this.col = 0;
@@ -872,32 +872,16 @@ var ArabicHandler = function() {
 /* NEW TEXT EFFECTS */
 var TextEffects = new Map();
 
-var RainbowEffect = function() { // TODO - should it be an object or just a method?
-	this.DoEffect = function(char,time) {
-		// bitsyLog("RAINBOW!!!");
-		// bitsyLog(char);
-		// bitsyLog(char.color);
-		// bitsyLog(char.col);
-
-		var h = Math.abs( Math.sin( (time / 600) - (char.col / 8) ) );
-		var rgb = hslToRgb( h, 1, 0.5 );
-		char.color.r = rgb[0];
-		char.color.g = rgb[1];
-		char.color.b = rgb[2];
-		char.color.a = 255;
+var RainbowEffect = function() {
+	this.DoEffect = function(char, time) {
+		char.color = rainbowColorStartIndex + Math.floor(((time / 100) - char.col * 0.5) % rainbowColorCount);
 	}
 };
 TextEffects["rbw"] = new RainbowEffect();
 
 var ColorEffect = function(index) {
 	this.DoEffect = function(char) {
-		var pal = getPal( curPal() );
-		var color = pal[ parseInt( index ) ];
-		// bitsyLog(color);
-		char.color.r = color[0];
-		char.color.g = color[1];
-		char.color.b = color[2];
-		char.color.a = 255;
+		char.color = tileColorStartIndex + index;
 	}
 };
 TextEffects["clr1"] = new ColorEffect(0);
@@ -931,10 +915,7 @@ TextEffects["shk"] = new ShakyEffect();
 
 var DebugHighlightEffect = function() {
 	this.DoEffect = function(char) {
-		char.color.r = 255;
-		char.color.g = 255;
-		char.color.b = 0;
-		char.color.a = 255;
+		char.color = tileColorStartIndex;
 	}
 }
 TextEffects["_debug_highlight"] = new DebugHighlightEffect();

@@ -622,11 +622,32 @@ function movePlayerThroughExit(ext) {
 // todo : where should this be stored?
 var tileColorStartIndex = 16;
 
+// precalculated rainbow colors
+var rainbowColorStartIndex = 2;
+var rainbowColorCount = 10;
+var rainbowColors = [
+	[255,0,0],
+	[255,217,0],
+	[78,255,0],
+	[0,255,125],
+	[0,192,255],
+	[0,18,255],
+	[136,0,255],
+	[255,0,242],
+	[255,0,138],
+	[255,0,61],
+];
+
 function updatePalette(palId) {
-	// text colors
+	// textbox colors
 	bitsySetColor(0, 0, 0, 0); // black
 	bitsySetColor(1, 255, 255, 255); // white
-	// todo : rainbow
+
+	// rainbow colors
+	for (var i = 0; i < rainbowColorCount; i++) {
+		var color = rainbowColors[i];
+		bitsySetColor(rainbowColorStartIndex + i, color[0], color[1], color[2]);
+	}
 
 	// tile colors
 	var pal = palette[palId];
