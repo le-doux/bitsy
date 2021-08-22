@@ -321,6 +321,8 @@ var screenBufferIndex = 0;
 var textboxBufferIndex = 1;
 var nextBufferIndex = 2;
 var drawingBuffers = [];
+var textboxWidth = 0;
+var textboxHeight = 0;
 
 function hackForEditor_GetImageFromTileId(tileId) {
 	return drawingBuffers[tileId].canvas;
@@ -370,10 +372,28 @@ function bitsySetColor(paletteIndex, r, g, b) {
 function bitsyClearBuffer(paletteIndex) {
 	var clearColor = systemPalette[paletteIndex];
 
-	if (curBufferIndex === 0) {
+	if (curBufferIndex === screenBufferIndex) {
 		// clear screen (todo : should this be disabled in tile mode?)
 		ctx.fillStyle = "rgb(" + clearColor[0] + "," + clearColor[1] + "," + clearColor[2] + ")";
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
+	}
+	else if (curBufferIndex === textboxBufferIndex) {
+		if (!drawingBuffers[textboxBufferIndex]) {
+			// todo : is this useful to keep around?
+			// force init the buffer
+			bitsySetTextboxSize(textboxWidth, textboxHeight);
+		}
+
+		var textboxBuffer = drawingBuffers[textboxBufferIndex];
+
+		// todo : clean up this code
+		// fill text box
+		for (var i = 0; i < textboxBuffer.img.data.length; i += 4) {
+			textboxBuffer.img.data[i + 0] = clearColor[0];
+			textboxBuffer.img.data[i + 1] = clearColor[1];
+			textboxBuffer.img.data[i + 2] = clearColor[2];
+			textboxBuffer.img.data[i + 3] = 255;
+		}
 	}
 }
 
@@ -440,8 +460,11 @@ function bitsyDrawTile(tileIndex, tx, ty) {
 
 // note: width and height are in text scale pixels
 function bitsySetTextboxSize(w, h) {
+	textboxWidth = w;
+	textboxHeight = h;
+
 	drawingBuffers[textboxBufferIndex] = {
-		img : ctx.createImageData(w * textScale, h * textScale),
+		img : ctx.createImageData(textboxWidth * textScale, textboxHeight * textScale),
 		canvas : null, // currently unused since it's not a performance bottleneck
 	};
 }
