@@ -93,7 +93,7 @@ function renderTileFromImageSource(imageSource, pal, col) {
 	var backgroundColor = tileColorStartIndex + 0;
 	var foregroundColor = tileColorStartIndex + col;
 
-	bitsySetDrawBuffer(tileId);
+	bitsyDrawBegin(tileId);
 
 	for (var y = 0; y < tilesize; y++) {
 		for (var x = 0; x < tilesize; x++) {
@@ -107,6 +107,8 @@ function renderTileFromImageSource(imageSource, pal, col) {
 			}
 		}
 	}
+
+	bitsyDrawEnd();
 
 	return tileId;
 }

@@ -54,8 +54,9 @@ var DialogRenderer = function() {
 	};
 
 	this.ClearTextbox = function() {
-		bitsySetDrawBuffer(1);
-		bitsyClearBuffer(0); // todo : what's the right index?
+		bitsyDrawBegin(1);
+		bitsyDrawFill(0);
+		bitsyDrawEnd();
 	};
 
 	var isCentered = false;
@@ -86,7 +87,7 @@ var DialogRenderer = function() {
 
 	this.DrawNextArrow = function() {
 		// bitsyLog("draw arrow!");
-		bitsySetDrawBuffer(1);
+		bitsyDrawBegin(1);
 
 		var top = (textboxInfo.height - 5) * text_scale;
 		var left = (textboxInfo.width - (5 + 4)) * text_scale;
@@ -107,11 +108,13 @@ var DialogRenderer = function() {
 				}
 			}
 		}
+
+		bitsyDrawEnd();
 	};
 
 	var text_scale = 2; //using a different scaling factor for text feels like cheating... but it looks better
 	this.DrawChar = function(char, row, col, leftPos) {
-		bitsySetDrawBuffer(1);
+		bitsyDrawBegin(1);
 
 		char.offset = {
 			x: char.base_offset.x,
@@ -135,7 +138,9 @@ var DialogRenderer = function() {
 				}
 			}
 		}
-		
+
+		bitsyDrawEnd();
+
 		// call printHandler for character
 		char.OnPrint();
 	};

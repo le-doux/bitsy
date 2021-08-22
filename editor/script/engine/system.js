@@ -314,15 +314,18 @@ function quitGame() {
 }
 
 /* graphics */
-var curGraphicsMode = 0;
 var textScale = 2; // todo : move tile scale into here too?
+
+var curGraphicsMode = 0;
+var curBufferId = -1; // note: -1 is invalid
 var systemPalette = [];
-var curBufferId = 0; // todo : name? selectedBuffer?
+var drawingBuffers = [];
+
 var screenBufferId = 0;
 var textboxBufferId = 1;
 var tileStartBufferId = 2;
 var nextBufferId = tileStartBufferId;
-var drawingBuffers = [];
+
 var textboxWidth = 0;
 var textboxHeight = 0;
 
@@ -371,16 +374,37 @@ function bitsySetGraphicsMode(mode) {
 	}
 }
 
-// todo : name?? bitsyDrawStart? or bitsyStartDraw? or bitsyOpenBuffer?
-function bitsySetDrawBuffer(BufferId) {
-	curBufferId = BufferId;
-}
-
 function bitsySetColor(paletteIndex, r, g, b) {
 	systemPalette[paletteIndex] = [r, g, b];
 }
 
-function bitsyClearBuffer(paletteIndex) {
+function bitsyDrawBegin(bufferId) {
+	curBufferId = bufferId;
+}
+
+function bitsyDrawEnd() {
+	if (curBufferId >= tileStartBufferId) {
+		var tileBuffer = drawingBuffers[curBufferId];
+
+		// todo : move this step into a bitsyDrawEnd function?
+		if (tileBuffer.canvas === null) {
+			var img = tileBuffer.img;
+
+			// convert to canvas: chrome has poor performance when working directly with image data
+			var imageCanvas = document.createElement("canvas");
+			imageCanvas.width = img.width;
+			imageCanvas.height = img.height;
+			var imageContext = imageCanvas.getContext("2d");
+			imageContext.putImageData(img, 0, 0);
+
+			tileBuffer.canvas = imageCanvas;
+		}
+	}
+
+	curBufferId = -1;
+}
+
+function bitsyDrawFill(paletteIndex) {
 	var clearColor = systemPalette[paletteIndex];
 
 	if (curBufferId === screenBufferId) {
@@ -483,22 +507,7 @@ function bitsyCreateTile() {
 
 // todo : name? bitsySetTile?
 function bitsyDrawTile(tileIndex, tx, ty) {
-	// todo : check that we're in tile mode?
-
 	var tileBuffer = drawingBuffers[tileIndex];
-	var img = tileBuffer.img;
-
-	// todo : move this step into a bitsyDrawEnd function?
-	if (tileBuffer.canvas === null) {
-		// convert to canvas: chrome has poor performance when working directly with image data
-		var imageCanvas = document.createElement("canvas");
-		imageCanvas.width = img.width;
-		imageCanvas.height = img.height;
-		var imageContext = imageCanvas.getContext("2d");
-		imageContext.putImageData(img, 0, 0);
-
-		tileBuffer.canvas = imageCanvas;
-	}
 
 	// NOTE: tiles are now canvases, instead of raw image data (for chrome performance reasons)
 	ctx.drawImage(
