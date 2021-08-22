@@ -314,8 +314,11 @@ function quitGame() {
 }
 
 /* graphics */
+var textScale = 2; // todo : move tile scale into here too
 var systemPalette = [];
 var curBufferIndex = 0; // todo : name? selectedBuffer?
+var screenBufferIndex = 0;
+var textboxBufferIndex = 1;
 var nextBufferIndex = 2;
 var drawingBuffers = [];
 
@@ -355,7 +358,7 @@ function bitsyButton(buttonCode) {
 		input.isTapReleased();
 }
 
-// todo : name?? bitsyDrawStart? or bitsyStartDraw?
+// todo : name?? bitsyDrawStart? or bitsyStartDraw? or bitsyOpenBuffer?
 function bitsySetDrawBuffer(bufferIndex) {
 	curBufferIndex = bufferIndex;
 }
@@ -409,6 +412,8 @@ function bitsyCreateTile() {
 
 // todo : name? bitsySetTile?
 function bitsyDrawTile(tileIndex, tx, ty) {
+	// todo : check that we're in tile mode?
+
 	var tileBuffer = drawingBuffers[tileIndex];
 	var img = tileBuffer.img;
 
@@ -431,6 +436,20 @@ function bitsyDrawTile(tileIndex, tx, ty) {
 		ty * tilesize * scale,
 		tilesize * scale,
 		tilesize * scale);
+}
+
+// note: width and height are in text scale pixels
+function bitsySetTextboxSize(w, h) {
+	drawingBuffers[textboxBufferIndex] = {
+		img : ctx.createImageData(w * textScale, h * textScale),
+		canvas : null, // currently unused since it's not a performance bottleneck
+	};
+}
+
+// note: x and y are in tile scale pixels
+// todo : move to a hide/show model? what should the name of this be?
+function bitsyDrawTextbox(x, y) {
+	ctx.putImageData(drawingBuffers[textboxBufferIndex].img, x * scale, y * scale);
 }
 
 function bitsyOnLoad(fn) {

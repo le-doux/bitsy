@@ -29,6 +29,11 @@ var DialogRenderer = function() {
 		font = f;
 		textboxInfo.height = (textboxInfo.padding_vert * 3) + (relativeFontHeight() * 2) + textboxInfo.arrow_height;
 		textboxInfo.img = context.createImageData(textboxInfo.width*scale, textboxInfo.height*scale);
+
+		// todo : replace the old method of textbox rendering
+		var textboxScaleW = textboxInfo.width / textboxInfo.font_scale;
+		var textboxScaleH = textboxInfo.height / textboxInfo.font_scale;
+		bitsySetTextboxSize(textboxScaleW, textboxScaleH);
 	}
 
 	function textScale() {
@@ -71,17 +76,17 @@ var DialogRenderer = function() {
 	};
 
 	this.DrawTextbox = function() {
-		if(context == null) return;
 		if (isCentered) {
-			context.putImageData(textboxInfo.img, textboxInfo.left*scale, ((height/2)-(textboxInfo.height/2))*scale);
+			// todo : will the height calculations always work?
+			bitsyDrawTextbox(textboxInfo.left, ((height / 2) - (textboxInfo.height / 2)));
 		}
-		else if (player().y < mapsize/2) {
-			//bottom
-			context.putImageData(textboxInfo.img, textboxInfo.left*scale, (height-textboxInfo.bottom-textboxInfo.height)*scale);
+		else if (player().y < (mapsize / 2)) {
+			// bottom
+			bitsyDrawTextbox(textboxInfo.left, (height - textboxInfo.bottom - textboxInfo.height));
 		}
 		else {
-			//top
-			context.putImageData(textboxInfo.img, textboxInfo.left*scale, textboxInfo.top*scale);
+			// top
+			bitsyDrawTextbox(textboxInfo.left, textboxInfo.top);
 		}
 	};
 
