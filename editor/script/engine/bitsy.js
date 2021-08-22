@@ -343,8 +343,12 @@ function update() {
 	}
 
 	if (transition.IsTransitionActive()) {
-		// transition animation takes over everything!
 		bitsySetGraphicsMode(0);
+		bitsyDrawBegin(0);
+		bitsyDrawFill(0);
+		bitsyDrawEnd();
+
+		// transition animation takes over everything!
 		transition.UpdateTransition(deltaTime);
 	}
 	else {
@@ -352,9 +356,10 @@ function update() {
 
 		if (!isNarrating && !isEnding) {
 			updateAnimation();
-			drawRoom( room[curRoom] ); // draw world if game has begun
+			drawRoom(room[curRoom]); // draw world if game has begun
 		}
 		else {
+			// TODO!!!
 			//make sure to still clear screen
 			ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
 			ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -1714,7 +1719,7 @@ function parseFlag(lines, i) {
 }
 
 function drawTile(tileId, x, y) {
-	bitsyDrawTile(tileId, x, y);
+	bitsySetTile(tileId, x, y);
 }
 
 function drawSprite(tileId, x, y) {
@@ -1752,6 +1757,9 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	for (i in room.tilemap) {
 		for (j in room.tilemap[i]) {
 			var id = room.tilemap[i][j];
+			var x = parseInt(j);
+			var y = parseInt(i);
+
 			if (id != "0") {
 				//bitsyLog(id);
 				if (tile[id] == null) { // hack-around to avoid corrupting files (not a solution though!)
@@ -1760,12 +1768,12 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 				}
 				else {
 					// bitsyLog(id);
-					drawTile(getTileImage(tile[id],paletteId,frameIndex), j, i);
+					drawTile(getTileImage(tile[id], paletteId, frameIndex), x, y);
 				}
 			}
 			else {
 				// clear tile
-				drawTile(getTileImage(null, paletteId, frameIndex), j, i);
+				drawTile(getTileImage(null, paletteId, frameIndex), x, y);
 			}
 		}
 	}

@@ -276,14 +276,37 @@ function loadGame(gameData) {
 				onUpdateFunction();
 			}
 
-			if (curGraphicsMode === 0) {
-				// show screen buffer
-				ctx.putImageData(drawingBuffers[screenBufferId].img, 0, 0);
-			}
+			renderGame();
 
 			input.resetTapReleased();
 		},
 		16);
+}
+
+function renderGame() {
+	if (curGraphicsMode === 0) {
+		// show screen buffer
+		ctx.putImageData(drawingBuffers[screenBufferId].img, 0, 0);
+	}
+	else if (curGraphicsMode === 1) {
+		// tile mode
+		for (var y = 0; y < 16; y++) {
+			for (var x = 0; x < 16; x++) {
+				var tileId = tilemapMemory[(y * 16) + x];
+				var tileBuffer = drawingBuffers[tileId];
+
+				if (tileBuffer) {
+					// NOTE: tiles are now canvases, instead of raw image data (for chrome performance reasons)
+					ctx.drawImage(
+						tileBuffer.canvas,
+						x * tilesize * scale,
+						y * tilesize * scale,
+						tilesize * scale,
+						tilesize * scale);
+				}
+			}
+		}
+	}
 }
 
 function quitGame() {
@@ -322,9 +345,28 @@ function quitGame() {
 var textScale = 2; // todo : move tile scale into here too?
 
 var curGraphicsMode = 0;
-var curBufferId = -1; // note: -1 is invalid
 var systemPalette = [];
+var curBufferId = -1; // note: -1 is invalid
 var drawingBuffers = [];
+
+var tilemapMemory = [
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+];
 
 var screenBufferId = 0;
 var textboxBufferId = 1;
@@ -333,6 +375,20 @@ var nextBufferId = tileStartBufferId;
 
 var textboxWidth = 0;
 var textboxHeight = 0;
+
+function debug_printTilemapMemory() {
+	var str = "";
+
+	for (var y = 0; y < 16; y++) {
+		for (var x = 0; x < 16; x++) {
+			var tileId = tilemapMemory[(y * 16) + x];
+			str += tileId + ",";
+		}
+		str += "\n";
+	}
+
+	console.log(str);
+}
 
 function hackForEditor_GetImageFromTileId(tileId) {
 	return drawingBuffers[tileId].canvas;
@@ -511,17 +567,8 @@ function bitsyCreateTile() {
 	return tileBufferId;
 }
 
-// todo : name? bitsySetTile?
-function bitsyDrawTile(tileIndex, tx, ty) {
-	var tileBuffer = drawingBuffers[tileIndex];
-
-	// NOTE: tiles are now canvases, instead of raw image data (for chrome performance reasons)
-	ctx.drawImage(
-		tileBuffer.canvas,
-		tx * tilesize * scale,
-		ty * tilesize * scale,
-		tilesize * scale,
-		tilesize * scale);
+function bitsySetTile(tileId, x, y) {
+	tilemapMemory[(y * 16) + x] = tileId;
 }
 
 // note: width and height are in text scale pixels
