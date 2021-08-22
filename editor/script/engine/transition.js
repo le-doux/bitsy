@@ -407,7 +407,6 @@ var PostProcessUtilities = {
 		}
 	},
 	LerpColor : function(colorA,colorB,t) {
-		// TODO: move to color_util.js?
 		return {
 			r : colorA.r + ((colorB.r - colorA.r) * t),
 			g : colorA.g + ((colorB.g - colorA.g) * t),
