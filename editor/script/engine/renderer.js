@@ -77,8 +77,8 @@ function renderTileFromImageSource(imageSource, pal, col) {
 
 	var tileId = bitsyCreateTile();
 
-	var backgroundColor = 0;
-	var foregroundColor = col;
+	var backgroundColor = tileColorStartIndex + 0;
+	var foregroundColor = tileColorStartIndex + col;
 
 	bitsySetDrawBuffer(tileId);
 

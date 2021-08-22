@@ -55,7 +55,7 @@ var DialogRenderer = function() {
 
 	this.ClearTextbox = function() {
 		bitsySetDrawBuffer(1);
-		bitsyClearBuffer(1); // todo : what's the right index?
+		bitsyClearBuffer(0); // todo : what's the right index?
 	};
 
 	var isCentered = false;

@@ -619,12 +619,21 @@ function movePlayerThroughExit(ext) {
 	}
 }
 
+// todo : where should this be stored?
+var tileColorStartIndex = 16;
+
 function updatePalette(palId) {
+	// text colors
+	bitsySetColor(0, 0, 0, 0); // black
+	bitsySetColor(1, 255, 255, 255); // white
+	// todo : rainbow
+
+	// tile colors
 	var pal = palette[palId];
 
 	for (var i = 0; i < pal.colors.length; i++) {
 		var color = pal.colors[i];
-		bitsySetColor(i, color[0], color[1], color[2]);
+		bitsySetColor(tileColorStartIndex + i, color[0], color[1], color[2]);
 	}
 }
 
@@ -1702,7 +1711,7 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 
 	// clear screen // todo : this doesn't seem right for tile mode... remove?
 	bitsySetDrawBuffer(0);
-	bitsyClearBuffer(0);
+	bitsyClearBuffer(tileColorStartIndex);
 
 	var paletteId = "default";
 
