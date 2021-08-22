@@ -398,7 +398,24 @@ function bitsyClearBuffer(paletteIndex) {
 }
 
 function bitsyDrawPixel(paletteIndex, x, y) {
-	if (curBufferIndex >= 2) {
+	if (curBufferIndex == textboxBufferIndex) {
+		var textboxBuffer = drawingBuffers[textboxBufferIndex];
+		var img = textboxBuffer.img;
+		var color = systemPalette[paletteIndex];
+
+		//scaling nonsense
+		for (var sy = 0; sy < textScale; sy++) {
+			for (var sx = 0; sx < textScale; sx++) {
+				var pixelIndex = (((y * textScale) + sy) * textboxWidth * textScale * 4) + (((x * textScale) + sx) * 4);
+
+				img.data[pixelIndex + 0] = color[0];
+				img.data[pixelIndex + 1] = color[1];
+				img.data[pixelIndex + 2] = color[2];
+				img.data[pixelIndex + 3] = 255;
+			}
+		}
+	}
+	else if (curBufferIndex >= 2) {
 		// tiles
 		var tileBuffer = drawingBuffers[curBufferIndex];
 		var img = tileBuffer.img;

@@ -83,26 +83,25 @@ var DialogRenderer = function() {
 		0,1,1,1,0,
 		0,0,1,0,0
 	];
+
 	this.DrawNextArrow = function() {
 		// bitsyLog("draw arrow!");
-		var top = (textboxInfo.height-5) * scale;
-		var left = (textboxInfo.width-(5+4)) * scale;
+		var top = (textboxInfo.height - 5) * text_scale;
+		var left = (textboxInfo.width - (5 + 4)) * text_scale;
 		if (textDirection === TextDirection.RightToLeft) { // RTL hack
-			left = 4 * scale;
+			left = 4 * text_scale;
 		}
+
+		bitsySetDrawBuffer(1);
 
 		for (var y = 0; y < 3; y++) {
 			for (var x = 0; x < 5; x++) {
 				var i = (y * 5) + x;
 				if (arrowdata[i] == 1) {
 					//scaling nonsense
-					for (var sy = 0; sy < scale; sy++) {
-						for (var sx = 0; sx < scale; sx++) {
-							var pxl = 4 * ( ((top+(y*scale)+sy) * (textboxInfo.width*scale)) + (left+(x*scale)+sx) );
-							textboxInfo.img.data[pxl+0] = 255;
-							textboxInfo.img.data[pxl+1] = 255;
-							textboxInfo.img.data[pxl+2] = 255;
-							textboxInfo.img.data[pxl+3] = 255;
+					for (var sy = 0; sy < text_scale; sy++) {
+						for (var sx = 0; sx < text_scale; sx++) {
+							bitsyDrawPixel(1, left + (x * text_scale) + sx, top + (y * text_scale) + sy);
 						}
 					}
 				}
