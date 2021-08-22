@@ -333,6 +333,9 @@ function update() {
 	var curTime = Date.now();
 	deltaTime = curTime - prevTime;
 
+	// disable text box (if it's active, we'll turn it back on)
+	bitsySetTextMode(0);
+
 	if (curRoom == null) {
 		// in the special case where there is no valid room, end the game
 		startNarrating( "", true /*isEnding*/ );
@@ -359,10 +362,7 @@ function update() {
 			drawRoom(room[curRoom]); // draw world if game has begun
 		}
 		else {
-			// TODO!!!
-			//make sure to still clear screen
-			ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
-			ctx.fillRect(0,0,canvas.width,canvas.height);
+			clearRoomTiles();
 		}
 
 		// if (isDialogMode) { // dialog mode
@@ -1732,6 +1732,25 @@ function drawItem(tileId, x, y) {
 
 // var debugLastRoomDrawn = "0";
 
+function clearRoomTiles() {
+	var paletteId = "default";
+
+	if (room === undefined) {
+		// protect against invalid rooms
+		return;
+	}
+
+	if (room.pal != null && palette[paletteId] != undefined) {
+		paletteId = room.pal;
+	}
+
+	for (var y = 0; y < 16; y++) {
+		for (var x = 0; x < 16; x++) {
+			drawTile(getTileImage(null, paletteId, 0), x, y);
+		}
+	}
+}
+
 function drawRoom(room,context,frameIndex) { // context & frameIndex are optional
 	if (!context) { //optional pass in context; otherwise, use default (ok this is REAL hacky isn't it)
 		context = ctx;
@@ -1773,7 +1792,7 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 			}
 			else {
 				// clear tile
-				drawTile(getTileImage(null, paletteId, frameIndex), x, y);
+				drawTile(getTileImage(null, paletteId, 0), x, y);
 			}
 		}
 	}

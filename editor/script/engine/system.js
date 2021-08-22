@@ -306,6 +306,14 @@ function renderGame() {
 				}
 			}
 		}
+
+		// text
+		if (curTextMode === 1) {
+			ctx.putImageData(
+				drawingBuffers[textboxBufferId].img,
+				textboxX * scale,
+				textboxY * scale);
+		}
 	}
 }
 
@@ -373,6 +381,9 @@ var textboxBufferId = 1;
 var tileStartBufferId = 2;
 var nextBufferId = tileStartBufferId;
 
+var curTextMode = 0;
+var textboxX = 0;
+var textboxY = 0;
 var textboxWidth = 0;
 var textboxHeight = 0;
 
@@ -554,8 +565,8 @@ function bitsyDrawPixel(paletteIndex, x, y) {
 	}
 }
 
-// todo : name??? AddTile? AllocateTile?
-function bitsyCreateTile() {
+// allocates a tile buffer and returns the ID (todo: name ok?)
+function bitsyGetTile() {
 	var tileBufferId = nextBufferId;
 	nextBufferId++;
 
@@ -571,6 +582,11 @@ function bitsySetTile(tileId, x, y) {
 	tilemapMemory[(y * 16) + x] = tileId;
 }
 
+// note: 0 == off, 1 == on
+function bitsySetTextMode(mode) {
+	curTextMode = mode;
+}
+
 // note: width and height are in text scale pixels
 function bitsySetTextboxSize(w, h) {
 	textboxWidth = w;
@@ -583,9 +599,9 @@ function bitsySetTextboxSize(w, h) {
 }
 
 // note: x and y are in tile scale pixels
-// todo : move to a hide/show model? what should the name of this be?
-function bitsyDrawTextbox(x, y) {
-	ctx.putImageData(drawingBuffers[textboxBufferId].img, x * scale, y * scale);
+function bitsySetTextboxPosition(x, y) {
+	textboxX = x;
+	textboxY = y;
 }
 
 function bitsyOnLoad(fn) {

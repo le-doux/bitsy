@@ -65,17 +65,20 @@ var DialogRenderer = function() {
 	};
 
 	this.DrawTextbox = function() {
+		// make the textbox visible
+		bitsySetTextMode(1);
+
 		if (isCentered) {
 			// todo : will the height calculations always work?
-			bitsyDrawTextbox(textboxInfo.left, ((height / 2) - (textboxInfo.height / 2)));
+			bitsySetTextboxPosition(textboxInfo.left, ((height / 2) - (textboxInfo.height / 2)));
 		}
 		else if (player().y < (mapsize / 2)) {
 			// bottom
-			bitsyDrawTextbox(textboxInfo.left, (height - textboxInfo.bottom - textboxInfo.height));
+			bitsySetTextboxPosition(textboxInfo.left, (height - textboxInfo.bottom - textboxInfo.height));
 		}
 		else {
 			// top
-			bitsyDrawTextbox(textboxInfo.left, textboxInfo.top);
+			bitsySetTextboxPosition(textboxInfo.left, textboxInfo.top);
 		}
 	};
 
