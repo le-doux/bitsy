@@ -28,7 +28,6 @@ var InputManager = function() {
 
 	var pressed;
 	var ignored;
-	var newKeyPress;
 	var touchState;
 
 	var SwipeDir = {
@@ -42,7 +41,6 @@ var InputManager = function() {
 	function resetAll() {
 		pressed = {};
 		ignored = {};
-		newKeyPress = false;
 
 		touchState = {
 			isDown : false,
@@ -109,10 +107,6 @@ var InputManager = function() {
 
 		if (ignored[event.keyCode]) {
 			return;
-		}
-
-		if (!self.isKeyDown(event.keyCode)) {
-			newKeyPress = true;
 		}
 
 		pressed[event.keyCode] = true;
@@ -185,12 +179,19 @@ var InputManager = function() {
 		return pressed[keyCode] != null && pressed[keyCode] == true && (ignored[keyCode] == null || ignored[keyCode] == false);
 	}
 
-	this.anyKeyPressed = function() {
-		return newKeyPress;
-	}
+	this.anyKeyDown = function() {
+		var anyKey = false;
 
-	this.resetKeyPressed = function() {
-		newKeyPress = false;
+		for (var key in pressed) {
+			if (pressed[key] && (ignored[key] == null || ignored[key] == false) &&
+				!(key === key.up || key === key.down || key === key.left || key === key.right) &&
+				!(key === key.w || key === key.s || key === key.a || key === key.d)) {
+				// detected that a key other than the d-pad keys are down!
+				anyKey = true;
+			}
+		}
+
+		return anyKey;
 	}
 
 	this.swipeLeft = function() {
@@ -275,7 +276,6 @@ function loadGame(gameData) {
 				onUpdateFunction();
 			}
 
-			input.resetKeyPressed();
 			input.resetTapReleased();
 		},
 		16);
@@ -352,7 +352,7 @@ function bitsyButton(buttonCode) {
 		case 3: // RIGHT
 			return ((input.isKeyDown(key.right) || input.isKeyDown(key.d) || input.swipeRight()));
 		case 4: // OK (equivalent to "any key" on the keyboard or "tap" on touch screen)
-			return (input.anyKeyPressed() || input.isTapReleased());
+			return (input.anyKeyDown() || input.isTapReleased());
 	}
 
 	return false;

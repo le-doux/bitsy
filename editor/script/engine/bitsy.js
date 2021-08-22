@@ -1757,8 +1757,12 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 				}
 				else {
 					// bitsyLog(id);
-					drawTile( getTileImage(tile[id],paletteId,frameIndex), j, i, context );
+					drawTile(getTileImage(tile[id],paletteId,frameIndex), j, i);
 				}
+			}
+			else {
+				// clear tile
+				drawTile(getTileImage(null, paletteId, frameIndex), j, i);
 			}
 		}
 	}
@@ -1766,14 +1770,14 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	//draw items
 	for (var i = 0; i < room.items.length; i++) {
 		var itm = room.items[i];
-		drawItem( getItemImage(item[itm.id],paletteId,frameIndex), itm.x, itm.y, context );
+		drawItem(getItemImage(item[itm.id], paletteId, frameIndex), itm.x, itm.y);
 	}
 
 	//draw sprites
 	for (id in sprite) {
 		var spr = sprite[id];
 		if (spr.room === room.id) {
-			drawSprite( getSpriteImage(spr,paletteId,frameIndex), spr.x, spr.y, context );
+			drawSprite(getSpriteImage(spr, paletteId, frameIndex), spr.x, spr.y);
 		}
 	}
 }
