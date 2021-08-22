@@ -86,13 +86,13 @@ var DialogRenderer = function() {
 
 	this.DrawNextArrow = function() {
 		// bitsyLog("draw arrow!");
+		bitsySetDrawBuffer(1);
+
 		var top = (textboxInfo.height - 5) * text_scale;
 		var left = (textboxInfo.width - (5 + 4)) * text_scale;
 		if (textDirection === TextDirection.RightToLeft) { // RTL hack
 			left = 4 * text_scale;
 		}
-
-		bitsySetDrawBuffer(1);
 
 		for (var y = 0; y < 3; y++) {
 			for (var x = 0; x < 5; x++) {
@@ -111,6 +111,8 @@ var DialogRenderer = function() {
 
 	var text_scale = 2; //using a different scaling factor for text feels like cheating... but it looks better
 	this.DrawChar = function(char, row, col, leftPos) {
+		bitsySetDrawBuffer(1);
+
 		char.offset = {
 			x: char.base_offset.x,
 			y: char.base_offset.y
@@ -121,43 +123,16 @@ var DialogRenderer = function() {
 
 		var charData = char.bitmap;
 
-		var top = (4 * scale) + (row * 2 * scale) + (row * font.getHeight() * text_scale) + Math.floor( char.offset.y );
-		var left = (4 * scale) + (leftPos * text_scale) + Math.floor( char.offset.x );
-
-		var debug_r = Math.random() * 255;
+		var top = (4 * text_scale) + (row * 2 * text_scale) + (row * font.getHeight()) + Math.floor(char.offset.y);
+		var left = (4 * text_scale) + leftPos + Math.floor(char.offset.x);
 
 		for (var y = 0; y < char.height; y++) {
 			for (var x = 0; x < char.width; x++) {
-
 				var i = (y * char.width) + x;
-				if ( charData[i] == 1 ) {
-
-					//scaling nonsense
-					for (var sy = 0; sy < text_scale; sy++) {
-						for (var sx = 0; sx < text_scale; sx++) {
-							var pxl = 4 * ( ((top+(y*text_scale)+sy) * (textboxInfo.width*scale)) + (left+(x*text_scale)+sx) );
-							textboxInfo.img.data[pxl+0] = char.color.r;
-							textboxInfo.img.data[pxl+1] = char.color.g;
-							textboxInfo.img.data[pxl+2] = char.color.b;
-							textboxInfo.img.data[pxl+3] = char.color.a;
-						}
-					}
+				if (charData[i] == 1) {
+					// todo : other colors
+					bitsyDrawPixel(1, left + x, top + y);
 				}
-				// else {
-				// 	// DEBUG
-
-				// 	//scaling nonsense
-				// 	for (var sy = 0; sy < text_scale; sy++) {
-				// 		for (var sx = 0; sx < text_scale; sx++) {
-				// 			var pxl = 4 * ( ((top+(y*text_scale)+sy) * (textboxInfo.width*scale)) + (left+(x*text_scale)+sx) );
-				// 			textboxInfo.img.data[pxl+0] = debug_r;
-				// 			textboxInfo.img.data[pxl+1] = 0;
-				// 			textboxInfo.img.data[pxl+2] = 0;
-				// 			textboxInfo.img.data[pxl+3] = 255;
-				// 		}
-				// 	}
-				// }
-
 			}
 		}
 		
@@ -931,25 +906,25 @@ TextEffects["clr3"] = new ColorEffect(2);
 
 var WavyEffect = function() {
 	this.DoEffect = function(char,time) {
-		char.offset.y += Math.sin( (time / 250) - (char.col / 2) ) * 4;
+		char.offset.y += Math.sin((time / 250) - (char.col / 2)) * 2;
 	}
 };
 TextEffects["wvy"] = new WavyEffect();
 
 var ShakyEffect = function() {
-	function disturb(func,time,offset,mult1,mult2) {
-		return func( (time * mult1) - (offset * mult2) );
+	function disturb(func, time, offset, mult1, mult2) {
+		return func((time * mult1) - (offset * mult2));
 	}
 
 	this.DoEffect = function(char,time) {
-		char.offset.y += 3
-						* disturb(Math.sin,time,char.col,0.1,0.5)
-						* disturb(Math.cos,time,char.col,0.3,0.2)
-						* disturb(Math.sin,time,char.row,2.0,1.0);
-		char.offset.x += 3
-						* disturb(Math.cos,time,char.row,0.1,1.0)
-						* disturb(Math.sin,time,char.col,3.0,0.7)
-						* disturb(Math.cos,time,char.col,0.2,0.3);
+		char.offset.y += 1.5
+						* disturb(Math.sin, time, char.col, 0.1, 0.5)
+						* disturb(Math.cos, time, char.col, 0.3, 0.2)
+						* disturb(Math.sin, time, char.row, 2.0, 1.0);
+		char.offset.x += 1.5
+						* disturb(Math.cos, time, char.row, 0.1, 1.0)
+						* disturb(Math.sin, time, char.col, 3.0, 0.7)
+						* disturb(Math.cos, time, char.col, 0.2, 0.3);
 	}
 };
 TextEffects["shk"] = new ShakyEffect();
