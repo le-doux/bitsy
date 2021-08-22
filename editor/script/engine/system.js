@@ -314,8 +314,10 @@ function quitGame() {
 }
 
 /* graphics */
-var curBufferIndex = 0;
 var systemPalette = [];
+var curBufferIndex = 0; // todo : name? selectedBuffer?
+var nextBufferIndex = 2;
+var drawingBuffers = [];
 
 /* ==== */
 function bitsyLog(message, category) {
@@ -349,7 +351,7 @@ function bitsyButton(buttonCode) {
 		input.isTapReleased();
 }
 
-// todo : name??
+// todo : name?? bitsyDrawStart? or bitsyStartDraw?
 function bitsySetDrawBuffer(bufferIndex) {
 	curBufferIndex = bufferIndex;
 }
@@ -369,16 +371,62 @@ function bitsyClearBuffer(paletteIndex) {
 }
 
 function bitsyDrawPixel(paletteIndex, x, y) {
-	// todo
+	if (curBufferIndex >= 2) {
+		// tiles
+		var tileBuffer = drawingBuffers[curBufferIndex];
+		var img = tileBuffer.img;
+		var color = systemPalette[paletteIndex];
+
+		for (var sy = 0; sy < scale; sy++) {
+			for (var sx = 0; sx < scale; sx++) {
+				var pixelIndex = (((y * scale) + sy) * tilesize * scale * 4) + (((x * scale) + sx) * 4);
+
+				img.data[pixelIndex + 0] = color[0];
+				img.data[pixelIndex + 1] = color[1];
+				img.data[pixelIndex + 2] = color[2];
+				img.data[pixelIndex + 3] = 255;
+			}
+		}
+	}
 }
 
-// todo : name???
+// todo : name??? AddTile? AllocateTile?
 function bitsyCreateTile() {
+	var tileBufferIndex = nextBufferIndex;
+	nextBufferIndex++;
 
+	drawingBuffers[tileBufferIndex] = {
+		img : ctx.createImageData(tilesize * scale, tilesize * scale),
+		canvas : null,
+	};
+
+	return tileBufferIndex;
 }
 
-function bitsyDrawTile(tileIndex, x, y) {
-	// todo
+// todo : name? bitsySetTile?
+function bitsyDrawTile(tileIndex, tx, ty) {
+	var tileBuffer = drawingBuffers[tileIndex];
+	var img = tileBuffer.img;
+
+	// todo : move this step into a bitsyDrawEnd function?
+	if (tileBuffer.canvas === null) {
+		// convert to canvas: chrome has poor performance when working directly with image data
+		var imageCanvas = document.createElement("canvas");
+		imageCanvas.width = img.width;
+		imageCanvas.height = img.height;
+		var imageContext = imageCanvas.getContext("2d");
+		imageContext.putImageData(img, 0, 0);
+
+		tileBuffer.canvas = imageCanvas;
+	}
+
+	// NOTE: tiles are now canvases, instead of raw image data (for chrome performance reasons)
+	ctx.drawImage(
+		tileBuffer.canvas,
+		tx * tilesize * scale,
+		ty * tilesize * scale,
+		tilesize * scale,
+		tilesize * scale);
 }
 
 function bitsyOnLoad(fn) {
