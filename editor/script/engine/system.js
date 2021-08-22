@@ -319,6 +319,10 @@ var curBufferIndex = 0; // todo : name? selectedBuffer?
 var nextBufferIndex = 2;
 var drawingBuffers = [];
 
+function hackForEditor_GetImageFromTileId(tileId) {
+	return drawingBuffers[tileId].canvas;
+}
+
 /* ==== */
 function bitsyLog(message, category) {
 	if (!category) {

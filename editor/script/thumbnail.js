@@ -218,7 +218,9 @@ function createDrawingThumbnailRenderer(source) {
 		if (drawing && drawing.id in source) {
 			for (var i = 0; i < drawing.animation.frameCount; i++) {
 				if (options.isAnimated || options.frameIndex === i) {
-					var renderedImg = renderer.GetImage(drawing, palId, i);
+					var imageTileId = renderer.GetImage(drawing, palId, i);
+					// todo : bug! this still doesn't totally work because the images aren't always rendered to a canvas by now
+					var renderedImg = hackForEditor_GetImageFromTileId(imageTileId);
 
 					if (renderedImg) {
 						ctx.drawImage(renderedImg, 0, 0, tilesize * scale, tilesize * scale);

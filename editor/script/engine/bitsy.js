@@ -1676,20 +1676,16 @@ function parseFlag(lines, i) {
 	return i;
 }
 
-function drawTile(img,x,y,context) {
-	if (!context) { //optional pass in context; otherwise, use default
-		context = ctx;
-	}
-	// NOTE: images are now canvases, instead of raw image data (for chrome performance reasons)
-	context.drawImage(img,x*tilesize*scale,y*tilesize*scale,tilesize*scale,tilesize*scale);
+function drawTile(tileId, x, y) {
+	bitsyDrawTile(tileId, x, y);
 }
 
-function drawSprite(img,x,y,context) { //this may differ later (or not haha)
-	drawTile(img,x,y,context);
+function drawSprite(tileId, x, y) {
+	drawTile(tileId, x, y);
 }
 
-function drawItem(img,x,y,context) {
-	drawTile(img,x,y,context); //TODO these methods are dumb and repetitive
+function drawItem(tileId, x, y) {
+	drawTile(tileId, x, y);
 }
 
 // var debugLastRoomDrawn = "0";
@@ -1704,7 +1700,7 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	// 	bitsyLog("DRAW ROOM " + debugLastRoomDrawn);
 	// }
 
-	// clear screen
+	// clear screen // todo : this doesn't seem right for tile mode... remove?
 	bitsySetDrawBuffer(0);
 	bitsyClearBuffer(0);
 
