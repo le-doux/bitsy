@@ -388,7 +388,7 @@ var isAnyButtonHeld = false;
 var isIgnoringInput = false;
 
 function isAnyButtonDown() {
-	return bitsyButton(0) || bitsyButton(1) || bitsyButton(2) || bitsyButton(3) || bitsyButton(4);
+	return bitsyGetButton(0) || bitsyGetButton(1) || bitsyGetButton(2) || bitsyGetButton(3) || bitsyGetButton(4);
 }
 
 function updateInput() {
@@ -418,16 +418,16 @@ function updateInput() {
 		/* WALK */
 		var prevPlayerDirection = curPlayerDirection;
 
-		if (bitsyButton(0)) {
+		if (bitsyGetButton(0)) {
 			curPlayerDirection = Direction.Up;
 		}
-		else if (bitsyButton(1)) {
+		else if (bitsyGetButton(1)) {
 			curPlayerDirection = Direction.Down;
 		}
-		else if (bitsyButton(2)) {
+		else if (bitsyGetButton(2)) {
 			curPlayerDirection = Direction.Left;
 		}
-		else if (bitsyButton(3)) {
+		else if (bitsyGetButton(3)) {
 			curPlayerDirection = Direction.Right;
 		}
 		else {

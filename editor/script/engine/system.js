@@ -349,7 +349,7 @@ function bitsyLog(message, category) {
 	}
 }
 
-function bitsyButton(buttonCode) {
+function bitsyGetButton(buttonCode) {
 	switch (buttonCode) {
 		case 0: // UP
 			return (input.isKeyDown(key.up) || input.isKeyDown(key.w) || input.swipeUp());
@@ -442,6 +442,7 @@ function bitsyDrawFill(paletteIndex) {
 			textboxBuffer.img.data[i + 3] = 255;
 		}
 	}
+	// todo : tiles
 }
 
 function bitsyDrawPixel(paletteIndex, x, y) {
