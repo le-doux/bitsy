@@ -384,9 +384,13 @@ function update() {
 var isAnyButtonHeld = false;
 var isIgnoringInput = false;
 
+function isAnyButtonDown() {
+	return bitsyButton(0) || bitsyButton(1) || bitsyButton(2) || bitsyButton(3) || bitsyButton(4);
+}
+
 function updateInput() {
 	if (dialogBuffer.IsActive()) {
-		if (!isAnyButtonHeld && bitsyButton()) {
+		if (!isAnyButtonHeld && isAnyButtonDown()) {
 			/* CONTINUE DIALOG */
 			if (dialogBuffer.CanContinue()) {
 				var hasMoreDialog = dialogBuffer.Continue();
@@ -402,7 +406,7 @@ function updateInput() {
 		}
 	}
 	else if (isEnding) {
-		if (!isAnyButtonHeld && bitsyButton()) {
+		if (!isAnyButtonHeld && isAnyButtonDown()) {
 			/* RESTART GAME */
 			reset_cur_game();
 		}
@@ -433,11 +437,11 @@ function updateInput() {
 		}
 	}
 
-	if (!bitsyButton()) {
+	if (!isAnyButtonDown()) {
 		isIgnoringInput = false;
 	}
 
-	isAnyButtonHeld = bitsyButton();
+	isAnyButtonHeld = isAnyButtonDown();
 }
 
 var animationCounter = 0;
@@ -1729,10 +1733,6 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	// 	debugLastRoomDrawn = room.id;
 	// 	bitsyLog("DRAW ROOM " + debugLastRoomDrawn);
 	// }
-
-	// clear screen // todo : this doesn't seem right for tile mode... remove?
-	bitsySetDrawBuffer(0);
-	bitsyClearBuffer(tileColorStartIndex);
 
 	var paletteId = "default";
 

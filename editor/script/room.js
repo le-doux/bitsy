@@ -249,10 +249,6 @@ function RoomTool(canvas) {
 	}
 
 	this.drawEditMap = function() {
-		//clear screen // todo : is this necessary?
-		bitsySetDrawBuffer(0);
-		bitsyClearBuffer(0);
-
 		//draw map
 		drawRoom( room[curRoom] );
 

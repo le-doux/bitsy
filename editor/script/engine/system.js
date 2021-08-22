@@ -314,12 +314,14 @@ function quitGame() {
 }
 
 /* graphics */
-var textScale = 2; // todo : move tile scale into here too
+var curGraphicsMode = 0;
+var textScale = 2; // todo : move tile scale into here too?
 var systemPalette = [];
-var curBufferIndex = 0; // todo : name? selectedBuffer?
-var screenBufferIndex = 0;
-var textboxBufferIndex = 1;
-var nextBufferIndex = 2;
+var curBufferId = 0; // todo : name? selectedBuffer?
+var screenBufferId = 0;
+var textboxBufferId = 1;
+var tileStartBufferId = 2;
+var nextBufferId = tileStartBufferId;
 var drawingBuffers = [];
 var textboxWidth = 0;
 var textboxHeight = 0;
@@ -339,7 +341,6 @@ function bitsyLog(message, category) {
 	}
 }
 
-// todo : should 0 be used for any instead of null/undefined?
 function bitsyButton(buttonCode) {
 	switch (buttonCode) {
 		case 0: // UP
@@ -350,19 +351,29 @@ function bitsyButton(buttonCode) {
 			return (input.isKeyDown(key.left) || input.isKeyDown(key.a) || input.swipeLeft());
 		case 3: // RIGHT
 			return ((input.isKeyDown(key.right) || input.isKeyDown(key.d) || input.swipeRight()));
+		case 4: // OK (equivalent to "any key" on the keyboard or "tap" on touch screen)
+			return (input.anyKeyPressed() || input.isTapReleased());
 	}
 
-	// if no code is supplied, check any key
-	return input.isKeyDown(key.up) || input.isKeyDown(key.w) ||
-		input.isKeyDown(key.down) || input.isKeyDown(key.s) ||
-		input.isKeyDown(key.left) || input.isKeyDown(key.a) ||
-		input.isKeyDown(key.right) || input.isKeyDown(key.d) ||
-		input.isTapReleased();
+	return false;
+}
+
+// two modes (0 == pixel mode, 1 == tile mode)
+function bitsySetGraphicsMode(mode) {
+	curGraphicsMode = mode;
+
+	if (curGraphicsMode === 0) {
+		// init a new screen buffer
+		drawingBuffers[screenBufferId] = {
+			img : ctx.createImageData(128 * scale, 128 * scale),
+			canvas : null,
+		};
+	}
 }
 
 // todo : name?? bitsyDrawStart? or bitsyStartDraw? or bitsyOpenBuffer?
-function bitsySetDrawBuffer(bufferIndex) {
-	curBufferIndex = bufferIndex;
+function bitsySetDrawBuffer(BufferId) {
+	curBufferId = BufferId;
 }
 
 function bitsySetColor(paletteIndex, r, g, b) {
@@ -372,19 +383,26 @@ function bitsySetColor(paletteIndex, r, g, b) {
 function bitsyClearBuffer(paletteIndex) {
 	var clearColor = systemPalette[paletteIndex];
 
-	if (curBufferIndex === screenBufferIndex) {
+	if (curBufferId === screenBufferId) {
 		// clear screen (todo : should this be disabled in tile mode?)
-		ctx.fillStyle = "rgb(" + clearColor[0] + "," + clearColor[1] + "," + clearColor[2] + ")";
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		// ctx.fillStyle = "rgb(" + clearColor[0] + "," + clearColor[1] + "," + clearColor[2] + ")";
+		// ctx.fillRect(0, 0, canvas.width, canvas.height);
+		var screenBuffer = drawingBuffers[screenBufferId];
+		for (var i = 0; i < screenBuffer.img.data.length; i += 4) {
+			screenBuffer.img.data[i + 0] = clearColor[0];
+			screenBuffer.img.data[i + 1] = clearColor[1];
+			screenBuffer.img.data[i + 2] = clearColor[2];
+			screenBuffer.img.data[i + 3] = 255;
+		}
 	}
-	else if (curBufferIndex === textboxBufferIndex) {
-		if (!drawingBuffers[textboxBufferIndex]) {
+	else if (curBufferId === textboxBufferId) {
+		if (!drawingBuffers[textboxBufferId]) {
 			// todo : is this useful to keep around?
 			// force init the buffer
 			bitsySetTextboxSize(textboxWidth, textboxHeight);
 		}
 
-		var textboxBuffer = drawingBuffers[textboxBufferIndex];
+		var textboxBuffer = drawingBuffers[textboxBufferId];
 
 		// todo : clean up this code
 		// fill text box
@@ -398,8 +416,25 @@ function bitsyClearBuffer(paletteIndex) {
 }
 
 function bitsyDrawPixel(paletteIndex, x, y) {
-	if (curBufferIndex == textboxBufferIndex) {
-		var textboxBuffer = drawingBuffers[textboxBufferIndex];
+	if (curBufferId == screenBufferId) { /* screen */
+		var screenBuffer = drawingBuffers[screenBufferId];
+		var img = screenBuffer.img;
+		var color = systemPalette[paletteIndex];
+
+		for (var sy = 0; sy < scale; sy++) {
+			for (var sx = 0; sx < scale; sx++) {
+				// note: 128 == screen width (should I store that somewhere?)
+				var pixelIndex = (((y * scale) + sy) * 128 * scale * 4) + (((x * scale) + sx) * 4);
+
+				img.data[pixelIndex + 0] = color[0];
+				img.data[pixelIndex + 1] = color[1];
+				img.data[pixelIndex + 2] = color[2];
+				img.data[pixelIndex + 3] = 255;
+			}
+		}
+	}
+	else if (curBufferId == textboxBufferId) { /* textbox */
+		var textboxBuffer = drawingBuffers[textboxBufferId];
 		var img = textboxBuffer.img;
 		var color = systemPalette[paletteIndex];
 
@@ -415,9 +450,8 @@ function bitsyDrawPixel(paletteIndex, x, y) {
 			}
 		}
 	}
-	else if (curBufferIndex >= 2) {
-		// tiles
-		var tileBuffer = drawingBuffers[curBufferIndex];
+	else if (curBufferId >= tileStartBufferId) { /* tiles */
+		var tileBuffer = drawingBuffers[curBufferId];
 		var img = tileBuffer.img;
 		var color = systemPalette[paletteIndex];
 
@@ -436,15 +470,15 @@ function bitsyDrawPixel(paletteIndex, x, y) {
 
 // todo : name??? AddTile? AllocateTile?
 function bitsyCreateTile() {
-	var tileBufferIndex = nextBufferIndex;
-	nextBufferIndex++;
+	var tileBufferId = nextBufferId;
+	nextBufferId++;
 
-	drawingBuffers[tileBufferIndex] = {
+	drawingBuffers[tileBufferId] = {
 		img : ctx.createImageData(tilesize * scale, tilesize * scale),
 		canvas : null,
 	};
 
-	return tileBufferIndex;
+	return tileBufferId;
 }
 
 // todo : name? bitsySetTile?
@@ -480,7 +514,7 @@ function bitsySetTextboxSize(w, h) {
 	textboxWidth = w;
 	textboxHeight = h;
 
-	drawingBuffers[textboxBufferIndex] = {
+	drawingBuffers[textboxBufferId] = {
 		img : ctx.createImageData(textboxWidth * textScale, textboxHeight * textScale),
 		canvas : null, // currently unused since it's not a performance bottleneck
 	};
@@ -489,7 +523,7 @@ function bitsySetTextboxSize(w, h) {
 // note: x and y are in tile scale pixels
 // todo : move to a hide/show model? what should the name of this be?
 function bitsyDrawTextbox(x, y) {
-	ctx.putImageData(drawingBuffers[textboxBufferIndex].img, x * scale, y * scale);
+	ctx.putImageData(drawingBuffers[textboxBufferId].img, x * scale, y * scale);
 }
 
 function bitsyOnLoad(fn) {
