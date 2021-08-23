@@ -510,15 +510,19 @@ function bitsySetGraphicsMode(mode) {
 
 	if (curGraphicsMode === 0) {
 		// init a new screen buffer
-		drawingBuffers[screenBufferId] = {
-			img : ctx.createImageData(128 * scale, 128 * scale),
-			canvas : null,
-		};
+		drawingBuffers[screenBufferId] = createDrawingBuffer(128, 128, scale);
 	}
 }
 
 function bitsySetColor(paletteIndex, r, g, b) {
 	systemPalette[paletteIndex] = [r, g, b];
+
+	// invalidate all drawing buffers
+	for (var i = 0; i < drawingBuffers.length; i++) {
+		if (drawingBuffers[i]) {
+			drawingBuffers[i].canvas = null;
+		}
+	}
 }
 
 function bitsyDrawBegin(bufferId) {
@@ -526,114 +530,25 @@ function bitsyDrawBegin(bufferId) {
 }
 
 function bitsyDrawEnd() {
-	if (curBufferId >= tileStartBufferId) {
-		var tileBuffer = drawingBuffers[curBufferId];
-
-		// todo : move this step into a bitsyDrawEnd function?
-		if (tileBuffer.canvas === null) {
-			var img = tileBuffer.img;
-
-			// convert to canvas: chrome has poor performance when working directly with image data
-			var imageCanvas = document.createElement("canvas");
-			imageCanvas.width = img.width;
-			imageCanvas.height = img.height;
-			var imageContext = imageCanvas.getContext("2d");
-			imageContext.putImageData(img, 0, 0);
-
-			tileBuffer.canvas = imageCanvas;
-		}
-	}
-
 	curBufferId = -1;
 }
 
 function bitsyDrawFill(paletteIndex) {
-	var clearColor = systemPalette[paletteIndex];
-
-	if (curBufferId === screenBufferId) {
-		// clear screen (todo : should this be disabled in tile mode?)
-		// ctx.fillStyle = "rgb(" + clearColor[0] + "," + clearColor[1] + "," + clearColor[2] + ")";
-		// ctx.fillRect(0, 0, canvas.width, canvas.height);
-		var screenBuffer = drawingBuffers[screenBufferId];
-		for (var i = 0; i < screenBuffer.img.data.length; i += 4) {
-			screenBuffer.img.data[i + 0] = clearColor[0];
-			screenBuffer.img.data[i + 1] = clearColor[1];
-			screenBuffer.img.data[i + 2] = clearColor[2];
-			screenBuffer.img.data[i + 3] = 255;
-		}
+	if (curBufferId === textboxBufferId && !drawingBuffers[textboxBufferId]) {
+		// todo : is this useful to keep around?
+		// force init the buffer
+		bitsySetTextboxSize(textboxWidth, textboxHeight);
 	}
-	else if (curBufferId === textboxBufferId) {
-		if (!drawingBuffers[textboxBufferId]) {
-			// todo : is this useful to keep around?
-			// force init the buffer
-			bitsySetTextboxSize(textboxWidth, textboxHeight);
-		}
 
-		var textboxBuffer = drawingBuffers[textboxBufferId];
-
-		// todo : clean up this code
-		// fill text box
-		for (var i = 0; i < textboxBuffer.img.data.length; i += 4) {
-			textboxBuffer.img.data[i + 0] = clearColor[0];
-			textboxBuffer.img.data[i + 1] = clearColor[1];
-			textboxBuffer.img.data[i + 2] = clearColor[2];
-			textboxBuffer.img.data[i + 3] = 255;
-		}
+	var buffer = drawingBuffers[curBufferId];
+	for (var i = 0; i < buffer.pixels.length; i++) {
+		buffer.pixels[i] = paletteIndex;
 	}
-	// todo : tiles
 }
 
 function bitsyDrawPixel(paletteIndex, x, y) {
-	if (curBufferId == screenBufferId) { /* screen */
-		var screenBuffer = drawingBuffers[screenBufferId];
-		var img = screenBuffer.img;
-		var color = systemPalette[paletteIndex];
-
-		for (var sy = 0; sy < scale; sy++) {
-			for (var sx = 0; sx < scale; sx++) {
-				// note: 128 == screen width (should I store that somewhere?)
-				var pixelIndex = (((y * scale) + sy) * 128 * scale * 4) + (((x * scale) + sx) * 4);
-
-				img.data[pixelIndex + 0] = color[0];
-				img.data[pixelIndex + 1] = color[1];
-				img.data[pixelIndex + 2] = color[2];
-				img.data[pixelIndex + 3] = 255;
-			}
-		}
-	}
-	else if (curBufferId == textboxBufferId) { /* textbox */
-		var textboxBuffer = drawingBuffers[textboxBufferId];
-		var img = textboxBuffer.img;
-		var color = systemPalette[paletteIndex];
-
-		//scaling nonsense
-		for (var sy = 0; sy < textScale; sy++) {
-			for (var sx = 0; sx < textScale; sx++) {
-				var pixelIndex = (((y * textScale) + sy) * textboxWidth * textScale * 4) + (((x * textScale) + sx) * 4);
-
-				img.data[pixelIndex + 0] = color[0];
-				img.data[pixelIndex + 1] = color[1];
-				img.data[pixelIndex + 2] = color[2];
-				img.data[pixelIndex + 3] = 255;
-			}
-		}
-	}
-	else if (curBufferId >= tileStartBufferId) { /* tiles */
-		var tileBuffer = drawingBuffers[curBufferId];
-		var img = tileBuffer.img;
-		var color = systemPalette[paletteIndex];
-
-		for (var sy = 0; sy < scale; sy++) {
-			for (var sx = 0; sx < scale; sx++) {
-				var pixelIndex = (((y * scale) + sy) * tilesize * scale * 4) + (((x * scale) + sx) * 4);
-
-				img.data[pixelIndex + 0] = color[0];
-				img.data[pixelIndex + 1] = color[1];
-				img.data[pixelIndex + 2] = color[2];
-				img.data[pixelIndex + 3] = 255;
-			}
-		}
-	}
+	var buffer = drawingBuffers[curBufferId];
+	buffer.pixels[(y * buffer.width) + x] = paletteIndex;
 }
 
 // allocates a tile buffer and returns the ID
@@ -641,10 +556,7 @@ function bitsyAddTile() {
 	var tileBufferId = nextBufferId;
 	nextBufferId++;
 
-	drawingBuffers[tileBufferId] = {
-		img : ctx.createImageData(tilesize * scale, tilesize * scale),
-		canvas : null,
-	};
+	drawingBuffers[tileBufferId] = createDrawingBuffer(tilesize, tilesize, scale);
 
 	return tileBufferId;
 }
@@ -662,11 +574,7 @@ function bitsySetTextMode(mode) {
 function bitsySetTextboxSize(w, h) {
 	textboxWidth = w;
 	textboxHeight = h;
-
-	drawingBuffers[textboxBufferId] = {
-		img : ctx.createImageData(textboxWidth * textScale, textboxHeight * textScale),
-		canvas : null, // currently unused since it's not a performance bottleneck
-	};
+	drawingBuffers[textboxBufferId] = createDrawingBuffer(textboxWidth, textboxHeight, textScale);
 }
 
 // note: x and y are in tile scale pixels
