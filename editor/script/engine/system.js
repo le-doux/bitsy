@@ -286,7 +286,14 @@ function loadGame(gameData) {
 function renderGame() {
 	if (curGraphicsMode === 0) {
 		// show screen buffer
-		ctx.putImageData(drawingBuffers[screenBufferId].img, 0, 0);
+		var screenBuffer = drawingBuffers[screenBufferId];
+		renderDrawingBuffer(screenBuffer);
+		ctx.drawImage(
+			screenBuffer.canvas,
+			0,
+			0,
+			screenBuffer.width * screenBuffer.scale,
+			screenBuffer.height * screenBuffer.scale);
 	}
 	else if (curGraphicsMode === 1) {
 		// tile mode
@@ -296,7 +303,10 @@ function renderGame() {
 				var tileBuffer = drawingBuffers[tileId];
 
 				if (tileBuffer) {
-					// NOTE: tiles are now canvases, instead of raw image data (for chrome performance reasons)
+					if (!tileBuffer.canvas) {
+						renderDrawingBuffer(tileBuffer);
+					}
+
 					ctx.drawImage(
 						tileBuffer.canvas,
 						x * tilesize * scale,
@@ -309,10 +319,14 @@ function renderGame() {
 
 		// text
 		if (curTextMode === 1) {
-			ctx.putImageData(
-				drawingBuffers[textboxBufferId].img,
+			var textboxBuffer = drawingBuffers[textboxBufferId];
+			renderDrawingBuffer(textboxBuffer);
+			ctx.drawImage(
+				textboxBuffer.canvas,
 				textboxX * scale,
-				textboxY * scale);
+				textboxY * scale,
+				textboxBuffer.width * textboxBuffer.scale,
+				textboxBuffer.height * textboxBuffer.scale);
 		}
 	}
 }
@@ -386,6 +400,63 @@ var textboxX = 0;
 var textboxY = 0;
 var textboxWidth = 0;
 var textboxHeight = 0;
+
+function createDrawingBuffer(width, height, scale) {
+	var buffer = {
+		width : width,
+		height : height,
+		scale : scale, // logical-pixel to display-pixel scale
+		pixels : [],
+		canvas : null,
+	}
+
+	for (var i = 0; i < width * height; i++) {
+		buffer.pixels.push(0);
+	}
+
+	return buffer;
+}
+
+function renderDisplayPixel(img, width, scale, paletteIndex, x, y) {
+	var color = systemPalette[paletteIndex];
+
+	for (var sy = 0; sy < scale; sy++) {
+		for (var sx = 0; sx < scale; sx++) {
+			var pixelIndex = (((y * scale) + sy) * width * scale * 4) + (((x * scale) + sx) * 4);
+
+			img.data[pixelIndex + 0] = color[0];
+			img.data[pixelIndex + 1] = color[1];
+			img.data[pixelIndex + 2] = color[2];
+			img.data[pixelIndex + 3] = 255;
+		}
+	}
+}
+
+function renderDrawingBuffer(buffer) {
+	var img = ctx.createImageData(buffer.width * buffer.scale, buffer.height * buffer.scale);
+
+	for (var y = 0; y < buffer.height; y++) {
+		for (var x = 0; x < buffer.width; x++) {
+			var i = (y * buffer.width) + x;
+			var paletteIndex = buffer.pixels[i];
+			renderDisplayPixel(img, buffer.width, buffer.scale, paletteIndex, x, y);
+		}
+	}
+
+	// todo : should I even use an image data object anymore?
+	// convert to canvas: chrome has poor performance when working directly with image data
+	var imageCanvas = document.createElement("canvas");
+	imageCanvas.width = img.width;
+	imageCanvas.height = img.height;
+	var imageContext = imageCanvas.getContext("2d");
+	imageContext.putImageData(img, 0, 0);
+
+	buffer.canvas = imageCanvas;
+}
+
+function invalidateDrawingBuffer(buffer) {
+	buffer.canvas = null;
+}
 
 function debug_printTilemapMemory() {
 	var str = "";
