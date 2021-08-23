@@ -565,8 +565,8 @@ function bitsyDrawPixel(paletteIndex, x, y) {
 	}
 }
 
-// allocates a tile buffer and returns the ID (todo: name ok?)
-function bitsyGetTile() {
+// allocates a tile buffer and returns the ID
+function bitsyAddTile() {
 	var tileBufferId = nextBufferId;
 	nextBufferId++;
 
