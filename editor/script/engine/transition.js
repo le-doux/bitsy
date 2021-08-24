@@ -26,9 +26,9 @@ var TransitionManager = function() {
 			player().room = "_transition_none"; // kind of hacky!!
 		}
 
-		drawRoom(room[startRoom]);
+		var startRoomPixels = createRoomPixelBuffer(room[startRoom]);
 		var startPalette = getPal( room[startRoom].pal );
-		var startImage = new PostProcessImage( ctx.getImageData(0,0,canvas.width,canvas.height) ); // TODO : don't use global ctx?
+		var startImage = new PostProcessImage(startRoomPixels);
 		transitionStart = new TransitionInfo(startImage, startPalette, startX, startY);
 
 		if (transitionEffects[curEffect].showPlayerEnd) {
@@ -40,12 +40,12 @@ var TransitionManager = function() {
 			player().room = "_transition_none";
 		}
 
-		drawRoom(room[endRoom]);
+		var endRoomPixels = createRoomPixelBuffer(room[endRoom]);
 		var endPalette = getPal( room[endRoom].pal );
-		var endImage = new PostProcessImage( ctx.getImageData(0,0,canvas.width,canvas.height) );
+		var endImage = new PostProcessImage(endRoomPixels);
 		transitionEnd = new TransitionInfo(endImage, endPalette, endX, endY);
 
-		effectImage = new PostProcessImage( ctx.createImageData(canvas.width,canvas.height) );
+		effectImage = new PostProcessImage(createRoomPixelBuffer(room[startRoom]));
 
 		isTransitioning = true;
 		transitionTime = 0;
@@ -315,6 +315,69 @@ var TransitionManager = function() {
 		}
 	});
 
+	function createRoomPixelBuffer(room) {
+		var pixelBuffer = [];
+
+		for (var i = 0; i < 128 * 128; i++) {
+			pixelBuffer.push(0);
+		}
+
+		var drawTileInPixelBuffer = function(sourceData, frameIndex, tx, ty, pixelBuffer) {
+			var frameData = sourceData[frameIndex];
+
+			for (var y = 0; y < tilesize; y++) {
+				for (var x = 0; x < tilesize; x++) {
+					var color = frameData[(y * tilesize) + x];
+					pixelBuffer[(((ty * tilesize) + y) *  128) + ((tx * tilesize) + x)] = color;
+				}
+			}
+		}
+
+		//draw tiles
+		for (i in room.tilemap) {
+			for (j in room.tilemap[i]) {
+				var id = room.tilemap[i][j];
+				var x = parseInt(j);
+				var y = parseInt(i);
+
+				if (id != "0" && tile[id] != null) {
+					drawTileInPixelBuffer(
+						renderer.GetImageSource(tile[id].drw),
+						tile[id].animation.frameIndex,
+						x,
+						y,
+						pixelBuffer);
+				}
+			}
+		}
+
+		//draw items
+		for (var i = 0; i < room.items.length; i++) {
+			var itm = room.items[i];
+			drawTileInPixelBuffer(
+				renderer.GetImageSource(item[itm.id].drw),
+				item[itm.id].animation.frameIndex,
+				itm.x,
+				itm.y,
+				pixelBuffer);
+		}
+
+		//draw sprites
+		for (id in sprite) {
+			var spr = sprite[id];
+			if (spr.room === room.id) {
+				drawTileInPixelBuffer(
+					renderer.GetImageSource(spr.drw),
+					spr.animation.frameIndex,
+					spr.x,
+					spr.y,
+					pixelBuffer);
+			}
+		}
+
+		return pixelBuffer;
+	}
+
 	function clampLerp(deltaIn, clampDuration) {
 		var clampOffset = (1.0 - clampDuration) / 2;
 		var deltaOut = Math.min(clampDuration, Math.max(0.0, deltaIn - clampOffset)) / clampDuration;
@@ -440,16 +503,18 @@ var PostProcessUtilities = {
 	},
 };
 
+// todo : is this wrapper still useful?
 var PostProcessImage = function(imageData) {
-	this.Width = imageData.width / scale;
-	this.Height = imageData.height / scale;
+	this.Width = 128;
+	this.Height = 128;
 
-	this.GetPixel = function(x,y) {
-		return PostProcessUtilities.SamplePixelColor(imageData,x,y);
+	this.GetPixel = function(x, y) {
+		return imageData[(y * 128) + x];
 	};
 
-	this.SetPixel = function(x,y,colorRgba) {
-		PostProcessUtilities.SetPixelColor(imageData,x,y,colorRgba);
+	this.SetPixel = function(x, y, colorRgba) {
+		// todo
+		// PostProcessUtilities.SetPixelColor(imageData,x,y,colorRgba);
 	};
 
 	this.GetData = function() {
