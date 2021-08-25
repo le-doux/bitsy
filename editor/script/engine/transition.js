@@ -1,7 +1,6 @@
 var TransitionManager = function() {
 	var transitionStart = null;
 	var transitionEnd = null;
-	var effectImage = null;
 
 	var isTransitioning = false;
 	var transitionTime = 0; // milliseconds
@@ -45,8 +44,6 @@ var TransitionManager = function() {
 		var endImage = new PostProcessImage(endRoomPixels);
 		transitionEnd = new TransitionInfo(endImage, endPalette, endX, endY);
 
-		effectImage = new PostProcessImage(createRoomPixelBuffer(room[startRoom]));
-
 		isTransitioning = true;
 		transitionTime = 0;
 		prevStep = -1;
@@ -61,31 +58,34 @@ var TransitionManager = function() {
 			return;
 		}
 
+		bitsySetGraphicsMode(0);
+
 		transitionTime += dt;
 
 		var transitionDelta = transitionTime / transitionEffects[curEffect].duration;
 		var maxStep = Math.floor(frameRate * (transitionEffects[curEffect].duration / 1000));
 		var step = Math.floor(transitionDelta * maxStep);
 
+		bitsyDrawBegin(0);
+
 		if (step != prevStep) {
 			// bitsyLog("step! " + step + " " + transitionDelta);
-			for (var y = 0; y < effectImage.Height; y++) {
-				for (var x = 0; x < effectImage.Width; x++) {
-					var color = transitionEffects[curEffect].pixelEffectFunc(transitionStart,transitionEnd,x,y,(step / maxStep));
-					effectImage.SetPixel(x,y,color);
+			for (var y = 0; y < 128; y++) {
+				for (var x = 0; x < 128; x++) {
+					var color = tileColorStartIndex; // transitionEffects[curEffect].pixelEffectFunc(transitionStart,transitionEnd,x,y,(step / maxStep));
+					bitsyDrawPixel(color, x, y);
 				}
 			}
 		}
 		prevStep = step;
 
-		ctx.putImageData(effectImage.GetData(), 0, 0);
+		bitsyDrawEnd();
 
 		if (transitionTime >= transitionEffects[curEffect].duration) {
 			isTransitioning = false;
 			transitionTime = 0;
 			transitionStart = null;
 			transitionEnd = null;
-			effectImage = null;
 			prevStep = -1;
 
 			if (transitionCompleteCallback != null) {
@@ -510,11 +510,6 @@ var PostProcessImage = function(imageData) {
 
 	this.GetPixel = function(x, y) {
 		return imageData[(y * 128) + x];
-	};
-
-	this.SetPixel = function(x, y, colorRgba) {
-		// todo
-		// PostProcessUtilities.SetPixelColor(imageData,x,y,colorRgba);
 	};
 
 	this.GetData = function() {

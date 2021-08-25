@@ -346,11 +346,6 @@ function update() {
 	}
 
 	if (transition.IsTransitionActive()) {
-		bitsySetGraphicsMode(0);
-		bitsyDrawBegin(0);
-		bitsyDrawFill(0);
-		bitsyDrawEnd();
-
 		// transition animation takes over everything!
 		transition.UpdateTransition(deltaTime);
 	}
