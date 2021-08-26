@@ -418,6 +418,11 @@ function createDrawingBuffer(width, height, scale) {
 }
 
 function renderDisplayPixel(img, width, scale, paletteIndex, x, y) {
+	if (!systemPalette[paletteIndex]) {
+		// bitsyLog("invalid index " + paletteIndex + " @ " + x + "," + y);
+		return;
+	}
+
 	var color = systemPalette[paletteIndex];
 
 	for (var sy = 0; sy < scale; sy++) {
@@ -508,7 +513,7 @@ function bitsyGetButton(buttonCode) {
 function bitsySetGraphicsMode(mode) {
 	curGraphicsMode = mode;
 
-	if (curGraphicsMode === 0) {
+	if (curGraphicsMode === 0 && !drawingBuffers[screenBufferId]) {
 		// init a new screen buffer
 		drawingBuffers[screenBufferId] = createDrawingBuffer(128, 128, scale);
 	}

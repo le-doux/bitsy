@@ -58,6 +58,7 @@ var TransitionManager = function() {
 			return;
 		}
 
+		// todo : shouldn't need to set this every frame!
 		bitsySetGraphicsMode(0);
 
 		transitionTime += dt;
@@ -66,20 +67,18 @@ var TransitionManager = function() {
 		var maxStep = Math.floor(frameRate * (transitionEffects[curEffect].duration / 1000));
 		var step = Math.floor(transitionDelta * maxStep);
 
-		bitsyDrawBegin(0);
-
 		if (step != prevStep) {
+			bitsyDrawBegin(0);
 			// bitsyLog("step! " + step + " " + transitionDelta);
 			for (var y = 0; y < 128; y++) {
 				for (var x = 0; x < 128; x++) {
-					var color = tileColorStartIndex; // transitionEffects[curEffect].pixelEffectFunc(transitionStart,transitionEnd,x,y,(step / maxStep));
+					var color = transitionEffects[curEffect].pixelEffectFunc(transitionStart, transitionEnd, x, y, (step / maxStep));
 					bitsyDrawPixel(color, x, y);
 				}
 			}
+			bitsyDrawEnd();
 		}
 		prevStep = step;
-
-		bitsyDrawEnd();
 
 		if (transitionTime >= transitionEffects[curEffect].duration) {
 			isTransitioning = false;
@@ -319,7 +318,7 @@ var TransitionManager = function() {
 		var pixelBuffer = [];
 
 		for (var i = 0; i < 128 * 128; i++) {
-			pixelBuffer.push(0);
+			pixelBuffer.push(tileColorStartIndex);
 		}
 
 		var drawTileInPixelBuffer = function(sourceData, frameIndex, tx, ty, pixelBuffer) {
@@ -327,8 +326,8 @@ var TransitionManager = function() {
 
 			for (var y = 0; y < tilesize; y++) {
 				for (var x = 0; x < tilesize; x++) {
-					var color = frameData[(y * tilesize) + x];
-					pixelBuffer[(((ty * tilesize) + y) *  128) + ((tx * tilesize) + x)] = color;
+					var color = tileColorStartIndex + frameData[y][x];
+					pixelBuffer[(((ty * tilesize) + y) * 128) + ((tx * tilesize) + x)] = color;
 				}
 			}
 		}
@@ -374,6 +373,15 @@ var TransitionManager = function() {
 					pixelBuffer);
 			}
 		}
+
+		// var debugStr = "transition:\n";
+		// for (var i = 0; i < pixelBuffer.length; i++) {
+		// 	debugStr += pixelBuffer[i] + ",";
+		// 	if (i % 128 === 0) {
+		// 		debugStr += "\n";
+		// 	}
+		// }
+		// bitsyLog(debugStr);
 
 		return pixelBuffer;
 	}
@@ -509,7 +517,7 @@ var PostProcessImage = function(imageData) {
 	this.Height = 128;
 
 	this.GetPixel = function(x, y) {
-		return imageData[(y * 128) + x];
+		return imageData[(parseInt(y) * 128) + parseInt(x)];;
 	};
 
 	this.GetData = function() {
