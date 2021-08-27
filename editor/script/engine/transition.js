@@ -7,8 +7,8 @@ var TransitionManager = function() {
 	var frameRate = 8; // cap the FPS
 	var prevStep = -1; // used to avoid running post-process effect constantly
 
-	this.BeginTransition = function(startRoom,startX,startY,endRoom,endX,endY,effectName) {
-		// bitsyLog("--- START ROOM TRANSITION ---");
+	this.BeginTransition = function(startRoom, startX, startY, endRoom, endX, endY, effectName) {
+		bitsyLog("--- START ROOM TRANSITION ---");
 
 		curEffect = effectName;
 
@@ -26,7 +26,7 @@ var TransitionManager = function() {
 		}
 
 		var startRoomPixels = createRoomPixelBuffer(room[startRoom]);
-		var startPalette = getPal( room[startRoom].pal );
+		var startPalette = getPal(room[startRoom].pal);
 		var startImage = new PostProcessImage(startRoomPixels);
 		transitionStart = new TransitionInfo(startImage, startPalette, startX, startY);
 
@@ -40,7 +40,7 @@ var TransitionManager = function() {
 		}
 
 		var endRoomPixels = createRoomPixelBuffer(room[endRoom]);
-		var endPalette = getPal( room[endRoom].pal );
+		var endPalette = getPal(room[endRoom].pal);
 		var endImage = new PostProcessImage(endRoomPixels);
 		transitionEnd = new TransitionInfo(endImage, endPalette, endX, endY);
 
@@ -68,8 +68,17 @@ var TransitionManager = function() {
 		var step = Math.floor(transitionDelta * maxStep);
 
 		if (step != prevStep) {
+			bitsyLog("transition step " + step);
+
+			if (transitionEffects[curEffect].paletteEffectFunc) {
+				var colors = transitionEffects[curEffect].paletteEffectFunc(transitionStart, transitionEnd, (step / maxStep));
+
+				for (var i = 0; i < colors.length; i++) {
+					bitsySetColor(tileColorStartIndex + i, colors[i][0], colors[i][1], colors[i][2]);
+				}
+			}
+
 			bitsyDrawBegin(0);
-			// bitsyLog("step! " + step + " " + transitionDelta);
 			for (var y = 0; y < 128; y++) {
 				for (var x = 0; x < 128; x++) {
 					var color = transitionEffects[curEffect].pixelEffectFunc(transitionStart, transitionEnd, x, y, (step / maxStep));
@@ -115,6 +124,7 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("none", {
 		showPlayerStart : false,
 		showPlayerEnd : false,
+		paletteEffectFunc : function() {},
 		pixelEffectFunc : function() {},
 	});
 
@@ -122,14 +132,29 @@ var TransitionManager = function() {
 		showPlayerStart : false,
 		showPlayerEnd : true,
 		duration : 750,
-		pixelEffectFunc : function(start,end,pixelX,pixelY,delta) {
-			var pixelColorA = delta < 0.5 ? start.Image.GetPixel(pixelX,pixelY) : {r:255,g:255,b:255,a:255};
-			var pixelColorB = delta < 0.5 ? {r:255,g:255,b:255,a:255} : end.Image.GetPixel(pixelX,pixelY);
+		pixelEffectFunc : function(start, end, pixelX, pixelY, delta) {
+			return delta < 0.5 ? start.Image.GetPixel(pixelX, pixelY) : end.Image.GetPixel(pixelX, pixelY);
+		},
+		paletteEffectFunc : function(start, end, delta) {
+			var colors = [];
 
-			delta = delta < 0.5 ? (delta / 0.5) : ((delta - 0.5) / 0.5); // hacky
+			if (delta < 0.5) {
+				delta = delta / 0.5;
 
-			return PostProcessUtilities.LerpColor(pixelColorA, pixelColorB, delta);
-		}
+				for (var i = 0; i < start.Palette.length; i++) {
+					colors.push(lerpColor(start.Palette[i], [255, 255, 255], delta));
+				}
+			}
+			else {
+				delta = ((delta - 0.5) / 0.5);
+
+				for (var i = 0; i < end.Palette.length; i++) {
+					colors.push(lerpColor([255, 255, 255], end.Palette[i], delta));
+				}
+			}
+
+			return colors;
+		},
 	});
 
 	this.RegisterTransitionEffect("fade_b", {
@@ -321,12 +346,12 @@ var TransitionManager = function() {
 			pixelBuffer.push(tileColorStartIndex);
 		}
 
-		var drawTileInPixelBuffer = function(sourceData, frameIndex, tx, ty, pixelBuffer) {
+		var drawTileInPixelBuffer = function(sourceData, frameIndex, colorIndex, tx, ty, pixelBuffer) {
 			var frameData = sourceData[frameIndex];
 
 			for (var y = 0; y < tilesize; y++) {
 				for (var x = 0; x < tilesize; x++) {
-					var color = tileColorStartIndex + frameData[y][x];
+					var color = tileColorStartIndex + (frameData[y][x] === 1 ? colorIndex : 0);
 					pixelBuffer[(((ty * tilesize) + y) * 128) + ((tx * tilesize) + x)] = color;
 				}
 			}
@@ -343,6 +368,7 @@ var TransitionManager = function() {
 					drawTileInPixelBuffer(
 						renderer.GetImageSource(tile[id].drw),
 						tile[id].animation.frameIndex,
+						tile[id].col,
 						x,
 						y,
 						pixelBuffer);
@@ -356,6 +382,7 @@ var TransitionManager = function() {
 			drawTileInPixelBuffer(
 				renderer.GetImageSource(item[itm.id].drw),
 				item[itm.id].animation.frameIndex,
+				item[itm.id].col,
 				itm.x,
 				itm.y,
 				pixelBuffer);
@@ -368,6 +395,7 @@ var TransitionManager = function() {
 				drawTileInPixelBuffer(
 					renderer.GetImageSource(spr.drw),
 					spr.animation.frameIndex,
+					spr.col,
 					spr.x,
 					spr.y,
 					pixelBuffer);
@@ -391,6 +419,14 @@ var TransitionManager = function() {
 		var deltaOut = Math.min(clampDuration, Math.max(0.0, deltaIn - clampOffset)) / clampDuration;
 		return deltaOut;
 	}
+
+	function lerpColor(colorA, colorB, t) {
+		return [
+			colorA[0] + ((colorB[0] - colorA[0]) * t),
+			colorA[1] + ((colorB[1] - colorA[1]) * t),
+			colorA[2] + ((colorB[2] - colorA[2]) * t),
+		];
+	};
 
 	// TODO : WIP
 	// this.RegisterTransitionEffect("fuzz", {

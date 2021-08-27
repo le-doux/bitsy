@@ -284,6 +284,8 @@ function loadGame(gameData) {
 }
 
 function renderGame() {
+	bitsyLog("render game mode=" + curGraphicsMode);
+
 	if (curGraphicsMode === 0) {
 		// show screen buffer
 		var screenBuffer = drawingBuffers[screenBufferId];

@@ -594,16 +594,34 @@ var transition = new TransitionManager();
 function movePlayerThroughExit(ext) {
 	var GoToDest = function() {
 		if (ext.transition_effect != null) {
-			transition.BeginTransition(player().room, player().x, player().y, ext.dest.room, ext.dest.x, ext.dest.y, ext.transition_effect);
+			transition.BeginTransition(
+				player().room,
+				player().x,
+				player().y,
+				ext.dest.room,
+				ext.dest.x,
+				ext.dest.y,
+				ext.transition_effect);
+
 			transition.UpdateTransition(0);
+
+			transition.OnTransitionComplete(function() {
+				player().room = ext.dest.room;
+				player().x = ext.dest.x;
+				player().y = ext.dest.y;
+				curRoom = ext.dest.room;
+
+				initRoom(curRoom);
+			});
 		}
+		else {
+			player().room = ext.dest.room;
+			player().x = ext.dest.x;
+			player().y = ext.dest.y;
+			curRoom = ext.dest.room;
 
-		player().room = ext.dest.room;
-		player().x = ext.dest.x;
-		player().y = ext.dest.y;
-		curRoom = ext.dest.room;
-
-		initRoom(curRoom);
+			initRoom(curRoom);
+		}
 	};
 
 	if (ext.dlg != undefined && ext.dlg != null) {
@@ -666,6 +684,8 @@ function updatePalette(palId) {
 }
 
 function initRoom(roomId) {
+	bitsyLog("init room " + roomId);
+
 	updatePalette(curPal());
 
 	// init exit properties
