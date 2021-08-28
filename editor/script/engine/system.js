@@ -233,6 +233,9 @@ var onUpdateFunction = null;
 var updateInterval = null;
 
 function loadGame(gameData) {
+	drawingBuffers[screenBufferId] = createDrawingBuffer(128, 128, scale);
+	drawingBuffers[textboxBufferId] = createDrawingBuffer(0, 0, textScale);
+
 	document.addEventListener('keydown', input.onkeydown);
 	document.addEventListener('keyup', input.onkeyup);
 
