@@ -286,51 +286,35 @@ function loadGame(gameData) {
 function renderGame() {
 	bitsyLog("render game mode=" + curGraphicsMode);
 
-	if (curGraphicsMode === 0) {
-		// show screen buffer
-		var screenBuffer = drawingBuffers[screenBufferId];
-		renderDrawingBuffer(screenBuffer);
-		ctx.drawImage(
-			screenBuffer.canvas,
-			0,
-			0,
-			screenBuffer.width * screenBuffer.scale,
-			screenBuffer.height * screenBuffer.scale);
-	}
-	else if (curGraphicsMode === 1) {
-		// tile mode
-		for (var y = 0; y < 16; y++) {
-			for (var x = 0; x < 16; x++) {
-				var tileId = tilemapMemory[(y * 16) + x];
-				var tileBuffer = drawingBuffers[tileId];
-
-				if (tileBuffer) {
-					if (!tileBuffer.canvas) {
-						renderDrawingBuffer(tileBuffer);
-					}
-
-					ctx.drawImage(
-						tileBuffer.canvas,
-						x * tilesize * scale,
-						y * tilesize * scale,
-						tilesize * scale,
-						tilesize * scale);
-				}
-			}
-		}
-
-		// text
-		if (curTextMode === 1) {
-			var textboxBuffer = drawingBuffers[textboxBufferId];
-			renderDrawingBuffer(textboxBuffer);
-			ctx.drawImage(
-				textboxBuffer.canvas,
-				textboxX * scale,
-				textboxY * scale,
-				textboxBuffer.width * textboxBuffer.scale,
-				textboxBuffer.height * textboxBuffer.scale);
+	for (var i = drawingBuffers.length - 1; i >= 0; i--) {
+		var buffer = drawingBuffers[i];
+		if (buffer && buffer.canvas === null) {
+			renderDrawingBuffer(i, buffer);
 		}
 	}
+
+	// show screen buffer
+	var screenBuffer = drawingBuffers[screenBufferId];
+	renderDrawingBuffer(screenBufferId, screenBuffer);
+	ctx.drawImage(
+		screenBuffer.canvas,
+		0,
+		0,
+		screenBuffer.width * screenBuffer.scale,
+		screenBuffer.height * screenBuffer.scale);
+
+	// todo : show text buffer
+	// // text
+	// if (curTextMode === 1) {
+	// 	var textboxBuffer = drawingBuffers[textboxBufferId];
+	// 	renderDrawingBuffer(textboxBuffer);
+	// 	ctx.drawImage(
+	// 		textboxBuffer.canvas,
+	// 		textboxX * scale,
+	// 		textboxY * scale,
+	// 		textboxBuffer.width * textboxBuffer.scale,
+	// 		textboxBuffer.height * textboxBuffer.scale);
+	// }
 }
 
 function quitGame() {
@@ -373,25 +357,6 @@ var systemPalette = [];
 var curBufferId = -1; // note: -1 is invalid
 var drawingBuffers = [];
 
-var tilemapMemory = [
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-];
-
 var screenBufferId = 0;
 var textboxBufferId = 1;
 var tileStartBufferId = 2;
@@ -403,11 +368,18 @@ var textboxY = 0;
 var textboxWidth = 0;
 var textboxHeight = 0;
 
+var DrawingInstruction = {
+	Pixel : 0,
+	Tile : 1,
+	Textbox : 2, // todo : should this really be a drawing instruction??
+};
+
 function createDrawingBuffer(width, height, scale) {
 	var buffer = {
 		width : width,
 		height : height,
 		scale : scale, // logical-pixel to display-pixel scale
+		instructions : [], // drawing instructions
 		pixels : [],
 		canvas : null,
 	}
@@ -419,7 +391,11 @@ function createDrawingBuffer(width, height, scale) {
 	return buffer;
 }
 
-function renderDisplayPixel(img, width, scale, paletteIndex, x, y) {
+function renderPixelInstruction(bufferId, img, width, scale, paletteIndex, x, y) {
+	if (bufferId === screenBufferId && curGraphicsMode != 0) {
+		return;
+	}
+
 	if (!systemPalette[paletteIndex]) {
 		// bitsyLog("invalid index " + paletteIndex + " @ " + x + "," + y);
 		return;
@@ -439,26 +415,50 @@ function renderDisplayPixel(img, width, scale, paletteIndex, x, y) {
 	}
 }
 
-function renderDrawingBuffer(buffer) {
-	var img = ctx.createImageData(buffer.width * buffer.scale, buffer.height * buffer.scale);
+function renderTileInstruction(bufferId, canvas, scale, tileId, x, y) {
+	if (bufferId != screenBufferId || curGraphicsMode != 1) {
+		return;
+	}
 
-	for (var y = 0; y < buffer.height; y++) {
-		for (var x = 0; x < buffer.width; x++) {
-			var i = (y * buffer.width) + x;
-			var paletteIndex = buffer.pixels[i];
-			renderDisplayPixel(img, buffer.width, buffer.scale, paletteIndex, x, y);
+	if (!drawingBuffers[tileId]) {
+		return;
+	}
+
+	var tileBuffer = drawingBuffers[tileId];
+
+	var context = canvas.getContext("2d");
+
+	context.drawImage(
+		tileBuffer.canvas,
+		x * tilesize * scale,
+		y * tilesize * scale,
+		tilesize * scale,
+		tilesize * scale);
+}
+
+function renderDrawingBuffer(bufferId, buffer) {
+	buffer.canvas = document.createElement("canvas");
+	buffer.canvas.width = buffer.width * buffer.scale;
+	buffer.canvas.height = buffer.height * buffer.scale;
+
+	// todo : should I even use an image data object anymore?
+	var img = ctx.createImageData(buffer.canvas.width, buffer.canvas.height);
+
+	for (var i = 0; i < buffer.instructions.length; i++) {
+		var instruction = buffer.instructions[i];
+		switch (instruction.type) {
+			case DrawingInstruction.Pixel:
+				renderPixelInstruction(bufferId, img, buffer.width, buffer.scale, instruction.id, instruction.x, instruction.y);
+				break;
+			case DrawingInstruction.Tile:
+				renderTileInstruction(bufferId, buffer.canvas, buffer.scale, instruction.id, instruction.x, instruction.y);
+				break;
 		}
 	}
 
-	// todo : should I even use an image data object anymore?
-	// convert to canvas: chrome has poor performance when working directly with image data
-	var imageCanvas = document.createElement("canvas");
-	imageCanvas.width = img.width;
-	imageCanvas.height = img.height;
-	var imageContext = imageCanvas.getContext("2d");
-	imageContext.putImageData(img, 0, 0);
-
-	buffer.canvas = imageCanvas;
+	// convert image to canvas: chrome has poor performance when working directly with image data
+	var bufferContext = buffer.canvas.getContext("2d");
+	bufferContext.putImageData(img, 0, 0);
 }
 
 function invalidateDrawingBuffer(buffer) {
@@ -534,12 +534,16 @@ function bitsySetColor(paletteIndex, r, g, b) {
 
 function bitsyDrawBegin(bufferId) {
 	curBufferId = bufferId;
+	var buffer = drawingBuffers[curBufferId];
+	buffer.canvas = null; // invalidate rendered version
+	buffer.instructions = []; // clear out instructions
 }
 
 function bitsyDrawEnd() {
 	curBufferId = -1;
 }
 
+// todo : replace with Clear()?
 function bitsyDrawFill(paletteIndex) {
 	if (curBufferId === textboxBufferId && !drawingBuffers[textboxBufferId]) {
 		// todo : is this useful to keep around?
@@ -554,8 +558,12 @@ function bitsyDrawFill(paletteIndex) {
 }
 
 function bitsyDrawPixel(paletteIndex, x, y) {
+	if (curBufferId === screenBufferId && curGraphicsMode != 0) {
+		return;
+	}
+
 	var buffer = drawingBuffers[curBufferId];
-	buffer.pixels[(y * buffer.width) + x] = paletteIndex;
+	buffer.instructions.push({ type: DrawingInstruction.Pixel, id: paletteIndex, x: x, y: y, });
 }
 
 // allocates a tile buffer and returns the ID
@@ -568,8 +576,13 @@ function bitsyAddTile() {
 	return tileBufferId;
 }
 
-function bitsySetTile(tileId, x, y) {
-	tilemapMemory[(y * 16) + x] = tileId;
+function bitsyDrawTile(tileId, x, y) {
+	if (curBufferId != screenBufferId || curGraphicsMode != 1) {
+		return;
+	}
+
+	var buffer = drawingBuffers[curBufferId];
+	buffer.instructions.push({ type: DrawingInstruction.Tile, id: tileId, x: x, y: y, });
 }
 
 // note: 0 == off, 1 == on

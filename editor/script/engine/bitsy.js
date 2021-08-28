@@ -1734,7 +1734,7 @@ function parseFlag(lines, i) {
 }
 
 function drawTile(tileId, x, y) {
-	bitsySetTile(tileId, x, y);
+	bitsyDrawTile(tileId, x, y);
 }
 
 function drawSprite(tileId, x, y) {
