@@ -232,6 +232,12 @@ var onQuitFunction = null;
 var onUpdateFunction = null;
 var updateInterval = null;
 
+function initSystem() {
+	// temp hack for the editor? unless??
+	drawingBuffers[screenBufferId] = createDrawingBuffer(128, 128, scale);
+	drawingBuffers[textboxBufferId] = createDrawingBuffer(0, 0, textScale);
+}
+
 function loadGame(gameData) {
 	drawingBuffers[screenBufferId] = createDrawingBuffer(128, 128, scale);
 	drawingBuffers[textboxBufferId] = createDrawingBuffer(0, 0, textScale);
@@ -298,7 +304,7 @@ function renderGame() {
 
 	// show screen buffer
 	var screenBuffer = drawingBuffers[screenBufferId];
-	renderDrawingBuffer(screenBufferId, screenBuffer);
+	// renderDrawingBuffer(screenBufferId, screenBuffer);
 	ctx.drawImage(
 		screenBuffer.canvas,
 		0,
@@ -440,6 +446,10 @@ function renderTileInstruction(bufferId, canvas, scale, tileId, x, y) {
 }
 
 function renderDrawingBuffer(bufferId, buffer) {
+	// if (bufferId === 0) {
+	// 	bitsyLog("instructions " + buffer.instructions.length);
+	// }
+
 	buffer.canvas = document.createElement("canvas");
 	buffer.canvas.width = buffer.width * buffer.scale;
 	buffer.canvas.height = buffer.height * buffer.scale;
@@ -459,9 +469,12 @@ function renderDrawingBuffer(bufferId, buffer) {
 		}
 	}
 
-	// convert image to canvas: chrome has poor performance when working directly with image data
-	var bufferContext = buffer.canvas.getContext("2d");
-	bufferContext.putImageData(img, 0, 0);
+	// please enjoy this irritatingly specific check for tiled screen mode
+	if (bufferId != 0 || curGraphicsMode != 1) {
+		// convert image to canvas: chrome has poor performance when working directly with image data
+		var bufferContext = buffer.canvas.getContext("2d");
+		bufferContext.putImageData(img, 0, 0);
+	}
 }
 
 function invalidateDrawingBuffer(buffer) {
@@ -539,11 +552,15 @@ function bitsyDrawBegin(bufferId) {
 	curBufferId = bufferId;
 	var buffer = drawingBuffers[curBufferId];
 	buffer.canvas = null; // invalidate rendered version
-	buffer.instructions = []; // clear out instructions
 }
 
 function bitsyDrawEnd() {
 	curBufferId = -1;
+}
+
+// todo : replace fill and supply a color?
+function bitsyClear() {
+	drawingBuffers[curBufferId].instructions = []; // reset instructions
 }
 
 // todo : replace with Clear()?

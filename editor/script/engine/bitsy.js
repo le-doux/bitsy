@@ -1734,7 +1734,9 @@ function parseFlag(lines, i) {
 }
 
 function drawTile(tileId, x, y) {
+	bitsyDrawBegin(0);
 	bitsyDrawTile(tileId, x, y);
+	bitsyDrawEnd();
 }
 
 function drawSprite(tileId, x, y) {
@@ -1758,6 +1760,11 @@ function clearRoomTiles() {
 	if (room.pal != null && palette[paletteId] != undefined) {
 		paletteId = room.pal;
 	}
+
+	// todo : if this set the background color maybe we wouldn't need the "null" tile method below
+	bitsyDrawBegin(0);
+	bitsyClear();
+	bitsyDrawEnd();
 
 	for (var y = 0; y < 16; y++) {
 		for (var x = 0; x < 16; x++) {
@@ -1786,6 +1793,11 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	if (room.pal != null && palette[paletteId] != undefined) {
 		paletteId = room.pal;
 	}
+
+	// clear the screen buffer
+	bitsyDrawBegin(0);
+	bitsyClear();
+	bitsyDrawEnd();
 
 	//draw tiles
 	for (i in room.tilemap) {

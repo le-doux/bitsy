@@ -813,6 +813,8 @@ function isPortraitOrientation() {
 }
 
 function start() {
+	initSystem();
+
 	events.Listen("game_data_change", function(event) {
 		updatePaletteOptionsFromGameData();
 
