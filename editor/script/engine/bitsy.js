@@ -1763,7 +1763,7 @@ function clearRoomTiles() {
 
 	// todo : if this set the background color maybe we wouldn't need the "null" tile method below
 	bitsyDrawBegin(0);
-	bitsyClear();
+	bitsyClear(tileColorStartIndex);
 	bitsyDrawEnd();
 
 	for (var y = 0; y < 16; y++) {
@@ -1796,7 +1796,7 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 
 	// clear the screen buffer
 	bitsyDrawBegin(0);
-	bitsyClear();
+	bitsyClear(tileColorStartIndex);
 	bitsyDrawEnd();
 
 	//draw tiles

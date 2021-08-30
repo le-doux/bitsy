@@ -380,7 +380,8 @@ var textboxHeight = 0;
 var DrawingInstruction = {
 	Pixel : 0,
 	Tile : 1,
-	Textbox : 2, // todo : should this really be a drawing instruction??
+	Clear : 2,
+	Textbox : 3, // todo : should this really be a drawing instruction??
 };
 
 function createDrawingBuffer(width, height, scale) {
@@ -400,7 +401,7 @@ function createDrawingBuffer(width, height, scale) {
 	return buffer;
 }
 
-function renderPixelInstruction(bufferId, img, width, scale, paletteIndex, x, y) {
+function renderPixelInstruction(bufferId, buffer, paletteIndex, x, y) {
 	if (bufferId === screenBufferId && curGraphicsMode != 0) {
 		return;
 	}
@@ -412,19 +413,12 @@ function renderPixelInstruction(bufferId, img, width, scale, paletteIndex, x, y)
 
 	var color = systemPalette[paletteIndex];
 
-	for (var sy = 0; sy < scale; sy++) {
-		for (var sx = 0; sx < scale; sx++) {
-			var pixelIndex = (((y * scale) + sy) * width * scale * 4) + (((x * scale) + sx) * 4);
-
-			img.data[pixelIndex + 0] = color[0];
-			img.data[pixelIndex + 1] = color[1];
-			img.data[pixelIndex + 2] = color[2];
-			img.data[pixelIndex + 3] = 255;
-		}
-	}
+	var bufferContext = buffer.canvas.getContext("2d");
+	bufferContext.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
+	bufferContext.fillRect(x * scale, y * scale, scale, scale);
 }
 
-function renderTileInstruction(bufferId, canvas, scale, tileId, x, y) {
+function renderTileInstruction(bufferId, buffer, tileId, x, y) {
 	if (bufferId != screenBufferId || curGraphicsMode != 1) {
 		return;
 	}
@@ -435,14 +429,20 @@ function renderTileInstruction(bufferId, canvas, scale, tileId, x, y) {
 
 	var tileBuffer = drawingBuffers[tileId];
 
-	var context = canvas.getContext("2d");
-
-	context.drawImage(
+	var bufferContext = buffer.canvas.getContext("2d");
+	bufferContext.drawImage(
 		tileBuffer.canvas,
-		x * tilesize * scale,
-		y * tilesize * scale,
-		tilesize * scale,
-		tilesize * scale);
+		x * tilesize * buffer.scale,
+		y * tilesize * buffer.scale,
+		tilesize * buffer.scale,
+		tilesize * buffer.scale);
+}
+
+function renderClearInstruction(bufferId, buffer, paletteIndex) {
+	var color = systemPalette[paletteIndex];
+	var bufferContext = buffer.canvas.getContext("2d");
+	bufferContext.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
+	bufferContext.fillRect(0, 0, buffer.canvas.width, buffer.canvas.height);
 }
 
 function renderDrawingBuffer(bufferId, buffer) {
@@ -454,26 +454,19 @@ function renderDrawingBuffer(bufferId, buffer) {
 	buffer.canvas.width = buffer.width * buffer.scale;
 	buffer.canvas.height = buffer.height * buffer.scale;
 
-	// todo : should I even use an image data object anymore?
-	var img = ctx.createImageData(buffer.canvas.width, buffer.canvas.height);
-
 	for (var i = 0; i < buffer.instructions.length; i++) {
 		var instruction = buffer.instructions[i];
 		switch (instruction.type) {
 			case DrawingInstruction.Pixel:
-				renderPixelInstruction(bufferId, img, buffer.width, buffer.scale, instruction.id, instruction.x, instruction.y);
+				renderPixelInstruction(bufferId, buffer, instruction.id, instruction.x, instruction.y);
 				break;
 			case DrawingInstruction.Tile:
-				renderTileInstruction(bufferId, buffer.canvas, buffer.scale, instruction.id, instruction.x, instruction.y);
+				renderTileInstruction(bufferId, buffer, instruction.id, instruction.x, instruction.y);
+				break;
+			case DrawingInstruction.Clear:
+				renderClearInstruction(bufferId, buffer, instruction.id);
 				break;
 		}
-	}
-
-	// please enjoy this irritatingly specific check for tiled screen mode
-	if (bufferId != 0 || curGraphicsMode != 1) {
-		// convert image to canvas: chrome has poor performance when working directly with image data
-		var bufferContext = buffer.canvas.getContext("2d");
-		bufferContext.putImageData(img, 0, 0);
 	}
 }
 
@@ -559,8 +552,9 @@ function bitsyDrawEnd() {
 }
 
 // todo : replace fill and supply a color?
-function bitsyClear() {
+function bitsyClear(paletteIndex) {
 	drawingBuffers[curBufferId].instructions = []; // reset instructions
+	drawingBuffers[curBufferId].instructions.push({ type: DrawingInstruction.Clear, id: paletteIndex, });
 }
 
 // todo : replace with Clear()?
