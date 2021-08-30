@@ -1,6 +1,6 @@
 /* logging */
 var DebugLogCategory = {
-	bitsy : false,
+	bitsy : true,
 	editor : false,
 };
 
@@ -295,7 +295,9 @@ function loadGame(gameData) {
 function renderGame() {
 	bitsyLog("render game mode=" + curGraphicsMode);
 
-	for (var i = drawingBuffers.length - 1; i >= 0; i--) {
+	var startIndex = curGraphicsMode === 0 ? screenBufferId : (drawingBuffers.length - 1);
+
+	for (var i = startIndex; i >= 0; i--) {
 		var buffer = drawingBuffers[i];
 		if (buffer && buffer.canvas === null) {
 			renderDrawingBuffer(i, buffer);
@@ -441,6 +443,8 @@ function renderTextboxInstruction(bufferId, buffer, x, y) {
 }
 
 function renderDrawingBuffer(bufferId, buffer) {
+	bitsyLog("render buffer " + bufferId);
+
 	// if (bufferId === 0) {
 	// 	bitsyLog("instructions " + buffer.instructions.length);
 	// }
@@ -521,11 +525,6 @@ function bitsyGetButton(buttonCode) {
 // two modes (0 == pixel mode, 1 == tile mode)
 function bitsySetGraphicsMode(mode) {
 	curGraphicsMode = mode;
-
-	if (curGraphicsMode === 0 && !drawingBuffers[screenBufferId]) {
-		// init a new screen buffer
-		drawingBuffers[screenBufferId] = createDrawingBuffer(128, 128, scale);
-	}
 }
 
 function bitsySetColor(paletteIndex, r, g, b) {
