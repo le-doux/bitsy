@@ -357,7 +357,7 @@ function update() {
 			drawRoom(room[curRoom]); // draw world if game has begun
 		}
 		else {
-			clearRoomTiles();
+			clearRoom();
 		}
 
 		// if (isDialogMode) { // dialog mode
@@ -1749,7 +1749,7 @@ function drawItem(tileId, x, y) {
 
 // var debugLastRoomDrawn = "0";
 
-function clearRoomTiles() {
+function clearRoom() {
 	var paletteId = "default";
 
 	if (room === undefined) {
@@ -1761,16 +1761,9 @@ function clearRoomTiles() {
 		paletteId = room.pal;
 	}
 
-	// todo : if this set the background color maybe we wouldn't need the "null" tile method below
 	bitsyDrawBegin(0);
 	bitsyClear(tileColorStartIndex);
 	bitsyDrawEnd();
-
-	for (var y = 0; y < 16; y++) {
-		for (var x = 0; x < 16; x++) {
-			drawTile(getTileImage(null, paletteId, 0), x, y);
-		}
-	}
 }
 
 function drawRoom(room,context,frameIndex) { // context & frameIndex are optional
@@ -1816,10 +1809,6 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 					// bitsyLog(id);
 					drawTile(getTileImage(tile[id], paletteId, frameIndex), x, y);
 				}
-			}
-			else {
-				// clear tile
-				drawTile(getTileImage(null, paletteId, 0), x, y);
 			}
 		}
 	}

@@ -3,19 +3,6 @@ function Renderer(tilesize, scale) {
 
 bitsyLog("!!!!! NEW RENDERER");
 
-var EMPTY_TILE_ID = "__EMPTY_TILE__";
-
-var emptyTileData = [[
-	0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,
-]];
-
 var imageCache = {
 	source: {},
 	render: {},
@@ -60,11 +47,11 @@ function renderImage(drawing, paletteId) {
 	// debugRenderCount++;
 	// bitsyLog("RENDER COUNT " + debugRenderCount);
 
-	var col = (drawing === null) ? 0 : drawing.col;
+	var col = drawing.col;
 	var colStr = "" + col;
 	var pal = paletteId;
-	var drwId = (drawing === null) ? EMPTY_TILE_ID : drawing.drw;
-	var imgSrc = (drawing === null) ? emptyTileData : imageCache.source[drwId];
+	var drwId = drawing.drw;
+	var imgSrc = imageCache.source[drwId];
 
 	// initialize render cache entry
 	if (imageCache.render[drwId] === undefined || imageCache.render[drwId] === null) {
@@ -119,10 +106,10 @@ function undefinedOrNull(x) {
 }
 
 function isImageRendered(drawing, paletteId) {
-	var col = (drawing === null) ? 0 : drawing.col;
+	var col = drawing.col;
 	var colStr = "" + col;
 	var pal = paletteId;
-	var drwId = (drawing === null) ? EMPTY_TILE_ID : drawing.drw;
+	var drwId = drawing.drw;
 
 	if (undefinedOrNull(imageCache.render[drwId]) ||
 		undefinedOrNull(imageCache.render[drwId][pal]) ||
@@ -135,10 +122,10 @@ function isImageRendered(drawing, paletteId) {
 }
 
 function getImageSet(drawing, paletteId) {
-	var col = (drawing === null) ? 0 : drawing.col;
+	var col = drawing.col;
 	var colStr = "" + col;
 	var pal = paletteId;
-	var drwId = (drawing === null) ? EMPTY_TILE_ID : drawing.drw;
+	var drwId = drawing.drw;
 
 	return imageCache.render[drwId][pal][colStr];
 }
