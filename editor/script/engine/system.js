@@ -304,7 +304,6 @@ function renderGame() {
 
 	// show screen buffer
 	var screenBuffer = drawingBuffers[screenBufferId];
-	// renderDrawingBuffer(screenBufferId, screenBuffer);
 	ctx.drawImage(
 		screenBuffer.canvas,
 		0,
@@ -313,17 +312,16 @@ function renderGame() {
 		screenBuffer.height * screenBuffer.scale);
 
 	// todo : show text buffer
-	// // text
-	// if (curTextMode === 1) {
-	// 	var textboxBuffer = drawingBuffers[textboxBufferId];
-	// 	renderDrawingBuffer(textboxBuffer);
-	// 	ctx.drawImage(
-	// 		textboxBuffer.canvas,
-	// 		textboxX * scale,
-	// 		textboxY * scale,
-	// 		textboxBuffer.width * textboxBuffer.scale,
-	// 		textboxBuffer.height * textboxBuffer.scale);
-	// }
+	// text
+	if (curTextMode === 1) {
+		var textboxBuffer = drawingBuffers[textboxBufferId];
+		ctx.drawImage(
+			textboxBuffer.canvas,
+			textboxX * scale,
+			textboxY * scale,
+			textboxBuffer.width * textboxBuffer.scale,
+			textboxBuffer.height * textboxBuffer.scale);
+	}
 }
 
 function quitGame() {
@@ -390,12 +388,7 @@ function createDrawingBuffer(width, height, scale) {
 		height : height,
 		scale : scale, // logical-pixel to display-pixel scale
 		instructions : [], // drawing instructions
-		pixels : [],
 		canvas : null,
-	}
-
-	for (var i = 0; i < width * height; i++) {
-		buffer.pixels.push(0);
 	}
 
 	return buffer;
@@ -415,7 +408,7 @@ function renderPixelInstruction(bufferId, buffer, paletteIndex, x, y) {
 
 	var bufferContext = buffer.canvas.getContext("2d");
 	bufferContext.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
-	bufferContext.fillRect(x * scale, y * scale, scale, scale);
+	bufferContext.fillRect(x * buffer.scale, y * buffer.scale, buffer.scale, buffer.scale);
 }
 
 function renderTileInstruction(bufferId, buffer, tileId, x, y) {
@@ -551,26 +544,6 @@ function bitsyDrawEnd() {
 	curBufferId = -1;
 }
 
-// todo : replace fill and supply a color?
-function bitsyClear(paletteIndex) {
-	drawingBuffers[curBufferId].instructions = []; // reset instructions
-	drawingBuffers[curBufferId].instructions.push({ type: DrawingInstruction.Clear, id: paletteIndex, });
-}
-
-// todo : replace with Clear()?
-function bitsyDrawFill(paletteIndex) {
-	if (curBufferId === textboxBufferId && !drawingBuffers[textboxBufferId]) {
-		// todo : is this useful to keep around?
-		// force init the buffer
-		bitsySetTextboxSize(textboxWidth, textboxHeight);
-	}
-
-	var buffer = drawingBuffers[curBufferId];
-	for (var i = 0; i < buffer.pixels.length; i++) {
-		buffer.pixels[i] = paletteIndex;
-	}
-}
-
 function bitsyDrawPixel(paletteIndex, x, y) {
 	if (curBufferId === screenBufferId && curGraphicsMode != 0) {
 		return;
@@ -578,6 +551,20 @@ function bitsyDrawPixel(paletteIndex, x, y) {
 
 	var buffer = drawingBuffers[curBufferId];
 	buffer.instructions.push({ type: DrawingInstruction.Pixel, id: paletteIndex, x: x, y: y, });
+}
+
+function bitsyDrawTile(tileId, x, y) {
+	if (curBufferId != screenBufferId || curGraphicsMode != 1) {
+		return;
+	}
+
+	var buffer = drawingBuffers[curBufferId];
+	buffer.instructions.push({ type: DrawingInstruction.Tile, id: tileId, x: x, y: y, });
+}
+
+function bitsyClear(paletteIndex) {
+	drawingBuffers[curBufferId].instructions = []; // reset instructions
+	drawingBuffers[curBufferId].instructions.push({ type: DrawingInstruction.Clear, id: paletteIndex, });
 }
 
 // allocates a tile buffer and returns the ID
@@ -588,15 +575,6 @@ function bitsyAddTile() {
 	drawingBuffers[tileBufferId] = createDrawingBuffer(tilesize, tilesize, scale);
 
 	return tileBufferId;
-}
-
-function bitsyDrawTile(tileId, x, y) {
-	if (curBufferId != screenBufferId || curGraphicsMode != 1) {
-		return;
-	}
-
-	var buffer = drawingBuffers[curBufferId];
-	buffer.instructions.push({ type: DrawingInstruction.Tile, id: tileId, x: x, y: y, });
 }
 
 // note: 0 == off, 1 == on

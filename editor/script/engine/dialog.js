@@ -55,7 +55,7 @@ var DialogRenderer = function() {
 
 	this.ClearTextbox = function() {
 		bitsyDrawBegin(1);
-		bitsyDrawFill(0);
+		bitsyClear(0);
 		bitsyDrawEnd();
 	};
 
