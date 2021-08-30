@@ -65,21 +65,22 @@ var DialogRenderer = function() {
 	};
 
 	this.DrawTextbox = function() {
-		// make the textbox visible
-		bitsySetTextMode(1);
+		bitsyDrawBegin(0);
 
 		if (isCentered) {
 			// todo : will the height calculations always work?
-			bitsySetTextboxPosition(textboxInfo.left, ((height / 2) - (textboxInfo.height / 2)));
+			bitsyDrawTextbox(textboxInfo.left, ((height / 2) - (textboxInfo.height / 2)));
 		}
 		else if (player().y < (mapsize / 2)) {
 			// bottom
-			bitsySetTextboxPosition(textboxInfo.left, (height - textboxInfo.bottom - textboxInfo.height));
+			bitsyDrawTextbox(textboxInfo.left, (height - textboxInfo.bottom - textboxInfo.height));
 		}
 		else {
 			// top
-			bitsySetTextboxPosition(textboxInfo.left, textboxInfo.top);
+			bitsyDrawTextbox(textboxInfo.left, textboxInfo.top);
 		}
+
+		bitsyDrawEnd();
 	};
 
 	var arrowdata = [

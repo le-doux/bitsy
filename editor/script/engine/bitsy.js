@@ -333,9 +333,6 @@ function update() {
 	var curTime = Date.now();
 	deltaTime = curTime - prevTime;
 
-	// disable text box (if it's active, we'll turn it back on)
-	bitsySetTextMode(0);
-
 	if (curRoom == null) {
 		// in the special case where there is no valid room, end the game
 		startNarrating( "", true /*isEnding*/ );
