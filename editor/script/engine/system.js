@@ -390,9 +390,23 @@ function renderPixelInstruction(bufferId, buffer, paletteIndex, x, y) {
 
 	var color = systemPalette[paletteIndex];
 
-	var bufferContext = buffer.canvas.getContext("2d");
-	bufferContext.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
-	bufferContext.fillRect(x * buffer.scale, y * buffer.scale, buffer.scale, buffer.scale);
+	if (buffer.imageData) {
+		for (var sy = 0; sy < buffer.scale; sy++) {
+			for (var sx = 0; sx < buffer.scale; sx++) {
+				var pixelIndex = (((y * buffer.scale) + sy) * buffer.width * buffer.scale * 4) + (((x * buffer.scale) + sx) * 4);
+
+				buffer.imageData.data[pixelIndex + 0] = color[0];
+				buffer.imageData.data[pixelIndex + 1] = color[1];
+				buffer.imageData.data[pixelIndex + 2] = color[2];
+				buffer.imageData.data[pixelIndex + 3] = 255;
+			}
+		}
+	}
+	else {
+		var bufferContext = buffer.canvas.getContext("2d");
+		bufferContext.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
+		bufferContext.fillRect(x * buffer.scale, y * buffer.scale, buffer.scale, buffer.scale);
+	}
 }
 
 function renderTileInstruction(bufferId, buffer, tileId, x, y) {
@@ -470,6 +484,11 @@ function renderDrawingBuffer(bufferId, buffer) {
 				break;
 		}
 	}
+
+	if (buffer.imageData) {
+		var bufferContext = buffer.canvas.getContext("2d");
+		bufferContext.putImageData(buffer.imageData, 0, 0);
+	}
 }
 
 function invalidateDrawingBuffer(buffer) {
@@ -525,6 +544,14 @@ function bitsyGetButton(buttonCode) {
 // two modes (0 == pixel mode, 1 == tile mode)
 function bitsySetGraphicsMode(mode) {
 	curGraphicsMode = mode;
+
+	var screenBuffer = drawingBuffers[screenBufferId];
+	if (curGraphicsMode === 0) {
+		screenBuffer.imageData = ctx.createImageData(screenBuffer.width * screenBuffer.scale, screenBuffer.height * screenBuffer.scale);
+	}
+	else {
+		screenBuffer.imageData = undefined;
+	}
 }
 
 function bitsySetColor(paletteIndex, r, g, b) {
