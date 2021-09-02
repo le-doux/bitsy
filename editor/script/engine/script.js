@@ -398,28 +398,28 @@ function printDrawingFunc(environment, parameters, onReturn) {
 
 function printSpriteFunc(environment,parameters,onReturn) {
 	var spriteId = parameters[0];
-	if(names.sprite.has(spriteId)) spriteId = names.sprite.get(spriteId); // id is actually a name
+	if(names.sprite[spriteId] != undefined) spriteId = names.sprite[spriteId]; // id is actually a name
 	var drawingId = sprite[spriteId].drw;
 	printDrawingFunc(environment, [drawingId], onReturn);
 }
 
 function printTileFunc(environment,parameters,onReturn) {
 	var tileId = parameters[0];
-	if(names.tile.has(tileId)) tileId = names.tile.get(tileId); // id is actually a name
+	if(names.tile[tileId] != undefined) tileId = names.tile[tileId]; // id is actually a name
 	var drawingId = tile[tileId].drw;
 	printDrawingFunc(environment, [drawingId], onReturn);
 }
 
 function printItemFunc(environment,parameters,onReturn) {
 	var itemId = parameters[0];
-	if(names.item.has(itemId)) itemId = names.item.get(itemId); // id is actually a name
+	if(names.item[itemId] != undefined) itemId = names.item[itemId]; // id is actually a name
 	var drawingId = item[itemId].drw;
 	printDrawingFunc(environment, [drawingId], onReturn);
 }
 
 function printFontFunc(environment, parameters, onReturn) {
 	var allCharacters = "";
-	var font = fontManager.Get( fontName );
+	var font = fontManager.Get(fontName);
 	var codeList = font.allCharCodes();
 	for (var i = 0; i < codeList.length; i++) {
 		allCharacters += String.fromCharCode(codeList[i]) + " ";
@@ -430,9 +430,9 @@ function printFontFunc(environment, parameters, onReturn) {
 function itemFunc(environment,parameters,onReturn) {
 	var itemId = parameters[0];
 
-	if (names.item.has(itemId)) {
+	if (names.item[itemId] != undefined) {
 		// id is actually a name
-		itemId = names.item.get(itemId);
+		itemId = names.item[itemId];
 	}
 
 	var curItemCount = player().inventory[itemId] ? player().inventory[itemId] : 0;
@@ -521,9 +521,9 @@ function endFunc(environment,parameters,onReturn) {
 function exitFunc(environment,parameters,onReturn) {
 	var destRoom = parameters[0];
 
-	if (names.room.has(destRoom)) {
+	if (names.room[destRoom] != undefined) {
 		// it's a name, not an id! (note: these could cause trouble if people names things weird)
-		destRoom = names.room.get(destRoom);
+		destRoom = names.room[destRoom];
 	}
 
 	var destX = parseInt(parameters[1]);
@@ -649,50 +649,50 @@ var Environment = function() {
 	this.SetDialogBuffer = function(buffer) { dialogBuffer = buffer; };
 	this.GetDialogBuffer = function() { return dialogBuffer; };
 
-	var functionMap = new Map();
-	functionMap.set("print", printFunc);
-	functionMap.set("say", printFunc);
-	functionMap.set("br", linebreakFunc);
-	functionMap.set("item", itemFunc);
-	functionMap.set("rbw", rainbowFunc);
-	functionMap.set("clr1", color1Func);
-	functionMap.set("clr2", color2Func);
-	functionMap.set("clr3", color3Func);
-	functionMap.set("wvy", wavyFunc);
-	functionMap.set("shk", shakyFunc);
-	functionMap.set("printSprite", printSpriteFunc);
-	functionMap.set("printTile", printTileFunc);
-	functionMap.set("printItem", printItemFunc);
-	functionMap.set("debugOnlyPrintFont", printFontFunc); // DEBUG ONLY
-	functionMap.set("end", endFunc);
-	functionMap.set("exit", exitFunc);
-	functionMap.set("pg", pagebreakFunc);
-	functionMap.set("property", propertyFunc);
+	var functionMap = {};
+	functionMap["print"] = printFunc;
+	functionMap["say"] = printFunc;
+	functionMap["br"] = linebreakFunc;
+	functionMap["item"] = itemFunc;
+	functionMap["rbw"] = rainbowFunc;
+	functionMap["clr1"] = color1Func;
+	functionMap["clr2"] = color2Func;
+	functionMap["clr3"] = color3Func;
+	functionMap["wvy"] = wavyFunc;
+	functionMap["shk"] = shakyFunc;
+	functionMap["printSprite"] = printSpriteFunc;
+	functionMap["printTile"] = printTileFunc;
+	functionMap["printItem"] = printItemFunc;
+	functionMap["debugOnlyPrintFont"] = printFontFunc; // DEBUG ONLY
+	functionMap["end"] = endFunc;
+	functionMap["exit"] = exitFunc;
+	functionMap["pg"] = pagebreakFunc;
+	functionMap["property"] = propertyFunc;
 
-	this.HasFunction = function(name) { return functionMap.has(name); };
+	this.HasFunction = function(name) { return functionMap[name] != undefined; };
 	this.EvalFunction = function(name,parameters,onReturn,env) {
 		if (env == undefined || env == null) {
 			env = this;
 		}
 
-		functionMap.get(name)(env, parameters, onReturn);
+		functionMap[name](env, parameters, onReturn);
 	}
 
-	var variableMap = new Map();
+	var variableMap = {};
 
-	this.HasVariable = function(name) { return variableMap.has(name); };
-	this.GetVariable = function(name) { return variableMap.get(name); };
+	this.HasVariable = function(name) { return variableMap[name] != undefined; };
+	this.GetVariable = function(name) { return variableMap[name]; };
 	this.SetVariable = function(name,value,useHandler) {
 		// bitsyLog("SET VARIABLE " + name + " = " + value);
 		if(useHandler === undefined) useHandler = true;
-		variableMap.set(name, value);
+		variableMap[name] = value;
 		if(onVariableChangeHandler != null && useHandler){
 			onVariableChangeHandler(name);
 		}
 	};
 	this.DeleteVariable = function(name,useHandler) {
 		if(useHandler === undefined) useHandler = true;
-		if(variableMap.has(name)) {
+		if(variableMap[name] != undefined) {
 			variableMap.delete(name);
 			if(onVariableChangeHandler != null && useHandler) {
 				onVariableChangeHandler(name);
@@ -700,27 +700,27 @@ var Environment = function() {
 		}
 	};
 
-	var operatorMap = new Map();
-	operatorMap.set("=", setExp);
-	operatorMap.set("==", equalExp);
-	operatorMap.set(">", greaterExp);
-	operatorMap.set("<", lessExp);
-	operatorMap.set(">=", greaterEqExp);
-	operatorMap.set("<=", lessEqExp);
-	operatorMap.set("*", multExp);
-	operatorMap.set("/", divExp);
-	operatorMap.set("+", addExp);
-	operatorMap.set("-", subExp);
+	var operatorMap = {};
+	operatorMap["="] = setExp;
+	operatorMap["=="] = equalExp;
+	operatorMap[">"] = greaterExp;
+	operatorMap["<"] = lessExp;
+	operatorMap[">="] = greaterEqExp;
+	operatorMap["<="] = lessEqExp;
+	operatorMap["*"] = multExp;
+	operatorMap["/"] = divExp;
+	operatorMap["+"] = addExp;
+	operatorMap["-"] = subExp;
 
-	this.HasOperator = function(sym) { return operatorMap.get(sym); };
+	this.HasOperator = function(sym) { return operatorMap[sym] != undefined; };
 	this.EvalOperator = function(sym,left,right,onReturn) {
-		operatorMap.get( sym )( this, left, right, onReturn );
+		operatorMap[ sym ]( this, left, right, onReturn );
 	}
 
-	var scriptMap = new Map();
-	this.HasScript = function(name) { return scriptMap.has(name); };
-	this.GetScript = function(name) { return scriptMap.get(name); };
-	this.SetScript = function(name,script) { scriptMap.set(name, script); };
+	var scriptMap = {};
+	this.HasScript = function(name) { return scriptMap[name] != undefined; };
+	this.GetScript = function(name) { return scriptMap[name]; };
+	this.SetScript = function(name,script) { scriptMap[name] = script; };
 
 	var onVariableChangeHandler = null;
 	this.SetOnVariableChangeHandler = function(onVariableChange) {

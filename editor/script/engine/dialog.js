@@ -879,7 +879,7 @@ var ArabicHandler = function() {
 }
 
 /* NEW TEXT EFFECTS */
-var TextEffects = new Map();
+var TextEffects = {};
 
 var RainbowEffect = function() {
 	this.DoEffect = function(char, time) {

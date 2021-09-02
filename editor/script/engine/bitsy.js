@@ -33,22 +33,26 @@ var TextDirection = {
 };
 var textDirection = TextDirection.LeftToRight;
 
+/* NAME-TO-ID MAPS */
 var names = {
-	room : new Map(),
-	tile : new Map(), // Note: Not currently enabled in the UI
-	sprite : new Map(),
-	item : new Map(),
-	dialog : new Map(),
+	room : {},
+	tile : {},
+	sprite : {},
+	item : {},
+	dialog : {},
 };
+
 function updateNamesFromCurData() {
 
 	function createNameMap(objectStore) {
-		var map = new Map();
+		var map = {};
+
 		for (id in objectStore) {
 			if (objectStore[id].name != undefined && objectStore[id].name != null) {
-				map.set(objectStore[id].name, id);
+				map[objectStore[id].name] = id;
 			}
 		}
+
 		return map;
 	}
 
@@ -104,14 +108,7 @@ function clearGameData() {
 
 	spriteStartLocations = {};
 
-	// hacky to have this multiple times...
-	names = {
-		room : new Map(),
-		tile : new Map(),
-		sprite : new Map(),
-		item : new Map(),
-		dialog : new Map(),
-	};
+	updateNamesFromCurData();
 
 	fontName = defaultFontName; // TODO : reset font manager too?
 	textDirection = TextDirection.LeftToRight;
@@ -1388,7 +1385,7 @@ function parseRoom(lines, i, compatibilityFlags) {
 		else if (getType(lines[i]) === "NAME") {
 			var name = lines[i].split(/\s(.+)/)[1];
 			room[id].name = name;
-			names.room.set(name, id);
+			names.room[name] = id;
 		}
 
 		i++;
@@ -1445,7 +1442,7 @@ function parseTile(lines, i) {
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
 			tileData.name = lines[i].split(/\s(.+)/)[1];
-			names.tile.set(tileData.name, id);
+			names.tile[tileData.name] = id;
 		}
 		else if (getType(lines[i]) === "WAL") {
 			var wallArg = getArg(lines[i], 1);
@@ -1505,7 +1502,7 @@ function parseSprite(lines, i) {
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
 			spriteData.name = lines[i].split(/\s(.+)/)[1];
-			names.sprite.set(spriteData.name, id);
+			names.sprite[spriteData.name] = id;
 		}
 		else if (getType(lines[i]) === "ITM") {
 			/* ITEM STARTING INVENTORY */
@@ -1548,7 +1545,7 @@ function parseItem(lines, i) {
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
 			itemData.name = lines[i].split(/\s(.+)/)[1];
-			names.item.set(itemData.name, id);
+			names.item[itemData.name] = id;
 		}
 
 		i++;
@@ -1669,7 +1666,7 @@ function parseDialog(lines, i, compatibilityFlags) {
 
 	if (lines[i].length > 0 && getType(lines[i]) === "NAME") {
 		dialog[id].name = lines[i].split(/\s(.+)/)[1]; // TODO : hacky to keep copying this regex around...
-		names.dialog.set(dialog[id].name, id);
+		names.dialog[dialog[id].name] = id;
 		i++;
 	}
 
