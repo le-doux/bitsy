@@ -21,7 +21,6 @@ var resourceFiles = [
 	"../editor/script/engine/font.js",
 	"../editor/script/engine/dialog.js",
 	"../editor/script/engine/script.js",
-	"../editor/script/engine/color_util.js",
 	"../editor/script/engine/renderer.js",
 	"../editor/script/engine/transition.js",
 ];
