@@ -238,7 +238,7 @@ function initSystem() {
 	drawingBuffers[textboxBufferId] = createDrawingBuffer(0, 0, textScale);
 }
 
-function loadGame(gameData) {
+function loadGame(gameData, defaultFontData) {
 	drawingBuffers[screenBufferId] = createDrawingBuffer(128, 128, scale);
 	drawingBuffers[textboxBufferId] = createDrawingBuffer(0, 0, textScale);
 
@@ -276,7 +276,8 @@ function loadGame(gameData) {
 	window.onblur = input.onblur;
 
 	if (onLoadFunction) {
-		onLoadFunction(gameData);
+		// todo : is this the right place to supply default font data?
+		onLoadFunction(gameData, defaultFontData);
 	}
 
 	updateInterval = setInterval(
@@ -347,6 +348,9 @@ function quitGame() {
 }
 
 /* graphics */
+var canvas;
+var ctx;
+
 var textScale = 2; // todo : move tile scale into here too?
 
 var curGraphicsMode = 0;
@@ -365,6 +369,13 @@ var DrawingInstruction = {
 	Clear : 2,
 	Textbox : 3,
 };
+
+function attachCanvas(c) {
+	canvas = c;
+	canvas.width = width * scale;
+	canvas.height = width * scale;
+	ctx = canvas.getContext("2d");
+}
 
 function createDrawingBuffer(width, height, scale) {
 	var buffer = {
@@ -495,20 +506,6 @@ function invalidateDrawingBuffer(buffer) {
 	buffer.canvas = null;
 }
 
-function debug_printTilemapMemory() {
-	var str = "";
-
-	for (var y = 0; y < 16; y++) {
-		for (var x = 0; x < 16; x++) {
-			var tileId = tilemapMemory[(y * 16) + x];
-			str += tileId + ",";
-		}
-		str += "\n";
-	}
-
-	console.log(str);
-}
-
 function hackForEditor_GetImageFromTileId(tileId) {
 	return drawingBuffers[tileId].canvas;
 }
@@ -568,7 +565,7 @@ function bitsySetColor(paletteIndex, r, g, b) {
 function bitsyDrawBegin(bufferId) {
 	curBufferId = bufferId;
 	var buffer = drawingBuffers[curBufferId];
-	buffer.canvas = null; // invalidate rendered version
+	invalidateDrawingBuffer(buffer);
 }
 
 function bitsyDrawEnd() {

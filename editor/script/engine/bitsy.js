@@ -1,8 +1,3 @@
-var xhr; // TODO : remove
-var canvas;
-var context; // TODO : remove if safe?
-var ctx;
-
 var room = {};
 var tile = {};
 var sprite = {};
@@ -135,32 +130,23 @@ var isPlayerEmbeddedInEditor = false;
 
 var renderer = new TileRenderer(tilesize);
 
-function getGameNameFromURL() {
-	var game = window.location.hash.substring(1);
-	// bitsyLog("game name --- " + game);
-	return game;
-}
-
-function attachCanvas(c) {
-	canvas = c;
-	canvas.width = width * scale;
-	canvas.height = width * scale;
-	ctx = canvas.getContext("2d");
-	dialogRenderer.AttachContext(ctx);
-}
-
 var curGameData = null;
-function load_game(game_data, startWithTitle) {
-	curGameData = game_data; //remember the current game (used to reset the game)
+var curDefaultFontData = null;
+
+function load_game(gameData, defaultFontData, startWithTitle) {
+	curGameData = gameData; //remember the current game (used to reset the game)
 
 	dialogBuffer.Reset();
 	scriptInterpreter.ResetEnvironment(); // ensures variables are reset -- is this the best way?
 
-	parseWorld(game_data);
+	parseWorld(gameData);
 
-	if (!isPlayerEmbeddedInEditor) {
+	if (!isPlayerEmbeddedInEditor && defaultFontData) {
+		curDefaultFontData = defaultFontData; // store for resetting game
+
+		// todo : consider replacing this with a more general system for requesting resources from the system?
 		// hack to ensure default font is available
-		fontManager.AddResource(defaultFontName + fontManager.GetExtension(), document.getElementById(defaultFontName).text.slice(1));
+		fontManager.AddResource(defaultFontName + fontManager.GetExtension(), defaultFontData);
 	}
 
 	var font = fontManager.Get( fontName );
@@ -179,7 +165,7 @@ function reset_cur_game() {
 
 	stopGame();
 	clearGameData();
-	load_game(curGameData);
+	load_game(curGameData, curDefaultFontData);
 
 	if (isPlayerEmbeddedInEditor && onGameReset != null) {
 		onGameReset();
@@ -230,99 +216,6 @@ function getOffset(evt) {
 
 function stopGame() {
 	bitsyLog("stop GAME!");
-}
-
-/* loading animation */
-var loading_anim_data = [
-	[
-		0,1,1,1,1,1,1,0,
-		0,0,1,1,1,1,0,0,
-		0,0,1,1,1,1,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,1,0,0,1,0,0,
-		0,0,1,0,0,1,0,0,
-		0,1,1,1,1,1,1,0,
-	],
-	[
-		0,1,1,1,1,1,1,0,
-		0,0,1,0,0,1,0,0,
-		0,0,1,1,1,1,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,1,0,0,1,0,0,
-		0,0,1,1,1,1,0,0,
-		0,1,1,1,1,1,1,0,
-	],
-	[
-		0,1,1,1,1,1,1,0,
-		0,0,1,0,0,1,0,0,
-		0,0,1,0,0,1,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,1,1,1,1,0,0,
-		0,0,1,1,1,1,0,0,
-		0,1,1,1,1,1,1,0,
-	],
-	[
-		0,1,1,1,1,1,1,0,
-		0,0,1,0,0,1,0,0,
-		0,0,1,0,0,1,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,1,1,1,1,0,0,
-		0,0,1,1,1,1,0,0,
-		0,1,1,1,1,1,1,0,
-	],
-	[
-		0,0,0,0,0,0,0,0,
-		1,0,0,0,0,0,0,1,
-		1,1,1,0,0,1,1,1,
-		1,1,1,1,1,0,0,1,
-		1,1,1,1,1,0,0,1,
-		1,1,1,0,0,1,1,1,
-		1,0,0,0,0,0,0,1,
-		0,0,0,0,0,0,0,0,
-	]
-];
-var loading_anim_frame = 0;
-var loading_anim_speed = 500;
-
-function loadingAnimation() {
-	//create image
-	var loadingAnimImg = ctx.createImageData(8*scale, 8*scale);
-	//draw image
-	for (var y = 0; y < 8; y++) {
-		for (var x = 0; x < 8; x++) {
-			var i = (y * 8) + x;
-			if (loading_anim_data[loading_anim_frame][i] == 1) {
-				//scaling nonsense
-				for (var sy = 0; sy < scale; sy++) {
-					for (var sx = 0; sx < scale; sx++) {
-						var pxl = 4 * ( (((y*scale)+sy) * (8*scale)) + ((x*scale)+sx) );
-						loadingAnimImg.data[pxl+0] = 255;
-						loadingAnimImg.data[pxl+1] = 255;
-						loadingAnimImg.data[pxl+2] = 255;
-						loadingAnimImg.data[pxl+3] = 255;
-					}
-				}
-			}
-		}
-	}
-	//put image on canvas
-	ctx.putImageData(loadingAnimImg,scale*(width/2 - 4),scale*(height/2 - 4));
-	//update frame
-	loading_anim_frame++;
-	if (loading_anim_frame >= 5) loading_anim_frame = 0;
-}
-
-function updateLoadingScreen() {
-	// TODO : in progress
-	ctx.fillStyle = "rgb(0,0,0)";
-	ctx.fillRect(0,0,canvas.width,canvas.height);
-
-	loadingAnimation();
-	drawSprite( getSpriteFrame(sprite["a"],0), 8, 8, ctx );
 }
 
 function update() {
@@ -1757,11 +1650,8 @@ function clearRoom() {
 	bitsyDrawEnd();
 }
 
-function drawRoom(room, context, frameIndex) { // context & frameIndex are optional
-	if (!context) { //optional pass in context; otherwise, use default (ok this is REAL hacky isn't it)
-		context = ctx;
-	}
-
+// TODO : what do I do with the pass in context?
+function drawRoom(room, TODO_UNUSED_CONTEXT, frameIndex) { // context & frameIndex are optional
 	// if (room.id != debugLastRoomDrawn) {
 	// 	debugLastRoomDrawn = room.id;
 	// 	bitsyLog("DRAW ROOM " + debugLastRoomDrawn);

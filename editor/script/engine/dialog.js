@@ -12,7 +12,6 @@ var DialogRenderer = function() {
 
 	// TODO : refactor this eventually? remove everything from struct.. avoid the defaults?
 	var textboxInfo = {
-		img : null,
 		width : 104,
 		height : 8+4+2+5, //8 for text, 4 for top-bottom padding, 2 for line padding, 5 for arrow
 		top : 12,
@@ -28,9 +27,8 @@ var DialogRenderer = function() {
 	this.SetFont = function(f) {
 		font = f;
 		textboxInfo.height = (textboxInfo.padding_vert * 3) + (relativeFontHeight() * 2) + textboxInfo.arrow_height;
-		textboxInfo.img = context.createImageData(textboxInfo.width*scale, textboxInfo.height*scale);
 
-		// todo : replace the old method of textbox rendering
+		// todo : clean up all the scale stuff
 		var textboxScaleW = textboxInfo.width / textboxInfo.font_scale;
 		var textboxScaleH = textboxInfo.height / textboxInfo.font_scale;
 		bitsySetTextboxSize(textboxScaleW, textboxScaleH);
@@ -47,11 +45,6 @@ var DialogRenderer = function() {
 	function relativeFontHeight() {
 		return Math.ceil( font.getHeight() * textboxInfo.font_scale );
 	}
-
-	var context = null;
-	this.AttachContext = function(c) {
-		context = c;
-	};
 
 	this.ClearTextbox = function() {
 		bitsyDrawBegin(1);

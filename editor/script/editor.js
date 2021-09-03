@@ -1741,8 +1741,6 @@ function on_play_mode() {
 
 	roomTool.unlistenEditEvents();
 
-	// load_game(document.getElementById("game_data").value, !isPreviewDialogMode /* startWithTitle */);
-	// load_game(getFullGameData(), !isPreviewDialogMode /* startWithTitle */);
 	loadGame(getFullGameData());
 }
 
