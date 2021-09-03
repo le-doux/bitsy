@@ -1,6 +1,6 @@
 /* logging */
 var DebugLogCategory = {
-	bitsy : true,
+	bitsy : false,
 	editor : false,
 };
 

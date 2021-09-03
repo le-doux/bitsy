@@ -159,7 +159,7 @@ function hexColorDistance(hex1,hex2) {
 	return rgbColorDistance(color1.r, color1.g, color1.b, color2.r, color2.g, color2.b);
 }
 
-function renderGameScreenIntoContext(room, context, frameIndex) {
+function renderGameScreenIntoContext(roomId, context, frameIndex) {
 	var tmpCtx = ctx;
 
 	// temporarily swap out the global drawing context! (what time is it???? half past hacks o'clock!!)
@@ -168,9 +168,11 @@ function renderGameScreenIntoContext(room, context, frameIndex) {
 	}
 
 	bitsySetGraphicsMode(1); // tile mode
-	drawRoom(room, frameIndex);
+	updatePalette(room[roomId].pal);
+	drawRoom(room[roomId], frameIndex);
 	renderGame();
 
+	updatePalette(curPal());
 	ctx = tmpCtx;
 }
 
