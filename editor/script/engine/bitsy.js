@@ -1650,8 +1650,7 @@ function clearRoom() {
 	bitsyDrawEnd();
 }
 
-// TODO : what do I do with the pass in context?
-function drawRoom(room, TODO_UNUSED_CONTEXT, frameIndex) { // context & frameIndex are optional
+function drawRoom(room, frameIndex) { // frameIndex is optional
 	// if (room.id != debugLastRoomDrawn) {
 	// 	debugLastRoomDrawn = room.id;
 	// 	bitsyLog("DRAW ROOM " + debugLastRoomDrawn);

@@ -2591,10 +2591,10 @@ function takeSnapshotGif(e) {
 	gifCaptureCanvas.width = 512; // stop hardcoding 512?
 	gifCaptureCanvas.height = 512;
 
-	drawRoom( room[curRoom], gifCaptureCtx, 0 );
+	drawRoomIntoContext( room[curRoom], gifCaptureCtx, 0 );
 	var frame0 = gifCaptureCtx.getImageData(0,0,512,512);
 
-	drawRoom( room[curRoom], gifCaptureCtx, 1 );
+	drawRoomIntoContext( room[curRoom], gifCaptureCtx, 1 );
 	var frame1 = gifCaptureCtx.getImageData(0,0,512,512);
 
 	if (isGifSnapshotLandscape) {

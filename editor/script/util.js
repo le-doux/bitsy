@@ -159,6 +159,16 @@ function hexColorDistance(hex1,hex2) {
 	return rgbColorDistance(color1.r, color1.g, color1.b, color2.r, color2.g, color2.b);
 }
 
+function drawRoomIntoContext(room, context, frameIndex) {
+	// temporarily swap out the global drawing context! (what time is it???? half past hacks o'clock!!)
+	var tmpCtx = ctx;
+	ctx = context;
+
+	drawRoom(room, frameIndex);
+
+	ctx = tmpCtx;
+}
+
 
 // source : http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
 /* accepts parameters
