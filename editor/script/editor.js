@@ -1200,6 +1200,10 @@ function selectRoom(roomId) {
 	if (nextRoomIndex != -1) {
 		roomIndex = nextRoomIndex;
 		curRoom = ids[roomIndex];
+
+		// hacky engine call oh well
+		// initRoom(curRoom);
+
 		markerTool.SetRoom(curRoom);
 		roomTool.drawEditMap();
 		paintTool.updateCanvas();
@@ -2591,10 +2595,10 @@ function takeSnapshotGif(e) {
 	gifCaptureCanvas.width = 512; // stop hardcoding 512?
 	gifCaptureCanvas.height = 512;
 
-	drawRoomIntoContext( room[curRoom], gifCaptureCtx, 0 );
+	renderGameScreenIntoContext(room[curRoom], gifCaptureCtx, 0);
 	var frame0 = gifCaptureCtx.getImageData(0,0,512,512);
 
-	drawRoomIntoContext( room[curRoom], gifCaptureCtx, 1 );
+	renderGameScreenIntoContext(room[curRoom], gifCaptureCtx, 1);
 	var frame1 = gifCaptureCtx.getImageData(0,0,512,512);
 
 	if (isGifSnapshotLandscape) {

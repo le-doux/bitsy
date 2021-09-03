@@ -250,7 +250,9 @@ function RoomTool(canvas) {
 
 	this.drawEditMap = function() {
 		//draw map
-		drawRoom( room[curRoom] );
+		bitsySetGraphicsMode(1);
+		drawRoom(room[curRoom]);
+		renderGame();
 
 		//draw grid
 		if (self.drawMapGrid) {

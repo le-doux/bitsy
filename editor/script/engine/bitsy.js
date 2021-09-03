@@ -554,6 +554,7 @@ function updatePalette(palId) {
 	bitsySetColor(0, 0, 0, 0); // black
 	bitsySetColor(1, 255, 255, 255); // white
 
+	// todo : move this to game init?
 	// rainbow colors
 	for (var i = 0; i < rainbowColorCount; i++) {
 		var color = rainbowColors[i];
