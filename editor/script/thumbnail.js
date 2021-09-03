@@ -13,13 +13,13 @@ function ThumbnailRenderer() {
 
 	function thumbnailGetImage(drawing, palId, frameIndex) {
 		if(drawing.type === TileType.Sprite || drawing.type === TileType.Avatar) {
-			return getSpriteImage(sprite[drawing.id],palId,frameIndex);
+			return getSpriteFrame(sprite[drawing.id],frameIndex);
 		}
 		else if(drawing.type === TileType.Item) {
-			return getItemImage(item[drawing.id],palId,frameIndex);
+			return getItemFrame(item[drawing.id],frameIndex);
 		}
 		else if(drawing.type === TileType.Tile) {
-			return getTileImage(tile[drawing.id],palId,frameIndex);
+			return getTileFrame(tile[drawing.id],frameIndex);
 		}
 		return null;
 	}
@@ -218,7 +218,7 @@ function createDrawingThumbnailRenderer(source) {
 		if (drawing && drawing.id in source) {
 			for (var i = 0; i < drawing.animation.frameCount; i++) {
 				if (options.isAnimated || options.frameIndex === i) {
-					var imageTileId = renderer.GetImage(drawing, palId, i);
+					var imageTileId = renderer.GetDrawingFrame(drawing, i);
 					// todo : bug! this still doesn't totally work because the images aren't always rendered to a canvas by now
 					var renderedImg = hackForEditor_GetImageFromTileId(imageTileId);
 

@@ -133,7 +133,7 @@ var onInitRoom = null;
 
 var isPlayerEmbeddedInEditor = false;
 
-var renderer = new Renderer(tilesize, scale);
+var renderer = new TileRenderer(tilesize);
 
 function getGameNameFromURL() {
 	var game = window.location.hash.substring(1);
@@ -147,7 +147,6 @@ function attachCanvas(c) {
 	canvas.height = width * scale;
 	ctx = canvas.getContext("2d");
 	dialogRenderer.AttachContext(ctx);
-	renderer.AttachContext(ctx);
 }
 
 var curGameData = null;
@@ -323,7 +322,7 @@ function updateLoadingScreen() {
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 
 	loadingAnimation();
-	drawSprite( getSpriteImage(sprite["a"],"0",0), 8, 8, ctx );
+	drawSprite( getSpriteFrame(sprite["a"],0), 8, 8, ctx );
 }
 
 function update() {
@@ -922,8 +921,6 @@ function parseWorld(file) {
 		initRoom(curRoom);
 	}
 
-	renderer.SetPalettes(palette);
-
 	scriptCompatibility(compatibilityFlags);
 
 	return versionNumber;
@@ -1173,17 +1170,17 @@ function serializeWorld(skipFonts) {
 }
 
 function serializeDrawing(drwId) {
-	var imageSource = renderer.GetImageSource(drwId);
+	var drawingData = renderer.GetDrawingSource(drwId);
 	var drwStr = "";
-	for (f in imageSource) {
-		for (y in imageSource[f]) {
+	for (f in drawingData) {
+		for (y in drawingData[f]) {
 			var rowStr = "";
-			for (x in imageSource[f][y]) {
-				rowStr += imageSource[f][y][x];
+			for (x in drawingData[f][y]) {
+				rowStr += drawingData[f][y][x];
 			}
 			drwStr += rowStr + "\n";
 		}
-		if (f < (imageSource.length-1)) drwStr += ">\n";
+		if (f < (drawingData.length-1)) drwStr += ">\n";
 	}
 	return drwStr;
 }
@@ -1590,7 +1587,7 @@ function parseDrawingCore(lines, i, drwId) {
 		}
 	}
 
-	renderer.SetImageSource(drwId, frameList);
+	renderer.SetDrawingSource(drwId, frameList);
 
 	return i;
 }
@@ -1760,7 +1757,7 @@ function clearRoom() {
 	bitsyDrawEnd();
 }
 
-function drawRoom(room,context,frameIndex) { // context & frameIndex are optional
+function drawRoom(room, context, frameIndex) { // context & frameIndex are optional
 	if (!context) { //optional pass in context; otherwise, use default (ok this is REAL hacky isn't it)
 		context = ctx;
 	}
@@ -1770,15 +1767,9 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	// 	bitsyLog("DRAW ROOM " + debugLastRoomDrawn);
 	// }
 
-	var paletteId = "default";
-
 	if (room === undefined) {
 		// protect against invalid rooms
 		return;
-	}
-
-	if (room.pal != null && palette[paletteId] != undefined) {
-		paletteId = room.pal;
 	}
 
 	// clear the screen buffer
@@ -1801,7 +1792,7 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 				}
 				else {
 					// bitsyLog(id);
-					drawTile(getTileImage(tile[id], paletteId, frameIndex), x, y);
+					drawTile(getTileFrame(tile[id], frameIndex), x, y);
 				}
 			}
 		}
@@ -1810,29 +1801,29 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	//draw items
 	for (var i = 0; i < room.items.length; i++) {
 		var itm = room.items[i];
-		drawItem(getItemImage(item[itm.id], paletteId, frameIndex), itm.x, itm.y);
+		drawItem(getItemFrame(item[itm.id], frameIndex), itm.x, itm.y);
 	}
 
 	//draw sprites
 	for (id in sprite) {
 		var spr = sprite[id];
 		if (spr.room === room.id) {
-			drawSprite(getSpriteImage(spr, paletteId, frameIndex), spr.x, spr.y);
+			drawSprite(getSpriteFrame(spr, frameIndex), spr.x, spr.y);
 		}
 	}
 }
 
 // TODO : remove these get*Image methods
-function getTileImage(t,palId,frameIndex) {
-	return renderer.GetImage(t,palId,frameIndex);
+function getTileFrame(t, frameIndex) {
+	return renderer.GetDrawingFrame(t, frameIndex);
 }
 
-function getSpriteImage(s,palId,frameIndex) {
-	return renderer.GetImage(s,palId,frameIndex);
+function getSpriteFrame(s, frameIndex) {
+	return renderer.GetDrawingFrame(s, frameIndex);
 }
 
-function getItemImage(itm,palId,frameIndex) {
-	return renderer.GetImage(itm,palId,frameIndex);
+function getItemFrame(itm, frameIndex) {
+	return renderer.GetDrawingFrame(itm, frameIndex);
 }
 
 function curPal() {

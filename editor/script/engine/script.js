@@ -727,7 +727,13 @@ var Environment = function() {
 		onVariableChangeHandler = onVariableChange;
 	}
 	this.GetVariableNames = function() {
-		return Array.from( variableMap.keys() );
+		var variableNames = [];
+
+		for (var key in variableMap) {
+			variableNames.push(key);
+		}
+
+		return variableNames;
 	}
 }
 

@@ -202,7 +202,7 @@ function makeDrawing(id, imageData) {
 		];
 	}
 
-	renderer.SetImageSource(id, imageData);
+	renderer.SetDrawingSource(id, imageData);
 }
 
 /* EVENTS */
@@ -2977,10 +2977,10 @@ function removeItemAnimation() {
 }
 
 function addDrawingAnimation(drwId, frameData) {
-	var imageSource = renderer.GetImageSource(drwId);
+	var drawingSource = renderer.GetDrawingSource(drwId);
 
 	if (!frameData) {
-		var firstFrame = imageSource[0];
+		var firstFrame = drawingSource[0];
 
 		// copy first frame data into second frame
 		frameData = [];
@@ -2992,22 +2992,22 @@ function addDrawingAnimation(drwId, frameData) {
 		}
 	}
 
-	imageSource[1] = frameData;
+	drawingSource[1] = frameData;
 
-	renderer.SetImageSource(drwId, imageSource);
+	renderer.SetDrawingSource(drwId, drawingSource);
 }
 
 function removeDrawingAnimation(drwId) {
-	var imageSource = renderer.GetImageSource(drwId);
-	var oldImageData = imageSource.slice(0);
-	renderer.SetImageSource(drwId, [oldImageData[0]]);
+	var drawingData = renderer.GetDrawingSource(drwId);
+	var oldDrawingData = drawingData.slice(0);
+	renderer.SetDrawingSource(drwId, [oldDrawingData[0]]);
 }
 
 // let's us restore the animation during the session if the user wants it back
 function cacheDrawingAnimation(drawing, sourceId) {
-	var imageSource = renderer.GetImageSource(sourceId);
-	var oldImageData = imageSource.slice(0);
-	drawing.cachedAnimation = [oldImageData[1]]; // ah the joys of javascript
+	var drawingData = renderer.GetDrawingSource(sourceId);
+	var oldDrawingData = drawingData.slice(0);
+	drawing.cachedAnimation = [oldDrawingData[1]]; // ah the joys of javascript
 }
 
 function on_paint_frame1() {

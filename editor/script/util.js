@@ -57,8 +57,9 @@ var TileType = {
 	Item : "ITM",
 };
 
+// todo : rename function
 function getDrawingImageSource(drawing) {
-	return renderer.GetImageSource(drawing.drw);
+	return renderer.GetDrawingSource(drawing.drw);
 }
 
 function getDrawingFrameData(drawing, frameIndex) {

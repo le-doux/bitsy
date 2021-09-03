@@ -399,7 +399,7 @@ var TransitionManager = function() {
 
 				if (id != "0" && tile[id] != null) {
 					drawTileInPixelBuffer(
-						renderer.GetImageSource(tile[id].drw),
+						renderer.GetDrawingSource(tile[id].drw),
 						tile[id].animation.frameIndex,
 						tile[id].col,
 						x,
@@ -413,7 +413,7 @@ var TransitionManager = function() {
 		for (var i = 0; i < room.items.length; i++) {
 			var itm = room.items[i];
 			drawTileInPixelBuffer(
-				renderer.GetImageSource(item[itm.id].drw),
+				renderer.GetDrawingSource(item[itm.id].drw),
 				item[itm.id].animation.frameIndex,
 				item[itm.id].col,
 				itm.x,
@@ -426,7 +426,7 @@ var TransitionManager = function() {
 			var spr = sprite[id];
 			if (spr.room === room.id) {
 				drawTileInPixelBuffer(
-					renderer.GetImageSource(spr.drw),
+					renderer.GetDrawingSource(spr.drw),
 					spr.animation.frameIndex,
 					spr.col,
 					spr.x,

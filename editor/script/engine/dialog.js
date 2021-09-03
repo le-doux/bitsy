@@ -440,14 +440,14 @@ var DialogBuffer = function() {
 	function DialogDrawingChar(drawingId, effectList) {
 		Object.assign(this, new DialogChar(effectList));
 
-		var imageData = renderer.GetImageSource(drawingId)[0];
-		var imageDataFlat = [];
-		for (var i = 0; i < imageData.length; i++) {
-			// bitsyLog(imageData[i]);
-			imageDataFlat = imageDataFlat.concat(imageData[i]);
+		// get the first frame of the drawing and flatten it
+		var drawingData = renderer.GetDrawingSource(drawingId)[0];
+		var drawingDataFlat = [];
+		for (var i = 0; i < drawingData.length; i++) {
+			drawingDataFlat = drawingDataFlat.concat(drawingData[i]);
 		}
 
-		this.bitmap = imageDataFlat;
+		this.bitmap = drawingDataFlat;
 		this.width = 8;
 		this.height = 8;
 		this.spacing = 8;
