@@ -530,11 +530,13 @@ function movePlayerThroughExit(ext) {
 	}
 }
 
-// todo : where should this be stored?
-var tileColorStartIndex = 16;
+/* PALETTE INDICES */
+var textBackgroundIndex = 0;
+var textArrowIndex = 1;
+var textColorIndex = 2;
 
 // precalculated rainbow colors
-var rainbowColorStartIndex = 2;
+var rainbowColorStartIndex = 3;
 var rainbowColorCount = 10;
 var rainbowColors = [
 	[255,0,0],
@@ -549,10 +551,14 @@ var rainbowColors = [
 	[255,0,61],
 ];
 
+// todo : where should this be stored?
+var tileColorStartIndex = 16;
+
 function updatePalette(palId) {
 	// textbox colors
-	bitsySetColor(0, 0, 0, 0); // black
-	bitsySetColor(1, 255, 255, 255); // white
+	bitsySetColor(textBackgroundIndex, 0, 0, 0); // black
+	bitsySetColor(textArrowIndex, 255, 255, 255); // white
+	bitsySetColor(textColorIndex, 255, 255, 255); // white
 
 	// todo : move this to game init?
 	// rainbow colors

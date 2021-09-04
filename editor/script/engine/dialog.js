@@ -48,7 +48,7 @@ var DialogRenderer = function() {
 
 	this.ClearTextbox = function() {
 		bitsyDrawBegin(1);
-		bitsyClear(0);
+		bitsyClear(textBackgroundIndex);
 		bitsyDrawEnd();
 	};
 
@@ -99,7 +99,7 @@ var DialogRenderer = function() {
 					//scaling nonsense
 					for (var sy = 0; sy < text_scale; sy++) {
 						for (var sx = 0; sx < text_scale; sx++) {
-							bitsyDrawPixel(1, left + (x * text_scale) + sx, top + (y * text_scale) + sy);
+							bitsyDrawPixel(textArrowIndex, left + (x * text_scale) + sx, top + (y * text_scale) + sy);
 						}
 					}
 				}
@@ -374,7 +374,7 @@ var DialogBuffer = function() {
 	function DialogChar(effectList) {
 		this.effectList = effectList.slice(); // clone effect list (since it can change between chars)
 
-		this.color = 1; // white
+		this.color = textColorIndex; // white
 		this.offset = { x:0, y:0 }; // in pixels (screen pixels?)
 
 		this.col = 0;
