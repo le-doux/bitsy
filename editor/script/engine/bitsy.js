@@ -417,7 +417,9 @@ var curPlayerDirection = Direction.None;
 var playerHoldToMoveTimer = 0;
 
 function movePlayer(direction) {
-	if (player().room == null || !Object.keys(room).includes(player().room)) {
+	var roomIds = Object.keys(room);
+
+	if (player().room == null || roomIds.indexOf(player().room) < 0) {
 		return; // player room is missing or invalid.. can't move them!
 	}
 
@@ -806,7 +808,7 @@ function parseWorld(file) {
 	placeSprites();
 
 	var roomIds = Object.keys(room);
-	if (player() != undefined && player().room != null && roomIds.includes(player().room)) {
+	if (player() != undefined && player().room != null && roomIds.indexOf(player().room) < 0) {
 		// player has valid room
 		curRoom = player().room;
 	}
