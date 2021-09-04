@@ -11,28 +11,31 @@ function ThumbnailRenderer() {
 	var thumbnailRenderEncoders = {};
 	var cache = {};
 
-	function thumbnailGetImage(drawing, palId, frameIndex) {
-		if(drawing.type === TileType.Sprite || drawing.type === TileType.Avatar) {
-			return getSpriteFrame(sprite[drawing.id],frameIndex);
+	function thumbnailGetImage(drawing, frameIndex) {
+		if (drawing.type === TileType.Sprite || drawing.type === TileType.Avatar) {
+			return getSpriteFrame(sprite[drawing.id], frameIndex);
 		}
 		else if(drawing.type === TileType.Item) {
-			return getItemFrame(item[drawing.id],frameIndex);
+			return getItemFrame(item[drawing.id], frameIndex);
 		}
 		else if(drawing.type === TileType.Tile) {
-			return getTileFrame(tile[drawing.id],frameIndex);
+			return getTileFrame(tile[drawing.id], frameIndex);
 		}
 		return null;
 	}
 
-	function thumbnailDraw(drawing, context, x, y, palId, frameIndex) {
-		if(drawing.type === TileType.Sprite || drawing.type === TileType.Avatar) {
-			return drawSprite(thumbnailGetImage(drawing,palId,frameIndex),x,y,context);
+	function thumbnailDraw(drawing, context, x, y, frameIndex) {
+		bitsyLog("thumbnail: " + drawing.type + " " + drawing.id + " f:" + frameIndex, "editor");
+		var imageTileId = renderer.GetDrawingFrame(drawing, frameIndex);
+		bitsyLog("tile id: " + imageTileId, "editor");
+
+		var renderedImg = hackForEditor_GetImageFromTileId(imageTileId);
+
+		if (renderedImg) {
+			context.drawImage(renderedImg, x, y, tilesize * scale, tilesize * scale);
 		}
-		else if(drawing.type === TileType.Item) {
-			return drawItem(thumbnailGetImage(drawing,palId,frameIndex),x,y,context);
-		}
-		else if(drawing.type === TileType.Tile) {
-			return drawTile(thumbnailGetImage(drawing,palId,frameIndex),x,y,context);
+		else {
+			bitsyLog("oh no! image render for thumbnail failed", "editor");
 		}
 	}
 
@@ -53,11 +56,11 @@ function ThumbnailRenderer() {
 		var drawingFrameData = [];
 
 		if( isAnimated || frameIndex == 0 ) {
-			thumbnailDraw(drawing, drawingThumbnailCtx, 0, 0, palId, 0 /*frameIndex*/);
+			thumbnailDraw(drawing, drawingThumbnailCtx, 0, 0, 0 /*frameIndex*/);
 			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 		}
 		if( isAnimated || frameIndex == 1 ) {
-			thumbnailDraw(drawing, drawingThumbnailCtx, 0, 0, palId, 1 /*frameIndex*/);
+			thumbnailDraw(drawing, drawingThumbnailCtx, 0, 0, 1 /*frameIndex*/);
 			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
 		}
 

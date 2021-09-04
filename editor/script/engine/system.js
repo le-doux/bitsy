@@ -1,7 +1,7 @@
 /* logging */
 var DebugLogCategory = {
-	bitsy : false,
-	editor : false,
+	bitsy : true,
+	editor : true,
 };
 
 /* input */
