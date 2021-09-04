@@ -1,3 +1,6 @@
+v.7.9:
+- improve exit tool layout (all menus open)
+
 v7.8:
 - play mode is more visually distinct
 - tools are disabled during play mode
