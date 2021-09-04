@@ -33,6 +33,8 @@ var InputManager = function() {
 	var ignored;
 	var touchState;
 
+	var isRestartComboPressed = false;
+
 	var SwipeDir = {
 		None : -1,
 		Up : 0,
@@ -42,6 +44,8 @@ var InputManager = function() {
 	};
 
 	function resetAll() {
+		isRestartComboPressed = false;
+
 		pressed = {};
 		ignored = {};
 
@@ -56,6 +60,7 @@ var InputManager = function() {
 			tapReleased : false
 		};
 	}
+
 	resetAll();
 
 	function stopWindowScrolling(e) {
@@ -63,13 +68,8 @@ var InputManager = function() {
 			e.preventDefault();
 	}
 
-	function tryRestartGame(e) {
-		/* RESTART GAME */
-		if ( e.keyCode === key.r && ( e.getModifierState("Control") || e.getModifierState("Meta") ) ) {
-			if ( confirm("Restart the game?") ) {
-				reset_cur_game();
-			}
-		}
+	function isRestartCombo(e) {
+		return (e.keyCode === key.r && (e.getModifierState("Control")|| e.getModifierState("Meta")));
 	}
 
 	function eventIsModifier(event) {
@@ -94,7 +94,7 @@ var InputManager = function() {
 
 		stopWindowScrolling(event);
 
-		tryRestartGame(event);
+		isRestartComboPressed = isRestartCombo(event);
 
 		// Special keys being held down can interfere with keyup events and lock movement
 		// so just don't collect input when they're held
@@ -197,6 +197,10 @@ var InputManager = function() {
 		return anyKey;
 	}
 
+	this.isRestartComboPressed = function() {
+		return isRestartComboPressed;
+	}
+
 	this.swipeLeft = function() {
 		return touchState.swipeDirection == SwipeDir.Left;
 	}
@@ -225,6 +229,8 @@ var InputManager = function() {
 		// bitsyLog("~~~ BLUR ~~", "system");
 		resetAll();
 	}
+
+	this.resetAll = resetAll;
 }
 
 var input = new InputManager();
@@ -292,6 +298,15 @@ function loadGame(gameData, defaultFontData) {
 			renderGame();
 
 			input.resetTapReleased();
+
+			if (bitsyGetButton(5)) {
+				if (confirm("Restart the game?")) {
+					input.resetAll();
+					reset_cur_game();
+				}
+
+				return;
+			}
 		},
 		16);
 }
@@ -561,6 +576,8 @@ function bitsyGetButton(buttonCode) {
 			return ((input.isKeyDown(key.right) || input.isKeyDown(key.d) || input.swipeRight()));
 		case 4: // OK (equivalent to "any key" on the keyboard or "tap" on touch screen)
 			return (input.anyKeyDown() || input.isTapReleased());
+		case 5: // MENU / RESTART (restart the game: "ctrl+r" on keyboard, no touch control yet)
+			return input.isRestartComboPressed();
 	}
 
 	return false;
