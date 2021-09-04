@@ -1,11 +1,11 @@
 /* logging */
 var DebugLogCategory = {
 	system: false,
-	bitsy : true,
+	bitsy : false,
 	editor : false,
 };
 
-var isLoggingVerbose = true;
+var isLoggingVerbose = false;
 
 /* input */
 var key = {
@@ -297,7 +297,7 @@ function loadGame(gameData, defaultFontData) {
 }
 
 function renderGame() {
-	bitsyLog("render game mode=" + curGraphicsMode, "system");
+	// bitsyLog("render game mode=" + curGraphicsMode, "system");
 
 	var startIndex = curGraphicsMode === 0 ? screenBufferId : (drawingBuffers.length - 1);
 
@@ -471,7 +471,7 @@ function renderTextboxInstruction(bufferId, buffer, x, y) {
 }
 
 function renderDrawingBuffer(bufferId, buffer) {
-	bitsyLog("render buffer " + bufferId, "system");
+	// bitsyLog("render buffer " + bufferId, "system");
 
 	// if (bufferId === 0) {
 	// 	bitsyLog("instructions " + buffer.instructions.length, "system");
@@ -510,6 +510,16 @@ function invalidateDrawingBuffer(buffer) {
 }
 
 function hackForEditor_GetImageFromTileId(tileId) {
+	if (tileId === undefined || !drawingBuffers[tileId]) {
+		bitsyLog("editor hack::invalid tile id!", "system");
+		return null;
+	}
+
+	// force render the buffer if it hasn't been
+	if (drawingBuffers[tileId].canvas === null) {
+		renderDrawingBuffer(tileId, drawingBuffers[tileId]);
+	}
+
 	return drawingBuffers[tileId].canvas;
 }
 
@@ -630,6 +640,15 @@ function bitsyAddTile() {
 	drawingBuffers[tileBufferId] = createDrawingBuffer(tilesize, tilesize, scale);
 
 	return tileBufferId;
+}
+
+// clears all tile buffers
+function bitsyResetTiles() {
+	bitsyLog("RESET TILES", "system");
+	// bitsyLog(drawingBuffers, "system");
+	// bitsyLog(tileStartBufferId, "system");
+	// bitsyLog(drawingBuffers.slice(tileStartBufferId), "system");
+	drawingBuffers = drawingBuffers.slice(0, tileStartBufferId);
 }
 
 // note: width and height are in text scale pixels

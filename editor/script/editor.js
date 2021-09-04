@@ -537,8 +537,8 @@ function setDefaultGameState() {
 	clearGameData();
 	parseWorld(document.getElementById("game_data").value); // load game
 
-	// TODO RENDERER : refresh images
-	// TODO -- more setup???
+	// refresh images
+	renderer.ClearCache();
 }
 
 function newGameDialog() {
@@ -570,7 +570,9 @@ function resetGameData() {
 
 	refreshGameData();
 
-	// TODO RENDERER : refresh images
+	// refresh images
+	renderer.ClearCache();
+
 	updateExitOptionsFromGameData();
 	updateRoomName();
 	updateInventoryUI();
@@ -2111,7 +2113,8 @@ function on_game_data_change_core() {
 		makeItem("0");
 	}
 
-	// TODO RENDERER : refresh images
+	// refresh images
+	renderer.ClearCache();
 
 	roomIndex = 0;
 	roomTool.drawEditMap();
@@ -2837,7 +2840,8 @@ function addSpriteAnimation() {
 		addDrawingAnimation(spriteImageId);
 	}
 
-	// TODO RENDERER : refresh images
+	// refresh images
+	renderer.ClearCache();
 
 	//refresh data model
 	refreshGameData();
@@ -2861,7 +2865,8 @@ function removeSpriteAnimation() {
 	cacheDrawingAnimation( sprite[drawing.id], spriteImageId );
 	removeDrawingAnimation( spriteImageId );
 
-	// TODO RENDERER : refresh images
+	// refresh images
+	renderer.ClearCache();
 
 	//refresh data model
 	refreshGameData();
@@ -2890,7 +2895,8 @@ function addTileAnimation() {
 		addDrawingAnimation(tileImageId);
 	}
 
-	// TODO RENDERER : refresh images
+	// refresh images
+	renderer.ClearCache();
 
 	//refresh data model
 	refreshGameData();
@@ -2914,7 +2920,8 @@ function removeTileAnimation() {
 	cacheDrawingAnimation( tile[drawing.id], tileImageId );
 	removeDrawingAnimation( tileImageId );
 
-	// TODO RENDERER : refresh images
+	// refresh images
+	renderer.ClearCache();
 
 	//refresh data model
 	refreshGameData();
@@ -2944,7 +2951,8 @@ function addItemAnimation() {
 		addDrawingAnimation(itemImageId);
 	}
 
-	// TODO RENDERER : refresh images
+	// refresh images
+	renderer.ClearCache();
 
 	//refresh data model
 	refreshGameData();
@@ -2968,7 +2976,8 @@ function removeItemAnimation() {
 	cacheDrawingAnimation( item[drawing.id], itemImageId );
 	removeDrawingAnimation( itemImageId );
 
-	// TODO RENDERER : refresh images
+	// refresh images
+	renderer.ClearCache();
 
 	//refresh data model (TODO : these should really be a shared method)
 	refreshGameData();

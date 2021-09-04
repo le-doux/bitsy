@@ -120,6 +120,7 @@ this.GetFrameCount = function(drawingId) {
 }
 
 this.ClearCache = function() {
+	bitsyResetTiles();
 	drawingCache.render = {};
 }
 

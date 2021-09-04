@@ -573,6 +573,8 @@ function updatePalette(palId) {
 function initRoom(roomId) {
 	bitsyLog("init room " + roomId);
 
+	renderer.ClearCache();
+
 	updatePalette(curPal());
 
 	// init exit properties
