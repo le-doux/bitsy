@@ -1,8 +1,11 @@
 /* logging */
 var DebugLogCategory = {
+	system: false,
 	bitsy : true,
-	editor : true,
+	editor : false,
 };
+
+var isLoggingVerbose = true;
 
 /* input */
 var key = {
@@ -81,13 +84,13 @@ var InputManager = function() {
 		for (var key in pressed) {
 			if (pressed[key]) { // only ignore keys that are actually held
 				ignored[key] = true;
-				// bitsyLog("IGNORE -- " + key);
+				// bitsyLog("IGNORE -- " + key, "system");
 			}
 		}
 	}
 
 	this.onkeydown = function(event) {
-		// bitsyLog("KEYDOWN -- " + event.keyCode);
+		// bitsyLog("KEYDOWN -- " + event.keyCode, "system");
 
 		stopWindowScrolling(event);
 
@@ -114,7 +117,7 @@ var InputManager = function() {
 	}
 
 	this.onkeyup = function(event) {
-		// bitsyLog("KEYUP -- " + event.keyCode);
+		// bitsyLog("KEYUP -- " + event.keyCode, "system");
 		pressed[event.keyCode] = false;
 		ignored[event.keyCode] = false;
 	}
@@ -219,7 +222,7 @@ var InputManager = function() {
 	}
 
 	this.onblur = function() {
-		// bitsyLog("~~~ BLUR ~~");
+		// bitsyLog("~~~ BLUR ~~", "system");
 		resetAll();
 	}
 }
@@ -294,7 +297,7 @@ function loadGame(gameData, defaultFontData) {
 }
 
 function renderGame() {
-	bitsyLog("render game mode=" + curGraphicsMode);
+	bitsyLog("render game mode=" + curGraphicsMode, "system");
 
 	var startIndex = curGraphicsMode === 0 ? screenBufferId : (drawingBuffers.length - 1);
 
@@ -395,7 +398,7 @@ function renderPixelInstruction(bufferId, buffer, paletteIndex, x, y) {
 	}
 
 	if (!systemPalette[paletteIndex]) {
-		// bitsyLog("invalid index " + paletteIndex + " @ " + x + "," + y);
+		// bitsyLog("invalid index " + paletteIndex + " @ " + x + "," + y, "system");
 		return;
 	}
 
@@ -468,10 +471,10 @@ function renderTextboxInstruction(bufferId, buffer, x, y) {
 }
 
 function renderDrawingBuffer(bufferId, buffer) {
-	bitsyLog("render buffer " + bufferId);
+	bitsyLog("render buffer " + bufferId, "system");
 
 	// if (bufferId === 0) {
-	// 	bitsyLog("instructions " + buffer.instructions.length);
+	// 	bitsyLog("instructions " + buffer.instructions.length, "system");
 	// }
 
 	buffer.canvas = document.createElement("canvas");
@@ -516,8 +519,23 @@ function bitsyLog(message, category) {
 		category = "bitsy";
 	}
 
+	var summary = category + "::" + message;
+
 	if (DebugLogCategory[category] === true) {
-		console.log(category + "::" + message);
+		if (isLoggingVerbose) {
+			console.group(summary);
+
+			console.dir(message);
+
+			console.group("stack")
+			console.trace();
+			console.groupEnd();
+
+			console.groupEnd();
+		}
+		else {
+			console.log(summary);
+		}
 	}
 }
 

@@ -93,10 +93,10 @@ function getDrawingFrameTileId(drawing, frameOverride) {
 }
 
 function getOrRenderDrawingFrame(drawing, frameOverride) {
-	bitsyLog("frame render: " + drawing.type + " " + drawing.id + " f:" + frameOverride);
+	// bitsyLog("frame render: " + drawing.type + " " + drawing.id + " f:" + frameOverride);
 
 	if (!isDrawingRendered(drawing)) {
-		bitsyLog("frame render: doesn't exist");
+		// bitsyLog("frame render: doesn't exist");
 		renderDrawing(drawing);
 	}
 
