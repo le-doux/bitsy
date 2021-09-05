@@ -808,7 +808,8 @@ function parseWorld(file) {
 	placeSprites();
 
 	var roomIds = Object.keys(room);
-	if (player() != undefined && player().room != null && roomIds.indexOf(player().room) < 0) {
+
+	if (player() != undefined && player().room != null && roomIds.indexOf(player().room) != -1) {
 		// player has valid room
 		curRoom = player().room;
 	}
