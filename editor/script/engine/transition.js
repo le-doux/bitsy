@@ -5,7 +5,7 @@ var TransitionManager = function() {
 	var isTransitioning = false;
 	var transitionTime = 0; // milliseconds
 	var minStepTime = 125; // cap the frame rate
-	var curStep = -1; // used to avoid running post-process effect constantly
+	var curStep = 0;
 
 	this.BeginTransition = function(startRoom, startX, startY, endRoom, endX, endY, effectName) {
 		bitsyLog("--- START ROOM TRANSITION ---");
@@ -46,7 +46,7 @@ var TransitionManager = function() {
 
 		isTransitioning = true;
 		transitionTime = 0;
-		curStep = -1;
+		curStep = 0;
 
 		player().room = tmpRoom;
 		player().x = tmpX;
@@ -96,7 +96,7 @@ var TransitionManager = function() {
 			transitionTime = 0;
 			transitionStart = null;
 			transitionEnd = null;
-			curStep = -1;
+			curStep = 0;
 
 			if (transitionCompleteCallback != null) {
 				transitionCompleteCallback();
@@ -265,8 +265,6 @@ var TransitionManager = function() {
 			var pixelOffset = -1 * Math.floor(start.Image.Height * delta);
 			var slidePixelY = pixelY + pixelOffset;
 
-			var colorDelta = clampLerp(delta, 0.4);
-
 			if (slidePixelY >= 0) {
 				return start.Image.GetPixel(pixelX, slidePixelY);
 			}
@@ -293,8 +291,6 @@ var TransitionManager = function() {
 		pixelEffectFunc : function(start, end, pixelX, pixelY, delta) {
 			var pixelOffset = Math.floor(start.Image.Height * delta);
 			var slidePixelY = pixelY + pixelOffset;
-
-			var colorDelta = clampLerp(delta, 0.4);
 
 			if (slidePixelY < start.Image.Height) {
 				return start.Image.GetPixel(pixelX, slidePixelY);
@@ -323,8 +319,6 @@ var TransitionManager = function() {
 			var pixelOffset = -1 * Math.floor(start.Image.Width * delta);
 			var slidePixelX = pixelX + pixelOffset;
 
-			var colorDelta = clampLerp(delta, 0.4);
-
 			if (slidePixelX >= 0) {
 				return start.Image.GetPixel(slidePixelX, pixelY);
 			}
@@ -351,8 +345,6 @@ var TransitionManager = function() {
 		pixelEffectFunc : function(start, end, pixelX, pixelY, delta) {
 			var pixelOffset = Math.floor(start.Image.Width * delta);
 			var slidePixelX = pixelX + pixelOffset;
-
-			var colorDelta = clampLerp(delta, 0.4);
 
 			if (slidePixelX < start.Image.Width) {
 				return start.Image.GetPixel(slidePixelX, pixelY);
@@ -440,12 +432,6 @@ var TransitionManager = function() {
 		return pixelBuffer;
 	}
 
-	function clampLerp(deltaIn, clampDuration) {
-		var clampOffset = (1.0 - clampDuration) / 2;
-		var deltaOut = Math.min(clampDuration, Math.max(0.0, deltaIn - clampOffset)) / clampDuration;
-		return deltaOut;
-	}
-
 	function lerpColor(colorA, colorB, t) {
 		return [
 			colorA[0] + ((colorB[0] - colorA[0]) * t),
@@ -461,7 +447,7 @@ var PostProcessImage = function(imageData) {
 	this.Height = 128;
 
 	this.GetPixel = function(x, y) {
-		return imageData[(parseInt(y) * 128) + parseInt(x)];;
+		return imageData[(y * 128) + x];
 	};
 
 	this.GetData = function() {
