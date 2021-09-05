@@ -4,8 +4,8 @@ var TransitionManager = function() {
 
 	var isTransitioning = false;
 	var transitionTime = 0; // milliseconds
-	var frameRate = 8; // cap the FPS
-	var prevStep = -1; // used to avoid running post-process effect constantly
+	var minStepTime = 125; // cap the frame rate
+	var curStep = -1; // used to avoid running post-process effect constantly
 
 	this.BeginTransition = function(startRoom, startX, startY, endRoom, endX, endY, effectName) {
 		bitsyLog("--- START ROOM TRANSITION ---");
@@ -46,7 +46,7 @@ var TransitionManager = function() {
 
 		isTransitioning = true;
 		transitionTime = 0;
-		prevStep = -1;
+		curStep = -1;
 
 		player().room = tmpRoom;
 		player().x = tmpX;
@@ -63,11 +63,12 @@ var TransitionManager = function() {
 
 		transitionTime += dt;
 
-		var transitionDelta = transitionTime / transitionEffects[curEffect].duration;
-		var maxStep = Math.floor(frameRate * (transitionEffects[curEffect].duration / 1000));
-		var step = Math.floor(transitionDelta * maxStep);
+		var maxStep = transitionEffects[curEffect].stepCount;
 
-		if (step != prevStep) {
+		if (transitionTime >= minStepTime) {
+			curStep++;
+
+			var step = curStep;
 			bitsyLog("transition step " + step);
 
 			if (transitionEffects[curEffect].paletteEffectFunc) {
@@ -86,15 +87,16 @@ var TransitionManager = function() {
 				}
 			}
 			bitsyDrawEnd();
-		}
-		prevStep = step;
 
-		if (transitionTime >= transitionEffects[curEffect].duration) {
+			transitionTime = 0;
+		}
+
+		if (curStep >= (maxStep - 1)) {
 			isTransitioning = false;
 			transitionTime = 0;
 			transitionStart = null;
 			transitionEnd = null;
-			prevStep = -1;
+			curStep = -1;
 
 			if (transitionCompleteCallback != null) {
 				transitionCompleteCallback();
@@ -131,7 +133,7 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("fade_w", { // TODO : have it linger on full white briefly?
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		duration : 750,
+		stepCount : 6,
 		pixelEffectFunc : function(start, end, pixelX, pixelY, delta) {
 			return delta < 0.5 ? start.Image.GetPixel(pixelX, pixelY) : end.Image.GetPixel(pixelX, pixelY);
 		},
@@ -160,7 +162,7 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("fade_b", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		duration : 750,
+		stepCount : 6,
 		pixelEffectFunc : function(start, end, pixelX, pixelY, delta) {
 			return delta < 0.5 ? start.Image.GetPixel(pixelX, pixelY) : end.Image.GetPixel(pixelX, pixelY);
 		},
@@ -189,7 +191,7 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("wave", {
 		showPlayerStart : true,
 		showPlayerEnd : true,
-		duration : 1500,
+		stepCount : 12,
 		pixelEffectFunc : function(start, end, pixelX, pixelY, delta) {
 			var waveDelta = delta < 0.5 ? delta / 0.5 : 1 - ((delta - 0.5) / 0.5);
 
@@ -216,7 +218,7 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("tunnel", {
 		showPlayerStart : true,
 		showPlayerEnd : true,
-		duration : 1500,
+		stepCount : 12,
 		pixelEffectFunc : function(start, end, pixelX, pixelY, delta) {
 			if (delta <= 0.4) {
 				var tunnelDelta = 1 - (delta / 0.4);
@@ -258,7 +260,7 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("slide_u", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		duration : 1000,
+		stepCount : 8,
 		pixelEffectFunc : function(start, end, pixelX, pixelY, delta) {
 			var pixelOffset = -1 * Math.floor(start.Image.Height * delta);
 			var slidePixelY = pixelY + pixelOffset;
@@ -287,7 +289,7 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("slide_d", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		duration : 1000,
+		stepCount : 8,
 		pixelEffectFunc : function(start, end, pixelX, pixelY, delta) {
 			var pixelOffset = Math.floor(start.Image.Height * delta);
 			var slidePixelY = pixelY + pixelOffset;
@@ -316,7 +318,7 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("slide_l", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		duration : 1000,
+		stepCount : 8,
 		pixelEffectFunc : function(start, end, pixelX, pixelY, delta) {
 			var pixelOffset = -1 * Math.floor(start.Image.Width * delta);
 			var slidePixelX = pixelX + pixelOffset;
@@ -345,7 +347,7 @@ var TransitionManager = function() {
 	this.RegisterTransitionEffect("slide_r", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
-		duration : 1000,
+		stepCount : 8,
 		pixelEffectFunc : function(start, end, pixelX, pixelY, delta) {
 			var pixelOffset = Math.floor(start.Image.Width * delta);
 			var slidePixelX = pixelX + pixelOffset;
