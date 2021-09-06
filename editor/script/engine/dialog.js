@@ -12,7 +12,6 @@ var DialogRenderer = function() {
 
 	// TODO : refactor this eventually? remove everything from struct.. avoid the defaults?
 	var textboxInfo = {
-		img : null,
 		width : 104,
 		height : 8+4+2+5, //8 for text, 4 for top-bottom padding, 2 for line padding, 5 for arrow
 		top : 12,
@@ -28,7 +27,11 @@ var DialogRenderer = function() {
 	this.SetFont = function(f) {
 		font = f;
 		textboxInfo.height = (textboxInfo.padding_vert * 3) + (relativeFontHeight() * 2) + textboxInfo.arrow_height;
-		textboxInfo.img = context.createImageData(textboxInfo.width*scale, textboxInfo.height*scale);
+
+		// todo : clean up all the scale stuff
+		var textboxScaleW = textboxInfo.width / textboxInfo.font_scale;
+		var textboxScaleH = textboxInfo.height / textboxInfo.font_scale;
+		bitsySetTextboxSize(textboxScaleW, textboxScaleH);
 	}
 
 	function textScale() {
@@ -43,26 +46,10 @@ var DialogRenderer = function() {
 		return Math.ceil( font.getHeight() * textboxInfo.font_scale );
 	}
 
-	var context = null;
-	this.AttachContext = function(c) {
-		context = c;
-	};
-
 	this.ClearTextbox = function() {
-		if(context == null) return;
-
-		//create new image none exists
-		if(textboxInfo.img == null)
-			textboxInfo.img = context.createImageData(textboxInfo.width*scale, textboxInfo.height*scale);
-
-		// fill text box with black
-		for (var i=0;i<textboxInfo.img.data.length;i+=4)
-		{
-			textboxInfo.img.data[i+0]=0;
-			textboxInfo.img.data[i+1]=0;
-			textboxInfo.img.data[i+2]=0;
-			textboxInfo.img.data[i+3]=255;
-		}
+		bitsyDrawBegin(1);
+		bitsyClear(textBackgroundIndex);
+		bitsyDrawEnd();
 	};
 
 	var isCentered = false;
@@ -71,18 +58,22 @@ var DialogRenderer = function() {
 	};
 
 	this.DrawTextbox = function() {
-		if(context == null) return;
+		bitsyDrawBegin(0);
+
 		if (isCentered) {
-			context.putImageData(textboxInfo.img, textboxInfo.left*scale, ((height/2)-(textboxInfo.height/2))*scale);
+			// todo : will the height calculations always work?
+			bitsyDrawTextbox(textboxInfo.left, ((height / 2) - (textboxInfo.height / 2)));
 		}
-		else if (player().y < mapsize/2) {
-			//bottom
-			context.putImageData(textboxInfo.img, textboxInfo.left*scale, (height-textboxInfo.bottom-textboxInfo.height)*scale);
+		else if (player().y < (mapsize / 2)) {
+			// bottom
+			bitsyDrawTextbox(textboxInfo.left, (height - textboxInfo.bottom - textboxInfo.height));
 		}
 		else {
-			//top
-			context.putImageData(textboxInfo.img, textboxInfo.left*scale, textboxInfo.top*scale);
+			// top
+			bitsyDrawTextbox(textboxInfo.left, textboxInfo.top);
 		}
+
+		bitsyDrawEnd();
 	};
 
 	var arrowdata = [
@@ -90,12 +81,15 @@ var DialogRenderer = function() {
 		0,1,1,1,0,
 		0,0,1,0,0
 	];
+
 	this.DrawNextArrow = function() {
 		// bitsyLog("draw arrow!");
-		var top = (textboxInfo.height-5) * scale;
-		var left = (textboxInfo.width-(5+4)) * scale;
+		bitsyDrawBegin(1);
+
+		var top = (textboxInfo.height - 5) * text_scale;
+		var left = (textboxInfo.width - (5 + 4)) * text_scale;
 		if (textDirection === TextDirection.RightToLeft) { // RTL hack
-			left = 4 * scale;
+			left = 4 * text_scale;
 		}
 
 		for (var y = 0; y < 3; y++) {
@@ -103,22 +97,22 @@ var DialogRenderer = function() {
 				var i = (y * 5) + x;
 				if (arrowdata[i] == 1) {
 					//scaling nonsense
-					for (var sy = 0; sy < scale; sy++) {
-						for (var sx = 0; sx < scale; sx++) {
-							var pxl = 4 * ( ((top+(y*scale)+sy) * (textboxInfo.width*scale)) + (left+(x*scale)+sx) );
-							textboxInfo.img.data[pxl+0] = 255;
-							textboxInfo.img.data[pxl+1] = 255;
-							textboxInfo.img.data[pxl+2] = 255;
-							textboxInfo.img.data[pxl+3] = 255;
+					for (var sy = 0; sy < text_scale; sy++) {
+						for (var sx = 0; sx < text_scale; sx++) {
+							bitsyDrawPixel(textArrowIndex, left + (x * text_scale) + sx, top + (y * text_scale) + sy);
 						}
 					}
 				}
 			}
 		}
+
+		bitsyDrawEnd();
 	};
 
 	var text_scale = 2; //using a different scaling factor for text feels like cheating... but it looks better
 	this.DrawChar = function(char, row, col, leftPos) {
+		bitsyDrawBegin(1);
+
 		char.offset = {
 			x: char.base_offset.x,
 			y: char.base_offset.y
@@ -129,46 +123,21 @@ var DialogRenderer = function() {
 
 		var charData = char.bitmap;
 
-		var top = (4 * scale) + (row * 2 * scale) + (row * font.getHeight() * text_scale) + Math.floor( char.offset.y );
-		var left = (4 * scale) + (leftPos * text_scale) + Math.floor( char.offset.x );
-
-		var debug_r = Math.random() * 255;
+		var top = (4 * text_scale) + (row * 2 * text_scale) + (row * font.getHeight()) + Math.floor(char.offset.y);
+		var left = (4 * text_scale) + leftPos + Math.floor(char.offset.x);
 
 		for (var y = 0; y < char.height; y++) {
 			for (var x = 0; x < char.width; x++) {
-
 				var i = (y * char.width) + x;
-				if ( charData[i] == 1 ) {
-
-					//scaling nonsense
-					for (var sy = 0; sy < text_scale; sy++) {
-						for (var sx = 0; sx < text_scale; sx++) {
-							var pxl = 4 * ( ((top+(y*text_scale)+sy) * (textboxInfo.width*scale)) + (left+(x*text_scale)+sx) );
-							textboxInfo.img.data[pxl+0] = char.color.r;
-							textboxInfo.img.data[pxl+1] = char.color.g;
-							textboxInfo.img.data[pxl+2] = char.color.b;
-							textboxInfo.img.data[pxl+3] = char.color.a;
-						}
-					}
+				if (charData[i] == 1) {
+					// todo : other colors
+					bitsyDrawPixel(char.color, left + x, top + y);
 				}
-				// else {
-				// 	// DEBUG
-
-				// 	//scaling nonsense
-				// 	for (var sy = 0; sy < text_scale; sy++) {
-				// 		for (var sx = 0; sx < text_scale; sx++) {
-				// 			var pxl = 4 * ( ((top+(y*text_scale)+sy) * (textboxInfo.width*scale)) + (left+(x*text_scale)+sx) );
-				// 			textboxInfo.img.data[pxl+0] = debug_r;
-				// 			textboxInfo.img.data[pxl+1] = 0;
-				// 			textboxInfo.img.data[pxl+2] = 0;
-				// 			textboxInfo.img.data[pxl+3] = 255;
-				// 		}
-				// 	}
-				// }
-
 			}
 		}
-		
+
+		bitsyDrawEnd();
+
 		// call printHandler for character
 		char.OnPrint();
 	};
@@ -405,7 +374,7 @@ var DialogBuffer = function() {
 	function DialogChar(effectList) {
 		this.effectList = effectList.slice(); // clone effect list (since it can change between chars)
 
-		this.color = { r:255, g:255, b:255, a:255 };
+		this.color = textColorIndex; // white
 		this.offset = { x:0, y:0 }; // in pixels (screen pixels?)
 
 		this.col = 0;
@@ -464,14 +433,14 @@ var DialogBuffer = function() {
 	function DialogDrawingChar(drawingId, effectList) {
 		Object.assign(this, new DialogChar(effectList));
 
-		var imageData = renderer.GetImageSource(drawingId)[0];
-		var imageDataFlat = [];
-		for (var i = 0; i < imageData.length; i++) {
-			// bitsyLog(imageData[i]);
-			imageDataFlat = imageDataFlat.concat(imageData[i]);
+		// get the first frame of the drawing and flatten it
+		var drawingData = renderer.GetDrawingSource(drawingId)[0];
+		var drawingDataFlat = [];
+		for (var i = 0; i < drawingData.length; i++) {
+			drawingDataFlat = drawingDataFlat.concat(drawingData[i]);
 		}
 
-		this.bitmap = imageDataFlat;
+		this.bitmap = drawingDataFlat;
 		this.width = 8;
 		this.height = 8;
 		this.spacing = 8;
@@ -903,34 +872,18 @@ var ArabicHandler = function() {
 }
 
 /* NEW TEXT EFFECTS */
-var TextEffects = new Map();
+var TextEffects = {};
 
-var RainbowEffect = function() { // TODO - should it be an object or just a method?
-	this.DoEffect = function(char,time) {
-		// bitsyLog("RAINBOW!!!");
-		// bitsyLog(char);
-		// bitsyLog(char.color);
-		// bitsyLog(char.col);
-
-		var h = Math.abs( Math.sin( (time / 600) - (char.col / 8) ) );
-		var rgb = hslToRgb( h, 1, 0.5 );
-		char.color.r = rgb[0];
-		char.color.g = rgb[1];
-		char.color.b = rgb[2];
-		char.color.a = 255;
+var RainbowEffect = function() {
+	this.DoEffect = function(char, time) {
+		char.color = rainbowColorStartIndex + Math.floor(((time / 100) - char.col * 0.5) % rainbowColorCount);
 	}
 };
 TextEffects["rbw"] = new RainbowEffect();
 
 var ColorEffect = function(index) {
 	this.DoEffect = function(char) {
-		var pal = getPal( curPal() );
-		var color = pal[ parseInt( index ) ];
-		// bitsyLog(color);
-		char.color.r = color[0];
-		char.color.g = color[1];
-		char.color.b = color[2];
-		char.color.a = 255;
+		char.color = tileColorStartIndex + index;
 	}
 };
 TextEffects["clr1"] = new ColorEffect(0);
@@ -939,35 +892,32 @@ TextEffects["clr3"] = new ColorEffect(2);
 
 var WavyEffect = function() {
 	this.DoEffect = function(char,time) {
-		char.offset.y += Math.sin( (time / 250) - (char.col / 2) ) * 4;
+		char.offset.y += Math.sin((time / 250) - (char.col / 2)) * 2;
 	}
 };
 TextEffects["wvy"] = new WavyEffect();
 
 var ShakyEffect = function() {
-	function disturb(func,time,offset,mult1,mult2) {
-		return func( (time * mult1) - (offset * mult2) );
+	function disturb(func, time, offset, mult1, mult2) {
+		return func((time * mult1) - (offset * mult2));
 	}
 
 	this.DoEffect = function(char,time) {
-		char.offset.y += 3
-						* disturb(Math.sin,time,char.col,0.1,0.5)
-						* disturb(Math.cos,time,char.col,0.3,0.2)
-						* disturb(Math.sin,time,char.row,2.0,1.0);
-		char.offset.x += 3
-						* disturb(Math.cos,time,char.row,0.1,1.0)
-						* disturb(Math.sin,time,char.col,3.0,0.7)
-						* disturb(Math.cos,time,char.col,0.2,0.3);
+		char.offset.y += 1.5
+						* disturb(Math.sin, time, char.col, 0.1, 0.5)
+						* disturb(Math.cos, time, char.col, 0.3, 0.2)
+						* disturb(Math.sin, time, char.row, 2.0, 1.0);
+		char.offset.x += 1.5
+						* disturb(Math.cos, time, char.row, 0.1, 1.0)
+						* disturb(Math.sin, time, char.col, 3.0, 0.7)
+						* disturb(Math.cos, time, char.col, 0.2, 0.3);
 	}
 };
 TextEffects["shk"] = new ShakyEffect();
 
 var DebugHighlightEffect = function() {
 	this.DoEffect = function(char) {
-		char.color.r = 255;
-		char.color.g = 255;
-		char.color.b = 0;
-		char.color.a = 255;
+		char.color = tileColorStartIndex;
 	}
 }
 TextEffects["_debug_highlight"] = new DebugHighlightEffect();

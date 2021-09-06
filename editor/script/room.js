@@ -249,12 +249,10 @@ function RoomTool(canvas) {
 	}
 
 	this.drawEditMap = function() {
-		//clear screen
-		ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
-		ctx.fillRect(0,0,canvas.width,canvas.height);
-
 		//draw map
-		drawRoom( room[curRoom] );
+		bitsySetGraphicsMode(1);
+		drawRoom(room[curRoom]);
+		renderGame();
 
 		//draw grid
 		if (self.drawMapGrid) {

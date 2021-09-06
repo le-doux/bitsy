@@ -1,8 +1,11 @@
 /* logging */
 var DebugLogCategory = {
+	system: false,
 	bitsy : false,
 	editor : false,
 };
+
+var isLoggingVerbose = false;
 
 /* input */
 var key = {
@@ -28,8 +31,9 @@ var InputManager = function() {
 
 	var pressed;
 	var ignored;
-	var newKeyPress;
 	var touchState;
+
+	var isRestartComboPressed = false;
 
 	var SwipeDir = {
 		None : -1,
@@ -40,9 +44,10 @@ var InputManager = function() {
 	};
 
 	function resetAll() {
+		isRestartComboPressed = false;
+
 		pressed = {};
 		ignored = {};
-		newKeyPress = false;
 
 		touchState = {
 			isDown : false,
@@ -55,6 +60,7 @@ var InputManager = function() {
 			tapReleased : false
 		};
 	}
+
 	resetAll();
 
 	function stopWindowScrolling(e) {
@@ -62,13 +68,8 @@ var InputManager = function() {
 			e.preventDefault();
 	}
 
-	function tryRestartGame(e) {
-		/* RESTART GAME */
-		if ( e.keyCode === key.r && ( e.getModifierState("Control") || e.getModifierState("Meta") ) ) {
-			if ( confirm("Restart the game?") ) {
-				reset_cur_game();
-			}
-		}
+	function isRestartCombo(e) {
+		return (e.keyCode === key.r && (e.getModifierState("Control")|| e.getModifierState("Meta")));
 	}
 
 	function eventIsModifier(event) {
@@ -83,17 +84,17 @@ var InputManager = function() {
 		for (var key in pressed) {
 			if (pressed[key]) { // only ignore keys that are actually held
 				ignored[key] = true;
-				// bitsyLog("IGNORE -- " + key);
+				// bitsyLog("IGNORE -- " + key, "system");
 			}
 		}
 	}
 
 	this.onkeydown = function(event) {
-		// bitsyLog("KEYDOWN -- " + event.keyCode);
+		// bitsyLog("KEYDOWN -- " + event.keyCode, "system");
 
 		stopWindowScrolling(event);
 
-		tryRestartGame(event);
+		isRestartComboPressed = isRestartCombo(event);
 
 		// Special keys being held down can interfere with keyup events and lock movement
 		// so just don't collect input when they're held
@@ -111,16 +112,12 @@ var InputManager = function() {
 			return;
 		}
 
-		if (!self.isKeyDown(event.keyCode)) {
-			newKeyPress = true;
-		}
-
 		pressed[event.keyCode] = true;
 		ignored[event.keyCode] = false;
 	}
 
 	this.onkeyup = function(event) {
-		// bitsyLog("KEYUP -- " + event.keyCode);
+		// bitsyLog("KEYUP -- " + event.keyCode, "system");
 		pressed[event.keyCode] = false;
 		ignored[event.keyCode] = false;
 	}
@@ -185,12 +182,23 @@ var InputManager = function() {
 		return pressed[keyCode] != null && pressed[keyCode] == true && (ignored[keyCode] == null || ignored[keyCode] == false);
 	}
 
-	this.anyKeyPressed = function() {
-		return newKeyPress;
+	this.anyKeyDown = function() {
+		var anyKey = false;
+
+		for (var key in pressed) {
+			if (pressed[key] && (ignored[key] == null || ignored[key] == false) &&
+				!(key === key.up || key === key.down || key === key.left || key === key.right) &&
+				!(key === key.w || key === key.s || key === key.a || key === key.d)) {
+				// detected that a key other than the d-pad keys are down!
+				anyKey = true;
+			}
+		}
+
+		return anyKey;
 	}
 
-	this.resetKeyPressed = function() {
-		newKeyPress = false;
+	this.isRestartComboPressed = function() {
+		return isRestartComboPressed;
 	}
 
 	this.swipeLeft = function() {
@@ -218,9 +226,11 @@ var InputManager = function() {
 	}
 
 	this.onblur = function() {
-		// bitsyLog("~~~ BLUR ~~");
+		// bitsyLog("~~~ BLUR ~~", "system");
 		resetAll();
 	}
+
+	this.resetAll = resetAll;
 }
 
 var input = new InputManager();
@@ -231,7 +241,16 @@ var onQuitFunction = null;
 var onUpdateFunction = null;
 var updateInterval = null;
 
-function loadGame(gameData) {
+function initSystem() {
+	// temp hack for the editor? unless??
+	drawingBuffers[screenBufferId] = createDrawingBuffer(128, 128, scale);
+	drawingBuffers[textboxBufferId] = createDrawingBuffer(0, 0, textScale);
+}
+
+function loadGame(gameData, defaultFontData) {
+	drawingBuffers[screenBufferId] = createDrawingBuffer(128, 128, scale);
+	drawingBuffers[textboxBufferId] = createDrawingBuffer(0, 0, textScale);
+
 	document.addEventListener('keydown', input.onkeydown);
 	document.addEventListener('keyup', input.onkeyup);
 
@@ -266,7 +285,8 @@ function loadGame(gameData) {
 	window.onblur = input.onblur;
 
 	if (onLoadFunction) {
-		onLoadFunction(gameData);
+		// todo : is this the right place to supply default font data?
+		onLoadFunction(gameData, defaultFontData);
 	}
 
 	updateInterval = setInterval(
@@ -275,10 +295,45 @@ function loadGame(gameData) {
 				onUpdateFunction();
 			}
 
-			input.resetKeyPressed();
+			renderGame();
+
 			input.resetTapReleased();
+
+			if (bitsyGetButton(5)) {
+				if (confirm("Restart the game?")) {
+					input.resetAll();
+					reset_cur_game();
+				}
+
+				return;
+			}
 		},
 		16);
+}
+
+function renderGame() {
+	// bitsyLog("render game mode=" + curGraphicsMode, "system");
+
+	bitsyLog(systemPalette.length, "system");
+
+	var startIndex = curGraphicsMode === 0 ? screenBufferId : (drawingBuffers.length - 1);
+
+	for (var i = startIndex; i >= 0; i--) {
+		var buffer = drawingBuffers[i];
+		if (buffer && buffer.canvas === null) {
+			bitsyLog("render buffer " + i, "system");
+			renderDrawingBuffer(i, buffer);
+		}
+	}
+
+	// show screen buffer
+	var screenBuffer = drawingBuffers[screenBufferId];
+	ctx.drawImage(
+		screenBuffer.canvas,
+		0,
+		0,
+		screenBuffer.width * screenBuffer.scale,
+		screenBuffer.height * screenBuffer.scale);
 }
 
 function quitGame() {
@@ -313,19 +368,206 @@ function quitGame() {
 	clearInterval(updateInterval);
 }
 
+/* graphics */
+var canvas;
+var ctx;
+
+var textScale = 2; // todo : move tile scale into here too?
+
+var curGraphicsMode = 0;
+var systemPalette = [[0, 0, 0]];
+var curBufferId = -1; // note: -1 is invalid
+var drawingBuffers = [];
+
+var screenBufferId = 0;
+var textboxBufferId = 1;
+var tileStartBufferId = 2;
+var nextBufferId = tileStartBufferId;
+
+var DrawingInstruction = {
+	Pixel : 0,
+	Tile : 1,
+	Clear : 2,
+	Textbox : 3,
+};
+
+function attachCanvas(c) {
+	canvas = c;
+	canvas.width = width * scale;
+	canvas.height = width * scale;
+	ctx = canvas.getContext("2d");
+}
+
+function createDrawingBuffer(width, height, scale) {
+	var buffer = {
+		width : width,
+		height : height,
+		scale : scale, // logical-pixel to display-pixel scale
+		instructions : [], // drawing instructions
+		canvas : null,
+	}
+
+	return buffer;
+}
+
+function renderPixelInstruction(bufferId, buffer, paletteIndex, x, y) {
+	if (bufferId === screenBufferId && curGraphicsMode != 0) {
+		return;
+	}
+
+	if (!systemPalette[paletteIndex]) {
+		// bitsyLog("invalid index " + paletteIndex + " @ " + x + "," + y, "system");
+		return;
+	}
+
+	var color = systemPalette[paletteIndex];
+
+	if (buffer.imageData) {
+		for (var sy = 0; sy < buffer.scale; sy++) {
+			for (var sx = 0; sx < buffer.scale; sx++) {
+				var pixelIndex = (((y * buffer.scale) + sy) * buffer.width * buffer.scale * 4) + (((x * buffer.scale) + sx) * 4);
+
+				buffer.imageData.data[pixelIndex + 0] = color[0];
+				buffer.imageData.data[pixelIndex + 1] = color[1];
+				buffer.imageData.data[pixelIndex + 2] = color[2];
+				buffer.imageData.data[pixelIndex + 3] = 255;
+			}
+		}
+	}
+	else {
+		var bufferContext = buffer.canvas.getContext("2d");
+		bufferContext.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
+		bufferContext.fillRect(x * buffer.scale, y * buffer.scale, buffer.scale, buffer.scale);
+	}
+}
+
+function renderTileInstruction(bufferId, buffer, tileId, x, y) {
+	if (bufferId != screenBufferId || curGraphicsMode != 1) {
+		return;
+	}
+
+	if (!drawingBuffers[tileId]) {
+		return;
+	}
+
+	var tileBuffer = drawingBuffers[tileId];
+
+	var bufferContext = buffer.canvas.getContext("2d");
+	bufferContext.drawImage(
+		tileBuffer.canvas,
+		x * tilesize * buffer.scale,
+		y * tilesize * buffer.scale,
+		tilesize * buffer.scale,
+		tilesize * buffer.scale);
+}
+
+function renderClearInstruction(bufferId, buffer, paletteIndex) {
+	var color = systemPalette[paletteIndex];
+	var bufferContext = buffer.canvas.getContext("2d");
+	bufferContext.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
+	bufferContext.fillRect(0, 0, buffer.canvas.width, buffer.canvas.height);
+}
+
+function renderTextboxInstruction(bufferId, buffer, x, y) {
+	if (bufferId != screenBufferId || curGraphicsMode != 1) {
+		return;
+	}
+
+	if (!drawingBuffers[textboxBufferId]) {
+		return;
+	}
+
+	var textboxBuffer = drawingBuffers[textboxBufferId];
+
+	var bufferContext = buffer.canvas.getContext("2d");
+	bufferContext.drawImage(
+		textboxBuffer.canvas,
+		x * buffer.scale,
+		y * buffer.scale,
+		textboxBuffer.canvas.width,
+		textboxBuffer.canvas.height);
+}
+
+function renderDrawingBuffer(bufferId, buffer) {
+	// bitsyLog("render buffer " + bufferId, "system");
+
+	// if (bufferId === 0) {
+	// 	bitsyLog("instructions " + buffer.instructions.length, "system");
+	// }
+
+	buffer.canvas = document.createElement("canvas");
+	buffer.canvas.width = buffer.width * buffer.scale;
+	buffer.canvas.height = buffer.height * buffer.scale;
+
+	for (var i = 0; i < buffer.instructions.length; i++) {
+		var instruction = buffer.instructions[i];
+		switch (instruction.type) {
+			case DrawingInstruction.Pixel:
+				renderPixelInstruction(bufferId, buffer, instruction.id, instruction.x, instruction.y);
+				break;
+			case DrawingInstruction.Tile:
+				renderTileInstruction(bufferId, buffer, instruction.id, instruction.x, instruction.y);
+				break;
+			case DrawingInstruction.Clear:
+				renderClearInstruction(bufferId, buffer, instruction.id);
+				break;
+			case DrawingInstruction.Textbox:
+				renderTextboxInstruction(bufferId, buffer, instruction.x, instruction.y);
+				break;
+		}
+	}
+
+	if (buffer.imageData) {
+		var bufferContext = buffer.canvas.getContext("2d");
+		bufferContext.putImageData(buffer.imageData, 0, 0);
+	}
+}
+
+function invalidateDrawingBuffer(buffer) {
+	buffer.canvas = null;
+}
+
+function hackForEditor_GetImageFromTileId(tileId) {
+	if (tileId === undefined || !drawingBuffers[tileId]) {
+		bitsyLog("editor hack::invalid tile id!", "system");
+		return null;
+	}
+
+	// force render the buffer if it hasn't been
+	if (drawingBuffers[tileId].canvas === null) {
+		renderDrawingBuffer(tileId, drawingBuffers[tileId]);
+	}
+
+	return drawingBuffers[tileId].canvas;
+}
+
 /* ==== */
 function bitsyLog(message, category) {
 	if (!category) {
 		category = "bitsy";
 	}
 
+	var summary = category + "::" + message;
+
 	if (DebugLogCategory[category] === true) {
-		console.log(category + "::" + message);
+		if (isLoggingVerbose) {
+			console.group(summary);
+
+			console.dir(message);
+
+			console.group("stack")
+			console.trace();
+			console.groupEnd();
+
+			console.groupEnd();
+		}
+		else {
+			console.log(summary);
+		}
 	}
 }
 
-// todo : should 0 be used for any instead of null/undefined?
-function bitsyButton(buttonCode) {
+function bitsyGetButton(buttonCode) {
 	switch (buttonCode) {
 		case 0: // UP
 			return (input.isKeyDown(key.up) || input.isKeyDown(key.w) || input.swipeUp());
@@ -335,14 +577,125 @@ function bitsyButton(buttonCode) {
 			return (input.isKeyDown(key.left) || input.isKeyDown(key.a) || input.swipeLeft());
 		case 3: // RIGHT
 			return ((input.isKeyDown(key.right) || input.isKeyDown(key.d) || input.swipeRight()));
+		case 4: // OK (equivalent to "any key" on the keyboard or "tap" on touch screen)
+			return (input.anyKeyDown() || input.isTapReleased());
+		case 5: // MENU / RESTART (restart the game: "ctrl+r" on keyboard, no touch control yet)
+			return input.isRestartComboPressed();
 	}
 
-	// if no code is supplied, check any key
-	return input.isKeyDown(key.up) || input.isKeyDown(key.w) ||
-		input.isKeyDown(key.down) || input.isKeyDown(key.s) ||
-		input.isKeyDown(key.left) || input.isKeyDown(key.a) ||
-		input.isKeyDown(key.right) || input.isKeyDown(key.d) ||
-		input.isTapReleased();
+	return false;
+}
+
+// two modes (0 == pixel mode, 1 == tile mode)
+function bitsySetGraphicsMode(mode) {
+	curGraphicsMode = mode;
+
+	var screenBuffer = drawingBuffers[screenBufferId];
+	if (curGraphicsMode === 0) {
+		screenBuffer.imageData = ctx.createImageData(screenBuffer.width * screenBuffer.scale, screenBuffer.height * screenBuffer.scale);
+	}
+	else {
+		screenBuffer.imageData = undefined;
+	}
+}
+
+function bitsySetColor(paletteIndex, r, g, b) {
+	systemPalette[paletteIndex] = [r, g, b];
+
+	// invalidate all drawing buffers
+	for (var i = 0; i < drawingBuffers.length; i++) {
+		if (drawingBuffers[i]) {
+			invalidateDrawingBuffer(drawingBuffers[i]);
+		}
+	}
+}
+
+function bitsyResetColors() {
+	systemPalette = [[0, 0, 0]];
+
+	// invalidate all drawing buffers
+	for (var i = 0; i < drawingBuffers.length; i++) {
+		if (drawingBuffers[i]) {
+			invalidateDrawingBuffer(drawingBuffers[i]);
+		}
+	}
+}
+
+function bitsyDrawBegin(bufferId) {
+	curBufferId = bufferId;
+	var buffer = drawingBuffers[curBufferId];
+	invalidateDrawingBuffer(buffer);
+}
+
+function bitsyDrawEnd() {
+	curBufferId = -1;
+}
+
+function bitsyDrawPixel(paletteIndex, x, y) {
+	if (curBufferId === screenBufferId && curGraphicsMode != 0) {
+		return;
+	}
+
+	// avoid trying to render out-of-bounds colors
+	if (paletteIndex >= systemPalette.length) {
+		bitsyLog("invalid color! " + paletteIndex, "system");
+		paletteIndex = systemPalette.length - 1;
+	}
+
+	var buffer = drawingBuffers[curBufferId];
+	buffer.instructions.push({ type: DrawingInstruction.Pixel, id: paletteIndex, x: x, y: y, });
+}
+
+function bitsyDrawTile(tileId, x, y) {
+	if (curBufferId != screenBufferId || curGraphicsMode != 1) {
+		return;
+	}
+
+	var buffer = drawingBuffers[curBufferId];
+	buffer.instructions.push({ type: DrawingInstruction.Tile, id: tileId, x: x, y: y, });
+}
+
+function bitsyDrawTextbox(x, y) {
+	if (curBufferId != screenBufferId || curGraphicsMode != 1) {
+		return;
+	}
+
+	var buffer = drawingBuffers[curBufferId];
+	buffer.instructions.push({ type: DrawingInstruction.Textbox, x: x, y: y, });
+}
+
+function bitsyClear(paletteIndex) {
+	// avoid trying to render out-of-bounds colors
+	if (paletteIndex >= systemPalette.length) {
+		paletteIndex = systemPalette.length - 1;
+	}
+
+	drawingBuffers[curBufferId].instructions = []; // reset instructions
+	drawingBuffers[curBufferId].instructions.push({ type: DrawingInstruction.Clear, id: paletteIndex, });
+}
+
+// allocates a tile buffer and returns the ID
+function bitsyAddTile() {
+	var tileBufferId = nextBufferId;
+	nextBufferId++;
+
+	drawingBuffers[tileBufferId] = createDrawingBuffer(tilesize, tilesize, scale);
+
+	return tileBufferId;
+}
+
+// clears all tile buffers
+function bitsyResetTiles() {
+	bitsyLog("RESET TILES", "system");
+	// bitsyLog(drawingBuffers, "system");
+	// bitsyLog(tileStartBufferId, "system");
+	// bitsyLog(drawingBuffers.slice(tileStartBufferId), "system");
+	drawingBuffers = drawingBuffers.slice(0, tileStartBufferId);
+}
+
+// note: width and height are in text scale pixels
+function bitsySetTextboxSize(w, h) {
+	drawingBuffers[textboxBufferId] = createDrawingBuffer(w, h, textScale);
 }
 
 function bitsyOnLoad(fn) {

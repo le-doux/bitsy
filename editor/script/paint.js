@@ -77,6 +77,10 @@ function PaintTool(canvas, roomTool) {
 		bitsyLog("?????", "editor");
 		if (isPainting) {
 			isPainting = false;
+
+			// force all tiles to re-render
+			renderer.ClearCache();
+
 			updateDrawingData();
 			refreshGameData();
 
@@ -166,7 +170,7 @@ function PaintTool(canvas, roomTool) {
 	// TODO : rename?
 	function updateDrawingData() {
 		// this forces a renderer cache refresh but it's kind of wonky
-		renderer.SetImageSource(drawing.drw, getDrawingImageSource(drawing));
+		renderer.SetDrawingSource(drawing.drw, getDrawingImageSource(drawing));
 	}
 
 	// methods for updating the UI

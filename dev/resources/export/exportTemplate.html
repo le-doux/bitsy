@@ -19,17 +19,16 @@
 <!-- SCRIPTS -->
 <script>
 function startExportedGame() {
-	attachCanvas(document.getElementById("game"));
-	loadGame(document.getElementById("exportedGameData").text.slice(1));
+	var gameCanvas = document.getElementById("game");
+	var exportedGameData = document.getElementById("exportedGameData").text.slice(1);
+	var exportedDefaultFontData = document.getElementById(defaultFontName).text.slice(1)
+	attachCanvas(gameCanvas);
+	loadGame(exportedGameData, exportedDefaultFontData);
 }
 </script>
 
 <script>
 @@Y
-</script>
-
-<script>
-@@U
 </script>
 
 <script>

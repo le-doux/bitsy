@@ -1,8 +1,3 @@
-var xhr; // TODO : remove
-var canvas;
-var context; // TODO : remove if safe?
-var ctx;
-
 var room = {};
 var tile = {};
 var sprite = {};
@@ -33,22 +28,26 @@ var TextDirection = {
 };
 var textDirection = TextDirection.LeftToRight;
 
+/* NAME-TO-ID MAPS */
 var names = {
-	room : new Map(),
-	tile : new Map(), // Note: Not currently enabled in the UI
-	sprite : new Map(),
-	item : new Map(),
-	dialog : new Map(),
+	room : {},
+	tile : {},
+	sprite : {},
+	item : {},
+	dialog : {},
 };
+
 function updateNamesFromCurData() {
 
 	function createNameMap(objectStore) {
-		var map = new Map();
+		var map = {};
+
 		for (id in objectStore) {
 			if (objectStore[id].name != undefined && objectStore[id].name != null) {
-				map.set(objectStore[id].name, id);
+				map[objectStore[id].name] = id;
 			}
 		}
+
 		return map;
 	}
 
@@ -64,7 +63,7 @@ var spriteStartLocations = {};
 /* VERSION */
 var version = {
 	major: 7, // major changes
-	minor: 8, // smaller changes
+	minor: 9, // smaller changes
 	devBuildPhase: "RELEASE",
 };
 function getEngineVersion() {
@@ -104,14 +103,7 @@ function clearGameData() {
 
 	spriteStartLocations = {};
 
-	// hacky to have this multiple times...
-	names = {
-		room : new Map(),
-		tile : new Map(),
-		sprite : new Map(),
-		item : new Map(),
-		dialog : new Map(),
-	};
+	updateNamesFromCurData();
 
 	fontName = defaultFontName; // TODO : reset font manager too?
 	textDirection = TextDirection.LeftToRight;
@@ -136,35 +128,25 @@ var onInitRoom = null;
 
 var isPlayerEmbeddedInEditor = false;
 
-var renderer = new Renderer(tilesize, scale);
-
-function getGameNameFromURL() {
-	var game = window.location.hash.substring(1);
-	// bitsyLog("game name --- " + game);
-	return game;
-}
-
-function attachCanvas(c) {
-	canvas = c;
-	canvas.width = width * scale;
-	canvas.height = width * scale;
-	ctx = canvas.getContext("2d");
-	dialogRenderer.AttachContext(ctx);
-	renderer.AttachContext(ctx);
-}
+var renderer = new TileRenderer(tilesize);
 
 var curGameData = null;
-function load_game(game_data, startWithTitle) {
-	curGameData = game_data; //remember the current game (used to reset the game)
+var curDefaultFontData = null;
+
+function load_game(gameData, defaultFontData, startWithTitle) {
+	curGameData = gameData; //remember the current game (used to reset the game)
 
 	dialogBuffer.Reset();
 	scriptInterpreter.ResetEnvironment(); // ensures variables are reset -- is this the best way?
 
-	parseWorld(game_data);
+	parseWorld(gameData);
 
-	if (!isPlayerEmbeddedInEditor) {
+	if (!isPlayerEmbeddedInEditor && defaultFontData) {
+		curDefaultFontData = defaultFontData; // store for resetting game
+
+		// todo : consider replacing this with a more general system for requesting resources from the system?
 		// hack to ensure default font is available
-		fontManager.AddResource(defaultFontName + fontManager.GetExtension(), document.getElementById(defaultFontName).text.slice(1));
+		fontManager.AddResource(defaultFontName + fontManager.GetExtension(), defaultFontData);
 	}
 
 	var font = fontManager.Get( fontName );
@@ -183,7 +165,7 @@ function reset_cur_game() {
 
 	stopGame();
 	clearGameData();
-	load_game(curGameData);
+	load_game(curGameData, curDefaultFontData);
 
 	if (isPlayerEmbeddedInEditor && onGameReset != null) {
 		onGameReset();
@@ -236,99 +218,6 @@ function stopGame() {
 	bitsyLog("stop GAME!");
 }
 
-/* loading animation */
-var loading_anim_data = [
-	[
-		0,1,1,1,1,1,1,0,
-		0,0,1,1,1,1,0,0,
-		0,0,1,1,1,1,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,1,0,0,1,0,0,
-		0,0,1,0,0,1,0,0,
-		0,1,1,1,1,1,1,0,
-	],
-	[
-		0,1,1,1,1,1,1,0,
-		0,0,1,0,0,1,0,0,
-		0,0,1,1,1,1,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,1,0,0,1,0,0,
-		0,0,1,1,1,1,0,0,
-		0,1,1,1,1,1,1,0,
-	],
-	[
-		0,1,1,1,1,1,1,0,
-		0,0,1,0,0,1,0,0,
-		0,0,1,0,0,1,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,1,1,1,1,0,0,
-		0,0,1,1,1,1,0,0,
-		0,1,1,1,1,1,1,0,
-	],
-	[
-		0,1,1,1,1,1,1,0,
-		0,0,1,0,0,1,0,0,
-		0,0,1,0,0,1,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,0,1,1,0,0,0,
-		0,0,1,1,1,1,0,0,
-		0,0,1,1,1,1,0,0,
-		0,1,1,1,1,1,1,0,
-	],
-	[
-		0,0,0,0,0,0,0,0,
-		1,0,0,0,0,0,0,1,
-		1,1,1,0,0,1,1,1,
-		1,1,1,1,1,0,0,1,
-		1,1,1,1,1,0,0,1,
-		1,1,1,0,0,1,1,1,
-		1,0,0,0,0,0,0,1,
-		0,0,0,0,0,0,0,0,
-	]
-];
-var loading_anim_frame = 0;
-var loading_anim_speed = 500;
-
-function loadingAnimation() {
-	//create image
-	var loadingAnimImg = ctx.createImageData(8*scale, 8*scale);
-	//draw image
-	for (var y = 0; y < 8; y++) {
-		for (var x = 0; x < 8; x++) {
-			var i = (y * 8) + x;
-			if (loading_anim_data[loading_anim_frame][i] == 1) {
-				//scaling nonsense
-				for (var sy = 0; sy < scale; sy++) {
-					for (var sx = 0; sx < scale; sx++) {
-						var pxl = 4 * ( (((y*scale)+sy) * (8*scale)) + ((x*scale)+sx) );
-						loadingAnimImg.data[pxl+0] = 255;
-						loadingAnimImg.data[pxl+1] = 255;
-						loadingAnimImg.data[pxl+2] = 255;
-						loadingAnimImg.data[pxl+3] = 255;
-					}
-				}
-			}
-		}
-	}
-	//put image on canvas
-	ctx.putImageData(loadingAnimImg,scale*(width/2 - 4),scale*(height/2 - 4));
-	//update frame
-	loading_anim_frame++;
-	if (loading_anim_frame >= 5) loading_anim_frame = 0;
-}
-
-function updateLoadingScreen() {
-	// TODO : in progress
-	ctx.fillStyle = "rgb(0,0,0)";
-	ctx.fillRect(0,0,canvas.width,canvas.height);
-
-	loadingAnimation();
-	drawSprite( getSpriteImage(sprite["a"],"0",0), 8, 8, ctx );
-}
-
 function update() {
 	var curTime = Date.now();
 	deltaTime = curTime - prevTime;
@@ -347,14 +236,14 @@ function update() {
 		transition.UpdateTransition(deltaTime);
 	}
 	else {
+		bitsySetGraphicsMode(1);
+
 		if (!isNarrating && !isEnding) {
 			updateAnimation();
-			drawRoom( room[curRoom] ); // draw world if game has begun
+			drawRoom(room[curRoom]); // draw world if game has begun
 		}
 		else {
-			//make sure to still clear screen
-			ctx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
-			ctx.fillRect(0,0,canvas.width,canvas.height);
+			clearRoom();
 		}
 
 		// if (isDialogMode) { // dialog mode
@@ -384,9 +273,13 @@ function update() {
 var isAnyButtonHeld = false;
 var isIgnoringInput = false;
 
+function isAnyButtonDown() {
+	return bitsyGetButton(0) || bitsyGetButton(1) || bitsyGetButton(2) || bitsyGetButton(3) || bitsyGetButton(4);
+}
+
 function updateInput() {
 	if (dialogBuffer.IsActive()) {
-		if (!isAnyButtonHeld && bitsyButton()) {
+		if (!isAnyButtonHeld && isAnyButtonDown()) {
 			/* CONTINUE DIALOG */
 			if (dialogBuffer.CanContinue()) {
 				var hasMoreDialog = dialogBuffer.Continue();
@@ -402,7 +295,7 @@ function updateInput() {
 		}
 	}
 	else if (isEnding) {
-		if (!isAnyButtonHeld && bitsyButton()) {
+		if (!isAnyButtonHeld && isAnyButtonDown()) {
 			/* RESTART GAME */
 			reset_cur_game();
 		}
@@ -411,16 +304,16 @@ function updateInput() {
 		/* WALK */
 		var prevPlayerDirection = curPlayerDirection;
 
-		if (bitsyButton(0)) {
+		if (bitsyGetButton(0)) {
 			curPlayerDirection = Direction.Up;
 		}
-		else if (bitsyButton(1)) {
+		else if (bitsyGetButton(1)) {
 			curPlayerDirection = Direction.Down;
 		}
-		else if (bitsyButton(2)) {
+		else if (bitsyGetButton(2)) {
 			curPlayerDirection = Direction.Left;
 		}
-		else if (bitsyButton(3)) {
+		else if (bitsyGetButton(3)) {
 			curPlayerDirection = Direction.Right;
 		}
 		else {
@@ -433,11 +326,11 @@ function updateInput() {
 		}
 	}
 
-	if (!bitsyButton()) {
+	if (!isAnyButtonDown()) {
 		isIgnoringInput = false;
 	}
 
-	isAnyButtonHeld = bitsyButton();
+	isAnyButtonHeld = isAnyButtonDown();
 }
 
 var animationCounter = 0;
@@ -524,7 +417,9 @@ var curPlayerDirection = Direction.None;
 var playerHoldToMoveTimer = 0;
 
 function movePlayer(direction) {
-	if (player().room == null || !Object.keys(room).includes(player().room)) {
+	var roomIds = Object.keys(room);
+
+	if (player().room == null || roomIds.indexOf(player().room) < 0) {
 		return; // player room is missing or invalid.. can't move them!
 	}
 
@@ -587,16 +482,34 @@ var transition = new TransitionManager();
 function movePlayerThroughExit(ext) {
 	var GoToDest = function() {
 		if (ext.transition_effect != null) {
-			transition.BeginTransition(player().room, player().x, player().y, ext.dest.room, ext.dest.x, ext.dest.y, ext.transition_effect);
+			transition.BeginTransition(
+				player().room,
+				player().x,
+				player().y,
+				ext.dest.room,
+				ext.dest.x,
+				ext.dest.y,
+				ext.transition_effect);
+
 			transition.UpdateTransition(0);
+
+			transition.OnTransitionComplete(function() {
+				player().room = ext.dest.room;
+				player().x = ext.dest.x;
+				player().y = ext.dest.y;
+				curRoom = ext.dest.room;
+
+				initRoom(curRoom);
+			});
 		}
+		else {
+			player().room = ext.dest.room;
+			player().x = ext.dest.x;
+			player().y = ext.dest.y;
+			curRoom = ext.dest.room;
 
-		player().room = ext.dest.room;
-		player().x = ext.dest.x;
-		player().y = ext.dest.y;
-		curRoom = ext.dest.room;
-
-		initRoom(curRoom);
+			initRoom(curRoom);
+		}
 	};
 
 	if (ext.dlg != undefined && ext.dlg != null) {
@@ -619,7 +532,66 @@ function movePlayerThroughExit(ext) {
 	}
 }
 
+/* PALETTE INDICES */
+var textBackgroundIndex = 0;
+var textArrowIndex = 1;
+var textColorIndex = 2;
+
+// precalculated rainbow colors
+var rainbowColorStartIndex = 3;
+var rainbowColorCount = 10;
+var rainbowColors = [
+	[255,0,0],
+	[255,217,0],
+	[78,255,0],
+	[0,255,125],
+	[0,192,255],
+	[0,18,255],
+	[136,0,255],
+	[255,0,242],
+	[255,0,138],
+	[255,0,61],
+];
+
+// todo : where should this be stored?
+var tileColorStartIndex = 16;
+
+function updatePaletteWithTileColors(tileColors) {
+	// clear existing colors
+	bitsyResetColors();
+
+	// textbox colors
+	bitsySetColor(textBackgroundIndex, 0, 0, 0); // black
+	bitsySetColor(textArrowIndex, 255, 255, 255); // white
+	bitsySetColor(textColorIndex, 255, 255, 255); // white
+
+	// todo : move this to game init?
+	// rainbow colors
+	for (var i = 0; i < rainbowColorCount; i++) {
+		var color = rainbowColors[i];
+		bitsySetColor(rainbowColorStartIndex + i, color[0], color[1], color[2]);
+	}
+
+	// tile colors
+	for (var i = 0; i < tileColors.length; i++) {
+		var color = tileColors[i];
+		bitsySetColor(tileColorStartIndex + i, color[0], color[1], color[2]);
+	}
+}
+
+function updatePalette(palId) {
+	var pal = palette[palId];
+	bitsyLog(pal.colors.length, "editor");
+	updatePaletteWithTileColors(pal.colors);
+}
+
 function initRoom(roomId) {
+	bitsyLog("init room " + roomId);
+
+	updatePalette(curPal());
+
+	renderer.ClearCache();
+
 	// init exit properties
 	for (var i = 0; i < room[roomId].exits.length; i++) {
 		room[roomId].exits[i].property = { locked:false };
@@ -843,7 +815,8 @@ function parseWorld(file) {
 	placeSprites();
 
 	var roomIds = Object.keys(room);
-	if (player() != undefined && player().room != null && roomIds.includes(player().room)) {
+
+	if (player() != undefined && player().room != null && roomIds.indexOf(player().room) != -1) {
 		// player has valid room
 		curRoom = player().room;
 	}
@@ -859,8 +832,6 @@ function parseWorld(file) {
 	if (curRoom != null) {
 		initRoom(curRoom);
 	}
-
-	renderer.SetPalettes(palette);
 
 	scriptCompatibility(compatibilityFlags);
 
@@ -1111,17 +1082,17 @@ function serializeWorld(skipFonts) {
 }
 
 function serializeDrawing(drwId) {
-	var imageSource = renderer.GetImageSource(drwId);
+	var drawingData = renderer.GetDrawingSource(drwId);
 	var drwStr = "";
-	for (f in imageSource) {
-		for (y in imageSource[f]) {
+	for (f in drawingData) {
+		for (y in drawingData[f]) {
 			var rowStr = "";
-			for (x in imageSource[f][y]) {
-				rowStr += imageSource[f][y][x];
+			for (x in drawingData[f][y]) {
+				rowStr += drawingData[f][y][x];
 			}
 			drwStr += rowStr + "\n";
 		}
-		if (f < (imageSource.length-1)) drwStr += ">\n";
+		if (f < (drawingData.length-1)) drwStr += ">\n";
 	}
 	return drwStr;
 }
@@ -1323,7 +1294,7 @@ function parseRoom(lines, i, compatibilityFlags) {
 		else if (getType(lines[i]) === "NAME") {
 			var name = lines[i].split(/\s(.+)/)[1];
 			room[id].name = name;
-			names.room.set(name, id);
+			names.room[name] = id;
 		}
 
 		i++;
@@ -1380,7 +1351,7 @@ function parseTile(lines, i) {
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
 			tileData.name = lines[i].split(/\s(.+)/)[1];
-			names.tile.set(tileData.name, id);
+			names.tile[tileData.name] = id;
 		}
 		else if (getType(lines[i]) === "WAL") {
 			var wallArg = getArg(lines[i], 1);
@@ -1440,7 +1411,7 @@ function parseSprite(lines, i) {
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
 			spriteData.name = lines[i].split(/\s(.+)/)[1];
-			names.sprite.set(spriteData.name, id);
+			names.sprite[spriteData.name] = id;
 		}
 		else if (getType(lines[i]) === "ITM") {
 			/* ITEM STARTING INVENTORY */
@@ -1483,7 +1454,7 @@ function parseItem(lines, i) {
 		else if (getType(lines[i]) === "NAME") {
 			/* NAME */
 			itemData.name = lines[i].split(/\s(.+)/)[1];
-			names.item.set(itemData.name, id);
+			names.item[itemData.name] = id;
 		}
 
 		i++;
@@ -1528,7 +1499,7 @@ function parseDrawingCore(lines, i, drwId) {
 		}
 	}
 
-	renderer.SetImageSource(drwId, frameList);
+	renderer.SetDrawingSource(drwId, frameList);
 
 	return i;
 }
@@ -1604,7 +1575,7 @@ function parseDialog(lines, i, compatibilityFlags) {
 
 	if (lines[i].length > 0 && getType(lines[i]) === "NAME") {
 		dialog[id].name = lines[i].split(/\s(.+)/)[1]; // TODO : hacky to keep copying this regex around...
-		names.dialog.set(dialog[id].name, id);
+		names.dialog[dialog[id].name] = id;
 		i++;
 	}
 
@@ -1665,54 +1636,62 @@ function parseFlag(lines, i) {
 	return i;
 }
 
-function drawTile(img,x,y,context) {
-	if (!context) { //optional pass in context; otherwise, use default
-		context = ctx;
-	}
-	// NOTE: images are now canvases, instead of raw image data (for chrome performance reasons)
-	context.drawImage(img,x*tilesize*scale,y*tilesize*scale,tilesize*scale,tilesize*scale);
+function drawTile(tileId, x, y) {
+	bitsyDrawBegin(0);
+	bitsyDrawTile(tileId, x, y);
+	bitsyDrawEnd();
 }
 
-function drawSprite(img,x,y,context) { //this may differ later (or not haha)
-	drawTile(img,x,y,context);
+function drawSprite(tileId, x, y) {
+	drawTile(tileId, x, y);
 }
 
-function drawItem(img,x,y,context) {
-	drawTile(img,x,y,context); //TODO these methods are dumb and repetitive
+function drawItem(tileId, x, y) {
+	drawTile(tileId, x, y);
 }
 
 // var debugLastRoomDrawn = "0";
 
-function drawRoom(room,context,frameIndex) { // context & frameIndex are optional
-	if (!context) { //optional pass in context; otherwise, use default (ok this is REAL hacky isn't it)
-		context = ctx;
+function clearRoom() {
+	var paletteId = "default";
+
+	if (room === undefined) {
+		// protect against invalid rooms
+		return;
 	}
 
+	if (room.pal != null && palette[paletteId] != undefined) {
+		paletteId = room.pal;
+	}
+
+	bitsyDrawBegin(0);
+	bitsyClear(tileColorStartIndex);
+	bitsyDrawEnd();
+}
+
+function drawRoom(room, frameIndex) { // frameIndex is optional
 	// if (room.id != debugLastRoomDrawn) {
 	// 	debugLastRoomDrawn = room.id;
 	// 	bitsyLog("DRAW ROOM " + debugLastRoomDrawn);
 	// }
 
-	var paletteId = "default";
-
 	if (room === undefined) {
 		// protect against invalid rooms
-		context.fillStyle = "rgb(" + getPal(paletteId)[0][0] + "," + getPal(paletteId)[0][1] + "," + getPal(paletteId)[0][2] + ")";
-		context.fillRect(0,0,canvas.width,canvas.height);
 		return;
 	}
 
-	//clear screen
-	if (room.pal != null && palette[paletteId] != undefined) {
-		paletteId = room.pal;
-	}
-	context.fillStyle = "rgb(" + getPal(paletteId)[0][0] + "," + getPal(paletteId)[0][1] + "," + getPal(paletteId)[0][2] + ")";
-	context.fillRect(0,0,canvas.width,canvas.height);
+	// clear the screen buffer
+	bitsyDrawBegin(0);
+	bitsyClear(tileColorStartIndex);
+	bitsyDrawEnd();
 
 	//draw tiles
 	for (i in room.tilemap) {
 		for (j in room.tilemap[i]) {
 			var id = room.tilemap[i][j];
+			var x = parseInt(j);
+			var y = parseInt(i);
+
 			if (id != "0") {
 				//bitsyLog(id);
 				if (tile[id] == null) { // hack-around to avoid corrupting files (not a solution though!)
@@ -1721,7 +1700,7 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 				}
 				else {
 					// bitsyLog(id);
-					drawTile( getTileImage(tile[id],paletteId,frameIndex), j, i, context );
+					drawTile(getTileFrame(tile[id], frameIndex), x, y);
 				}
 			}
 		}
@@ -1730,29 +1709,29 @@ function drawRoom(room,context,frameIndex) { // context & frameIndex are optiona
 	//draw items
 	for (var i = 0; i < room.items.length; i++) {
 		var itm = room.items[i];
-		drawItem( getItemImage(item[itm.id],paletteId,frameIndex), itm.x, itm.y, context );
+		drawItem(getItemFrame(item[itm.id], frameIndex), itm.x, itm.y);
 	}
 
 	//draw sprites
 	for (id in sprite) {
 		var spr = sprite[id];
 		if (spr.room === room.id) {
-			drawSprite( getSpriteImage(spr,paletteId,frameIndex), spr.x, spr.y, context );
+			drawSprite(getSpriteFrame(spr, frameIndex), spr.x, spr.y);
 		}
 	}
 }
 
 // TODO : remove these get*Image methods
-function getTileImage(t,palId,frameIndex) {
-	return renderer.GetImage(t,palId,frameIndex);
+function getTileFrame(t, frameIndex) {
+	return renderer.GetDrawingFrame(t, frameIndex);
 }
 
-function getSpriteImage(s,palId,frameIndex) {
-	return renderer.GetImage(s,palId,frameIndex);
+function getSpriteFrame(s, frameIndex) {
+	return renderer.GetDrawingFrame(s, frameIndex);
 }
 
-function getItemImage(itm,palId,frameIndex) {
-	return renderer.GetImage(itm,palId,frameIndex);
+function getItemFrame(itm, frameIndex) {
+	return renderer.GetDrawingFrame(itm, frameIndex);
 }
 
 function curPal() {

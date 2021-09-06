@@ -256,7 +256,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				var endPos = curMarker.GetMarkerPos(1);
 
 				if (room[startPos.room] != undefined) {
-					drawRoom( room[startPos.room], markerCtx1 );
+					renderGameScreenIntoContext(startPos.room, markerCtx1);
 
 					markerCtx1.globalAlpha = 1.0;
 					markerCtx1.fillStyle = getContrastingColor(room[startPos.room].pal);
@@ -264,7 +264,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				}
 
 				if (room[endPos.room] != undefined) {
-					drawRoom( room[endPos.room], markerCtx2 );
+					renderGameScreenIntoContext(endPos.room, markerCtx2);
 
 					markerCtx2.globalAlpha = 1.0;
 					markerCtx2.fillStyle = getContrastingColor(room[endPos.room].pal);
@@ -278,7 +278,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				var markerPos = curMarker.GetMarkerPos(0);
 
 				if (room[markerPos.room] != undefined) {
-					drawRoom( room[markerPos.room], markerCtx1 );
+					renderGameScreenIntoContext(markerPos.room, markerCtx1);
 
 					markerCtx1.globalAlpha = 1.0;
 					markerCtx1.fillStyle = getContrastingColor(room[markerPos.room].pal);

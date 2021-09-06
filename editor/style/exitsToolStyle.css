@@ -52,6 +52,7 @@
 
 #markerLinkControl button {
 	margin-top: calc(0.5 * var(--bitsy-size-xs));
+	margin-bottom: calc(0.5 * var(--bitsy-size-xs));
 }
 
 #markerControl2 {
@@ -111,4 +112,12 @@
 
 #addMarkerOptions button {
 	width: 100%;
+}
+
+#editControlsMarker1 select {
+	max-width: 10ch;
+}
+
+#editControlsMarker2 select {
+	max-width: 10ch;
 }

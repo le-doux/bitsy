@@ -1,3 +1,11 @@
+v.7.9:
+- improve exit tool layout (when all menus open)
+- more robust transitions between different length palettes
+- fix bug where thumbnails don't update on add / delete
+- fix bug where gif recorder is disabled in play mode
+- fix bug where service worker stops updates from installing
+- refactor to make porting easier
+
 v7.8:
 - play mode is more visually distinct
 - tools are disabled during play mode

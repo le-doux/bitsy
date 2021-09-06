@@ -1,124 +1,65 @@
-/*
-TODO
-- reset renderer function
-- react to changes in: drawings, palettes
-- possible future plan: limit size of cache (remove old images)
-- change image store path from (pal > col > draw) to (draw > pal > col)
-- get rid of old getSpriteImage (etc) methods
-- get editor working again [in progress]
-- move debug timer class into core (seems useful)
-*/
+function TileRenderer(tilesize) {
+// todo : do I need to pass in tilesize? or can I use the global value?
 
-function Renderer(tilesize, scale) {
+bitsyLog("!!!!! NEW TILE RENDERER");
 
-bitsyLog("!!!!! NEW RENDERER");
-
-var imageStore = { // TODO : rename to imageCache
+var drawingCache = {
 	source: {},
-	render: {}
+	render: {},
 };
 
-var palettes = null; // TODO : need null checks?
-var context = null;
+// var debugRenderCount = 0;
 
-function setPalettes(paletteObj) {
-	palettes = paletteObj;
-
-	// TODO : should this really clear out the render cache?
-	imageStore.render = {};
+function createRenderCacheId(drawingId, colorIndex) {
+	return drawingId + "_" + colorIndex;
 }
 
-function getPaletteColor(paletteId, colorIndex) {
-	if (palettes[paletteId] === undefined) {
-		paletteId = "default";
-	}
-
-	var palette = palettes[paletteId];
-
-	if (colorIndex > palette.colors.length) { // do I need this failure case? (seems un-reliable)
-		colorIndex = 0;
-	}
-
-	var color = palette.colors[colorIndex];
-
-	return {
-		r : color[0],
-		g : color[1],
-		b : color[2]
-	};
-}
-
-var debugRenderCount = 0;
-
-// TODO : change image store path from (pal > col > draw) to (draw > pal > col)
-function renderImage(drawing, paletteId) {
+function renderDrawing(drawing) {
 	// debugRenderCount++;
 	// bitsyLog("RENDER COUNT " + debugRenderCount);
 
 	var col = drawing.col;
-	var colStr = "" + col;
-	var pal = paletteId;
 	var drwId = drawing.drw;
-	var imgSrc = imageStore.source[ drawing.drw ];
+	var drawingFrames = drawingCache.source[drwId];
 
 	// initialize render cache entry
-	if (imageStore.render[drwId] === undefined || imageStore.render[drwId] === null) {
-		imageStore.render[drwId] = {};
+	var cacheId = createRenderCacheId(drwId, col);
+	if (drawingCache.render[cacheId] === undefined) {
+		// initialize array of frames for drawing
+		drawingCache.render[cacheId] = [];
 	}
 
-	if (imageStore.render[drwId][pal] === undefined || imageStore.render[drwId][pal] === null) {
-		imageStore.render[drwId][pal] = {};
-	}
-
-	// create array of ImageData frames
-	imageStore.render[drwId][pal][colStr] = [];
-
-	for (var i = 0; i < imgSrc.length; i++) {
-		var frameSrc = imgSrc[i];
-		var frameData = imageDataFromImageSource( frameSrc, pal, col );
-		imageStore.render[drwId][pal][colStr].push(frameData);
+	for (var i = 0; i < drawingFrames.length; i++) {
+		var frameData = drawingFrames[i];
+		var frameTileId = renderTileFromDrawingData(frameData, col);
+		drawingCache.render[cacheId].push(frameTileId);
 	}
 }
 
-function imageDataFromImageSource(imageSource, pal, col) {
-	//bitsyLog(imageSource);
+function renderTileFromDrawingData(drawingData, col) {
+	var tileId = bitsyAddTile();
 
-	var img = context.createImageData(tilesize*scale,tilesize*scale);
+	var backgroundColor = tileColorStartIndex + 0;
+	var foregroundColor = tileColorStartIndex + col;
 
-	var backgroundColor = getPaletteColor(pal,0);
-	var foregroundColor = getPaletteColor(pal,col);
+	bitsyDrawBegin(tileId);
 
 	for (var y = 0; y < tilesize; y++) {
 		for (var x = 0; x < tilesize; x++) {
-			var px = imageSource[y][x];
-			for (var sy = 0; sy < scale; sy++) {
-				for (var sx = 0; sx < scale; sx++) {
-					var pxl = (((y * scale) + sy) * tilesize * scale * 4) + (((x*scale) + sx) * 4);
-					if ( px === 1 ) {
-						img.data[pxl + 0] = foregroundColor.r;
-						img.data[pxl + 1] = foregroundColor.g;
-						img.data[pxl + 2] = foregroundColor.b;
-						img.data[pxl + 3] = 255;
-					}
-					else { //ch === 0
-						img.data[pxl + 0] = backgroundColor.r;
-						img.data[pxl + 1] = backgroundColor.g;
-						img.data[pxl + 2] = backgroundColor.b;
-						img.data[pxl + 3] = 255;
-					}
-				}
+			var px = drawingData[y][x];
+
+			if (px === 1) {
+				bitsyDrawPixel(foregroundColor, x, y);
+			}
+			else {
+				bitsyDrawPixel(backgroundColor, x, y);
 			}
 		}
 	}
 
-	// convert to canvas: chrome has poor performance when working directly with image data
-	var imageCanvas = document.createElement("canvas");
-	imageCanvas.width = img.width;
-	imageCanvas.height = img.height;
-	var imageContext = imageCanvas.getContext("2d");
-	imageContext.putImageData(img,0,0);
+	bitsyDrawEnd();
 
-	return imageCanvas;
+	return tileId;
 }
 
 // TODO : move into core
@@ -126,29 +67,20 @@ function undefinedOrNull(x) {
 	return x === undefined || x === null;
 }
 
-function isImageRendered(drawing, paletteId) {
-	var col = drawing.col;
-	var colStr = "" + col;
-	var pal = paletteId;
-	var drwId = drawing.drw;
-
-	if (undefinedOrNull(imageStore.render[drwId]) ||
-		undefinedOrNull(imageStore.render[drwId][pal]) ||
-		undefinedOrNull(imageStore.render[drwId][pal][colStr])) {
-			return false;
-	}
-	else {
-		return true;
-	}
+function isDrawingRendered(drawing) {
+	var cacheId = createRenderCacheId(drawing.drw, drawing.col);
+	return drawingCache.render[cacheId] != undefined;
 }
 
-function getImageSet(drawing, paletteId) {
-	return imageStore.render[drawing.drw][paletteId][drawing.col];
+function getRenderedDrawingFrames(drawing) {
+	var cacheId = createRenderCacheId(drawing.drw, drawing.col);
+	return drawingCache.render[cacheId];
 }
 
-function getImageFrame(drawing, paletteId, frameOverride) {
+function getDrawingFrameTileId(drawing, frameOverride) {
 	var frameIndex = 0;
-	if (drawing.animation.isAnimated) {
+
+	if (drawing != null && drawing.animation.isAnimated) {
 		if (frameOverride != undefined && frameOverride != null) {
 			frameIndex = frameOverride;
 		}
@@ -157,41 +89,39 @@ function getImageFrame(drawing, paletteId, frameOverride) {
 		}
 	}
 
-	return getImageSet(drawing, paletteId)[frameIndex];
+	return getRenderedDrawingFrames(drawing)[frameIndex];
 }
 
-function getOrRenderImage(drawing, paletteId, frameOverride) {
-	if (!isImageRendered(drawing, paletteId)) {
-		renderImage(drawing, paletteId);
+function getOrRenderDrawingFrame(drawing, frameOverride) {
+	// bitsyLog("frame render: " + drawing.type + " " + drawing.id + " f:" + frameOverride);
+
+	if (!isDrawingRendered(drawing)) {
+		// bitsyLog("frame render: doesn't exist");
+		renderDrawing(drawing);
 	}
 
-	return getImageFrame(drawing, paletteId, frameOverride);
+	return getDrawingFrameTileId(drawing, frameOverride);
 }
 
 /* PUBLIC INTERFACE */
-this.GetImage = getOrRenderImage;
+this.GetDrawingFrame = getOrRenderDrawingFrame;
 
-this.SetPalettes = setPalettes;
-
-this.SetImageSource = function(drawingId, imageSourceData) {
-	imageStore.source[drawingId] = imageSourceData;
-	imageStore.render[drawingId] = {}; // reset render cache for this image
+this.SetDrawingSource = function(drawingId, drawingData) {
+	drawingCache.source[drawingId] = drawingData;
+	// TODO : reset render cache for this image
 }
 
-this.GetImageSource = function(drawingId) {
-	return imageStore.source[drawingId];
+this.GetDrawingSource = function(drawingId) {
+	return drawingCache.source[drawingId];
 }
 
 this.GetFrameCount = function(drawingId) {
-	return imageStore.source[drawingId].length;
-}
-
-this.AttachContext = function(ctx) {
-	context = ctx;
+	return drawingCache.source[drawingId].length;
 }
 
 this.ClearCache = function() {
-	imageStore.render = {};
+	bitsyResetTiles();
+	drawingCache.render = {};
 }
 
 } // Renderer()
