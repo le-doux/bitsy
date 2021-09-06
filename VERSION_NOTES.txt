@@ -4,7 +4,7 @@ v.7.9:
 - fix bug where thumbnails don't update on add / delete
 - fix bug where gif recorder is disabled in play mode
 - fix bug where updates are not installed
-	- had to turn of service worker temporarily
+	- had to turn off service worker temporarily
 - refactor to make porting easier
 
 v7.8:
