@@ -3,7 +3,8 @@ v.7.9:
 - more robust transitions between different length palettes
 - fix bug where thumbnails don't update on add / delete
 - fix bug where gif recorder is disabled in play mode
-- fix bug where service worker stops updates from installing
+- fix bug where updates are not installed
+	- had to turn of service worker temporarily
 - refactor to make porting easier
 
 v7.8:
