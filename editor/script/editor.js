@@ -613,7 +613,8 @@ function refreshGameData() {
 
 	Store.set("game_data", gameDataNoFonts);
 
-	// events.Raise("game_data_refresh");
+	// todo : test if re-enabling this going to mess up HTML imports?
+	events.Raise("game_data_refresh");
 }
 
 /* TIMER */
@@ -1201,10 +1202,9 @@ function selectRoom(roomId) {
 
 	if (nextRoomIndex != -1) {
 		roomIndex = nextRoomIndex;
-		curRoom = ids[roomIndex];
 
-		// hacky engine call oh well
-		// initRoom(curRoom);
+		curRoom = ids[roomIndex];
+		initRoom(curRoom);
 
 		markerTool.SetRoom(curRoom);
 		roomTool.drawEditMap();
@@ -1223,8 +1223,12 @@ function selectRoom(roomId) {
 
 function nextRoom() {
 	var ids = sortedRoomIdList();
+
 	roomIndex = (roomIndex + 1) % ids.length;
+
 	curRoom = ids[roomIndex];
+	initRoom(curRoom);
+
 	markerTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();
@@ -1241,9 +1245,15 @@ function nextRoom() {
 
 function prevRoom() {
 	var ids = sortedRoomIdList();
+
 	roomIndex--;
-	if (roomIndex < 0) roomIndex = (ids.length-1);
+	if (roomIndex < 0) {
+		roomIndex = (ids.length - 1);
+	}
+
 	curRoom = ids[roomIndex];
+	initRoom(curRoom);
+
 	markerTool.SetRoom(curRoom);
 	roomTool.drawEditMap();
 	paintTool.updateCanvas();

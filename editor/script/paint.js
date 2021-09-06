@@ -77,6 +77,10 @@ function PaintTool(canvas, roomTool) {
 		bitsyLog("?????", "editor");
 		if (isPainting) {
 			isPainting = false;
+
+			// force all tiles to re-render
+			renderer.ClearCache();
+
 			updateDrawingData();
 			refreshGameData();
 
