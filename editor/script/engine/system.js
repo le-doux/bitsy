@@ -314,11 +314,14 @@ function loadGame(gameData, defaultFontData) {
 function renderGame() {
 	// bitsyLog("render game mode=" + curGraphicsMode, "system");
 
+	bitsyLog(systemPalette.length, "system");
+
 	var startIndex = curGraphicsMode === 0 ? screenBufferId : (drawingBuffers.length - 1);
 
 	for (var i = startIndex; i >= 0; i--) {
 		var buffer = drawingBuffers[i];
 		if (buffer && buffer.canvas === null) {
+			bitsyLog("render buffer " + i, "system");
 			renderDrawingBuffer(i, buffer);
 		}
 	}
@@ -372,7 +375,7 @@ var ctx;
 var textScale = 2; // todo : move tile scale into here too?
 
 var curGraphicsMode = 0;
-var systemPalette = [];
+var systemPalette = [[0, 0, 0]];
 var curBufferId = -1; // note: -1 is invalid
 var drawingBuffers = [];
 
@@ -602,7 +605,18 @@ function bitsySetColor(paletteIndex, r, g, b) {
 	// invalidate all drawing buffers
 	for (var i = 0; i < drawingBuffers.length; i++) {
 		if (drawingBuffers[i]) {
-			drawingBuffers[i].canvas = null;
+			invalidateDrawingBuffer(drawingBuffers[i]);
+		}
+	}
+}
+
+function bitsyResetColors() {
+	systemPalette = [[0, 0, 0]];
+
+	// invalidate all drawing buffers
+	for (var i = 0; i < drawingBuffers.length; i++) {
+		if (drawingBuffers[i]) {
+			invalidateDrawingBuffer(drawingBuffers[i]);
 		}
 	}
 }
@@ -620,6 +634,12 @@ function bitsyDrawEnd() {
 function bitsyDrawPixel(paletteIndex, x, y) {
 	if (curBufferId === screenBufferId && curGraphicsMode != 0) {
 		return;
+	}
+
+	// avoid trying to render out-of-bounds colors
+	if (paletteIndex >= systemPalette.length) {
+		bitsyLog("invalid color! " + paletteIndex, "system");
+		paletteIndex = systemPalette.length - 1;
 	}
 
 	var buffer = drawingBuffers[curBufferId];
@@ -645,6 +665,11 @@ function bitsyDrawTextbox(x, y) {
 }
 
 function bitsyClear(paletteIndex) {
+	// avoid trying to render out-of-bounds colors
+	if (paletteIndex >= systemPalette.length) {
+		paletteIndex = systemPalette.length - 1;
+	}
+
 	drawingBuffers[curBufferId].instructions = []; // reset instructions
 	drawingBuffers[curBufferId].instructions.push({ type: DrawingInstruction.Clear, id: paletteIndex, });
 }

@@ -167,12 +167,16 @@ function renderGameScreenIntoContext(roomId, context, frameIndex) {
 		ctx = context;
 	}
 
-	bitsySetGraphicsMode(1); // tile mode
 	updatePalette(room[roomId].pal);
+	renderer.ClearCache();
+
+	bitsySetGraphicsMode(1); // tile mode
 	drawRoom(room[roomId], frameIndex);
 	renderGame();
 
 	updatePalette(curPal());
+	renderer.ClearCache();
+
 	ctx = tmpCtx;
 }
 

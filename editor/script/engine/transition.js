@@ -73,10 +73,7 @@ var TransitionManager = function() {
 
 			if (transitionEffects[curEffect].paletteEffectFunc) {
 				var colors = transitionEffects[curEffect].paletteEffectFunc(transitionStart, transitionEnd, (step / maxStep));
-
-				for (var i = 0; i < colors.length; i++) {
-					bitsySetColor(tileColorStartIndex + i, colors[i][0], colors[i][1], colors[i][2]);
-				}
+				updatePaletteWithTileColors(colors);
 			}
 
 			bitsyDrawBegin(0);
@@ -257,6 +254,33 @@ var TransitionManager = function() {
 		},
 	});
 
+	function lerpPalettes(start, end, delta) {
+		var colors = [];
+
+		var maxLength = (start.Palette.length > end.Palette.length) ?
+			start.Palette.length : end.Palette.length;
+
+		for (var i = 0; i < maxLength; i++) {
+			if (i < start.Palette.length && i < end.Palette.length) {
+				colors.push(lerpColor(start.Palette[i], end.Palette[i], delta));
+			}
+			else if (i < start.Palette.length) {
+				colors.push(lerpColor(
+					start.Palette[i],
+					end.Palette[end.Palette.length - 1],
+					delta));
+			}
+			else if (i < end.Palette.length) {
+				colors.push(lerpColor(
+					start.Palette[start.Palette.length - 1],
+					end.Palette[i],
+					delta));
+			}
+		}
+
+		return colors;
+	}
+
 	this.RegisterTransitionEffect("slide_u", {
 		showPlayerStart : false,
 		showPlayerEnd : true,
@@ -273,15 +297,7 @@ var TransitionManager = function() {
 				return end.Image.GetPixel(pixelX, slidePixelY);
 			}
 		},
-		paletteEffectFunc : function(start, end, delta) {
-			var colors = [];
-
-			for (var i = 0; i < start.Palette.length; i++) {
-				colors.push(lerpColor(start.Palette[i], end.Palette[i], delta));
-			}
-
-			return colors;
-		},
+		paletteEffectFunc : lerpPalettes,
 	});
 
 	this.RegisterTransitionEffect("slide_d", {
@@ -300,15 +316,7 @@ var TransitionManager = function() {
 				return end.Image.GetPixel(pixelX, slidePixelY);
 			}
 		},
-		paletteEffectFunc : function(start, end, delta) {
-			var colors = [];
-
-			for (var i = 0; i < start.Palette.length; i++) {
-				colors.push(lerpColor(start.Palette[i], end.Palette[i], delta));
-			}
-
-			return colors;
-		},
+		paletteEffectFunc : lerpPalettes,
 	});
 
 	this.RegisterTransitionEffect("slide_l", {
@@ -327,15 +335,7 @@ var TransitionManager = function() {
 				return end.Image.GetPixel(slidePixelX, pixelY);
 			}
 		},
-		paletteEffectFunc : function(start, end, delta) {
-			var colors = [];
-
-			for (var i = 0; i < start.Palette.length; i++) {
-				colors.push(lerpColor(start.Palette[i], end.Palette[i], delta));
-			}
-
-			return colors;
-		},
+		paletteEffectFunc : lerpPalettes,
 	});
 
 	this.RegisterTransitionEffect("slide_r", {
@@ -354,15 +354,7 @@ var TransitionManager = function() {
 				return end.Image.GetPixel(slidePixelX, pixelY);
 			}
 		},
-		paletteEffectFunc : function(start, end, delta) {
-			var colors = [];
-
-			for (var i = 0; i < start.Palette.length; i++) {
-				colors.push(lerpColor(start.Palette[i], end.Palette[i], delta));
-			}
-
-			return colors;
-		},
+		paletteEffectFunc : lerpPalettes,
 	});
 
 	// todo : move to Renderer()?

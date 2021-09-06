@@ -556,7 +556,10 @@ var rainbowColors = [
 // todo : where should this be stored?
 var tileColorStartIndex = 16;
 
-function updatePalette(palId) {
+function updatePaletteWithTileColors(tileColors) {
+	// clear existing colors
+	bitsyResetColors();
+
 	// textbox colors
 	bitsySetColor(textBackgroundIndex, 0, 0, 0); // black
 	bitsySetColor(textArrowIndex, 255, 255, 255); // white
@@ -570,20 +573,24 @@ function updatePalette(palId) {
 	}
 
 	// tile colors
-	var pal = palette[palId];
-
-	for (var i = 0; i < pal.colors.length; i++) {
-		var color = pal.colors[i];
+	for (var i = 0; i < tileColors.length; i++) {
+		var color = tileColors[i];
 		bitsySetColor(tileColorStartIndex + i, color[0], color[1], color[2]);
 	}
+}
+
+function updatePalette(palId) {
+	var pal = palette[palId];
+	bitsyLog(pal.colors.length, "editor");
+	updatePaletteWithTileColors(pal.colors);
 }
 
 function initRoom(roomId) {
 	bitsyLog("init room " + roomId);
 
-	renderer.ClearCache();
-
 	updatePalette(curPal());
+
+	renderer.ClearCache();
 
 	// init exit properties
 	for (var i = 0; i < room[roomId].exits.length; i++) {
