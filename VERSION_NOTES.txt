@@ -1,6 +1,7 @@
 v.7.9:
 - improve exit tool layout (when all menus open)
 - fix bug where thumbnails don't update on add / delete
+- fix bug where gif recorder is disabled in play mode
 
 v7.8:
 - play mode is more visually distinct
