@@ -58,40 +58,13 @@ function unescapeSpecialCharacters(str) {
 this.importGame = function( html ) {
 	bitsyLog("IMPORT!!!", "editor");
 
-	// IMPORT : old style
-	// find start of game data
-	var i = html.indexOf("var exportedGameData");
-	if(i > -1) {
-		bitsyLog("OLD STYLE", "editor");
-
-		while ( html.charAt(i) != '"' ) {
-			i++; // move to first quote
-		}
-		i++; // move past first quote
-
-		// isolate game data
-		var gameDataStr = "";
-		var isEscapeChar = false;
-		while ( html.charAt(i) != '"' || isEscapeChar ) {
-			gameDataStr += html.charAt(i);
-			isEscapeChar = html.charAt(i) == "\\";
-			i++;
-		}
-
-		// replace special characters
-		gameDataStr = gameDataStr.replace(/\\n/g, "\n"); //todo: move this into the method below
-		gameDataStr = unescapeSpecialCharacters( gameDataStr );
-
-		return gameDataStr;		
-	}
-
 	// IMPORT : new style
 	var scriptStart = '<script type="bitsyGameData" id="exportedGameData">\n';
 	var scriptEnd = '</script>';
 
 	// this is kind of embarassing, but I broke import by making the export template pass w3c validation
 	// so we have to check for two slightly different versions of the script start line :(
-	i = html.indexOf( scriptStart );
+	var i = html.indexOf( scriptStart );
 	if (i === -1) {
 		scriptStart = '<script type="text/bitsyGameData" id="exportedGameData">\n';
 		i = html.indexOf( scriptStart );
@@ -119,6 +92,35 @@ this.importGame = function( html ) {
 			i++;
 		}
 		return gameStr;
+	}
+
+	// bugfix for 7.9: moved the old style of import after the new style since I accidentally
+	// triggered the old style in the HTML template for v7.9 - this way those files will still import
+	// IMPORT : old style
+	// find start of game data
+	i = html.indexOf("var exportedGameData");
+	if (i > -1) {
+		bitsyLog("OLD STYLE", "editor");
+
+		while ( html.charAt(i) != '"' ) {
+			i++; // move to first quote
+		}
+		i++; // move past first quote
+
+		// isolate game data
+		var gameDataStr = "";
+		var isEscapeChar = false;
+		while ( html.charAt(i) != '"' || isEscapeChar ) {
+			gameDataStr += html.charAt(i);
+			isEscapeChar = html.charAt(i) == "\\";
+			i++;
+		}
+
+		// replace special characters
+		gameDataStr = gameDataStr.replace(/\\n/g, "\n"); //todo: move this into the method below
+		gameDataStr = unescapeSpecialCharacters( gameDataStr );
+
+		return gameDataStr;
 	}
 
 	bitsyLog("FAIL!!!!", "editor");
