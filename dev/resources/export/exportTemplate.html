@@ -20,10 +20,10 @@
 <script>
 function startExportedGame() {
 	var gameCanvas = document.getElementById("game");
-	var exportedGameData = document.getElementById("exportedGameData").text.slice(1);
-	var exportedDefaultFontData = document.getElementById(defaultFontName).text.slice(1)
+	var gameData = document.getElementById("exportedGameData").text.slice(1);
+	var defaultFontData = document.getElementById(defaultFontName).text.slice(1)
 	attachCanvas(gameCanvas);
-	loadGame(exportedGameData, exportedDefaultFontData);
+	loadGame(gameData, defaultFontData);
 }
 </script>
 
