@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2016-2019 Adam Le Doux
+Copyright (c) 2016-present, Bitsy authors (see CREDITS.md)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
