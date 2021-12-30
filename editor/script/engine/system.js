@@ -389,6 +389,7 @@ var DrawingInstruction = {
 	Tile : 1,
 	Clear : 2,
 	Textbox : 3,
+	PixelIndex : 4,
 };
 
 function attachCanvas(c) {
@@ -435,6 +436,39 @@ function renderPixelInstruction(bufferId, buffer, paletteIndex, x, y) {
 		}
 	}
 	else {
+		var bufferContext = buffer.canvas.getContext("2d");
+		bufferContext.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
+		bufferContext.fillRect(x * buffer.scale, y * buffer.scale, buffer.scale, buffer.scale);
+	}
+}
+
+function renderPixelAtIndexInstruction(bufferId, buffer, paletteIndex, index) {
+	if (bufferId === screenBufferId && curGraphicsMode != 0) {
+		return;
+	}
+
+	if (!systemPalette[paletteIndex]) {
+		// bitsyLog("invalid index " + paletteIndex + " @ " + x + "," + y, "system");
+		return;
+	}
+
+	var color = systemPalette[paletteIndex];
+
+	if (buffer.imageData) {
+		for (var sy = 0; sy < buffer.scale; sy++) {
+			for (var sx = 0; sx < buffer.scale; sx++) {
+				var pixelIndex = index * 4;
+
+				buffer.imageData.data[pixelIndex + 0] = color[0];
+				buffer.imageData.data[pixelIndex + 1] = color[1];
+				buffer.imageData.data[pixelIndex + 2] = color[2];
+				buffer.imageData.data[pixelIndex + 3] = 255;
+			}
+		}
+	}
+	else {
+		var y = Math.floor(index / buffer.width);
+		var x = index - (y * buffer.width);
 		var bufferContext = buffer.canvas.getContext("2d");
 		bufferContext.fillStyle = "rgb(" + color[0] + "," + color[1] + "," + color[2] + ")";
 		bufferContext.fillRect(x * buffer.scale, y * buffer.scale, buffer.scale, buffer.scale);
@@ -514,6 +548,8 @@ function renderDrawingBuffer(bufferId, buffer) {
 			case DrawingInstruction.Textbox:
 				renderTextboxInstruction(bufferId, buffer, instruction.x, instruction.y);
 				break;
+			case DrawingInstruction.PixelIndex:
+				renderPixelAtIndexInstruction(bufferId, buffer, instruction.id, instruction.index);
 		}
 	}
 
@@ -644,6 +680,23 @@ function bitsyDrawPixel(paletteIndex, x, y) {
 
 	var buffer = drawingBuffers[curBufferId];
 	buffer.instructions.push({ type: DrawingInstruction.Pixel, id: paletteIndex, x: x, y: y, });
+}
+
+// todo : name is too long :(
+// todo : merge with function above?
+function bitsySetPixelAtIndex(paletteIndex, pixelIndex) {
+	if (curBufferId === screenBufferId && curGraphicsMode != 0) {
+		return;
+	}
+
+	// avoid trying to render out-of-bounds colors
+	if (paletteIndex >= systemPalette.length) {
+		bitsyLog("invalid color! " + paletteIndex, "system");
+		paletteIndex = systemPalette.length - 1;
+	}
+
+	var buffer = drawingBuffers[curBufferId];
+	buffer.instructions.push({ type: DrawingInstruction.PixelIndex, id: paletteIndex, index: pixelIndex, });
 }
 
 function bitsyDrawTile(tileId, x, y) {

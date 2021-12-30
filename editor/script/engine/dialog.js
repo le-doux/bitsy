@@ -131,7 +131,7 @@ var DialogRenderer = function() {
 				var i = (y * char.width) + x;
 				if (charData[i] == 1) {
 					// todo : other colors
-					bitsyDrawPixel(char.color, left + x, top + y);
+					bitsySetPixelAtIndex(char.color, ((top + y) * (textboxInfo.width * text_scale)) + (left + x));
 				}
 			}
 		}
