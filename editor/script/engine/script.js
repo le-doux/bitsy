@@ -543,24 +543,26 @@ function exitFunc(environment,parameters,onReturn) {
 		transition.UpdateTransition(0);
 	}
 
+	var movePlayerAndResumeScript = function() {
+		// update world state
+		player().room = destRoom;
+		player().x = destX;
+		player().y = destY;
+		curRoom = destRoom;
+
+		// update game state
+		initRoom(curRoom);
+
+		// resume dialog script
+		onReturn(null);
+	};
+
 	// TODO : this doesn't play nice with pagebreak because it thinks the dialog is finished!
 	if (transition.IsTransitionActive()) {
-		transition.OnTransitionComplete(function() {
-			// update world state
-			player().room = destRoom;
-			player().x = destX;
-			player().y = destY;
-			curRoom = destRoom;
-
-			// update game state
-			initRoom(curRoom);
-
-			// resume dialog script
-			onReturn(null);
-		});
+		transition.OnTransitionComplete(movePlayerAndResumeScript);
 	}
 	else {
-		onReturn(null);
+		movePlayerAndResumeScript();
 	}
 }
 
