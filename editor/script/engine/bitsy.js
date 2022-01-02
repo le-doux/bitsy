@@ -109,11 +109,11 @@ function clearGameData() {
 	textDirection = TextDirection.LeftToRight;
 }
 
-var width = 128;
-var height = 128;
 var scale = 4; //this is stupid but necessary
 var tilesize = 8;
 var mapsize = 16;
+var width = mapsize * tilesize;
+var height = mapsize * tilesize;
 
 var curRoom = "0";
 
