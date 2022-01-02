@@ -2803,7 +2803,8 @@ function DialogTool() {
 						var itemThumbnail = document.createElement("img");
 						span.appendChild(itemThumbnail);
 						itemThumbnail.id = "param_item_" + curValue;
-						itemThumbnail.style.width = "16px";
+						itemThumbnail.style.width = tilesize * 2 + "px";
+						itemThumbnail.style.height = tilesize * 2 + "px";
 						itemThumbnail.style.marginLeft = "4px";
 						thumbnailRenderer.Render(itemThumbnail.id, item[curValue], 0, itemThumbnail);
 					}
