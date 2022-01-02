@@ -637,7 +637,7 @@ function isWallLeft() {
 }
 
 function isWallRight() {
-	return (player().x + 1 >= 16) || isWall( player().x + 1, player().y );
+	return (player().x + 1 >= mapsize) || isWall( player().x + 1, player().y );
 }
 
 function isWallUp() {
@@ -645,7 +645,7 @@ function isWallUp() {
 }
 
 function isWallDown() {
-	return (player().y + 1 >= 16) || isWall( player().x, player().y + 1 );
+	return (player().y + 1 >= mapsize) || isWall( player().x, player().y + 1 );
 }
 
 function isWall(x,y,roomId) {
@@ -1098,9 +1098,9 @@ function serializeDrawing(drwId) {
 }
 
 function isExitValid(e) {
-	var hasValidStartPos = e.x >= 0 && e.x < 16 && e.y >= 0 && e.y < 16;
+	var hasValidStartPos = e.x >= 0 && e.x < mapsize && e.y >= 0 && e.y < mapsize;
 	var hasDest = e.dest != null;
-	var hasValidRoomDest = (e.dest.room != null && e.dest.x >= 0 && e.dest.x < 16 && e.dest.y >= 0 && e.dest.y < 16);
+	var hasValidRoomDest = (e.dest.room != null && e.dest.x >= 0 && e.dest.x < mapsize && e.dest.y >= 0 && e.dest.y < mapsize);
 	return hasValidStartPos && hasDest && hasValidRoomDest;
 }
 
