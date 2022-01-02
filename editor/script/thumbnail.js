@@ -4,8 +4,8 @@ function ThumbnailRenderer() {
 
 	var drawingThumbnailCanvas, drawingThumbnailCtx;
 	drawingThumbnailCanvas = document.createElement("canvas");
-	drawingThumbnailCanvas.width = 8 * scale; // TODO: scale constants need to be contained somewhere
-	drawingThumbnailCanvas.height = 8 * scale;
+	drawingThumbnailCanvas.width = tilesize * scale; // TODO: scale constants need to be contained somewhere
+	drawingThumbnailCanvas.height = tilesize * scale;
 	drawingThumbnailCtx = drawingThumbnailCanvas.getContext("2d");
 
 	var thumbnailRenderEncoders = {};
@@ -57,18 +57,18 @@ function ThumbnailRenderer() {
 
 		if( isAnimated || frameIndex == 0 ) {
 			thumbnailDraw(drawing, drawingThumbnailCtx, 0, 0, 0 /*frameIndex*/);
-			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,tilesize*scale,tilesize*scale).data );
 		}
 		if( isAnimated || frameIndex == 1 ) {
 			thumbnailDraw(drawing, drawingThumbnailCtx, 0, 0, 1 /*frameIndex*/);
-			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,8*scale,8*scale).data );
+			drawingFrameData.push( drawingThumbnailCtx.getImageData(0,0,tilesize*scale,tilesize*scale).data );
 		}
 
 		// create encoder
 		var gifData = {
 			frames: drawingFrameData,
-			width: 8*scale,
-			height: 8*scale,
+			width: tilesize*scale,
+			height: tilesize*scale,
 			palette: hexPalette,
 			loops: 0,
 			delay: animationTime / 10 // TODO why divide by 10???
@@ -117,8 +117,8 @@ function ThumbnailRenderer() {
 
 function ThumbnailRendererBase(getRenderable, getHexPalette, onRender) {
 	var renderCanvas = document.createElement("canvas");
-	renderCanvas.width = 8 * scale; // TODO: scale constants need to be contained somewhere
-	renderCanvas.height = 8 * scale;
+	renderCanvas.width = tilesize * scale; // TODO: scale constants need to be contained somewhere
+	renderCanvas.height = tilesize * scale;
 
 	var renderCtx = renderCanvas.getContext("2d");
 
@@ -227,7 +227,7 @@ function createDrawingThumbnailRenderer(source) {
 
 					if (renderedImg) {
 						ctx.drawImage(renderedImg, 0, 0, tilesize * scale, tilesize * scale);
-						renderFrames.push(ctx.getImageData(0, 0, 8 * scale, 8 * scale).data);
+						renderFrames.push(ctx.getImageData(0, 0, tilesize * scale, tilesize * scale).data);
 					}
 					else {
 						bitsyLog("oh no! image render for thumbnail failed", "editor");
@@ -281,23 +281,26 @@ function createPaletteThumbnailRenderer() {
 	}
 
 	var onRender = function(pal, ctx, options) {
+		var padding = 0.125;
+		var fillSize = 1 - padding*2;
 		if (pal.id in palette) {
 			var hexPalette = getHexPaletteBase(pal);
+			var bar = (1 / 3) * fillSize;
 
 			ctx.fillStyle = "black";
-			ctx.fillRect(0, 0, 8 * scale, 8 * scale);
+			ctx.fillRect(0, 0, tilesize * scale, tilesize * scale);
 
 			ctx.fillStyle = "#" + hexPalette[0];
-			ctx.fillRect(1 * scale, 1 * scale, 6 * scale, 2 * scale);
+			ctx.fillRect(tilesize * scale * padding, tilesize * scale * (padding + 0 * bar), tilesize * scale * fillSize, tilesize * scale * bar);
 
 			ctx.fillStyle = "#" + hexPalette[1];
-			ctx.fillRect(1 * scale, 3 * scale, 6 * scale, 2 * scale);
+			ctx.fillRect(tilesize * scale * padding, tilesize * scale * (padding + 1 * bar), tilesize * scale * fillSize, tilesize * scale * bar);
 
 			ctx.fillStyle = "#" + hexPalette[2];
-			ctx.fillRect(1 * scale, 5 * scale, 6 * scale, 2 * scale);
+			ctx.fillRect(tilesize * scale * padding, tilesize * scale * (padding + 2 * bar), tilesize * scale * fillSize, tilesize * scale * bar);
 		}
 
-		return [ctx.getImageData(0, 0, 8 * scale, 8 * scale).data];
+		return [ctx.getImageData(0, 0, tilesize * scale, tilesize * scale).data];
 	}
 
 	return new ThumbnailRendererBase(getRenderable, getHexPalette, onRender);
@@ -325,8 +328,8 @@ function createRoomThumbnailRenderer() {
 	}
 
 	function onRender(r, ctx, options) {
-		var roomRenderSize = 8 * scale;
-		var tileRenderSize = roomRenderSize / 16;
+		var roomRenderSize = tilesize * scale;
+		var tileRenderSize = roomRenderSize / mapsize;
 
 		if (r.id in room) {
 			var roomId = r.id;
@@ -338,8 +341,8 @@ function createRoomThumbnailRenderer() {
 			ctx.fillRect(0, 0, roomRenderSize, roomRenderSize);
 
 			// tiles
-			for (var ry = 0; ry < 16; ry++) {
-				for (var rx = 0; rx < 16; rx++) {
+			for (var ry = 0; ry < mapsize; ry++) {
+				for (var rx = 0; rx < mapsize; rx++) {
 					var tileId = r.tilemap[ry][rx];
 
 					if (tileId != "0" && (tileId in tile)) {
