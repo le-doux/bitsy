@@ -2034,11 +2034,11 @@ function editDrawingAtCoordinate(x,y) {
 		return;
 	}
 
-	var item = getItem(curRoom,x,y);
+	var itemObj = getItem(curRoom,x,y);
 	// bitsyLog(item, "editor");
-	if(item) {
+	if(itemObj) {
 		on_paint_item_ui_update();
-		paintTool.selectDrawing(item[item.id]);
+		paintTool.selectDrawing(item[itemObj.id]);
 		return;
 	}
 
