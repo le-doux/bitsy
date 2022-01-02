@@ -243,12 +243,12 @@ var updateInterval = null;
 
 function initSystem() {
 	// temp hack for the editor? unless??
-	drawingBuffers[screenBufferId] = createDrawingBuffer(128, 128, scale);
+	drawingBuffers[screenBufferId] = createDrawingBuffer(width, height, scale);
 	drawingBuffers[textboxBufferId] = createDrawingBuffer(0, 0, textScale);
 }
 
 function loadGame(gameData, defaultFontData) {
-	drawingBuffers[screenBufferId] = createDrawingBuffer(128, 128, scale);
+	drawingBuffers[screenBufferId] = createDrawingBuffer(width, height, scale);
 	drawingBuffers[textboxBufferId] = createDrawingBuffer(0, 0, textScale);
 
 	document.addEventListener('keydown', input.onkeydown);
