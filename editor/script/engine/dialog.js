@@ -874,9 +874,12 @@ var ArabicHandler = function() {
 /* NEW TEXT EFFECTS */
 var TextEffects = {};
 
+function positiveModulo(number, divisor) {
+	return ((number % divisor) + divisor) % divisor;
+}
 var RainbowEffect = function() {
 	this.DoEffect = function(char, time) {
-		char.color = rainbowColorStartIndex + Math.floor(((time / 100) - char.col * 0.5) % rainbowColorCount);
+		char.color = rainbowColorStartIndex + Math.floor(positiveModulo((time / 100) - char.col * 0.5, rainbowColorCount));
 	}
 };
 TextEffects["rbw"] = new RainbowEffect();
