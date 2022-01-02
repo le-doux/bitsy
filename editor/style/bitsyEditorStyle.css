@@ -232,6 +232,8 @@ input[type=checkbox] + label:hover {
 	max-height: 100%;
 	overflow-y: auto;
 	overflow-x: hidden;
+	display: flex;
+	flex-direction: column;
 }
 
 .bitsy-card-xs .bitsy-card-main {
