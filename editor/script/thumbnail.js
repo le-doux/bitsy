@@ -285,19 +285,15 @@ function createPaletteThumbnailRenderer() {
 		var fillSize = 1 - padding*2;
 		if (pal.id in palette) {
 			var hexPalette = getHexPaletteBase(pal);
-			var bar = (1 / 3) * fillSize;
+			var bar = (1 / hexPalette.length) * fillSize;
 
 			ctx.fillStyle = "black";
 			ctx.fillRect(0, 0, tilesize * scale, tilesize * scale);
 
-			ctx.fillStyle = "#" + hexPalette[0];
-			ctx.fillRect(tilesize * scale * padding, tilesize * scale * (padding + 0 * bar), tilesize * scale * fillSize, tilesize * scale * bar);
-
-			ctx.fillStyle = "#" + hexPalette[1];
-			ctx.fillRect(tilesize * scale * padding, tilesize * scale * (padding + 1 * bar), tilesize * scale * fillSize, tilesize * scale * bar);
-
-			ctx.fillStyle = "#" + hexPalette[2];
-			ctx.fillRect(tilesize * scale * padding, tilesize * scale * (padding + 2 * bar), tilesize * scale * fillSize, tilesize * scale * bar);
+			for (i in hexPalette) {
+				ctx.fillStyle = "#" + hexPalette[i];
+				ctx.fillRect(tilesize * scale * padding, tilesize * scale * (padding + i * bar), tilesize * scale * fillSize, tilesize * scale * bar);
+			}
 		}
 
 		return [ctx.getImageData(0, 0, tilesize * scale, tilesize * scale).data];
