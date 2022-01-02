@@ -259,7 +259,7 @@ function createPaletteThumbnailRenderer() {
 		return palette[id];
 	}
 
-	var getHexPalette = function(pal) {
+	var getHexPaletteBase = function(pal) {
 		var hexPalette = [];
 
 		if (pal.id in palette) {
@@ -275,9 +275,14 @@ function createPaletteThumbnailRenderer() {
 		return hexPalette;
 	}
 
+	// always include black for border, but not in palette itself
+	var getHexPalette = function(pal) {
+		return getHexPaletteBase(pal).concat('000000');
+	}
+
 	var onRender = function(pal, ctx, options) {
 		if (pal.id in palette) {
-			var hexPalette = getHexPalette(pal);
+			var hexPalette = getHexPaletteBase(pal);
 
 			ctx.fillStyle = "black";
 			ctx.fillRect(0, 0, 8 * scale, 8 * scale);
