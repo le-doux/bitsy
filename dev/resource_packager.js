@@ -1,5 +1,7 @@
 var fs = require("fs");
 
+/* NOTE: this is made to deal with text files. if you add binaries to it,
+ * it WILL break! */
 var resourceFiles = [
 	/* localization */
 	"resources/localization.tsv",
@@ -40,6 +42,11 @@ for (var i = 0; i < resourceFiles.length; i++) {
 	var path = resourceFiles[i];
 	var fileName = getFileName(path);
 	var result = fs.readFileSync(path, "utf8");
+	/* if this program is checked out with git on Windows, our text fiels
+	 * will use CR LF lines. we try to deal with this in places where it
+	 * may break, but we should really just make sure the resource files
+	 * consistently only have LF. */
+	result = result.replaceAll(/\r\n/g, "\n");
 	resourcePackage[fileName] = result;
 }
 
