@@ -1,3 +1,9 @@
+v7.12 [WIP]:
+- fix: alt-clicking items not selecting them (@seansleblanc)
+- fix: rainbow text effect letters not showing up when dialog completed early (@seansleblanc)
+- fix: room preview not updating when changing current palette (@seansleblanc)
+- fix: remove empty path to fix invalid svg (@seansleblanc)
+
 v7.11:
 - fix bug where fade transitions alter the palette of the destination room during exit-from-script
 - fix bug where textbox overflow stopped working
