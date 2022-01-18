@@ -292,6 +292,7 @@ function RoomTool(canvas) {
 	}
 
 	events.Listen("palette_change", function(event) {
+		initRoom(curRoom);
 		self.drawEditMap();
 	});
 } // RoomTool()
