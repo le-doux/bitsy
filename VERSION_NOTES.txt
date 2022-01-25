@@ -3,6 +3,7 @@ v7.12 [WIP]:
 - fix: rainbow text effect letters not showing up when dialog completed early (@seansleblanc)
 - fix: room preview not updating when changing current palette (@seansleblanc)
 - fix: remove empty path to fix invalid svg (@seansleblanc)
+- fix: exported games breaking due to CRLF in template (equa)
 
 v7.11:
 - fix bug where fade transitions alter the palette of the destination room during exit-from-script

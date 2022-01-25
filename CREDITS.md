@@ -6,6 +6,8 @@ Adam Le Doux - Project Lead
 
 Elkie - Contributor
 
+equa (@equaa) - Contributor
+
 @ragzouken - Contributor
 
 Samuel Fine - Contributor
