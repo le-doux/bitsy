@@ -46,7 +46,7 @@ for (var i = 0; i < resourceFiles.length; i++) {
 	 * will use CR LF lines. we try to deal with this in places where it
 	 * may break, but we should really just make sure the resource files
 	 * consistently only have LF. */
-	result = result.replaceAll(/\r\n/g, "\n");
+	result = result.replace(/\r\n/g, "\n");
 	resourcePackage[fileName] = result;
 }
 
