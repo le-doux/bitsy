@@ -58,6 +58,10 @@ function unescapeSpecialCharacters(str) {
 this.importGame = function( html ) {
 	bitsyLog("IMPORT!!!", "editor");
 
+	// fix a regression with 7.11 where the template data in resources included
+	// CRLFs
+	html = html.replace(/\r\n/g, "\n")
+
 	// IMPORT : new style
 	var scriptStart = '<script type="bitsyGameData" id="exportedGameData">\n';
 	var scriptEnd = '</script>';
