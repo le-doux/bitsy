@@ -1074,21 +1074,21 @@
 
 					<div class="bitsy-card-main">
 						<textarea title="raw text of the bitsy game data file (be careful when editing)" id="game_data" onchange="on_game_data_change();"></textarea>
-						<br>
-						<button title="reset everything and start new game" class="bitsy-menu-label" onclick="newGameDialog();">
-							<span class="bitsy_icon">new_game</span>
-							<span class="localize reset_data">reset game data</span>
-						</button>
-						<button title="download game data" class="bitsy-menu-label" onclick="exportGameData();">
-							<span class="bitsy_icon">download</span>
-							<span class="localize download_data">download data</span>
-						</button>
-						<br/>
-						<input type="checkbox" id="fontDataCheck" onclick="toggleFontDataVisibility(event);" autocomplete="off" />
-						<label title="show / hide font data (WARNING: can be very slow for large fonts)" for="fontDataCheck" class="bitsy-menu-label">
-							<span id="fontDataIcon" class="bitsy_icon">visibility_off</span>
-							<span class="localize font_data_toggle_visible">font data</span>
-						</label>
+						<div class="bitsy-menu-group">
+							<button title="reset everything and start new game" class="bitsy-menu-label" onclick="newGameDialog();">
+								<span class="bitsy_icon">new_game</span>
+								<span class="localize reset_data">reset game data</span>
+							</button>
+							<button title="download game data" class="bitsy-menu-label" onclick="exportGameData();">
+								<span class="bitsy_icon">download</span>
+								<span class="localize download_data">download data</span>
+							</button>
+							<input type="checkbox" id="fontDataCheck" onclick="toggleFontDataVisibility(event);" autocomplete="off" />
+							<label title="show / hide font data (WARNING: can be very slow for large fonts)" for="fontDataCheck" class="bitsy-menu-label">
+								<span id="fontDataIcon" class="bitsy_icon">visibility_off</span>
+								<span class="localize font_data_toggle_visible">font data</span>
+							</label>
+						</div>
 					</div>
 				</div>
 
