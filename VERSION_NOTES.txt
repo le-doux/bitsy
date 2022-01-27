@@ -1,4 +1,5 @@
 v7.12 [WIP]:
+- allow editor panels to be resized (@seansleblanc)
 - fix: alt-clicking items not selecting them (@seansleblanc)
 - fix: rainbow text effect letters not showing up when dialog completed early (@seansleblanc)
 - fix: room preview not updating when changing current palette (@seansleblanc)
