@@ -77,8 +77,8 @@ var TransitionManager = function() {
 			}
 
 			bitsyDrawBegin(0);
-			for (var y = 0; y < 128; y++) {
-				for (var x = 0; x < 128; x++) {
+			for (var y = 0; y < height; y++) {
+				for (var x = 0; x < width; x++) {
 					var color = transitionEffects[curEffect].pixelEffectFunc(transitionStart, transitionEnd, x, y, (step / maxStep));
 					bitsyDrawPixel(color, x, y);
 				}
@@ -361,7 +361,7 @@ var TransitionManager = function() {
 	function createRoomPixelBuffer(room) {
 		var pixelBuffer = [];
 
-		for (var i = 0; i < 128 * 128; i++) {
+		for (var i = 0; i < width * height; i++) {
 			pixelBuffer.push(tileColorStartIndex);
 		}
 
@@ -371,7 +371,7 @@ var TransitionManager = function() {
 			for (var y = 0; y < tilesize; y++) {
 				for (var x = 0; x < tilesize; x++) {
 					var color = tileColorStartIndex + (frameData[y][x] === 1 ? colorIndex : 0);
-					pixelBuffer[(((ty * tilesize) + y) * 128) + ((tx * tilesize) + x)] = color;
+					pixelBuffer[(((ty * tilesize) + y) * width) + ((tx * tilesize) + x)] = color;
 				}
 			}
 		}
@@ -435,11 +435,11 @@ var TransitionManager = function() {
 
 // todo : is this wrapper still useful?
 var PostProcessImage = function(imageData) {
-	this.Width = 128;
-	this.Height = 128;
+	this.Width = width;
+	this.Height = height;
 
 	this.GetPixel = function(x, y) {
-		return imageData[(y * 128) + x];
+		return imageData[(y * width) + x];
 	};
 
 	this.GetData = function() {

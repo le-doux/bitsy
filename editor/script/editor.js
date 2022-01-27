@@ -878,8 +878,8 @@ function start() {
 
 	//
 	drawingThumbnailCanvas = document.createElement("canvas");
-	drawingThumbnailCanvas.width = 8 * scale;
-	drawingThumbnailCanvas.height = 8 * scale;
+	drawingThumbnailCanvas.width = tilesize * scale;
+	drawingThumbnailCanvas.height = tilesize * scale;
 	drawingThumbnailCtx = drawingThumbnailCanvas.getContext("2d");
 
 	// load custom font

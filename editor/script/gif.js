@@ -505,11 +505,7 @@ function trailer(gifArr) {
 
 //refactor and rename?
 function colorTableSizeThatFitsPalette(colors) {
-	var size = 0;
-	while (colors.length > Math.pow(2,size+1)) {
-		size++;
-	}
-	return size;
+	return Math.max(0, Math.ceil(Math.log2(colors.length))-1);
 }
 
 function padPalette(colors, size) {
