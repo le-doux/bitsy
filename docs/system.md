@@ -4,10 +4,13 @@
 These APIs are the base on which the Bitsy engine is built. They are currently experimental and likely to change significantly from version to version - at least until I reach v1.0. The web implementation of these APIs is found in [`editor/script/engine/system.js`](https://github.com/le-doux/bitsy/blob/main/editor/script/engine/system.js).
 
 ### IO (Input / Output) ###
+
 `bitsyLog(message, category)`
+
 Writes `message` to the debug console. The optional `category` is used for filtering debug messages from different sources such as the system, engine, and editor.
 
 `bitsyGetButton(buttonCode)`
+
 Returns `true` if the button referred to by `buttonCode` is down.
 
 The button codes are:
