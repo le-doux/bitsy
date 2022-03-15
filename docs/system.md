@@ -79,6 +79,12 @@ Sets the width `w` and height `h` of the textbox buffer.
 
 `bitsyOnLoad(fn)`
 
+A function to call when the system loads a game. Should accept `gameData` and `defaultFontData` as input.
+
 `bitsyOnQuit(fn)`
 
+A function to call when the system exits.
+
 `bitsyOnUpdate(fn)`
+
+A function to call on each update loop. It will attempt to run at 60fps.
