@@ -1,0 +1,9 @@
+.sprite {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 10rem;
+}
+.sprite pre {
+  white-space: pre-line;
+}
