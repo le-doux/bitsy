@@ -17,13 +17,13 @@ eval(
 		'renderer',
 		'bitsy'
 	]
-		.map(file => fs.readFileSync(path.resolve(__dirname, `../../editor/script/engine/${file}.js`), "utf8"))
+		.map(file => fs.readFileSync(path.resolve(__dirname, `../../editor/script/engine/${file}.js`), { encoding: "utf8" }))
 		.join(';\n')
 );
 
 console.log("*** loading drawings ***")
 
-parseWorld(fs.readFileSync(path.resolve(__dirname, "icons.bitsy"), "utf8"));
+parseWorld(fs.readFileSync(path.resolve(__dirname, "icons.bitsy"), { encoding: "utf8" }));
 
 console.log("*** generating icons ***");
 
@@ -50,7 +50,7 @@ function drawingToSvg(bitmapArray, width, height, filename) {
 
 	svg += '</svg>' + '\n';
 
-	fs.writeFileSync(filename, svg);
+	fs.writeFileSync(filename, svg, { encoding: "utf-8" });
 }
 
 for (var t in tile) {
