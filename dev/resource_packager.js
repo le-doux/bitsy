@@ -43,7 +43,7 @@ for (var i = 0; i < resourceFiles.length; i++) {
 	var filePath = resourceFiles[i];
 	var fileName = getFileName(filePath);
 	var result = fs.readFileSync(path.resolve(__dirname, filePath), "utf8");
-	/* if this program is checked out with git on Windows, our text fiels
+	/* if this program is checked out with git on Windows, our text files
 	 * will use CR LF lines. we try to deal with this in places where it
 	 * may break, but we should really just make sure the resource files
 	 * consistently only have LF. */
