@@ -1,0 +1,25 @@
+name: release
+
+on: manual_dispatch
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # setup
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+
+      # build resources
+      - run: node ./dev/icon_generator/makeicons
+      - run: node ./dev/resource_packager
+
+      # publish
+      - name: publish to itch.io
+        uses: josephbmanley/butler-publish-itchio-action@v1.0.3
+        env:
+          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
+          CHANNEL: win-linux-mac-stable
+          ITCH_GAME: bitsy
+          ITCH_USER: ledoux
+          PACKAGE: editor
