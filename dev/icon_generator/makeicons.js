@@ -4,14 +4,21 @@ var fs = require('fs');
 
 console.log("*** initializing bitsy ***");
 
-// load the bitsy engine
-eval(fs.readFileSync("../../editor/script/engine/color_util.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/font.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/transition.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/script.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/dialog.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/renderer.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/bitsy.js", "utf8"))
+// HACK: combine and evaluate the bitsy engine scripts in module scope
+// so that we can call `parseWorld` on the icon data
+eval(
+	[
+		'system',
+		'font',
+		'transition',
+		'script',
+		'dialog',
+		'renderer',
+		'bitsy'
+	]
+		.map(file => fs.readFileSync(`../../editor/script/engine/${file}.js`, "utf8"))
+		.join(';\n')
+);
 
 console.log("*** loading drawings ***")
 
