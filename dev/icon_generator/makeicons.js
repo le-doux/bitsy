@@ -1,4 +1,5 @@
 var fs = require('fs');
+var path = require('path');
 
 // todo : use flood fill to merge pixels into continuous vector shapes
 
@@ -16,13 +17,13 @@ eval(
 		'renderer',
 		'bitsy'
 	]
-		.map(file => fs.readFileSync(`../../editor/script/engine/${file}.js`, "utf8"))
+		.map(file => fs.readFileSync(path.resolve(__dirname, `../../editor/script/engine/${file}.js`), "utf8"))
 		.join(';\n')
 );
 
 console.log("*** loading drawings ***")
 
-parseWorld(fs.readFileSync("icons.bitsy", "utf8"));
+parseWorld(fs.readFileSync(path.resolve(__dirname, "icons.bitsy"), "utf8"));
 
 console.log("*** generating icons ***");
 
@@ -62,10 +63,10 @@ for (var t in tile) {
 
 	var frame0 = imageSource[0];
 
-	drawingToSvg(frame0, 8, 8, "../resources/icons/icon_" + name + ".svg");
+	drawingToSvg(frame0, 8, 8, path.resolve(__dirname, "../resources/icons/icon_" + name + ".svg"));
 
 	if (imageSource.length > 1) {
 		var frame1 = imageSource[1];
-		drawingToSvg(frame1, 8, 8, "../resources/icons/icon_" + name + "_f1.svg");
+		drawingToSvg(frame1, 8, 8, path.resolve(__dirname, "../resources/icons/icon_" + name + "_f1.svg"));
 	}
 }
