@@ -18,7 +18,8 @@ jobs:
       # TODO: cleaner version number
       - name: get version
         id: version
-        run: echo ::set-output name=current-version::$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=major: )\d+').$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=minor: )\d+')
+        run: |
+          echo ::set-output name=current-version::$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=major: )\d+').$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=minor: )\d+')
       - name: publish to itch.io
         uses: josephbmanley/butler-publish-itchio-action@v1.0.3
         env:
