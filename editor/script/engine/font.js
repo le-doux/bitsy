@@ -202,7 +202,7 @@ function Font(fontData) {
 					}
 
 					curCharLineCount++;
-					if (curCharLineCount >= height) {
+					if (curCharLineCount >= chardata[curCharCode].height) {
 						isReadingChar = false;
 					}
 				}
