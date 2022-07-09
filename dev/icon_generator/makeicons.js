@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 
+var dirIcons = "../resources/icons";
 // todo : use flood fill to merge pixels into continuous vector shapes
 
 console.log("*** initializing bitsy ***");
@@ -68,10 +69,10 @@ for (var t in tile) {
 
 	var frame0 = imageSource[0];
 
-	drawingToSvg(frame0, 8, 8, path.resolve(__dirname, "../resources/icons/icon_" + name + ".svg"));
+	drawingToSvg(frame0, 8, 8, path.resolve(__dirname, dirIcons, "icon_" + name + ".svg"));
 
 	if (imageSource.length > 1) {
 		var frame1 = imageSource[1];
-		drawingToSvg(frame1, 8, 8, path.resolve(__dirname, "../resources/icons/icon_" + name + "_f1.svg"));
+		drawingToSvg(frame1, 8, 8, path.resolve(__dirname, dirIcons, "icon_" + name + "_f1.svg"));
 	}
 }
