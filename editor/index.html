@@ -219,40 +219,7 @@
 					</div>
 
 					<div id="aboutInner" class="bitsy-card-main">
-						<p>
-							<span class="localize about1">hi! bitsy is a little editor for little games or worlds. the goal is to make it easy to make games where you can walk around and talk to people and be somewhere.</span>
-						</p>
-
-						<p>
-							<span class="localize about9">have fun making things with bitsy!</span>
-						</p>
-
-						<p>
-							- 
-							<a target="_blank" href="https://www.twitter.com/adamledoux">
-								<span class="localize about10_link_twitter">adam</span>
-							</a>
-						</p>
-
-						<p>
-							getting started: <br/>
-							<a target="_blank" href="https://www.shimmerwitch.space/bitsyTutorial.html">tutorial</a>
-						</p>
-
-						<p>
-							community: <br/>
-							<a target="_blank" href="https://itch.io/games/made-with-bitsy">made with bitsy</a> |
-							<a target="_blank" href="https://discordapp.com/invite/9rAjhtr">discord server</a> |
-							<a target="_blank" href="https://ledoux.itch.io/bitsy/community">itch.io forum</a>
-						</p>
-
-						<p>
-							development: <br/>
-							<a target="_blank" href="https://github.com/le-doux/bitsy/blob/master/CREDITS.md">contributors</a> |
-							<a target="_blank" href="https://github.com/le-doux/bitsy/blob/master/VERSION_NOTES.txt">version notes</a> |
-							<a target="_blank" href="https://github.com/le-doux/bitsy/issues">report a bug</a> |
-							<a target="_blank" href="https://github.com/le-doux/bitsy">source code</a>
-						</p>
+						<iframe id="docFrame" src="https://bitsy.fandom.com/wiki/Bitsy_Wiki" height="100%"></iframe>
 					</div>
 				</div>
 
@@ -266,6 +233,10 @@
 							<span class="localize room_tool_name bitsy-playmode-hide">room</span>
 							<span class="bitsy-playmode-show">playing...</span>
 						</span>
+
+						<button onclick="document.getElementById('docFrame').src='https://bitsy.fandom.com/wiki/Room'">
+							<span class="bitsy_icon">help</span>
+						</button>
 
 						<button title="minimize room window" onclick="hidePanel('roomPanel');">
 							<span class="bitsy_icon">close</span>
