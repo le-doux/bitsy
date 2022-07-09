@@ -5,25 +5,29 @@ var path = require('path');
 
 console.log("*** initializing bitsy ***");
 
-// HACK: combine and evaluate the bitsy engine scripts in module scope
-// so that we can call `parseWorld` on the icon data
-eval(
-	[
-		'system',
-		'font',
-		'transition',
-		'script',
-		'dialog',
-		'renderer',
-		'bitsy'
-	]
-		.map(file => fs.readFileSync(path.resolve(__dirname, `../../editor/script/engine/${file}.js`), { encoding: "utf8" }))
-		.join(';\n')
-);
+function bitsyLog(str) {
+	console.log("bitsy:: " + str);
+}
+
+var bitsy = {
+	log : bitsyLog,
+	MAP_SIZE : 16,
+	TILE_SIZE : 8,
+};
+
+// kind of too bad that I still need to load a script module
+eval(fs.readFileSync(path.resolve(__dirname, "../../editor/script/engine/script.js"), { encoding: "utf8" }));
+var scriptModule = new Script();
+var scriptUtils = scriptModule.CreateUtils();
+
+eval(fs.readFileSync(path.resolve(__dirname, "../../editor/script/engine/world.js"), { encoding: "utf8" }));
 
 console.log("*** loading drawings ***")
 
-parseWorld(fs.readFileSync(path.resolve(__dirname, "icons.bitsy"), { encoding: "utf8" }));
+var iconBitsySrc = fs.readFileSync(path.resolve(__dirname, "icons.bitsy"), { encoding: "utf8" });
+iconBitsySrc = iconBitsySrc.replace(/\r\n/g, "\n"); // clean up line endings
+var world = parseWorld(iconBitsySrc);
+var tile = world.tile;
 
 console.log("*** generating icons ***");
 
@@ -59,7 +63,7 @@ for (var t in tile) {
 
 	console.log(name);
 
-	var imageSource = renderer.GetDrawingSource(drwId);
+	var imageSource = world.drawings[drwId];
 
 	var frame0 = imageSource[0];
 

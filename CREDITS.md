@@ -77,3 +77,11 @@ Sequoia Edwards - Chinook translation
 Török Ádám - Hungarian translation
 
 Tokoro - Japanese translation
+
+**Music**
+
+tuneful town - Jared Le Doux
+
+rhythmic ruins - Jared Le Doux
+
+finale fanfare - Adam Le Doux & Jared Le Doux

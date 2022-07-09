@@ -199,6 +199,10 @@
 	display: block;
 }
 
+.actionBuilder_sound .actionBuilderButton_sound {
+	display: block;
+}
+
 .actionBuilder_dialog .actionBuilderButton_back {
 	display: block;
 }
@@ -212,6 +216,10 @@
 }
 
 .actionBuilder_item .actionBuilderButton_back {
+	display: block;
+}
+
+.actionBuilder_sound .actionBuilderButton_back {
 	display: block;
 }
 
