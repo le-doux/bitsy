@@ -1,5 +1,6 @@
 #animationOuter {
 	margin-top: var(--bitsy-space-s);
+	margin-bottom: var(--bitsy-space-m);
 }
 
 #animation .bitsy-thumbnail {
@@ -12,4 +13,9 @@
 
 #animation .bitsy-thumbnail.bitsy-thumbnail-selected .bitsy-thumbnail-image-container {
 	border-color: var(--bitsy-color-main-2);
+}
+
+#animation .bitsy-thumbnail img {
+	width: 3em;
+	height: 3em;
 }

@@ -9,7 +9,6 @@ this.CreateBuffer = function() {
 };
 
 var DialogRenderer = function() {
-
 	// TODO : refactor this eventually? remove everything from struct.. avoid the defaults?
 	var textboxInfo = {
 		width : 104,
@@ -17,7 +16,6 @@ var DialogRenderer = function() {
 		top : 12,
 		left : 12,
 		bottom : 12, //for drawing it from the bottom
-		font_scale : 0.5, // we draw font at half-size compared to everything else
 		padding_vert : 2,
 		padding_horz : 4,
 		arrow_height : 5,
@@ -29,27 +27,30 @@ var DialogRenderer = function() {
 		textboxInfo.height = (textboxInfo.padding_vert * 3) + (relativeFontHeight() * 2) + textboxInfo.arrow_height;
 
 		// todo : clean up all the scale stuff
-		var textboxScaleW = textboxInfo.width / textboxInfo.font_scale;
-		var textboxScaleH = textboxInfo.height / textboxInfo.font_scale;
-		bitsySetTextboxSize(textboxScaleW, textboxScaleH);
+		var textboxScaleW = textboxInfo.width * getTextScale();
+		var textboxScaleH = textboxInfo.height * getTextScale();
+		bitsy.textbox(false, 0, 0, textboxScaleW, textboxScaleH);
 	}
 
-	function textScale() {
-		return scale * textboxInfo.font_scale;
+	this.GetPixelsPerRow = function() {
+		return (textboxInfo.width - (textboxInfo.padding_horz * 2)) * getTextScale();
+	}
+
+	// todo : cache this value? it shouldn't really change in the middle of a game
+	function getTextScale() {
+		return bitsy.textMode() === bitsy.TXT_LOREZ ? 1 : 2;
 	}
 
 	function relativeFontWidth() {
-		return Math.ceil( font.getWidth() * textboxInfo.font_scale );
+		return Math.ceil(font.getWidth() / getTextScale());
 	}
 
 	function relativeFontHeight() {
-		return Math.ceil( font.getHeight() * textboxInfo.font_scale );
+		return Math.ceil(font.getHeight() / getTextScale());
 	}
 
 	this.ClearTextbox = function() {
-		bitsyDrawBegin(1);
-		bitsyClear(textBackgroundIndex);
-		bitsyDrawEnd();
+		bitsy.fill(bitsy.TEXTBOX, textBackgroundIndex);
 	};
 
 	var isCentered = false;
@@ -57,23 +58,20 @@ var DialogRenderer = function() {
 		isCentered = centered;
 	};
 
+	// todo : I can stop doing this every frame right?
 	this.DrawTextbox = function() {
-		bitsyDrawBegin(0);
-
 		if (isCentered) {
 			// todo : will the height calculations always work?
-			bitsyDrawTextbox(textboxInfo.left, ((height / 2) - (textboxInfo.height / 2)));
+			bitsy.textbox(true, textboxInfo.left, ((bitsy.VIDEO_SIZE / 2) - (textboxInfo.height / 2)));
 		}
-		else if (player().y < (mapsize / 2)) {
+		else if (player().y < (bitsy.MAP_SIZE / 2)) {
 			// bottom
-			bitsyDrawTextbox(textboxInfo.left, (height - textboxInfo.bottom - textboxInfo.height));
+			bitsy.textbox(true, textboxInfo.left, (bitsy.VIDEO_SIZE - textboxInfo.bottom - textboxInfo.height));
 		}
 		else {
 			// top
-			bitsyDrawTextbox(textboxInfo.left, textboxInfo.top);
+			bitsy.textbox(true, textboxInfo.left, textboxInfo.top);
 		}
-
-		bitsyDrawEnd();
 	};
 
 	var arrowdata = [
@@ -83,8 +81,10 @@ var DialogRenderer = function() {
 	];
 
 	this.DrawNextArrow = function() {
-		// bitsyLog("draw arrow!");
-		bitsyDrawBegin(1);
+		// bitsy.log("draw arrow!");
+		var text_scale = getTextScale();
+		var textboxScaleW = textboxInfo.width * text_scale;
+		var textboxScaleH = textboxInfo.height * text_scale;
 
 		var top = (textboxInfo.height - 5) * text_scale;
 		var left = (textboxInfo.width - (5 + 4)) * text_scale;
@@ -99,66 +99,124 @@ var DialogRenderer = function() {
 					//scaling nonsense
 					for (var sy = 0; sy < text_scale; sy++) {
 						for (var sx = 0; sx < text_scale; sx++) {
-							bitsyDrawPixel(textArrowIndex, left + (x * text_scale) + sx, top + (y * text_scale) + sy);
+							var px = left + (x * text_scale) + sx;
+							var py = top + (y * text_scale) + sy;
+							bitsy.set(bitsy.TEXTBOX, (py * textboxScaleW) + px, textArrowIndex);
 						}
 					}
 				}
 			}
 		}
-
-		bitsyDrawEnd();
 	};
 
-	var text_scale = 2; //using a different scaling factor for text feels like cheating... but it looks better
-	this.DrawChar = function(char, row, col, leftPos) {
-		bitsyDrawBegin(1);
-
-		char.offset = {
-			x: char.base_offset.x,
-			y: char.base_offset.y
-		}; // compute render offset *every* frame
-
-		char.SetPosition(row,col);
-		char.ApplyEffects(effectTime);
-
-		var charData = char.bitmap;
-
-		var top = (4 * text_scale) + (row * 2 * text_scale) + (row * font.getHeight()) + Math.floor(char.offset.y);
-		var left = (4 * text_scale) + leftPos + Math.floor(char.offset.x);
-
-		for (var y = 0; y < char.height; y++) {
-			for (var x = 0; x < char.width; x++) {
-				var i = (y * char.width) + x;
+	function drawCharData(charData, textScale, top, left, width, height, color) {
+		for (var y = 0; y < height; y++) {
+			for (var x = 0; x < width; x++) {
+				var i = (y * width) + x;
 				if (charData[i] == 1) {
-					// todo : other colors
-					bitsySetPixelAtIndex(char.color, ((top + y) * (textboxInfo.width * text_scale)) + (left + x));
+					bitsy.set(bitsy.TEXTBOX, ((top + y) * (textboxInfo.width * textScale)) + (left + x), color);
 				}
 			}
 		}
+	}
 
-		bitsyDrawEnd();
+	this.DrawChar = function(char, row, col, leftPos) {
+		// characters with effects need to be redrawn every frame
+		if (char.effectList.length > 0) {
+			char.redraw = true;
+		}
+
+		// skip characters that are already drawn and don't need to be updated
+		if (!char.redraw) {
+			return;
+		}
+		char.redraw = false;
+
+		var text_scale = getTextScale();
+		var charData = char.bitmap;
+		var top;
+		var left;
+
+		if (char.effectList.length > 0) {
+			// clear the pixels from the previous frame
+			top = (4 * text_scale) + (row * 2 * text_scale) + (row * font.getHeight()) + Math.floor(char.offset.y);
+			left = (4 * text_scale) + leftPos + Math.floor(char.offset.x);
+			drawCharData(charData, text_scale, top, left, char.width, char.height, textBackgroundIndex);
+		}
+
+		// compute render offset *every* frame
+		char.offset = {
+			x: char.base_offset.x,
+			y: char.base_offset.y
+		};
+		char.SetPosition(row, col);
+		char.ApplyEffects(effectTime);
+
+		top = (4 * text_scale) + (row * 2 * text_scale) + (row * font.getHeight()) + Math.floor(char.offset.y);
+		left = (4 * text_scale) + leftPos + Math.floor(char.offset.x);
+
+		drawCharData(charData, text_scale, top, left, char.width, char.height, char.color);
+
+		// TODO : consider for a future update?
+		/*
+		if (soundPlayer && char.blip && char.hasPlayedBlip != true) {
+			soundPlayer.playBlip(blip[char.blip], { isPitchRandomized: true });
+			char.hasPlayedBlip = true;
+		}
+		*/
 
 		// call printHandler for character
-		char.OnPrint();
+		if (!disableOnPrintHandlers) {
+			char.OnPrint();
+		}
 	};
 
 	var effectTime = 0; // TODO this variable should live somewhere better
-	this.Draw = function(buffer, dt) {
+
+	var shouldUpdateTextboxSettings = true;
+	var shouldClearTextbox = true;
+	var shouldDrawArrow = true;
+
+	var disableOnPrintHandlers = false;
+
+	this.Draw = function(buffer, dt, disableOnPrint) {
+		disableOnPrintHandlers = (disableOnPrint === true);
+
+		// bitsy.log("draw dialog");
+		if (buffer.DidFlipPageThisFrame()) {
+			shouldClearTextbox = true;
+			shouldDrawArrow = true;
+		}
+
 		effectTime += dt;
 
-		this.ClearTextbox();
+		if (shouldUpdateTextboxSettings) {
+			bitsy.log("draw textbox");
+			this.DrawTextbox(); // todo : rename to something more accurate
+			shouldUpdateTextboxSettings = false;
+		}
 
+		if (shouldClearTextbox) {
+			// bitsy.log("clear textbox");
+			this.ClearTextbox();
+			shouldClearTextbox = false;
+		}
+
+		// bitsy.log("draw chars");
 		buffer.ForEachActiveChar(this.DrawChar);
 
-		if (buffer.CanContinue()) {
+		if (buffer.CanContinue() && shouldDrawArrow) {
+			// bitsy.log("draw next arrow");
 			this.DrawNextArrow();
+			shouldDrawArrow = false;
 		}
-
-		this.DrawTextbox();
 
 		if (buffer.DidPageFinishThisFrame() && onPageFinish != null) {
+			bitsy.log("page finished");
 			onPageFinish();
 		}
+
+		// bitsy.log("draw dialog end");
 	};
 
 	/* this is a hook for GIF rendering */
@@ -170,13 +228,16 @@ var DialogRenderer = function() {
 	this.Reset = function() {
 		effectTime = 0;
 		// TODO - anything else?
+
+		shouldUpdateTextboxSettings = true;
+		shouldClearTextbox = true;
+		shouldDrawArrow = true;
 	}
 
 	// this.CharsPerRow = function() {
 	// 	return textboxInfo.charsPerRow;
 	// }
 }
-
 
 var DialogBuffer = function() {
 	var buffer = [[[]]]; // holds dialog in an array buffer
@@ -187,13 +248,18 @@ var DialogBuffer = function() {
 	var nextCharMaxTime = 50; // in milliseconds
 	var isDialogReadyToContinue = false;
 	var activeTextEffects = [];
+	var activeTextEffectParameters = [];
 	var font = null;
 	var arabicHandler = new ArabicHandler();
 	var onDialogEndCallbacks = [];
 
 	this.SetFont = function(f) {
 		font = f;
-	}
+	};
+
+	this.SetPixelsPerRow = function(n) {
+		pixelsPerRow = n;
+	};
 
 	this.CurPage = function() { return buffer[ pageIndex ]; };
 	this.CurRow = function() { return this.CurPage()[ rowIndex ]; };
@@ -207,7 +273,7 @@ var DialogBuffer = function() {
 		for (var i = 0; i < rowCount; i++) {
 			var row = this.CurPage()[i];
 			var charCount = (i == rowIndex) ? charIndex+1 : row.length;
-			// bitsyLog(charCount);
+			// bitsy.log(charCount);
 
 			var leftPos = 0;
 			if (textDirection === TextDirection.RightToLeft) {
@@ -220,7 +286,7 @@ var DialogBuffer = function() {
 					if (textDirection === TextDirection.RightToLeft) {
 						leftPos -= char.spacing;
 					}
-					// bitsyLog(j + " " + leftPos);
+					// bitsy.log(j + " " + leftPos);
 
 					// handler( char, i /*rowIndex*/, j /*colIndex*/ );
 					handler(char, i /*rowIndex*/, j /*colIndex*/, leftPos)
@@ -294,22 +360,41 @@ var DialogBuffer = function() {
 		}
 	};
 
+	var isSkipping = false;
+
 	this.Skip = function() {
-		bitsyLog("SKIPPP");
+		bitsy.log("SKIPPP");
+		isSkipping = true;
+
 		didPageFinishThisFrame = false;
 		didFlipPageThisFrame = false;
+
 		// add new characters until you get to the end of the current line of dialog
-		while (rowIndex < this.CurRowCount()) {
+		while (rowIndex < this.CurRowCount() && isSkipping) {
 			this.DoNextChar();
 
-			if(isDialogReadyToContinue) {
+			if (isDialogReadyToContinue) {
 				//make sure to push the rowIndex past the end to break out of the loop
 				rowIndex++;
 				charIndex = 0;
 			}
 		}
-		rowIndex = this.CurRowCount()-1;
-		charIndex = this.CurCharCount()-1;
+
+		if (isSkipping) {
+			rowIndex = this.CurRowCount() - 1;
+			charIndex = this.CurCharCount() - 1;
+		}
+
+		isSkipping = false;
+	};
+
+	this.tryInterruptSkip = function() {
+		if (isSkipping) {
+			isSkipping = false;
+			return true;
+		}
+
+		return false;
 	};
 
 	this.FlipPage = function() {
@@ -331,7 +416,7 @@ var DialogBuffer = function() {
 	var afterManualPagebreak = false; // is it bad to track this state like this?
 
 	this.Continue = function() {
-		bitsyLog("CONTINUE");
+		bitsy.log("CONTINUE");
 
 		// if we used a page break character to continue we need
 		// to run whatever is in the script afterwards! // TODO : make this comment better
@@ -344,13 +429,14 @@ var DialogBuffer = function() {
 			return false;
 		}
 		if (pageIndex + 1 < this.CurPageCount()) {
-			bitsyLog("FLIP PAGE!");
+			bitsy.log("FLIP PAGE!");
 			//start next page
 			this.FlipPage();
 			return true; /* hasMoreDialog */
 		}
 		else {
-			bitsyLog("END DIALOG!");
+			bitsy.log("END DIALOG!");
+			bitsy.textbox(false);
 			//end dialog mode
 			this.EndDialog();
 			return false; /* hasMoreDialog */
@@ -371,8 +457,11 @@ var DialogBuffer = function() {
 
 	this.CanContinue = function() { return isDialogReadyToContinue; };
 
-	function DialogChar(effectList) {
-		this.effectList = effectList.slice(); // clone effect list (since it can change between chars)
+	function DialogChar() {
+		this.redraw = true;
+
+		this.effectList = [];
+		this.effectParameterList = [];
 
 		this.color = textColorIndex; // white
 		this.offset = { x:0, y:0 }; // in pixels (screen pixels?)
@@ -381,32 +470,32 @@ var DialogBuffer = function() {
 		this.row = 0;
 
 		this.SetPosition = function(row,col) {
-			// bitsyLog("SET POS");
-			// bitsyLog(this);
+			// bitsy.log("SET POS");
+			// bitsy.log(this);
 			this.row = row;
 			this.col = col;
-		}
+		};
 
 		this.ApplyEffects = function(time) {
-			// bitsyLog("APPLY EFFECTS! " + time);
-			for(var i = 0; i < this.effectList.length; i++) {
+			// bitsy.log("APPLY EFFECTS! " + time);
+			for (var i = 0; i < this.effectList.length; i++) {
 				var effectName = this.effectList[i];
-				// bitsyLog("FX " + effectName);
-				TextEffects[ effectName ].DoEffect( this, time );
+				// bitsy.log("FX " + effectName);
+				TextEffects[effectName].doEffect(this, time, this.effectParameterList[i]);
 			}
-		}
+		};
 
 		var printHandler = null; // optional function to be called once on printing character
 		this.SetPrintHandler = function(handler) {
 			printHandler = handler;
-		}
+		};
 		this.OnPrint = function() {
 			if (printHandler != null) {
-				// bitsyLog("PRINT HANDLER ---- DIALOG BUFFER");
+				// bitsy.log("PRINT HANDLER ---- DIALOG BUFFER");
 				printHandler();
 				printHandler = null; // only call handler once (hacky)
 			}
-		}
+		};
 
 		this.bitmap = [];
 		this.width = 0;
@@ -418,20 +507,29 @@ var DialogBuffer = function() {
 		this.spacing = 0;
 	}
 
-	function DialogFontChar(font, char, effectList) {
-		Object.assign(this, new DialogChar(effectList));
+	function DialogFontChar(font, char, effectList, effectParameterList) {
+		DialogChar.call(this);
+
+		this.effectList = effectList.slice(); // clone effect list (since it can change between chars)
+		this.effectParameterList = effectParameterList.slice();
 
 		var charData = font.getChar(char);
+		this.char = char;
 		this.bitmap = charData.data;
 		this.width = charData.width;
 		this.height = charData.height;
 		this.base_offset.x = charData.offset.x;
 		this.base_offset.y = charData.offset.y;
 		this.spacing = charData.spacing;
+		this.blip = null;
+		this.hasPlayedBlip = false;
 	}
 
-	function DialogDrawingChar(drawingId, effectList) {
-		Object.assign(this, new DialogChar(effectList));
+	function DialogDrawingChar(drawingId, effectList, effectParameterList) {
+		DialogChar.call(this);
+
+		this.effectList = effectList.slice(); // clone effect list (since it can change between chars)
+		this.effectParameterList = effectParameterList.slice();
 
 		// get the first frame of the drawing and flatten it
 		var drawingData = renderer.GetDrawingSource(drawingId)[0];
@@ -447,7 +545,7 @@ var DialogBuffer = function() {
 	}
 
 	function DialogScriptControlChar() {
-		Object.assign(this, new DialogChar([]));
+		DialogChar.call(this);
 
 		this.width = 0;
 		this.height = 0;
@@ -456,7 +554,7 @@ var DialogBuffer = function() {
 
 	// is a control character really the best way to handle page breaks?
 	function DialogPageBreakChar() {
-		Object.assign(this, new DialogChar([]));
+		DialogChar.call(this);
 
 		this.width = 0;
 		this.height = 0;
@@ -468,19 +566,21 @@ var DialogBuffer = function() {
 
 		this.SetContinueHandler = function(handler) {
 			continueHandler = handler;
-		}
+		};
 
 		this.OnContinue = function() {
 			if (continueHandler) {
 				continueHandler();
 			}
-		}
+		};
 	}
 
-	function AddWordToCharArray(charArray,word,effectList) {
-		for(var i = 0; i < word.length; i++) {
-			charArray.push( new DialogFontChar( font, word[i], effectList ) );
+	function AddWordToCharArray(charArray, word, effectList, effectParameterList) {
+		// bitsy.log("add char array");
+		for (var i = 0; i < word.length; i++) {
+			charArray.push(new DialogFontChar(font, word[i], effectList, effectParameterList));
 		}
+		// bitsy.log("add char array end");
 		return charArray;
 	}
 
@@ -517,13 +617,13 @@ var DialogBuffer = function() {
 	}
 
 	this.AddDrawing = function(drawingId) {
-		// bitsyLog("DRAWING ID " + drawingId);
+		// bitsy.log("DRAWING ID " + drawingId);
 
 		var curPageIndex = buffer.length - 1;
 		var curRowIndex = buffer[curPageIndex].length - 1;
 		var curRowArr = buffer[curPageIndex][curRowIndex];
 
-		var drawingChar = new DialogDrawingChar(drawingId, activeTextEffects);
+		var drawingChar = new DialogDrawingChar(drawingId, activeTextEffects, activeTextEffectParameters);
 
 		var rowLength = GetCharArrayWidth(curRowArr);
 
@@ -569,7 +669,7 @@ var DialogBuffer = function() {
 
 	// TODO : convert this into something that takes DialogChar arrays
 	this.AddText = function(textStr) {
-		bitsyLog("ADD TEXT " + textStr);
+		bitsy.log("ADD TEXT " + textStr);
 
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
@@ -603,13 +703,13 @@ var DialogBuffer = function() {
 				buffer[curPageIndex].push([]);
 				curRowIndex = 0;
 				curRowArr = buffer[curPageIndex][curRowIndex];
-				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects);
+				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects, activeTextEffectParameters);
 
 				afterManualPagebreak = false;
 			}
 			else if (rowLength + wordLength <= pixelsPerRow || rowLength <= 0) {
 				//stay on same row
-				curRowArr = AddWordToCharArray(curRowArr, wordWithPrecedingSpace, activeTextEffects);
+				curRowArr = AddWordToCharArray(curRowArr, wordWithPrecedingSpace, activeTextEffects, activeTextEffectParameters);
 			}
 			else if (curRowIndex == 0) {
 				//start next row
@@ -617,7 +717,7 @@ var DialogBuffer = function() {
 				buffer[curPageIndex].push([]);
 				curRowIndex++;
 				curRowArr = buffer[curPageIndex][curRowIndex];
-				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects);
+				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects, activeTextEffectParameters);
 			}
 			else {
 				//start next page
@@ -627,7 +727,7 @@ var DialogBuffer = function() {
 				buffer[curPageIndex].push([]);
 				curRowIndex = 0;
 				curRowArr = buffer[curPageIndex][curRowIndex];
-				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects);
+				curRowArr = AddWordToCharArray(curRowArr, word, activeTextEffects, activeTextEffectParameters);
 			}
 		}
 
@@ -648,7 +748,9 @@ var DialogBuffer = function() {
 			var lastChar = lastRow[lastRow.length-1];
 		}
 
-		// bitsyLog(buffer);
+		// bitsy.log(buffer);
+
+		bitsy.log("add text finished");
 
 		isActive = true;
 	};
@@ -656,7 +758,7 @@ var DialogBuffer = function() {
 	this.AddLinebreak = function() {
 		var lastPage = buffer[buffer.length-1];
 		if (lastPage.length <= 1) {
-			// bitsyLog("LINEBREAK - NEW ROW ");
+			// bitsy.log("LINEBREAK - NEW ROW ");
 			// add new row
 			lastPage.push([]);
 		}
@@ -664,7 +766,7 @@ var DialogBuffer = function() {
 			// add new page
 			buffer.push([[]]);
 		}
-		// bitsyLog(buffer);
+		// bitsy.log(buffer);
 
 		isActive = true;
 	}
@@ -691,16 +793,20 @@ var DialogBuffer = function() {
 		isActive = true;		
 	}
 
-	/* new text effects */
-	this.HasTextEffect = function(name) {
-		return activeTextEffects.indexOf( name ) > -1;
-	}
-	this.AddTextEffect = function(name) {
-		activeTextEffects.push( name );
-	}
-	this.RemoveTextEffect = function(name) {
-		activeTextEffects.splice( activeTextEffects.indexOf( name ), 1 );
-	}
+	this.hasTextEffect = function(name) {
+		return activeTextEffects.indexOf(name) != -1;
+	};
+
+	this.pushTextEffect = function(name, parameters) {
+		activeTextEffects.push(name);
+		activeTextEffectParameters.push(parameters);
+	};
+
+	this.popTextEffect = function(name) {
+		var i = activeTextEffects.lastIndexOf(name);
+		activeTextEffects.splice(i, 1);
+		activeTextEffectParameters.splice(i, 1);
+	};
 
 	/* this is a hook for GIF rendering */
 	var didPageFinishThisFrame = false;
@@ -871,41 +977,51 @@ var ArabicHandler = function() {
 	this.ShapeArabicCharacters = ShapeArabicCharacters;
 }
 
-/* NEW TEXT EFFECTS */
+/* TEXT EFFECTS */
 var TextEffects = {};
 
-function positiveModulo(number, divisor) {
-	return ((number % divisor) + divisor) % divisor;
-}
-var RainbowEffect = function() {
-	this.DoEffect = function(char, time) {
-		char.color = rainbowColorStartIndex + Math.floor(positiveModulo((time / 100) - char.col * 0.5, rainbowColorCount));
+function RainbowEffect() {
+	function positiveModulo(number, divisor) {
+		return ((number % divisor) + divisor) % divisor;
 	}
-};
+
+	this.doEffect = function(char, time, parameters) {
+		char.color = rainbowColorStartIndex + Math.floor(positiveModulo((time / 100) - char.col * 0.5, rainbowColorCount));
+	};
+}
+
 TextEffects["rbw"] = new RainbowEffect();
 
-var ColorEffect = function(index) {
-	this.DoEffect = function(char) {
-		char.color = tileColorStartIndex + index;
-	}
-};
+function ColorEffect(index) {
+	this.doEffect = function(char, time, parameters) {
+		if (parameters && parameters.length > 0) {
+			char.color = tileColorStartIndex + parameters[0];
+		}
+		else {
+			char.color = tileColorStartIndex + index;
+		}
+	};
+}
+
+TextEffects["clr"] = new ColorEffect();
 TextEffects["clr1"] = new ColorEffect(0);
-TextEffects["clr2"] = new ColorEffect(1); // TODO : should I use parameters instead of special names?
+TextEffects["clr2"] = new ColorEffect(1);
 TextEffects["clr3"] = new ColorEffect(2);
 
-var WavyEffect = function() {
-	this.DoEffect = function(char,time) {
+function WavyEffect() {
+	this.doEffect = function(char, time, parameters) {
 		char.offset.y += Math.sin((time / 250) - (char.col / 2)) * 2;
-	}
-};
+	};
+}
+
 TextEffects["wvy"] = new WavyEffect();
 
-var ShakyEffect = function() {
+function ShakyEffect() {
 	function disturb(func, time, offset, mult1, mult2) {
 		return func((time * mult1) - (offset * mult2));
 	}
 
-	this.DoEffect = function(char,time) {
+	this.doEffect = function(char, time, parameters) {
 		char.offset.y += 1.5
 						* disturb(Math.sin, time, char.col, 0.1, 0.5)
 						* disturb(Math.cos, time, char.col, 0.3, 0.2)
@@ -914,15 +1030,30 @@ var ShakyEffect = function() {
 						* disturb(Math.cos, time, char.row, 0.1, 1.0)
 						* disturb(Math.sin, time, char.col, 3.0, 0.7)
 						* disturb(Math.cos, time, char.col, 0.2, 0.3);
-	}
-};
+	};
+}
+
 TextEffects["shk"] = new ShakyEffect();
 
-var DebugHighlightEffect = function() {
-	this.DoEffect = function(char) {
-		char.color = tileColorStartIndex;
-	}
+/*
+// TODO : maybe use this in a future update?
+function YakEffect() {
+	this.doEffect = function(char, time, parameters) {
+		if (char.char != " ") {
+			char.blip = parameters[0];
+		}
+	};
 }
+
+TextEffects["yak"] = new YakEffect();
+*/
+
+var DebugHighlightEffect = function() {
+	this.doEffect = function(char, time, parameters) {
+		char.color = tileColorStartIndex;
+	};
+}
+
 TextEffects["_debug_highlight"] = new DebugHighlightEffect();
 
 } // Dialog()

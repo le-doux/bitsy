@@ -7,9 +7,12 @@ function FindTool(options) {
 	var paletteThumbnailRenderer = createPaletteThumbnailRenderer();
 	var roomThumbnailRenderer = createRoomThumbnailRenderer();
 
+	// todo : try making a blip thumbnail renderer again later..
+	// var blipThumbnailRenderer = createBlipThumbnailRenderer();
+
 	var categoryDefinitions = [
 		{
-			id: "avatar",
+			id: "AVA",
 			icon: "avatar",
 			getIdList: function() { return ["A"]; },
 			getCategoryName: function() {
@@ -18,8 +21,13 @@ function FindTool(options) {
 			getItemName: function(id) {
 				return localization.GetStringOrFallback("avatar_label", "avatar");
 			},
-			getItemDescription: function(id) {
-				return localization.GetStringOrFallback("avatar_label", "avatar");
+			getItemDescription: function(id, short) {
+				if (short) {
+					return id;
+				}
+				else {
+					return localization.GetStringOrFallback("sprite_label", "sprite") + " " + id;
+				}
 			},
 			isItemSelected: function(id) {
 				return (drawing.type === TileType.Avatar) && (drawing.id === id);
@@ -32,23 +40,18 @@ function FindTool(options) {
 			renderer: spriteThumbnailRenderer,
 		},
 		{
-			id: "tile",
+			id: "TIL",
 			icon: "tile",
 			getIdList: function() { return sortedTileIdList(); },
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("tile_label", "tile");
 			},
 			getItemName: function(id) {
-				if (tile[id].name) {
-					return tile[id].name;
-				}
-				else {
-					return "#" + id;
-				}
+				return tile[id].name;
 			},
-			getItemDescription: function(id) {
-				if (tile[id].name) {
-					return localization.GetStringOrFallback("tile_label", "tile") + " " + tile[id].name;
+			getItemDescription: function(id, short) {
+				if (short) {
+					return id;
 				}
 				else {
 					return localization.GetStringOrFallback("tile_label", "tile") + " " + id;
@@ -65,7 +68,7 @@ function FindTool(options) {
 			renderer: tileThumbnailRenderer,
 		},
 		{
-			id: "sprite",
+			id: "SPR",
 			icon: "sprite",
 			getIdList: function() {
 				var idList = sortedSpriteIdList();
@@ -76,16 +79,11 @@ function FindTool(options) {
 				return localization.GetStringOrFallback("sprite_label", "sprite");
 			},
 			getItemName: function(id) {
-				if (sprite[id].name) {
-					return sprite[id].name;
-				}
-				else {
-					return "#" + id;
-				}
+				return sprite[id].name;
 			},
-			getItemDescription: function(id) {
-				if (sprite[id].name) {
-					return localization.GetStringOrFallback("sprite_label", "sprite") + " " + sprite[id].name;
+			getItemDescription: function(id, short) {
+				if (short) {
+					return id;
 				}
 				else {
 					return localization.GetStringOrFallback("sprite_label", "sprite") + " " + id;
@@ -102,23 +100,18 @@ function FindTool(options) {
 			renderer: spriteThumbnailRenderer,
 		},
 		{
-			id: "item",
+			id: "ITM",
 			icon: "item",
 			getIdList: function() { return sortedItemIdList(); },
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("item_label", "item");
 			},
 			getItemName: function(id) {
-				if (item[id].name) {
-					return item[id].name;
-				}
-				else {
-					return "#" + id;
-				}
+				return item[id].name;
 			},
-			getItemDescription: function(id) {
-				if (item[id].name) {
-					return localization.GetStringOrFallback("item_label", "item") + " " + item[id].name;
+			getItemDescription: function(id, short) {
+				if (short) {
+					return id;
 				}
 				else {
 					return localization.GetStringOrFallback("item_label", "item") + " " + id;
@@ -135,30 +128,33 @@ function FindTool(options) {
 			renderer: itemThumbnailRenderer,
 		},
 		{
-			id: "room",
+			id: "ROOM",
 			icon: "room",
 			getIdList: function() { return sortedRoomIdList(); },
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("room_label", "room");
 			},
 			getItemName: function(id) {
-				if (room[id].name) {
-					return room[id].name;
-				}
-				else {
-					return "#" + id;
+				return (id && room[id]) ? room[id].name : "";
+			},
+			setItemName: function(id, name) {
+				if (room[id]) {
+					room[id].name = name;
 				}
 			},
-			getItemDescription: function(id) {
-				if (room[id].name) {
-					return localization.GetStringOrFallback("room_label", "room") + " " + room[id].name;
+			getItemDescription: function(id, short) {
+				if (short) {
+					return id;
+				}
+				else if (id) {
+					return localization.GetStringOrFallback("room_label", "room") + " " + id;
 				}
 				else {
-					return localization.GetStringOrFallback("room_label", "room") + " " + id;
+					return localization.GetStringOrFallback("room_label", "room");
 				}
 			},
 			isItemSelected: function(id) {
-				return curRoom === id;
+				return (roomTool != undefined) && roomTool.getSelected() === id;
 			},
 			openTool: function(id) {
 				selectRoom(id);
@@ -167,23 +163,18 @@ function FindTool(options) {
 			renderer: roomThumbnailRenderer,
 		},
 		{
-			id: "colors",
+			id: "PAL",
 			icon: "colors",
 			getIdList: function() { return sortedPaletteIdList(); },
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("palette_tool_name", "colors");
 			},
 			getItemName: function(id) {
-				if (palette[id].name) {
-					return palette[id].name;
-				}
-				else {
-					return "#" + id;
-				}
+				return palette[id].name;
 			},
-			getItemDescription: function(id) {
-				if (palette[id].name) {
-					return localization.GetStringOrFallback("palette_label", "palette") + " " + palette[id].name;
+			getItemDescription: function(id, short) {
+				if (short) {
+					return id;
 				}
 				else {
 					return localization.GetStringOrFallback("palette_label", "palette") + " " + id;
@@ -199,29 +190,18 @@ function FindTool(options) {
 			renderer: paletteThumbnailRenderer,
 		},
 		{
-			id: "dialog",
+			id: "DLG",
 			icon: "dialog",
 			getIdList: function() { return [titleDialogId].concat(sortedDialogIdList()); },
 			getCategoryName: function() {
 				return localization.GetStringOrFallback("dialog_label", "dialog");
 			},
 			getItemName: function(id) {
-				if (id === titleDialogId) {
-					return titleDialogId; // todo : localize
-				}
-				else if (dialog[id].name) {
-					return dialog[id].name;
-				}
-				else {
-					return "#" + id;
-				}
+				return dialog[id].name;
 			},
-			getItemDescription: function(id) {
-				if (id === titleDialogId) {
-					return titleDialogId; // todo : localize
-				}
-				else if (dialog[id].name) {
-					return localization.GetStringOrFallback("dialog_label", "dialog") + " " + dialog[id].name;
+			getItemDescription: function(id, short) {
+				if (short) {
+					return id;
 				}
 				else {
 					return localization.GetStringOrFallback("dialog_label", "dialog") + " " + id;
@@ -235,9 +215,69 @@ function FindTool(options) {
 				showPanel("dialogPanel", "findPanel");
 			},
 		},
+		{
+			id: "TUNE",
+			icon: "tune",
+			getIdList: function() { return sortedBase36IdList(tune); },
+			getCategoryName: function() { return "tune"; },
+			getItemName: function(id) { return (id && tune[id]) ? tune[id].name : ""; },
+			getItemDescription: function(id, short) {
+				if (short) {
+					return id;
+				}
+				else if (id) {
+					// todo : localize
+					return "tune " + id;
+				}
+				else {
+					return "tune";
+				}
+			},
+			isItemSelected: function(id) { return tuneTool && id === tuneTool.getSelected(); },
+			openTool: function(id) {
+				tuneTool.select(id);
+				tuneTool.show("findPanel");
+			},
+			setItemName: function(id, name) {
+				if (tune[id]) {
+					tune[id].name = name;
+				}
+			},
+		},
+		{
+			id: "BLIP",
+			icon: "blip",
+			getIdList: function() { return sortedBase36IdList(blip); },
+			getCategoryName: function() { return "blip"; },
+			getItemName: function(id) { return (id && blip[id]) ? blip[id].name : ""; },
+			getItemDescription: function(id, short) {
+				if (short) {
+					return id;
+				}
+				else if (id) {
+					// todo : localize
+					return "blip " + id;
+				}
+				else {
+					return "blip";
+				}
+			},
+			isItemSelected: function(id) { return blipTool && id === blipTool.getSelected(); },
+			openTool: function(id) {
+				blipTool.select(id);
+				blipTool.show("findPanel");
+			},
+			setItemName: function(id, name) {
+				if (blip[id]) {
+					blip[id].name = name;
+				}
+			},
+			// todo : make better blip thumbnail renderer
+			// renderer: blipThumbnailRenderer
+		},
 	];
 
-	var curFilter = "all";
+	var curFilter = "ALL";
 	var curSearchText = "";
 
 	var searchGroup = createGroupElement();
@@ -261,7 +301,7 @@ function FindTool(options) {
 	var filterTabList = [
 		{
 			text: "all", // todo : localize
-			value: "all",
+			value: "ALL",
 			icon: "game_data",
 		},
 	];
@@ -288,12 +328,10 @@ function FindTool(options) {
 		document.getElementById("findFilter-" + categoryId).checked = true;
 	}
 
-	this.SelectCategory = selectCategoryAndUpdateUI;
-
-	var filterSelect = createTabSelectElement({
+	var filterSelect = createRadioElement({
 		name: "findFilter",
 		value: curFilter,
-		tabs: filterTabList,
+		options: filterTabList,
 		onclick: function(e) {
 			selectCategory(e.target.value);
 		},
@@ -329,12 +367,21 @@ function FindTool(options) {
 		for (var i = 0; i < categoryDefinitions.length; i++) {
 			var category = categoryDefinitions[i];
 
-			if (curFilter === "all" || curFilter === category.id) {
+			if (curFilter === "ALL" || curFilter === category.id) {
 				var idList = category.getIdList()
 
 				for (var j = 0; j < idList.length; j++) {
 					var id = idList[j];
+
 					var displayName = category.getItemName(id);
+					var tooltip = category.getItemDescription(id);
+					if (displayName === null || displayName === undefined) {
+						displayName = category.getItemDescription(id, true);
+					}
+					else {
+						tooltip = displayName + " (" + tooltip + ")";
+					}
+
 					var isSearchTextInName = (curSearchText === undefined || curSearchText === null ||
 						curSearchText.length <= 0 || displayName.indexOf(curSearchText) != -1);
 
@@ -344,7 +391,7 @@ function FindTool(options) {
 								renderer: category.renderer,
 								icon: category.icon,
 								text: displayName,
-								tooltip: category.getItemDescription(id),
+								tooltip: tooltip,
 								isSelectedFunc: category.isItemSelected,
 								onclick: createOnClick(category, id),
 								renderOptions: { isAnimated: true },
@@ -392,16 +439,6 @@ function FindTool(options) {
 		GenerateItems();
 	});
 
-	// todo : the naming of these events is confusing
-	events.Listen("game_data_refresh", function(event) {
-		spriteThumbnailRenderer.InvalidateCache();
-		tileThumbnailRenderer.InvalidateCache();
-		itemThumbnailRenderer.InvalidateCache();
-		paletteThumbnailRenderer.InvalidateCache();
-		roomThumbnailRenderer.InvalidateCache();
-		GenerateItems();
-	});
-
 	events.Listen("select_drawing", function(event) {
 		UpdateSelectedItems();
 	});
@@ -437,4 +474,29 @@ function FindTool(options) {
 
 	// init
 	GenerateItems();
+
+	this.SelectCategory = selectCategoryAndUpdateUI;
+
+	this.getCategory = function(id) {
+		for (var i = 0; i < categoryDefinitions.length; i++) {
+			if (categoryDefinitions[i].id === id) {
+				return categoryDefinitions[i];
+			}
+		}
+
+		return null;
+	};
+
+	this.updateSelection = function() {
+		GenerateItems();
+	};
+
+	this.updateThumbnails = function() {
+		spriteThumbnailRenderer.InvalidateCache();
+		tileThumbnailRenderer.InvalidateCache();
+		itemThumbnailRenderer.InvalidateCache();
+		paletteThumbnailRenderer.InvalidateCache();
+		roomThumbnailRenderer.InvalidateCache();
+		GenerateItems();
+	};
 }

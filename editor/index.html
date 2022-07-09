@@ -9,9 +9,7 @@
 		<title>Bitsy</title>
 
 		<!-- APP -->
-		<script src="app.js"></script>
 		<link rel="icon" type="image/png" href="image/cat5.png">
-		<link rel="manifest" href="manifest.json">
 
 		<!-- STYLES -->
 		<link rel="stylesheet" type="text/css" href="style/bitsyEditorStyle.css">
@@ -27,8 +25,15 @@
 		<!-- GENERATED -->
 		<script src="script/generated/resources.js"></script>
 
-		<!-- ENGINE SCRIPTS -->
-		<script src="script/engine/system.js"></script>
+		<!-- SYSTEM -->
+		<script src="script/system/input.js"></script>
+		<script src="script/system/soundchip.js"></script>
+		<script src="script/system/graphics.js"></script>
+		<script src="script/system/system.js"></script>
+
+		<!-- ENGINE -->
+		<script src="script/engine/world.js"></script>
+		<script src="script/engine/sound.js"></script>
 		<script src="script/engine/font.js"></script>
 		<script src="script/engine/transition.js"></script>
 		<script src="script/engine/script.js"></script>
@@ -36,15 +41,16 @@
 		<script src="script/engine/renderer.js"></script>
 		<script src="script/engine/bitsy.js"></script>
 
-		<!-- EDITOR SCRIPTS -->
+		<!-- EDITOR -->
 		<script src="script/store.js"></script>
 		<script src="script/util.js"></script>
 		<script src="script/icons.js"></script>
-		<script src="script/menu.js"></script>
-		<script src="script/paint.js"></script>
-		<script src="script/room.js"></script>
-		<script src="script/room_markers.js"></script>
 		<script src="script/thumbnail.js"></script>
+		<script src="script/mouse.js"></script>
+		<script src="script/menu.js"></script>
+		<script src="script/card.js"></script>
+		<script src="script/paint.js"></script>
+		<script src="script/room_markers.js"></script>
 		<script src="script/find.js"></script>
 		<script src="script/localization.js"></script>
 		<script src="script/event_manager.js"></script>
@@ -55,6 +61,11 @@
 		<script src="script/dialog_editor.js"></script>
 		<script src="script/editor.js"></script>
 		<script src="script/inventory.js"></script>
+
+		<!-- TOOLS -->
+		<script src="script/tools/room.js"></script>
+		<script src="script/tools/tune.js"></script>
+		<script src="script/tools/blip.js"></script>
 
 		<!-- FONTS -->
 		<link href="style/googleNunito.css" rel="stylesheet">
@@ -81,10 +92,18 @@
 						<div class="titleWidgetContainer"></div>
 					</div>
 
+					<!-- show tools -->
 					<input type="checkbox" value="toolsPanel" id="toolsCheck" onclick="toggleToolBar(event);" autocomplete="off" />
 					<label title="show / hide toolbar" for="toolsCheck" id="toolsCheckLabel" class="bitsy-menu-label">
 						<span class="bitsy_icon">tool</span>
 						<span id="toolsCheckLabelText" class="localize tools_label">tools</span>
+					</label>
+
+					<!-- play -->
+					<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" autocomplete="off" />
+					<label title="play / pause game" for="playModeCheck" class="bitsy-menu-label">
+						<span id="playModeIcon" class="bitsy_icon">play</span>
+						<span id="playModeText" class="localize play_game">play</span> <!-- TODO LOCALIZE: also stop_game -->
 					</label>
 
 				</div>
@@ -97,12 +116,6 @@
 				<label title="show / hide about window" for="aboutCheck">
 					<span class="bitsy_icon icon_space_right">about</span>
 					<span class="localize about_tool_name">about</span>
-				</label>
-				
-				<input type="checkbox" value="roomPanel" id="roomCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
-				<label title="show / hide room window" for="roomCheck">
-					<span class="bitsy_icon icon_space_right">room</span>
-					<span class="localize room_tool_name">room</span>
 				</label>
 
 				<input type="checkbox" value="exitsPanel" id="exitsCheck" onclick="togglePanelAnimated(event);" autocomplete="off" />
@@ -256,115 +269,6 @@
 					</div>
 				</div>
 
-				<div id="roomPanel" class="bitsy-card bitsy-card-l bitsy-workbench-item bitsy-playmode-enable">
-					<div class="bitsy-card-titlebar bitsy-playmode-reverse-color">
-						<span class="bitsy_icon bitsy-playmode-hide">room</span>
-
-						<span class="bitsy_icon bitsy-playmode-show">play</span>
-
-						<span class="bitsy-card-title" title="room window" onmousedown="grabCard(event);">
-							<span class="localize room_tool_name bitsy-playmode-hide">room</span>
-							<span class="bitsy-playmode-show">playing...</span>
-						</span>
-
-						<button title="minimize room window" onclick="hidePanel('roomPanel');">
-							<span class="bitsy_icon">close</span>
-						</button>
-					</div>
-
-					<div class="bitsy-card-main">
-						<div id="roomNav" class="navControl">
-							<!-- play -->
-							<input type="checkbox" id="playModeCheck" onclick="togglePlayMode(event);" autocomplete="off" />
-							<label title="play / pause game" for="playModeCheck" class="bitsy-menu-label">
-								<span id="playModeIcon" class="bitsy_icon">play</span>
-								<span id="playModeText" class="localize play_game">play</span> <!-- TODO LOCALIZE: also stop_game -->
-							</label>
-
-							<!-- current room -->
-							<label class="bitsy-playmode-show" title="current room location" style="flex-grow: 1;">
-								<span class="bitsy_icon">set_exit_location</span>
-								<span id="roomCurLocationText">???</span>
-							</label>
-
-							<!-- name -->
-							<input type="text" id="roomName" title="a name to refer to this room" class="bitsy-playmode-hide" onchange="on_room_name_change();" size="10"></input>
-
-							<!-- prev / next -->
-							<button title="previous room" class="bitsy-playmode-hide" onclick="prevRoom();">
-								<span class="bitsy_icon">previous</span>
-							</button>
-
-							<button title="next room" class="bitsy-playmode-hide" onclick="nextRoom();">
-								<span class="bitsy_icon">next</span>
-							</button>
-
-							<!-- add / copy / delete -->
-							<button title="add new room" class="bitsy-playmode-hide" onclick="newRoom();">
-								<span class="bitsy_icon">add</span>
-							</button>
-
-							<button title="duplicate room" class="bitsy-playmode-hide" onclick="duplicateRoom();">
-								<span class="bitsy_icon">copy</span>
-							</button>
-
-							<button title="delete room" class="bitsy-playmode-hide" onclick="deleteRoom();">
-								<span class="bitsy_icon">delete</span>
-							</button>
-
-							<!-- find -->
-							<button title="open find tool: rooms" class="bitsy-playmode-hide" onclick="openFindTool('room', 'roomPanel');">
-								<span class="bitsy_icon">search</span>
-							</button>
-						</div>
-
-						<canvas id="game"></canvas>
-
-						<div class="controlBox bitsy-menu-group bitsy-playmode-hide">
-							<span class="controlBox">
-								<span class="bitsy_icon icon_space_right">colors</span>
-								<span class="localize palette_tool_name">colors</span>: 
-								<select title="select color palette for room" id="roomPaletteSelect" style="margin-left: var(--bitsy-space-s);" onchange="roomPaletteChange(event);">
-									<option value="0">palette 0</option> <!-- other options are added dynamically -->
-								</select>
-							</span>
-
-							<button title="add exits and endings" class="color0" onclick="showPanel('exitsPanel', 'roomPanel');" style="margin-top:2px;">
-								<span class="localize marker_tool_name">exits & endings</span>
-								<span class="bitsy_icon" style="margin-left: var(--bitsy-space-s);">open_tool</span>
-							</button>
-
-							<input type="checkbox" id="roomVisibilityControlsCheck" onclick="document.getElementById('roomVisibilityControls').style.display = event.target.checked ? 'flex' : 'none';" autocomplete="off" />
-							<label title="show visibility controls" for="roomVisibilityControlsCheck" class="bitsy-menu-label">
-								<span class="bitsy_icon">visibility</span>
-								<span>visibility</span> <!-- TODO : localize -->
-							</label>
-						</div>
-
-						<div id="roomVisibilityControls" class="controlBox bitsy-menu-group bitsy-playmode-hide" style="margin-top: var(--bitsy-space-s); display: none;">
-							<span>visibility:</span> <!-- TODO : localize -->
-
-							<input type="checkbox" id="roomGridCheck" onclick="toggleMapGrid(event);" autocomplete="off" checked/>
-							<label title="show / hide grid" for="roomGridCheck" class="bitsy-menu-label">
-								<span id="roomGridIcon" class="bitsy_icon">visibility</span>
-								<span class="localize grid_toggle_visible">grid</span>
-							</label>
-
-							<input type="checkbox" id="roomWallsCheck" onclick="toggleCollisionMap(event);" autocomplete="off" />
-							<label title="show / hide walls" for="roomWallsCheck" class="bitsy-menu-label">
-								<span id="roomWallsIcon" class="bitsy_icon">visibility_off</span>
-								<span class="localize walls_toggle_visible">walls</span>
-							</label>
-
-							<input type="checkbox" id="roomMarkersCheck" onclick="toggleRoomMarkers(event.target.checked);" autocomplete="off" checked/>
-							<label title="show / hide exits & endings" for="roomMarkersCheck" class="bitsy-menu-label">
-								<span id="roomMarkersIcon" class="bitsy_icon">visibility</span>
-								<span class="localize marker_tool_name">exits & endings</span>
-							</label>
-						</div>
-					</div>
-				</div>
-
 				<div id="exitsPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item" style="display:none;">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">exits_endings</span>
@@ -439,7 +343,7 @@
 									<span id="markerName1">marker 1</span>
 								</span>
 
-								<canvas id="markerCanvas1" title="location of marker (click to go to room)" onclick="selectMarkerRoom1();" style="margin-top: 5px;"></canvas>
+								<canvas id="markerCanvas1" title="location of marker (click to go to room)" onclick="selectMarkerRoom1();" style="margin-top: 5px; image-rendering: pixelated;"></canvas>
 
 								<div class="markerPosControl">
 									<div class="markerCoordinatesHolder" title="marker coordinates">
@@ -494,7 +398,7 @@
 									<span id="markerName2">marker 2</span>
 								</span>
 
-								<canvas id="markerCanvas2" title="location of marker (click to go to room)" onclick="selectMarkerRoom2();" style="margin-top: 5px;"></canvas>
+								<canvas id="markerCanvas2" title="location of marker (click to go to room)" onclick="selectMarkerRoom2();" style="margin-top: 5px; image-rendering: pixelated;"></canvas>
 
 								<div class="markerPosControl">
 									<div class="markerCoordinatesHolder" title="marker coordinates">
@@ -742,6 +646,8 @@
 								</div>
 							</div>
 						</div>
+
+						<div id="newPaintMenu" class="bitsy-menu"></div>
 					</div>
 				</div>
 
@@ -798,7 +704,7 @@
 							</button>
 
 							<!-- find -->
-							<button title="open find tool: colors" onclick="openFindTool('colors', 'colorsPanel');">
+							<button title="open find tool: colors" onclick="openFindTool('PAL', 'colorsPanel');">
 								<span class="bitsy_icon">search</span>
 							</button>
 						</div>
@@ -881,7 +787,7 @@
 								</button>
 
 								<!-- find -->
-								<button title="open find tool: dialog" onclick="openFindTool('dialog', 'dialogPanel');">
+								<button title="open find tool: dialog" onclick="openFindTool('DLG', 'dialogPanel');">
 									<span class="bitsy_icon">search</span>
 								</button>
 							</div>
@@ -982,7 +888,7 @@
 								<span class="bitsy_icon">upload</span>
 								<span class="localize upload_game">upload game</span>
 							</label>
-							<input type="file" id="importGamePicker" style="display:none;" onchange="importGameFromFile(event);"/>
+							<input type="file" accept=".html" id="importGamePicker" style="display:none;" onchange="importGameFromFile(event);"/>
 						</div>
 
 						<!-- TODO LOCALIZE - word wrap -->
@@ -1075,19 +981,23 @@
 					<div class="bitsy-card-main">
 						<textarea title="raw text of the bitsy game data file (be careful when editing)" id="game_data" onchange="on_game_data_change();"></textarea>
 						<div class="bitsy-menu-group">
-							<button title="reset everything and start new game" class="bitsy-menu-label" onclick="newGameDialog();">
-								<span class="bitsy_icon">new_game</span>
-								<span class="localize reset_data">reset game data</span>
-							</button>
-							<button title="download game data" class="bitsy-menu-label" onclick="exportGameData();">
-								<span class="bitsy_icon">download</span>
-								<span class="localize download_data">download data</span>
-							</button>
 							<input type="checkbox" id="fontDataCheck" onclick="toggleFontDataVisibility(event);" autocomplete="off" />
 							<label title="show / hide font data (WARNING: can be very slow for large fonts)" for="fontDataCheck" class="bitsy-menu-label">
 								<span id="fontDataIcon" class="bitsy_icon">visibility_off</span>
 								<span class="localize font_data_toggle_visible">font data</span>
 							</label>
+
+							<button title="download game data" class="bitsy-menu-label" onclick="exportGameData();">
+								<span class="bitsy_icon">download</span>
+								<span class="localize download_data">download data</span>
+							</button>
+
+							<label for="importGameDataPicker" class="filePickerLabel" title="import game data from a .bitsy file on your computer">
+								<span class="bitsy_icon">upload</span>
+								<!-- todo: localize -->
+								<span>upload data</span>
+							</label>
+							<input type="file" accept=".bitsy" id="importGameDataPicker" style="display: none;" onchange="importGameDataFromFile(event);" />
 						</div>
 					</div>
 				</div>
@@ -1106,96 +1016,113 @@
 					</div>
 
 					<div id="settingsInner" class="bitsy-card-main">
-						<div>
-							<span class="localize editor_settings">editor settings</span>
-						</div>
-						<div class="controlBox">
-							<span class="localize language_label">language</span>:
-							<select id="languageSelect" onchange="on_change_language(event);"></select>
-							<br/>
-							<span class="localize language_translator_credit" style="font-size: 80%;">English text by Adam Le Doux</span>
-						</div>
-						<div>
-							<span class="localize game_settings">game settings</span>
-						</div>
-						<div class="controlBox">
-							<span class="localize option_page_color">html page color:</span>
-							<br/>
-							<input title="pick background color for exported html page" type="color" value="#ffffff" id="pageColor" onchange="on_change_color_page();" autocomplete="off">
-						</div>
-						<div class="controlBox">
-							<form>
-								<span class="localize option_window_size">game window size:</span>
-								<br/>
-								<input type="radio" name="export size" value="full" onclick="chooseExportSizeFull();" id="exportSizeOptionFull" checked>
-								<label title="game window resizes to fill page (mobile friendly)" for="exportSizeOptionFull" class="left">
-									<span class="bitsy_icon">pagesize_full</span>
-									<span class="localize option_full_size">full page</span>
-								</label>
+						<div class="bitsy-menu">
 
-								<input type="radio" name="export size" value="fixed" onclick="chooseExportSizeFixed();" id="exportSizeOptionFixed">
-								<label title="game window stays a fixed size" for="exportSizeOptionFixed" class="right">
-									<span class="bitsy_icon">pagesize_fixed</span>
-									<span class="localize option_fixed_size">fixed size</span>
-								</label>
-
-								<div style="margin-top:5px;">
-									<span class="controlBox" id="exportSizeFixedInputSpan" style="display:none;">
-										<input type="number" min="0" value="512" style="width:60px;" id="exportSizeFixedInput"> px
-									</span>
-								</div>
-							</form>
-						</div>
-						<div class="controlBox">
-							<span class="localize font_label">font</span>:
-							<select id="fontSelect" onchange="on_change_font(event);">
-								<option value="ascii_small" class="localize font_ascii_small">ASCII Small</option>
-								<option value="unicode_european_small" class="localize font_unicode_european_small">Unicode European Small</option>
-								<option value="unicode_european_large" class="localize font_unicode_european_large">Unicode European Large</option>
-								<option value="unicode_asian" class="localize font_unicode_asian">Unicode Asian</option>
-								<option value="arabic" class="localize font_arabic">Arabic</option>
-								<option value="custom">Custom Font - none</option> <!-- TODO : localize -->
-							</select>
-							<div id="ascii_small_description" style="font-size: 80%">
-								<span class="localize font_ascii_small_description">Small font limited to ASCII, which includes English characters and some symbols.</span>
+							<div class="bitsy-menu-group">
+								<span class="localize editor_settings">editor settings</span>
 							</div>
-							<div id="unicode_european_small_description" style="font-size: 80%">
-								<span class="localize font_unicode_european_small_description">Small font with some unicode support. Includes characters for most European languages.</span>
-							</div>
-							<div id="unicode_european_large_description" style="font-size: 80%">
-								<span class="localize font_unicode_european_large_description">Large font with more unicode support. Includes characters for all European languages.</span>
-							</div>
-							<div id="unicode_asian_description" style="font-size: 80%">
-								<span class="localize font_unicode_asian_description">Large font which includes characters for Asian languages such as Chinese, Japanese, and Korean.</span>
-							</div>
-							<div id="arabic_description" style="font-size: 80%">
-								<span class="localize font_arabic_description">Pixel font with Arabic characters</span>
-							</div>
-							<div id="custom_description" style="font-size: 80%">
-								<span class="localize font_custom_description">Upload your own custom font in the ".bitsyfont" format!</span>
+							<div class="controlBox">
+								<span class="localize language_label">language</span>:
+								<select id="languageSelect" onchange="on_change_language(event);"></select>
 								<br/>
-								<label for="importFontPicker" class="filePickerLabel" title="import font from bitsyfont file on your computer">
-									<span class="bitsy_icon">upload</span>
-									<span class="localize upload_font">upload font</span>
-								</label>
-								<input title="import font from bitsyfont file on your computer" type="file" id="importFontPicker" style="display:none;" onchange="importFontFromFile(event);"/>
+								<span class="localize language_translator_credit" style="font-size: 80%;">English text by Adam Le Doux</span>
 							</div>
-							<div style="margin-top:3px;">
-								<button title="download font file" class="color0" onclick="exportFont();">
-									<span class="bitsy_icon">download</span>
-									<span class="localize download_font">download font</span>
-								</button>
+							<div class="bitsy-menu-group">
+								<span class="localize game_settings">game settings</span>
 							</div>
-							<div>
-								<span class="localize text_direction_label">text direction</span>:
-								<select id="textDirectionSelect" onchange="on_change_text_direction(event);">
-									<option value="LTR" class="localize text_direction_ltr">Left to Right</option>
-									<option value="RTL" class="localize text_direction_rtl">Right to Left</option>
+							<div class="controlBox">
+								<span class="localize font_label">font</span>:
+								<select id="fontSelect" onchange="on_change_font(event);">
+									<option value="ascii_small" class="localize font_ascii_small">ASCII Small</option>
+									<option value="unicode_european_small" class="localize font_unicode_european_small">Unicode European Small</option>
+									<option value="unicode_european_large" class="localize font_unicode_european_large">Unicode European Large</option>
+									<option value="unicode_asian" class="localize font_unicode_asian">Unicode Asian</option>
+									<option value="arabic" class="localize font_arabic">Arabic</option>
+									<option value="custom">Custom Font - none</option> <!-- TODO : localize -->
 								</select>
+								<div id="ascii_small_description" style="font-size: 80%">
+									<span class="localize font_ascii_small_description">Small font limited to ASCII, which includes English characters and some symbols.</span>
+								</div>
+								<div id="unicode_european_small_description" style="font-size: 80%">
+									<span class="localize font_unicode_european_small_description">Small font with some unicode support. Includes characters for most European languages.</span>
+								</div>
+								<div id="unicode_european_large_description" style="font-size: 80%">
+									<span class="localize font_unicode_european_large_description">Large font with more unicode support. Includes characters for all European languages.</span>
+								</div>
+								<div id="unicode_asian_description" style="font-size: 80%">
+									<span class="localize font_unicode_asian_description">Large font which includes characters for Asian languages such as Chinese, Japanese, and Korean.</span>
+								</div>
+								<div id="arabic_description" style="font-size: 80%">
+									<span class="localize font_arabic_description">Pixel font with Arabic characters</span>
+								</div>
+								<div id="custom_description" style="font-size: 80%">
+									<span class="localize font_custom_description">Upload your own custom font in the ".bitsyfont" format!</span>
+									<br/>
+									<label for="importFontPicker" class="filePickerLabel" title="import font from bitsyfont file on your computer">
+										<span class="bitsy_icon">upload</span>
+										<span class="localize upload_font">upload font</span>
+									</label>
+									<input title="import font from bitsyfont file on your computer" type="file" accept=".bitsyfont" id="importFontPicker" style="display:none;" onchange="importFontFromFile(event);"/>
+								</div>
+								<div style="margin-top:3px;">
+									<button title="download font file" class="color0" onclick="exportFont();">
+										<span class="bitsy_icon">download</span>
+										<span class="localize download_font">download font</span>
+									</button>
+								</div>
+								<div>
+									<span class="localize text_direction_label">text direction</span>:
+									<select id="textDirectionSelect" onchange="on_change_text_direction(event);">
+										<option value="LTR" class="localize text_direction_ltr">Left to Right</option>
+										<option value="RTL" class="localize text_direction_rtl">Right to Left</option>
+									</select>
+								</div>
+								<div style="font-size: 80%">
+									<span class="localize text_direction_description">Option for languages that read right to left</span>
+								</div>
+								<div style="margin-top: 5px;">
+									<span class="bitsy_icon">text_edit</span>
+									<!-- todo : localize -->
+									<span title="textbox graphics mode">text mode:</span>
+									<select id="textModeSelect" title="select resolution of textbox pixels" onchange="onChangeTextMode(event);">
+										<option value="TXT_HIREZ" title="2x pixel resolution">default</option>
+										<option value="TXT_LOREZ" title="1x pixel resolution">chunky</option>
+									</select>
+								</div>
 							</div>
-							<div style="font-size: 80%">
-								<span class="localize text_direction_description">Option for languages that read right to left</span>
+							<div class="bitsy-menu-group">
+								<!-- todo : localize -->
+								<span>export settings</span>
 							</div>
+							<div class="controlBox">
+								<span class="localize option_page_color">html page color:</span>
+								<br/>
+								<input title="pick background color for exported html page" type="color" value="#ffffff" id="pageColor" onchange="on_change_color_page();" autocomplete="off">
+							</div>
+							<div class="controlBox">
+								<form>
+									<span class="localize option_window_size">game window size:</span>
+									<br/>
+									<input type="radio" name="export size" value="full" onclick="chooseExportSizeFull();" id="exportSizeOptionFull" checked>
+									<label title="game window resizes to fill page (mobile friendly)" for="exportSizeOptionFull" class="left">
+										<span class="bitsy_icon">pagesize_full</span>
+										<span class="localize option_full_size">full page</span>
+									</label>
+
+									<input type="radio" name="export size" value="fixed" onclick="chooseExportSizeFixed();" id="exportSizeOptionFixed">
+									<label title="game window stays a fixed size" for="exportSizeOptionFixed" class="right">
+										<span class="bitsy_icon">pagesize_fixed</span>
+										<span class="localize option_fixed_size">fixed size</span>
+									</label>
+
+									<div style="margin-top:5px;">
+										<span class="controlBox" id="exportSizeFixedInputSpan" style="display:none;">
+											<input type="number" min="0" value="512" style="width:60px;" id="exportSizeFixedInput"> px
+										</span>
+									</div>
+								</form>
+							</div>
+
 						</div>
 					</div>
 				</div>
