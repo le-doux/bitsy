@@ -9,17 +9,18 @@ function bitsyLog(str) {
 	console.log("bitsy:: " + str);
 }
 
+// mock out global dependencies of `world.js`
 var bitsy = {
-	log : bitsyLog,
-	MAP_SIZE : 16,
-	TILE_SIZE : 8,
+	log: bitsyLog,
+	MAP_SIZE: 16,
+	TILE_SIZE: 8,
 };
-
-// kind of too bad that I still need to load a script module
-eval(fs.readFileSync(path.resolve(__dirname, "../../editor/script/engine/script.js"), { encoding: "utf8" }));
-var scriptModule = new Script();
-var scriptUtils = scriptModule.CreateUtils();
-
+var scriptUtils = {
+	ReadDialogScript(_, index){
+		return { index };
+	},
+};
+// evaluate `world.js` to provide access to `parseWorld` in global scope
 eval(fs.readFileSync(path.resolve(__dirname, "../../editor/script/engine/world.js"), { encoding: "utf8" }));
 
 console.log("*** loading drawings ***")
