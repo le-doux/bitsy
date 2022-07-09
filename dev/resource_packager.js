@@ -55,8 +55,5 @@ for (var i = 0; i < resourceFiles.length; i++) {
 
 var resourceJavascriptFile = "var Resources = " + JSON.stringify(resourcePackage, null, 2) + ";";
 
-fs.writeFile(path.resolve(__dirname, "../editor/script/generated/resources.js"), resourceJavascriptFile, function () {});
-
-// console.log(resourcePackage);
-
+fs.writeFileSync(path.resolve(__dirname, "../editor/script/generated/resources.js"), resourceJavascriptFile);
 console.log("done!");
