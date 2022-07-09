@@ -2,6 +2,15 @@ var fs = require('fs');
 var path = require('path');
 
 var dirIcons = "../resources/icons";
+
+// delete existing icons
+fs.readdirSync(path.resolve(__dirname, dirIcons))
+	.map(file => path.join(dirIcons, file))
+	.forEach(file => {
+		fs.unlinkSync(path.resolve(__dirname, file));
+	});
+
+
 // todo : use flood fill to merge pixels into continuous vector shapes
 
 console.log("*** initializing bitsy ***");
