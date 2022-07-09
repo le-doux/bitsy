@@ -4,17 +4,21 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 	var markerList = [];
 	var curMarker = null;
 
-	markerCanvas1.width = width * scale; // TODO : globals?
-	markerCanvas1.height = width * scale;
+	var thumbnailScale = scale / 2;
+
+	markerCanvas1.width = mapsize * thumbnailScale; // TODO : globals?
+	markerCanvas1.height = mapsize * thumbnailScale;
 	var markerCtx1 = markerCanvas1.getContext("2d");
 
-	markerCanvas2.width = width * scale; // TODO : globals?
-	markerCanvas2.height = width * scale;
+	markerCanvas2.width = mapsize * thumbnailScale; // TODO : globals?
+	markerCanvas2.height = mapsize * thumbnailScale;
 	var markerCtx2 = markerCanvas2.getContext("2d");
 
 	var placementMode = PlacementMode.None;
 
 	// UpdatePlacementButtons();
+
+	var thumbnailRenderer = createRoomThumbnailRenderer();
 
 	function SelectMarker(marker) {
 		bitsyLog("SELECT MARKER!!! " + marker, "editor");
@@ -227,6 +231,15 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 	}
 
+	function drawLocation(ctx, roomId, x, y) {
+		ctx.globalAlpha = 1.0;
+		ctx.fillStyle = getContrastingColor(room[roomId].pal);
+		ctx.fillRect(x * thumbnailScale, 0 * thumbnailScale, thumbnailScale, y * thumbnailScale);
+		ctx.fillRect(x * thumbnailScale, (y + 1) * thumbnailScale, thumbnailScale, (mapsize - y - 1) * thumbnailScale);
+		ctx.fillRect(0 * thumbnailScale, y * thumbnailScale, x * thumbnailScale, thumbnailScale);
+		ctx.fillRect((x + 1) * thumbnailScale, y * thumbnailScale, (mapsize - x - 1) * thumbnailScale, thumbnailScale);
+	}
+
 	function RenderMarkerSelection() { // TODO - break this up???
 		bitsyLog('render marker', "editor");
 
@@ -247,7 +260,6 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 		if (curMarker != null) {
 			markersSelect.style.display = "flex";
-			var w = tilesize * scale;
 			if (curMarker.MarkerCount() == 2) {
 				markerControl1.style.visibility = "visible";
 				markerControl2.style.visibility = "visible";
@@ -256,20 +268,19 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				var endPos = curMarker.GetMarkerPos(1);
 
 				if (room[startPos.room] != undefined) {
-					renderGameScreenIntoContext(startPos.room, markerCtx1);
+					// draw thumbnail of room
+					thumbnailRenderer.renderToCtx(room[startPos.room], markerCtx1);
 
-					markerCtx1.globalAlpha = 1.0;
-					markerCtx1.fillStyle = getContrastingColor(room[startPos.room].pal);
-					markerCtx1.fillRect((startPos.x * w) - (w * 0.5), (startPos.y * w) - (w * 0.5), w * 2, w * 2);
+					// indicate exit location
+					drawLocation(markerCtx1, startPos.room, startPos.x, startPos.y);
 				}
 
 				if (room[endPos.room] != undefined) {
-					renderGameScreenIntoContext(endPos.room, markerCtx2);
+					// draw thumbnail of room
+					thumbnailRenderer.renderToCtx(room[endPos.room], markerCtx2);
 
-					markerCtx2.globalAlpha = 1.0;
-					markerCtx2.fillStyle = getContrastingColor(room[endPos.room].pal);
-					markerCtx2.fillRect(endPos.x * w, endPos.y * w, w, w);
-					markerCtx2.fillRect((endPos.x * w) - (w * 0.5), (endPos.y * w) - (w * 0.5), w * 2, w * 2);
+					// indicate exit location
+					drawLocation(markerCtx2, endPos.room, endPos.x, endPos.y);
 				}
 			}
 			else if (curMarker.MarkerCount() == 1) {
@@ -278,11 +289,11 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 				var markerPos = curMarker.GetMarkerPos(0);
 
 				if (room[markerPos.room] != undefined) {
-					renderGameScreenIntoContext(markerPos.room, markerCtx1);
+					// draw thumbnail of room
+					thumbnailRenderer.renderToCtx(room[markerPos.room], markerCtx1);
 
-					markerCtx1.globalAlpha = 1.0;
-					markerCtx1.fillStyle = getContrastingColor(room[markerPos.room].pal);
-					markerCtx1.fillRect((markerPos.x * w) - (w * 0.5), (markerPos.y * w) - (w * 0.5), w * 2, w * 2);
+					// indicate exit location
+					drawLocation(markerCtx1, markerPos.room, markerPos.x, markerPos.y);
 				}
 			}
 
@@ -344,7 +355,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 							curMarker.PlaceMarker(
 								index == 0 ? PlacementMode.FirstMarker : PlacementMode.SecondMarker,
 								curPos.room,
-								input.value,
+								parseInt(input.value),
 								curPos.y);
 							refreshGameData();
 							RenderMarkerSelection();
@@ -360,7 +371,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 								index == 0 ? PlacementMode.FirstMarker : PlacementMode.SecondMarker,
 								curPos.room,
 								curPos.x,
-								input.value);
+								parseInt(input.value));
 							refreshGameData();
 							RenderMarkerSelection();
 						}
@@ -635,7 +646,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		return curMarker;
 	}
 
-	this.TrySelectMarkerAtLocation = function(x,y) {
+	this.TrySelectMarkerAtLocation = function(x, y) {
 		if (placementMode != PlacementMode.None) {
 			return false;
 		}
@@ -648,7 +659,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		return foundMarker != null;
 	}
 
-	this.IsMarkerAtLocation = function(x,y) {
+	this.IsMarkerAtLocation = function(x, y) {
 		return FindMarkerAtLocation(x,y) != null;
 	}
 
@@ -760,7 +771,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		// }
 	}
 
-	this.PlaceMarker = function(x,y) {
+	this.PlaceMarker = function(x, y) {
 		if (curMarker != null) {
 			curMarker.PlaceMarker(placementMode,selectedRoom,x,y);
 			refreshGameData();
@@ -898,18 +909,18 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 	var dragMarker = null;
 
-	this.StartDrag = function(x,y) {
+	this.StartDrag = function(x, y) {
 		x = clamp(x, 0, mapsize - 1);
 		y = clamp(y, 0, mapsize - 1);
 
-		dragMarker = FindMarkerAtLocation(x,y);
+		dragMarker = FindMarkerAtLocation(x, y);
 
 		if (dragMarker != null) {
-			dragMarker.StartDrag(selectedRoom,x,y);
+			dragMarker.StartDrag(selectedRoom, x, y);
 		}
 	}
 
-	this.ContinueDrag = function(x,y) {
+	this.ContinueDrag = function(x, y) {
 		x = clamp(x, 0, mapsize - 1);
 		y = clamp(y, 0, mapsize - 1);
 
@@ -917,9 +928,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			return;
 		}
 
-		dragMarker.ContinueDrag(selectedRoom,x,y);
+		dragMarker.ContinueDrag(selectedRoom, x, y);
 
-		refreshGameData();
 		RenderMarkerSelection();
 	}
 
@@ -1007,26 +1017,6 @@ function InitMarkerObj(obj, parent) {
 function RoomMarkerBase(parentRoom) {
 	this.parentRoom = parentRoom;
 
-	this.DrawMarker = function(ctx,x,y,w,selected) {
-		ctx.fillStyle = getComplimentingColor();
-		ctx.strokeStyle = getContrastingColor();
-
-		ctx.globalAlpha = 0.7;
-		ctx.fillRect(x * w, y * w, w, w);
-
-		ctx.globalAlpha = 1.0;
-		ctx.lineWidth = 2.0;
-		ctx.strokeRect(x * w, y * w, w, w);
-
-		if (selected) {
-			ctx.lineWidth = 4;
-			var offset = 3;
-			ctx.strokeRect((x * w) - offset, (y * w) - offset, w + (offset*2), w + (offset*2));
-		}
-	}
-
-	this.Draw = function(ctx,roomId,w,selected) {}
-
 	this.IsAtLocation = function(roomId,x,y) {
 		return false;
 	}
@@ -1072,89 +1062,6 @@ function ExitMarker(parentRoom, exit, hasReturn, returnExit, linkState) {
 	this.hasReturn = hasReturn;
 	this.return = returnExit; // TODO naming?
 	this.linkState = linkState;
-
-	this.Draw = function(ctx,roomId,w,selected) {
-		if (this.parentRoom === roomId) {
-			this.base.DrawMarker(ctx, this.exit.x, this.exit.y, w, selected);
-
-			if (this.hasReturn) {
-				DrawTwoWayExit(ctx, this.exit.x, this.exit.y, w);
-			}
-			else {
-				DrawExit(ctx, this.exit.x, this.exit.y, w);
-			}
-		}
-
-		if (this.exit.dest.room === roomId) {
-			this.base.DrawMarker(ctx, this.exit.dest.x, this.exit.dest.y, w, selected);
-
-			if (this.hasReturn) {
-				DrawTwoWayExit(ctx, this.exit.dest.x, this.exit.dest.y, w);
-			}
-			else {
-				DrawEntrance(ctx, this.exit.dest.x, this.exit.dest.y, w);
-			}
-		}
-	}
-
-	function DrawExit(ctx,x,y,w) {
-		ctx.fillStyle = getContrastingColor();
-		ctx.strokeStyle = getContrastingColor();
-		ctx.lineWidth = 2.0;
-		ctx.globalAlpha = 1.0;
-		var centerX = (x * w) + (w/2);
-		var centerY = (y * w) + (w/2);
-		ctx.beginPath();
-		ctx.moveTo(centerX, centerY - (w/4));
-		ctx.lineTo(centerX + (w/6), centerY + (w/12));
-		ctx.lineTo(centerX - (w/6), centerY + (w/12));
-		ctx.fill();
-		ctx.beginPath();
-		ctx.moveTo(centerX, centerY + (w/12));
-		ctx.lineTo(centerX, centerY + (w/4));
-		ctx.stroke();
-	}
-
-	function DrawEntrance(ctx,x,y,w) {
-		ctx.strokeStyle = getContrastingColor();
-		ctx.lineWidth = 2.0;
-		ctx.globalAlpha = 1.0;
-		var centerX = (x * w) + (w/2);
-		var centerY = (y * w) + (w/2);
-		ctx.beginPath();
-		ctx.moveTo(centerX, centerY + (w/4));
-		ctx.lineTo(centerX + (w/6), centerY - (w/12));
-		ctx.lineTo(centerX - (w/6), centerY - (w/12));
-		ctx.lineTo(centerX, centerY + (w/4));
-		ctx.stroke();
-		ctx.beginPath();
-		ctx.moveTo(centerX, centerY - (w/12));
-		ctx.lineTo(centerX, centerY - (w/4));
-		ctx.stroke();
-	}
-
-	function DrawTwoWayExit(ctx,x,y,w) {
-		ctx.fillStyle = getContrastingColor();
-		ctx.strokeStyle = getContrastingColor();
-		ctx.lineWidth = 3.0;
-		ctx.globalAlpha = 1.0;
-		var centerX = (x * w) + (w/2);
-		var centerY = (y * w) + (w/2);
-		ctx.beginPath();
-		ctx.moveTo(centerX, centerY - (w/4));
-		ctx.lineTo(centerX + (w/6), centerY - (w * 0.1));
-		ctx.lineTo(centerX - (w/6), centerY - (w * 0.1));
-		ctx.fill();
-		ctx.beginPath();
-		ctx.moveTo(centerX, centerY + (w/4));
-		ctx.lineTo(centerX + (w/6), centerY + (w * 0.1));
-		ctx.lineTo(centerX - (w/6), centerY + (w * 0.1));
-		ctx.fill();
-		ctx.beginPath();
-		ctx.moveTo(centerX, centerY - (w * 0.2));
-		ctx.lineTo(centerX, centerY + (w * 0.2));
-		ctx.stroke();
-	}
 
 	this.IsAtLocation = function(roomId,x,y) {
 		var startsInThisRoom = this.parentRoom === roomId && this.exit.x == x && this.exit.y == y;
@@ -1395,29 +1302,6 @@ function EndingMarker(parentRoom, ending) {
 	this.type = MarkerType.Ending;
 
 	this.ending = ending;
-
-	this.Draw = function(ctx,roomId,w,selected) {
-		if (this.parentRoom === roomId) {
-			this.base.DrawMarker(ctx, this.ending.x, this.ending.y, w, selected);
-			DrawEnding(ctx, this.ending.x, this.ending.y, w);
-		}
-	}
-
-	function DrawEnding(ctx,x,y,w) {
-		ctx.strokeStyle = getContrastingColor();
-		ctx.lineWidth = 2.0;
-		ctx.globalAlpha = 1.0;
-
-		ctx.beginPath();
-		ctx.moveTo((x * w) + (w * 0.3), (y * w) + (w * 0.3));
-		ctx.lineTo((x * w) + (w * 0.7), (y * w) + (w * 0.7));
-		ctx.stroke();
-
-		ctx.beginPath();
-		ctx.moveTo((x * w) + (w * 0.3), (y * w) + (w * 0.7));
-		ctx.lineTo((x * w) + (w * 0.7), (y * w) + (w * 0.3));
-		ctx.stroke();
-	}
 
 	this.IsAtLocation = function(roomId,x,y) {
 		return this.parentRoom === roomId && this.ending.x == x && this.ending.y == y;

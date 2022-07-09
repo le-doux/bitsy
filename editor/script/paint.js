@@ -1,7 +1,25 @@
 /*
 	PAINT
 */
-function PaintTool(canvas, roomTool) {
+function drawGrid(canvas, gridDivisions, lineColor) {
+	var ctx = canvas.getContext("2d");
+	ctx.fillStyle = lineColor;
+
+	var gridSize = canvas.width; // assumes width === height
+	var gridSpacing = (gridSize / gridDivisions);
+
+	// vertical lines
+	for (var x = 1; x < gridDivisions; x++) {
+		ctx.fillRect(x * gridSpacing, 0 * gridSpacing, 1, gridSize);
+	}
+
+	// horizontal lines
+	for (var y = 1; y < gridDivisions; y++) {
+		ctx.fillRect(0 * gridSpacing, y * gridSpacing, gridSize, 1);
+	}
+}
+
+function PaintTool(canvas, menuElement) {
 	// TODO : variables
 	var self = this; // feels a bit hacky
 
@@ -78,18 +96,24 @@ function PaintTool(canvas, roomTool) {
 		if (isPainting) {
 			isPainting = false;
 
-			// force all tiles to re-render
-			renderer.ClearCache();
+			// force tile to re-render
+			// renderer.ClearCache();
+			// renderer.DeleteDrawing(drawing);
+			if (roomTool) {
+				// roomTool.renderer.ClearCache();
+				roomTool.select(roomTool.getSelected());
+			}
 
 			updateDrawingData();
 			refreshGameData();
 
 			self.updateCanvas();
-			roomTool.drawEditMap(); // TODO : events instead of direct coupling
 
 			if (self.isCurDrawingAnimated) {
 				renderAnimationPreview(drawing);
 			}
+
+			events.Raise("paint_edit");
 		}
 	}
 
@@ -115,16 +139,28 @@ function PaintTool(canvas, roomTool) {
 	}
 
 	this.updateCanvas = function() {
+		// get palette of selected room
+		var selectedRoomId = state.room;
+		if (roomTool) {
+			selectedRoomId = roomTool.getSelected();
+		}
+		if (room[selectedRoomId] === undefined) {
+			selectedRoomId = "0";
+		}
+
+		var palId = room[selectedRoomId].pal;
+		var palColors = getPal(palId);
+
 		//background
-		ctx.fillStyle = "rgb("+getPal(curPal())[0][0]+","+getPal(curPal())[0][1]+","+getPal(curPal())[0][2]+")";
-		ctx.fillRect(0,0,canvas.width,canvas.height);
+		ctx.fillStyle = "rgb(" + palColors[0][0] + "," + palColors[0][1] + "," + palColors[0][2] + ")";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 		//pixel color
 		if (drawing.type === TileType.Tile) {
-			ctx.fillStyle = "rgb("+getPal(curPal())[1][0]+","+getPal(curPal())[1][1]+","+getPal(curPal())[1][2]+")";
+			ctx.fillStyle = "rgb(" + palColors[1][0] + "," + palColors[1][1] + "," + palColors[1][2] + ")";
 		}
 		else if (drawing.type === TileType.Sprite || drawing.type === TileType.Avatar || drawing.type === TileType.Item) {
-			ctx.fillStyle = "rgb("+getPal(curPal())[2][0]+","+getPal(curPal())[2][1]+","+getPal(curPal())[2][2]+")";
+			ctx.fillStyle = "rgb(" + palColors[2][0] + "," + palColors[2][1] + "," + palColors[2][2] + ")";
 		}
 
 		//draw pixels
@@ -143,16 +179,9 @@ function PaintTool(canvas, roomTool) {
 			}
 		}
 
-		//draw grid
+		// draw grid
 		if (self.drawPaintGrid) {
-			ctx.fillStyle = getContrastingColor();
-
-			for (var x = 1; x < tilesize; x++) {
-				ctx.fillRect(x*paint_scale,0*paint_scale,1,tilesize*paint_scale);
-			}
-			for (var y = 1; y < tilesize; y++) {
-				ctx.fillRect(0*paint_scale,y*paint_scale,tilesize*paint_scale,1);
-			}
+			drawGrid(canvas, bitsy.TILE_SIZE, getContrastingColor());
 		}
 	}
 
@@ -173,6 +202,7 @@ function PaintTool(canvas, roomTool) {
 		renderer.SetDrawingSource(drawing.drw, getDrawingImageSource(drawing));
 	}
 
+	// todo: this is a *mess* - I really need to refactor it (someday)
 	// methods for updating the UI
 	this.onReloadTile = null;
 	this.onReloadSprite = null;
@@ -193,6 +223,9 @@ function PaintTool(canvas, roomTool) {
 				self.onReloadItem();
 			}
 		}
+
+		// hack to force update of new menu
+		self.menu.update();
 	}
 
 	this.selectDrawing = function(drawingData) {
@@ -321,7 +354,6 @@ function PaintTool(canvas, roomTool) {
 				findAndReplaceTileInAllRooms(drawing.id, "0");
 				refreshGameData();
 
-				roomTool.drawEditMap();
 				nextTile();
 			}
 			else if (drawing.type === TileType.Avatar || drawing.type === TileType.Sprite) {
@@ -338,7 +370,6 @@ function PaintTool(canvas, roomTool) {
 				deleteUnreferencedDialog(dlgId);
 				refreshGameData();
 
-				roomTool.drawEditMap();
 				nextSprite();
 			}
 			else if (drawing.type === TileType.Item) {
@@ -355,7 +386,6 @@ function PaintTool(canvas, roomTool) {
 				removeAllItems(drawing.id);
 				refreshGameData();
 
-				roomTool.drawEditMap();
 				nextItem();
 				updateInventoryItemUI();
 			}
@@ -370,5 +400,33 @@ function PaintTool(canvas, roomTool) {
 			renderAnimationPreview(drawing);
 		}
 	});
+
+	/* NEW MENU */
+	this.menuElement = menuElement;
+
+	this.menuUpdate = function() {
+		if (drawing.type != TileType.Tile && drawing.type != TileType.Avatar) {
+			self.menu.push({ control: "group" });
+			self.menu.push({ control: "label", icon: "blip", description: "blip (sound effect)" });
+			self.menu.push({
+				control: "select",
+				data: "BLIP",
+				noneOption: "none",
+				value: drawing.blip,
+				onchange: function(e) {
+					if (e.target.value === "null") { // always a string :(
+						drawing.blip = null;
+					}
+					else {
+						drawing.blip = e.target.value;
+					}
+					refreshGameData();
+				}
+			});
+			self.menu.pop({ control: "group" });
+		}
+	};
+
+	this.menu = new MenuInterface(this);
 }
 

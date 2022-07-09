@@ -58,6 +58,7 @@ body {
 /* canvas */
 canvas {
 	width: 100%;
+	margin-bottom: var(--bitsy-space-s);
 }
 
 /* button */
@@ -82,7 +83,6 @@ button:disabled {
 
 /* label */
 label {
-	background: var(--bitsy-color-accent-1);
 	padding: var(--bitsy-space-s);
 	margin: var(--bitsy-space-xs);
 	border-radius: var(--bitsy-space-s);
@@ -105,6 +105,10 @@ textarea {
 /* input */
 input {
 	font-family: monospace;
+}
+
+input + label {
+	background: var(--bitsy-color-accent-1);
 }
 
 input:checked + label {
@@ -189,6 +193,10 @@ input[type=checkbox] + label {
 
 input[type=checkbox] + label:hover {
 	text-decoration: underline;
+}
+
+input[type=checkbox]:disabled + label {
+	opacity: 0.5;
 }
 
 /* icons */
@@ -351,10 +359,26 @@ input[type=checkbox] + label:hover {
 }
 
 /* menu */
+.bitsy-menu {
+	/* this should be the root of menus - do what with it? */
+}
+
 .bitsy-menu-group {
 	display: flex;
 	flex-wrap: wrap;
 	margin-bottom: var(--bitsy-space-s);
+}
+
+.bitsy-menu-group.disabled {
+	pointer-events: none;
+}
+
+.bitsy-menu-group.disabled .bitsy-menu-label {
+	opacity: 0.5;
+}
+
+.bitsy-menu-group.disabled select {
+	opacity: 0.5;
 }
 
 .bitsy-menu-label .bitsy_icon {
@@ -367,6 +391,10 @@ input[type=checkbox] + label:hover {
 	margin-right: 0;
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
+}
+
+.bitsy-label-style-button {
+	background: var(--bitsy-color-accent-1);
 }
 
 .bitsy-menu-scrollview {
@@ -507,6 +535,10 @@ input[type=checkbox] + label:hover {
 	}
 
 	#toolsCheckLabelText {
+		display: none;
+	}
+
+	#playModeText {
 		display: none;
 	}
 
@@ -653,4 +685,33 @@ input[type=checkbox] + label:hover {
 .bitsy-playmode .bitsy-card:not(.bitsy-playmode-enable) .bitsy-card-main {
 	pointer-events: none;
 	opacity: 0.5;
+}
+
+.bitsy-playmode-room-location {
+	background: var(--bitsy-color-accent-1);
+	font-family: monospace;
+	border-radius: var(--bitsy-space-s);
+	margin-top: var(--bitsy-space-xs);
+	margin-bottom: var(--bitsy-space-m);
+}
+
+.filePickerLabel {
+	background: var(--bitsy-color-accent-1);
+}
+
+.controlBox .filePickerLabel {
+	background: var(--bitsy-color-accent-2);
+}
+
+/* cards with nothing to work with */
+.bitsy-card-nothing-show {
+	display: none;
+}
+
+.bitsy-card-nothing .bitsy-card-nothing-hide {
+	display: none;
+}
+
+.bitsy-card-nothing .bitsy-card-nothing-show {
+	display: flex;
 }

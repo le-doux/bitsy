@@ -28,9 +28,15 @@ this.exportGame = function(gameData, title, pageColor, filename, isFixedSize, si
 
 	html = replaceTemplateMarker( html, "@@B", pageColor );
 
+	html = replaceTemplateMarker( html, "@@I", Resources["input.js"] );
+	html = replaceTemplateMarker( html, "@@P", Resources["soundchip.js"] );
+	html = replaceTemplateMarker( html, "@@G", Resources["graphics.js"] );
 	html = replaceTemplateMarker( html, "@@Y", Resources["system.js"] );
-	html = replaceTemplateMarker( html, "@@X", Resources["transition.js"] );
+
+	html = replaceTemplateMarker( html, "@@W", Resources["world.js"] );
+	html = replaceTemplateMarker( html, "@@O", Resources["sound.js"] );
 	html = replaceTemplateMarker( html, "@@F", Resources["font.js"] );
+	html = replaceTemplateMarker( html, "@@X", Resources["transition.js"] );
 	html = replaceTemplateMarker( html, "@@S", Resources["script.js"] );
 	html = replaceTemplateMarker( html, "@@L", Resources["dialog.js"] );
 	html = replaceTemplateMarker( html, "@@R", Resources["renderer.js"] );

@@ -1,3 +1,15 @@
+v8.0:
+- blips (sound effects)
+- tunes (music)
+- change avatar per room
+- change avatar and palette from dialog
+- new color text effect that accepts any palette index
+- added UI for tile picker / eyedropper tool in room tool
+- update system APIs to v0.2:
+-- new sound system APIs
+-- improved rendering performance
+- misc. bugfixes & tweaks
+
 v7.12:
 - allow editor panels to be resized (@seansleblanc)
 - fix: alt-clicking items not selecting them (@seansleblanc)

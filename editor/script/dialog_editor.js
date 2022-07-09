@@ -530,7 +530,7 @@ function DialogTool() {
 
 		/* root level creation functions for the dialog editor top-bar UI */
 		this.AddDialog = function() {
-			var printFunc = scriptUtils.CreateEmptyPrintFunc();
+			var printFunc = scriptUtils.CreateEmptySayFunc();
 			rootEditor.GetNodes()[0].AddChild(printFunc); // hacky -- see note in action builder
 			var editor = new DialogTextEditor([printFunc], rootEditor);
 			rootEditor.AppendChild(editor);
@@ -821,7 +821,9 @@ function DialogTool() {
 			localization.GetStringOrFallback("dialog_action_category_list", "lists")));
 		div.appendChild(makeActionCategoryButton(
 			"exit",
-			localization.GetStringOrFallback("dialog_action_category_exit", "exit and ending actions")));
+			"room actions")); // todo : re-localize
+			//localization.GetStringOrFallback("dialog_action_category_exit", "exit and ending actions")));
+		div.appendChild(makeActionCategoryButton("sound", "sound actions")); // todo : localize
 		div.appendChild(makeActionCategoryButton(
 			"item",
 			localization.GetStringOrFallback("dialog_action_category_item", "item and variable actions")));
@@ -842,12 +844,13 @@ function DialogTool() {
 		}
 
 		// TODO : localize these too! *** START FROM HERE ***
+		// dialog
 		div.appendChild(
 			makeActionBuilderButton(
 				"dialog",
 				localization.GetStringOrFallback("dialog_block_basic", "dialog"),
 				function() {
-					var printFunc = scriptUtils.CreateEmptyPrintFunc();
+					var printFunc = scriptUtils.CreateEmptySayFunc();
 
 					// hacky access of the parent node is required
 					// because the print function needs to start with a parent
@@ -868,6 +871,7 @@ function DialogTool() {
 					return editor;
 				}));
 
+		// lists
 		div.appendChild(
 			makeActionBuilderButton(
 				"flow",
@@ -908,6 +912,7 @@ function DialogTool() {
 					return editor;
 				}));
 
+		// room actions
 		div.appendChild(
 			makeActionBuilderButton(
 				"exit",
@@ -934,6 +939,47 @@ function DialogTool() {
 				localization.GetStringOrFallback("dialog_action_locked_set", "lock / unlock"),
 				function() {
 					var node = scriptUtils.CreatePropertyNode("locked", true);
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"exit",
+				"palette",
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("pal", ["0"]);
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"exit",
+				"avatar",
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("ava", ["a"]);
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
+		// sound actions
+		div.appendChild(
+			makeActionBuilderButton(
+				"sound",
+				"blip",
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("blip", ["1"]);
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"sound",
+				"tune",
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("tune", ["1"]);
 					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
@@ -979,6 +1025,17 @@ function DialogTool() {
 		div.appendChild(
 			makeActionBuilderButton(
 				"item",
+				"say item count", // todo : localize
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("say", []);
+					node.children[0].args.push(scriptUtils.CreateFunctionBlock("item", ["0"])); // hacky
+					var editor = new FunctionEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"item",
 				localization.GetStringOrFallback("dialog_action_variable_set", "set variable value"),
 				function() {
 					var expressionNode = scriptInterpreter.CreateExpression("a = 5");
@@ -997,6 +1054,17 @@ function DialogTool() {
 					var node = scriptUtils.CreateCodeBlock();
 					node.children.push(expressionNode);
 					var editor = new ExpressionEditor(node, parentEditor);
+					return editor;
+				}));
+
+		div.appendChild(
+			makeActionBuilderButton(
+				"item",
+				"say variable value", // todo : localize
+				function() {
+					var node = scriptUtils.CreateFunctionBlock("say", []);
+					node.children[0].args.push(scriptInterpreter.CreateExpression("a")); // hacky
+					var editor = new FunctionEditor(node, parentEditor);
 					return editor;
 				}));
 
@@ -1134,15 +1202,15 @@ function DialogTool() {
 							effectWrapperSpan.style.animationDelay = (-0.25 * curLineDiv.innerText.length) + "s";
 
 							if (curTextEffects[k] === "clr1") {
-								var color = rgbToHex(getPal(curPal())[0][0], getPal(curPal())[0][1], getPal(curPal())[0][2]);
+								var color = rgbToHex(getPal(curDefaultPal())[0][0], getPal(curDefaultPal())[0][1], getPal(curDefaultPal())[0][2]);
 								effectWrapperSpan.style.color = color;
 							}
 							else if (curTextEffects[k] === "clr2") {
-								var color = rgbToHex(getPal(curPal())[1][0], getPal(curPal())[1][1], getPal(curPal())[1][2]);
+								var color = rgbToHex(getPal(curDefaultPal())[1][0], getPal(curDefaultPal())[1][1], getPal(curDefaultPal())[1][2]);
 								effectWrapperSpan.style.color = color;
 							}
 							else if (curTextEffects[k] === "clr3") {
-								var color = rgbToHex(getPal(curPal())[2][0], getPal(curPal())[2][1], getPal(curPal())[2][2]);
+								var color = rgbToHex(getPal(curDefaultPal())[2][0], getPal(curDefaultPal())[2][1], getPal(curDefaultPal())[2][2]);
 								effectWrapperSpan.style.color = color;
 							}
 							else if (curTextEffects[k] === "wvy") {
@@ -1200,50 +1268,82 @@ function DialogTool() {
 		textEffectsControlsDiv.style.marginBottom = "5px";
 		textEffectsDiv.appendChild(textEffectsControlsDiv);
 
-		var effectsTags = ["{clr1}", "{clr2}", "{clr3}", "{wvy}", "{shk}", "{rbw}"];
-		var effectsNames = [
-			localization.GetStringOrFallback("dialog_effect_color1", "color 1"),
-			localization.GetStringOrFallback("dialog_effect_color2", "color 2"),
-			localization.GetStringOrFallback("dialog_effect_color3", "color 3"),
-			localization.GetStringOrFallback("dialog_effect_wavy", "wavy"),
-			localization.GetStringOrFallback("dialog_effect_shaky", "shaky"),
-			localization.GetStringOrFallback("dialog_effect_rainbow", "rainbow"),
-		];
+		// basic text effects
+		var effectsTags = ["wvy", "shk", "rbw"];
+		var effectsIcons = ["wave", "shake", "rainbow"];
 
 		var effectsDescriptions = [
-			"text in tags matches the 1st color in the palette",
-			"text in tags matches the 2nd color in the palette",
-			"text in tags matches the 3rd color in the palette",
-			"text in tags waves up and down",
-			"text in tags shakes constantly",
-			"text in tags is rainbow colored"
+			"{wvy} text in tags waves up and down",
+			"{shk} text in tags shakes constantly",
+			"{rbw} text in tags is rainbow colored"
 		]; // TODO : localize
 
 		function CreateAddEffectHandler(tag) {
 			return function() {
-				wrapTextSelection(tag); // hacky to still use this?
+				wrapTextSelection("{" + tag + "}", "{/" + tag + "}"); // hacky to still use this?
 			}
 		}
 
 		for (var i = 0; i < effectsTags.length; i++) {
 			var effectButton = document.createElement("button");
 			effectButton.onclick = CreateAddEffectHandler(effectsTags[i]);
-			effectButton.innerText = effectsNames[i];
+			effectButton.appendChild(iconUtils.CreateIcon(effectsIcons[i]));
 			effectButton.title = effectsDescriptions[i];
 			textEffectsControlsDiv.appendChild(effectButton);
 		}
 
-		var textEffectsPrintDrawingDiv = document.createElement("div");
-		textEffectsDiv.appendChild(textEffectsPrintDrawingDiv);
+		// todo : someday I should refactor these to use more shared menu control code
+		// color text effect
+		var textEffectsColorSpan = document.createElement("span");
+		// hacky: should use a style for these spans
+		textEffectsColorSpan.style.marginLeft = "5px";
+		textEffectsColorSpan.style.display = "inline-block";
+		textEffectsControlsDiv.appendChild(textEffectsColorSpan);
 
-		var textEffectsPrintDrawingButton = document.createElement("button");
-		textEffectsPrintDrawingButton.innerHTML = iconUtils.CreateIcon("add").outerHTML + " "
-			+ localization.GetStringOrFallback("dialog_effect_drawing", "insert drawing");
-		textEffectsPrintDrawingButton.title = "draw a sprite, tile, or item in your dialog";
-		textEffectsPrintDrawingDiv.appendChild(textEffectsPrintDrawingButton);
+		var textEffectsColorButton = document.createElement("button");
+		textEffectsColorButton.appendChild(iconUtils.CreateIcon("colors"));
+		textEffectsColorButton.title = "{clr} use a palette color for dialog text";
+		textEffectsColorSpan.appendChild(textEffectsColorButton);
 
-		var textEffectsPrintDrawingSelect = document.createElement("select");
-		textEffectsPrintDrawingDiv.appendChild(textEffectsPrintDrawingSelect);
+		var textEffectsColorSelect = document.createElement("select");
+		textEffectsColorSpan.appendChild(textEffectsColorSelect);
+
+		var textEffectsColorBackgroundOption = document.createElement("option");
+		textEffectsColorBackgroundOption.value = 0;
+		textEffectsColorBackgroundOption.innerText = "ground";
+		textEffectsColorBackgroundOption.title = "make text the background color (0)";
+		textEffectsColorSelect.appendChild(textEffectsColorBackgroundOption);
+
+		var textEffectsColorTileOption = document.createElement("option");
+		textEffectsColorTileOption.value = 1;
+		textEffectsColorTileOption.innerText = "tile";
+		textEffectsColorTileOption.title = "make text the tile color (1)";
+		textEffectsColorSelect.appendChild(textEffectsColorTileOption);
+
+		var textEffectsColorSpriteOption = document.createElement("option");
+		textEffectsColorSpriteOption.value = 2;
+		textEffectsColorSpriteOption.innerText = "sprite";
+		textEffectsColorSpriteOption.title = "make text the sprite color (2)";
+		textEffectsColorSelect.appendChild(textEffectsColorSpriteOption);
+
+		textEffectsColorButton.onclick = function(e) {
+			wrapTextSelection("{clr " + textEffectsColorSelect.value + "}", "{/clr}");
+		};
+
+		// insert drawing text effect
+		var textEffectsDrawingSpan = document.createElement("span");
+		// hacky: should use a style for these spans
+		textEffectsDrawingSpan.style.marginLeft = "5px";
+		textEffectsDrawingSpan.style.display = "inline-block";
+		textEffectsControlsDiv.appendChild(textEffectsDrawingSpan);
+
+		var textEffectsDrawingButton = document.createElement("button");
+		textEffectsDrawingButton.appendChild(iconUtils.CreateIcon("paint"));
+		textEffectsDrawingButton.title = "{drwt}/{drws}/{drwi} draw a tile, sprite, or item in your dialog";
+		textEffectsDrawingSpan.appendChild(textEffectsDrawingButton);
+
+		var textEffectsDrawingSelect = document.createElement("select");
+		textEffectsDrawingSpan.appendChild(textEffectsDrawingSelect);
 
 		// TODO : there needs to be a shared function for these dropdowns...
 		for (id in sprite) {
@@ -1260,9 +1360,9 @@ function DialogTool() {
 
 			option.innerText = spriteName;
 
-			option.value = '{printSprite "' + id + '"}';
+			option.value = '{drws "' + (sprite[id].name ? sprite[id].name : id) + '"}';
 
-			textEffectsPrintDrawingSelect.appendChild(option);
+			textEffectsDrawingSelect.appendChild(option);
 		}
 
 		for (id in tile) {
@@ -1275,9 +1375,9 @@ function DialogTool() {
 
 			option.innerText = tileName;
 
-			option.value = '{printTile "' + id + '"}';
+			option.value = '{drwt "' + (tile[id].name ? tile[id].name : id) + '"}';
 
-			textEffectsPrintDrawingSelect.appendChild(option);
+			textEffectsDrawingSelect.appendChild(option);
 		}
 
 		for (id in item) {
@@ -1290,16 +1390,46 @@ function DialogTool() {
 
 			option.innerText = itemName;
 
-			option.value = '{printItem "' + id + '"}';
+			option.value = '{drwi "' + (item[id].name ? item[id].name : id) + '"}';
 
-			textEffectsPrintDrawingSelect.appendChild(option);
+			textEffectsDrawingSelect.appendChild(option);
 		}
 
-		textEffectsPrintDrawingButton.onclick = function() {
-			textArea.value += textEffectsPrintDrawingSelect.value;
+		textEffectsDrawingButton.onclick = function() {
+			textArea.value += textEffectsDrawingSelect.value;
 
 			OnDialogTextChange();
 		}
+
+/*
+		// TODO : use in a future update?
+		// "yak" (dialog sounds) text effect
+		var textEffectsYakSpan = document.createElement("span");
+		// hacky: should use a style for these spans
+		textEffectsYakSpan.style.marginLeft = "5px";
+		textEffectsYakSpan.style.display = "inline-block";
+		textEffectsControlsDiv.appendChild(textEffectsYakSpan);
+
+		var textEffectsYakButton = document.createElement("button");
+		textEffectsYakButton.appendChild(iconUtils.CreateIcon("blip"));
+		textEffectsYakButton.title = "{yak} use a blip as dialog speech sounds";
+		textEffectsYakSpan.appendChild(textEffectsYakButton);
+
+		var textEffectsYakSelect = document.createElement("select");
+		textEffectsYakSpan.appendChild(textEffectsYakSelect);
+
+		// share with find tool code?
+		for (var id in blip) {
+			var blipOption = document.createElement("option");
+			blipOption.innerText = blip[id].name ? blip[id].name : "blip " + id; // todo : localize
+			blipOption.value = blip[id].name ? blip[id].name : id;
+			textEffectsYakSelect.appendChild(blipOption);
+		}
+
+		textEffectsYakButton.onclick = function(e) {
+			wrapTextSelection("{yak \"" + textEffectsYakSelect.value + "\"}", "{/yak}");
+		};
+*/
 
 		this.GetElement = function() {
 			return div;
@@ -2242,41 +2372,43 @@ function DialogTool() {
 		moveButton.innerHTML = commandDescription;
 		moveButton.title = "click to select new destination";
 		moveButton.onclick = function() {
+			if (!roomTool) {
+				return;
+			}
+
 			isMoving = !isMoving;
 
 			if (isMoving) {
 				moveMessageSpan.innerHTML = "<i>" + localization.GetStringOrFallback("marker_move_click", "click in room") + "</i> ";
 				moveButton.innerHTML = iconUtils.CreateIcon("cancel").outerHTML + " "
 					+ localization.GetStringOrFallback("action_cancel", "cancel");
-				events.Raise("disable_room_tool"); // TODO : don't know if I like this design
+
+				roomTool.onNextClick(function(room, x, y) {
+					if (isMoving) {
+						roomId = room;
+						roomPosX = x;
+						roomPosY = y;
+
+						functionNode.args.splice(0, 1, scriptUtils.CreateStringLiteralNode(roomId));
+						functionNode.args.splice(1, 1, scriptUtils.CreateLiteralNode(roomPosX));
+						functionNode.args.splice(2, 1, scriptUtils.CreateLiteralNode(roomPosY));
+
+						isMoving = false;
+						moveMessageSpan.innerHTML = "";
+						moveButton.innerHTML = commandDescription;
+
+						createFunctionDescriptionFunc(true);
+						parentEditor.NotifyUpdate();
+					}
+				});
 			}
 			else {
 				moveMessageSpan.innerHTML = "";
 				moveButton.innerHTML = commandDescription;
-				events.Raise("enable_room_tool");
+				roomTool.cancelOnNextClick();
 			}
 		}
 		moveCommand.appendChild(moveButton);
-
-		listener.Listen("click_room", function(event) {
-			if (isMoving) {
-				roomId = event.roomId;
-				roomPosX = event.x;
-				roomPosY = event.y;
-
-				functionNode.args.splice(0, 1, scriptUtils.CreateStringLiteralNode(roomId));
-				functionNode.args.splice(1, 1, scriptUtils.CreateLiteralNode(roomPosX));
-				functionNode.args.splice(2, 1, scriptUtils.CreateLiteralNode(roomPosY));
-
-				isMoving = false;
-				moveMessageSpan.innerHTML = "";
-				moveButton.innerHTML = commandDescription;
-
-				createFunctionDescriptionFunc(true);
-				parentEditor.NotifyUpdate();
-				events.Raise("enable_room_tool");
-			}
-		});
 
 		this.GetElement = function() {
 			return moveCommand;
@@ -2367,7 +2499,9 @@ function DialogTool() {
 				return localization.GetStringOrFallback("function_print_name", "print");
 			},
 			GetDescription : function() {
-				return localization.GetStringOrFallback("function_print_description", "print _ in the dialog box");
+				// todo : re-localize
+				// return localization.GetStringOrFallback("function_print_description", "print _ in the dialog box");
+				return "say value of _ in textbox";
 			},
 			parameters : [
 				{ types: ["text", "variable"], index: 0, name: "output", },
@@ -2378,12 +2512,46 @@ function DialogTool() {
 				return localization.GetStringOrFallback("function_say_name", "say");
 			},
 			GetDescription : function() {
-				return localization.GetStringOrFallback("function_print_description", "print _ in the dialog box");
+				// todo : re-localize
+				// return localization.GetStringOrFallback("function_print_description", "print _ in the dialog box");
+				return "say value of _ in textbox";
 			},
 			parameters : [
 				{ types: ["text", "variable"], index: 0, name: "output", },
 			],
 		},
+		"tune": {
+			GetName: function() { return "tune"; },
+			// todo : localization
+			GetDescription: function() { return "change room's current tune to _"; },
+			parameters: [
+				{ types: ["tune", "text", "variable"], index:0, name:"tune" }
+			]
+		},
+		"blip": {
+			GetName: function() { return "blip"; },
+			// todo : localization
+			GetDescription: function() { return "play _"; },
+			parameters: [
+				{ types: ["blip", "text", "variable"], index:0, name:"blip" }
+			]
+		},
+		"pal": {
+			GetName: function() { return "swap palette"; },
+			// todo : localization
+			GetDescription: function() { return "change room's current palette to _"; },
+			parameters: [
+				{ types: ["palette", "text", "variable"], index: 0, name: "palette" }
+			]
+		},
+		"ava": {
+			GetName: function() { return "morph avatar"; },
+			// todo : localization
+			GetDescription: function() { return "make avatar look like _"; },
+			parameters: [
+				{ types: ["sprite", "text", "variable"], index: 0, name: "sprite" }
+			]
+		}
 	};
 
 	var isHelpTextOn = true;
@@ -2681,6 +2849,19 @@ function DialogTool() {
 		else if (type === "transition") {
 			argNode = scriptUtils.CreateStringLiteralNode("fade_w");
 		}
+		else if (type === "tune") {
+			argNode = scriptUtils.CreateStringLiteralNode("1");
+		}
+		else if (type === "blip") {
+			argNode = scriptUtils.CreateStringLiteralNode("1");
+		}
+		else if (type === "palette") {
+			argNode = scriptUtils.CreateStringLiteralNode("0");
+		}
+		else if (type === "sprite") {
+			argNode = scriptUtils.CreateStringLiteralNode("a");
+		}
+
 		return argNode;
 	}
 
@@ -2704,6 +2885,18 @@ function DialogTool() {
 			return "greenColor";
 		}
 		else if (type === "transition") {
+			return "greenColor";
+		}
+		else if (type === "tune") {
+			return "greenColor";
+		}
+		else if (type === "blip") {
+			return "greenColor";
+		}
+		else if (type === "palette") {
+			return "greenColor";
+		}
+		else if (type === "sprite") {
 			return "greenColor";
 		}
 	}
@@ -2817,6 +3010,18 @@ function DialogTool() {
 							parameterValue.innerText = transitionTypes[i].GetName();
 						}
 					}
+				}
+				else if (type === "tune") {
+					parameterValue.innerText = GetTuneNameFromId(curValue);
+				}
+				else if (type === "blip") {
+					parameterValue.innerText = GetBlipNameFromId(curValue);
+				}
+				else if (type === "palette") {
+					parameterValue.innerText = GetPaletteNameFromId(curValue);
+				}
+				else if (type === "sprite") {
+					parameterValue.innerText = GetSpriteNameFromId(curValue);
 				}
 				else if (type === "function") {
 					var inlineFunctionEditor = TryCreateFunctionEditor();
@@ -3002,6 +3207,99 @@ function DialogTool() {
 					onChange(argNode);
 				}
 			}
+			else if (type === "tune") {
+				// todo : use shared controls
+				parameterInput = document.createElement("select");
+				parameterInput.title = "choose tune";
+
+				var tuneOffId = "0";
+				var tuneOffOption = document.createElement("option");
+				tuneOffOption.value = tuneOffId;
+				tuneOffOption.innerText = GetTuneNameFromId(tuneOffId);
+				tuneOffOption.selected = (tuneOffId === value);
+				parameterInput.appendChild(tuneOffOption);
+
+				// todo : use IDs or names??
+				for (id in tune) {
+					// "0" is reserved for the off option
+					if (id != "0") {
+						var tuneOption = document.createElement("option");
+						tuneOption.value = id;
+						tuneOption.innerText = GetTuneNameFromId(id);
+						tuneOption.selected = (id === value);
+						parameterInput.appendChild(tuneOption);
+					}
+				}
+
+				parameterInput.onchange = function(event) {
+					var val = event.target.value;
+					var argNode = scriptUtils.CreateStringLiteralNode(val);
+					onChange(argNode);
+				}
+			}
+			else if (type === "blip") {
+				// todo : use shared controls
+				parameterInput = document.createElement("select");
+				parameterInput.title = "choose blip";
+
+				// todo : use IDs or names??
+				for (id in blip) {
+					var blipOption = document.createElement("option");
+					blipOption.value = id;
+					blipOption.innerText = GetBlipNameFromId(id);
+					blipOption.selected = (id === value);
+					parameterInput.appendChild(blipOption);
+				}
+
+				parameterInput.onchange = function(event) {
+					var val = event.target.value;
+					var argNode = scriptUtils.CreateStringLiteralNode(val);
+					onChange(argNode);
+				}
+			}
+			else if (type === "palette") {
+				// todo : use shared controls
+				parameterInput = document.createElement("select");
+				parameterInput.title = "choose palette";
+
+				// todo : use IDs or names??
+				for (id in palette) {
+					// todo : do I even *use* "default" anymore??
+					if (id != "default") {
+						var paletteOption = document.createElement("option");
+						paletteOption.value = id;
+						paletteOption.innerText = GetPaletteNameFromId(id);
+						paletteOption.selected = (id === value);
+						parameterInput.appendChild(paletteOption);
+					}
+				}
+
+				parameterInput.onchange = function(event) {
+					var val = event.target.value;
+					var argNode = scriptUtils.CreateStringLiteralNode(val);
+					onChange(argNode);
+				}
+			}
+			else if (type === "sprite") {
+				// todo : use shared controls
+				parameterInput = document.createElement("select");
+				parameterInput.title = "choose sprite";
+
+				// todo : use IDs or names??
+				for (id in sprite) {
+					var spriteOption = document.createElement("option");
+					spriteOption.value = id;
+					spriteOption.innerText = GetSpriteNameFromId(id);
+					spriteOption.selected = (id === value);
+					parameterInput.appendChild(spriteOption);
+				}
+
+				parameterInput.onchange = function(event) {
+					var val = event.target.value;
+					var argNode = scriptUtils.CreateStringLiteralNode(val);
+					onChange(argNode);
+				}
+			}
 			else if (type === "function") {
 				parameterInput = document.createElement("span");
 				var inlineFunctionEditor = TryCreateFunctionEditor();
@@ -3071,6 +3369,18 @@ function DialogTool() {
 			else if (type === "transition" && node.type === "literal" && (typeof node.value) === "string") {
 				return true;
 			}
+			else if (type === "tune" && node.type === "literal" && (typeof node.value) === "string" && (tune.hasOwnProperty(node.value) || node.value === "0")) {
+				return true;
+			}
+			else if (type === "blip" && node.type === "literal" && (typeof node.value) === "string" && blip.hasOwnProperty(node.value)) {
+				return true;
+			}
+			else if (type === "palette" && node.type === "literal" && (typeof node.value) === "string" && palette.hasOwnProperty(node.value)) {
+				return true;
+			}
+			else if (type === "sprite" && node.type === "literal" && (typeof node.value) === "string" && sprite.hasOwnProperty(node.value)) {
+				return true;
+			}
 			else if (type === "function" && node.type === "code_block" && node.children[0].type === "function") {
 				return true;
 			}
@@ -3123,6 +3433,51 @@ function DialogTool() {
 		}
 
 		return (room[id].name != null ? room[id].name : localization.GetStringOrFallback("room_label", "room") + " " + id);
+	}
+
+	function GetTuneNameFromId(id) {
+		if (id === "0") {
+			return "off"; // todo : localize
+		}
+
+		if (!tune[id]) {
+			return "";
+		}
+
+		// todo : localize
+		return (tune[id].name != null ? tune[id].name : "tune" + " " + id);
+	}
+
+	function GetBlipNameFromId(id) {
+		if (!blip[id]) {
+			return "";
+		}
+
+		// todo : localize
+		return (blip[id].name != null ? blip[id].name : "blip" + " " + id);
+	}
+
+	function GetPaletteNameFromId(id) {
+		if (!palette[id]) {
+			return "";
+		}
+
+		// todo : localize
+		return (palette[id].name != null ? palette[id].name : "palette" + " " + id);
+	}
+
+	function GetSpriteNameFromId(id) {
+		if (!sprite[id]) {
+			return "";
+		}
+
+		if (id === "A") {
+			// todo : localize
+			return "default avatar";
+		}
+
+		// todo : localize
+		return (sprite[id].name != null ? sprite[id].name : "sprite" + " " + id);
 	}
 
 	function OrderControls(editor, parentEditor) {
@@ -3733,29 +4088,35 @@ function preventTextDeselectAndClick(event) {
 	}
 }
 
-function wrapTextSelection(effect) {
-	if( dialogSel.target != null ) {
+function wrapTextSelection(openTag, closeTag) {
+	if (dialogSel.target != null) {
+		// get the selected text
 		var curText = dialogSel.target.value;
-		var selText = curText.slice(dialogSel.start, dialogSel.end);
+		var selectedText = curText.slice(dialogSel.start, dialogSel.end);
 
-		var isEffectAlreadyApplied = selText.indexOf( effect ) > -1;
-		if(isEffectAlreadyApplied) {
-			//remove all instances of effect
-			var effectlessText = selText.split( effect ).join( "" );
+		if (selectedText.indexOf(openTag) > -1) {
+			// remove open and closing tags
+			var effectlessText = selectedText.replace(openTag, "").replace(closeTag, "");
 			var newText = curText.slice(0, dialogSel.start) + effectlessText + curText.slice(dialogSel.end);
 			dialogSel.target.value = newText;
-			dialogSel.target.setSelectionRange(dialogSel.start,dialogSel.start + effectlessText.length);
-			if(dialogSel.onchange != null)
-				dialogSel.onchange( dialogSel ); // dialogSel needs to mimic the event the onchange would usually receive
+
+			// update the selection range
+			dialogSel.target.setSelectionRange(dialogSel.start, dialogSel.start + effectlessText.length);
+			if (dialogSel.onchange != null) {
+				dialogSel.onchange(dialogSel); // dialogSel needs to mimic the event the onchange would usually receive
+			}
 		}
 		else {
-			// add effect
-			var effectText = effect + selText + effect;
-			var newText = curText.slice(0, dialogSel.start) + effectText + curText.slice(dialogSel.end);
+			// add open and closing tagss
+			var wrappedText = openTag + selectedText + closeTag;
+			var newText = curText.slice(0, dialogSel.start) + wrappedText + curText.slice(dialogSel.end);
 			dialogSel.target.value = newText;
-			dialogSel.target.setSelectionRange(dialogSel.start,dialogSel.start + effectText.length);
-			if(dialogSel.onchange != null)
-				dialogSel.onchange( dialogSel ); // dialogSel needs to mimic the event the onchange would usually receive
+
+			// update the selection range
+			dialogSel.target.setSelectionRange(dialogSel.start, dialogSel.start + wrappedText.length);
+			if (dialogSel.onchange != null) {
+				dialogSel.onchange(dialogSel); // dialogSel needs to mimic the event the onchange would usually receive
+			}
 		}
 	}
 }

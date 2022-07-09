@@ -8,7 +8,7 @@ var TransitionManager = function() {
 	var curStep = 0;
 
 	this.BeginTransition = function(startRoom, startX, startY, endRoom, endX, endY, effectName) {
-		bitsyLog("--- START ROOM TRANSITION ---");
+		bitsy.log("--- START ROOM TRANSITION ---");
 
 		curEffect = effectName;
 
@@ -48,18 +48,17 @@ var TransitionManager = function() {
 		transitionTime = 0;
 		curStep = 0;
 
-		player().room = tmpRoom;
-		player().x = tmpX;
-		player().y = tmpY;
+		player().room = endRoom;
+		player().x = endX;
+		player().y = endY;
+
+		bitsy.graphicsMode(bitsy.GFX_VIDEO);
 	}
 
 	this.UpdateTransition = function(dt) {
 		if (!isTransitioning) {
 			return;
 		}
-
-		// todo : shouldn't need to set this every frame!
-		bitsySetGraphicsMode(0);
 
 		transitionTime += dt;
 
@@ -69,21 +68,21 @@ var TransitionManager = function() {
 			curStep++;
 
 			var step = curStep;
-			bitsyLog("transition step " + step);
+			bitsy.log("transition step " + step);
 
 			if (transitionEffects[curEffect].paletteEffectFunc) {
 				var colors = transitionEffects[curEffect].paletteEffectFunc(transitionStart, transitionEnd, (step / maxStep));
 				updatePaletteWithTileColors(colors);
 			}
 
-			bitsyDrawBegin(0);
-			for (var y = 0; y < height; y++) {
-				for (var x = 0; x < width; x++) {
+			bitsy.fill(bitsy.VIDEO, tileColorStartIndex);
+
+			for (var y = 0; y < bitsy.VIDEO_SIZE; y++) {
+				for (var x = 0; x < bitsy.VIDEO_SIZE; x++) {
 					var color = transitionEffects[curEffect].pixelEffectFunc(transitionStart, transitionEnd, x, y, (step / maxStep));
-					bitsyDrawPixel(color, x, y);
+					bitsy.set(bitsy.VIDEO, (y * bitsy.VIDEO_SIZE) + x, color);
 				}
 			}
-			bitsyDrawEnd();
 
 			transitionTime = 0;
 		}
@@ -99,6 +98,8 @@ var TransitionManager = function() {
 				transitionCompleteCallback();
 			}
 			transitionCompleteCallback = null;
+
+			bitsy.graphicsMode(bitsy.GFX_MAP);
 		}
 	}
 
@@ -361,17 +362,17 @@ var TransitionManager = function() {
 	function createRoomPixelBuffer(room) {
 		var pixelBuffer = [];
 
-		for (var i = 0; i < width * height; i++) {
+		for (var i = 0; i < bitsy.VIDEO_SIZE * bitsy.VIDEO_SIZE; i++) {
 			pixelBuffer.push(tileColorStartIndex);
 		}
 
 		var drawTileInPixelBuffer = function(sourceData, frameIndex, colorIndex, tx, ty, pixelBuffer) {
 			var frameData = sourceData[frameIndex];
 
-			for (var y = 0; y < tilesize; y++) {
-				for (var x = 0; x < tilesize; x++) {
+			for (var y = 0; y < bitsy.TILE_SIZE; y++) {
+				for (var x = 0; x < bitsy.TILE_SIZE; x++) {
 					var color = tileColorStartIndex + (frameData[y][x] === 1 ? colorIndex : 0);
-					pixelBuffer[(((ty * tilesize) + y) * width) + ((tx * tilesize) + x)] = color;
+					pixelBuffer[(((ty * bitsy.TILE_SIZE) + y) * bitsy.VIDEO_SIZE) + ((tx * bitsy.TILE_SIZE) + x)] = color;
 				}
 			}
 		}
@@ -435,11 +436,11 @@ var TransitionManager = function() {
 
 // todo : is this wrapper still useful?
 var PostProcessImage = function(imageData) {
-	this.Width = width;
-	this.Height = height;
+	this.Width = bitsy.VIDEO_SIZE;
+	this.Height = bitsy.VIDEO_SIZE;
 
 	this.GetPixel = function(x, y) {
-		return imageData[(y * width) + x];
+		return imageData[(y * bitsy.VIDEO_SIZE) + x];
 	};
 
 	this.GetData = function() {
@@ -449,7 +450,16 @@ var PostProcessImage = function(imageData) {
 
 var TransitionInfo = function(image, palette, playerX, playerY) {
 	this.Image = image;
+
 	this.Palette = palette;
-	this.PlayerTilePos = { x: playerX, y: playerY };
-	this.PlayerCenter = { x: Math.floor((playerX * tilesize) + (tilesize / 2)), y: Math.floor((playerY * tilesize) + (tilesize / 2)) };
+
+	this.PlayerTilePos = {
+		x: playerX,
+		y: playerY
+	};
+
+	this.PlayerCenter = {
+		x: Math.floor((playerX * bitsy.TILE_SIZE) + (bitsy.TILE_SIZE / 2)),
+		y: Math.floor((playerY * bitsy.TILE_SIZE) + (bitsy.TILE_SIZE / 2))
+	};
 };

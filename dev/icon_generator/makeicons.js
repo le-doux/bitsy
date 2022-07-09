@@ -4,18 +4,29 @@ var fs = require('fs');
 
 console.log("*** initializing bitsy ***");
 
-// load the bitsy engine
-eval(fs.readFileSync("../../editor/script/engine/color_util.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/font.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/transition.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/script.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/dialog.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/renderer.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/bitsy.js", "utf8"))
+function bitsyLog(str) {
+	console.log("bitsy:: " + str);
+}
+
+var bitsy = {
+	log : bitsyLog,
+	MAP_SIZE : 16,
+	TILE_SIZE : 8,
+};
+
+// kind of too bad that I still need to load a script module
+eval(fs.readFileSync("../../editor/script/engine/script.js", "utf8"));
+var scriptModule = new Script();
+var scriptUtils = scriptModule.CreateUtils();
+
+eval(fs.readFileSync("../../editor/script/engine/world.js", "utf8"));
 
 console.log("*** loading drawings ***")
 
-parseWorld(fs.readFileSync("icons.bitsy", "utf8"));
+var iconBitsySrc = fs.readFileSync("icons.bitsy", "utf8");
+iconBitsySrc = iconBitsySrc.replace(/\r\n/g, "\n"); // clean up line endings
+var world = parseWorld(iconBitsySrc);
+var tile = world.tile;
 
 console.log("*** generating icons ***");
 
@@ -51,7 +62,7 @@ for (var t in tile) {
 
 	console.log(name);
 
-	var imageSource = renderer.GetImageSource(drwId);
+	var imageSource = world.drawings[drwId];
 
 	var frame0 = imageSource[0];
 
