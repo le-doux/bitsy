@@ -39,14 +39,9 @@ var resourceDirectories = [
 
 var resourcePackage = {};
 
-function getFileName(path) {
-	var splitPath = path.split("/");
-	return splitPath[splitPath.length - 1];
-}
-
 for (var i = 0; i < resourceFiles.length; i++) {
 	var filePath = resourceFiles[i];
-	var fileName = getFileName(filePath);
+	var fileName = path.basename(filePath);
 	var result = fs.readFileSync(path.resolve(__dirname, filePath), { encoding: "utf8" });
 	/* if this program is checked out with git on Windows, our text files
 	 * will use CR LF lines. we try to deal with this in places where it
