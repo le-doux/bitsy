@@ -39,6 +39,8 @@ var resourceDirectories = [
 
 var resourcePackage = {};
 
+resourceFiles.push(...resourceDirectories.flatMap(dir => fs.readdirSync(path.resolve(__dirname, dir)).map(file => path.join(dir, file))));
+
 for (var i = 0; i < resourceFiles.length; i++) {
 	var filePath = resourceFiles[i];
 	var fileName = path.basename(filePath);
@@ -49,21 +51,6 @@ for (var i = 0; i < resourceFiles.length; i++) {
 	 * consistently only have LF. */
 	result = result.replace(/\r\n/g, "\n");
 	resourcePackage[fileName] = result;
-}
-
-for (var i = 0; i < resourceDirectories.length; i++) {
-	var dir = resourceDirectories[i];
-	var fileNames = fs.readdirSync(path.resolve(__dirname, dir));
-	for (var j = 0; j < fileNames.length; j++) {
-		var fileName = fileNames[j];
-		var result = fs.readFileSync(path.resolve(__dirname, dir + "/" + fileName), { encoding: "utf8" });
-		/* if this program is checked out with git on Windows, our text fiels
-		 * will use CR LF lines. we try to deal with this in places where it
-		 * may break, but we should really just make sure the resource files
-		 * consistently only have LF. */
-		result = result.replace(/\r\n/g, "\n");
-		resourcePackage[fileName] = result;
-	}
 }
 
 var resourceJavascriptFile = "var Resources = " + JSON.stringify(resourcePackage, null, 2) + ";";
