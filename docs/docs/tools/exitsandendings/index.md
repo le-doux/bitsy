@@ -1,6 +1,6 @@
 # Exits & Endings
 
-<h1>Description</h1>
+## Description
 
 - no sub-pages as functionality is similar enough between the 3 types
 
@@ -10,6 +10,6 @@
 
 - "how to make a locked door" - or separate FAQ page?
 
-<h1>Features</h1>
+## Features
 
 -diagram

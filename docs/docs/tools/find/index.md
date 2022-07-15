@@ -1,9 +1,9 @@
 # Find
 
-<h1>Description</h1>
+## Description
 
 - filter by tab and by search bar (name / ID - clarify this)
 
-<h1>Features</h1>
+## Features
 
 -diagram

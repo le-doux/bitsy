@@ -1,9 +1,12 @@
+---
+tags: [Variables]
+---
 # Inventory
 
-<h1>Description</h1>
+## Description
 
 - used to collect / count / conditional dialog etc.
 
-<h1>Features</h1>
+## Features
 
 -diagram

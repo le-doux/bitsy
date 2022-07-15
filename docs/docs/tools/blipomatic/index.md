@@ -1,9 +1,9 @@
 # Blip-o-matic
 
-<h1>Description</h1>
+##Description
 
 
 
-<h1>Features</h1>
+##Features
 
 -diagram

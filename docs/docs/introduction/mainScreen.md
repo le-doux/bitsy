@@ -1,6 +1,6 @@
 # Main Screen
 
-<h1>Description</h1>
+##Description
 
 When you first open Bitsy, you will see a selection of ‘tools’ open in the main panel. Above this is the tools menu which allows you to open and close these Bitsy tools. At the top of the main screen you can edit the title of your game, which will display when the game first begins.  
 
@@ -9,17 +9,17 @@ As your avatar walks around your Bitsy world they may interact with sprites (peo
 
 At any point you can download your game to play it outside of the Bitsy editor.  
 
-<h1>Features</h1>
+##Features
 
 ![main screen of Bitsy](.images/mainScreen.JPG)
 
-1 <b>Game title</b>. The text that you write here will be displayed at the beginning of your game.
+1. **Game title**. The text that you write here will be displayed at the beginning of your game.
 
-2 <b>Tools button</b>. Toggle the tools menu on / off.
+2. **Tools button**. Toggle the tools menu on / off.
 
-3 <b>Play button</b>. Press play to play and test your game. Then press stop to continue editing it.
+3. **Play button**. Press play to play and test your game. Then press stop to continue editing it.
 
-4 <b>Tools menu</b>. Toggle each of the [Bitsy tools](../category/tools) on / off by clicking the buttons. Tools shown in dark blue are open in the main panel.
+4. **Tools menu**. Toggle each of the [Bitsy tools](../category/tools) on / off by clicking the buttons. Tools shown in dark blue are open in the main panel.
 
-5 <b>Main panel</b>. View all of your active Bitsy tools. Click and drag to rearrange them. Open and close them using the X in the top-right corner of each tool, or through the buttons in the Tools menu.
+5. **Main panel**. View all of your active Bitsy tools. Click and drag to rearrange them. Open and close them using the X in the top-right corner of each tool, or through the buttons in the Tools menu.
 

@@ -1,6 +1,6 @@
 # Paint
 
-<h1>Description</h1>
+## Description
 
 - no sub-pages, link all references to e.g. 'avatar' here
 - create all the objects in your game and give them behaviour, also background / decorations
@@ -10,6 +10,6 @@
 - dialog
 - sound
 
-<h1>Features</h1>
+## Features
 
 -diagram

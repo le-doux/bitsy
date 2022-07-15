@@ -1,11 +1,11 @@
 # Download
 
-<h1>Description</h1>
+## Description
 
 - download game
 
 - upload game
 
-<h1>Features</h1>
+## Features
 
 -diagram

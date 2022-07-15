@@ -1,6 +1,6 @@
 # Game Data
 
-<h1>Description</h1>
+## Description
 
 - download / upload
 
@@ -8,6 +8,6 @@
 
 - uses of game data
 
-<h1>Features</h1>
+## Features
 
 -diagram
