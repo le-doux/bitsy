@@ -1,3 +1,0 @@
-# Exits & Endings Tool
-
-test

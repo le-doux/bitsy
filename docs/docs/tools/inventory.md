@@ -1,3 +1,0 @@
-# Inventory Tool
-
-test

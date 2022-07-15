@@ -1,3 +1,0 @@
-# Colors Tool
-
-test
