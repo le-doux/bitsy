@@ -1,3 +1,6 @@
+# Production docs
+/editor/docs
+
 heroku-server/*
 itch-version/*
 bitsy.sublime-project
