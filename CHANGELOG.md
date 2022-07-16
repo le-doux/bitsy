@@ -120,7 +120,7 @@
 - pagebreak function
 - titles can have multiple lines of dialog
 - bugfixes:
-  - spaces work inside nexted dialog
+  - spaces work inside nested dialog
   - functions support multiple parameters
   - unknown functions aren't deleted
 
