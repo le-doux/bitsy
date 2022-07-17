@@ -1,9 +1,9 @@
 # Blip-o-matic
 
-##Description
+## Description
 
 
 
-##Features
+## Features
 
 -diagram

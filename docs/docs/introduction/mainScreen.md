@@ -1,6 +1,6 @@
 # Main Screen
 
-##Description
+## Description
 
 When you first open Bitsy, you will see a selection of ‘tools’ open in the main panel. Above this is the tools menu which allows you to open and close these Bitsy tools. At the top of the main screen you can edit the title of your game, which will display when the game first begins.  
 
@@ -9,7 +9,7 @@ As your avatar walks around your Bitsy world they may interact with sprites (peo
 
 At any point you can download your game to play it outside of the Bitsy editor.  
 
-##Features
+## Features
 
 ![main screen of Bitsy](.images/mainScreen.JPG)
 
