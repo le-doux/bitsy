@@ -1,3 +1,0 @@
-# Paint Tool
-
-test
