@@ -37,6 +37,7 @@
 		<script src="script/engine/bitsy.js"></script>
 
 		<!-- EDITOR SCRIPTS -->
+		<script src="script/tools/about.js"></script>
 		<script src="script/store.js"></script>
 		<script src="script/util.js"></script>
 		<script src="script/icons.js"></script>
@@ -219,7 +220,7 @@
 					</div>
 
 					<div id="aboutInner" class="bitsy-card-main">
-						<iframe id="docFrame" src="docs/index.html" height="100%"></iframe>
+						<iframe id="docsFrame" height="100%"></iframe>
 					</div>
 				</div>
 
@@ -234,7 +235,7 @@
 							<span class="bitsy-playmode-show">playing...</span>
 						</span>
 
-						<button onclick="document.getElementById('docFrame').src='docs/tools/room/index.html'">
+						<button onclick="showAbout('tools/room/', 'roomPanel');">
 							<span class="bitsy_icon">help</span>
 						</button>
 

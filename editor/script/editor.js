@@ -1049,6 +1049,9 @@ function start() {
 	findTool = new FindTool({
 		mainElement : document.getElementById("findPanelMain"),
 	});
+
+	// about tool
+	initAbout();
 }
 
 function newDrawing() {
