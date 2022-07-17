@@ -27,7 +27,10 @@ const config = {
 	// to replace "en" with "zh-Hans".
 	i18n: {
 		defaultLocale: 'en',
-		locales: fs.readdirSync(path.resolve(__dirname, './i18n')).concat('en'),
+		locales: fs
+			.readdirSync(path.resolve(__dirname, './i18n'))
+			.filter(i => fs.lstatSync(path.resolve(__dirname, './i18n', i)).isDirectory())
+			.concat('en'),
 	},
 
 	presets: [
