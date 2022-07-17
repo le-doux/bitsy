@@ -1,5 +1,3 @@
-# Credits
-
 ## Engine and Editor Development
 
 - Adam Le Doux - Project Lead
