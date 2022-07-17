@@ -1,5 +1,3 @@
-# Changelog
-
 ## 8.0
 
 - blips (sound effects)
