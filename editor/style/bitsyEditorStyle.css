@@ -658,4 +658,5 @@ input[type=checkbox] + label:hover {
 /* ABOUT TOOL */
 #docsFrame {
 	min-height: 450px;
+	padding: 0;
 }
