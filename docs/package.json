@@ -5,7 +5,9 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "build": "docusaurus build --out-dir ../editor/docs",
+    "build:base": "docusaurus build --out-dir ../editor/docs",
+    "build:postprocess": "node postprocess",
+    "build": "npm run build:base && npm run build:postprocess",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

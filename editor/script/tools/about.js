@@ -1,20 +1,20 @@
 /* ABOUT / DOCUMENTATION TOOL */
 
 // todo : only valid for development - need a real root later
-var docsRoot = "http://localhost:3000/";
+var docsRoot = window.location.href.replace(/\/?((index|editor)\.html)?$/, '/docs/');
 
 var isUpdatingHistory = true;
 var aboutHistory = [];
 var aboutHistoryIndex = -1;
 
 function setAboutPage(pagePath) {
-	var docsFrame = document.getElementById('docsFrame');
-	docsFrame.src = docsRoot + pagePath;
+	var src = new URL(pagePath.includes('.html') ? pagePath : `${pagePath}/index.html`, docsRoot).href;
+	docsFrame.src = src;
 }
 
 function onAboutLoad() {
 	// update history
-	var docsFrame = document.getElementById('docsFrame');
+	docsFrame = document.getElementById('docsFrame');
 	var url = docsFrame.src;
 
 	if (isUpdatingHistory && url.length > 0) {
@@ -30,7 +30,7 @@ function onAboutLoad() {
 }
 
 function initAbout() {
-	setAboutPage("");
+	setAboutPage(".");
 }
 
 function showAbout(pagePath, insertNextToId) {
@@ -64,6 +64,5 @@ function aboutForward() {
 
 // todo : this doesn't work if the user navigates *within* the iframe
 function aboutOpenTab() {
-	var docsFrame = document.getElementById('docsFrame');
 	window.open(docsFrame.src);
 }

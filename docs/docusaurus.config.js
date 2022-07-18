@@ -12,10 +12,11 @@ const config = {
 	tagline: 'Documentation for the Bitsy editor!',
 	// TODO: update urls with actual host
 	url: 'https://your-docusaurus-test-site.com',
-	baseUrl: '/',
+	baseUrl: '/docs/',
+	baseUrlIssueBanner: false,
 	onBrokenLinks: 'throw',
 	onBrokenMarkdownLinks: 'warn',
-	favicon: 'img/favicon.ico',
+	favicon: './img/favicon.ico',
 
 	// GitHub pages deployment config.
 	// If you aren't using GitHub pages, you don't need these.
