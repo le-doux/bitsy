@@ -656,7 +656,11 @@ input[type=checkbox] + label:hover {
 }
 
 /* ABOUT TOOL */
+#aboutInner {
+	height: 450px;
+}
+
 #docsFrame {
-	min-height: 450px;
+	min-height: 0;
 	padding: 0;
 }
