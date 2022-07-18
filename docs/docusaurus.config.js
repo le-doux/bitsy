@@ -110,6 +110,8 @@ const config = {
 				darkTheme,
 			},
 		}),
+
+	clientModules: [require.resolve('./client.js')],
 };
 
 module.exports = config;

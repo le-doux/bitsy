@@ -29,3 +29,40 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
+/* use more compact style when embedded */
+:root[data-embedded=true] {
+  --ifm-font-size-base: 90% !important;
+}
+
+:root[data-embedded=true] h1,
+:root[data-embedded=true] h2,
+:root[data-embedded=true] h3,
+:root[data-embedded=true] h4,
+:root[data-embedded=true] h5,
+:root[data-embedded=true] h6 {
+  --ifm-h1-font-size: 1.2rem !important;
+  --ifm-h2-font-size: 1.1rem !important;
+  --ifm-h3-font-size: 1.1rem !important;
+  --ifm-h4-font-size: 1.1rem !important;
+  --ifm-h5-font-size: 1.1rem !important;
+  --ifm-h6-font-size: 1.1rem !important;
+  margin-bottom: 0.25em !important;
+}
+
+:root[data-embedded=true] h2,
+:root[data-embedded=true] h3,
+:root[data-embedded=true] h4,
+:root[data-embedded=true] h5,
+:root[data-embedded=true] h6 {
+  margin-top: 0.25em !important;
+}
+
+:root[data-embedded=true] .footer {
+  display: none;
+}
+
+/* disable elements which don't work on file protocol */
+:root[data-hosted=false] .navbar__toggle,
+:root[data-hosted=false] .theme-doc-toc-mobile {
+  display: none;
+}
