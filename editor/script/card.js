@@ -116,6 +116,7 @@ function makeToolCard(processName, initFunction) {
 				text: card.name,
 				id: card.id + "Check",
 				value: card.id + "Panel",
+				style: "bitsy-tool-toggle",
 				checked: true,
 				onclick: function(e) {
 					togglePanelAnimated(e);
@@ -153,7 +154,7 @@ function makeToolCard(processName, initFunction) {
 		card.renderer.SetDrawings(card.world.drawings);
 	}
 
-	card.canvasElement.onmousedown = function(e) {
+	function onMouseDown(e) {
 		enableGlobalAudioContext();
 		e.preventDefault();
 		var off = getOffset(e);
@@ -162,9 +163,10 @@ function makeToolCard(processName, initFunction) {
 		card.mouseState.y = Math.floor( off.y / (scale) );
 		card.mouseState.altKey = e.altKey;
 		card.mouseState.down = true;
-	};
+		card.mouseState.hover = true;
+	}
 
-	card.canvasElement.onmouseup = function(e) {
+	function onMouseUp(e) {
 		e.preventDefault();
 		var off = getOffset(e);
 		off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
@@ -172,10 +174,11 @@ function makeToolCard(processName, initFunction) {
 		card.mouseState.y = Math.floor( off.y / (scale) );
 		card.mouseState.altKey = e.altKey;
 		card.mouseState.down = false;
+		card.mouseState.hover = false;
 		card.menu.update();
 	};
 
-	card.canvasElement.onmousemove = function(e) {
+	function onMouseMove(e) {
 		e.preventDefault();
 		var off = getOffset(e);
 		off = mobileOffsetCorrection(off,e,(tilesize*mapsize*scale));
@@ -183,6 +186,34 @@ function makeToolCard(processName, initFunction) {
 		card.mouseState.y = Math.floor( off.y / (scale) );
 		card.mouseState.altKey = e.altKey;
 	};
+
+	function onTouchStart(e) {
+		e.preventDefault();
+		// update event to translate from touch-style to mouse-style structure
+		e.clientX = e.touches[0].clientX;
+		e.clientY = e.touches[0].clientY;
+		onMouseDown(e);
+	}
+
+	function onTouchEnd(e) {
+		e.preventDefault();
+		// update event to translate from touch-style to mouse-style structure
+		e.clientX = 0;
+		e.clientY = 0;
+		onMouseUp(e);
+	}
+
+	function onTouchMove(e) {
+		e.preventDefault();
+		// update event to translate from touch-style to mouse-style structure
+		e.clientX = e.touches[0].clientX;
+		e.clientY = e.touches[0].clientY;
+		onMouseMove(e);
+	}
+
+	card.canvasElement.onmousedown = onMouseDown;
+	card.canvasElement.onmouseup = onMouseUp;
+	card.canvasElement.onmousemove = onMouseMove;
 
 	card.canvasElement.onmouseenter = function(e) {
 		card.mouseState.hover = true;
@@ -192,6 +223,10 @@ function makeToolCard(processName, initFunction) {
 		card.mouseState.hover = false;
 		card.canvasElement.onmouseup(e);
 	};
+
+	card.canvasElement.addEventListener('touchstart', onTouchStart, { passive: false });
+	card.canvasElement.addEventListener('touchmove', onTouchMove, { passive: false });
+	card.canvasElement.addEventListener('touchend', onTouchEnd, { passive: false });
 
 	// hacky way to respond to changes outside the tool??
 	events.Listen("paint_edit", function() {
