@@ -31,10 +31,9 @@ jobs:
           VERSION: ${{ steps.version.outputs.current-version }}
 
       - name: publish to bitsy.org
-        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        uses: SamKirkland/FTP-Deploy-Action@3.1.1
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
+          ftp-server: sftp:${{ secrets.FTP_SERVER }}:22/
+          ftp-username: ${{ secrets.FTP_USER }}
+          ftp-password: ${{ secrets.FTP_PASS }}
           local-dir: ./editor/
-          server-dir: /
