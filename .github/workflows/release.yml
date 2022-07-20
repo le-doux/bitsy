@@ -1,0 +1,40 @@
+name: release
+
+on: workflow_dispatch 
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # setup
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+
+      # build resources
+      - run: node ./dev/icon_generator/makeicons
+      - run: node ./dev/resource_packager
+
+      # publish
+      # TODO: cleaner version number
+      - name: get version
+        id: version
+        run: |
+          echo ::set-output name=current-version::$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=major: )\d+').$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=minor: )\d+')
+      - name: publish to itch.io
+        uses: josephbmanley/butler-publish-itchio-action@v1.0.3
+        env:
+          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
+          CHANNEL: win-linux-mac-stable
+          ITCH_GAME: bitsy
+          ITCH_USER: ledoux
+          PACKAGE: editor
+          VERSION: ${{ steps.version.outputs.current-version }}
+
+      - name: publish to bitsy.org
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          local-dir: editor
+          server-dir: /
