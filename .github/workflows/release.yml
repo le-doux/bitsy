@@ -37,15 +37,4 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASS }}
           local-dir: editor
-          server-dir: public_html/editor
-
-      - name: rename index for backwards compatibility on ledoux.io
-        run: mv editor/index.html editor/editor.html
-      - name: publish to ledoux.io
-        uses: SamKirkland/FTP-Deploy-Action@4.3.0
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
-          local-dir: editor
-          server-dir: public_html/bitsy
+          server-dir: /
