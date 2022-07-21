@@ -30,5 +30,8 @@ jobs:
           PACKAGE: editor
           VERSION: ${{ steps.version.outputs.current-version }}
 
+      - name: install lftp
+        run: sudo apt-get install -y lftp
+
       - name: publish to bitsy.org 
         run: lftp sftp://${{ secrets.FTP_USER }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER }} -e "mirror -R editor/; bye"
