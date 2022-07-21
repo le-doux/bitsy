@@ -30,10 +30,5 @@ jobs:
           PACKAGE: editor
           VERSION: ${{ steps.version.outputs.current-version }}
 
-      - name: publish to bitsy.org
-        uses: SamKirkland/FTP-Deploy-Action@3.1.1
-        with:
-          ftp-server: sftp://${{ secrets.FTP_SERVER }}:22/
-          ftp-username: ${{ secrets.FTP_USER }}
-          ftp-password: ${{ secrets.FTP_PASS }}
-          local-dir: ./editor/
+      - name: publish to bitsy.org 
+        run: lftp sftp://${{ secrets.FTP_USER }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER }} -e "mirror -R editor/; bye"
