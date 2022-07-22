@@ -34,4 +34,4 @@ jobs:
         run: sudo apt install expect
 
       - name: publish to bitsy.org 
-        run: expect -c 'spawn sftp ${{ secrets.FTP_USER }}@${{ secrets.FTP_SERVER }} ; expect "password:" ; send "${{ secrets.FTP_PASS }}\r" ; sleep 10 ; send "yes\r" ; expect "sftp>" ; send "put -r editor/\r" ; expect "sftp>" ; send "bye\r" ; expect eof'
+        run: expect -c 'spawn sftp ${{ secrets.FTP_USER }}@${{ secrets.FTP_SERVER }} ; sleep 10 ; send "yes\r" ; expect "password:" ; send "${{ secrets.FTP_PASS }}\r" ; expect "sftp>" ; send "put -r editor/\r" ; expect "sftp>" ; send "bye\r" ; expect eof'
