@@ -20,18 +20,18 @@ jobs:
         id: version
         run: |
           echo ::set-output name=current-version::$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=major: )\d+').$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=minor: )\d+')
-      - name: publish to itch.io
-        uses: josephbmanley/butler-publish-itchio-action@v1.0.3
-        env:
-          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
-          CHANNEL: win-linux-mac-stable
-          ITCH_GAME: bitsy
-          ITCH_USER: ledoux
-          PACKAGE: editor
-          VERSION: ${{ steps.version.outputs.current-version }}
+#      - name: publish to itch.io
+#        uses: josephbmanley/butler-publish-itchio-action@v1.0.3
+#        env:
+#          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
+#          CHANNEL: win-linux-mac-stable
+#          ITCH_GAME: bitsy
+#          ITCH_USER: ledoux
+#          PACKAGE: editor
+#          VERSION: ${{ steps.version.outputs.current-version }}
 
       - name: install lftp
         run: sudo apt-get install -y lftp
 
       - name: publish to bitsy.org 
-        run: lftp sftp://${{ secrets.FTP_USER }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER }} -e "mirror -R editor/; bye"
+        run: lftp sftp://${{ secrets.FTP_USER }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER }} -e "set sftp:auto-confirm yes; mirror -R editor/; bye"
