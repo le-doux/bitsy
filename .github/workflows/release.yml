@@ -30,6 +30,9 @@ jobs:
 #          PACKAGE: editor
 #          VERSION: ${{ steps.version.outputs.current-version }}
 
+      - name: install expect
+        run: sudo apt install expect
+
       - name: publish to bitsy.org 
         run: expect <<EOF
           spawn sftp ${{ secrets.FTP_USER }}@${{ secrets.FTP_SERVER }}
