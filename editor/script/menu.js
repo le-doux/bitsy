@@ -201,6 +201,7 @@ function createToggleElement(options) {
 		for: checkboxInput.id,
 		// style: "button",
 		description: options.description,
+		style: options.style
 	});
 	toggleSpan.appendChild(toggleLabel);
 

@@ -234,6 +234,10 @@ var DialogRenderer = function() {
 		shouldDrawArrow = true;
 	}
 
+	this.updateTextboxPosition = function() {
+		shouldUpdateTextboxSettings = true;
+	};
+
 	// this.CharsPerRow = function() {
 	// 	return textboxInfo.charsPerRow;
 	// }
