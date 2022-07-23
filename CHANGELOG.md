@@ -1,3 +1,12 @@
+
+## 8.1
+
+- fix touch controls on mobile
+- fix bug where sprites/items "under" player avatar wouldn't draw
+- fix bug where stacked items don't draw correctly
+- fix bug where textbox position doesn't update after script {exit}
+- bitsycat links to bitsy.org
+
 ## 8.0
 
 - blips (sound effects)

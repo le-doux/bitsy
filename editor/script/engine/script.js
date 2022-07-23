@@ -600,6 +600,10 @@ function exitFunc(environment, parameters, onReturn) {
 			initRoom(state.room);
 		}
 
+		if (dialogRenderer) {
+			dialogRenderer.updateTextboxPosition();
+		}
+
 		// resume dialog script
 		onReturn(state.room);
 	};

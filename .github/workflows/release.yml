@@ -30,8 +30,8 @@ jobs:
           PACKAGE: editor
           VERSION: ${{ steps.version.outputs.current-version }}
 
-      - name: install lftp
-        run: sudo apt-get install -y lftp
+      - name: install expect
+        run: sudo apt install expect
 
       - name: publish to bitsy.org 
-        run: lftp sftp://${{ secrets.FTP_USER }}:${{ secrets.FTP_PASS }}@${{ secrets.FTP_SERVER }} -e "mirror -R editor/; bye"
+        run: expect -c 'spawn sftp ${{ secrets.FTP_USER }}@${{ secrets.FTP_SERVER }} ; sleep 10 ; send "yes\r" ; expect "password:" ; send "${{ secrets.FTP_PASS }}\r" ; expect "sftp>" ; send "put -r editor/\r" ; expect "sftp>" ; send "bye\r" ; expect eof'

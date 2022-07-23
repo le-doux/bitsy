@@ -195,6 +195,8 @@ function BitsySystem(name) {
 
 		self._poke(self._buttonBlock, self.BTN_MENU,
 			(input.isRestartComboPressed()) ? 1 : 0);
+
+		input.resetTapReleased();
 	}
 
 	function updateSound(dt) {
