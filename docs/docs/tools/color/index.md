@@ -4,7 +4,7 @@
 
 Every room in Bitsy has a color palette containing three colours, with all the artwork you create set to this palette. You may have as many palettes as you like though, and can assign any one of these to each [room](../room) in the [room settings](../room/roomSettings). 
 
-The three colours in the palette are:
+The three colors in the palette are:
 
 - background color (anything that is not interactive, the background color of all [tiles](../paint) and [sprites](../paint))
 - tile color (the foreground color of all your tiles)
