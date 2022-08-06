@@ -16,7 +16,6 @@ var Interpreter = function() {
 
 	// TODO -- maybe this should return a string instead othe actual script??
 	this.Compile = function(scriptName, scriptStr) {
-		// bitsyLog("COMPILE");
 		var script = parser.Parse(scriptStr, scriptName);
 		env.SetScript(scriptName, script);
 	}
@@ -32,7 +31,7 @@ var Interpreter = function() {
 		script.Eval( localEnv, function(result) { OnScriptReturn(localEnv, exitHandler); } );
 	}
 	this.Interpret = function(scriptStr, exitHandler, objectContext) { // Compiles and runs code immediately
-		// bitsyLog("INTERPRET");
+		// bitsy.log("INTERPRET");
 		var localEnv = new LocalEnvironment(env);
 
 		if (objectContext) {
@@ -52,17 +51,6 @@ var Interpreter = function() {
 	this.Parse = function(scriptStr, rootId) { // parses a script but doesn't save it
 		return parser.Parse(scriptStr, rootId);
 	}
-
-	// TODO : add back in if needed later...
-	// this.CompatibilityParse = function(scriptStr, compatibilityFlags) {
-	// 	env.compatibilityFlags = compatibilityFlags;
-
-	// 	var result = parser.Parse(scriptStr);
-
-	// 	delete env.compatibilityFlags;
-
-	// 	return result;
-	// }
 
 	this.Eval = function(scriptTree, exitHandler) { // runs a script stored externally
 		var localEnv = new LocalEnvironment(env); // TODO : does this need an object context?
@@ -107,7 +95,7 @@ var Interpreter = function() {
 	function DebugVisualizeScriptTree(scriptTree) {
 		var printVisitor = {
 			Visit : function(node,depth) {
-				bitsyLog("-".repeat(depth) + "- " + node.ToString());
+				bitsy.log("-".repeat(depth) + "- " + node.ToString());
 			},
 		};
 
@@ -139,7 +127,7 @@ var Utils = function() {
 
 	this.CreateOptionBlock = function() {
 		var block = new DialogBlockNode(false);
-		block.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		block.AddChild(new FuncNode("say", [new LiteralNode(" ")]));
 		return block;
 	}
 
@@ -147,7 +135,7 @@ var Utils = function() {
 		var itemFunc = this.CreateFunctionBlock("item", ["0"]);
 		var condition = new ExpNode("==", itemFunc, new LiteralNode(1));
 		var result = new DialogBlockNode(true);
-		result.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		result.AddChild(new FuncNode("say", [new LiteralNode(" ")]));
 		var conditionPair = new ConditionPairNode(condition, result);
 		return conditionPair;
 	}
@@ -156,7 +144,7 @@ var Utils = function() {
 		var varNode = this.CreateVariableNode("a");
 		var condition = new ExpNode("==", varNode, new LiteralNode(1));
 		var result = new DialogBlockNode(true);
-		result.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		result.AddChild(new FuncNode("say", [new LiteralNode(" ")]));
 		var conditionPair = new ConditionPairNode(condition, result);
 		return conditionPair;
 	}
@@ -164,13 +152,13 @@ var Utils = function() {
 	this.CreateDefaultConditionPair = function() {
 		var condition = this.CreateElseNode();
 		var result = new DialogBlockNode(true);
-		result.AddChild(new FuncNode("print", [new LiteralNode(" ")]));
+		result.AddChild(new FuncNode("say", [new LiteralNode(" ")]));
 		var conditionPair = new ConditionPairNode(condition, result);
 		return conditionPair;
 	}
 
-	this.CreateEmptyPrintFunc = function() {
-		return new FuncNode("print", [new LiteralNode("...")]);
+	this.CreateEmptySayFunc = function() {
+		return new FuncNode("say", [new LiteralNode("...")]);
 	}
 
 	this.CreateFunctionBlock = function(name, initParamValues) {
@@ -242,10 +230,10 @@ var Utils = function() {
 
 	this.CreateSequenceBlock = function() {
 		var option1 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option1.AddChild(new FuncNode("print", [new LiteralNode("...")]));
+		option1.AddChild(new FuncNode("say", [new LiteralNode("...")]));
 
 		var option2 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option2.AddChild(new FuncNode("print", [new LiteralNode("...")]));
+		option2.AddChild(new FuncNode("say", [new LiteralNode("...")]));
 
 		var sequence = new SequenceNode( [ option1, option2 ] );
 		var block = new CodeBlockNode();
@@ -255,10 +243,10 @@ var Utils = function() {
 
 	this.CreateCycleBlock = function() {
 		var option1 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option1.AddChild(new FuncNode("print", [new LiteralNode("...")]));
+		option1.AddChild(new FuncNode("say", [new LiteralNode("...")]));
 
 		var option2 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option2.AddChild(new FuncNode("print", [new LiteralNode("...")]));
+		option2.AddChild(new FuncNode("say", [new LiteralNode("...")]));
 
 		var sequence = new CycleNode( [ option1, option2 ] );
 		var block = new CodeBlockNode();
@@ -268,10 +256,10 @@ var Utils = function() {
 
 	this.CreateShuffleBlock = function() {
 		var option1 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option1.AddChild(new FuncNode("print", [new LiteralNode("...")]));
+		option1.AddChild(new FuncNode("say", [new LiteralNode("...")]));
 
 		var option2 = new DialogBlockNode( false /*doIndentFirstLine*/ );
-		option2.AddChild(new FuncNode("print", [new LiteralNode("...")]));
+		option2.AddChild(new FuncNode("say", [new LiteralNode("...")]));
 
 		var sequence = new ShuffleNode( [ option1, option2 ] );
 		var block = new CodeBlockNode();
@@ -288,10 +276,10 @@ var Utils = function() {
 		var condition2 = new ElseNode();
 
 		var result1 = new DialogBlockNode();
-		result1.AddChild(new FuncNode("print", [new LiteralNode("...")]));
+		result1.AddChild(new FuncNode("say", [new LiteralNode("...")]));
 
 		var result2 = new DialogBlockNode();
-		result2.AddChild(new FuncNode("print", [new LiteralNode("...")]));
+		result2.AddChild(new FuncNode("say", [new LiteralNode("...")]));
 
 		var ifNode = new IfNode( [ condition1, condition2 ], [ result1, result2 ] );
 		var block = new CodeBlockNode();
@@ -365,11 +353,11 @@ var Utils = function() {
 
 /* BUILT-IN FUNCTIONS */ // TODO: better way to encapsulate these?
 function deprecatedFunc(environment,parameters,onReturn) {
-	bitsyLog("BITSY SCRIPT WARNING: Tried to use deprecated function");
+	bitsy.log("BITSY SCRIPT WARNING: Tried to use deprecated function");
 	onReturn(null);
 }
 
-function printFunc(environment, parameters, onReturn) {
+function sayFunc(environment, parameters, onReturn) {
 	if (parameters[0] != undefined && parameters[0] != null) {
 		var textStr = "" + parameters[0];
 		environment.GetDialogBuffer().AddText(textStr);
@@ -381,7 +369,7 @@ function printFunc(environment, parameters, onReturn) {
 }
 
 function linebreakFunc(environment, parameters, onReturn) {
-	// bitsyLog("LINEBREAK FUNC");
+	// bitsy.log("LINEBREAK FUNC");
 	environment.GetDialogBuffer().AddLinebreak();
 	environment.GetDialogBuffer().AddScriptReturn(function() { onReturn(null); });
 }
@@ -390,31 +378,46 @@ function pagebreakFunc(environment, parameters, onReturn) {
 	environment.GetDialogBuffer().AddPagebreak(function() { onReturn(null); });
 }
 
-function printDrawingFunc(environment, parameters, onReturn) {
+function drawFunc(environment, parameters, onReturn) {
 	var drawingId = parameters[0];
 	environment.GetDialogBuffer().AddDrawing(drawingId);
 	environment.GetDialogBuffer().AddScriptReturn(function() { onReturn(null); });
 }
 
-function printSpriteFunc(environment,parameters,onReturn) {
+function drawSpriteFunc(environment, parameters, onReturn) {
 	var spriteId = parameters[0];
-	if(names.sprite[spriteId] != undefined) spriteId = names.sprite[spriteId]; // id is actually a name
+
+	// check if id parameter is actually a name
+	if (names.sprite[spriteId] != undefined) {
+		spriteId = names.sprite[spriteId];
+	}
+
 	var drawingId = sprite[spriteId].drw;
-	printDrawingFunc(environment, [drawingId], onReturn);
+	drawFunc(environment, [drawingId], onReturn);
 }
 
-function printTileFunc(environment,parameters,onReturn) {
+function drawTileFunc(environment, parameters, onReturn) {
 	var tileId = parameters[0];
-	if(names.tile[tileId] != undefined) tileId = names.tile[tileId]; // id is actually a name
+
+	// check if id parameter is actually a name
+	if (names.tile[tileId] != undefined) {
+		tileId = names.tile[tileId];
+	}
+
 	var drawingId = tile[tileId].drw;
-	printDrawingFunc(environment, [drawingId], onReturn);
+	drawFunc(environment, [drawingId], onReturn);
 }
 
-function printItemFunc(environment,parameters,onReturn) {
+function drawItemFunc(environment, parameters, onReturn) {
 	var itemId = parameters[0];
-	if(names.item[itemId] != undefined) itemId = names.item[itemId]; // id is actually a name
+
+	// check if id parameter is actually a name
+	if (names.item[itemId] != undefined) {
+		itemId = names.item[itemId];
+	}
+
 	var drawingId = item[itemId].drw;
-	printDrawingFunc(environment, [drawingId], onReturn);
+	drawFunc(environment, [drawingId], onReturn);
 }
 
 function printFontFunc(environment, parameters, onReturn) {
@@ -424,7 +427,7 @@ function printFontFunc(environment, parameters, onReturn) {
 	for (var i = 0; i < codeList.length; i++) {
 		allCharacters += String.fromCharCode(codeList[i]) + " ";
 	}
-	printFunc(environment, [allCharacters], onReturn);
+	sayFunc(environment, [allCharacters], onReturn);
 }
 
 function itemFunc(environment,parameters,onReturn) {
@@ -450,41 +453,75 @@ function itemFunc(environment,parameters,onReturn) {
 	onReturn(curItemCount);
 }
 
-function addOrRemoveTextEffect(environment,name) {
-	if( environment.GetDialogBuffer().HasTextEffect(name) )
-		environment.GetDialogBuffer().RemoveTextEffect(name);
-	else
-		environment.GetDialogBuffer().AddTextEffect(name);
+function toggleTextEffect(environment, name) {
+	if (environment.GetDialogBuffer().hasTextEffect(name)) {
+		environment.GetDialogBuffer().popTextEffect(name);
+	}
+	else {
+		environment.GetDialogBuffer().pushTextEffect(name, []);
+	}
 }
 
-function rainbowFunc(environment,parameters,onReturn) {
-	addOrRemoveTextEffect(environment,"rbw");
+function color1Func(environment, parameters, onReturn) {
+	toggleTextEffect(environment, "clr1");
 	onReturn(null);
 }
 
-// TODO : should the colors use a parameter instead of special names?
-function color1Func(environment,parameters,onReturn) {
-	addOrRemoveTextEffect(environment,"clr1");
+function color2Func(environment, parameters, onReturn) {
+	toggleTextEffect(environment, "clr2");
 	onReturn(null);
 }
 
-function color2Func(environment,parameters,onReturn) {
-	addOrRemoveTextEffect(environment,"clr2");
+function color3Func(environment, parameters, onReturn) {
+	toggleTextEffect(environment, "clr3");
 	onReturn(null);
 }
 
-function color3Func(environment,parameters,onReturn) {
-	addOrRemoveTextEffect(environment,"clr3");
+function colorFunc(environment, parameters, onReturn) {
+	environment.GetDialogBuffer().pushTextEffect("clr", parameters);
 	onReturn(null);
 }
 
-function wavyFunc(environment,parameters,onReturn) {
-	addOrRemoveTextEffect(environment,"wvy");
+function colorPopFunc(environment, parameters, onReturn) {
+	if (environment.GetDialogBuffer().hasTextEffect("clr")) {
+		environment.GetDialogBuffer().popTextEffect("clr");
+	}
 	onReturn(null);
 }
 
-function shakyFunc(environment,parameters,onReturn) {
-	addOrRemoveTextEffect(environment,"shk");
+function rainbowFunc(environment, parameters, onReturn) {
+	toggleTextEffect(environment, "rbw");
+	onReturn(null);
+}
+
+function rainbowPopFunc(environment, parameters, onReturn) {
+	if (environment.GetDialogBuffer().hasTextEffect("rbw")) {
+		environment.GetDialogBuffer().popTextEffect("rbw");
+	}
+	onReturn(null);
+}
+
+function wavyFunc(environment, parameters, onReturn) {
+	toggleTextEffect(environment, "wvy");
+	onReturn(null);
+}
+
+function wavyPopFunc(environment, parameters, onReturn) {
+	if (environment.GetDialogBuffer().hasTextEffect("wvy")) {
+		environment.GetDialogBuffer().popTextEffect("wvy");
+	}
+	onReturn(null);
+}
+
+function shakyFunc(environment, parameters, onReturn) {
+	toggleTextEffect(environment, "shk");
+	onReturn(null);
+}
+
+function shakyPopFunc(environment, parameters, onReturn) {
+	if (environment.GetDialogBuffer().hasTextEffect("shk")) {
+		environment.GetDialogBuffer().popTextEffect("shk");
+	}
 	onReturn(null);
 }
 
@@ -506,7 +543,7 @@ function propertyFunc(environment, parameters, onReturn) {
 		}
 	}
 
-	bitsyLog("PROPERTY! " + propertyName + " " + outValue);
+	bitsy.log("PROPERTY! " + propertyName + " " + outValue);
 
 	onReturn(outValue);
 }
@@ -518,16 +555,24 @@ function endFunc(environment,parameters,onReturn) {
 	onReturn(null);
 }
 
-function exitFunc(environment,parameters,onReturn) {
-	var destRoom = parameters[0];
+function exitFunc(environment, parameters, onReturn) {
+	var destRoom;
+	var destX;
+	var destY;
 
-	if (names.room[destRoom] != undefined) {
-		// it's a name, not an id! (note: these could cause trouble if people names things weird)
-		destRoom = names.room[destRoom];
+	if (parameters.length >= 1) {
+		destRoom = parameters[0];
+
+		// is it a name?
+		if (names.room[destRoom] != undefined) {
+			destRoom = names.room[destRoom];
+		}
 	}
 
-	var destX = parseInt(parameters[1]);
-	var destY = parseInt(parameters[2]);
+	if (parameters.length >= 3) {
+		destX = parseInt(parameters[1]);
+		destY = parseInt(parameters[2]);
+	}
 
 	if (parameters.length >= 4) {
 		var transitionEffect = parameters[3];
@@ -544,17 +589,23 @@ function exitFunc(environment,parameters,onReturn) {
 	}
 
 	var movePlayerAndResumeScript = function() {
-		// update world state
-		player().room = destRoom;
-		player().x = destX;
-		player().y = destY;
-		curRoom = destRoom;
+		if (destRoom != undefined && destX != undefined && destY != undefined) {
+			// update world state
+			player().room = destRoom;
+			player().x = destX;
+			player().y = destY;
+			state.room = destRoom;
 
-		// update game state
-		initRoom(curRoom);
+			// update game state
+			initRoom(state.room);
+		}
+
+		if (dialogRenderer) {
+			dialogRenderer.updateTextboxPosition();
+		}
 
 		// resume dialog script
-		onReturn(null);
+		onReturn(state.room);
 	};
 
 	// TODO : this doesn't play nice with pagebreak because it thinks the dialog is finished!
@@ -566,9 +617,115 @@ function exitFunc(environment,parameters,onReturn) {
 	}
 }
 
+function tuneFunc(environment, parameters, onReturn) {
+	if (parameters.length > 0) {
+		var tuneId = parameters[0];
+
+		// check if id parameter is actually a name
+		if (names.tune[tuneId] != undefined) {
+			tuneId = names.tune[tuneId];
+		}
+
+		if (soundPlayer) {
+			if (tuneId === "0") {
+				soundPlayer.stopTune();
+			}
+			else if (state.tune != tuneId) {
+				soundPlayer.playTune(tune[tuneId]);
+			}
+		}
+
+		state.tune = tuneId;
+	}
+
+	onReturn(state.tune);
+}
+
+function blipFunc(environment, parameters, onReturn) {
+	if (parameters.length > 0) {
+		var blipId = parameters[0];
+
+		// check if id parameter is actually a name
+		if (names.blip[blipId] != undefined) {
+			blipId = names.blip[blipId];
+		}
+
+		soundPlayer.playBlip(blip[blipId]);
+	}
+
+	// if a dialog skip is happening, stop it and force a redraw of the textbox
+	if (dialogBuffer) {
+		if (dialogBuffer.tryInterruptSkip()) {
+			dialogRenderer.Draw(dialogBuffer, 0, true /* disableOnPrint */);
+		}
+	}
+
+	onReturn(null);
+}
+
+/*
+// TODO : use later?
+function yakFunc(environment, parameters, onReturn) {
+	if (parameters.length > 0) {
+		var blipId = parameters[0];
+
+		// check if id parameter is actually a name
+		if (names.blip[blipId] != undefined) {
+			blipId = names.blip[blipId];
+		}
+
+		environment.GetDialogBuffer().pushTextEffect("yak", [blipId]);
+	}
+
+	onReturn(null);
+}
+
+function yakPopFunc(environment, parameters, onReturn) {
+	if (environment.GetDialogBuffer().hasTextEffect("yak")) {
+		environment.GetDialogBuffer().popTextEffect("yak");
+	}
+
+	onReturn(null);
+}
+*/
+
+function paletteFunc(environment, parameters, onReturn) {
+	if (parameters.length > 0) {
+		var palId = parameters[0];
+
+		// check if id parameter is actually a name
+		if (names.palette[palId] != undefined) {
+			palId = names.palette[palId];
+		}
+
+		updatePalette(palId);
+	}
+
+	onReturn(state.pal);
+}
+
+function avatarFunc(environment, parameters, onReturn) {
+	if (parameters.length > 0) {
+		var sprId = parameters[0];
+
+		// check if id parameter is actually a name
+		if (names.sprite[sprId] != undefined) {
+			sprId = names.sprite[sprId];
+		}
+
+		// override the avatar's current appearance
+		state.ava = sprId;
+
+		// redraw the avatar with its new appearance
+		drawRoom(room[state.room], { redrawAvatar: true });
+	}
+
+	onReturn(state.ava);
+}
+
 /* BUILT-IN OPERATORS */
 function setExp(environment,left,right,onReturn) {
-	// bitsyLog("SET " + left.name);
+	// bitsy.log("SET " + left.name);
 
 	if(left.type != "variable") {
 		// not a variable! return null and hope for the best D:
@@ -578,16 +735,16 @@ function setExp(environment,left,right,onReturn) {
 
 	right.Eval(environment,function(rVal) {
 		environment.SetVariable( left.name, rVal );
-		// bitsyLog("VAL " + environment.GetVariable( left.name ) );
+		// bitsy.log("VAL " + environment.GetVariable( left.name ) );
 		left.Eval(environment,function(lVal) {
 			onReturn( lVal );
 		});
 	});
 }
 function equalExp(environment,left,right,onReturn) {
-	// bitsyLog("EVAL EQUAL");
-	// bitsyLog(left);
-	// bitsyLog(right);
+	// bitsy.log("EVAL EQUAL");
+	// bitsy.log(left);
+	// bitsy.log(right);
 	right.Eval(environment,function(rVal){
 		left.Eval(environment,function(lVal){
 			onReturn( lVal === rVal );
@@ -658,24 +815,55 @@ var Environment = function() {
 	this.GetDialogBuffer = function() { return dialogBuffer; };
 
 	var functionMap = {};
-	functionMap["print"] = printFunc;
-	functionMap["say"] = printFunc;
+
+	// dialog
+	functionMap["say"] = sayFunc;
 	functionMap["br"] = linebreakFunc;
-	functionMap["item"] = itemFunc;
+	functionMap["pg"] = pagebreakFunc;
+
+	// text effects
+	functionMap["wvy"] = wavyFunc;
+	functionMap["/wvy"] = wavyPopFunc;
+	functionMap["shk"] = shakyFunc;
+	functionMap["/shk"] = shakyPopFunc;
 	functionMap["rbw"] = rainbowFunc;
+	functionMap["/rbw"] = rainbowPopFunc;
+	functionMap["clr"] = colorFunc;
+	functionMap["/clr"] = colorPopFunc;
+	// drawing text effects
+	functionMap["drwt"] = drawTileFunc;
+	functionMap["drws"] = drawSpriteFunc;
+	functionMap["drwi"] = drawItemFunc;
+
+	// room
+	functionMap["end"] = endFunc;
+	functionMap["exit"] = exitFunc;
+	functionMap["pal"] = paletteFunc;
+	functionMap["ava"] = avatarFunc;
+
+	// inventory & variables
+	functionMap["item"] = itemFunc;
+	functionMap["property"] = propertyFunc;
+
+	// sound
+	functionMap["tune"] = tuneFunc;
+	functionMap["blip"] = blipFunc;
+
+	// legacy
 	functionMap["clr1"] = color1Func;
 	functionMap["clr2"] = color2Func;
 	functionMap["clr3"] = color3Func;
-	functionMap["wvy"] = wavyFunc;
-	functionMap["shk"] = shakyFunc;
-	functionMap["printSprite"] = printSpriteFunc;
-	functionMap["printTile"] = printTileFunc;
-	functionMap["printItem"] = printItemFunc;
-	functionMap["debugOnlyPrintFont"] = printFontFunc; // DEBUG ONLY
-	functionMap["end"] = endFunc;
-	functionMap["exit"] = exitFunc;
-	functionMap["pg"] = pagebreakFunc;
-	functionMap["property"] = propertyFunc;
+	functionMap["print"] = sayFunc;
+	functionMap["printTile"] = drawTileFunc;
+	functionMap["printSprite"] = drawSpriteFunc;
+	functionMap["printItem"] = drawItemFunc;
+
+	// DEBUG
+	functionMap["_debugOnlyPrintFont"] = printFontFunc;
+
+	// EXPERIMENTAL
+	// functionMap["yak"] = yakFunc;
+	// functionMap["/yak"] = yakPopFunc;
 
 	this.HasFunction = function(name) { return functionMap[name] != undefined; };
 	this.EvalFunction = function(name,parameters,onReturn,env) {
@@ -691,7 +879,7 @@ var Environment = function() {
 	this.HasVariable = function(name) { return variableMap[name] != undefined; };
 	this.GetVariable = function(name) { return variableMap[name]; };
 	this.SetVariable = function(name,value,useHandler) {
-		// bitsyLog("SET VARIABLE " + name + " = " + value);
+		// bitsy.log("SET VARIABLE " + name + " = " + value);
 		if(useHandler === undefined) useHandler = true;
 		variableMap[name] = value;
 		if(onVariableChangeHandler != null && useHandler){
@@ -823,7 +1011,7 @@ function leadingWhitespace(depth) {
 	for(var i = 0; i < depth; i++) {
 		str += "  "; // two spaces per indent
 	}
-	// bitsyLog("WHITESPACE " + depth + " ::" + str + "::");
+	// bitsy.log("WHITESPACE " + depth + " ::" + str + "::");
 	return str;
 }
 
@@ -861,7 +1049,7 @@ var TreeRelationship = function() {
 
 	this.rootId = null; // for debugging
 	this.GetId = function() {
-		// bitsyLog(this);
+		// bitsy.log(this);
 		if (this.rootId != null) {
 			return this.rootId;
 		}
@@ -877,13 +1065,13 @@ var TreeRelationship = function() {
 	}
 }
 
-var DialogBlockNode = function(doIndentFirstLine) {
-	Object.assign( this, new TreeRelationship() );
-	// Object.assign( this, new Runnable() );
+function DialogBlockNode(doIndentFirstLine) {
+	TreeRelationship.call(this);
+
 	this.type = "dialog_block";
 
 	this.Eval = function(environment, onReturn) {
-		// bitsyLog("EVAL BLOCK " + this.children.length);
+		// bitsy.log("EVAL BLOCK " + this.children.length);
 
 		if (isPlayerEmbeddedInEditor && events != undefined && events != null) {
 			events.Raise("script_node_enter", { id: this.GetId() });
@@ -894,9 +1082,9 @@ var DialogBlockNode = function(doIndentFirstLine) {
 
 		function evalChildren(children, done) {
 			if (i < children.length) {
-				// bitsyLog(">> CHILD " + i);
+				// bitsy.log(">> CHILD " + i);
 				children[i].Eval(environment, function(val) {
-					// bitsyLog("<< CHILD " + i);
+					// bitsy.log("<< CHILD " + i);
 					lastVal = val;
 					i++;
 					evalChildren(children,done);
@@ -953,12 +1141,13 @@ var DialogBlockNode = function(doIndentFirstLine) {
 	};
 }
 
-var CodeBlockNode = function() {
-	Object.assign( this, new TreeRelationship() );
+function CodeBlockNode() {
+	TreeRelationship.call(this);
+
 	this.type = "code_block";
 
 	this.Eval = function(environment, onReturn) {
-		// bitsyLog("EVAL BLOCK " + this.children.length);
+		// bitsy.log("EVAL BLOCK " + this.children.length);
 
 		if (isPlayerEmbeddedInEditor && events != undefined && events != null) {
 			events.Raise("script_node_enter", { id: this.GetId() });
@@ -969,9 +1158,9 @@ var CodeBlockNode = function() {
 
 		function evalChildren(children, done) {
 			if (i < children.length) {
-				// bitsyLog(">> CHILD " + i);
+				// bitsy.log(">> CHILD " + i);
 				children[i].Eval(environment, function(val) {
-					// bitsyLog("<< CHILD " + i);
+					// bitsy.log("<< CHILD " + i);
 					lastVal = val;
 					i++;
 					evalChildren(children,done);
@@ -997,9 +1186,9 @@ var CodeBlockNode = function() {
 			depth = 0;
 		}
 
-		// bitsyLog("SERIALIZE BLOCK!!!");
-		// bitsyLog(depth);
-		// bitsyLog(doIndentFirstLine);
+		// bitsy.log("SERIALIZE BLOCK!!!");
+		// bitsy.log(depth);
+		// bitsy.log(doIndentFirstLine);
 
 		var str = "{"; // todo: increase scope of Sym?
 
@@ -1050,17 +1239,18 @@ function isMultilineListBlock(node) {
 }
 
 // for round-tripping undefined code through the parser (useful for hacks!)
-var UndefinedNode = function(sourceStr) {
-	Object.assign(this, new TreeRelationship());
+function UndefinedNode(sourceStr) {
+	TreeRelationship.call(this);
+
 	this.type = "undefined";
 	this.source = sourceStr;
 
 	this.Eval = function(environment,onReturn) {
-		addOrRemoveTextEffect(environment, "_debug_highlight");
-		printFunc(environment, ["{" + sourceStr + "}"], function() {
+		toggleTextEffect(environment, "_debug_highlight");
+		sayFunc(environment, ["{" + sourceStr + "}"], function() {
 			onReturn(null);
 		});
-		addOrRemoveTextEffect(environment, "_debug_highlight");
+		toggleTextEffect(environment, "_debug_highlight");
 	}
 
 	this.Serialize = function(depth) {
@@ -1072,9 +1262,9 @@ var UndefinedNode = function(sourceStr) {
 	}
 }
 
-var FuncNode = function(name,args) {
-	Object.assign( this, new TreeRelationship() );
-	// Object.assign( this, new Runnable() );
+function FuncNode(name, args) {
+	TreeRelationship.call(this);
+
 	this.type = "function";
 	this.name = name;
 	this.args = args;
@@ -1133,7 +1323,7 @@ var FuncNode = function(name,args) {
 
 	this.Serialize = function(depth) {
 		var isDialogBlock = this.parent.type === "dialog_block";
-		if (isDialogBlock && this.name === "print") {
+		if (isDialogBlock && this.name === "say") {
 			// TODO this could cause problems with "real" print functions
 			return this.args[0].value; // first argument should be the text of the {print} func
 		}
@@ -1156,15 +1346,15 @@ var FuncNode = function(name,args) {
 	};
 }
 
-var LiteralNode = function(value) {
-	Object.assign( this, new TreeRelationship() );
-	// Object.assign( this, new Runnable() );
+function LiteralNode(value) {
+	TreeRelationship.call(this);
+
 	this.type = "literal";
 	this.value = value;
 
 	this.Eval = function(environment,onReturn) {
 		onReturn(this.value);
-	}
+	};
 
 	this.Serialize = function(depth) {
 		var str = "";
@@ -1184,21 +1374,21 @@ var LiteralNode = function(value) {
 		}
 
 		return str;
-	}
+	};
 
 	this.ToString = function() {
 		return this.type + " " + this.value + " " + this.GetId();
 	};
 }
 
-var VarNode = function(name) {
-	Object.assign( this, new TreeRelationship() );
-	// Object.assign( this, new Runnable() );
+function VarNode(name) {
+	TreeRelationship.call(this);
+
 	this.type = "variable";
 	this.name = name;
 
 	this.Eval = function(environment,onReturn) {
-		// bitsyLog("EVAL " + this.name + " " + environment.HasVariable(this.name) + " " + environment.GetVariable(this.name));
+		// bitsy.log("EVAL " + this.name + " " + environment.HasVariable(this.name) + " " + environment.GetVariable(this.name));
 		if( environment.HasVariable(this.name) )
 			onReturn( environment.GetVariable( this.name ) );
 		else
@@ -1215,23 +1405,24 @@ var VarNode = function(name) {
 	};
 }
 
-var ExpNode = function(operator, left, right) {
-	Object.assign( this, new TreeRelationship() );
+function ExpNode(operator, left, right) {
+	TreeRelationship.call(this);
+
 	this.type = "operator";
 	this.operator = operator;
 	this.left = left;
 	this.right = right;
 
 	this.Eval = function(environment,onReturn) {
-		// bitsyLog("EVAL " + this.operator);
+		// bitsy.log("EVAL " + this.operator);
 		var self = this; // hack to deal with scope
 		environment.EvalOperator( this.operator, this.left, this.right, 
 			function(val){
-				// bitsyLog("EVAL EXP " + self.operator + " " + val);
+				// bitsy.log("EVAL EXP " + self.operator + " " + val);
 				onReturn(val);
 			} );
 		// NOTE : sadly this pushes a lot of complexity down onto the actual operator methods
-	}
+	};
 
 	this.Serialize = function(depth) {
 		var isNegativeNumber = this.operator === "-" && this.left.type === "literal" && this.left.value === null;
@@ -1254,7 +1445,7 @@ var ExpNode = function(operator, left, right) {
 		else {
 			return this.operator + this.right.Serialize(depth); // hacky but seems to work
 		}
-	}
+	};
 
 	this.VisitAll = function(visitor, depth) {
 		if (depth == undefined || depth == null) {
@@ -1273,7 +1464,9 @@ var ExpNode = function(operator, left, right) {
 	};
 }
 
-var SequenceBase = function() {
+function SequenceBase() {
+	TreeRelationship.call(this);
+
 	this.Serialize = function(depth) {
 		var str = "";
 		str += this.type + "\n";
@@ -1284,7 +1477,7 @@ var SequenceBase = function() {
 		}
 		str += leadingWhitespace(depth);
 		return str;
-	}
+	};
 
 	this.VisitAll = function(visitor, depth) {
 		if (depth == undefined || depth == null) {
@@ -1302,15 +1495,15 @@ var SequenceBase = function() {
 	};
 }
 
-var SequenceNode = function(options) {
-	Object.assign(this, new TreeRelationship());
-	Object.assign(this, new SequenceBase());
+function SequenceNode(options) {
+	SequenceBase.call(this);
+
 	this.type = "sequence";
 	this.AddChildren(options);
 
 	var index = 0;
 	this.Eval = function(environment, onReturn) {
-		// bitsyLog("SEQUENCE " + index);
+		// bitsy.log("SEQUENCE " + index);
 		this.children[index].Eval(environment, onReturn);
 
 		var next = index + 1;
@@ -1320,15 +1513,15 @@ var SequenceNode = function(options) {
 	}
 }
 
-var CycleNode = function(options) {
-	Object.assign(this, new TreeRelationship());
-	Object.assign(this, new SequenceBase());
+function CycleNode(options) {
+	SequenceBase.call(this);
+
 	this.type = "cycle";
 	this.AddChildren(options);
 
 	var index = 0;
 	this.Eval = function(environment, onReturn) {
-		// bitsyLog("CYCLE " + index);
+		// bitsy.log("CYCLE " + index);
 		this.children[index].Eval(environment, onReturn);
 
 		var next = index + 1;
@@ -1341,9 +1534,9 @@ var CycleNode = function(options) {
 	}
 }
 
-var ShuffleNode = function(options) {
-	Object.assign(this, new TreeRelationship());
-	Object.assign(this, new SequenceBase());
+function ShuffleNode(options) {
+	SequenceBase.call(this);
+
 	this.type = "shuffle";
 	this.AddChildren(options);
 
@@ -1371,8 +1564,9 @@ var ShuffleNode = function(options) {
 }
 
 // TODO : rename? ConditionalNode?
-var IfNode = function(conditions, results, isSingleLine) {
-	Object.assign(this, new TreeRelationship());
+function IfNode(conditions, results, isSingleLine) {
+	TreeRelationship.call(this);
+
 	this.type = "if";
 
 	for (var i = 0; i < conditions.length; i++) {
@@ -1381,7 +1575,7 @@ var IfNode = function(conditions, results, isSingleLine) {
 
 	var self = this;
 	this.Eval = function(environment, onReturn) {
-		// bitsyLog("EVAL IF");
+		// bitsy.log("EVAL IF");
 		var i = 0;
 		function TestCondition() {
 			self.children[i].Eval(environment, function(result) {
@@ -1398,7 +1592,7 @@ var IfNode = function(conditions, results, isSingleLine) {
 			});
 		};
 		TestCondition();
-	}
+	};
 
 	if (isSingleLine === undefined) {
 		isSingleLine = false; // This is just for serialization
@@ -1421,11 +1615,11 @@ var IfNode = function(conditions, results, isSingleLine) {
 			str += leadingWhitespace(depth);
 		}
 		return str;
-	}
+	};
 
 	this.IsSingleLine = function() {
 		return isSingleLine;
-	}
+	};
 
 	this.VisitAll = function(visitor, depth) {
 		if (depth == undefined || depth == null) {
@@ -1444,8 +1638,8 @@ var IfNode = function(conditions, results, isSingleLine) {
 	};
 }
 
-var ConditionPairNode = function(condition, result) {
-	Object.assign(this, new TreeRelationship());
+function ConditionPairNode(condition, result) {
+	TreeRelationship.call(this);
 
 	this.type = "condition_pair";
 
@@ -1465,7 +1659,7 @@ var ConditionPairNode = function(condition, result) {
 				onReturn({ conditionValue:false });
 			}
 		});
-	}
+	};
 
 	this.Serialize = function(depth) {
 		var str = "";
@@ -1473,7 +1667,7 @@ var ConditionPairNode = function(condition, result) {
 		str += Sym.List + " " + this.children[0].Serialize(depth) + " " + Sym.ConditionEnd + Sym.Linebreak;
 		str += this.children[1].Serialize(depth + 2) + Sym.Linebreak;
 		return str;
-	}
+	};
 
 	this.VisitAll = function(visitor, depth) {
 		if (depth == undefined || depth == null) {
@@ -1485,24 +1679,25 @@ var ConditionPairNode = function(condition, result) {
 		for (var i = 0; i < this.children.length; i++) {
 			this.children[i].VisitAll(visitor, depth + 1);
 		}
-	}
+	};
 
 	this.ToString = function() {
 		return this.type + " " + this.GetId();
-	}
+	};
 }
 
-var ElseNode = function() {
-	Object.assign( this, new TreeRelationship() );
+function ElseNode() {
+	TreeRelationship.call(this);
+
 	this.type = Sym.Else;
 
 	this.Eval = function(environment, onReturn) {
 		onReturn(true);
-	}
+	};
 
 	this.Serialize = function() {
 		return Sym.Else;
-	}
+	};
 
 	this.ToString = function() {
 		return this.type + " " + this.mode + " " + this.GetId();
@@ -1533,9 +1728,6 @@ var Parser = function(env) {
 		rootNode.rootId = rootId;
 		var state = new ParserState(rootNode, scriptStr);
 
-		bitsyLog(scriptStr);
-		bitsyLog(state.Source());
-
 		if (state.MatchAhead(Sym.DialogOpen)) {
 			// multi-line dialog block
 			var dialogStr = state.ConsumeBlock(Sym.DialogOpen + Sym.Linebreak, Sym.Linebreak + Sym.DialogClose);
@@ -1564,10 +1756,10 @@ var Parser = function(env) {
 		this.Char = function() { return sourceStr[i]; };
 		this.Step = function(n) { if(n===undefined) n=1; i += n; };
 		this.MatchAhead = function(str) {
-			// bitsyLog(str);
+			// bitsy.log(str);
 			str = "" + str; // hack to turn single chars into strings
-			// bitsyLog(str);
-			// bitsyLog(str.length);
+			// bitsy.log(str);
+			// bitsy.log(str.length);
 			for (var j = 0; j < str.length; j++) {
 				if (i + j >= sourceStr.length) {
 					return false;
@@ -1581,12 +1773,12 @@ var Parser = function(env) {
 		this.Peak = function(end) {
 			var str = "";
 			var j = i;
-			// bitsyLog(j);
+			// bitsy.log(j);
 			while (j < sourceStr.length && end.indexOf(sourceStr[j]) == -1) {
 				str += sourceStr[j];
 				j++;
 			}
-			// bitsyLog("PEAK ::" + str + "::");
+			// bitsy.log("PEAK ::" + str + "::");
 			return str;
 		}
 		this.ConsumeBlock = function(open, close, includeSymbols) {
@@ -1624,7 +1816,7 @@ var Parser = function(env) {
 			}
 		}
 
-		this.Print = function() { bitsyLog(sourceStr); };
+		this.Print = function() { bitsy.log(sourceStr); };
 		this.Source = function() { return sourceStr; };
 	};
 
@@ -1668,8 +1860,8 @@ var Parser = function(env) {
 
 		var tryAddTextNodeToList = function() {
 			if (curText.length > 0) {
-				var printNode = new FuncNode("print", [new LiteralNode(curText)]);
-				curLineNodeList.push(printNode);
+				var sayNode = new FuncNode("say", [new LiteralNode(curText)]);
+				curLineNodeList.push(sayNode);
 
 				curText = "";
 				curLineIsEmpty = false;
@@ -1881,7 +2073,7 @@ var Parser = function(env) {
 	}
 
 	function IsSequence(str) {
-		// bitsyLog("IsSequence? " + str);
+		// bitsy.log("IsSequence? " + str);
 		return str === "sequence" || str === "cycle" || str === "shuffle";
 	}
 
@@ -2005,16 +2197,16 @@ var Parser = function(env) {
 	}
 
 	function ParseFunction(state, funcName) {
-		bitsyLog("~~~ PARSE FUNCTION " + funcName);
+		bitsy.log("~~~ PARSE FUNCTION " + funcName);
 
 		var args = [];
 
 		var curSymbol = "";
 		function OnSymbolEnd() {
 			curSymbol = curSymbol.trim();
-			// bitsyLog("PARAMTER " + curSymbol);
+			// bitsy.log("PARAMTER " + curSymbol);
 			args.push( StringToValue(curSymbol) );
-			// bitsyLog(args);
+			// bitsy.log(args);
 			curSymbol = "";
 		}
 
@@ -2029,7 +2221,7 @@ var Parser = function(env) {
 			else if( state.MatchAhead(Sym.String) ) {
 				/* STRING LITERAL */
 				var str = state.ConsumeBlock(Sym.String, Sym.String);
-				// bitsyLog("STRING " + str);
+				// bitsy.log("STRING " + str);
 				args.push( new LiteralNode(str) );
 				curSymbol = "";
 			}
@@ -2054,7 +2246,7 @@ var Parser = function(env) {
 	function IsValidVariableName(str) {
 		var reg = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
 		var isValid = reg.test(str);
-		// bitsyLog("VALID variable??? " + isValid);
+		// bitsy.log("VALID variable??? " + isValid);
 		return isValid;
 	}
 
@@ -2068,14 +2260,14 @@ var Parser = function(env) {
 		}
 		else if(valStr[0] === Sym.String) {
 			// STRING!!
-			// bitsyLog("STRING");
+			// bitsy.log("STRING");
 			var str = "";
 			var i = 1;
 			while (i < valStr.length && valStr[i] != Sym.String) {
 				str += valStr[i];
 				i++;
 			}
-			// bitsyLog(str);
+			// bitsy.log(str);
 			return new LiteralNode( str );
 		}
 		else if(valStr === "true") {
@@ -2088,12 +2280,12 @@ var Parser = function(env) {
 		}
 		else if( !isNaN(parseFloat(valStr)) ) {
 			// NUMBER!!
-			// bitsyLog("NUMBER!!! " + valStr);
+			// bitsy.log("NUMBER!!! " + valStr);
 			return new LiteralNode( parseFloat(valStr) );
 		}
 		else if(IsValidVariableName(valStr)) {
 			// VARIABLE!!
-			// bitsyLog("VARIABLE");
+			// bitsy.log("VARIABLE");
 			return new VarNode(valStr); // TODO : check for valid potential variables
 		}
 		else {
@@ -2234,9 +2426,9 @@ var Parser = function(env) {
 
 	function ParseExpression(state) {
 		var line = state.Source(); // state.Peak( [Sym.Linebreak] ); // TODO : remove the linebreak thing
-		// bitsyLog("EXPRESSION " + line);
+		// bitsy.log("EXPRESSION " + line);
 		var exp = CreateExpression(line);
-		// bitsyLog(exp);
+		// bitsy.log(exp);
 		state.curNode.AddChild(exp);
 		state.Step(line.length);
 		return state;

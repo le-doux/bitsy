@@ -1,3 +1,52 @@
+// renders a tile to canvas (kind of hackily recreates some of the TileRenderer logic - oh well)
+function renderTileToCanvas(drawing, frameIndex) {
+	var selectedRoomId = state.room;
+	if (roomTool) {
+		selectedRoomId = roomTool.getSelected();
+	}
+
+	// get frame data
+	var imageSource;
+	var frameData;
+	
+	imageSource = getDrawingImageSource(drawing);
+
+	if (imageSource != undefined) {
+		frameData = imageSource[frameIndex];
+	}
+
+	// get palette colors
+	var palId = room[selectedRoomId].pal;
+	var palColors = getPal(palId);
+
+	// clamp tile colors to available palette size
+	var bgc = Math.min(palColors.length - 1, Math.max(0, drawing.bgc));
+	var col = Math.min(palColors.length - 1, Math.max(0, drawing.col));
+
+	// draw
+	var tileThumbCanvas = document.createElement("canvas");
+	tileThumbCanvas.width = tilesize * scale;
+	tileThumbCanvas.height = tilesize * scale;
+
+	var ctx = tileThumbCanvas.getContext("2d");
+	ctx.fillStyle = "rgb(" + palColors[bgc][0] + "," + palColors[bgc][1] + "," + palColors[bgc][2] + ")";
+	ctx.fillRect(0, 0, tilesize * scale, tilesize * scale);
+
+	ctx.fillStyle = "rgb(" + palColors[col][0] + "," + palColors[col][1] + "," + palColors[col][2] + ")";
+
+	if (frameData != undefined) {
+		for (var y = 0; y < tilesize; y++) {
+			for (var x = 0; x < tilesize; x++) {
+				if (frameData[y][x] === 1) {
+					ctx.fillRect(x * scale, y * scale, scale, scale);
+				}
+			}
+		}
+	}
+
+	return tileThumbCanvas;
+}
+
 // todo : deprecate this old version of the thumbnail renderer
 function ThumbnailRenderer() {
 	bitsyLog("NEW THUMB RENDERER", "editor");
@@ -25,12 +74,7 @@ function ThumbnailRenderer() {
 	}
 
 	function thumbnailDraw(drawing, context, x, y, frameIndex) {
-		bitsyLog("thumbnail: " + drawing.type + " " + drawing.id + " f:" + frameIndex, "editor");
-		var imageTileId = renderer.GetDrawingFrame(drawing, frameIndex);
-		bitsyLog("tile id: " + imageTileId, "editor");
-
-		var renderedImg = hackForEditor_GetImageFromTileId(imageTileId);
-
+		var renderedImg = renderTileToCanvas(drawing, frameIndex);
 		if (renderedImg) {
 			context.drawImage(renderedImg, x, y, tilesize * scale, tilesize * scale);
 		}
@@ -42,7 +86,7 @@ function ThumbnailRenderer() {
 	function render(imgId,drawing,frameIndex,imgElement) {
 		var isAnimated = (frameIndex === undefined || frameIndex === null) ? true : false;
 
-		var palId = getRoomPal(curRoom); // TODO : should NOT be hardcoded like this
+		var palId = getRoomPal(state.room); // TODO : should NOT be hardcoded like this
 
 		var hexPalette = [];
 		var roomColors = getPal(palId);
@@ -202,7 +246,7 @@ function createDrawingThumbnailRenderer(source) {
 	}
 
 	var getHexPalette = function(drawing) {
-		var palId = getRoomPal(curRoom);
+		var palId = roomTool ? getRoomPal(roomTool.getSelected()) : getRoomPal(state.room);
 
 		var hexPalette = [];
 		var roomColors = getPal(palId);
@@ -215,16 +259,13 @@ function createDrawingThumbnailRenderer(source) {
 	}
 
 	var onRender = function(drawing, ctx, options) {
-		var palId = getRoomPal(curRoom);
+		var palId = getRoomPal(state.room);
 		var renderFrames = [];
 
 		if (drawing && drawing.id in source) {
 			for (var i = 0; i < drawing.animation.frameCount; i++) {
 				if (options.isAnimated || options.frameIndex === i) {
-					var imageTileId = renderer.GetDrawingFrame(drawing, i);
-					// todo : bug! this still doesn't totally work because the images aren't always rendered to a canvas by now
-					var renderedImg = hackForEditor_GetImageFromTileId(imageTileId);
-
+					var renderedImg = renderTileToCanvas(drawing, i);
 					if (renderedImg) {
 						ctx.drawImage(renderedImg, 0, 0, tilesize * scale, tilesize * scale);
 						renderFrames.push(ctx.getImageData(0, 0, tilesize * scale, tilesize * scale).data);
@@ -373,6 +414,55 @@ function createRoomThumbnailRenderer() {
 		}
 
 		return [ctx.getImageData(0, 0, roomRenderSize, roomRenderSize).data];
+	}
+
+	var renderer = new ThumbnailRendererBase(getRenderable, getHexPalette, onRender);
+	renderer.renderToCtx = onRender;
+
+	return renderer;
+}
+
+// todo : make better blip thumbnail renderer
+function createBlipThumbnailRenderer() {
+	var getRenderable = function(id) {
+		return blip[id];
+	}
+
+	var getHexPalette = function(blipObj) {
+		var hexPalette = [];
+
+		if (roomTool) {
+			var colors = roomTool.world.palette["0"].colors;
+			for (i in colors) {
+				var hexStr = rgbToHex(colors[i][0], colors[i][1], colors[i][2]).slice(1);
+				hexPalette.push(hexStr);
+			}
+		}
+
+		return hexPalette;
+	}
+
+	var onRender = function(blipObj, ctx, options) {
+		var hexPalette = getHexPalette(blipObj);
+
+		ctx.fillStyle = "#" + hexPalette[2];
+		ctx.fillRect(0, 0, tilesize * scale, tilesize * scale);
+
+		if (soundPlayer) {
+			ctx.fillStyle = "#" + hexPalette[0];
+
+			// draw waveform (copied from makeBlipTile())
+			var blipSamples = soundPlayer.sampleBlip(blipObj, 8);
+			for (var i = 0; i < blipSamples.frequencies.length; i++) {
+				var freq = 1 + Math.floor(blipSamples.frequencies[i] * 4);
+				for (var j = 0; j < freq; j++) {
+					ctx.fillRect(i * scale, (3 - j) * scale, scale, scale);
+					ctx.fillRect(i * scale, (4 + j) * scale, scale, scale);
+				}
+			}
+		}
+
+		return [ctx.getImageData(0, 0, tilesize * scale, tilesize * scale).data];
 	}
 
 	return new ThumbnailRendererBase(getRenderable, getHexPalette, onRender);

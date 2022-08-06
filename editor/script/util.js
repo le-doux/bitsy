@@ -159,28 +159,6 @@ function hexColorDistance(hex1,hex2) {
 	return rgbColorDistance(color1.r, color1.g, color1.b, color2.r, color2.g, color2.b);
 }
 
-function renderGameScreenIntoContext(roomId, context, frameIndex) {
-	var tmpCtx = ctx;
-
-	// temporarily swap out the global drawing context! (what time is it???? half past hacks o'clock!!)
-	if (context) {
-		ctx = context;
-	}
-
-	updatePalette(room[roomId].pal);
-	renderer.ClearCache();
-
-	bitsySetGraphicsMode(1); // tile mode
-	drawRoom(room[roomId], frameIndex);
-	renderGame();
-
-	updatePalette(curPal());
-	renderer.ClearCache();
-
-	ctx = tmpCtx;
-}
-
-
 // source : http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
 /* accepts parameters
  * h  Object = {h:x, s:y, v:z}

@@ -1,31 +1,21 @@
+/* WORLD DATA */
 var room = {};
 var tile = {};
 var sprite = {};
 var item = {};
 var dialog = {};
-var palette = { //start off with a default palette
+var end = {}; // for backwards compatibility
+var palette = { // start off with a default palette
 		"default" : {
 			name : "default",
 			colors : [[0,0,0],[255,255,255],[255,255,255]]
 		}
 	};
 var variable = {}; // these are starting variable values -- they don't update (or I don't think they will)
+var tune = {};
+var blip = {};
 var playerId = "A";
-
-var titleDialogId = "title";
-function getTitle() {
-	return dialog[titleDialogId].src;
-}
-function setTitle(titleSrc) {
-	dialog[titleDialogId] = { src:titleSrc, name:null };
-}
-
-var defaultFontName = "ascii_small";
 var fontName = defaultFontName;
-var TextDirection = {
-	LeftToRight : "LTR",
-	RightToLeft : "RTL"
-};
 var textDirection = TextDirection.LeftToRight;
 
 /* NAME-TO-ID MAPS */
@@ -35,8 +25,12 @@ var names = {
 	sprite : {},
 	item : {},
 	dialog : {},
+	palette : {},
+	tune : {},
+	blip : {},
 };
 
+// todo : this is basically a copy of the one in world.js - can I remove it?
 function updateNamesFromCurData() {
 
 	function createNameMap(objectStore) {
@@ -56,14 +50,32 @@ function updateNamesFromCurData() {
 	names.sprite = createNameMap(sprite);
 	names.item = createNameMap(item);
 	names.dialog = createNameMap(dialog);
+	names.palette = createNameMap(palette);
+	names.tune = createNameMap(tune);
+	names.blip = createNameMap(blip);
 }
 
-var spriteStartLocations = {};
+/* GAME STATE */
+var state = {}
+function resetGameState() {
+	state.room = "0";
+	state.ava = playerId; // avatar appearance override
+	state.pal = "0"; // current palette id
+	state.tune = "0"; // current tune id ("0" === off)
+}
+
+// title helper functions
+function getTitle() {
+	return dialog[titleDialogId].src;
+}
+function setTitle(titleSrc) {
+	dialog[titleDialogId] = { src:titleSrc, name:null };
+}
 
 /* VERSION */
 var version = {
-	major: 7, // major changes
-	minor: 12, // smaller changes
+	major: 8, // major changes
+	minor: 1, // smaller changes
 	devBuildPhase: "RELEASE",
 };
 function getEngineVersion() {
@@ -71,17 +83,16 @@ function getEngineVersion() {
 }
 
 /* FLAGS */
-var flags;
-function resetFlags() {
-	flags = {
-		ROOM_FORMAT : 0 // 0 = non-comma separated, 1 = comma separated
-	};
-}
-resetFlags(); //init flags on load script
+var flags = createDefaultFlags();
 
-// SUPER hacky location... :/
-var editorDevFlags = {
-	// NONE right now!
+// feature flags for testing purposes
+var engineFeatureFlags = {
+	isSoundEnabled : true,
+	isFontEnabled : true,
+	isTransitionEnabled : true,
+	isScriptEnabled : true,
+	isDialogEnabled : true,
+	isRendererEnabled : true,
 };
 
 function clearGameData() {
@@ -99,26 +110,16 @@ function clearGameData() {
 	isEnding = false; //todo - correct place for this?
 	variable = {};
 
-	// TODO RENDERER : clear data?
-
-	spriteStartLocations = {};
-
 	updateNamesFromCurData();
 
 	fontName = defaultFontName; // TODO : reset font manager too?
 	textDirection = TextDirection.LeftToRight;
+
+	resetGameState();
+
+	isGameLoaded = false;
+	isGameOver = false;
 }
-
-var scale = 4; //this is stupid but necessary
-var tilesize = 8;
-var mapsize = 16;
-var width = mapsize * tilesize;
-var height = mapsize * tilesize;
-
-var curRoom = "0";
-
-var prevTime = 0;
-var deltaTime = 0;
 
 // engine event hooks for the editor
 var onInventoryChanged = null;
@@ -128,34 +129,126 @@ var onInitRoom = null;
 
 var isPlayerEmbeddedInEditor = false;
 
-var renderer = new TileRenderer(tilesize);
+var renderer;
+if (engineFeatureFlags.isRendererEnabled) {
+	renderer = new TileRenderer();
+}
 
 var curGameData = null;
 var curDefaultFontData = null;
 
+var isGameLoaded = false;
+var isGameOver = false;
+
 function load_game(gameData, defaultFontData, startWithTitle) {
+	// bitsy.log("game data in: \n" + gameData);
+
 	curGameData = gameData; //remember the current game (used to reset the game)
 
-	dialogBuffer.Reset();
-	scriptInterpreter.ResetEnvironment(); // ensures variables are reset -- is this the best way?
+	if (dialogBuffer) {
+		dialogBuffer.Reset();
+	}
 
-	parseWorld(gameData);
+	if (scriptInterpreter) {
+		scriptInterpreter.ResetEnvironment(); // ensures variables are reset -- is this the best way?
+	}
 
-	if (!isPlayerEmbeddedInEditor && defaultFontData) {
+	loadWorldFromGameData(gameData);
+
+	bitsy.log("world loaded");
+
+	if (fontManager && !isPlayerEmbeddedInEditor && defaultFontData) {
+		bitsy.log("load font");
+
 		curDefaultFontData = defaultFontData; // store for resetting game
 
 		// todo : consider replacing this with a more general system for requesting resources from the system?
 		// hack to ensure default font is available
 		fontManager.AddResource(defaultFontName + fontManager.GetExtension(), defaultFontData);
+
+		bitsy.log("load font end");
 	}
 
-	var font = fontManager.Get( fontName );
-	dialogBuffer.SetFont(font);
-	dialogRenderer.SetFont(font);
+	// request text mode
+	if (flags.TXT_MODE === 1) {
+		bitsy.textMode(bitsy.TXT_LOREZ);
+	}
+	else {
+		// default to 2x scale for text rendering
+		bitsy.textMode(bitsy.TXT_HIREZ);
+	}
+
+	if (fontManager && dialogBuffer) {
+		bitsy.log("get font");
+
+		var font = fontManager.Get( fontName );
+		dialogBuffer.SetFont(font);
+		dialogRenderer.SetFont(font);
+
+		bitsy.log("get font end");
+	}
+
+	if (dialogBuffer) {
+		// this feels a little silly to me - oh well??
+		dialogBuffer.SetPixelsPerRow(dialogRenderer.GetPixelsPerRow());
+	}
 
 	setInitialVariables();
 
+	bitsy.log("ready");
+
 	onready(startWithTitle);
+
+	isGameLoaded = true;
+}
+
+function loadWorldFromGameData(gameData) {
+	bitsy.log("load world from game data");
+
+	var world = parseWorld(gameData);
+
+	bitsy.log("parse world done");
+
+	// move world data into global scope
+	palette = world.palette;
+	room = world.room;
+	tile = world.tile;
+	sprite = world.sprite;
+	item = world.item;
+	dialog = world.dialog;
+	end = world.end; // back compat endings
+	variable = world.variable;
+	fontName = world.fontName;
+	textDirection = world.textDirection;
+	tune = world.tune;
+	blip = world.blip;
+	flags = world.flags;
+	names = world.names;
+
+	if (renderer) {
+		renderer.SetDrawings(world.drawings);
+	}
+
+	// find starting room and initialize it
+	var roomIds = Object.keys(room);
+
+	if (player() != undefined && player().room != null && roomIds.indexOf(player().room) != -1) {
+		// player has valid room
+		state.room = player().room;
+	}
+	else if (roomIds.length > 0) {
+		// player not in any room! what the heck
+		state.room = roomIds[0];
+	}
+	else {
+		// uh oh there are no rooms I guess???
+		state.room = null;
+	}
+
+	if (state.room != null) {
+		bitsy.log("INIT ROOM " + state.room);
+		initRoom(state.room);
+	}
 }
 
 function reset_cur_game() {
@@ -165,7 +258,6 @@ function reset_cur_game() {
 
 	stopGame();
 	clearGameData();
-	load_game(curGameData, curDefaultFontData);
 
 	if (isPlayerEmbeddedInEditor && onGameReset != null) {
 		onGameReset();
@@ -173,6 +265,8 @@ function reset_cur_game() {
 }
 
 function onready(startWithTitle) {
+	bitsy.log("game ready!");
+
 	if (startWithTitle === undefined || startWithTitle === null) {
 		startWithTitle = true;
 	}
@@ -183,6 +277,10 @@ function onready(startWithTitle) {
 }
 
 function setInitialVariables() {
+	if (!scriptInterpreter) {
+		return;
+	}
+
 	for(id in variable) {
 		var value = variable[id]; // default to string
 		if(value === "true") {
@@ -215,105 +313,140 @@ function getOffset(evt) {
 }
 
 function stopGame() {
-	bitsyLog("stop GAME!");
+	if (soundPlayer) {
+		soundPlayer.stopTune();
+	}
+	bitsy.log("stop GAME!");
 }
 
-function update() {
-	var curTime = Date.now();
-	deltaTime = curTime - prevTime;
+function update(dt) {
+	if (!isGameLoaded) {
+		load_game(bitsy.getGameData(), bitsy.getFontData());
+	}
 
-	if (curRoom == null) {
+	if (state.room == null) {
 		// in the special case where there is no valid room, end the game
 		startNarrating( "", true /*isEnding*/ );
 	}
 
-	if (!transition.IsTransitionActive()) {
+	if (!transition || !transition.IsTransitionActive()) {
 		updateInput();
 	}
 
-	if (transition.IsTransitionActive()) {
+	if (transition && transition.IsTransitionActive()) {
 		// transition animation takes over everything!
-		transition.UpdateTransition(deltaTime);
+		transition.UpdateTransition(dt);
 	}
 	else {
-		bitsySetGraphicsMode(1);
+		if (bitsy.graphicsMode() != bitsy.GFX_MAP) {
+			bitsy.graphicsMode(bitsy.GFX_MAP);
+		}
+
+		if (soundPlayer) {
+			soundPlayer.update(dt);
+		}
 
 		if (!isNarrating && !isEnding) {
-			updateAnimation();
-			drawRoom(room[curRoom]); // draw world if game has begun
+			// draw world if game has begun
+			var didAnimate = updateAnimation(dt);
+
+			// test whether player moved so we can redraw just the avatar
+			playerCurX = player().x;
+			playerCurY = player().y;
+			var didPlayerMove = (playerPrevX != playerCurX) || (playerPrevY != playerCurY);
+
+			drawRoom(room[state.room], { redrawAnimated: didAnimate, redrawAvatar: didPlayerMove });
+
+			// store player's position for next frame
+			playerPrevX = playerCurX;
+			playerPrevY = playerCurY;
 		}
 		else {
 			clearRoom();
 		}
 
-		// if (isDialogMode) { // dialog mode
-		if(dialogBuffer.IsActive()) {
-			dialogRenderer.Draw( dialogBuffer, deltaTime );
-			dialogBuffer.Update( deltaTime );
+		if (dialogBuffer && dialogBuffer.IsActive() && !(soundPlayer && soundPlayer.isBlipPlaying())) {
+			// bitsy.log("update dialog");
+			// bitsy.log("renderer");
+			dialogRenderer.Draw(dialogBuffer, dt);
+			// bitsy.log("buffer");
+			dialogBuffer.Update(dt);
+			// bitsy.log("update dialog end");
 		}
 
 		// keep moving avatar if player holds down button
-		if( !dialogBuffer.IsActive() && !isEnding )
-		{
-			if( curPlayerDirection != Direction.None ) {
-				playerHoldToMoveTimer -= deltaTime;
+		if ((!dialogBuffer || !dialogBuffer.IsActive()) && !isEnding) {
+			if (curPlayerDirection != Direction.None) {
+				playerHoldToMoveTimer -= dt;
 
-				if( playerHoldToMoveTimer <= 0 )
-				{
-					movePlayer( curPlayerDirection );
+				if (playerHoldToMoveTimer <= 0) {
+					movePlayer(curPlayerDirection, false /* isFirstMove */);
 					playerHoldToMoveTimer = 150;
+					// playerHoldToMoveTimer = 16; // PERF TEST
 				}
 			}
 		}
 	}
 
-	prevTime = curTime;
+	// clean up state if the game is ending
+	if (isGameOver) {
+		bitsy.log("game over");
+		reset_cur_game();
+	}
+
+	return true;
 }
 
 var isAnyButtonHeld = false;
 var isIgnoringInput = false;
 
 function isAnyButtonDown() {
-	return bitsyGetButton(0) || bitsyGetButton(1) || bitsyGetButton(2) || bitsyGetButton(3) || bitsyGetButton(4);
+	return bitsy.button(bitsy.BTN_UP) ||
+		bitsy.button(bitsy.BTN_DOWN) ||
+		bitsy.button(bitsy.BTN_LEFT) ||
+		bitsy.button(bitsy.BTN_RIGHT) ||
+		bitsy.button(bitsy.BTN_OK);
 }
 
 function updateInput() {
-	if (dialogBuffer.IsActive()) {
-		if (!isAnyButtonHeld && isAnyButtonDown()) {
-			/* CONTINUE DIALOG */
-			if (dialogBuffer.CanContinue()) {
-				var hasMoreDialog = dialogBuffer.Continue();
-				if (!hasMoreDialog) {
-					// ignore currently held keys UNTIL they are released (stops player from insta-moving)
-					isIgnoringInput = true;
-					curPlayerDirection = Direction.None;
+	if (dialogBuffer && dialogBuffer.IsActive()) {
+		if (!(soundPlayer && soundPlayer.isBlipPlaying())) {
+			if (!isAnyButtonHeld && isAnyButtonDown()) {
+				/* CONTINUE DIALOG */
+				if (dialogBuffer.CanContinue()) {
+					var hasMoreDialog = dialogBuffer.Continue();
+					if (!hasMoreDialog) {
+						// ignore currently held keys UNTIL they are released (stops player from insta-moving)
+						isIgnoringInput = true;
+						curPlayerDirection = Direction.None;
+					}
 				}
-			}
-			else {
-				dialogBuffer.Skip();
+				else {
+					dialogBuffer.Skip();
+				}
 			}
 		}
 	}
 	else if (isEnding) {
 		if (!isAnyButtonHeld && isAnyButtonDown()) {
-			/* RESTART GAME */
-			reset_cur_game();
+			// tell game to restart
+			isGameOver = true;
 		}
 	}
 	else if (!isIgnoringInput) {
 		/* WALK */
 		var prevPlayerDirection = curPlayerDirection;
 
-		if (bitsyGetButton(0)) {
+		if (bitsy.button(bitsy.BTN_UP)) {
 			curPlayerDirection = Direction.Up;
 		}
-		else if (bitsyGetButton(1)) {
+		else if (bitsy.button(bitsy.BTN_DOWN)) {
 			curPlayerDirection = Direction.Down;
 		}
-		else if (bitsyGetButton(2)) {
+		else if (bitsy.button(bitsy.BTN_LEFT)) {
 			curPlayerDirection = Direction.Left;
 		}
-		else if (bitsyGetButton(3)) {
+		else if (bitsy.button(bitsy.BTN_RIGHT)) {
 			curPlayerDirection = Direction.Right;
 		}
 		else {
@@ -321,8 +454,9 @@ function updateInput() {
 		}
 
 		if (curPlayerDirection != Direction.None && curPlayerDirection != prevPlayerDirection) {
-			movePlayer(curPlayerDirection);
+			movePlayer(curPlayerDirection, true /* isFirstMove */);
 			playerHoldToMoveTimer = 500;
+			// playerHoldToMoveTimer = 32; // PERF TEST
 		}
 	}
 
@@ -330,21 +464,26 @@ function updateInput() {
 		isIgnoringInput = false;
 	}
 
+	// quit if the user ever presses the restart button
+	// todo : should I rename it bitsy.BTN_RESTART or bitsy.BTN_QUIT or bitsy.BTN_OFF?
+	if (bitsy.button(bitsy.BTN_MENU)) {
+		isGameOver = true;
+	}
+
 	isAnyButtonHeld = isAnyButtonDown();
 }
 
 var animationCounter = 0;
 var animationTime = 400;
-function updateAnimation() {
-	animationCounter += deltaTime;
-
-	if ( animationCounter >= animationTime ) {
-
+function updateAnimation(dt) {
+	animationCounter += dt;
+	// bitsy.log("anim " + animationCounter);
+	if (animationCounter >= animationTime) {
 		// animate sprites
 		for (id in sprite) {
 			var spr = sprite[id];
 			if (spr.animation.isAnimated) {
-				spr.animation.frameIndex = ( spr.animation.frameIndex + 1 ) % spr.animation.frameCount;
+				spr.animation.frameIndex = (spr.animation.frameIndex + 1) % spr.animation.frameCount;
 			}
 		}
 
@@ -352,7 +491,7 @@ function updateAnimation() {
 		for (id in tile) {
 			var til = tile[id];
 			if (til.animation.isAnimated) {
-				til.animation.frameIndex = ( til.animation.frameIndex + 1 ) % til.animation.frameCount;
+				til.animation.frameIndex = (til.animation.frameIndex + 1) % til.animation.frameCount;
 			}
 		}
 
@@ -360,14 +499,19 @@ function updateAnimation() {
 		for (id in item) {
 			var itm = item[id];
 			if (itm.animation.isAnimated) {
-				itm.animation.frameIndex = ( itm.animation.frameIndex + 1 ) % itm.animation.frameCount;
+				itm.animation.frameIndex = (itm.animation.frameIndex + 1) % itm.animation.frameCount;
 			}
 		}
 
 		// reset counter
 		animationCounter = 0;
 
+		// updated animations this frame
+		return true;
 	}
+
+	// did *not* update animations this frame
+	return false;
 }
 
 function resetAllAnimations() {
@@ -393,15 +537,20 @@ function resetAllAnimations() {
 	}
 }
 
-function getSpriteAt(x,y) {
+function getSpriteAt(x, y, roomId) {
+	if (roomId === undefined) {
+		roomId = state.room;
+	}
+
 	for (id in sprite) {
 		var spr = sprite[id];
-		if (spr.room === curRoom) {
+		if (spr.room === roomId) {
 			if (spr.x == x && spr.y == y) {
 				return id;
 			}
 		}
 	}
+
 	return null;
 }
 
@@ -415,8 +564,11 @@ var Direction = {
 
 var curPlayerDirection = Direction.None;
 var playerHoldToMoveTimer = 0;
+var playerPrevX = 0;
+var playerPrevY = 0;
 
-function movePlayer(direction) {
+function movePlayer(direction, isFirstMove) {
+	didPlayerMove = false;
 	var roomIds = Object.keys(room);
 
 	if (player().room == null || roomIds.indexOf(player().room) < 0) {
@@ -425,27 +577,35 @@ function movePlayer(direction) {
 
 	var spr = null;
 
-	if ( curPlayerDirection == Direction.Left && !(spr = getSpriteLeft()) && !isWallLeft()) {
+	if (direction == Direction.Left && !(spr = getSpriteLeft()) && !isWallLeft()) {
 		player().x -= 1;
 	}
-	else if ( curPlayerDirection == Direction.Right && !(spr = getSpriteRight()) && !isWallRight()) {
+	else if (direction == Direction.Right && !(spr = getSpriteRight()) && !isWallRight()) {
 		player().x += 1;
 	}
-	else if ( curPlayerDirection == Direction.Up && !(spr = getSpriteUp()) && !isWallUp()) {
+	else if (direction == Direction.Up && !(spr = getSpriteUp()) && !isWallUp()) {
 		player().y -= 1;
 	}
-	else if ( curPlayerDirection == Direction.Down && !(spr = getSpriteDown()) && !isWallDown()) {
+	else if (direction == Direction.Down && !(spr = getSpriteDown()) && !isWallDown()) {
 		player().y += 1;
 	}
-	
+
 	var ext = getExit( player().room, player().x, player().y );
 	var end = getEnding( player().room, player().x, player().y );
 	var itmIndex = getItemIndex( player().room, player().x, player().y );
+
+	// only play one sound effect per "turn"
+	var blipId = null;
 
 	// do items first, because you can pick up an item AND go through a door
 	if (itmIndex > -1) {
 		var itm = room[player().room].items[itmIndex];
 		var itemRoom = player().room;
+
+		// play sound on pitck up item
+		if (item[itm.id].blip != null) {
+			blipId = item[itm.id].blip;
+		}
 
 		startItemDialog(itm.id, function() {
 			// remove item from room
@@ -473,15 +633,37 @@ function movePlayer(direction) {
 		movePlayerThroughExit(ext);
 	}
 	else if (spr) {
+		// play sound on greet sprite
+		if (sprite[spr].blip != null) {
+			blipId = sprite[spr].blip;
+		}
+
 		startSpriteDialog(spr /*spriteId*/);
+	}
+
+	// TODO : maybe add in a future update?
+	/*
+	// play sound when player moves (if no other sound selected)
+	if (isFirstMove && blipId === null && sprite[state.ava].blip != null) {
+		blipId = sprite[state.ava].blip;
+		randomizeBlip = true;
+		blipChannel = bitsy.SOUND2; // play walking sfx *under* the tune melody
+	}
+	*/
+
+	if (soundPlayer && blipId != null && blip[blipId]) {
+		soundPlayer.playBlip(blip[blipId]);
 	}
 }
 
-var transition = new TransitionManager();
+var transition;
+if (engineFeatureFlags.isTransitionEnabled) {
+	transition = new TransitionManager();
+}
 
 function movePlayerThroughExit(ext) {
 	var GoToDest = function() {
-		if (ext.transition_effect != null) {
+		if (transition && ext.transition_effect != null) {
 			transition.BeginTransition(
 				player().room,
 				player().x,
@@ -497,18 +679,17 @@ function movePlayerThroughExit(ext) {
 				player().room = ext.dest.room;
 				player().x = ext.dest.x;
 				player().y = ext.dest.y;
-				curRoom = ext.dest.room;
-
-				initRoom(curRoom);
+				state.room = ext.dest.room;
+				initRoom(state.room);
 			});
 		}
 		else {
 			player().room = ext.dest.room;
 			player().x = ext.dest.x;
 			player().y = ext.dest.y;
-			curRoom = ext.dest.room;
+			state.room = ext.dest.room;
 
-			initRoom(curRoom);
+			initRoom(state.room);
 		}
 	};
 
@@ -533,12 +714,13 @@ function movePlayerThroughExit(ext) {
 }
 
 /* PALETTE INDICES */
-var textBackgroundIndex = 0;
-var textArrowIndex = 1;
-var textColorIndex = 2;
+var backgroundIndex = 0;
+var textBackgroundIndex = 1;
+var textArrowIndex = 2;
+var textColorIndex = 3;
 
 // precalculated rainbow colors
-var rainbowColorStartIndex = 3;
+var rainbowColorStartIndex = 4;
 var rainbowColorCount = 10;
 var rainbowColors = [
 	[255,0,0],
@@ -553,44 +735,53 @@ var rainbowColors = [
 	[255,0,61],
 ];
 
-// todo : where should this be stored?
-var tileColorStartIndex = 16;
-
 function updatePaletteWithTileColors(tileColors) {
-	// clear existing colors
-	bitsyResetColors();
+	// the screen background color should match the first tile color
+	if (tileColors.length > 0) {
+		var color = tileColors[0];
+		bitsy.color(backgroundIndex, color[0], color[1], color[2]);
+	}
+	else {
+		// as a fallback, use black as the background
+		bitsy.log("no tile colors!");
+		bitsy.color(backgroundIndex, 0, 0, 0);
+	}
 
 	// textbox colors
-	bitsySetColor(textBackgroundIndex, 0, 0, 0); // black
-	bitsySetColor(textArrowIndex, 255, 255, 255); // white
-	bitsySetColor(textColorIndex, 255, 255, 255); // white
+	bitsy.color(textBackgroundIndex, 0, 0, 0); // black
+	bitsy.color(textArrowIndex, 255, 255, 255); // white
+	bitsy.color(textColorIndex, 255, 255, 255); // white
 
-	// todo : move this to game init?
 	// rainbow colors
 	for (var i = 0; i < rainbowColorCount; i++) {
 		var color = rainbowColors[i];
-		bitsySetColor(rainbowColorStartIndex + i, color[0], color[1], color[2]);
+		bitsy.color(rainbowColorStartIndex + i, color[0], color[1], color[2]);
 	}
 
 	// tile colors
 	for (var i = 0; i < tileColors.length; i++) {
 		var color = tileColors[i];
-		bitsySetColor(tileColorStartIndex + i, color[0], color[1], color[2]);
+		bitsy.color(tileColorStartIndex + i, color[0], color[1], color[2]);
 	}
 }
 
 function updatePalette(palId) {
-	var pal = palette[palId];
-	bitsyLog(pal.colors.length, "editor");
+	state.pal = palId;
+	var pal = palette[state.pal];
 	updatePaletteWithTileColors(pal.colors);
 }
 
 function initRoom(roomId) {
-	bitsyLog("init room " + roomId);
+	bitsy.log("init room " + roomId);
 
-	updatePalette(curPal());
+	updatePalette(getRoomPal(roomId));
 
-	renderer.ClearCache();
+	// update avatar appearance
+	state.ava = (room[roomId].ava != null) ? room[roomId].ava : playerId;
+
+	if (renderer) {
+		renderer.ClearCache();
+	}
 
 	// init exit properties
 	for (var i = 0; i < room[roomId].exits.length; i++) {
@@ -601,6 +792,22 @@ function initRoom(roomId) {
 	for (var i = 0; i < room[roomId].endings.length; i++) {
 		room[roomId].endings[i].property = { locked:false };
 	}
+
+	if (soundPlayer) {
+		if (!room[roomId].tune || room[roomId].tune === "0" || !tune[room[roomId].tune]) {
+			// stop music
+			state.tune = "0";
+			soundPlayer.stopTune();
+		}
+		else if (room[roomId].tune != state.tune) {
+			// start music
+			state.tune = room[roomId].tune;
+			soundPlayer.playTune(tune[state.tune]);
+		}
+	}
+
+	var drawArgs = { redrawAll: true };
+	drawRoom(room[roomId], drawArgs);
 
 	if (onInitRoom) {
 		onInitRoom(roomId);
@@ -637,7 +844,7 @@ function isWallLeft() {
 }
 
 function isWallRight() {
-	return (player().x + 1 >= mapsize) || isWall( player().x + 1, player().y );
+	return (player().x + 1 >= bitsy.MAP_SIZE) || isWall(player().x + 1, player().y);
 }
 
 function isWallUp() {
@@ -645,22 +852,23 @@ function isWallUp() {
 }
 
 function isWallDown() {
-	return (player().y + 1 >= mapsize) || isWall( player().x, player().y + 1 );
+	return (player().y + 1 >= bitsy.MAP_SIZE) || isWall(player().x, player().y + 1);
 }
 
-function isWall(x,y,roomId) {
-	if(roomId == undefined || roomId == null)
-		roomId = curRoom;
+function isWall(x, y, roomId) {
+	if (roomId == undefined || roomId == null) {
+		roomId = state.room;
+	}
 
-	var tileId = getTile( x, y );
-
-	if( tileId === '0' )
+	var tileId = getTile(x, y, roomId);
+	if (tileId === '0') {
 		return false; // Blank spaces aren't walls, ya doofus
+	}
 
-	if( tile[tileId].isWall === undefined || tile[tileId].isWall === null ) {
+	if (tile[tileId].isWall === undefined || tile[tileId].isWall === null) {
 		// No wall-state defined: check room-specific walls
-		var i = room[roomId].walls.indexOf( getTile(x,y) );
-		return i > -1;
+		var i = room[roomId].walls.indexOf(getTile(x, y, roomId));
+		return (i > -1);
 	}
 
 	// Otherwise, use the tile's own wall-state
@@ -697,9 +905,9 @@ function getEnding(roomId,x,y) {
 	return null;
 }
 
-function getTile(x,y) {
-	// bitsyLog(x + " " + y);
-	var t = getRoom().tilemap[y][x];
+function getTile(x, y, roomId) {
+	// bitsy.log(x + " " + y);
+	var t = getRoom(roomId).tilemap[y][x];
 	return t;
 }
 
@@ -716,167 +924,74 @@ function getPal(id) {
 	return palette[ id ].colors;
 }
 
-function getRoom() {
-	return room[curRoom];
+function getRoom(id) {
+	return room[id === undefined ? state.room : id];
 }
 
 function isSpriteOffstage(id) {
 	return sprite[id].room == null;
 }
 
-function parseWorld(file) {
-	spriteStartLocations = {};
+function serializeNote(note, key, useFriendlyName) {
+	var isSolfa = (key != undefined && key != null);
+	var noteType = (isSolfa === true) ? Solfa : Note;
 
-	resetFlags();
+	if (isSolfa && key.scale.indexOf(note) === -1) {
+		// no matching note in key
+		return null;
+	}
 
-	var versionNumber = 0;
-
-	// flags to keep track of which compatibility conversions
-	// need to be applied to this game data
-	var compatibilityFlags = {
-		convertSayToPrint : false,
-		combineEndingsWithDialog : false,
-		convertImplicitSpriteDialogIds : false,
-	};
-
-	var lines = file.split("\n");
-	var i = 0;
-	while (i < lines.length) {
-		var curLine = lines[i];
-
-		// bitsyLog(lines[i]);
-
-		if (i == 0) {
-			i = parseTitle(lines, i);
-		}
-		else if (curLine.length <= 0 || curLine.charAt(0) === "#") {
-			// collect version number (from a comment.. hacky I know)
-			if (curLine.indexOf("# BITSY VERSION ") != -1) {
-				versionNumber = parseFloat(curLine.replace("# BITSY VERSION ", ""));
-
-				if (versionNumber < 5.0) {
-					compatibilityFlags.convertSayToPrint = true;
-				}
-
-				if (versionNumber < 7.0) {
-					compatibilityFlags.combineEndingsWithDialog = true;
-					compatibilityFlags.convertImplicitSpriteDialogIds = true;
-				}
+	if (isSolfa && useFriendlyName != true) {
+		for (var name in Solfa) {
+			if (Solfa[name] === note) {
+				return name.toLowerCase();
 			}
+		}
 
-			//skip blank lines & comments
-			i++;
-		}
-		else if (getType(curLine) == "PAL") {
-			i = parsePalette(lines, i);
-		}
-		else if (getType(curLine) === "ROOM" || getType(curLine) === "SET") { //SET for back compat
-			i = parseRoom(lines, i, compatibilityFlags);
-		}
-		else if (getType(curLine) === "TIL") {
-			i = parseTile(lines, i);
-		}
-		else if (getType(curLine) === "SPR") {
-			i = parseSprite(lines, i);
-		}
-		else if (getType(curLine) === "ITM") {
-			i = parseItem(lines, i);
-		}
-		else if (getType(curLine) === "DRW") {
-			i = parseDrawing(lines, i);
-		}
-		else if (getType(curLine) === "DLG") {
-			i = parseDialog(lines, i, compatibilityFlags);
-		}
-		else if (getType(curLine) === "END" && compatibilityFlags.combineEndingsWithDialog) {
-			// parse endings for back compat
-			i = parseEnding(lines, i, compatibilityFlags);
-		}
-		else if (getType(curLine) === "VAR") {
-			i = parseVariable(lines, i);
-		}
-		else if (getType(curLine) === "DEFAULT_FONT") {
-			i = parseFontName(lines, i);
-		}
-		else if (getType(curLine) === "TEXT_DIRECTION") {
-			i = parseTextDirection(lines, i);
-		}
-		else if (getType(curLine) === "FONT") {
-			i = parseFontData(lines, i);
-		}
-		else if (getType(curLine) === "!") {
-			i = parseFlag(lines, i);
-		}
-		else {
-			i++;
+		// no solfa note found
+		return null;
+	}
+
+	// for a solfa note's "friendly name" convert to the chromatic equivalent
+	if (isSolfa && useFriendlyName === true) {
+		note = key.notes[note];
+	}
+
+	// from this point on, we know the note we're looking for is chromatic
+	for (var name in Note) {
+		if (Note[name] === note) {
+			name = name.replace("_SHARP", "#");
+			if (useFriendlyName === true && name === "H") {
+				name = "C";
+			}
+			return name;
 		}
 	}
 
-	placeSprites();
-
-	var roomIds = Object.keys(room);
-
-	if (player() != undefined && player().room != null && roomIds.indexOf(player().room) != -1) {
-		// player has valid room
-		curRoom = player().room;
-	}
-	else if (roomIds.length > 0) {
-		// player not in any room! what the heck
-		curRoom = roomIds[0];
-	}
-	else {
-		// uh oh there are no rooms I guess???
-		curRoom = null;
-	}
-
-	if (curRoom != null) {
-		initRoom(curRoom);
-	}
-
-	scriptCompatibility(compatibilityFlags);
-
-	return versionNumber;
+	// no note found
+	return symbol;
 }
 
-function scriptCompatibility(compatibilityFlags) {
-	if (compatibilityFlags.convertSayToPrint) {
-		bitsyLog("CONVERT SAY TO PRINT!");
-
-		var PrintFunctionVisitor = function() {
-			var didChange = false;
-			this.DidChange = function() { return didChange; };
-
-			this.Visit = function(node) {
-				if (node.type != "function") {
-					return;
-				}
-
-				if (node.name === "say") {
-					node.name = "print";
-					didChange = true;
-				}
-			};
-		};
-
-		for (dlgId in dialog) {
-			var dialogScript = scriptInterpreter.Parse(dialog[dlgId].src);
-			var visitor = new PrintFunctionVisitor();
-			dialogScript.VisitAll(visitor);
-			if (visitor.DidChange()) {
-				var newDialog = dialogScript.Serialize();
-				if (newDialog.indexOf("\n") > -1) {
-					newDialog = '"""\n' + newDialog + '\n"""';
-				}
-				dialog[dlgId].src = newDialog;
-			}
+function serializeOctave(octave) {
+	for (var symbol in Octave) {
+		if (Octave[symbol] === octave) {
+			return symbol;
 		}
 	}
+
+	// default to middle octave
+	return "4";
 }
 
 //TODO this is in progress and doesn't support all features
 function serializeWorld(skipFonts) {
-	if (skipFonts === undefined || skipFonts === null)
+	if (skipFonts === undefined || skipFonts === null) {
 		skipFonts = false;
+	}
+
+	// update version flags
+	flags.VER_MAJ = version.major;
+	flags.VER_MIN = version.minor;
 
 	var worldStr = "";
 	/* TITLE */
@@ -906,14 +1021,15 @@ function serializeWorld(skipFonts) {
 	for (id in palette) {
 		if (id != "default") {
 			worldStr += "PAL " + id + "\n";
-			if( palette[id].name != null )
-				worldStr += "NAME " + palette[id].name + "\n";
 			for (i in getPal(id)) {
 				for (j in getPal(id)[i]) {
 					worldStr += getPal(id)[i][j];
 					if (j < 2) worldStr += ",";
 				}
 				worldStr += "\n";
+			}
+			if (palette[id].name != null) {
+				worldStr += "NAME " + palette[id].name + "\n";
 			}
 			worldStr += "\n";
 		}
@@ -992,6 +1108,14 @@ function serializeWorld(skipFonts) {
 			/* PALETTE */
 			worldStr += "PAL " + room[id].pal + "\n";
 		}
+		if (room[id].ava != null) {
+			/* AVATAR SPRITE */
+			worldStr += "AVA " + room[id].ava + "\n";
+		}
+		if (room[id].tune != null && room[id].tune != "0") {
+			/* TUNE */
+			worldStr += "TUNE " + room[id].tune + "\n";
+		}
 		worldStr += "\n";
 	}
 	/* TILES */
@@ -1009,6 +1133,16 @@ function serializeWorld(skipFonts) {
 		if (tile[id].col != null && tile[id].col != undefined && tile[id].col != 1) {
 			/* COLOR OVERRIDE */
 			worldStr += "COL " + tile[id].col + "\n";
+		}
+		if (tile[id].bgc != null && tile[id].bgc != undefined && tile[id].bgc != 0) {
+			/* BACKGROUND COLOR OVERRIDE */
+			if (tile[id].bgc < 0) {
+				// transparent background
+				worldStr += "BGC *\n";
+			}
+			else {
+				worldStr += "BGC " + tile[id].bgc + "\n";
+			}
 		}
 		worldStr += "\n";
 	}
@@ -1036,6 +1170,20 @@ function serializeWorld(skipFonts) {
 			/* COLOR OVERRIDE */
 			worldStr += "COL " + sprite[id].col + "\n";
 		}
+		if (sprite[id].bgc != null && sprite[id].bgc != undefined && sprite[id].bgc != 0) {
+			/* BACKGROUND COLOR OVERRIDE */
+			if (sprite[id].bgc < 0) {
+				// transparent background
+				worldStr += "BGC *\n";
+			}
+			else {
+				worldStr += "BGC " + sprite[id].bgc + "\n";
+			}
+		}
+		if (sprite[id].blip != null && sprite[id].blip != undefined) {
+			/* BLIP */
+			worldStr += "BLIP " + sprite[id].blip + "\n";
+		}
 		worldStr += "\n";
 	}
 	/* ITEMS */
@@ -1053,6 +1201,20 @@ function serializeWorld(skipFonts) {
 			/* COLOR OVERRIDE */
 			worldStr += "COL " + item[id].col + "\n";
 		}
+		if (item[id].bgc != null && item[id].bgc != undefined && item[id].bgc != 0) {
+			/* BACKGROUND COLOR OVERRIDE */
+			if (item[id].bgc < 0) {
+				// transparent background
+				worldStr += "BGC *\n";
+			}
+			else {
+				worldStr += "BGC " + item[id].bgc + "\n";
+			}
+		}
+		if (item[id].blip != null && item[id].blip != undefined) {
+			/* BLIP */
+			worldStr += "BLIP " + item[id].blip + "\n";
+		}
 		worldStr += "\n";
 	}
 	/* DIALOG */
@@ -1066,15 +1228,239 @@ function serializeWorld(skipFonts) {
 			worldStr += "\n";
 		}
 	}
+	/* ENDINGS (for backwards compability only) */
+	for (id in end) {
+		worldStr += "END " + id + "\n";
+		worldStr += end[id].src + "\n";
+		worldStr += "\n";
+	}
 	/* VARIABLES */
 	for (id in variable) {
 		worldStr += "VAR " + id + "\n";
 		worldStr += variable[id] + "\n";
 		worldStr += "\n";
 	}
+	/* TUNES */
+	for (id in tune) {
+		if (id === "0") {
+			continue;
+		}
+
+		worldStr += "TUNE " + id + "\n";
+		for (var i = 0; i < maxTuneLength && i < tune[id].melody.length; i++) {
+			// MELODY
+			for (var j = 0; j < barLength; j++) {
+				var noteStr = serializeNote(tune[id].melody[i][j].note, tune[id].key);
+				if (noteStr === null) {
+					tune[id].melody[i][j].beats = 0;
+				}
+				if (tune[id].melody[i][j].beats != 1) {
+					worldStr += tune[id].melody[i][j].beats;
+				}
+				if (tune[id].melody[i][j].beats > 0) {
+					worldStr += noteStr;
+				}
+				if (tune[id].melody[i][j].beats > 0 && tune[id].melody[i][j].octave != Octave[4]) {
+					worldStr += serializeOctave(tune[id].melody[i][j].octave);
+				}
+				if (tune[id].melody[i][j].beats > 0 && tune[id].melody[i][j].blip != undefined) {
+					// todo : create constant for the blip separator?
+					worldStr += "~" + tune[id].melody[i][j].blip;
+				}
+				if (j < 15) {
+					worldStr += ",";
+				}
+			}
+			worldStr += "\n";
+
+			// HARMONY
+			// todo : lots of copy-pasting - I could probably make some helper functions to simplify this
+			for (var j = 0; j < barLength; j++) {
+				var noteStr = serializeNote(tune[id].harmony[i][j].note, tune[id].key);
+				if (noteStr === null) {
+					tune[id].harmony[i][j].beats = 0;
+				}
+				if (tune[id].harmony[i][j].beats != 1) {
+					worldStr += tune[id].harmony[i][j].beats;
+				}
+				if (tune[id].harmony[i][j].beats > 0) {
+					worldStr += noteStr;
+				}
+				if (tune[id].harmony[i][j].beats > 0 && tune[id].harmony[i][j].octave != Octave[4]) {
+					worldStr += serializeOctave(tune[id].harmony[i][j].octave);
+				}
+				if (tune[id].harmony[i][j].beats > 0 && tune[id].harmony[i][j].blip != undefined) {
+					worldStr += "~" + tune[id].harmony[i][j].blip;
+				}
+				if (j < 15) {
+					worldStr += ",";
+				}
+			}
+			worldStr += "\n";
+
+			if (i < (tune[id].melody.length - 1)) {
+				worldStr += ">";
+				worldStr += "\n";
+			}
+		}
+		if (tune[id].name != null) {
+			/* NAME */
+			worldStr += "NAME " + tune[id].name + "\n";
+		}
+		if (tune[id].key != undefined && tune[id].key != null) {
+			worldStr += "KEY ";
+			for (var i = 0; i < Solfa.COUNT; i++) {
+				worldStr += serializeNote(tune[id].key.notes[i]);
+				if (i < Solfa.COUNT - 1) {
+					worldStr += ",";
+				}
+			}
+			worldStr += " ";
+			for (var i = 0; i < tune[id].key.scale.length; i++) {
+				worldStr += serializeNote(tune[id].key.scale[i], tune[id].key);
+				if (i < tune[id].key.scale.length - 1) {
+					worldStr += ",";
+				}
+			}
+			worldStr += "\n";
+		}
+		worldStr += "TMP ";
+		switch (tune[id].tempo) {
+			case Tempo.SLW:
+				worldStr += "SLW";
+				break;
+			case Tempo.MED:
+				worldStr += "MED";
+				break;
+			case Tempo.FST:
+				worldStr += "FST";
+				break;
+			case Tempo.XFST:
+				worldStr += "XFST";
+				break;
+		}
+		worldStr += "\n";
+		worldStr += "SQR ";
+		switch (tune[id].instrumentA) {
+			case SquareWave.P8:
+				worldStr += "P8";
+				break;
+			case SquareWave.P4:
+				worldStr += "P4";
+				break;
+			case SquareWave.P2:
+				worldStr += "P2";
+				break;
+		}
+		worldStr += " ";
+		switch (tune[id].instrumentB) {
+			case SquareWave.P8:
+				worldStr += "P8";
+				break;
+			case SquareWave.P4:
+				worldStr += "P4";
+				break;
+			case SquareWave.P2:
+				worldStr += "P2";
+				break;
+		}
+		worldStr += "\n";
+		if (tune[id].key != undefined && tune[id].key != null && tune[id].arpeggioPattern != ArpeggioPattern.OFF) {
+			switch (tune[id].arpeggioPattern) {
+				case ArpeggioPattern.UP:
+					worldStr += "ARP UP\n";
+					break;
+				case ArpeggioPattern.DWN:
+					worldStr += "ARP DWN\n";
+					break;
+				case ArpeggioPattern.INT5:
+					worldStr += "ARP INT5\n";
+					break;
+				case ArpeggioPattern.INT8:
+					worldStr += "ARP INT8\n";
+					break;
+			}
+		}
+		worldStr += "\n";
+	}
+	/* BLIP */
+	for (id in blip) {
+		if (id === "0") {
+			continue;
+		}
+
+		worldStr += "BLIP " + id + "\n";
+		// pitches
+		if (blip[id].pitchA.beats > 0) {
+			worldStr += serializeNote(blip[id].pitchA.note);
+			if (blip[id].pitchA.octave != Octave[4]) {
+				worldStr += serializeOctave(blip[id].pitchA.octave);
+			}
+		}
+		else {
+			worldStr += blip[id].pitchA.beats;
+		}
+		worldStr += ",";
+		if (blip[id].pitchB.beats > 0) {
+			worldStr += serializeNote(blip[id].pitchB.note);
+			if (blip[id].pitchB.octave != Octave[4]) {
+				worldStr += serializeOctave(blip[id].pitchB.octave);
+			}
+		}
+		else {
+			worldStr += blip[id].pitchB.beats;
+		}
+		worldStr += ",";
+		if (blip[id].pitchC.beats > 0) {
+			worldStr += serializeNote(blip[id].pitchC.note);
+			if (blip[id].pitchC.octave != Octave[4]) {
+				worldStr += serializeOctave(blip[id].pitchC.octave);
+			}
+		}
+		else {
+			worldStr += blip[id].pitchC.beats;
+		}
+		worldStr += "\n";
+		if (blip[id].name != null) {
+			/* NAME */
+			worldStr += "NAME " + blip[id].name + "\n";
+		}
+		// envelope
+		worldStr += "ENV " + blip[id].envelope.attack
+			+ " " + blip[id].envelope.decay
+			+ " " + blip[id].envelope.sustain
+			+ " " + blip[id].envelope.length
+			+ " " + blip[id].envelope.release + "\n";
+		// beat
+		worldStr += "BEAT " + blip[id].beat.time
+			+ " " + blip[id].beat.delay + "\n";
+		// instrument (square wave type)
+		worldStr += "SQR ";
+		switch (blip[id].instrument) {
+			case SquareWave.P8:
+				worldStr += "P8";
+				break;
+			case SquareWave.P4:
+				worldStr += "P4";
+				break;
+			case SquareWave.P2:
+				worldStr += "P2";
+				break;
+		}
+		worldStr += "\n";
+		// other parameters
+		if (blip[id].doRepeat === true) {
+			worldStr += "RPT 1\n";
+		}
+		// TODO : consider for future update
+		// if (blip[id].doSlide === true) {
+		// 	worldStr += "SLD 1\n";
+		// }
+		worldStr += "\n";
+	}
 	/* FONT */
 	// TODO : support multiple fonts
-	if (fontName != defaultFontName && !skipFonts) {
+	if (fontManager && fontName != defaultFontName && !skipFonts) {
 		worldStr += fontManager.GetData(fontName);
 	}
 
@@ -1082,6 +1468,10 @@ function serializeWorld(skipFonts) {
 }
 
 function serializeDrawing(drwId) {
+	if (!renderer) {
+		return "";
+	}
+
 	var drawingData = renderer.GetDrawingSource(drwId);
 	var drwStr = "";
 	for (f in drawingData) {
@@ -1098,556 +1488,26 @@ function serializeDrawing(drwId) {
 }
 
 function isExitValid(e) {
-	var hasValidStartPos = e.x >= 0 && e.x < mapsize && e.y >= 0 && e.y < mapsize;
+	var hasValidStartPos = e.x >= 0 && e.x < bitsy.MAP_SIZE && e.y >= 0 && e.y < bitsy.MAP_SIZE;
 	var hasDest = e.dest != null;
-	var hasValidRoomDest = (e.dest.room != null && e.dest.x >= 0 && e.dest.x < mapsize && e.dest.y >= 0 && e.dest.y < mapsize);
+	var hasValidRoomDest = (e.dest.room != null && e.dest.x >= 0 && e.dest.x < bitsy.MAP_SIZE && e.dest.y >= 0 && e.dest.y < bitsy.MAP_SIZE);
 	return hasValidStartPos && hasDest && hasValidRoomDest;
 }
 
-function placeSprites() {
-	for (id in spriteStartLocations) {
-		//bitsyLog(id);
-		//bitsyLog( spriteStartLocations[id] );
-		//bitsyLog(sprite[id]);
-		sprite[id].room = spriteStartLocations[id].room;
-		sprite[id].x = spriteStartLocations[id].x;
-		sprite[id].y = spriteStartLocations[id].y;
-		//bitsyLog(sprite[id]);
-	}
-}
-
-/* ARGUMENT GETTERS */
-function getType(line) {
-	return getArg(line,0);
-}
-
-function getId(line) {
-	return getArg(line,1);
-}
-
-function getArg(line,arg) {
-	return line.split(" ")[arg];
-}
-
-function getCoord(line,arg) {
-	return getArg(line,arg).split(",");
-}
-
-function parseTitle(lines, i) {
-	var results = scriptUtils.ReadDialogScript(lines,i);
-	setTitle(results.script);
-	i = results.index;
-
-	i++;
-
-	return i;
-}
-
-function parseRoom(lines, i, compatibilityFlags) {
-	var id = getId(lines[i]);
-	room[id] = {
-		id : id,
-		tilemap : [],
-		walls : [],
-		exits : [],
-		endings : [],
-		items : [],
-		pal : null,
-		name : null
-	};
-	i++;
-
-	// create tile map
-	if ( flags.ROOM_FORMAT == 0 ) {
-		// old way: no commas, single char tile ids
-		var end = i + mapsize;
-		var y = 0;
-		for (; i<end; i++) {
-			room[id].tilemap.push( [] );
-			for (x = 0; x<mapsize; x++) {
-				room[id].tilemap[y].push( lines[i].charAt(x) );
-			}
-			y++;
-		}
-	}
-	else if ( flags.ROOM_FORMAT == 1 ) {
-		// new way: comma separated, multiple char tile ids
-		var end = i + mapsize;
-		var y = 0;
-		for (; i<end; i++) {
-			room[id].tilemap.push( [] );
-			var lineSep = lines[i].split(",");
-			for (x = 0; x<mapsize; x++) {
-				room[id].tilemap[y].push( lineSep[x] );
-			}
-			y++;
-		}
-	}
-
-	while (i < lines.length && lines[i].length > 0) { //look for empty line
-		// bitsyLog(getType(lines[i]));
-		if (getType(lines[i]) === "SPR") {
-			/* NOTE SPRITE START LOCATIONS */
-			var sprId = getId(lines[i]);
-			if (sprId.indexOf(",") == -1 && lines[i].split(" ").length >= 3) { //second conditional checks for coords
-				/* PLACE A SINGLE SPRITE */
-				var sprCoord = lines[i].split(" ")[2].split(",");
-				spriteStartLocations[sprId] = {
-					room : id,
-					x : parseInt(sprCoord[0]),
-					y : parseInt(sprCoord[1])
-				};
-			}
-			else if ( flags.ROOM_FORMAT == 0 ) { // TODO: right now this shortcut only works w/ the old comma separate format
-				/* PLACE MULTIPLE SPRITES*/ 
-				//Does find and replace in the tilemap (may be hacky, but its convenient)
-				var sprList = sprId.split(",");
-				for (row in room[id].tilemap) {
-					for (s in sprList) {
-						var col = room[id].tilemap[row].indexOf( sprList[s] );
-						//if the sprite is in this row, replace it with the "null tile" and set its starting position
-						if (col != -1) {
-							room[id].tilemap[row][col] = "0";
-							spriteStartLocations[ sprList[s] ] = {
-								room : id,
-								x : parseInt(col),
-								y : parseInt(row)
-							};
-						}
-					}
-				}
-			}
-		}
-		else if (getType(lines[i]) === "ITM") {
-			var itmId = getId(lines[i]);
-			var itmCoord = lines[i].split(" ")[2].split(",");
-			var itm = {
-				id: itmId,
-				x : parseInt(itmCoord[0]),
-				y : parseInt(itmCoord[1])
-			};
-			room[id].items.push( itm );
-		}
-		else if (getType(lines[i]) === "WAL") {
-			/* DEFINE COLLISIONS (WALLS) */
-			room[id].walls = getId(lines[i]).split(",");
-		}
-		else if (getType(lines[i]) === "EXT") {
-			/* ADD EXIT */
-			var exitArgs = lines[i].split(" ");
-			//arg format: EXT 10,5 M 3,2 [AVA:7 LCK:a,9] [AVA 7 LCK a 9]
-			var exitCoords = exitArgs[1].split(",");
-			var destName = exitArgs[2];
-			var destCoords = exitArgs[3].split(",");
-			var ext = {
-				x : parseInt(exitCoords[0]),
-				y : parseInt(exitCoords[1]),
-				dest : {
-					room : destName,
-					x : parseInt(destCoords[0]),
-					y : parseInt(destCoords[1])
-				},
-				transition_effect : null,
-				dlg: null,
-			};
-
-			// optional arguments
-			var exitArgIndex = 4;
-			while (exitArgIndex < exitArgs.length) {
-				if (exitArgs[exitArgIndex] == "FX") {
-					ext.transition_effect = exitArgs[exitArgIndex+1];
-					exitArgIndex += 2;
-				}
-				else if (exitArgs[exitArgIndex] == "DLG") {
-					ext.dlg = exitArgs[exitArgIndex+1];
-					exitArgIndex += 2;
-				}
-				else {
-					exitArgIndex += 1;
-				}
-			}
-
-			room[id].exits.push(ext);
-		}
-		else if (getType(lines[i]) === "END") {
-			/* ADD ENDING */
-			var endId = getId(lines[i]);
-
-			// compatibility with when endings were stored separate from other dialog
-			if (compatibilityFlags.combineEndingsWithDialog) {
-				endId = "end_" + endId;
-			}
-
-			var endCoords = getCoord(lines[i], 2);
-			var end = {
-				id : endId,
-				x : parseInt(endCoords[0]),
-				y : parseInt(endCoords[1])
-			};
-
-			room[id].endings.push(end);
-		}
-		else if (getType(lines[i]) === "PAL") {
-			/* CHOOSE PALETTE (that's not default) */
-			room[id].pal = getId(lines[i]);
-		}
-		else if (getType(lines[i]) === "NAME") {
-			var name = lines[i].split(/\s(.+)/)[1];
-			room[id].name = name;
-			names.room[name] = id;
-		}
-
-		i++;
-	}
-
-	return i;
-}
-
-function parsePalette(lines,i) { //todo this has to go first right now :(
-	var id = getId(lines[i]);
-	i++;
-	var colors = [];
-	var name = null;
-	while (i < lines.length && lines[i].length > 0) { //look for empty line
-		var args = lines[i].split(" ");
-		if (args[0] === "NAME") {
-			name = lines[i].split(/\s(.+)/)[1];
-		}
-		else {
-			var col = [];
-			lines[i].split(",").forEach(function(i) {
-				col.push(parseInt(i));
-			});
-			colors.push(col);
-		}
-		i++;
-	}
-	palette[id] = {
-		id : id,
-		name : name,
-		colors : colors
-	};
-	return i;
-}
-
-function parseTile(lines, i) {
-	var id = getId(lines[i]);
-	var tileData = createDrawingData("TIL", id);
-
-	i++;
-
-	// read & store tile image source
-	i = parseDrawingCore(lines, i, tileData.drw);
-
-	// update animation info
-	tileData.animation.frameCount = renderer.GetFrameCount(tileData.drw);
-	tileData.animation.isAnimated = tileData.animation.frameCount > 1;
-
-	// read other properties
-	while (i < lines.length && lines[i].length > 0) { // look for empty line
-		if (getType(lines[i]) === "COL") {
-			tileData.col = parseInt(getId(lines[i]));
-		}
-		else if (getType(lines[i]) === "NAME") {
-			/* NAME */
-			tileData.name = lines[i].split(/\s(.+)/)[1];
-			names.tile[tileData.name] = id;
-		}
-		else if (getType(lines[i]) === "WAL") {
-			var wallArg = getArg(lines[i], 1);
-			if (wallArg === "true") {
-				tileData.isWall = true;
-			}
-			else if (wallArg === "false") {
-				tileData.isWall = false;
-			}
-		}
-
-		i++;
-	}
-
-	// store tile data
-	tile[id] = tileData;
-
-	return i;
-}
-
-function parseSprite(lines, i) {
-	var id = getId(lines[i]);
-	var type = (id === "A") ? "AVA" : "SPR";
-	var spriteData = createDrawingData(type, id);
-
-	bitsyLog(spriteData);
-
-	i++;
-
-	// read & store sprite image source
-	i = parseDrawingCore(lines, i, spriteData.drw);
-
-	// update animation info
-	spriteData.animation.frameCount = renderer.GetFrameCount(spriteData.drw);
-	spriteData.animation.isAnimated = spriteData.animation.frameCount > 1;
-
-	// read other properties
-	while (i < lines.length && lines[i].length > 0) { // look for empty line
-		if (getType(lines[i]) === "COL") {
-			/* COLOR OFFSET INDEX */
-			spriteData.col = parseInt(getId(lines[i]));
-		}
-		else if (getType(lines[i]) === "POS") {
-			/* STARTING POSITION */
-			var posArgs = lines[i].split(" ");
-			var roomId = posArgs[1];
-			var coordArgs = posArgs[2].split(",");
-			spriteStartLocations[id] = {
-				room : roomId,
-				x : parseInt(coordArgs[0]),
-				y : parseInt(coordArgs[1])
-			};
-		}
-		else if(getType(lines[i]) === "DLG") {
-			spriteData.dlg = getId(lines[i]);
-		}
-		else if (getType(lines[i]) === "NAME") {
-			/* NAME */
-			spriteData.name = lines[i].split(/\s(.+)/)[1];
-			names.sprite[spriteData.name] = id;
-		}
-		else if (getType(lines[i]) === "ITM") {
-			/* ITEM STARTING INVENTORY */
-			var itemId = getId(lines[i]);
-			var itemCount = parseFloat(getArg(lines[i], 2));
-			spriteData.inventory[itemId] = itemCount;
-		}
-
-		i++;
-	}
-
-	// store sprite data
-	sprite[id] = spriteData;
-
-	return i;
-}
-
-function parseItem(lines, i) {
-	var id = getId(lines[i]);
-	var itemData = createDrawingData("ITM", id);
-
-	i++;
-
-	// read & store item image source
-	i = parseDrawingCore(lines, i, itemData.drw);
-
-	// update animation info
-	itemData.animation.frameCount = renderer.GetFrameCount(itemData.drw);
-	itemData.animation.isAnimated = itemData.animation.frameCount > 1;
-
-	// read other properties
-	while (i < lines.length && lines[i].length > 0) { // look for empty line
-		if (getType(lines[i]) === "COL") {
-			/* COLOR OFFSET INDEX */
-			itemData.col = parseInt(getArg(lines[i], 1));
-		}
-		else if (getType(lines[i]) === "DLG") {
-			itemData.dlg = getId(lines[i]);
-		}
-		else if (getType(lines[i]) === "NAME") {
-			/* NAME */
-			itemData.name = lines[i].split(/\s(.+)/)[1];
-			names.item[itemData.name] = id;
-		}
-
-		i++;
-	}
-
-	// store item data
-	item[id] = itemData;
-
-	return i;
-}
-
-function parseDrawing(lines, i) {
-	// store drawing source
-	var drwId = getId( lines[i] );
-	return parseDrawingCore( lines, i, drwId );
-}
-
-function parseDrawingCore(lines, i, drwId) {
-	var frameList = []; //init list of frames
-	frameList.push( [] ); //init first frame
-	var frameIndex = 0;
-	var y = 0;
-	while ( y < tilesize ) {
-		var l = lines[i+y];
-		var row = [];
-		for (x = 0; x < tilesize; x++) {
-			row.push( parseInt( l.charAt(x) ) );
-		}
-		frameList[frameIndex].push( row );
-		y++;
-
-		if (y === tilesize) {
-			i = i + y;
-			if ( lines[i] != undefined && lines[i].charAt(0) === ">" ) {
-				// start next frame!
-				frameList.push( [] );
-				frameIndex++;
-				//start the count over again for the next frame
-				i++;
-				y = 0;
-			}
-		}
-	}
-
-	renderer.SetDrawingSource(drwId, frameList);
-
-	return i;
-}
-
-// creates a drawing data structure with default property values for the type
-function createDrawingData(type, id) {
-	// the avatar's drawing id still uses the sprite prefix (for back compat)
-	var drwId = (type === "AVA" ? "SPR" : type) + "_" + id;
-
-	var drawingData = {
-		type : type,
-		id : id,
-		name : null,
-		drw : drwId,
-		col : (type === "TIL") ? 1 : 2,
-		animation : {
-			isAnimated : false,
-			frameIndex : 0,
-			frameCount : 1,
-		},
-	};
-
-	// add type specific properties
-	if (type === "TIL") {
-		// default null value indicates it can vary from room to room (original version)
-		drawingData.isWall = null;
-	}
-
-	if (type === "AVA" || type === "SPR") {
-		// default sprite location is "offstage"
-		drawingData.room = null;
-		drawingData.x = -1;
-		drawingData.y = -1;
-		drawingData.inventory = {};
-	}
-
-	if (type === "AVA" || type === "SPR" || type === "ITM") {
-		drawingData.dlg = null;
-	}
-
-	return drawingData;
-}
-
-function parseScript(lines, i, backCompatPrefix, compatibilityFlags) {
-	var id = getId(lines[i]);
-	id = backCompatPrefix + id;
-	i++;
-
-	var results = scriptUtils.ReadDialogScript(lines,i);
-
-	dialog[id] = { src: results.script, name: null, id: id, };
-
-	if (compatibilityFlags.convertImplicitSpriteDialogIds) {
-		// explicitly hook up dialog that used to be implicitly
-		// connected by sharing sprite and dialog IDs in old versions
-		if (sprite[id]) {
-			if (sprite[id].dlg === undefined || sprite[id].dlg === null) {
-				sprite[id].dlg = id;
-			}
-		}
-	}
-
-	i = results.index;
-
-	return i;
-}
-
-function parseDialog(lines, i, compatibilityFlags) {
-	// hacky but I need to store this so I can set the name below
-	var id = getId(lines[i]);
-
-	i = parseScript(lines, i, "", compatibilityFlags);
-
-	if (lines[i].length > 0 && getType(lines[i]) === "NAME") {
-		dialog[id].name = lines[i].split(/\s(.+)/)[1]; // TODO : hacky to keep copying this regex around...
-		names.dialog[dialog[id].name] = id;
-		i++;
-	}
-
-	return i;
-}
-
-// keeping this around to parse old files where endings were separate from dialogs
-function parseEnding(lines, i, compatibilityFlags) {
-	return parseScript(lines, i, "end_", compatibilityFlags);
-}
-
-function parseVariable(lines, i) {
-	var id = getId(lines[i]);
-	i++;
-	var value = lines[i];
-	i++;
-	variable[id] = value;
-	return i;
-}
-
-function parseFontName(lines, i) {
-	fontName = getArg(lines[i], 1);
-	i++;
-	return i;
-}
-
-function parseTextDirection(lines, i) {
-	textDirection = getArg(lines[i], 1);
-	i++;
-	return i;
-}
-
-function parseFontData(lines, i) {
-	// NOTE : we're not doing the actual parsing here --
-	// just grabbing the block of text that represents the font
-	// and giving it to the font manager to use later
-
-	var localFontName = getId(lines[i]);
-	var localFontData = lines[i];
-	i++;
-
-	while (i < lines.length && lines[i] != "") {
-		localFontData += "\n" + lines[i];
-		i++;
-	}
-
-	var localFontFilename = localFontName + fontManager.GetExtension();
-	fontManager.AddResource( localFontFilename, localFontData );
-
-	return i;
-}
-
-function parseFlag(lines, i) {
-	var id = getId(lines[i]);
-	var valStr = lines[i].split(" ")[2];
-	flags[id] = parseInt( valStr );
-	i++;
-	return i;
+function setTile(mapId, x, y, tileId) {
+	bitsy.set(mapId, (y * bitsy.MAP_SIZE) + x, tileId);
 }
 
 function drawTile(tileId, x, y) {
-	bitsyDrawBegin(0);
-	bitsyDrawTile(tileId, x, y);
-	bitsyDrawEnd();
+	setTile(bitsy.MAP1, x, y, tileId);
 }
 
 function drawSprite(tileId, x, y) {
-	drawTile(tileId, x, y);
+	setTile(bitsy.MAP2, x, y, tileId);
 }
 
 function drawItem(tileId, x, y) {
-	drawTile(tileId, x, y);
+	setTile(bitsy.MAP2, x, y, tileId);
 }
 
 // var debugLastRoomDrawn = "0";
@@ -1664,78 +1524,140 @@ function clearRoom() {
 		paletteId = room.pal;
 	}
 
-	bitsyDrawBegin(0);
-	bitsyClear(tileColorStartIndex);
-	bitsyDrawEnd();
+	// clear background & foreground
+	bitsy.fill(bitsy.MAP1, 0);
+	bitsy.fill(bitsy.MAP2, 0);
 }
 
-function drawRoom(room, frameIndex) { // frameIndex is optional
-	// if (room.id != debugLastRoomDrawn) {
-	// 	debugLastRoomDrawn = room.id;
-	// 	bitsyLog("DRAW ROOM " + debugLastRoomDrawn);
-	// }
-
-	if (room === undefined) {
-		// protect against invalid rooms
-		return;
+function drawRoomBackground(room, frameIndex, redrawAnimatedOnly) {
+	if (!redrawAnimatedOnly) {
+		// clear background map
+		bitsy.fill(bitsy.MAP1, 0);
 	}
 
-	// clear the screen buffer
-	bitsyDrawBegin(0);
-	bitsyClear(tileColorStartIndex);
-	bitsyDrawEnd();
+	// NOTE: interestingly the slowest part of this is iterating over all the tiles, not actually drawing them
+	for (var y = 0; y < bitsy.MAP_SIZE; y++) {
+		for (var x = 0; x < bitsy.MAP_SIZE; x++) {
+			var id = room.tilemap[y][x];
 
-	//draw tiles
-	for (i in room.tilemap) {
-		for (j in room.tilemap[i]) {
-			var id = room.tilemap[i][j];
-			var x = parseInt(j);
-			var y = parseInt(i);
+			if (id != "0" && tile[id] == null) { // hack-around to avoid corrupting files (not a solution though!)
+				id = "0";
+				room.tilemap[y][x] = id;
+			}
 
-			if (id != "0") {
-				//bitsyLog(id);
-				if (tile[id] == null) { // hack-around to avoid corrupting files (not a solution though!)
-					id = "0";
-					room.tilemap[i][j] = id;
-				}
-				else {
-					// bitsyLog(id);
-					drawTile(getTileFrame(tile[id], frameIndex), x, y);
-				}
+			if (id != "0" && (!redrawAnimatedOnly || tile[id].animation.isAnimated)) {
+				drawTile(getTileFrame(tile[id], frameIndex), x, y);
 			}
 		}
 	}
+}
 
-	//draw items
-	for (var i = 0; i < room.items.length; i++) {
-		var itm = room.items[i];
-		drawItem(getItemFrame(item[itm.id], frameIndex), itm.x, itm.y);
+function drawRoomForeground(room, frameIndex, redrawAnimatedOnly) {
+	if (!redrawAnimatedOnly) {
+		// clear foreground map
+		bitsy.fill(bitsy.MAP2, 0);
 	}
 
-	//draw sprites
+	// draw items
+	for (var i = 0; i < room.items.length; i++) {
+		var itm = room.items[i];
+		if (!redrawAnimatedOnly || item[itm.id].animation.isAnimated) {
+			drawItem(getItemFrame(item[itm.id], frameIndex), itm.x, itm.y);
+		}
+	}
+
+	// draw sprites
 	for (id in sprite) {
 		var spr = sprite[id];
-		if (spr.room === room.id) {
+		if (id != playerId && spr.room === room.id && (!redrawAnimatedOnly || spr.animation.isAnimated)) {
 			drawSprite(getSpriteFrame(spr, frameIndex), spr.x, spr.y);
 		}
 	}
 }
 
+function drawRoomForegroundTile(room, frameIndex, x, y) {
+	// draw items
+	for (var i = 0; i < room.items.length; i++) {
+		var itm = room.items[i];
+		if (itm.x === x && itm.y === y) {
+			drawItem(getItemFrame(item[itm.id], frameIndex), itm.x, itm.y);
+		}
+	}
+
+	// draw sprites
+	for (id in sprite) {
+		var spr = sprite[id];
+		if (id != playerId && spr.room === room.id && spr.x === x && spr.y === y) {
+			drawSprite(getSpriteFrame(spr, frameIndex), spr.x, spr.y);
+		}
+	}
+}
+
+function drawRoom(room, args) {
+	if (room === undefined || isNarrating) {
+		// protect against invalid rooms
+		return;
+	}
+
+	var redrawAll = args && (args.redrawAll === true);
+	var redrawAnimated = args && (args.redrawAnimated === true);
+	var redrawAvatar = args && (args.redrawAvatar === true);
+	var frameIndex = args ? args.frameIndex : undefined;
+
+	// if *only* redrawing the avatar, first clear its previous position
+	if (redrawAvatar) {
+		setTile(bitsy.MAP2, playerPrevX, playerPrevY, 0);
+		// also redraw any sprite or item that might be "under" the player (todo: possible perf issue?)
+		drawRoomForegroundTile(room, frameIndex, playerPrevX, playerPrevY);
+	}
+
+	// draw background & foreground tiles
+	if (redrawAll || redrawAnimated) {
+		// draw tiles
+		drawRoomBackground(room, frameIndex, redrawAnimated);
+		// draw sprites & items
+		drawRoomForeground(room, frameIndex, redrawAnimated);
+	}
+
+	// draw the player's avatar at its current position
+	if ((redrawAll || redrawAnimated || redrawAvatar) && sprite[playerId] && sprite[playerId].room === room.id) {
+		var spr = sprite[playerId];
+		var x = spr.x;
+		var y = spr.y;
+
+		// get the avatar override sprite (if there is one)
+		if (state.ava && state.ava != playerId && sprite[state.ava]) {
+			spr = sprite[state.ava];
+		}
+
+		drawSprite(getSpriteFrame(spr, frameIndex), x, y);
+	}
+}
+
 // TODO : remove these get*Image methods
 function getTileFrame(t, frameIndex) {
+	if (!renderer) {
+		return null;
+	}
 	return renderer.GetDrawingFrame(t, frameIndex);
 }
 
 function getSpriteFrame(s, frameIndex) {
+	if (!renderer) {
+		return null;
+	}
 	return renderer.GetDrawingFrame(s, frameIndex);
 }
 
 function getItemFrame(itm, frameIndex) {
+	if (!renderer) {
+		return null;
+	}
 	return renderer.GetDrawingFrame(itm, frameIndex);
 }
 
-function curPal() {
-	return getRoomPal(curRoom);
+function curDefaultPal() {
+	return getRoomPal(state.room);
 }
 
 function getRoomPal(roomId) {
@@ -1764,19 +1686,31 @@ function getRoomPal(roomId) {
 var isDialogMode = false;
 var isNarrating = false;
 var isEnding = false;
-var dialogModule = new Dialog();
-var dialogRenderer = dialogModule.CreateRenderer();
-var dialogBuffer = dialogModule.CreateBuffer();
-var fontManager = new FontManager();
+
+var dialogModule;
+var dialogRenderer;
+var dialogBuffer;
+if (engineFeatureFlags.isDialogEnabled) {
+	dialogModule = new Dialog();
+	dialogRenderer = dialogModule.CreateRenderer();
+	dialogBuffer = dialogModule.CreateBuffer();
+}
+
+var fontManager;
+if (engineFeatureFlags.isFontEnabled) {
+	fontManager = new FontManager();
+}
 
 // TODO : is this scriptResult thing being used anywhere???
 function onExitDialog(scriptResult, dialogCallback) {
-	bitsyLog("EXIT DIALOG!");
-
 	isDialogMode = false;
+	bitsy.textbox(false);
 
 	if (isNarrating) {
 		isNarrating = false;
+
+		// redraw the room
+		drawRoom(room[state.room], { redrawAll: true });
 	}
 
 	if (isDialogPreview) {
@@ -1790,6 +1724,10 @@ function onExitDialog(scriptResult, dialogCallback) {
 	if (dialogCallback != undefined && dialogCallback != null) {
 		dialogCallback(scriptResult);
 	}
+
+	if (soundPlayer) {
+		soundPlayer.resumeTune();
+	}
 }
 
 /*
@@ -1799,8 +1737,8 @@ TODO
 - what about dialog NAMEs vs IDs?
 - what about a special script block separate from DLG?
 */
-function startNarrating(dialogStr,end) {
-	bitsyLog("NARRATE " + dialogStr);
+function startNarrating(dialogStr, end) {
+	bitsy.log("NARRATE " + dialogStr);
 
 	if(end === undefined) {
 		end = false;
@@ -1809,6 +1747,14 @@ function startNarrating(dialogStr,end) {
 	isNarrating = true;
 	isEnding = end;
 
+	if (isEnding && soundPlayer) {
+		soundPlayer.stopTune();
+	}
+
+	// clear the room tiles before narrating
+	bitsy.fill(bitsy.MAP1, 0);
+	bitsy.fill(bitsy.MAP2, 0);
+
 	startDialog(dialogStr);
 }
 
@@ -1816,9 +1762,22 @@ function startEndingDialog(ending) {
 	isNarrating = true;
 	isEnding = true;
 
+	var endingScriptId = ending.id;
+	var endingDialogStr = dialog[ending.id].src;
+
+	// compatibility with pre-7.0 endings
+	if (flags.DLG_COMPAT === 1 && end[ending.id]) {
+		endingScriptId = "end_compat_" + ending.id;
+		endingDialogStr = end[ending.id].src;
+	}
+
+	if (isEnding && soundPlayer) {
+		soundPlayer.stopTune();
+	}
+
 	startDialog(
-		dialog[ending.id].src,
-		ending.id,
+		endingDialogStr,
+		endingScriptId,
 		function() {
 			var isLocked = ending.property && ending.property.locked === true;
 			if (isLocked) {
@@ -1830,7 +1789,7 @@ function startEndingDialog(ending) {
 
 function startItemDialog(itemId, dialogCallback) {
 	var dialogId = item[itemId].dlg;
-	// bitsyLog("START ITEM DIALOG " + dialogId);
+	// bitsy.log("START ITEM DIALOG " + dialogId);
 	if (dialog[dialogId]) {
 		var dialogStr = dialog[dialogId].src;
 		startDialog(dialogStr, dialogId, dialogCallback);
@@ -1843,20 +1802,48 @@ function startItemDialog(itemId, dialogCallback) {
 function startSpriteDialog(spriteId) {
 	var spr = sprite[spriteId];
 	var dialogId = spr.dlg;
-	// bitsyLog("START SPRITE DIALOG " + dialogId);
+
+	// back compat for when dialog IDs were implicitly the same as sprite IDs
+	if (flags.DLG_COMPAT === 1 && (dialogId === undefined || dialogId === null)) {
+		dialogId = spr.id;
+	}
+
+	// bitsy.log("START SPRITE DIALOG " + dialogId);
 	if (dialog[dialogId]){
 		var dialogStr = dialog[dialogId].src;
-		startDialog(dialogStr,dialogId);
+		startDialog(dialogStr, dialogId);
 	}
 }
 
 function startDialog(dialogStr, scriptId, dialogCallback, objectContext) {
-	// bitsyLog("START DIALOG ");
+	bitsy.log("START DIALOG");
+
+	if (soundPlayer) {
+		soundPlayer.pauseTune();
+	}
+
 	if (dialogStr.length <= 0) {
-		// bitsyLog("ON EXIT DIALOG -- startDialog 1");
 		onExitDialog(null, dialogCallback);
 		return;
 	}
+
+	if (!dialogBuffer) {
+		bitsy.log(dialogStr);
+		onExitDialog(null, dialogCallback);
+		return;
+	}
+
+	if (!scriptInterpreter) {
+		dialogRenderer.Reset();
+		dialogRenderer.SetCentered(isNarrating /*centered*/);
+		dialogBuffer.Reset();
+		dialogBuffer.AddText(dialogStr);
+		dialogBuffer.OnDialogEnd(function() {
+			onExitDialog(null, dialogCallback);
+		});
+		bitsy.log("dialog start end");
+		return;
+	};
 
 	isDialogMode = true;
 
@@ -1886,6 +1873,10 @@ function startDialog(dialogStr, scriptId, dialogCallback, objectContext) {
 
 var isDialogPreview = false;
 function startPreviewDialog(script, dialogCallback) {
+	if (!scriptInterpreter || !dialogBuffer) {
+		return;
+	}
+
 	isNarrating = true;
 
 	isDialogMode = true;
@@ -1910,12 +1901,25 @@ function startPreviewDialog(script, dialogCallback) {
 }
 
 /* NEW SCRIPT STUFF */
-var scriptModule = new Script();
-var scriptInterpreter = scriptModule.CreateInterpreter();
-var scriptUtils = scriptModule.CreateUtils(); // TODO: move to editor.js?
+var scriptModule;
+var scriptInterpreter;
+var scriptUtils;
 // scriptInterpreter.SetDialogBuffer( dialogBuffer );
+if (engineFeatureFlags.isScriptEnabled) {
+	bitsy.log("init script module");
+	scriptModule = new Script();
+	bitsy.log("init interpreter");
+	scriptInterpreter = scriptModule.CreateInterpreter();
+	bitsy.log("init utils");
+	scriptUtils = scriptModule.CreateUtils(); // TODO: move to editor.js?
+	bitsy.log("init script module end");
+}
+
+/* SOUND */
+var soundPlayer;
+if (engineFeatureFlags.isSoundEnabled) {
+	soundPlayer = new SoundPlayer();
+}
 
 /* EVENTS */
-bitsyOnUpdate(update);
-bitsyOnQuit(stopGame);
-bitsyOnLoad(load_game);
+bitsy.loop(update);
