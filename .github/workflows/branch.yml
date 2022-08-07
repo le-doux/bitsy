@@ -19,3 +19,10 @@ jobs:
         working-directory: docs
       - run: npm run build
         working-directory: docs
+
+      # upload
+      - uses: actions/upload-artifact@v3
+        with:
+          path: editor
+          retention-days: 7
+          name: ${{ github.head_ref }}
