@@ -14,6 +14,12 @@ jobs:
       - run: node ./dev/icon_generator/makeicons
       - run: node ./dev/resource_packager
 
+      # build docs
+      - run: npm ci
+        working-directory: docs
+      - run: npm run build
+        working-directory: docs
+
       # publish
       # TODO: cleaner version number
       - name: get version
