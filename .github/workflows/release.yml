@@ -9,10 +9,18 @@ jobs:
       # setup
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
+      - name: install expect
+        run: sudo apt install expect
 
       # build resources
       - run: node ./dev/icon_generator/makeicons
       - run: node ./dev/resource_packager
+
+      # build docs
+      - run: npm ci
+        working-directory: docs
+      - run: npm run build
+        working-directory: docs
 
       # publish
       # TODO: cleaner version number
@@ -29,9 +37,6 @@ jobs:
           ITCH_USER: ledoux
           PACKAGE: editor
           VERSION: ${{ steps.version.outputs.current-version }}
-
-      - name: install expect
-        run: sudo apt install expect
 
       - name: publish to bitsy.org 
         run: expect -c 'spawn sftp ${{ secrets.FTP_USER }}@${{ secrets.FTP_SERVER }} ; sleep 10 ; send "yes\r" ; expect "password:" ; send "${{ secrets.FTP_PASS }}\r" ; expect "sftp>" ; send "put -r editor/\r" ; expect "sftp>" ; send "bye\r" ; expect eof'
