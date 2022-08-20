@@ -75,7 +75,7 @@ function setTitle(titleSrc) {
 /* VERSION */
 var version = {
 	major: 8, // major changes
-	minor: 1, // smaller changes
+	minor: 2, // smaller changes
 	devBuildPhase: "RELEASE",
 };
 function getEngineVersion() {

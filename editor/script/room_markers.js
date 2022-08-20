@@ -326,7 +326,10 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 
 					var editRoomSelect = document.getElementById("editRoomMarker" + (i + 1));
 					editRoomSelect.innerHTML = "";
-					for (id in room) {
+
+					var roomIds = sortedRoomIdList();
+					for (var j = 0; j < roomIds.length; j++) {
+						var id = roomIds[j];
 						var roomName = room[id].name ? room[id].name : localization.GetStringOrFallback("room_tool_name", "room") + " " + id;
 						var roomOption = document.createElement("option");
 						roomOption.value = id;
@@ -334,6 +337,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 						roomOption.selected = pos ? pos.room === id : false;
 						editRoomSelect.appendChild(roomOption);
 					}
+
 					editRoomSelect.onchange = function(index, input) {
 						return function() {
 							var curPos = curMarker.GetMarkerPos(index);

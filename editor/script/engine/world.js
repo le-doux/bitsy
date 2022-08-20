@@ -265,7 +265,7 @@ function parseWorld(file) {
 			//skip blank lines & comments
 			i++;
 		}
-		else if (getType(curLine) == "PAL") {
+		else if (getType(curLine) === "PAL") {
 			i = parsePalette(parseState, world);
 		}
 		else if (getType(curLine) === "ROOM" || getType(curLine) === "SET") { // SET for back compat

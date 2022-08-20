@@ -1,9 +1,12 @@
 ## Engine and Editor Development
 
 - Adam Le Doux - Project Lead
+- @alts - Contributor
 - @ayolland - Contributor
+- @david-c14 - Contributor
 - Elkie - Contributor
 - equa (@equaa) - Contributor
+- max - Contributor
 - @ragzouken - Contributor
 - Samuel Fine - Contributor
 - Sean S. LeBlanc - Contributor
@@ -31,6 +34,7 @@
 - Elkie - Russian translation
 - Em - Swedish translation
 - enui - Italian translation
+- Florencia Rumpel Rodriguez (@\_\_rumpel) - Spanish translation
 - Game Makers Iceland - Icelandic translation
 - Kai Werder - German translation
 - Marina Díez - Spanish and Italian translation

@@ -1,0 +1,251 @@
+id	es
+about_tool_name	sobre
+about_tool_title	Sobre Bitsy
+about1	¡Hola! Bitsy es un motor para crear pequeños juegos y mundos. El objetivo es crear juegos fácilmente en cualquier lugar.
+about10_link_twitter	adam
+about2	¿No sabes por dónde empezar? ¡Prueba este
+about3_link_tutorial	tutorial de Bitsy!
+about4	Si necesitas inspiración, puedes
+about5_link_games	jugar a otros juegos de Bitsy
+about6	¡Puedes encontrar otros títulos en
+about7_link_itchio	itch.io
+about8	que es un gran lugar para compartir tus creaciones!
+about9	¡Diviértete creando en Bitsy! 
+action_add_new	
+action_back	
+action_cancel	
+action_save	
+animation_frame1	frame 1
+animation_frame2	frame 2
+animation_preview	previsualizar
+animation_title	animación
+author_by	por
+author_twitter	@adamledoux
+avatar_label	avatar
+axis_x_label	
+axis_y_label	
+bitsy_title	Bitsy
+branch_add	
+branch_type_default	
+branch_type_item	
+branch_type_variable	
+branching_list_description	
+branching_list_name	
+browser_chrome	chrome
+browser_firefox	firefox
+close_label	cerrar
+condition_else_if_label	
+condition_else_label	
+condition_if_label	
+condition_then_label	
+condition_type_custom	personalizado
+condition_type_default	por defecto
+cycle_list_description	
+cycle_list_name	
+cycle_name	
+data_tool_name	datos del juego
+default_end_dlg	Fin
+default_item_dlg	Encontraste una buena taza de té
+default_sprite_dlg	
+default_title	Escribe el título de tú juego aqui
+destination_label	destino
+dialog_action_category_dialog	
+dialog_action_category_exit	
+dialog_action_category_item	
+dialog_action_category_list	
+dialog_action_item_decrease	
+dialog_action_item_increase	
+dialog_action_item_set	
+dialog_action_locked_set	
+dialog_action_variable_change	
+dialog_action_variable_set	
+dialog_block_basic	diálogo
+dialog_block_conditional	condicional
+dialog_block_list	lista
+dialog_block_new	nueva sección
+dialog_conditional_add	añadir opción
+dialog_conditional_when	cuando
+dialog_effect_color1	color 1
+dialog_effect_color2	color 2
+dialog_effect_color3	color 3
+dialog_effect_drawing	
+dialog_effect_new	efectos de texto
+dialog_effect_rainbow	arcoiris
+dialog_effect_shaky	tembloroso
+dialog_effect_wavy	ondulado
+dialog_hide_code	esconder código
+dialog_list_add	añadir línea
+dialog_list_order	orden:
+dialog_no_selection	Selecciona un sprite u objeto para editar este diálogo
+dialog_show_code	mostrar código
+dialog_start_preview	previsualizar
+dialog_tool_name	diálogo
+download_data	descargar data
+download_font	descargar fuente
+download_game	descargar juego como html
+download_html	descargar juego como html
+download_tool_name	descargar
+editor_settings	ajustes del editor
+ending_dialog	dialógo de final
+ending_label	final
+ending_place	colocar final
+ending_place_help	haz click en un espacio de la sala para añadir un final
+ending_remove	eliminar el final seleccionado
+endings_tool_name	finales
+exit_click_add	haz click en un espacio de la sala para añadir una salida
+exit_delete	borrar salida seleccionada
+exit_destination	esta salida te lleva a
+exit_destination_move	
+exit_dialog	
+exit_dialog_lock_add	
+exit_dialog_lock_default_text1	
+exit_dialog_lock_default_text2	
+exit_dialog_lock_name	
+exit_dialog_narration_add	
+exit_dialog_narration_default_text	
+exit_dialog_narration_name	
+exit_label	salida
+exit_new	coloca una nueva salida
+exit_one_way_label	
+exit_options	opciones de salida
+exit_return_label	regresar salida
+exit_selected	salida seleccionada
+exit_selected_none	no has seleccionado una salida
+exit_transition_label	efectos de transición
+exits_tool_name	salidas
+explorer_tool_name	buscar dibujo
+expression_builder_all_clear	
+filter_placeholder	filtrar dibujos
+font_arabic	arábico
+font_arabic_description	Fuente pixel con carácteres arábicos.
+font_ascii_small	ASCII - pequeño
+font_ascii_small_description	La fuente pequeña sólo sirve para carácteres ASCII, que incluye los carácteres del inglés y algunos símbolos.
+font_custom_description	Sube tú fuente personalizada en el formato “.bitsyfont”!
+font_data_toggle_visible	datos de la fuente
+font_label	fuente
+font_missing_character	La fuente actual no incluye algunos de los carácteres usados en tú dialógo. No todo el texto de tú juego se va a mostrar correctamente. Considera elegir una fuente distinta en las opciones.
+font_unicode_asian	Unicode asiático
+font_unicode_asian_description	Fuente grande que incluye carácteres para lenguajes asiáticos como chino, japonés y coreano.
+font_unicode_european_large	Unicode Europeo - grande
+font_unicode_european_large_description	Fuente grande con soporte unicode. Incluye los carácteres usados en todos los lenguajes europeos.
+font_unicode_european_small	Unicode Europeo - pequeño
+font_unicode_european_small_description	Fuente pequeña con un poco de soporte unicode. Incluye los carácteres usados en la mayoría de los lenguajes europeos.
+function_end_description	
+function_end_help	
+function_end_name	
+function_exit_description	
+function_exit_name	
+function_item_description	
+function_item_name	
+function_pg_description	
+function_pg_help	
+function_pg_name	
+function_print_description	
+function_print_name	
+function_property_description	
+function_property_locked_example_help	
+function_property_name	
+function_say_name	
+game_settings	ajustes del juego
+gif_download	descargar gif
+gif_encoding	codificando...
+gif_recording	grabando...
+gif_snapshot	captura
+gif_start	empezar grabación
+gif_stop	parar grabación
+gif_tool_name	grabar gif
+grid_toggle_visible	grid
+import_html	importar juego desde archivo html
+instructions_title	instrucciones
+instructions1	puedes dibujar cosas en la caja de pintura, después colócalo en tu mundo en la caja de room. Puedes escribir también diálogos para tus personajes (aka sprites). ¡Ah! Y también puedes animar tus dibujos si quieres! 
+instructions10	puedes crear múltiples salas, pero no te olvides de conectarlas añadiendo algunas salidas
+instructions11	usa "compartir juego" para descargarlo como un archivo html. Puedes enviarlo en un mail a un amigo o compartirlo online!
+instructions12	si quieres hablar sobre bitsy, reportar un bug, o compartir el juego que has creado, estoy en twitter
+instructions13_link_twitter	@adamledoux
+instructions14	o puedes escribir en
+instructions15_link_forum	el foro de la comunidad
+instructions16	Agradecimientos especiales a: 
+instructions17	mary-margaret
+instructions18	seattle game meetup folks
+instructions19	¡todas las personas que forman la comunidad de Bitsy!
+instructions2	algunas palabras clave: 
+instructions3	room - una sala de tu juego
+instructions4	avatar: el personaje del jugador
+instructions5	tile: un elemento del escenario
+instructions6	sprite: un elemento o personaje interactivo
+instructions7	para probar tu juego cambia a modo de juego:
+instructions8	para probar tu juego cambia al modo de juego: 
+instructions9	habla con los sprites acercándote a ellos
+inventory_tool_name	inventario
+item_label	item
+items_label	items
+language_label	idioma
+language_name	Español
+language_translator_credit	Versión española por Marina Díez (@Ninfa_dp) y Florencia Rumpel Rodriguez (@__rumpel)
+list_type_description_cycle	ciclo (dice cada línea, entonces repite)
+list_type_description_sequence	secuencia (dice cada línea una vez) 
+list_type_description_shuffle	shuffle (dice cada línea en un orden cualquiera)
+marker_move	mover
+marker_move_click	click en la sala
+marker_moving	moviendo
+marker_tool_empty	Todavía no hay salidas ni finales en esta sala! Las puedes agregar con esta herramienta. =)
+marker_tool_name	salidas y finales
+name_label	nombre
+open_settings	abrir opciones
+option_fixed_size	resolución fija
+option_full_size	página completa
+option_page_color	color de la página html
+option_window_size	tamaño de la pantalla de juego
+options_label	opciones
+paint_tool_name	dibujar
+palette_background	color de fondo
+palette_label	paleta
+palette_sprite	color del sprite
+palette_tile	color del tile
+palette_tool_advanced	selecciona una paleta
+palette_tool_name	colores
+play_game	jugar
+reset_data	reset datos de juego
+reset_game	nuevo juego
+reset_game_message	Crear un nuevo juego va a borrar tu data vieja. Considera exportar tu trabajo primero! Empezar de cero?
+room_add_endings	añadir finales
+room_add_exits	añadir salidas
+room_add_markers	añadir salidas y finales
+room_label	sala
+room_tool_advanced	herramientas de juego
+room_tool_name	room
+sequence_list_description	
+sequence_list_name	
+sequence_name	
+settings_tool_name	ajustes
+shuffle_list_description	
+shuffle_list_name	
+shuffle_name	
+sprite_label	sprite
+stop_game	pausar
+text_direction_description	Opciones para idiomas que se leen de derecha a izquierda
+text_direction_label	dirección del texto
+text_direction_ltr	Izquierda a Derecha
+text_direction_rtl	Derecha a Izquierda
+tile_label	tile
+title_placeholder	Titúlo
+tools_label	Herramientas
+transition_fade_b	
+transition_fade_w	
+transition_slide_d	
+transition_slide_l	
+transition_slide_r	
+transition_slide_u	
+transition_tunnel	
+transition_wave	
+unsupported_features	oh oh! tu navegador no es compatible con todas las funcionalidades de Bitsy y es posible que algunas no funcionen correctamente. Puedes intentar utilizar otros como:
+unsupported_features_dismiss	Entiendo. Oculta este mensaje. 
+upload_font	subir fuente
+upload_game	subir juego
+value_type_text	
+variable_add	añadir variable
+variable_label	variables
+variables_label	variables
+version_notes_title	qué hay de nuevo
+wall_toggle	pared
+walls_toggle_visible	muros
