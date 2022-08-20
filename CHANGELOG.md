@@ -1,9 +1,11 @@
 ## 8.2
 
+- updated ascii_small.bitsyfont to use correct UTF8 codes
 - add spanish translations by Florencia Rumpel Rodriguez (@\_\_rumpel)
 - fix: find tools thumbnails weren't crisp in firefox
 - fix: font parser wasn't use per-character height when reading lines
 - fix: room order in exit tool matches order in room tool
+- fix: typo in palette ID comparison during world parsing
 
 ## 8.1
 
