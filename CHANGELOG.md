@@ -1,5 +1,6 @@
 ## 8.2
 
+- add spanish translations by Florencia Rumpel Rodriguez (@\_\_rumpel)
 - fix: find tools thumbnails weren't crisp in firefox
 - fix: font parser wasn't use per-character height when reading lines
 - fix: room order in exit tool matches order in room tool

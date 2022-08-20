@@ -34,6 +34,7 @@
 - Elkie - Russian translation
 - Em - Swedish translation
 - enui - Italian translation
+- Florencia Rumpel Rodriguez (@\_\_rumpel) - Spanish translation
 - Game Makers Iceland - Icelandic translation
 - Kai Werder - German translation
 - Marina Díez - Spanish and Italian translation
