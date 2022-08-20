@@ -1,21 +1,44 @@
 var fs = require('fs');
+var path = require('path');
+
+var dirIcons = "../resources/icons";
+
+// delete existing icons
+fs.readdirSync(path.resolve(__dirname, dirIcons))
+	.map(file => path.join(dirIcons, file))
+	.forEach(file => {
+		fs.unlinkSync(path.resolve(__dirname, file));
+	});
+
 
 // todo : use flood fill to merge pixels into continuous vector shapes
 
 console.log("*** initializing bitsy ***");
 
-// load the bitsy engine
-eval(fs.readFileSync("../../editor/script/engine/color_util.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/font.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/transition.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/script.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/dialog.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/renderer.js", "utf8"))
-eval(fs.readFileSync("../../editor/script/engine/bitsy.js", "utf8"))
+function bitsyLog(str) {
+	console.log("bitsy:: " + str);
+}
+
+// mock out global dependencies of `world.js`
+var bitsy = {
+	log: bitsyLog,
+	MAP_SIZE: 16,
+	TILE_SIZE: 8,
+};
+var scriptUtils = {
+	ReadDialogScript(_, index){
+		return { index };
+	},
+};
+// evaluate `world.js` to provide access to `parseWorld` in global scope
+eval(fs.readFileSync(path.resolve(__dirname, "../../editor/script/engine/world.js"), { encoding: "utf8" }));
 
 console.log("*** loading drawings ***")
 
-parseWorld(fs.readFileSync("icons.bitsy", "utf8"));
+var iconBitsySrc = fs.readFileSync(path.resolve(__dirname, "icons.bitsy"), { encoding: "utf8" });
+iconBitsySrc = iconBitsySrc.replace(/\r\n/g, "\n"); // clean up line endings
+var world = parseWorld(iconBitsySrc);
+var tile = world.tile;
 
 console.log("*** generating icons ***");
 
@@ -42,7 +65,7 @@ function drawingToSvg(bitmapArray, width, height, filename) {
 
 	svg += '</svg>' + '\n';
 
-	fs.writeFileSync(filename, svg);
+	fs.writeFileSync(filename, svg, { encoding: "utf-8" });
 }
 
 for (var t in tile) {
@@ -51,14 +74,14 @@ for (var t in tile) {
 
 	console.log(name);
 
-	var imageSource = renderer.GetImageSource(drwId);
+	var imageSource = world.drawings[drwId];
 
 	var frame0 = imageSource[0];
 
-	drawingToSvg(frame0, 8, 8, "../resources/icons/icon_" + name + ".svg");
+	drawingToSvg(frame0, 8, 8, path.resolve(__dirname, dirIcons, "icon_" + name + ".svg"));
 
 	if (imageSource.length > 1) {
 		var frame1 = imageSource[1];
-		drawingToSvg(frame1, 8, 8, "../resources/icons/icon_" + name + "_f1.svg");
+		drawingToSvg(frame1, 8, 8, path.resolve(__dirname, dirIcons, "icon_" + name + "_f1.svg"));
 	}
 }

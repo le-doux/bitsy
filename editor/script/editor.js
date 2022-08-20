@@ -136,16 +136,23 @@ function safeParseHex(str) {
 
 /* UTILS */
 function getContrastingColor(palId) {
-	if (!palId) palId = curPal();
-	var hsl = rgbToHsl( getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2] );
-	// bitsyLog(hsl, "editor");
-	var lightness = hsl[2];
-	if (lightness > 0.5) {
-		return "#000";
-	}
-	else {
+	if (isColorDark(palId)) {
 		return "#fff";
 	}
+	else {
+		return "#000";
+	}
+}
+
+function isColorDark(palId) {
+	if (!palId) {
+		palId = curDefaultPal();
+	}
+
+	var hsl = rgbToHsl(getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2]);
+	var lightness = hsl[2];
+
+	return lightness <= 0.5;
 }
 
 function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
@@ -209,7 +216,6 @@ function makeDrawing(id, imageData) {
 function on_change_title(e) {
 	setTitle(e.target.value);
 	refreshGameData();
-	tryWarnAboutMissingCharacters(getTitle());
 
 	// make sure all editors with a title know to update
 	events.Raise("dialog_update", { dialogId:titleDialogId, editorId:null });
@@ -535,7 +541,7 @@ function setDefaultGameState() {
 	document.getElementById("game_data").value = defaultData;
 	Store.set('game_data', document.getElementById("game_data").value); // save game
 	clearGameData();
-	parseWorld(document.getElementById("game_data").value); // load game
+	loadWorldFromGameData(document.getElementById("game_data").value); // load game
 
 	// refresh images
 	renderer.ClearCache();
@@ -574,18 +580,19 @@ function resetGameData() {
 	renderer.ClearCache();
 
 	updateExitOptionsFromGameData();
-	updateRoomName();
 	updateInventoryUI();
 	updateFontSelectUI(); // hmm is this really the place for this?
 
 	on_paint_avatar();
 	document.getElementById('paintOptionAvatar').checked = true;
 
-	paintTool.updateCanvas(); // hacky - assumes global paintTool and roomTool
+	paintTool.updateCanvas();
 	markerTool.Clear(); // hacky -- should combine more of this stuff together
-	markerTool.SetRoom(curRoom);
 	markerTool.Refresh();
-	roomTool.drawEditMap();
+
+	roomTool.selectAtIndex(0);
+	tuneTool.selectAtIndex(0);
+	blipTool.selectAtIndex(0);
 
 	events.Raise("game_data_change"); // TODO -- does this need to have a specific reset event or flag?
 
@@ -612,9 +619,6 @@ function refreshGameData() {
 	// Store.set("game_data", gameData); //auto-save
 
 	Store.set("game_data", gameDataNoFonts);
-
-	// todo : test if re-enabling this going to mess up HTML imports?
-	events.Raise("game_data_refresh");
 }
 
 /* TIMER */
@@ -744,6 +748,8 @@ var defaultPanelPrefs = {
 		{ id:"findPanel",			visible:false,	position:9  },
 		{ id:"inventoryPanel",		visible:false,	position:10 },
 		{ id:"settingsPanel",		visible:false,	position:11 },
+		{ id:"tunePanel",			visible:false,	position:12 },
+		{ id:"blipPanel",			visible:false,	position:13 },
 	]
 };
 // bitsyLog(defaultPanelPrefs, "editor");
@@ -752,7 +758,7 @@ function getPanelPrefs() {
 	// (TODO: weird that engine version and editor version are the same??)
 	var storedEngineVersion = Store.get('engine_version');
 	var useDefaultPrefs = (!storedEngineVersion) ||
-	                      (storedEngineVersion.major < 6) ||
+	                      (storedEngineVersion.major < 8) ||
 	                      (storedEngineVersion.minor < 0);
 	var prefs = useDefaultPrefs ? defaultPanelPrefs : Store.get('panel_prefs', defaultPanelPrefs);
 
@@ -819,8 +825,6 @@ function start() {
 	initSystem();
 
 	events.Listen("game_data_change", function(event) {
-		updatePaletteOptionsFromGameData();
-
 		// TODO -- over time I can move more things in here
 		// on the other hand this is still sort of global thing that we don't want TOO much of
 
@@ -858,23 +862,13 @@ function start() {
 		window.alert('A storage error occurred: The editor will continue to work, but data may not be saved/loaded. Make sure to export a local copy after making changes, or your gamedata may be lost!');
 	});
 
-	//game canvas & context (also the map editor)
-	attachCanvas( document.getElementById("game") );
-
-	//init tool controllers
-	roomTool = new RoomTool(canvas);
-	roomTool.listenEditEvents()
-	roomTool.editDrawingAtCoordinateCallback = editDrawingAtCoordinate;
-
-	paintTool = new PaintTool(document.getElementById("paint"),roomTool);
+	paintTool = new PaintTool(document.getElementById("paint"), document.getElementById("newPaintMenu"));
 	paintTool.onReloadTile = function(){ reloadTile() };
 	paintTool.onReloadSprite = function(){ reloadSprite() };
 	paintTool.onReloadItem = function(){ reloadItem() };
 
 	markerTool = new RoomMarkerTool(document.getElementById("markerCanvas1"), document.getElementById("markerCanvas2") );
 	bitsyLog("MARKER TOOL " + markerTool, "editor");
-
-	roomTool.markers = markerTool;
 
 	//
 	drawingThumbnailCanvas = document.createElement("canvas");
@@ -887,7 +881,6 @@ function start() {
 	if (fontStorage) {
 		fontManager.AddResource(fontStorage.name + ".bitsyfont", fontStorage.fontdata);
 	}
-	resetMissingCharacterWarning();
 
 	//load last auto-save
 	var gamedataStorage = Store.get('game_data');
@@ -903,32 +896,12 @@ function start() {
 
 	drawing = sprite["A"]; // will this break?
 
-	roomIndex = sortedRoomIdList().indexOf(curRoom);
-
-	markerTool.SetRoom(curRoom);
-
-	// load panel preferences
-	var prefs = getPanelPrefs();
-	Store.set('panel_prefs', prefs); // save loaded prefs
-	var sortedWorkspace = prefs.workspace.sort( function(a,b) { return a.position - b.position; } );
-	var editorContent = document.getElementById("editorContent");
-	for(i in sortedWorkspace) {
-		var panelSettings = sortedWorkspace[i];
-		var panelElement = document.getElementById(panelSettings.id);
-		if (panelElement != undefined && panelElement != null) {
-			togglePanelCore( panelSettings.id, panelSettings.visible, false /*doUpdatePrefs*/ );
-			editorContent.insertBefore( panelElement, null ); //insert on the left
-		}
-	}
+	roomIndex = sortedRoomIdList().indexOf(state.room);
 
 	//draw everything
 	on_paint_avatar();
 	paintTool.updateCanvas();
 	markerTool.Refresh();
-	roomTool.drawEditMap();
-
-	updateRoomPaletteSelect(); //dumb to have to specify this here --- wrap up room UI method?
-	updateRoomName(); // init the room UI
 
 	document.getElementById("inventoryOptionItem").checked = true; // a bit hacky
 	updateInventoryUI();
@@ -942,7 +915,6 @@ function start() {
 	});
 	events.Listen("palette_list_change", function(event) {
 		refreshGameData();
-		updatePaletteOptionsFromGameData();
 	});
 
 	//unsupported feature stuff
@@ -992,17 +964,24 @@ function start() {
 	}
 
 	onInitRoom = function(id) {
-		var curRoomName = "";
+		var name = "";
 
 		// basically copied from find tool
 		if (room[id].name) {
-			curRoomName = room[id].name;
+			name = room[id].name;
 		}
 		else {
-			curRoomName = localization.GetStringOrFallback("room_label", "room") + " " + id;
+			name = localization.GetStringOrFallback("room_label", "room") + " " + id;
 		}
 
-		document.getElementById("roomCurLocationText").innerText = curRoomName;
+		if (roomTool && isPlayMode) {
+			var curRoomLocationDiv = document.getElementById("curRoomLocation");
+			curRoomLocationDiv.innerHTML = "";
+			curRoomLocationDiv.appendChild(createLabelElement({
+				icon: "set_exit_location",
+				text: name
+			}));
+		}
 	}
 
 	//color testing
@@ -1049,6 +1028,40 @@ function start() {
 	findTool = new FindTool({
 		mainElement : document.getElementById("findPanelMain"),
 	});
+
+	// hack: reload drawing after find tool is created, so the blip dropdown is up-to-date
+	paintTool.reloadDrawing();
+
+	// ROOM TOOL
+	roomTool = makeRoomTool();
+	roomTool.rootElement.classList.add("bitsy-playmode-enable");
+	roomTool.titlebarElement.classList.add("bitsy-playmode-reverse-color");
+	roomTool.nav.element.classList.add("bitsy-playmode-hide");
+	var curRoomLocationDiv = document.createElement("div");
+	curRoomLocationDiv.id = "curRoomLocation";
+	curRoomLocationDiv.classList.add("bitsy-playmode-show");
+	curRoomLocationDiv.classList.add("bitsy-playmode-room-location");
+	roomTool.mainElement.insertBefore(curRoomLocationDiv, roomTool.canvasElement);
+	// attach engine to room tool canvas for play mode
+	attachCanvas(roomTool.canvasElement);
+
+	// sound tools
+	tuneTool = makeTuneTool();
+	blipTool = makeBlipTool();
+
+	// load panel preferences
+	var prefs = getPanelPrefs();
+	Store.set('panel_prefs', prefs); // save loaded prefs
+	var sortedWorkspace = prefs.workspace.sort( function(a,b) { return a.position - b.position; } );
+	var editorContent = document.getElementById("editorContent");
+	for(i in sortedWorkspace) {
+		var panelSettings = sortedWorkspace[i];
+		var panelElement = document.getElementById(panelSettings.id);
+		if (panelElement != undefined && panelElement != null) {
+			togglePanelCore( panelSettings.id, panelSettings.visible, false /*doUpdatePrefs*/ );
+			editorContent.insertBefore( panelElement, null ); //insert on the left
+		}
+	}
 }
 
 function newDrawing() {
@@ -1079,37 +1092,6 @@ function prevTile() {
 
 	paintTool.curDrawingFrameIndex = 0;
 	paintTool.reloadDrawing();
-}
-
-function updateRoomName() {
-	if (curRoom == null) { 
-		return;
-	}
-
-	// document.getElementById("roomId").innerHTML = curRoom;
-	var roomLabel = localization.GetStringOrFallback("room_label", "room");
-	document.getElementById("roomName").placeholder = roomLabel + " " + curRoom;
-	if(room[curRoom].name != null) {
-		document.getElementById("roomName").value = room[curRoom].name;
-	}
-	else {
-		document.getElementById("roomName").value = "";
-	}
-}
-
-// TODO : consolidate these function and rename them something nicer
-function on_room_name_change() {
-	var str = document.getElementById("roomName").value;
-	if(str.length > 0) {
-		room[curRoom].name = str;
-	}
-	else {
-		room[curRoom].name = null;
-	}
-
-	updateNamesFromCurData()
-
-	refreshGameData();
 }
 
 function on_drawing_name_change() {
@@ -1190,127 +1172,7 @@ function on_palette_name_change(event) {
 }
 
 function selectRoom(roomId) {
-	// ok watch out this is gonna be hacky
-	var ids = sortedRoomIdList();
-
-	var nextRoomIndex = -1;
-	for (var i = 0; i < ids.length; i++) {
-		if (ids[i] === roomId) {
-			nextRoomIndex = i;
-		}
-	}
-
-	if (nextRoomIndex != -1) {
-		roomIndex = nextRoomIndex;
-
-		curRoom = ids[roomIndex];
-		initRoom(curRoom);
-
-		markerTool.SetRoom(curRoom);
-		roomTool.drawEditMap();
-		paintTool.updateCanvas();
-		updateRoomPaletteSelect();
-
-		if (drawing.type === TileType.Tile) {
-			updateWallCheckboxOnCurrentTile();
-		}
-
-		updateRoomName();
-
-		events.Raise("select_room", { id: roomId });
-	}
-}
-
-function nextRoom() {
-	var ids = sortedRoomIdList();
-
-	roomIndex = (roomIndex + 1) % ids.length;
-
-	curRoom = ids[roomIndex];
-	initRoom(curRoom);
-
-	markerTool.SetRoom(curRoom);
-	roomTool.drawEditMap();
-	paintTool.updateCanvas();
-	updateRoomPaletteSelect();
-
-	if (drawing.type === TileType.Tile) {
-		updateWallCheckboxOnCurrentTile();
-	}
-
-	updateRoomName();
-
-	events.Raise("select_room", { id: curRoom });
-}
-
-function prevRoom() {
-	var ids = sortedRoomIdList();
-
-	roomIndex--;
-	if (roomIndex < 0) {
-		roomIndex = (ids.length - 1);
-	}
-
-	curRoom = ids[roomIndex];
-	initRoom(curRoom);
-
-	markerTool.SetRoom(curRoom);
-	roomTool.drawEditMap();
-	paintTool.updateCanvas();
-	updateRoomPaletteSelect();
-
-	if (drawing.type === TileType.Tile) {
-		updateWallCheckboxOnCurrentTile();
-	}
-
-	updateRoomName();
-
-	events.Raise("select_room", { id: curRoom });
-}
-
-function duplicateRoom() {
-	var copyRoomId = sortedRoomIdList()[roomIndex];
-	var roomToCopy = room[ copyRoomId ];
-
-	roomIndex = Object.keys( room ).length;
-	var newRoomId = nextRoomId();
-
-	bitsyLog(newRoomId, "editor");
-	var duplicateTilemap = [];
-	for (y in roomToCopy.tilemap) {
-		duplicateTilemap.push([]);
-		for (x in roomToCopy.tilemap[y]) {
-			duplicateTilemap[y].push( roomToCopy.tilemap[y][x] );
-		}
-	}
-
-	var duplicateExits = [];
-	for (i in roomToCopy.exits) {
-		var exit = roomToCopy.exits[i];
-		duplicateExits.push( duplicateExit( exit ) );
-	}
-
-	room[newRoomId] = {
-		id : newRoomId,
-		tilemap : duplicateTilemap,
-		walls : roomToCopy.walls.slice(0),
-		exits : duplicateExits,
-		endings : roomToCopy.endings.slice(0),
-		pal : roomToCopy.pal,
-		items : []
-	};
-	refreshGameData();
-
-	curRoom = newRoomId;
-	//bitsyLog(curRoom, "editor");
-	markerTool.SetRoom(curRoom); // hack to re-find all the markers
-	roomTool.drawEditMap();
-	paintTool.updateCanvas();
-	updateRoomPaletteSelect();
-
-	updateRoomName();
-
-	events.Raise("select_room", { id: curRoom });
+	roomTool.select(roomId);
 }
 
 function duplicateExit(exit) {
@@ -1326,99 +1188,6 @@ function duplicateExit(exit) {
 		dlg: exit.dlg,
 	}
 	return newExit;
-}
-
-function newRoom() {
-	roomIndex = Object.keys( room ).length;
-	var roomId = nextRoomId();
-
-	var palIdList = sortedPaletteIdList();
-	var palId = palIdList.length > 0 ? palIdList[0] : "default";
-
-	bitsyLog(roomId, "editor");
-	room[roomId] = {
-		id : roomId,
-		tilemap : [
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],
-				["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"]
-			],
-		walls : [],
-		exits : [],
-		endings : [],
-		effects : [],
-		pal : palId,
-		items : []
-	};
-	refreshGameData();
-
-	curRoom = roomId;
-	//bitsyLog(curRoom, "editor");
-	markerTool.SetRoom(curRoom);
-	roomTool.drawEditMap();
-	paintTool.updateCanvas();
-	updateRoomPaletteSelect();
-
-	updateRoomName();
-
-	// add new exit destination option to exits panel
-	// var select = document.getElementById("exitDestinationSelect");
-	// var option = document.createElement("option");
-	// var roomLabel = localization.GetStringOrFallback("room_label", "room");
-	// option.text = roomLabel + " " + roomId;
-	// option.value = roomId;
-	// select.add(option);
-
-	events.Raise("select_room", { id: curRoom });
-}
-
-function deleteRoom() {
-	if ( Object.keys(room).length <= 1 ) {
-		alert("You can't delete your only room!");
-	}
-	else if ( confirm("Are you sure you want to delete this room? You can't get it back.") ) {
-		var roomId = sortedRoomIdList()[roomIndex];
-
-		// delete exits in _other_ rooms that go to this room
-		for( r in room )
-		{
-			if( r != roomId) {
-				for( i in room[r].exits )
-				{
-					if( room[r].exits[i].dest.room === roomId )
-					{
-						room[r].exits.splice( i, 1 );
-					}
-				}
-			}
-		}
-
-		delete room[roomId];
-
-		refreshGameData();
-
-		markerTool.Clear();
-		nextRoom();
-		roomTool.drawEditMap();
-		paintTool.updateCanvas();
-		updateRoomPaletteSelect();
-		markerTool.Refresh();
-		// updateExitOptionsFromGameData();
-		//recreate exit options
-	}
 }
 
 function nextItem() {
@@ -1587,8 +1356,8 @@ function updateWallCheckboxOnCurrentTile() {
 	var isCurTileWall = false;
 
 	if( tile[ drawing.id ].isWall == undefined || tile[ drawing.id ].isWall == null ) {
-		if (room[curRoom]) {
-			isCurTileWall = (room[curRoom].walls.indexOf(drawing.id) != -1);
+		if (room[state.room]) {
+			isCurTileWall = (room[state.room].walls.indexOf(drawing.id) != -1);
 		}
 	}
 	else {
@@ -1709,6 +1478,39 @@ function toggleDownloadOptions(e) {
 	}
 }
 
+// hacky - part of hiding font data from the game data
+function getFullGameData() {
+	// return document.getElementById("game_data").value + fontManager.GetData(fontName);
+	return serializeWorld();
+}
+
+function togglePlayMode(e) {
+	if (e.target.checked) {
+		on_play_mode();
+	}
+	else {
+		on_edit_mode();
+	}
+
+	updatePlayModeButton();
+}
+
+function on_play_mode() {
+	isPlayMode = true;
+	if (document.getElementById("roomPanel").style.display === "none") {
+		showPanel("roomPanel");
+	}
+	else {
+		document.getElementById("roomPanel").scrollIntoView();
+	}
+	roomTool.setTitlebar("play", "playing...");
+	roomTool.system._active = false;
+	roomTool.menu.update();
+	document.getElementById("appRoot").classList.add("bitsy-playmode");
+	// todo : I feel likef I need to take a look at the font manager and simplify things there
+	loadGame(roomTool.canvasElement, getFullGameData(), fontManager.GetData(defaultFontName));
+}
+
 function on_edit_mode() {
 	isPlayMode = false;
 
@@ -1718,12 +1520,9 @@ function on_edit_mode() {
 	quitGame();
 
 	// TODO I should really do more to separate the editor's game-data from the engine's game-data
-	parseWorld(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
+	loadWorldFromGameData(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
 
-	curRoom = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
-
-	roomTool.drawEditMap();
-	roomTool.listenEditEvents();
+	state.room = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
 
 	markerTool.RefreshKeepSelection();
 
@@ -1741,23 +1540,24 @@ function on_edit_mode() {
 		// }
 	}
 
+	// make sure global drawing object is from the current world data
+	if (drawing.type === TileType.Tile) {
+		drawing = tile[drawing.id];
+	}
+	else if (drawing.type === TileType.Avatar || drawing.type === TileType.Sprite) {
+		drawing = sprite[drawing.id];
+	}
+	else if (drawing.type === TileType.Item) {
+		drawing = item[drawing.id];
+	}
+	paintTool.reloadDrawing();
+
+	renderer.ClearCache(true);
+	roomTool.resetTitlebar();
+	roomTool.system._active = true;
+	roomTool.menu.update();
+
 	events.Raise("on_edit_mode");
-}
-
-// hacky - part of hiding font data from the game data
-function getFullGameData() {
-	// return document.getElementById("game_data").value + fontManager.GetData(fontName);
-	return serializeWorld();
-}
-
-function on_play_mode() {
-	isPlayMode = true;
-
-	document.getElementById("appRoot").classList.add("bitsy-playmode");
-
-	roomTool.unlistenEditEvents();
-
-	loadGame(getFullGameData());
 }
 
 function updatePlayModeButton() {
@@ -1785,24 +1585,6 @@ function updatePaintGridCheck(checked) {
 	iconUtils.LoadIcon(document.getElementById("paintGridIcon"), checked ? "visibility" : "visibility_off");
 }
 
-function toggleMapGrid(e) {
-	roomTool.drawMapGrid = e.target.checked;
-	updateRoomGridCheck(roomTool.drawMapGrid);
-	roomTool.drawEditMap();
-	setPanelSetting("roomPanel", "grid", roomTool.drawMapGrid);
-}
-
-function updateRoomGridCheck(checked) {
-	document.getElementById("roomGridCheck").checked = checked;
-	iconUtils.LoadIcon(document.getElementById("roomGridIcon"), checked ? "visibility" : "visibility_off");
-}
-
-function toggleCollisionMap(e) {
-	roomTool.drawCollisionMap = e.target.checked;
-	iconUtils.LoadIcon(document.getElementById("roomWallsIcon"), roomTool.drawCollisionMap ? "visibility" : "visibility_off");
-	roomTool.drawEditMap();
-}
-
 var showFontDataInGameData = false;
 function toggleFontDataVisibility(e) {
 	showFontDataInGameData = e.target.checked;
@@ -1814,45 +1596,8 @@ function toggleFontDataVisibility(e) {
 var colorPicker = null;
 var paletteTool = null;
 
-function updateRoomPaletteSelect() {
-	var palOptions = document.getElementById("roomPaletteSelect").options;
-	for (i in palOptions) {
-		var o = palOptions[i];
-		// bitsyLog(o, "editor");
-		if (o.value === curPal()) {
-			o.selected = true;
-		}
-	}
-}
-
 function changeColorPickerIndex(index) {
 	paletteTool.changeColorPickerIndex(index);
-}
-
-function updatePaletteOptionsFromGameData() {
-	if (curRoom == null) {
-		return;
-	}
-
-	var select = document.getElementById("roomPaletteSelect");
-
-	// first, remove all current options
-	var i;
-	for(i = select.options.length - 1 ; i >= 0 ; i--) {
-		select.remove(i);
-	}
-
-	// then, add an option for each room
-	var paletteLabel = localization.GetStringOrFallback("palette_label", "palette");
-	for (palId in palette) {
-		if (palId != "default") {
-			var option = document.createElement("option");
-			option.text = palette[palId].name ? palette[palId].name : paletteLabel + " " + palId;
-			option.value = palId;
-			option.selected = ( palId === room[ curRoom ].pal );
-			select.add(option);
-		}
-	}
 }
 
 function prevPalette() {
@@ -1877,15 +1622,13 @@ function deletePalette() {
 
 function roomPaletteChange(event) {
 	var palId = event.target.value;
-	room[curRoom].pal = palId;
+	room[state.room].pal = palId;
 
 	// hacky?
-	initRoom(curRoom);
+	initRoom(state.room);
 
 	refreshGameData();
 
-	markerTool.SetRoom(curRoom);
-	roomTool.drawEditMap();
 	paintTool.updateCanvas();
 }
 
@@ -2019,7 +1762,8 @@ function on_paint_item_ui_update() {
 	}
 }
 
-function editDrawingAtCoordinate(x,y) {
+// todo : delete
+function editDrawingAtCoordinate(x, y) {
 	var spriteId = getSpriteAt(x,y); // todo: need more consistency with these methods
 	// bitsyLog(spriteId, "editor");
 	if(spriteId) {
@@ -2031,15 +1775,15 @@ function editDrawingAtCoordinate(x,y) {
 		}
 
 		paintTool.selectDrawing(sprite[spriteId]);
-		return;
+		return true;
 	}
 
-	var itemObj = getItem(curRoom,x,y);
+	var itemObj = getItem(state.room,x,y);
 	// bitsyLog(item, "editor");
 	if(itemObj) {
 		on_paint_item_ui_update();
 		paintTool.selectDrawing(item[itemObj.id]);
-		return;
+		return true;
 	}
 
 	var tileId = getTile(x,y);
@@ -2047,8 +1791,10 @@ function editDrawingAtCoordinate(x,y) {
 	if(tileId != 0) {
 		on_paint_tile_ui_update(); // really wasteful probably
 		paintTool.selectDrawing(tile[tileId]);
-		return;
+		return true;
 	}
+
+	return false;
 }
 
 var animationThumbnailRenderer = new ThumbnailRenderer();
@@ -2084,12 +1830,6 @@ function on_change_adv_dialog() {
 
 function on_game_data_change() {
 	on_game_data_change_core();
-
-	refreshGameData();
-
-	// ui stuff
-	markerTool.Refresh(); // wow I hope this doesn't cause bugs
-	updateRoomName();
 	refreshGameData();
 }
 
@@ -2097,7 +1837,23 @@ function on_game_data_change_core() {
 	bitsyLog(document.getElementById("game_data").value, "editor");
 
 	clearGameData();
-	var version = parseWorld(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
+	loadWorldFromGameData(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
+
+	if (roomTool) {
+		roomTool.selectAtIndex(0);
+	}
+
+	if (tuneTool) {
+		tuneTool.selectAtIndex(0);
+	}
+
+	if (blipTool) {
+		blipTool.selectAtIndex(0);
+	}
+
+	if (markerTool) {
+		markerTool.Refresh();
+	}
 
 	var curPaintMode = TileType.Avatar;
 
@@ -2127,7 +1883,6 @@ function on_game_data_change_core() {
 	renderer.ClearCache();
 
 	roomIndex = 0;
-	roomTool.drawEditMap();
 
 	if (curPaintMode === TileType.Tile) {
 		drawing = tile[sortedTileIdList()[0]];
@@ -2156,8 +1911,6 @@ function on_game_data_change_core() {
 	updateInventoryUI();
 
 	updateFontSelectUI();
-
-	markerTool.SetRoom(curRoom);
 
 	// TODO -- start using this for more things
 	events.Raise("game_data_change");
@@ -2287,37 +2040,30 @@ function cancelAddMarker() {
 
 function newExit() {
 	markerTool.AddExit(false);
-	roomTool.drawEditMap();
 }
 
 function newExitOneWay() {
 	markerTool.AddExit(true);
-	roomTool.drawEditMap();
 }
 
 function newEnding() {
 	markerTool.AddEnding();
-	roomTool.drawEditMap();
 }
 
 function duplicateMarker() {
 	markerTool.DuplicateSelected();
-	roomTool.drawEditMap(); // TODO : this should be triggered by an event really
 }
 
 function deleteMarker() {
 	markerTool.RemoveMarker();
-	roomTool.drawEditMap();
 }
 
 function prevMarker() {
 	markerTool.NextMarker();
-	roomTool.drawEditMap();
 }
 
 function nextMarker() {
 	markerTool.PrevMarker();
-	roomTool.drawEditMap();
 }
 
 function toggleMoveMarker1(e) {
@@ -2338,29 +2084,10 @@ function selectMarkerRoom2() {
 
 function changeExitDirection() {
 	markerTool.ChangeExitLink();
-	roomTool.drawEditMap();
 }
 
 function onEffectTextChange(event) {
 	markerTool.ChangeEffectText(event.target.value);
-}
-
-function showMarkers() {
-	toggleRoomMarkers(true);
-}
-
-function hideMarkers() {
-	toggleRoomMarkers(false);
-}
-
-function toggleRoomMarkers(visible) {
-	if (visible) {
-		markerTool.Refresh();
-	}
-	roomTool.areMarkersVisible = visible;
-	roomTool.drawEditMap();
-	document.getElementById("roomMarkersCheck").checked = visible;
-	iconUtils.LoadIcon(document.getElementById("roomMarkersIcon"), visible ? "visibility" : "visibility_off");
 }
 
 function onChangeExitTransitionEffect(effectId, exitIndex) {
@@ -2440,8 +2167,7 @@ function togglePanelCore(id, visible, doUpdatePrefs, insertNextToId) {
 
 	//hide/show panel
 	togglePanelUI(id, visible, insertNextToId);
-	//any side effects
-	afterTogglePanel(id, visible);
+
 	//save panel preferences
 	// savePanelPref( id, visible );
 	if (doUpdatePrefs) {
@@ -2476,28 +2202,6 @@ function togglePanelUI(id, visible, insertNextToId) {
 	// update checkbox
 	if (id != "toolsPanel") {
 		document.getElementById(id.replace("Panel","Check")).checked = visible;
-	}
-}
-
-function afterTogglePanel(id,visible) {
-	if (visible) {
-		afterShowPanel(id);
-	}
-	else {
-		afterHidePanel(id);
-	}
-}
-
-// TODO : change into event!
-function afterShowPanel(id) {
-	if (id === "exitsPanel") {
-		showMarkers();
-	}
-}
-
-function afterHidePanel(id) {
-	if (id === "exitsPanel") {
-		hideMarkers();
 	}
 }
 
@@ -2596,7 +2300,10 @@ function toggleSnapshotMode() {
 	iconUtils.LoadIcon(document.getElementById("gifSnapshotModeIcon"), iconName);
 }
 
+var isSnapshotInProgress = false;
 function takeSnapshotGif(e) {
+	isSnapshotInProgress = true;
+
 	var gif = {
 		frames: [],
 		width: 512,
@@ -2608,36 +2315,54 @@ function takeSnapshotGif(e) {
 	gifCaptureCanvas.width = 512; // stop hardcoding 512?
 	gifCaptureCanvas.height = 512;
 
-	renderGameScreenIntoContext(curRoom, gifCaptureCtx, 0);
-	var frame0 = gifCaptureCtx.getImageData(0,0,512,512);
+	var frame0;
+	var frame1;
 
-	renderGameScreenIntoContext(curRoom, gifCaptureCtx, 1);
-	var frame1 = gifCaptureCtx.getImageData(0,0,512,512);
+	var snapshotInterval;
+	var snapshotCount = 0;
 
-	if (isGifSnapshotLandscape) {
-		/* widescreen */
-		gif.width = gifCaptureWidescreenSize.width;
-		gif.height = gifCaptureWidescreenSize.height;
-		gifCaptureCanvas.width = gifCaptureWidescreenSize.width;
-		gifCaptureCanvas.height = gifCaptureWidescreenSize.height;
+	snapshotInterval = setInterval(function() {
+		if (snapshotCount === 0) {
+			gifCaptureCtx.drawImage(canvas, 0, 0, 512, 512);
+			frame0 = gifCaptureCtx.getImageData(0, 0, 512, 512);
+		}
+		else if (snapshotCount === 1) {
+			gifCaptureCtx.drawImage(canvas, 0, 0, 512, 512);
+			frame1 = gifCaptureCtx.getImageData(0, 0, 512, 512);
+		}
+		else if (snapshotCount === 2) {
+			if (isGifSnapshotLandscape) {
+				/* widescreen */
+				gif.width = gifCaptureWidescreenSize.width;
+				gif.height = gifCaptureWidescreenSize.height;
+				gifCaptureCanvas.width = gifCaptureWidescreenSize.width;
+				gifCaptureCanvas.height = gifCaptureWidescreenSize.height;
 
-		var widescreenX = (gifCaptureWidescreenSize.width / 2) - (512 / 2);
-		var widescreenY = (gifCaptureWidescreenSize.height / 2) - (512 / 2);
+				var widescreenX = (gifCaptureWidescreenSize.width / 2) - (512 / 2);
+				var widescreenY = (gifCaptureWidescreenSize.height / 2) - (512 / 2);
 
-		gifCaptureCtx.fillStyle = "rgb(" + getPal(curPal())[0][0] + "," + getPal(curPal())[0][1] + "," + getPal(curPal())[0][2] + ")";
-		gifCaptureCtx.fillRect(0,0,gifCaptureWidescreenSize.width,gifCaptureWidescreenSize.height);
+				var roomPal = getPal(room[roomTool.getSelected()].pal);
+				gifCaptureCtx.fillStyle = "rgb(" + roomPal[0][0] + "," + roomPal[0][1] + "," + roomPal[0][2] + ")";
+				gifCaptureCtx.fillRect(0, 0, gifCaptureWidescreenSize.width, gifCaptureWidescreenSize.height);
 
-		gifCaptureCtx.putImageData(frame0,widescreenX,widescreenY);
-		frame0 = gifCaptureCtx.getImageData(0,0,gifCaptureWidescreenSize.width,gifCaptureWidescreenSize.height);
+				gifCaptureCtx.putImageData(frame0,widescreenX,widescreenY);
+				frame0 = gifCaptureCtx.getImageData(0, 0, gifCaptureWidescreenSize.width, gifCaptureWidescreenSize.height);
 
-		gifCaptureCtx.putImageData(frame1,widescreenX,widescreenY);
-		frame1 = gifCaptureCtx.getImageData(0,0,gifCaptureWidescreenSize.width,gifCaptureWidescreenSize.height);
-	}
+				gifCaptureCtx.putImageData(frame1,widescreenX,widescreenY);
+				frame1 = gifCaptureCtx.getImageData(0, 0, gifCaptureWidescreenSize.width, gifCaptureWidescreenSize.height);
+			}
 
-	gif.frames.push( frame0.data );
-	gif.frames.push( frame1.data );
+			gif.frames.push(frame0.data);
+			gif.frames.push(frame1.data);
 
-	finishRecordingGif(gif);
+			finishRecordingGif(gif);
+
+			clearInterval(snapshotInterval);
+			isSnapshotInProgress = false;
+		}
+
+		snapshotCount++;
+	}, animationTime);
 }
 
 function stopRecordingGif() {
@@ -2790,6 +2515,34 @@ function importFontFromFile(e) {
 
 		// TODO
 		// fontLoadSettings.resources.set("custom.txt", fileText); // hacky!!!
+	}
+}
+
+function importGameDataFromFile(e) {
+	if (isPlayMode) {
+		alert("You can't upload a game while you're playing one! Sorry :(");
+		return;
+	}
+
+	resetGameData();
+
+	// load file chosen by user
+	var files = e.target.files;
+	var file = files[0];
+	var reader = new FileReader();
+	reader.readAsText(file);
+
+	reader.onloadend = function() {
+		var gameDataStr = reader.result;
+
+		// change game data & reload everything
+		document.getElementById("game_data").value = gameDataStr;
+		on_game_data_change();
+
+		// reset find tool (a bit heavy handed?)
+		findTool = new FindTool({
+			mainElement : document.getElementById("findPanelMain"),
+		});
 	}
 }
 
@@ -3057,7 +2810,7 @@ function on_change_color_page() {
 }
 
 function getComplimentingColor(palId) {
-	if (!palId) palId = curPal();
+	if (!palId) palId = curDefaultPal();
 	var hsl = rgbToHsl( getPal(palId)[0][0], getPal(palId)[0][1], getPal(palId)[0][2] );
 	// bitsyLog(hsl, "editor");
 	var lightness = hsl[2];
@@ -3381,7 +3134,6 @@ function pickDefaultFontForLanguage(lang) {
 		switchFont("unicode_european_small", true /*doPickTextDirection*/);
 	}
 	updateFontSelectUI();
-	resetMissingCharacterWarning();
 }
 
 function on_change_font(e) {
@@ -3394,7 +3146,6 @@ function on_change_font(e) {
 	}
 	updateFontDescriptionUI();
 	// updateEditorTextDirection();
-	resetMissingCharacterWarning();
 }
 
 function switchFont(newFontName, doPickTextDirection) {
@@ -3437,6 +3188,11 @@ function on_change_text_direction(e) {
 	refreshGameData();
 }
 
+function onChangeTextMode(e) {
+	flags.TXT_MODE = bitsy[e.target.value];
+	refreshGameData();
+}
+
 function pickDefaultTextDirectionForFont(newFontName) {
 	var newTextDirection = TextDirection.LeftToRight;
 	if (newFontName === "arabic") {
@@ -3463,6 +3219,13 @@ function updateTextDirectionSelectUI() {
 	for (var i in textDirSelect.options) {
 		var option = textDirSelect.options[i];
 		option.selected = (option.value === textDirection);
+	}
+
+	// hacky to stick this here..
+	var textModeSelect = document.getElementById("textModeSelect");
+	for (var i in textModeSelect.options) {
+		var option = textModeSelect.options[i];
+		option.selected = (bitsy[option.value] === flags.TXT_MODE);
 	}
 }
 
@@ -3513,48 +3276,6 @@ function toggleDialogDocs(e) {
 	}
 }
 
-/* WARNINGS */
-// TODO : turn this into a real system someday instead of hard-coded nonsense
-var missingCharacterWarningState = {
-	showedWarning : false,
-	curFont : null
-}
-
-function resetMissingCharacterWarning() {
-	// missingCharacterWarningState.showedWarning = false; // should I really do this every time?
-	missingCharacterWarningState.curFont = fontManager.Get( fontName );
-}
-
-function tryWarnAboutMissingCharacters(text) {
-	if (missingCharacterWarningState.showedWarning) {
-		return;
-	}
-
-	var hasMissingCharacter = false;
-
-	bitsyLog(missingCharacterWarningState.curFont.getData(), "editor");
-
-	for (var i = 0; i < text.length; i++) {
-		var character = text[i];
-		if (!missingCharacterWarningState.curFont.hasChar(character)) {
-			hasMissingCharacter = true;
-		}
-	}
-
-	if (hasMissingCharacter) {
-		showFontMissingCharacterWarning();
-	}
-}
-
-function showFontMissingCharacterWarning() {
-	document.getElementById("fontMissingCharacter").style.display = "block";
-	missingCharacterWarningState.showedWarning = true;
-}
-
-function hideFontMissingCharacterWarning() {
-	document.getElementById("fontMissingCharacter").style.display = "none";
-}
-
 /* ICONS */
 var iconUtils = new IconUtils(); // TODO : move?
 
@@ -3570,19 +3291,23 @@ function openFindTool(categoryId, insertNextToId) {
 }
 
 function openFindToolWithCurrentPaintCategory() {
-	var categoryId = "avatar";
+	var categoryId = "AVA";
 
 	if (drawing) {
 		if (drawing.type === TileType.Tile) {
-			categoryId = "tile";
+			categoryId = "TIL";
 		}
 		else if (drawing.type === TileType.Sprite) {
-			categoryId = "sprite";
+			categoryId = "SPR";
 		}
 		else if (drawing.type === TileType.Item) {
-			categoryId = "item";
+			categoryId = "ITM";
 		}
 	}
 
 	openFindTool(categoryId, "paintPanel");
 }
+
+/* SOUND TOOLS */
+var tuneTool;
+var blipTool;

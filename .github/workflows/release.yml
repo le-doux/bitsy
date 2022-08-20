@@ -1,0 +1,41 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # setup
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+
+      # build resources
+      - run: node ./dev/icon_generator/makeicons
+      - run: node ./dev/resource_packager
+
+      # publish
+      # TODO: cleaner version number
+      - name: get version
+        id: version
+        run: |
+          echo ::set-output name=current-version::$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=major: )\d+').$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=minor: )\d+')
+      - name: publish to itch.io
+        uses: josephbmanley/butler-publish-itchio-action@v1.0.3
+        env:
+          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
+          CHANNEL: win-linux-mac-stable
+          ITCH_GAME: bitsy
+          ITCH_USER: ledoux
+          PACKAGE: editor
+          VERSION: ${{ steps.version.outputs.current-version }}
+
+      - name: install expect
+        run: sudo apt install expect
+
+      - name: publish to bitsy.org 
+        run: expect -c 'spawn sftp ${{ secrets.FTP_USER }}@${{ secrets.FTP_SERVER }} ; sleep 10 ; send "yes\r" ; expect "password:" ; send "${{ secrets.FTP_PASS }}\r" ; expect "sftp>" ; send "put -r editor/\r" ; expect "sftp>" ; send "bye\r" ; expect eof'
