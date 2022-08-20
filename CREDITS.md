@@ -1,6 +1,7 @@
 ## Engine and Editor Development
 
 - Adam Le Doux - Project Lead
+- @alts - Contributor
 - @ayolland - Contributor
 - @david-c14 - Contributor
 - Elkie - Contributor
