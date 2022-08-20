@@ -2,8 +2,10 @@
 
 - Adam Le Doux - Project Lead
 - @ayolland - Contributor
+- @david-c14 - Contributor
 - Elkie - Contributor
 - equa (@equaa) - Contributor
+- max - Contributor
 - @ragzouken - Contributor
 - Samuel Fine - Contributor
 - Sean S. LeBlanc - Contributor

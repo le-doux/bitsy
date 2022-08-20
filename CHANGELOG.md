@@ -1,3 +1,7 @@
+## 8.2
+
+- fix: find tools thumbnails weren't crisp in firefox
+- fix: font parser wasn't use per-character height when reading lines
 
 ## 8.1
 
