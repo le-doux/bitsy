@@ -420,6 +420,7 @@ input[type=checkbox]:disabled + label {
 	width: 5em;
 	image-rendering: crisp-edges;
 	image-rendering: pixelated;
+	image-rendering: -moz-crisp-edges;
 }
 
 .bitsy-thumbnail.bitsy-thumbnail-selected .bitsy-thumbnail-image-container {
