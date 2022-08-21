@@ -35,6 +35,7 @@ function makeBlipTool() {
 		tool.data = "BLIP";
 		tool.worldData = "blip.bitsy";
 		tool.insertBefore = "findCheck";
+		tool.aboutPage = "./tools/blipomatic";
 
 		tool.soundPlayer = new SoundPlayer();
 		tool.soundPlayer.tag = "blip_tool"; // for debugging

@@ -34,6 +34,14 @@ function makeToolCard(processName, initFunction) {
 	titlebarDiv.appendChild(titleSpan);
 
 	titlebarDiv.appendChild(createButtonElement({
+		icon: "help",
+		description: "show about page for " + card.name,
+		onclick: function() {
+			showAbout(card.aboutPage, cardDiv.id);
+		}
+	}));
+
+	titlebarDiv.appendChild(createButtonElement({
 		icon: "close",
 		onclick: function() {
 			hidePanel(cardDiv.id);

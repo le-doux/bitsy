@@ -1,6 +1,6 @@
 /* ABOUT / DOCUMENTATION TOOL */
 var aboutFlags = {
-	isLocalhost: false, // flag for local debugging with a server running
+	isLocalhost: true, // flag for local debugging with a server running
 };
 
 function getDocsRoot() {
