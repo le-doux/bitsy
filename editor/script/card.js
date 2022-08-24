@@ -43,6 +43,7 @@ function makeToolCard(processName, initFunction) {
 
 	titlebarDiv.appendChild(createButtonElement({
 		icon: "close",
+		style: "bitsy-card-close-button",
 		onclick: function() {
 			hidePanel(cardDiv.id);
 		},
