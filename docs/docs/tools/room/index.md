@@ -14,10 +14,17 @@ There are several [room editing rools](../room/roomEditingTools) and [room setti
 ![room tool diagram](.images/roomToolDiagram.JPG)
 
 1. **Room name**. The name of this current room within the Bitsy editor. Visible e.g. in the [find tool](../find), but not to the player.
+
 2. **Previous / next room buttons**. Navigate between all the rooms you have created.
+
 3. **Add room button**. Creates a new room. The room tool will automatically switch view to that room.
+
 4. **Duplicate room button**. Creates a copy of the current room. The room tool will automatically switch view to that room.
+
 5. **Delete room button**. Deletes the current room. A warning message will display before permanent deletion.
+
 6. **Find room button**. Opens the find tool on the room tab to display all the rooms you have created.
+
 7. **Room Editing Tools and Room Settings menu**. Switches between different room editing options and settings. E.g. clicking 'edit' will display the room editing tools.
+
 8. **Room Tool options**. Displays options for the currently selected room editing tool or setting.
