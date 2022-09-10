@@ -1,3 +1,10 @@
+## 8.3
+
+- add package.json
+- add "smart quotes" to default font
+- fix: if ending is cancelled, resume playing the current tune
+- fix: {end} didn't update textbox position
+
 ## 8.2
 
 - updated ascii_small.bitsyfont to use correct UTF8 codes

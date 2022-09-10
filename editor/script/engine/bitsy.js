@@ -72,16 +72,6 @@ function setTitle(titleSrc) {
 	dialog[titleDialogId] = { src:titleSrc, name:null };
 }
 
-/* VERSION */
-var version = {
-	major: 8, // major changes
-	minor: 2, // smaller changes
-	devBuildPhase: "RELEASE",
-};
-function getEngineVersion() {
-	return version.major + "." + version.minor;
-}
-
 /* FLAGS */
 var flags = createDefaultFlags();
 
@@ -1771,7 +1761,9 @@ function startEndingDialog(ending) {
 		endingDialogStr = end[ending.id].src;
 	}
 
+	var tmpTuneId = null;
 	if (isEnding && soundPlayer) {
+		tmpTuneId = soundPlayer.getCurTuneId();
 		soundPlayer.stopTune();
 	}
 
@@ -1782,6 +1774,12 @@ function startEndingDialog(ending) {
 			var isLocked = ending.property && ending.property.locked === true;
 			if (isLocked) {
 				isEnding = false;
+
+				// if the ending was cancelled, restart the music
+				// todo : should it resume from where it started? (right now it starts over)
+				if (tmpTuneId && soundPlayer && !soundPlayer.isTunePlaying()) {
+					soundPlayer.playTune(tune[tmpTuneId]);
+				}
 			}
 		},
 		ending);

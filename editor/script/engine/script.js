@@ -552,6 +552,7 @@ function endFunc(environment,parameters,onReturn) {
 	isEnding = true;
 	isNarrating = true;
 	dialogRenderer.SetCentered(true);
+	dialogRenderer.DrawTextbox();
 	onReturn(null);
 }
 
