@@ -36,7 +36,11 @@ Once your PR is submitted, a few things will happen automatically:
 
 #### Getting your change merged
 
-TODO
+All reviewers are volunteers working in their free time, so please give us a few weeks to get to your PR. If no one has started reviewing your PR after a month, you can leave a comment on the PR and add the `help wanted` label to indicate it needs attention. If no one is available we'll try to give an estimate of when we expect to someone to have time to review your change.
+
+Once a review has started, the reviewer will review your change for accuracy, style (see the style guide above), and length. Do your best to make changes requested by the reviewer, however, it is ok to politely push back if you disagree with them. The reviewer will do their best to respond in a timely manner to comments and revisions once they begin the review process. If for any reason a review must be paused or a change rejected the reviewer will explain why and update the status of the review so you aren't left hanging.
+
+Thanks for contributing to Bitsy's documentation!
 
 ### Testing your changes locally
 
