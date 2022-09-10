@@ -408,6 +408,18 @@ function SoundPlayer() {
 		}
 	};
 
+	this.isTunePlaying = function() {
+		return curTune != null;
+	};
+
+	this.getCurTuneId = function() {
+		if (curTune) {
+			return curTune.id;
+		}
+
+		return null;
+	};
+
 	this.stopTune = function() {
 		curTune = null;
 	};

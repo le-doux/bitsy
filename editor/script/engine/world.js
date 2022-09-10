@@ -1,3 +1,14 @@
+/* BITSY VERSION */
+// is this the right place for this to live?
+var version = {
+	major: 8, // major changes
+	minor: 3, // smaller changes
+	devBuildPhase: "RELEASE",
+};
+function getEngineVersion() {
+	return version.major + "." + version.minor;
+}
+
 /* TEXT CONSTANTS */
 var titleDialogId = "title";
 
