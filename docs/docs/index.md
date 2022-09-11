@@ -10,19 +10,20 @@ sidebar_position: 1
 >
 > &ndash; <cite>[adam](https://www.twitter.com/adamledoux)</cite>
 
-## getting started
+## Getting started
 
-- [tutorial](https://www.shimmerwitch.space/bitsyTutorial.html)
+- [Tutorial](https://www.shimmerwitch.space/bitsyTutorial.html)
 
-## community
+## Community
 
-- [made with bitsy](https://itch.io/games/made-with-bitsy)
-- [discord server](https://discordapp.com/invite/9rAjhtr)
-- [itch.io forum](https://ledoux.itch.io/bitsy/community)
+- [Made with bitsy](https://itch.io/games/made-with-bitsy)
+- [Discord server](https://discordapp.com/invite/9rAjhtr)
 
-## development
+## Project
 
-- [contributors](https://github.com/le-doux/bitsy/blob/master/CREDITS.md)
-- [version notes](https://github.com/le-doux/bitsy/blob/master/VERSION_NOTES.txt)
-- [report a bug](https://github.com/le-doux/bitsy/issues)
-- [source code](https://github.com/le-doux/bitsy)
+- [Blog](https://ledoux.itch.io/bitsy/devlog "itch.io devlog with bitsy updates and news")
+- [Credits](credits "list of bitsy contributors")
+- [Changelog](changelog "bitsy version notes")
+- [Report a bug](https://github.com/le-doux/bitsy/issues)
+- [How to contribute documentation](contributing)
+- [Source code](https://github.com/le-doux/bitsy)
