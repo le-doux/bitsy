@@ -19,11 +19,9 @@ jobs:
       - run: node ./dev/resource_packager
 
       # publish
-      # TODO: cleaner version number
       - name: get version
         id: version
-        run: |
-          echo ::set-output name=current-version::$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=major: )\d+').$(cat ./editor/script/engine/bitsy.js | grep -oP '(?<=minor: )\d+')
+        uses: martinbeentjes/npm-get-version-action@v1.2.3
       - name: publish to itch.io
         uses: josephbmanley/butler-publish-itchio-action@v1.0.3
         env:
