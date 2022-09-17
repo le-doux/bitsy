@@ -2,17 +2,17 @@
 
 ## Description
 
-Every room in Bitsy has a color palette containing three colours, with all the artwork you create set to this palette. You may have as many palettes as you like though, and can assign any one of these to each [room](../room) in the [room settings](../room/roomSettings). 
+Every room in Bitsy has a color palette containing three colours, which all the artwork in the room will use. You may have as many palettes as you like, and can assign any one of these to each [room](../room) in the [room settings](../room/roomSettings). 
 
 The three colors in the palette are:
 
-- background color (anything that is not interactive, the background color of all [tiles](../paint) and [sprites](../paint))
-- tile color (the foreground color of all your tiles)
-- sprite color (the foreground color of your [avatar](../paint) and sprites)
+- background color (anything that is not interactive, the background color of all [tiles](../paint#tile) and [sprites](../paint#sprite))
+- tile color (the foreground color of all your [tiles](../paint#tile))
+- sprite color (the foreground color of your [avatar](../paint#avatar) and [sprites](../paint#sprite))
 
-Click on the background / tile / sprite color buttons to switch which one you are adjusting. 
-Then, using the color picker wheel, you may select the hue and saturation of your color, and then adjust its darkness / lightness using the slider below. 
-Alternatively if you know the exact hex code you want to use you can enter this in the text box at the bottom of the tool. 
+Click on the background / tile / sprite color buttons to switch which one you are adjusting. Then, using the color picker wheel, you may select the hue and saturation of your color, and then adjust its darkness / lightness using the slider below.
+
+Alternatively, if you know the exact hex code you want to use you can enter this in the text box at the bottom of the tool. 
 
 ## Features
 
