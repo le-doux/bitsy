@@ -2,13 +2,16 @@
 
 ## Description
 
-The exits & endings tool enables you to create transitions between or within rooms. When the player walks into an exit during the game they will be teleported to a location that you specify in the editor. 
-There are a number of visual effects you can apply, such as screen-swipes or fades, as well as dialog that triggers on an exit, or a condition such as a locked door. 
-Exits & Endings are created in this tool, and are visualised in the [room tool](../room) if the exits & endings visibility is enabled in [room settings](../room/roomSettings). 
+The exits & endings tool enables you to create transitions between or within rooms. When the player walks into an exit during the game they will be teleported to a location that you specify in the editor.
 
-Exits & Endings are separated into three types:
+There are a number of visual effects you can apply, such as screen-wipes or fades, as well as dialog that triggers on an exit, or a condition such as a locked door.
+
+Exits & endings are created in this tool, and are visualised in the [room tool](../room) if the exits & endings visibility is enabled in [room settings](../room/roomSettings).
+
+Exits & endings are separated into three types:
 
 ### Exit
+
 A connection between two locations that can be accessed from either direction. For example, this may link together two separate rooms, or teleport the player to another location within the same room. 
 
 ### One-way exit
@@ -29,7 +32,7 @@ A location that triggers the end of the Bitsy game. Locks and transition effects
 
 3 **Previous / next exit buttons**. Navigate between all the exits and endings you have created for the current room open in the [room tool](../room).
 
-4 **Add exit or ending button**. Opens a menu with options for 'exit', 'one-way exit' or 'ending'. Please see above for descriptions of each. Clicking any of these creates a new exit of that type and brings it into focus within the tool, or 'cancel' will return to the main exits & endings view.
+4 **Add exit or ending button**. Opens a menu with options for '[exit](#exit)', '[one-way exit](#one-way-exit)', or '[ending](#ending)'. Please see above for descriptions of each. Clicking any of these creates a new exit of that type and brings it into focus within the tool, or 'cancel' will return to the main exits & endings view.
 
 5 **Duplicate exit or ending**. Creates a copy of the current exit or ending. The starting location will automatically shift one grid cell over to avoid a conflict. The exits & endings tool will automatically switch view to that exit or ending.
 
