@@ -3,9 +3,9 @@
 ## Description
 
 The dialog tool is one of Bitsy's most powerful tools. It is used to create all the interactions the player has within the game. 
-For example, the most basic use of the dialog tool is to create text that will be displayed when the player walks into a sprite, e.g. the cat saying "I'm a cat". 
-At a more complex level it can be used for things like branching dialogue with choices based on the number of items the player has picked up, or, unlocking a door if the player has spoken to a specific sprite. 
-Dialog can be assigned to sprites, items, exits and endings. There is also a default 'title' dialog that can be edited. This will be displayed in the centre of the screen when the player first begins the game. 
+For example, the most basic use of the dialog tool is to create text that will be displayed when the player walks into a [sprite](/tools/paint/#sprite), e.g. the cat saying "I'm a cat". 
+At a more complex level it can be used for things like branching dialogue with choices based on the number of [items](/tools/paint/#item) the player has picked up, or, unlocking a door if the player has spoken to a specific sprite. 
+Dialog can be assigned to sprites, items, [exits and endings](/tools/exitsandendings). There is also a default 'title' dialog that can be edited. This will be displayed in the centre of the screen when the player first begins the game. 
 
 Below is a list of the basic features of the dialog tool, along with the text effect options that are available any time you see an editable text window. 
 

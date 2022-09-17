@@ -20,4 +20,4 @@ I'm a catI like to nap
 Who are you?
 ```
 
-4 **Cancel**. Closes the basic dialog options menu,
+4 **Cancel**. Closes the basic dialog options menu.
