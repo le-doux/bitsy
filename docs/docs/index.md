@@ -12,7 +12,11 @@ sidebar_position: 1
 
 ## Getting started
 
-- [Tutorial](https://www.shimmerwitch.space/bitsyTutorial.html)
+Here are good pages to start learning about Bitsy! :)
+
+- Start with an [overview](introduction/overview) of the Bitsy editor
+- Or read a [tutorial](introduction/tutorial) by a member of the Bitsy community
+- Or check out the [FAQ pages](category/FAQ) for answers to frequently asked!
 
 ## Community
 
