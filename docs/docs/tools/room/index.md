@@ -2,7 +2,8 @@
 
 ## Description
 
-A 'room' in Bitsy is where the action takes place! Rooms are where your avatar walks around and talks to others. 
+A 'room' in Bitsy is where the action takes place! Rooms are where your avatar walks around and talks to others.
+
 You may have as many rooms as you would like and can connect them together using the [exits & endings tool](../exitsandendings), allowing your avatar to walk between them. 
 
 Rooms are always composed of 16x16 tiles, but what is in each of those tiles is up to you. 

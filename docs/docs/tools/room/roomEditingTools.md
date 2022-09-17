@@ -8,7 +8,7 @@ The Room Editing tools allow you to change the appearance of the room, set the l
 
 ![room editing tool diagram](.images/roomEditingDiagram.JPG)
 
-1. **Room editing tools.** With this selected, the room editing tools are accessible. The other buttons in this row (colors, tune, avatar) will take you to the room settings.
+1. **Room editing tools.** With this selected, the room editing tools are accessible. The other buttons in this row (colors, tune, avatar) will take you to the [room settings](roomSettings).
 
 2. **Paint editing.** With this selected, the room's sprites, tiles, items and the avatar can be moved, added, or erased. Choose what you want to paint using the paint tool, then click a square in the room view to add or remove it.
 
@@ -16,8 +16,8 @@ The Room Editing tools allow you to change the appearance of the room, set the l
 
 4. **Exits & Endings editing.** With this selected, all exits and endings in the current room will become visible in the room view. The currently selected one shows in black and will flash (along with its paired exit if this is in the same room), and all others show up in white. Click and drag these to move them around in the room view.
 
-5. **Open Exits & Endings tool.** This button is only visible while the Exits & Endings editing is enabled. Clicking this button is a shortcut to open the Exits & Endings tool focused on any currently selected exit/ending in the room view.
+5. **Open Exits & Endings tool.** This button is only visible while the Exits & Endings editing is enabled. Clicking this button is a shortcut to open the [Exits & Endings tool](../exitsandendings) focused on any currently selected exit/ending in the room view.
 
 6. **Show / hide tile grid.** Toggles a grid on / off in the room tool. The grid is only visible while editing, not while playing the game.
 
-7. **Show / hide wall tiles.** If you have set any tiles as 'wall' in the Paint tool, a white or black (depending on your color palette) overlay will show the location of these. This is only visible while editing, not while playing the game.
+7. **Show / hide wall tiles.** If you have set any tiles as 'wall' in the [Paint tool](../paint), a white or black (depending on your color palette) overlay will show the location of these. This is only visible while editing, not while playing the game.
