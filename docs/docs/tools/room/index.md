@@ -20,7 +20,7 @@ There are several [room editing rools](../room/roomEditingTools) and [room setti
 
 3. **Add room button**. Creates a new room. The room tool will automatically switch view to that room.
 
-4. **Duplicate room button**. Creates a copy of the current room. The room tool will automatically switch view to that room.
+4. **Duplicate room button**. Creates a copy of the current room. Features such as tiles, color palette and exits & endings will be copied to the new room, but unique features such as the avatar, sprites and items will not be copied. The room tool will automatically switch view to the new duplicate room.
 
 5. **Delete room button**. Deletes the current room. A warning message will display before permanent deletion.
 

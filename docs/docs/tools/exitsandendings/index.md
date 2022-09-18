@@ -20,7 +20,7 @@ A connection between two locations that can only be accessed from the starting l
 
 ### Ending
 
-A location that triggers the end of the Bitsy game. Locks and transition effects can't be used for endings, but custom dialog can be added.
+A location that triggers the end of the Bitsy game. Transition effects cannot be added, but a lock may still be added by using the [dialog tool](../dialog). In a locked ending the game will return the player to the room they were previously in if the lock condition is false. 
 
 ## Features
 
@@ -50,7 +50,7 @@ A location that triggers the end of the Bitsy game. Locks and transition effects
 
 12 **Add narration**. Clicking this changes the exit dialog menu to an editable dialog window. Anything you write here will display when the player walks through that exit or ending.
 
-13 **Add lock**. Clicking this creates a new dialog with a 'lock' condition, and opens the [dialog tool](../dialog) with it in focus. A locked exit requires you to meet a certain condition before you can use the exit (by default, this is the player having picked up a 'key' item) and is a type of 'room action' dialog. Please refer to the [dialog tool](../dialog) for more details.
+13 **Add lock**. Clicking this creates a new dialog with a 'lock' condition, and opens the dialog tool with it in focus. A locked exit requires you to meet a certain condition before you can use the exit (by default, this is the player having picked up a 'key' item) and is a type of 'room action' dialog. Please refer to the [dialog tool](../dialog) for more details.
 
 14 **Exit dialog editor**. Toggle between a dropdown list of all your dialogs, and a small dialog-editor window that allows you to edit the current exit dialog. If you have already clicked 'add narration' or 'add lock' you will find that these buttons do not reappear, but you can always add a lock or extra dialog through the [dialog tool](../dialog). If you have chosen to add a lock you may also see special characters such as curly brackets, which are used to code in extra features. If you are not comfortable with this, you can open the dialog in the [dialog tool](../dialog) instead.
 

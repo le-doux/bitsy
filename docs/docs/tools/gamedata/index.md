@@ -1,9 +1,12 @@
 # Game Data
 
+:::info Warning! Editing your game data directly may result in the game becoming unplayable or having unwanted effects. 
+:::
+
 ## Description
 
 The Game Data tool allows you to view your Bitsy game's raw data in text format. All images, dialogues, rooms etc. that you have created are represented here and can be edited. 
-However, it is a good idea to create a backup of your game before doing this as any changes you make may result in the game becoming unplayable or having unwanted effects. 
+However, it is a good idea to create a backup of your game before doing this in case any changes you make have unwanted effects, such as the game becoming unplayable. 
 Create a backup by downloading the game data in this tool or by using the [download tool](../download). 
 
 ## Features

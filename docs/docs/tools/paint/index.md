@@ -31,7 +31,7 @@ So if for example you want two cats with their own dialog, you would need to cre
 
 ### Item
 
-Items are things that you can pick up. An in-game inventory will count the number of each type of item the avatar has collected, which you can then use in some of the advanced dialog settings, or as a condition for an exit or ending. 
+Items are things that you can pick up. An in-game inventory will count the number of each type of item the avatar has collected, which you can then use in some of the advanced dialog settings, or as a condition for an exit or ending. You can place as many copies of an item as you like in each room.  
 
 ## Features
 

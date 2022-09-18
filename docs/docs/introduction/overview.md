@@ -21,4 +21,3 @@ At any point you can download your game to play it outside of the Bitsy editor.
 4. **Toolbar**. Toggle each of the [Bitsy tools](../category/tools) on / off by clicking the buttons. Tools shown in dark blue are open in the workspace.
 
 5. **Workspace**. View all of your active Bitsy tools. Click and drag to rearrange them. Open and close them using the X in the top-right corner of each tool, or through the buttons in the toolbar.
-

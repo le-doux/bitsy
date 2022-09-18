@@ -10,11 +10,12 @@ Dialog can be assigned to sprites, items, [exits and endings](/tools/exitsandend
 Below is a list of the basic features of the dialog tool, along with the text effect options that are available any time you see an editable text window. 
 
 For details of the more advanced dialog features, please refer to the following pages:
-- [basic dialog](../dialog/basicDialog)
-- [lists](../dialog/lists)
-- [room actions](../dialog/roomActions)
-- [sound actions](../dialog/soundActions)
-- [item and variable actions](../dialog/itemVariableActions)
+
+[basic dialog](../dialog/basicDialog)  
+[lists](../dialog/lists)  
+[room actions](../dialog/roomActions)  
+[sound actions](../dialog/soundActions)  
+[item and variable actions](../dialog/itemVariableActions)
 
 The dialog tool also allows you to view and edit the Bitsy code for individual dialogs directly. Please see the page on [Bitsy code](/advancedTopics/scripting) for more details. 
 
@@ -56,4 +57,4 @@ The dialog tool also allows you to view and edit the Bitsy code for individual d
 
 17 **Palette color text effect**. Clicking this inserts e.g. `{clr 0}{/clr}` within your text. Any text inside these tags will display in the color selected from the dropdown, e.g. `{clr 0}hello{/clr}` would display the word 'hello' in the background color of the [colors tool](../color) assigned to the room the player is currently in. 'tile' uses the tile color of the palette and shows as `{clr 1}`. 'sprite' uses the sprite color of the palette and shows as `{clr 2}`. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it.
 
-18 **Drawing text effect**. Clicking this inserts e.g. `{drws "A"}` or `{drwi "tea"}` within your text. This displays a tiny image of that drawing in your text. Select any of your drawings from the dropdown menu. If you are writing this code manually take note that the syntax is a little different between sprites and avatars (`{drws ""}`), tiles (`{drwt ""}`) and items (`{drwi ""}`). You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it.
+18 **Drawing text effect**. Clicking this inserts a tiny image of one of your drawings in the text, which you can select from the dropdown menu. This is displayed in the dialog window as e.g. `{drws "A"}` or `{drwi "tea"}`. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it. If you are writing this code manually take note that the syntax is a little different between sprites and avatars (`{drws ""}`), tiles (`{drwt ""}`) and items (`{drwi ""}`). The string input inside the speechmarks can either be an id (like “A”) or a name (like “tea”).
