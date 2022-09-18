@@ -63,3 +63,11 @@ For example, if you wanted to translate the glossary from English to French:
 4. Translate the contents of the original file into the new file.
 
 Note that all files in the documentation folder (including images and `.json` files) can be translated by putting a copy in the corresponding locale folder.
+
+## Contributing to the Bitsy editor
+
+### Translating editor text
+
+TODO
+
+The editor localisation file is available at https://github.com/le-doux/bitsy/blob/main/dev/resources/localization.tsv
