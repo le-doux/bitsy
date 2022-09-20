@@ -1,6 +1,7 @@
 # Game Data
 
-:::info Warning! Editing your game data directly may result in the game becoming unplayable or having unwanted effects. 
+:::caution 
+Editing your game data directly may result in the game becoming unplayable or having unwanted effects. 
 :::
 
 ## Description
