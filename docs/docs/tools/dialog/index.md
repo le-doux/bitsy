@@ -11,11 +11,11 @@ Below is a list of the basic features of the dialog tool, along with the text ef
 
 For details of the more advanced dialog features, please refer to the following pages:
 
-[basic dialog](../dialog/basicDialog)  
-[lists](../dialog/lists)  
-[room actions](../dialog/roomActions)  
-[sound actions](../dialog/soundActions)  
-[item and variable actions](../dialog/itemVariableActions)
+- [basic dialog](../dialog/basicDialog)  
+- [lists](../dialog/lists)  
+- [room actions](../dialog/roomActions)  
+- [sound actions](../dialog/soundActions)  
+- [item and variable actions](../dialog/itemVariableActions)
 
 The dialog tool also allows you to view and edit the Bitsy code for individual dialogs directly. Please see the page on [Bitsy code](/advancedTopics/scripting) for more details. 
 
