@@ -16,11 +16,17 @@ If you are adding a new folder, a `_category.json` file can be included to chang
 
 ### Style/writing guide
 
-TODO
+When editing a page, consider that the main audience of the documentation are new users of Bitsy who may not be familiar with all the terminology in Bitsy or of its more advanced features. A general guideline for the tone is 'informative but approachable'. 
+
+The 'Tools' section of the documentation is split up according to the individual tools in Bitsy. Further sub-pages are used when a tool requires a change of tab or has especially complex features. 
+
+Each tool has a general description, followed by an annotated diagram of all the features. Feature annotations should be numbered in the images, rather than text labels, to allow for localisation. 
 
 ### How to add images
 
-TODO
+Images for the documentation were originally created in Miro. If you would like to edit or add more images you can access the board at https://bit.ly/3Bz6ptN. You can duplicate any diagram to edit a new version, or unlock / lock diagrams to edit the originals. 
+
+Once you have an updated image that is ready to go, screenshot it and save it in the .images folder of the tool it belongs to in `docs/docs/`. 
 
 ### Submitting a pull request with a change
 
