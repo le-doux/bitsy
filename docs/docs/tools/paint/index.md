@@ -35,35 +35,103 @@ Items are things that you can pick up. An in-game inventory will count the numbe
 
 ## Features
 
-![paint tool diagram part 1](.images/paint1Diagram.JPG)
-![paint tool diagram part 2](.images/paint2Diagram.JPG)
+### Avatar paint
 
-1. **Paint category**. Switch tab to edit your [avatar](../paint/#avatar), [tiles](../paint/#tile), [sprites](../paint/#sprite), or [items](../paint/#item). The four panels here show the options in each category.
+![avatar paint diagram](.images/paintDiagram01.JPG)
 
-2. **Drawing name**. The name of this current drawing within the Bitsy editor. Used e.g. in the [find tool](../find). The avatar name cannot be changed.
+1. **Avatar name**. The name of the [avatar](../paint/#avatar) within the Bitsy editor. Used e.g. in the [find tool](../find). The avatar name cannot be changed.
+
+2. **Find drawing button**. Opens the find tool on the avatar tab.
 
 3. **Paint canvas**. Edit the currently selected drawing by clicking the pixels to toggle them on / off. Any changes are also updated immediately in the [room tool](../room).
 
 4. **Show / hide grid**. Toggle a pixel grid on / off in the paint canvas. The grid is not displayed when playing the game.
 
-5. **Drawing animation**. Opens the animation panel where you can edit two animation frames. Select frame 1 or frame 2 to edit it in the paint window. The preview shows how the animation will look when playing the game.
+5. **Avatar animation**. Opens the animation panel where you can edit two animation frames. Select frame 1 or frame 2 to edit it in the paint window. The preview shows how the animation will look when playing the game.
 
-6. **Wall button**. Makes the tile act as an impassable wall when the player tries to walk into it. You can check which tiles in your room are walls with the wall visibility button in [room settings](../room/roomSettings).
 
-7. **Sound effect button**. Choose a [blip sound effect](../blipomatic) that will play when the player walks into this sprite / item. Choose none if you do not want a sound effect.
+### Tile paint
 
-8. **Sprite / item dialog**. The [dialog](../dialog) that is displayed when the player walks into this sprite  or item.
+![tile paint diagram](.images/paintDiagram02.JPG)
 
-9. **Dialog selection toggle**. Click this button to show a dropdown menu of all the dialogs you have created. Clicking it again will allow you to edit the current dialog.
+1. **Tile name**. The name of this current [tile](../paint/#tile) within the Bitsy editor. Used e.g. in the [find tool](../find).
 
-10. **Dialog editor button**. Opens the dialog tool for more advanced dialog options.
+2. **Previous / next tile buttons**. Navigate between all the tiles you have created.
 
-11. **Previous / next drawing buttons**. Navigate between all the tiles, sprites, or items you have created. As there is only one avatar these buttons are not available in the avatar tab.
+3. **Add tile button**. Creates a new tile. The paint tool will automatically switch view to that tile.
 
-12. **Add drawing button**. Creates a new tile, sprite, or item. The paint tool will automatically switch view to that drawing. New avatars cannot be added.
+4. **Duplicate tile button**. Creates a copy of the current tile. The paint tool will automatically switch view to that tile.
 
-13. **Duplicate drawing button**. Creates a copy of the current tile, sprite, or item. The paint tool will automatically switch view to that drawing. The avatar cannot be duplicated.
+5. **Delete tile button**. Deletes the current tile. A warning message will display before permanent deletion.
 
-14. **Delete drawing button**. Deletes the current tile, sprite, or item. A warning message will display before permanent deletion. The avatar cannot be deleted.
+6. **Find tile button**. Opens the find tool on the tile tab to display all the tiles you have created.
 
-15. **Find drawing button**. Opens the find tool on the avatar, tile, sprite, or item tab to display all the drawings you have created in that category.
+7. **Paint canvas**. Edit the currently selected tile by clicking the pixels to toggle them on / off. Any changes are also updated immediately in the [room tool](../room).
+
+8. **Show / hide grid**. Toggle a pixel grid on / off in the paint canvas. The grid is not displayed when playing the game.
+
+9. **Tile animation**. Opens the animation panel where you can edit two animation frames. Select frame 1 or frame 2 to edit it in the paint window. The preview shows how the animation will look when playing the game.
+
+
+### Sprite paint
+
+![sprite paint diagram](.images/paintDiagram03.JPG)
+
+1. **Sprite name**. The name of this current [sprite](../paint/#sprite) within the Bitsy editor. Used e.g. in the [find tool](../find).
+
+2. **Previous / next sprite buttons**. Navigate between all the sprites you have created.
+
+3. **Add sprite button**. Creates a new sprite. The paint tool will automatically switch view to that sprite.
+
+4. **Duplicate sprite button**. Creates a copy of the current sprite. The paint tool will automatically switch view to that sprite.
+
+5. **Delete sprite button**. Deletes the current sprite. A warning message will display before permanent deletion.
+
+6. **Find sprite button**. Opens the find tool on the sprite tab to display all the sprites you have created.
+
+7. **Paint canvas**. Edit the currently selected sprite by clicking the pixels to toggle them on / off. Any changes are also updated immediately in the [room tool](../room).
+
+8. **Show / hide grid**. Toggle a pixel grid on / off in the paint canvas. The grid is not displayed when playing the game.
+
+9. **Sprite dialog**. The [dialog](../dialog) that is displayed when the player walks into this sprite.
+
+10. **Sprite animation**. Opens the animation panel where you can edit two animation frames. Select frame 1 or frame 2 to edit it in the paint window. The preview shows how the animation will look when playing the game.
+
+11. **Sound effect button**. Choose a [blip sound effect](../blipomatic) that will play when the player walks into this sprite. Choose none if you do not want a sound effect.
+
+12. **Dialog selection toggle**. Click this button to show a dropdown menu of all the dialogs you have created. Clicking it again will allow you to edit the current dialog.
+
+13. **Dialog editor button**. Opens the dialog tool for more advanced dialog options.
+
+
+### Item paint
+
+![item paint diagram](.images/paintDiagram04.JPG)
+
+1. **Item name**. The name of this current [item](../paint/#item) within the Bitsy editor. Used e.g. in the [find tool](../find).
+
+2. **Previous / next item buttons**. Navigate between all the items you have created.
+
+3. **Add item button**. Creates a new item. The paint tool will automatically switch view to that item.
+
+4. **Duplicate item button**. Creates a copy of the current item. The paint tool will automatically switch view to that item.
+
+5. **Delete item button**. Deletes the current item. A warning message will display before permanent deletion.
+
+6. **Find item button**. Opens the find tool on the item tab to display all the items you have created.
+
+7. **Paint canvas**. Edit the currently selected sprite by clicking the pixels to toggle them on / off. Any changes are also updated immediately in the [room tool](../room).
+
+8. **Show / hide grid**. Toggle a pixel grid on / off in the paint canvas. The grid is not displayed when playing the game.
+
+9. **Item dialog**. The [dialog](../dialog) that is displayed when the player walks into this item.
+
+10. **Item animation**. Opens the animation panel where you can edit two animation frames. Select frame 1 or frame 2 to edit it in the paint window. The preview shows how the animation will look when playing the game.
+
+11. **Sound effect button**. Choose a [blip sound effect](../blipomatic) that will play when the player walks into this item. Choose none if you do not want a sound effect.
+
+12. **Open inventory**. Opens the [inventory tool](/tools/inventory/).
+
+13. **Dialog selection toggle**. Click this button to show a dropdown menu of all the dialogs you have created. Clicking it again will allow you to edit the current dialog.
+
+14. **Dialog editor button**. Opens the dialog tool for more advanced dialog options.

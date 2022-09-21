@@ -21,7 +21,9 @@ The dialog tool also allows you to view and edit the Bitsy code for individual d
 
 ## Features
 
-![dialog tool diagram](.images/dialogDiagram.JPG)
+### Main dialog window
+
+![dialog tool diagram](.images/dialogDiagram01.JPG)
 
 1 **Dialog name**. The name of this dialog within the Bitsy editor. Used e.g. in the [find tool](../find). The title name cannot be changed.
 
@@ -35,7 +37,7 @@ The dialog tool also allows you to view and edit the Bitsy code for individual d
 
 6 **Open find tool: dialog**. Clicking this opens the [find tool](../find) and focuses it on the current dialog.
 
-7 **Dialog editing window**. Clicking into this window allows you to edit the text that will display for this dialog. See features 11-18 below for details of the additional editing options that appear. Click anywhere outside the window to minimise these additional options.
+7 **Dialog editing window**. Clicking into this window allows you to edit the text that will display for this dialog. See [dialog editing tools](/tools/dialog#dialog-editing-tools) below for details of the additional editing options that appear.
 
 8 **Add section**. Multiple sections of text and actions can be added to each dialog, which will be carried out from top to bottom during the game. Please refer to the specific pages for more details for: [basic dialog](../dialog/basicDialog), [lists](../dialog/lists), [room actions](../dialog/roomActions), [sound actions](../dialog/soundActions), [item and variable actions](../dialog/itemVariableActions). Press cancel to exit out of this options menu.
 
@@ -43,18 +45,24 @@ The dialog tool also allows you to view and edit the Bitsy code for individual d
 
 10 **Always show dialog of selected drawing**. When this is toggled on the dialog window will update as you switch between drawings in the [paint tool](../paint), displaying whichever dialog is assigned to that drawing.
 
-11 **Move dialog section up / down**. Click to change the execution order of  the sections of dialog / actions. All sections will be carried out one by one from top to bottom. If you only have one dialog section these buttons will be disabled.
+### Dialog editing tools
 
-12 **Show / hide text effects controls**. Toggles the visibility of the text effect options (features 14-18).
+These tools are visible by clicking inside the black dialogue box. Click anywhere outside the window to minimise these additional options.
 
-13 **Delete dialog section**. Deletes the current section from this dialog. Be careful as this will take effect immediately.
+![dialog tool diagram](.images/dialogDiagram02.JPG)
 
-14 **Wavy text effect**. Clicking this inserts `{wvy}{/wvy}` within your text. Any text inside these tags will display with a wavy animation during the game, e.g. `{wvy}hello{/wvy}` would display the word 'hello' with a wavy animation. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it.
+1 **Move dialog section up / down**. Click to change the execution order of  the sections of dialog / actions. All sections will be carried out one by one from top to bottom. If you only have one dialog section these buttons will be disabled.
 
-15 **Shaky text effect**. Clicking this inserts `{shk}{/shk}` within your text. Any text inside these tags will display with a shaky animation during the game, e.g. `{shk}hello{/shk}` would display the word 'hello' with a shaky animation. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it.
+2 **Show / hide text effects controls**. Toggles the visibility of the text effect options (features 14-18).
 
-16 **Rainbow text effect**. Clicking this inserts `{rbw}{/rbw}` within your text. Any text inside these tags will display with a rainbow animation during the game, e.g. `{rbw}hello{/rbw}` would display the word 'hello' with a rainbow animation. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it.
+3 **Delete dialog section**. Deletes the current section from this dialog. Be careful as this will take effect immediately.
 
-17 **Palette color text effect**. Clicking this inserts e.g. `{clr 0}{/clr}` within your text. Any text inside these tags will display in the color selected from the dropdown, e.g. `{clr 0}hello{/clr}` would display the word 'hello' in the background color of the [colors tool](../color) assigned to the room the player is currently in. 'tile' uses the tile color of the palette and shows as `{clr 1}`. 'sprite' uses the sprite color of the palette and shows as `{clr 2}`. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it.
+4 **Wavy text effect**. Clicking this inserts `{wvy}{/wvy}` within your text. Any text inside these tags will display with a wavy animation during the game, e.g. `{wvy}hello{/wvy}` would display the word 'hello' with a wavy animation. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it.
 
-18 **Drawing text effect**. Clicking this inserts a tiny image of one of your drawings in the text, which you can select from the dropdown menu. This is displayed in the dialog window as e.g. `{drws "A"}` or `{drwi "tea"}`. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it. If you are writing this code manually take note that the syntax is a little different between sprites and avatars (`{drws ""}`), tiles (`{drwt ""}`) and items (`{drwi ""}`). The string input inside the speechmarks can either be an id (like “A”) or a name (like “tea”).
+5 **Shaky text effect**. Clicking this inserts `{shk}{/shk}` within your text. Any text inside these tags will display with a shaky animation during the game, e.g. `{shk}hello{/shk}` would display the word 'hello' with a shaky animation. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it.
+
+6 **Rainbow text effect**. Clicking this inserts `{rbw}{/rbw}` within your text. Any text inside these tags will display with a rainbow animation during the game, e.g. `{rbw}hello{/rbw}` would display the word 'hello' with a rainbow animation. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it.
+
+7 **Palette color text effect**. Clicking this inserts e.g. `{clr 0}{/clr}` within your text. Any text inside these tags will display in the color selected from the dropdown, e.g. `{clr 0}hello{/clr}` would display the word 'hello' in the background color of the [colors tool](../color) assigned to the room the player is currently in. 'tile' uses the tile color of the palette and shows as `{clr 1}`. 'sprite' uses the sprite color of the palette and shows as `{clr 2}`. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it.
+
+8 **Drawing text effect**. Clicking this inserts a tiny image of one of your drawings in the text, which you can select from the dropdown menu. This is displayed in the dialog window as e.g. `{drws "A"}` or `{drwi "tea"}`. You can either click this button then type your text inside the tags, or select the text first then click this button to insert the tags around it. If you are writing this code manually take note that the syntax is a little different between sprites and avatars (`{drws ""}`), tiles (`{drwt ""}`) and items (`{drwi ""}`). The string input inside the speechmarks can either be an id (like “A”) or a name (like “tea”).
