@@ -227,8 +227,9 @@
 							<span class="localize about_tool_name">about</span>
 						</span>
 
-						<button title="show about page for contributing to documentation" onclick="setAboutPage('./contributing');">
-							<span class="bitsy_icon">help</span>
+
+						<button title="open page in new tab" onclick="aboutOpenTab();">
+							<span class="bitsy_icon">open_tool</span>
 						</button>
 
 						<button title="minimize about window" class="bitsy-card-close-button" onclick="hidePanel('aboutPanel');">
@@ -238,12 +239,6 @@
 
 					<div id="aboutInner" class="bitsy-card-main">
 						<iframe id="docsFrame" class="bitsy-menu-scrollview" height="100%"></iframe>
-
-						<div class="bitsy-menu-group">
-							<button title="open page in new tab" onclick="aboutOpenTab();">
-								<span class="bitsy_icon">open_tool</span>
-							</button>
-						</div>
 					</div>
 				</div>
 
