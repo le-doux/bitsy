@@ -6,7 +6,7 @@ tags: [stub]
 # Glossary
 
 :::info This page is a stub
-You can improve the docs by [expanding it](../../contributing).
+You can improve the docs by [expanding it](./contributing).
 :::
 
 | Term                      | Definition                                         |
