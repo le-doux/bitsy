@@ -19,7 +19,7 @@ The values of all items will reset once you stop playing the game. By default al
 
 ### Variables
 
-Variables are custom pieces of information that you can create to keep track of anything other than item counts in your game. You may add as many variables as you like, and name them in a way that makes sense to you, though it is advisable to avoid spaces in your names (e.g. use something like "var1" rather than "var 1").
+Variables are custom pieces of information that you can create to keep track of anything other than item counts in your game. You may add as many variables as you like, and name them in a way that makes sense to you, though it is advisable to avoid spaces in your names (e.g. use something like `var1` rather than `var 1`).
 
 An example of a use of variables would be to track how many times you have talked to a sprite, then have a particular piece of dialog display once you have talked to them a certain number of times, but there are many uses for variables!
 

@@ -1,5 +1,12 @@
+---
+tags: [stub]
+---
 
 ## Contributing to documentation
+
+:::info This page is a stub
+You can improve the docs by [expanding it](../../contributing).
+:::
 
 ### How to edit a page
 
@@ -24,7 +31,7 @@ Each tool has a general description, followed by an annotated diagram of all the
 
 ### How to add images
 
-Images for the documentation were originally created in Miro. If you would like to edit or add more images you can access the board at https://bit.ly/3Bz6ptN. You can duplicate any diagram to edit a new version, or unlock / lock diagrams to edit the originals. 
+Images for the documentation were originally created in Miro. For an introduction to using Miro please visit https://academy.miro.com/learn/course/getting-started-with-miro/getting-started/what-is-miro?page=1 . If you would like to edit or add more images you can access the board at https://bit.ly/3Bz6ptN. You can duplicate any diagram to edit a new version, or unlock / lock diagrams to edit the originals. 
 
 Once you have an updated image that is ready to go, screenshot it and save it in the .images folder of the tool it belongs to in `docs/docs/`. 
 
@@ -73,7 +80,5 @@ Note that all files in the documentation folder (including images and `.json` fi
 ## Contributing to the Bitsy editor
 
 ### Translating editor text
-
-TODO
 
 The editor localisation file is available at https://github.com/le-doux/bitsy/blob/main/dev/resources/localization.tsv

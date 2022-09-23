@@ -1,7 +1,7 @@
 # Lists
 
 ## Description
-Lists in Bitsy allow you to add more complexity to characters' dialogue. Broadly there are two categories of list. The first includes 'sequence lists', 'cycle lists' and 'shuffle lists', which enable you to write several options for the text that will be displayed when interacting with that dialogue. Each time you speak to that character the dialogue will choose a different option, depending on the exact type of list it is. The other category is a 'branching list', which allows you to set up conditions to check against in order to choose which text to display. For example, you could set up a piece of text that would only display if the player has picked up three cups of tea. 
+Lists in Bitsy allow you to add more complexity to characters' dialog. Broadly there are two categories of list. The first includes 'sequence lists', 'cycle lists' and 'shuffle lists', which enable you to write several options for the text that will be displayed when interacting with that dialog. Each time you speak to that character the dialog will choose a different option, depending on the exact type of list it is. The other category is a 'branching list', which allows you to set up conditions to check against in order to choose which text to display. For example, you could set up a piece of text that would only display if the player has picked up three cups of tea. 
 
 Branching lists can check against items or variables in their conditions and can be edited further using the [expression editor](../dialog/expressionEditor). 
 
@@ -35,7 +35,7 @@ In a cycle list, the first time you interact with this dialog in the game, only 
 
 #### Shuffle lists
 
-In a shuffle list, each time you interact with this dialog in the game, a random item from the list will be chosen to display. 
+In a shuffle list, each time you interact with this dialog in the game, a random item from the list will be chosen to display. The random behaviour is set up so that every item will display once before any are repeated. 
 
 ![sequence, cycle, and shuffle lists diagram](.images/listsDiagram02.JPG)
 

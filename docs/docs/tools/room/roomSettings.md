@@ -12,4 +12,4 @@ The Room Settings tools allow you to change some aspects of the entire room. You
 
 2. **Tune dropdown menu.** Choose one of the tunes you created in the tune tool to apply to the current room.
 
-3. **Avatar dropdown menu.** Choose one of the sprites you created in the paint tool to override the appearance of the avatar in the current room. This will only apply the look of the sprite to the avatar, not any of the other settings such as dialogue.
+3. **Avatar dropdown menu.** Choose one of the sprites you created in the paint tool to override the appearance of the avatar in the current room. This will only apply the look of the sprite to the avatar, not any of the other settings such as dialog.

@@ -4,7 +4,7 @@
 
 The dialog tool is one of Bitsy's most powerful tools. It is used to create all the interactions the player has within the game. 
 For example, the most basic use of the dialog tool is to create text that will be displayed when the player walks into a [sprite](/tools/paint/#sprite), e.g. the cat saying "I'm a cat". 
-At a more complex level it can be used for things like branching dialogue with choices based on the number of [items](/tools/paint/#item) the player has picked up, or, unlocking a door if the player has spoken to a specific sprite. 
+At a more complex level it can be used for things like branching dialog with choices based on the number of [items](/tools/paint/#item) the player has picked up, or, unlocking a door if the player has spoken to a specific sprite. 
 Dialog can be assigned to sprites, items, [exits and endings](/tools/exitsandendings). There is also a default 'title' dialog that can be edited. This will be displayed in the centre of the screen when the player first begins the game. 
 
 Below is a list of the basic features of the dialog tool, along with the text effect options that are available any time you see an editable text window. 
@@ -17,7 +17,7 @@ For details of the more advanced dialog features, please refer to the following 
 - [sound actions](../dialog/soundActions)  
 - [item and variable actions](../dialog/itemVariableActions)
 
-The dialog tool also allows you to view and edit the Bitsy code for individual dialogs directly. Please see the page on [Bitsy code](/advancedTopics/scripting) for more details. 
+The dialog tool also allows you to view and edit the code for individual dialogs directly. Please see the page on [scripting](/advancedTopics/scripting) for more details. 
 
 ## Features
 
@@ -41,13 +41,13 @@ The dialog tool also allows you to view and edit the Bitsy code for individual d
 
 8 **Add section**. Multiple sections of text and actions can be added to each dialog, which will be carried out from top to bottom during the game. Please refer to the specific pages for more details for: [basic dialog](../dialog/basicDialog), [lists](../dialog/lists), [room actions](../dialog/roomActions), [sound actions](../dialog/soundActions), [item and variable actions](../dialog/itemVariableActions). Press cancel to exit out of this options menu.
 
-9 **Show code**. Toggles between the regular Bitsy interface and an editable window for [Bitsy code](/advancedTopics/scripting).
+9 **Show code**. Toggles between the regular Bitsy interface and an editable window for code.
 
 10 **Always show dialog of selected drawing**. When this is toggled on the dialog window will update as you switch between drawings in the [paint tool](../paint), displaying whichever dialog is assigned to that drawing.
 
 ### Dialog editing tools
 
-These tools are visible by clicking inside the black dialogue box. Click anywhere outside the window to minimise these additional options.
+These tools are visible by clicking inside the black dialog box. Click anywhere outside the window to minimise these additional options.
 
 ![dialog tool diagram](.images/dialogDiagram02.JPG)
 

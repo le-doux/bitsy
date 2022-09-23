@@ -21,7 +21,7 @@ You can improve the docs by [expanding it](../../contributing).
 
 2 **Add exit action**. [Click here for further details](/tools/dialog/roomActions#exit-action)
 
-3 **Add end action**. When executed this action triggers the end of the game. 
+3 **Add end action**. When executed this action triggers the end of the game. The game stops immediately, but if there is dialog after this action, it will still play. There are no additional features to this action. 
 
 4 **Add lock / unlock action**. [Click here for further details](/tools/dialog/roomActions#lock--unlock-action)
 

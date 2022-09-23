@@ -32,7 +32,7 @@ A location that triggers the end of the Bitsy game. Transition effects cannot be
 
 2 **Change exit direction**. Click to toggle between three options: a one-way exit leading from the left location to the right location, a one-way exit leading from the right location to the left location, or a two-way exit.
 
-3 **Previous / next exit buttons**. Navigate between all the exits and endings you have created for the current room open in the [room tool](../room).
+3 **Previous / next exit buttons**. Navigate between all the exits and endings you have created for the current room open in the room tool.
 
 4 **Add exit or ending button**. Opens a menu with options for '[exit](#exit)', '[one-way exit](#one-way-exit)', or '[ending](#ending)'. Please see above for descriptions of each. Clicking any of these creates a new exit of that type and brings it into focus within the tool, or 'cancel' will return to the main exits & endings view.
 
@@ -46,7 +46,7 @@ A location that triggers the end of the Bitsy game. Transition effects cannot be
 
 9 **Edit coordinates**. Toggles a small options menu that allows you to change the location of the exit by entering room coordinates. The 'room' dropdown allows you to select which room the exit should be in, and 'x' and 'y' refer to the grid cell coordinate, where 0,0 is the top-left of the room and 15,15 is the lower-right.
 
-10 **Move exit location**. Click to place the location marker in the current room. This allows you to change the location of the exit more visually. Navigate to the desired room first in the [room tool](../room), then click this button, then click the location for the exit in the room tool view.
+10 **Move exit location**. Click to place the location marker in the current room. This allows you to change the location of the exit more visually. Navigate to the desired room first in the room tool, then click this button, then click the location for the exit in the room tool view.
 
 ### Return exit settings
 
@@ -56,8 +56,8 @@ A location that triggers the end of the Bitsy game. Transition effects cannot be
 
 2 **Add narration**. Clicking this changes the exit dialog menu to an editable dialog window. Anything you write here will display when the player walks through that exit or ending.
 
-3 **Add lock**. Clicking this creates a new dialog with a 'lock' condition, and opens the dialog tool with it in focus. A locked exit requires you to meet a certain condition before you can use the exit (by default, this is the player having picked up a 'key' item) and is a type of 'room action' dialog. Please refer to the [dialog tool](../dialog) for more details.
+3 **Add lock**. Clicking this creates a new dialog with a 'lock' condition, and opens the dialog tool with it in focus. A locked exit requires you to meet a certain condition before you can use the exit (by default, this is the player having picked up a 'key' item) and is a type of [room action](../dialog/roomActions) dialog.
 
-4 **Exit dialog editor**. Toggle between a dropdown list of all your dialogs, and a small dialog-editor window that allows you to edit the current exit dialog. If you have already clicked 'add narration' or 'add lock' you will find that these buttons do not reappear, but you can always add a lock or extra dialog through the [dialog tool](../dialog). If you have chosen to add a lock you may also see special characters such as curly brackets, which are used to code in extra features. If you are not comfortable with this, you can open the dialog in the [dialog tool](../dialog) instead.
+4 **Exit dialog editor**. Toggle between a dropdown list of all your dialogs, and a small dialog-editor window that allows you to edit the current exit dialog. If you have already clicked 'add narration' or 'add lock' you will find that these buttons do not reappear, but you can always add a lock or extra dialog through the dialog tool. If you have chosen to add a lock you may also see special characters such as curly brackets, which are used to code in extra features. If you are not comfortable with this, you can open the dialog in the dialog tool instead.
 
 5 **Open dialog tool**. Clicking this will open the current exit dialog in the dialog tool. This can be useful if you have a complex dialog that includes locks or other conditions.

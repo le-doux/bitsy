@@ -31,4 +31,10 @@ You can improve the docs by [expanding it](../../contributing).
 
 8 **Blip to play**. 
 
-9 **Tune to change to**. 
+9 **Move section up or down**. All sections in each dialog will execute in the order they are shown in the dialog tool - from top to bottom. Use these buttons to move sections up and down to change the execution order.
+
+10 **Additional settings**.
+
+11 **Delete action**. Clicking this button removes the action from the dialog.
+
+12 **Tune to change to**. 

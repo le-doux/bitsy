@@ -10,7 +10,7 @@ The settings tool contains several useful customisations to do with font, langua
 
 1. **Language.** Choose from the dropdown menu to set the editor default language. Translations are created manually by the community. If you notice something that is missing in your language please feel free to [contribute](/contributing#translating-editor-text).
 
-2. **Game font.** Choose a font from the dropdown menu that your in-game dialogue will be displayed in. Generally this choice will depend on the language you are writing in.
+2. **Game font.** Choose a font from the dropdown menu that your in-game dialog will be displayed in. Generally this choice will depend on the language you are writing in.
 
 	ASCII is a set of 128 characters from the English language, but does not include characters from European languages, such as é, á etc.
 

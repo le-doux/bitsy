@@ -16,6 +16,6 @@ An alternative way to import and export Bitsy games is through the [game data to
 
 ![download tool diagram](.images/downloadDiagram.JPG)
 
-1. **Download game.** Downloads your Bitsy game as an .html file, which can be opened in any internet browser to play, or uploaded to a game hosting platform such as [itch.io](https://itch.io) to share with other people.
+1. **Download game.** Downloads your Bitsy game as an .html file, which can be opened in any internet browser to play, or uploaded to a game hosting platform such as itch.io to share with other people.
 
 2. **Upload game.** Upload a Bitsy game from .html format into the Bitsy editor to edit it.

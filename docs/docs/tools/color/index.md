@@ -8,7 +8,7 @@ The three colors in the palette are:
 
 - background color (anything that is not interactive, the background color of all [tiles](../paint#tile) and [sprites](../paint#sprite))
 - tile color (the foreground color of all your [tiles](../paint#tile))
-- sprite color (the foreground color of your [avatar](../paint#avatar) and [sprites](../paint#sprite))
+- sprite color (the foreground color of your [avatar](../paint#avatar), [sprites](../paint#sprite), and [items](../paint#item))
 
 Click on the background / tile / sprite color buttons to switch which one you are adjusting. Then, using the color picker wheel, you may select the hue and saturation of your color, and then adjust its darkness / lightness using the slider below.
 
