@@ -1,12 +1,4 @@
----
-tags: [stub]
----
-
 ## Contributing to documentation
-
-:::info This page is a stub
-You can improve the docs by [expanding it](../../contributing).
-:::
 
 ### How to edit a page
 
@@ -78,6 +70,9 @@ For example, if you wanted to translate the glossary from English to French:
 Note that all files in the documentation folder (including images and `.json` files) can be translated by putting a copy in the corresponding locale folder.
 
 ## Contributing to the Bitsy editor
+
+This section is a stub.
+You can improve the docs by expanding it.
 
 ### Translating editor text
 
