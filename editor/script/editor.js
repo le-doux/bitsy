@@ -834,12 +834,6 @@ function start() {
 
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
 
-	var versionLabelElements = document.getElementsByClassName("curVersionLabel");
-	for (var labelIndex in versionLabelElements) {
-		var versionLabel = versionLabelElements[labelIndex];
-		versionLabel.innerText = "v" + version.major + "." + version.minor;
-	}
-
 	detectBrowserFeatures();
 
 	readUrlParameters();
@@ -1062,6 +1056,9 @@ function start() {
 			editorContent.insertBefore( panelElement, null ); //insert on the left
 		}
 	}
+
+	// about tool
+	initAbout();
 }
 
 function newDrawing() {

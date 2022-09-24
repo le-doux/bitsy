@@ -275,6 +275,11 @@ input[type=checkbox]:disabled + label {
 	user-select: none;
 }
 
+/* this is a one-off hack to better align the close button's icon with the help button's icon */
+.bitsy-card-close-button .bitsy_icon {
+	transform: translateY(1px);
+}
+
 .panelShadow { /* TODO : rename */
 	display: inline-block;
 	vertical-align: top;
@@ -719,4 +724,14 @@ input[type=checkbox]:disabled + label {
 
 .bitsy-tool-toggle {
 	display: flex;
+}
+
+/* ABOUT TOOL */
+#aboutInner {
+	height: 450px;
+}
+
+#docsFrame {
+	min-height: 0;
+	padding: 0;
 }

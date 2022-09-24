@@ -2,8 +2,12 @@ name: branch
 
 on: pull_request
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       # setup
@@ -13,3 +17,16 @@ jobs:
       # build resources
       - run: node ./dev/icon_generator/makeicons
       - run: node ./dev/resource_packager
+
+      # build docs
+      - run: npm ci
+        working-directory: docs
+      - run: npm run build
+        working-directory: docs
+
+      # upload
+      - uses: actions/upload-artifact@v3
+        with:
+          path: editor
+          retention-days: 7
+          name: ${{ github.head_ref }}

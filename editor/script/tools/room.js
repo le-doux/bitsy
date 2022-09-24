@@ -7,6 +7,7 @@ function makeRoomTool() {
 		tool.data = "ROOM";
 		tool.worldData = "room.bitsy";
 		tool.insertBefore = "exitsCheck";
+		tool.aboutPage = "./tools/room";
 
 		var selectedId = "0";
 

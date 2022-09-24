@@ -171,8 +171,12 @@ function createButtonElement(options) {
 		if (options.onclick) {
 			options.onclick(e);
 		}
+	};
+
+	if (options.style) {
+		button.classList.add(options.style);
 	}
-	
+
 	return button;
 }
 

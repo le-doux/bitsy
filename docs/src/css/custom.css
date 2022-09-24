@@ -1,0 +1,68 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+ 
+/* Note: this reuses style directly from the editor for consistency, which is bit hacky */
+@import "../../../editor/style/googleNunito.css";
+@import "bitsy_ascii.css";
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #9797d8;
+  --ifm-color-primary-dark: #8484ca;
+  --ifm-color-primary-darker: #6767b2;
+  --ifm-color-primary-darkest: #4b4b7e;
+  --ifm-color-primary-light: #a4a4d4;
+  --ifm-color-primary-lighter: #c3c3e9;
+  --ifm-color-primary-lightest: #e8e8ff;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  --ifm-font-family-base: "Nunito", Helvetica, Arial, sans-serif;
+  --ifm-font-family-monospace: bitsy_ascii, monospace;
+  --ifm-code-font-size: 100%;
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* use more compact style when embedded */
+:root[data-embedded=true] {
+  --ifm-font-size-base: 90% !important;
+}
+
+:root[data-embedded=true] h1,
+:root[data-embedded=true] h2,
+:root[data-embedded=true] h3,
+:root[data-embedded=true] h4,
+:root[data-embedded=true] h5,
+:root[data-embedded=true] h6 {
+  --ifm-h1-font-size: 1.2rem !important;
+  --ifm-h2-font-size: 1.1rem !important;
+  --ifm-h3-font-size: 1.1rem !important;
+  --ifm-h4-font-size: 1.1rem !important;
+  --ifm-h5-font-size: 1.1rem !important;
+  --ifm-h6-font-size: 1.1rem !important;
+  margin-bottom: 0.25em !important;
+}
+
+:root[data-embedded=true] h2,
+:root[data-embedded=true] h3,
+:root[data-embedded=true] h4,
+:root[data-embedded=true] h5,
+:root[data-embedded=true] h6 {
+  margin-top: 0.25em !important;
+}
+
+:root[data-embedded=true] .footer {
+  display: none;
+}
+
+/* disable elements which don't work on file protocol */
+:root[data-hosted=false] .navbar__toggle,
+:root[data-hosted=false] .theme-doc-toc-mobile {
+  display: none;
+}

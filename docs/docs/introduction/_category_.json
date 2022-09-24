@@ -1,0 +1,8 @@
+{
+  "label": "Introduction",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Bitsy is a little editor for little games or worlds. the goal is to make it easy to make games where you can walk around and talk to people and be somewhere."
+  }
+}

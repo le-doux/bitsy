@@ -1,0 +1,8 @@
+{
+  "label": "Tools",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "The toolbar contains all of the Bitsy editing tools. Clicking on a tool button will toggle that tool on or off in the workspace. The new game button will give you the option to begin a new Bitsy game. Be careful as this will overwrite anything you are currently working on. If you want to save your current work first, consider exporting your game using the download or game data tools."
+  }
+}

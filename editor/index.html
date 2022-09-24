@@ -15,7 +15,6 @@
 
 		<!-- STYLES -->
 		<link rel="stylesheet" type="text/css" href="style/bitsyEditorStyle.css">
-		<link rel="stylesheet" type="text/css" href="style/aboutToolStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/colorsToolStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/dataToolStyle.css">
 		<link rel="stylesheet" type="text/css" href="style/dialogToolStyle.css">
@@ -43,7 +42,8 @@
 		<script src="script/engine/renderer.js"></script>
 		<script src="script/engine/bitsy.js"></script>
 
-		<!-- EDITOR -->
+		<!-- EDITOR SCRIPTS -->
+		<script src="script/tools/about.js"></script>
 		<script src="script/store.js"></script>
 		<script src="script/util.js"></script>
 		<script src="script/icons.js"></script>
@@ -224,50 +224,21 @@
 						<span class="bitsy_icon">about</span>
 
 						<span class="bitsy-card-title" title="about window" onmousedown="grabCard(event);">
-							<span class="localize about_tool_title">about bitsy</span>
-							 <span class="curVersionLabel"></span>
+							<span class="localize about_tool_name">about</span>
 						</span>
 
-						<button title="minimize about window" onclick="hidePanel('aboutPanel');">
+
+						<button title="open page in new tab" onclick="aboutOpenTab();">
+							<span class="bitsy_icon">open_tool</span>
+						</button>
+
+						<button title="minimize about window" class="bitsy-card-close-button" onclick="hidePanel('aboutPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
 					</div>
 
 					<div id="aboutInner" class="bitsy-card-main">
-						<p>
-							<span class="localize about1">hi! bitsy is a little editor for little games or worlds. the goal is to make it easy to make games where you can walk around and talk to people and be somewhere.</span>
-						</p>
-
-						<p>
-							<span class="localize about9">have fun making things with bitsy!</span>
-						</p>
-
-						<p>
-							- 
-							<a target="_blank" href="https://www.twitter.com/adamledoux">
-								<span class="localize about10_link_twitter">adam</span>
-							</a>
-						</p>
-
-						<p>
-							getting started: <br/>
-							<a target="_blank" href="https://www.shimmerwitch.space/bitsyTutorial.html">tutorial</a>
-						</p>
-
-						<p>
-							community: <br/>
-							<a target="_blank" href="https://itch.io/games/made-with-bitsy">made with bitsy</a> |
-							<a target="_blank" href="https://discordapp.com/invite/9rAjhtr">discord server</a> |
-							<a target="_blank" href="https://ledoux.itch.io/bitsy/community">itch.io forum</a>
-						</p>
-
-						<p>
-							development: <br/>
-							<a target="_blank" href="https://github.com/le-doux/bitsy/blob/master/CREDITS.md">contributors</a> |
-							<a target="_blank" href="https://github.com/le-doux/bitsy/blob/master/VERSION_NOTES.txt">version notes</a> |
-							<a target="_blank" href="https://github.com/le-doux/bitsy/issues">report a bug</a> |
-							<a target="_blank" href="https://github.com/le-doux/bitsy">source code</a>
-						</p>
+						<iframe id="docsFrame" class="bitsy-menu-scrollview" height="100%"></iframe>
 					</div>
 				</div>
 
@@ -279,7 +250,11 @@
 							<span class="localize marker_tool_name">exits & endings</span>
 						</span>
 
-						<button title="minimize exits & endings window" onclick="hidePanel('exitsPanel');">
+						<button title="show about page for exits & endings" onclick="showAbout('./tools/exitsandendings', 'exitsPanel');">
+							<span class="bitsy_icon">help</span>
+						</button>
+
+						<button title="minimize exits & endings window" class="bitsy-card-close-button" onclick="hidePanel('exitsPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
 					</div>
@@ -519,7 +494,11 @@
 							<span class="localize paint_tool_name">paint</span>
 						</span>
 
-						<button title="minimize paint window" onclick="hidePanel('paintPanel');">
+						<button title="show about page for paint" onclick="showAbout('./tools/paint', 'paintPanel');">
+							<span class="bitsy_icon">help</span>
+						</button>
+
+						<button title="minimize paint window" class="bitsy-card-close-button" onclick="hidePanel('paintPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
 					</div>
@@ -659,7 +638,11 @@
 
 						<span class="bitsy-card-title" title="find window" onmousedown="grabCard(event);">find</span> <!-- todo : localize -->
 
-						<button title="minimize find window" onclick="hidePanel('findPanel');">
+						<button title="show about page for find" onclick="showAbout('./tools/find', 'findPanel');">
+							<span class="bitsy_icon">help</span>
+						</button>
+
+						<button title="minimize find window" class="bitsy-card-close-button" onclick="hidePanel('findPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
 					</div>
@@ -676,7 +659,11 @@
 							<span class="localize palette_tool_name">colors</span>
 						</span>
 
-						<button title="minimize color palette window" onclick="hidePanel('colorsPanel');">
+						<button title="show about page for colors" onclick="showAbout('./tools/color', 'colorsPanel');">
+							<span class="bitsy_icon">help</span>
+						</button>
+
+						<button title="minimize color palette window" class="bitsy-card-close-button" onclick="hidePanel('colorsPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
 					</div>
@@ -750,7 +737,11 @@
 							<span class="localize dialog_tool_name">dialog</span>
 						</span>
 
-						<button title="minimize dialog window" onclick="hidePanel('dialogPanel');">
+						<button title="show about page for dialog" onclick="showAbout('./tools/dialog', 'dialogPanel');">
+							<span class="bitsy_icon">help</span>
+						</button>
+
+						<button title="minimize dialog window" class="bitsy-card-close-button" onclick="hidePanel('dialogPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
 					</div>
@@ -829,7 +820,11 @@
 							<span class="localize inventory_tool_name">inventory</span>
 						</span>
 
-						<button title="minimize inventory window" onclick="hidePanel('inventoryPanel');">
+						<button title="show about page for inventory" onclick="showAbout('./tools/inventory', 'inventoryPanel');">
+							<span class="bitsy_icon">help</span>
+						</button>
+
+						<button title="minimize inventory window" class="bitsy-card-close-button" onclick="hidePanel('inventoryPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
 					</div>
@@ -868,7 +863,11 @@
 							<span class="localize download_tool_name">download</span>
 						</span>
 
-						<button title="minimize download window" onclick="hidePanel('downloadPanel');">
+						<button title="show about page for download" onclick="showAbout('./tools/download', 'downloadPanel');">
+							<span class="bitsy_icon">help</span>
+						</button>
+
+						<button title="minimize download window" class="bitsy-card-close-button" onclick="hidePanel('downloadPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
 					</div>
@@ -915,7 +914,11 @@
 							<span class="localize gif_tool_name">record gif</span>
 						</span>
 
-						<button title="minimize gif recording window" onclick="hidePanel('gifPanel');">
+						<button title="show about page for record gif" onclick="showAbout('./tools/recordgif', 'gifPanel');">
+							<span class="bitsy_icon">help</span>
+						</button>
+
+						<button title="minimize gif recording window" class="bitsy-card-close-button" onclick="hidePanel('gifPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
 					</div>
@@ -975,7 +978,11 @@
 							<span class="localize data_tool_name">game data</span>
 						</span>
 
-						<button title="minimize game data window" onclick="hidePanel('dataPanel');">
+						<button title="show about page for game data" onclick="showAbout('./tools/gamedata', 'dataPanel');">
+							<span class="bitsy_icon">help</span>
+						</button>
+
+						<button title="minimize game data window" class="bitsy-card-close-button" onclick="hidePanel('dataPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
 					</div>
@@ -1012,7 +1019,11 @@
 							<span class="localize settings_tool_name">settings</span>
 						</span>
 
-						<button title="minimize settings window" onclick="hidePanel('settingsPanel');">
+						<button title="show about page for settings" onclick="showAbout('./tools/settings', 'settingsPanel');">
+							<span class="bitsy_icon">help</span>
+						</button>
+
+						<button title="minimize settings window" class="bitsy-card-close-button" onclick="hidePanel('settingsPanel');">
 							<span class="bitsy_icon">close</span>
 						</button>
 					</div>

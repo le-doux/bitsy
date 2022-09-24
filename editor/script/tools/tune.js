@@ -7,6 +7,7 @@ function makeTuneTool() {
 		tool.data = "TUNE"; // todo : what's the right naming convention?
 		tool.worldData = "tune.bitsy"; // todo : is "world" a confusing name?
 		tool.insertBefore = "findCheck"; // todo : name of option?
+		tool.aboutPage = "./tools/tune";
 
 		// todo : do something to re-enable the live preview?
 		// trying out giving each tool its own sound player
