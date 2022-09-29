@@ -41,5 +41,5 @@ jobs:
 
       - name: list files to help debug upload
         run: find . | grep -v "node_modules" | grep -v "git"
-      # - name: publish to bitsy.org (under /release-test)
-      #   run: expect -c 'spawn sftp ${{ secrets.FTP_USER }}@${{ secrets.FTP_SERVER }} ; sleep 10 ; send "yes\r" ; expect "password:" ; send "${{ secrets.FTP_PASS }}\r" ; expect "sftp>" ; mkdir release-test; send "put -r release-test/\r" ; expect "sftp>" ; send "bye\r" ; expect eof'
+      - name: publish to bitsy.org (under /release-test)
+        run: expect -c 'spawn sftp ${{ secrets.FTP_USER }}@${{ secrets.FTP_SERVER }} ; sleep 10 ; send "yes\r" ; expect "password:" ; send "${{ secrets.FTP_PASS }}\r" ; expect "sftp>" ; mkdir release-test; send "put -r release-test/\r" ; expect "sftp>" ; send "bye\r" ; expect eof'
