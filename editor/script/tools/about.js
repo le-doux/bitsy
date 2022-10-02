@@ -8,12 +8,24 @@ function getDocsRoot() {
 		return "http://localhost:3000/docs/";
 	}
 
-	return window.location.href.replace(/index\.html/, '/docs/');
+	// remove "index.html"
+	var root = window.location.href.replace(/index\.html/, '');
+
+	// add separator if necessary
+	if (root[root.length - 1] != "/") {
+		root += "/";
+	}
+
+	// add docs sub-directory
+	root += "docs/";
+
+	return root;
 }
 
 function setAboutPage(pagePath) {
 	var docsFrame = document.getElementById('docsFrame');
-	var src = new URL(pagePath.includes('.html') ? pagePath : `${pagePath}/index.html`, getDocsRoot()).href;
+	var url = new URL(pagePath.includes('.html') ? pagePath : `${pagePath}/index.html`, getDocsRoot());
+	var src = url.href;
 	docsFrame.src = src;
 }
 

@@ -1,0 +1,46 @@
+name: release-test
+
+on:
+  push:
+    branches:
+      - "release-test"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # setup
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - name: install ssh2
+        run: npm install ssh2
+
+      # build resources
+      - run: node ./dev/icon_generator/makeicons
+      - run: node ./dev/resource_packager
+
+      # build docs
+      - run: npm ci
+        working-directory: docs
+      - run: npm run build
+        working-directory: docs
+
+      # publish
+      # - name: get version
+      #   id: version
+      #   uses: martinbeentjes/npm-get-version-action@v1.2.3
+      # - name: publish to itch.io
+      #   uses: josephbmanley/butler-publish-itchio-action@v1.0.3
+      #   env:
+      #     BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
+      #     CHANNEL: win-linux-mac-stable
+      #     ITCH_GAME: bitsy
+      #     ITCH_USER: ledoux
+      #     PACKAGE: editor
+      #     VERSION: ${{ steps.version.outputs.current-version }}
+
+      - name: list files to help debug upload
+        run: find editor/docs/assets/ | grep -v "node_modules" | grep -v "git"
+
+      - name: publish to bitsy.org (under /release-test)
+        run: node dev/publish editor release-test ${{ secrets.FTP_USER }} ${{ secrets.FTP_SERVER }} 22 ${{ secrets.FTP_PASS }}
