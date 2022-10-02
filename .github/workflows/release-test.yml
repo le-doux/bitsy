@@ -12,8 +12,8 @@ jobs:
       # setup
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - name: install expect
-        run: sudo apt install expect
+      - name: install ssh2
+        run: npm install ssh2
 
       # build resources
       - run: node ./dev/icon_generator/makeicons
