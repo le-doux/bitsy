@@ -43,4 +43,4 @@ jobs:
         run: find editor/docs/assets/ | grep -v "node_modules" | grep -v "git"
 
       - name: publish to bitsy.org (under /release-test)
-        run: node dev/publish editor release-test ${{ secrets.FTP_USER }} {{ secrets.FTP_SERVER }} 22 ${{ secrets.FTP_PASS }}
+        run: node dev/publish editor release-test ${{ secrets.FTP_USER }} ${{ secrets.FTP_SERVER }} 22 ${{ secrets.FTP_PASS }}
