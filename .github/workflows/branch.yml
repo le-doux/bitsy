@@ -32,4 +32,4 @@ jobs:
         with:
           path: editor
           retention-days: 7
-          name: ${{ steps.name.outputs..ARTIFACT_NAME }}
+          name: ${{ steps.name.outputs.ARTIFACT_NAME }}
