@@ -21,7 +21,7 @@ Voici quelques bonnes pages pour commencer à apprendre Bitsy! :)
 ## Communauté
 
 - [Créé avec bitsy](https://itch.io/games/made-with-bitsy)
-- [Discord serveur](https://discordapp.com/invite/9rAjhtr)
+- [Forum](https://ledoux.itch.io/bitsy/community)
 
 ## Projet
 
