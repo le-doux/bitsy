@@ -25,8 +25,11 @@ jobs:
         working-directory: docs
 
       # upload
+      - name: sanitize branch name
+        id: name
+        run: echo ::set-output name=ARTIFACT_NAME::$(echo ${{ github.head_ref }} | tr "/" "_")
       - uses: actions/upload-artifact@v3
         with:
           path: editor
           retention-days: 7
-          name: ${{ github.head_ref }}
+          name: ${{ steps.name.outputs.ARTIFACT_NAME }}
