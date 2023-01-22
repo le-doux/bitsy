@@ -42,13 +42,13 @@ A location that triggers the end of the Bitsy game. Transition effects cannot be
 
 7 **Location of marker**. These thumbnails display the location of the start or end point of the exit or ending. The text above describes the type of exit: exit (start location for a one- or two-way exit), destination (end location for a one-way exit), return exit (end location for a two-way exit, which can also be returned through), ending (location of an ending).
 
-8 **Show / hide exit options**. Opens the text, lock, and transition effect options for the exit location. For two-way exits you can open the exit options for both locations by clicking this button under each thumbnail. [Click here for further details](/tools/exitsandendings#return-exit-settings)
+8 **Show / hide exit options**. Opens the text, lock, and transition effect options for the exit location. For two-way exits you can open the exit options for both locations by clicking this button under each thumbnail. [Click here for further details](#exit-options)
 
 9 **Edit coordinates**. Toggles a small options menu that allows you to change the location of the exit by entering room coordinates. The 'room' dropdown allows you to select which room the exit should be in, and 'x' and 'y' refer to the grid cell coordinate, where 0,0 is the top-left of the room and 15,15 is the lower-right.
 
 10 **Move exit location**. Click to place the location marker in the current room. This allows you to change the location of the exit more visually. Navigate to the desired room first in the room tool, then click this button, then click the location for the exit in the room tool view.
 
-### Return exit settings
+### Exit options
 
 ![exits & endings tool diagram](.images/exitsEndingsDiagram02.JPG)
 
