@@ -85,6 +85,9 @@ function PaletteTool(colorPicker,labelIds,nameFieldId) {
 
 		if( event.isMouseUp && !events.IsEventActive("game_data_change") ) {
 			events.Raise("palette_change"); // TODO -- try including isMouseUp and see if we can update more stuff live
+			if (roomTool) {
+				roomTool.select(roomTool.getSelected());
+			}
 		}
 	});
 
