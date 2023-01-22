@@ -95,8 +95,12 @@ const config = {
 						href: 'https://make.bitsy.org',
 					},
 					{
-						label: 'Discord',
-						href: 'https://discord.com/invite/9rAjhtr',
+						label: 'Forum',
+						href: 'https://ledoux.itch.io/bitsy/community',
+					},
+					{
+						label: 'Blog',
+						href: 'https://ledoux.itch.io/bitsy/devlog',
 					},
 					{
 						label: 'Twitter',
