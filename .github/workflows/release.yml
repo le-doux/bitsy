@@ -28,7 +28,7 @@ jobs:
       # publish
       - name: get version
         id: version
-        uses: martinbeentjes/npm-get-version-action@v1.2.3
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
       - name: publish to itch.io
         uses: josephbmanley/butler-publish-itchio-action@v1.0.3
         env:
