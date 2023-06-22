@@ -1,3 +1,7 @@
+## 8.5
+
+- fix:  Multiple {pg} (pagebreak) commands break dialogue execution #190 
+
 ## 8.4
 
 - documentation!
