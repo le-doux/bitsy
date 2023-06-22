@@ -673,7 +673,7 @@ var DialogBuffer = function() {
 
 	// TODO : convert this into something that takes DialogChar arrays
 	this.AddText = function(textStr) {
-		bitsy.log("ADD TEXT " + textStr);
+		bitsy.log("ADD TEXT >>" + textStr + "<<");
 
 		//process dialog so it's easier to display
 		var words = textStr.split(" ");
@@ -781,12 +781,17 @@ var DialogBuffer = function() {
 		var curRowArr = buffer[curPageIndex][curRowIndex];
 
 		// need to actually create a whole new page if following another pagebreak character
-		if (this.CurChar() && this.CurChar().isPageBreak) {
+		if (afterManualPagebreak) {
+			this.FlipPage(); // hacky
+
+			buffer[curPageIndex][curRowIndex] = curRowArr;
 			buffer.push([]);
 			curPageIndex++;
 			buffer[curPageIndex].push([]);
 			curRowIndex = 0;
 			curRowArr = buffer[curPageIndex][curRowIndex];
+
+			afterManualPagebreak = false;
 		}
 
 		var pagebreakChar = new DialogPageBreakChar();
@@ -794,7 +799,7 @@ var DialogBuffer = function() {
 
 		curRowArr.push(pagebreakChar);
 
-		isActive = true;		
+		isActive = true;
 	}
 
 	this.hasTextEffect = function(name) {
