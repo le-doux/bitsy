@@ -1,3 +1,7 @@
+## 8.6
+
+- localization: added Ukrainian translation by leonid.codes
+
 ## 8.5
 
 - fix:  Multiple {pg} (pagebreak) commands break dialogue execution #190 

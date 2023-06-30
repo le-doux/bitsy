@@ -37,6 +37,7 @@
 - Florencia Rumpel Rodriguez (@\_\_rumpel) - Spanish translation
 - Game Makers Iceland - Icelandic translation
 - Kai Werder - German translation
+- leonid.codes - Ukrainian translation
 - Marina Díez - Spanish and Italian translation
 - Mateusz Teklak - Polish translation
 - Matthias Löwe - German translation

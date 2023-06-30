@@ -2,8 +2,8 @@
 // is this the right place for this to live?
 var version = {
 	major: 8, // major changes
-	minor: 5, // smaller changes
-	devBuildPhase: "RELEASE",
+	minor: 6, // smaller changes
+	devBuildPhase: "DEV",
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
