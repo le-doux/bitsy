@@ -1,5 +1,6 @@
 ## 8.6
 
+- feature: add apple touch icon for iOS safari
 - localization: added Ukrainian translation by leonid.codes
 
 ## 8.5
