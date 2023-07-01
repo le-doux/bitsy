@@ -1,8 +1,9 @@
 ## 8.6
 
-- feature: add apple touch icon for iOS safari
 - localization: added Ukrainian translation by leonid.codes
+- feature: add apple touch icon for iOS safari
 - docs: updated the tutorials page to include new tutorials on bitsy dialogs, the bitsy museum hack, and a bitsy handout for beginners!
+- docs: update bitsy system API documentation to v0.2
 
 ## 8.5
 
