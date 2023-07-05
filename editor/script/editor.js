@@ -1172,19 +1172,19 @@ function selectRoom(roomId) {
 	roomTool.select(roomId);
 }
 
-function duplicateExit(exit) {
-	var newExit = {
-		x : exit.x,
-		y : exit.y,
-		dest : {
-			room : exit.dest.room,
-			x : exit.dest.x,
-			y : exit.dest.y
-		},
-		transition_effect : exit.transition_effect,
-		dlg: exit.dlg,
-	}
-	return newExit;
+function copyExitData(exit) {
+	return createExitData(
+		exit.x,
+		exit.y,
+		exit.dest.room,
+		exit.dest.x,
+		exit.dest.y,
+		exit.transition_effect,
+		exit.dlg);
+}
+
+function copyEndingData(ending) {
+	return createEndingData(ending.id, ending.x, ending.y);
 }
 
 function nextItem() {

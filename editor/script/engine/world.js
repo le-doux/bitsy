@@ -3,7 +3,7 @@
 var version = {
 	major: 8, // major changes
 	minor: 6, // smaller changes
-	devBuildPhase: "DEV",
+	devBuildPhase: "RELEASE",
 };
 function getEngineVersion() {
 	return version.major + "." + version.minor;
@@ -419,6 +419,28 @@ function createRoomData(id) {
 	};
 }
 
+function createExitData(x, y, destRoom, destX, destY, transition, dlg) {
+	return {
+		x: x,
+		y: x,
+		dest: {
+			room: destRoom,
+			x: destX,
+			y: destY
+		},
+		transition_effect: transition,
+		dlg: dlg,
+	};
+}
+
+function createEndingData(id, x, y) {
+	return {
+		id: id,
+		x: x,
+		y: y
+	};
+}
+
 function parseRoom(parseState, world) {
 	var i = parseState.index;
 	var lines = parseState.lines;
@@ -510,17 +532,14 @@ function parseRoom(parseState, world) {
 			var exitCoords = exitArgs[1].split(",");
 			var destName = exitArgs[2];
 			var destCoords = exitArgs[3].split(",");
-			var ext = {
-				x : parseInt(exitCoords[0]),
-				y : parseInt(exitCoords[1]),
-				dest : {
-					room : destName,
-					x : parseInt(destCoords[0]),
-					y : parseInt(destCoords[1])
-				},
-				transition_effect : null,
-				dlg: null,
-			};
+			var ext = createExitData(
+				/* x 			*/ parseInt(exitCoords[0]),
+				/* y 			*/ parseInt(exitCoords[1]),
+				/* destRoom 	*/ destName,
+				/* destX 		*/ parseInt(destCoords[0]),
+				/* destY 		*/ parseInt(destCoords[1]),
+				/* transition 	*/ null,
+				/* dlg 			*/ null);
 
 			// optional arguments
 			var exitArgIndex = 4;
@@ -545,11 +564,10 @@ function parseRoom(parseState, world) {
 			var endId = getId(lines[i]);
 
 			var endCoords = getCoord(lines[i], 2);
-			var end = {
-				id : endId,
-				x : parseInt(endCoords[0]),
-				y : parseInt(endCoords[1])
-			};
+			var end = createEndingData(
+				/* id */ endId,
+				/* x */ parseInt(endCoords[0]),
+				/* y */ parseInt(endCoords[1]));
 
 			roomData.endings.push(end);
 		}

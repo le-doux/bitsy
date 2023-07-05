@@ -3,7 +3,12 @@
 ## v0.2
 
 ### About
-These APIs are the foundation on which the bitsy engine is built. They are currently experimental and likely to change significantly from version to version - at least until they reach v1.0. The web implementation of these APIs is found in `editor/script/system/system.js` ([source](https://github.com/le-doux/bitsy/blob/main/editor/script/system/system.js)). I've also written a standalone desktop implementation called [bitsybox](https://ledoux.itch.io/bitsybox) ([source](https://github.com/le-doux/bitsybox)).
+
+These APIs are the base layer on which the bitsy engine is built. When combined with a JavaScript intepreter, they define the system requirements for bitsy.
+
+The web implementation of these APIs is found in `editor/script/system/system.js` ([source](https://github.com/le-doux/bitsy/blob/main/editor/script/system/system.js)). I've also written a standalone desktop implementation called [bitsybox](https://ledoux.itch.io/bitsybox) ([source](https://github.com/le-doux/bitsybox)).
+
+NOTE: Currently these are experimental and likely to change significantly from version to version - at least until they reach v1.0.
 
 ## Specification
 

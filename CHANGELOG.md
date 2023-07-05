@@ -2,7 +2,8 @@
 
 - localization: added Ukrainian translation by leonid.codes
 - feature: add apple touch icon for iOS safari
-- fix: drawing in paint tool doesn't revert drawing name edits anymore
+- fix: fix bug where {exit} undid the "locked" property state
+- fix: fix bug where clicking on paint canvas undid drawing name changes
 - docs: updated the tutorials page to include new tutorials on bitsy dialogs, the bitsy museum hack, and a bitsy handout for beginners!
 - docs: update bitsy system API documentation to v0.2
 
