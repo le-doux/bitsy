@@ -62,6 +62,8 @@ function resetGameState() {
 	state.ava = playerId; // avatar appearance override
 	state.pal = "0"; // current palette id
 	state.tune = "0"; // current tune id ("0" === off)
+	state.exits = []; // exits in current room
+	state.endings = []; // endings in current room
 }
 
 // title helper functions
@@ -774,13 +776,31 @@ function initRoom(roomId) {
 	}
 
 	// init exit properties
+	state.exits = [];
 	for (var i = 0; i < room[roomId].exits.length; i++) {
-		room[roomId].exits[i].property = { locked:false };
+		var exit = createExitData(
+			/* x 			*/ room[roomId].exits[i].x,
+			/* y 			*/ room[roomId].exits[i].y,
+			/* destRoom 	*/ room[roomId].exits[i].dest.room,
+			/* destX 		*/ room[roomId].exits[i].dest.x,
+			/* destY 		*/ room[roomId].exits[i].dest.y,
+			/* transition 	*/ room[roomId].exits[i].transition_effect,
+			/* dlg 			*/ room[roomId].exits[i].dlg);
+		exit.property = { locked: false };
+
+		state.exits.push(exit);
 	}
 
 	// init ending properties
+	state.endings = [];
 	for (var i = 0; i < room[roomId].endings.length; i++) {
-		room[roomId].endings[i].property = { locked:false };
+		var end = createEndingData(
+			/* id */ room[roomId].endings[i].id,
+			/* x  */ room[roomId].endings[i].x,
+			/* y  */ room[roomId].endings[i].y);
+		end.property = { locked: false };
+
+		state.endings.push(end);
 	}
 
 	if (soundPlayer) {
@@ -875,9 +895,10 @@ function getItem(roomId,x,y) {
 	return null;
 }
 
-function getExit(roomId,x,y) {
-	for (i in room[roomId].exits) {
-		var e = room[roomId].exits[i];
+// todo : roomId isn't useful in these functions anymore! safe to remove?
+function getExit(roomId, x, y) {
+	for (i in state.exits) {
+		var e = state.exits[i];
 		if (x == e.x && y == e.y) {
 			return e;
 		}
@@ -885,9 +906,9 @@ function getExit(roomId,x,y) {
 	return null;
 }
 
-function getEnding(roomId,x,y) {
-	for (i in room[roomId].endings) {
-		var e = room[roomId].endings[i];
+function getEnding(roomId, x, y) {
+	for (i in state.endings) {
+		var e = state.endings[i];
 		if (x == e.x && y == e.y) {
 			return e;
 		}

@@ -71,20 +71,11 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 		var nextRoomId = roomIds[roomIndex];
 
-		// bitsyLog(room, "editor");
-		// TODO : I really need a shared "createExit()" function
-		var newExit = {
-			x : 2,
-			y : 2,
-			dest : { // start with valid destination so you can't accidentally uncreate exits
-				room : nextRoomId,
-				x : 13,
-				y : 13
-			},
-			transition_effect : null,
-			dlg : null,
-		}
-		room[selectedRoom].exits.push( newExit );
+		// NOTE: make sure to start with valid destination so you can't accidentally uncreate exits
+		var newExit = createExitData(/* x */ 2, /* y */ 2,
+			/* destRoom */ nextRoomId, /* destX */ 13, /* destY */ 13,
+			/* transition */ null, /* dlg */ null);
+		room[selectedRoom].exits.push(newExit);
 
 		if (!isOneWay) {
 			var newReturn = {
@@ -111,11 +102,8 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			return;
 		}
 
-		var newEnding = {
-			x : 2,
-			y : 2,
-			id : nextAvailableDialogId(),
-		};
+		var newEnding = createEndingData(/* id */ nextAvailableDialogId(), /* x */ 2, /* y */ 2);
+
 		room[selectedRoom].endings.push(newEnding);
 		dialog[newEnding.id] = {
 			src: localization.GetStringOrFallback("default_end_dlg", "The end"),
@@ -134,7 +122,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 		}
 
 		if (curMarker.type === MarkerType.Exit) {
-			var newExit = duplicateExit(curMarker.exit);
+			var newExit = copyExitData(curMarker.exit);
 
 			if (newExit.x < 15) {
 				newExit.x++;
@@ -151,11 +139,7 @@ function RoomMarkerTool(markerCanvas1, markerCanvas2) {
 			refreshGameData();
 		}
 		else if (curMarker.type === MarkerType.Ending) {
-			var newEnding = { // TODO : there should be a helper function for this copy
-				x : curMarker.ending.x,
-				y : curMarker.ending.y,
-				id : curMarker.ending.id,
-			};
+			var newEnding = copyEndingData(curMarker.ending);
 
 			if (newEnding.x < 15) {
 				newEnding.x++;

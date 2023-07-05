@@ -45,10 +45,7 @@ function PaintTool(canvas, menuElement) {
 	canvas.addEventListener("touchmove", onTouchMove);
 	canvas.addEventListener("touchend", onTouchEnd);
 
-	// TODO : 
 	function onMouseDown(e) {
-		e.preventDefault();
-		
 		if (isPlayMode) {
 			return; //can't paint during play mode
 		}

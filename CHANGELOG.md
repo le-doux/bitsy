@@ -1,3 +1,12 @@
+## 8.6
+
+- localization: added Ukrainian translation by leonid.codes
+- feature: add apple touch icon for iOS safari
+- fix: fix bug where {exit} undid the "locked" property state
+- fix: fix bug where clicking on paint canvas undid drawing name changes
+- docs: updated the tutorials page to include new tutorials on bitsy dialogs, the bitsy museum hack, and a bitsy handout for beginners!
+- docs: update bitsy system API documentation to v0.2
+
 ## 8.5
 
 - fix:  Multiple {pg} (pagebreak) commands break dialogue execution #190 
