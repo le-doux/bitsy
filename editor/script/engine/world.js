@@ -422,7 +422,7 @@ function createRoomData(id) {
 function createExitData(x, y, destRoom, destX, destY, transition, dlg) {
 	return {
 		x: x,
-		y: x,
+		y: y,
 		dest: {
 			room: destRoom,
 			x: destX,
