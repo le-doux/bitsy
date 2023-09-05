@@ -431,7 +431,7 @@ function BitsySystem(name) {
 			count--;
 		}
 
-		if (memory.blocks[next] != undefined) {
+		if (count == 0) {
 			// couldn't find any available block
 			return null;
 		}
