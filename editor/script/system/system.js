@@ -637,6 +637,15 @@ function BitsySystem(name) {
 		self._free(tile);
 	};
 
+	this.deleteAllTiles = function() {
+		if (tilePoolStart != null) {
+			for (var i = 0; i < tilePoolSize; i++) {
+				var tile = tilePoolStart + i;
+				this.delete(tile);
+			}
+		}
+	};
+
 	this.fill = function(block, value) {
 		var len = memory.blocks[block].length;
 		for (var i = 0; i < len; i++) {

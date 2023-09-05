@@ -7,6 +7,7 @@
 - Elkie - Contributor
 - equa (@equaa) - Contributor
 - max - Contributor
+- @pancelor - Contributor
 - Pirijuamps - Contributor
 - @ragzouken - Contributor
 - Samuel Fine - Contributor
