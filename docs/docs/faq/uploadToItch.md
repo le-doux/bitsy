@@ -11,7 +11,7 @@ Before you upload your game to itch.io, make sure you have the following.
    
 2. Go to your [dashboard](https://itch.io/dashboard) and click on [Create New Project](https://itch.io/game/new).
 
-3. Fill out the fields for your game, and upload your game file, cover image, and screenshots. Bitsy games are executable in the web browser, but you can also set it to be downloadable if you prefer. You can specify the viewport dimensions; 512px x 512px is a good option for many bitsy games. 
+3. Fill out the fields for your game, and upload your game file, cover image, and screenshots. Bitsy games are executable in the web browser, but you can also set it to be downloadable if you prefer. You can specify the viewport dimensions; 512x512px is a good option for many bitsy games. 
 
 4. Save the game as a draft and view the itch.io page for your game You can make any style changes using the edit theme button. If you want to edit the html for the game page, you can do this back on your project dashboard.
 
