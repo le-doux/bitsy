@@ -1,3 +1,7 @@
+## 8.7
+
+- fix: Fix y-coordinate typo in createExitData (Pirijuamps)
+
 ## 8.6
 
 - localization: added Ukrainian translation by leonid.codes
