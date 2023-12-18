@@ -163,11 +163,11 @@ function makeRoomTool() {
 
 		function copyItem(item) {
 			return {
-        id: item.id,
+				id: item.id,
 				x: item.x,
 				y: item.y
 			};
-    }
+		}
 
 		function getAtCoord(roomId, x, y) {
 			var spriteId = getSpriteAt(x, y, roomId);
@@ -760,7 +760,7 @@ function makeRoomTool() {
 			room[nextId].walls = room[selectedId].walls.slice();
 			room[nextId].exits = exits;
 			room[nextId].endings = room[selectedId].endings.slice();
-			room[nextId].items = room[selectedId].items.slice();
+			room[nextId].items = items;
 			room[nextId].pal = room[selectedId].pal;
 			room[nextId].ava = room[selectedId].ava;
 			room[nextId].tune = room[selectedId].tune;
