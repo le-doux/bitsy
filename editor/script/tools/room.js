@@ -161,6 +161,14 @@ function makeRoomTool() {
 			};
 		}
 
+		function copyItem(item) {
+			return {
+				id: item.id,
+				x: item.x,
+				y: item.y
+			};
+		}
+
 		function getAtCoord(roomId, x, y) {
 			var spriteId = getSpriteAt(x, y, roomId);
 			if (spriteId) {
@@ -741,11 +749,21 @@ function makeRoomTool() {
 				exits.push(copyExit(exit));
 			}
 
+			// copy items
+			var items = [];
+			for (var i in room[selectedId].items) {
+				var item = room[selectedId].items[i];
+				items.push(copyItem(item));
+			}
+
 			room[nextId].tilemap = tilemap;
 			room[nextId].walls = room[selectedId].walls.slice();
 			room[nextId].exits = exits;
 			room[nextId].endings = room[selectedId].endings.slice();
+			room[nextId].items = items;
 			room[nextId].pal = room[selectedId].pal;
+			room[nextId].ava = room[selectedId].ava;
+			room[nextId].tune = room[selectedId].tune;
 
 			selectedId = nextId;
 		};
