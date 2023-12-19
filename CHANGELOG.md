@@ -1,3 +1,12 @@
+## 8.8
+
+- added brazilian portuguese translations by marco
+- add information to "upload to itch" documentation page
+- hook up localization to tune and blip tools
+- fix: copy room didn't copy everything
+- fix: memory leak in cache clearing
+- fix: localization was broken for room tool
+
 ## 8.7
 
 - fix: Fix y-coordinate typo in createExitData (Pirijuamps)

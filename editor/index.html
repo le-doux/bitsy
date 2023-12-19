@@ -148,7 +148,7 @@
 				<input type="checkbox" value="findPanel" id="findCheck" onclick="togglePanelAnimated(event);" autocomplete="off" />
 				<label title="show / hide find window" for="findCheck">
 					<span class="bitsy_icon icon_space_right">search</span>
-					<span>find</span> <!-- todo : localize -->
+					<span class="localize find_tool">find</span>
 				</label>
 
 				<input type="checkbox" value="inventoryPanel" id="inventoryCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
@@ -637,7 +637,9 @@
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">search</span>
 
-						<span class="bitsy-card-title" title="find window" onmousedown="grabCard(event);">find</span> <!-- todo : localize -->
+						<span class="bitsy-card-title" title="find window" onmousedown="grabCard(event);">
+							<span class="localize find_tool">find</span>
+						</span>
 
 						<button title="show about page for find" onclick="showAbout('./tools/find', 'findPanel');">
 							<span class="bitsy_icon">help</span>
@@ -1096,11 +1098,10 @@
 								</div>
 								<div style="margin-top: 5px;">
 									<span class="bitsy_icon">text_edit</span>
-									<!-- todo : localize -->
-									<span title="textbox graphics mode">text mode:</span>
+									<span title="textbox graphics mode" class="localize setting_text_mode">text mode</span>:
 									<select id="textModeSelect" title="select resolution of textbox pixels" onchange="onChangeTextMode(event);">
-										<option value="TXT_HIREZ" title="2x pixel resolution">default</option>
-										<option value="TXT_LOREZ" title="1x pixel resolution">chunky</option>
+										<option value="TXT_HIREZ" title="2x pixel resolution" class="localize setting_text_hirez">default</option>
+										<option value="TXT_LOREZ" title="1x pixel resolution" class="localize setting_text_lorez">chunky</option>
 									</select>
 								</div>
 							</div>

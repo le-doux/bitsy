@@ -194,7 +194,7 @@ function FindTool(options) {
 			icon: "dialog",
 			getIdList: function() { return [titleDialogId].concat(sortedDialogIdList()); },
 			getCategoryName: function() {
-				return localization.GetStringOrFallback("dialog_label", "dialog");
+				return localization.GetStringOrFallback("dialog_tool_name", "dialog");
 			},
 			getItemName: function(id) {
 				return dialog[id].name;
@@ -204,7 +204,7 @@ function FindTool(options) {
 					return id;
 				}
 				else {
-					return localization.GetStringOrFallback("dialog_label", "dialog") + " " + id;
+					return localization.GetStringOrFallback("dialog_tool_name", "dialog") + " " + id;
 				}
 			},
 			isItemSelected: function(id) {
@@ -219,7 +219,7 @@ function FindTool(options) {
 			id: "TUNE",
 			icon: "tune",
 			getIdList: function() { return sortedBase36IdList(tune); },
-			getCategoryName: function() { return "tune"; },
+			getCategoryName: function() { return localization.GetStringOrFallback("tune_tool", "tune"); },
 			getItemName: function(id) { return (id && tune[id]) ? tune[id].name : ""; },
 			getItemDescription: function(id, short) {
 				if (short) {
@@ -248,7 +248,7 @@ function FindTool(options) {
 			id: "BLIP",
 			icon: "blip",
 			getIdList: function() { return sortedBase36IdList(blip); },
-			getCategoryName: function() { return "blip"; },
+			getCategoryName: function() { return localization.GetStringOrFallback("blip_sfx", "blip"); },
 			getItemName: function(id) { return (id && blip[id]) ? blip[id].name : ""; },
 			getItemDescription: function(id, short) {
 				if (short) {
@@ -300,7 +300,7 @@ function FindTool(options) {
 
 	var filterTabList = [
 		{
-			text: "all", // todo : localize
+			text: localization.GetStringOrFallback("find_all", "all"),
 			value: "ALL",
 			icon: "game_data",
 		},

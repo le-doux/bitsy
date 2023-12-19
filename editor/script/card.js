@@ -27,7 +27,7 @@ function makeToolCard(processName, initFunction) {
 
 	var titleSpan = document.createElement("span");
 	titleSpan.classList.add("bitsy-card-title");
-	titleSpan.innerText = card.name;
+	titleSpan.innerText = card.name();
 	titleSpan.onmousedown = function(event) {
 		grabCard(event);
 	};
@@ -35,7 +35,7 @@ function makeToolCard(processName, initFunction) {
 
 	titlebarDiv.appendChild(createButtonElement({
 		icon: "help",
-		description: "show about page for " + card.name,
+		description: "show about page for " + card.name(),
 		onclick: function() {
 			showAbout(card.aboutPage, cardDiv.id);
 		}
@@ -58,7 +58,7 @@ function makeToolCard(processName, initFunction) {
 	card.resetTitlebar = function() {
 		titleIconSpan.innerHTML = "";
 		titleIconSpan.appendChild(createIconElement(card.icon));
-		titleSpan.innerText = card.name;
+		titleSpan.innerText = card.name();
 	};
 
 	var mainDiv = document.createElement("div");
@@ -122,7 +122,7 @@ function makeToolCard(processName, initFunction) {
 		.insertBefore(
 			createToggleElement({
 				icon: card.icon,
-				text: card.name,
+				text: card.name(),
 				id: card.id + "Check",
 				value: card.id + "Panel",
 				style: "bitsy-tool-toggle",

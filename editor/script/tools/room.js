@@ -1,7 +1,12 @@
 function makeRoomTool() {
 	return makeToolCard("room", function(tool) {
 		tool.id = "room";
-		tool.name = "room"; // todo : localize
+
+		// todo : how do I feel about these being functions? should I rename the property?
+		tool.name = function() {
+			return localization.GetStringOrFallback("room_tool_name", "room");
+		};
+
 		tool.icon = "room";
 		tool.size = "l";
 		tool.data = "ROOM";
@@ -507,10 +512,30 @@ function makeRoomTool() {
 				name: "roomMenuSelect",
 				value: curMenu,
 				options: [
-					{ icon: "edit", text: "edit", description: "room editing tools", value: RoomMenu.EDIT, },
-					{ icon: "colors", text: "colors", description: "room palette settings", value: RoomMenu.COLORS, },
-					{ icon: "tune", text: "tune", description: "room tune settings", value: RoomMenu.TUNE, },
-					{ icon: "avatar", text: "avatar", description: "room avatar settings", value: RoomMenu.AVATAR, }
+					{
+						icon: "edit",
+						text: localization.GetStringOrFallback("general_edit", "edit"),
+						description: "room editing tools",
+						value: RoomMenu.EDIT,
+					},
+					{
+						icon: "colors",
+						text: localization.GetStringOrFallback("palette_tool_name", "colors"),
+						description: "room palette settings",
+						value: RoomMenu.COLORS,
+					},
+					{
+						icon: "tune",
+						text: localization.GetStringOrFallback("tune_tool", "tune"),
+						description: "room tune settings",
+						value: RoomMenu.TUNE,
+					},
+					{
+						icon: "avatar",
+						text: localization.GetStringOrFallback("avatar_label", "avatar"),
+						description: "room avatar settings",
+						value: RoomMenu.AVATAR,
+					},
 				],
 				onchange: function(e) {
 					curMenu = parseInt(e.target.value);
@@ -529,23 +554,22 @@ function makeRoomTool() {
 					control: "select",
 					name: "roomEditToolSelect",
 					value: curEditTool,
-					// todo : localize
 					options: [
 						{
 							icon: "paint",
-							text: "paint",
+							text: localization.GetStringOrFallback("paint_tool_name", "paint"),
 							description: "paint: draw or erase selected tile, sprite, or item (alt: swap with pick)",
 							value: RoomEditTool.PAINT
 						},
 						{
 							icon: "eyedropper",
-							text: "pick",
+							text: localization.GetStringOrFallback("room_eyedropper_pick", "pick"),
 							description: "eyedropper: click to select tile, sprite, or item in paint tool (alt: swap with paint)",
 							value: RoomEditTool.PICK
 						},
 						{
 							icon: "exits_endings",
-							text: "exits & endings",
+							text: localization.GetStringOrFallback("marker_tool_name", "exits & endings"),
 							description: "select or move exits & endings",
 							value: RoomEditTool.EXITS
 						}
@@ -584,7 +608,7 @@ function makeRoomTool() {
 					control: "toggle",
 					id: "roomGridToggle", // todo : auto-generate these?
 					icon: isGridVisible ? "visibility" : "visibility_off",
-					text: "grid",
+					text: localization.GetStringOrFallback("grid_toggle_visible", "grid"),
 					description: "show/hide tile grid",
 					checked: isGridVisible,
 					onclick: function(e) { isGridVisible = e.target.checked; }
@@ -594,7 +618,7 @@ function makeRoomTool() {
 					control: "toggle",
 					id: "roomWallToggle",
 					icon: areWallsVisible ? "visibility" : "visibility_off",
-					text: "walls",
+					text: localization.GetStringOrFallback("walls_toggle_visible", "walls"),
 					description: "show/hide wall tiles",
 					checked: areWallsVisible,
 					onclick: function(e) { areWallsVisible = e.target.checked; }

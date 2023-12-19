@@ -505,7 +505,7 @@ function reloadDialogUI() {
 	}
 
 	paintDialogWidget = dialogTool.CreateWidget(
-		"dialog",
+		localization.GetStringOrFallback("dialog_tool_name", "dialog"),
 		"paintPanel",
 		obj.dlg,
 		true,
@@ -3095,6 +3095,25 @@ function on_change_language_inner(language) {
 			name: null,
 		};
 		paintTool.reloadDrawing(); // hacky to do this twice
+	}
+
+	// hack : manually update tool menus & titles
+	if (roomTool) {
+		roomTool.resetTitlebar();
+		roomTool.menu.update();
+		document.getElementById(roomTool.id + "CheckLabelText").innerText = roomTool.name();
+	}
+
+	if (blipTool) {
+		blipTool.resetTitlebar();
+		blipTool.menu.update();
+		document.getElementById(blipTool.id + "CheckLabelText").innerText = blipTool.name();
+	}
+
+	if (tuneTool) {
+		tuneTool.resetTitlebar();
+		tuneTool.menu.update();
+		document.getElementById(tuneTool.id + "CheckLabelText").innerText = tuneTool.name();
 	}
 
 	refreshGameData();
