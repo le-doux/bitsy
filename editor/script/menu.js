@@ -29,6 +29,11 @@ function createLabelElement(options) {
 	if (options.text) {
 		var textSpan = document.createElement("span");
 		textSpan.innerText = options.text;
+
+		if (options.id) {
+			textSpan.id = options.id + "Text";
+		}
+
 		label.appendChild(textSpan);
 	}
 
@@ -38,6 +43,10 @@ function createLabelElement(options) {
 
 	if (options.for) {
 		label.setAttribute("for", options.for);
+	}
+
+	if (options.id) {
+		label.id = options.id;
 	}
 
 	return label;
@@ -201,6 +210,7 @@ function createToggleElement(options) {
 
 	var toggleLabel = createLabelElement({
 		icon: options.icon,
+		id: options.id + "Label",
 		text: options.text,
 		for: checkboxInput.id,
 		// style: "button",

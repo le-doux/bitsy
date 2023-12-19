@@ -135,12 +135,7 @@ this.GetFrameCount = function(drawingId) {
 // todo : forceReset option is hacky?
 this.ClearCache = function(forceReset) {
 	if (forceReset === undefined || forceReset === true) {
-		for (var cacheId in drawingCache.render) {
-			var tiles = drawingCache.render[cacheId];
-			for (var i = 0; i < tiles.length; i++) {
-				bitsy.delete(tiles[i]);
-			}
-		}
+		bitsy.deleteAllTiles();
 	}
 
 	drawingCache.render = {};

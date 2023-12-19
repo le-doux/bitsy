@@ -431,7 +431,7 @@ function BitsySystem(name) {
 			count--;
 		}
 
-		if (memory.blocks[next] != undefined) {
+		if (count == 0) {
 			// couldn't find any available block
 			return null;
 		}
@@ -635,6 +635,15 @@ function BitsySystem(name) {
 		}
 
 		self._free(tile);
+	};
+
+	this.deleteAllTiles = function() {
+		if (tilePoolStart != null) {
+			for (var i = 0; i < tilePoolSize; i++) {
+				var tile = tilePoolStart + i;
+				this.delete(tile);
+			}
+		}
 	};
 
 	this.fill = function(block, value) {

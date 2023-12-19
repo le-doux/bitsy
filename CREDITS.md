@@ -6,12 +6,21 @@
 - @david-c14 - Contributor
 - Elkie - Contributor
 - equa (@equaa) - Contributor
+- @frojo - Contributor
 - max - Contributor
+- @pancelor - Contributor
 - Pirijuamps - Contributor
 - @ragzouken - Contributor
 - Samuel Fine - Contributor
 - Sean S. LeBlanc - Contributor
 - @zachThePerson - Contributor
+
+## Documentation
+
+- Adam Le Doux
+- Claire Morwood
+- Sean S. Le Blanc
+- @vaasut
 
 ## Icons
 
@@ -39,6 +48,7 @@
 - Game Makers Iceland - Icelandic translation
 - Kai Werder - German translation
 - leonid.codes - Ukrainian translation
+- Marco - Brazilian Portuguese translation
 - Marina Díez - Spanish and Italian translation
 - Mateusz Teklak - Polish translation
 - Matthias Löwe - German translation

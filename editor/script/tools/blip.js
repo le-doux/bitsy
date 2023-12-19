@@ -29,7 +29,12 @@ function makeBlipTile(soundPlayer, blipId, invert) {
 function makeBlipTool() {
 	return makeToolCard("blip", function(tool) {
 		tool.id = "blip";
-		tool.name = "blip-o-matic";
+
+		// todo : how do I feel about these being functions? should I rename the property?
+		tool.name = function() {
+			return localization.GetStringOrFallback("blip_tool", "blip-o-matic");
+		};
+
 		tool.icon = "blip";
 		tool.size = "s";
 		tool.data = "BLIP";
@@ -376,7 +381,7 @@ function makeBlipTool() {
 			tool.menu.push({
 				control: "button",
 				icon: "play",
-				text: "play",
+				text: localization.GetStringOrFallback("play_game", "play"),
 				description: "play blip",
 				onclick : function(e) {
 					tool.soundPlayer.playBlip(curBlip);
@@ -388,7 +393,7 @@ function makeBlipTool() {
 			tool.menu.push({
 				control: "label",
 				icon: "tune",
-				text: "pitch",
+				text: localization.GetStringOrFallback("blip_pitch", "pitch"),
 				description: "adjust the pitch"
 			});
 			tool.menu.push({
@@ -425,7 +430,7 @@ function makeBlipTool() {
 			tool.menu.push({
 				control: "label",
 				icon: "play",
-				text: "length",
+				text: localization.GetStringOrFallback("general_length", "length"),
 				description: "adjust the total play time (duration)"
 			});
 			tool.menu.push({
@@ -458,7 +463,7 @@ function makeBlipTool() {
 			tool.menu.push({
 				control: "label",
 				icon: "tempo_fast",
-				text: "speed",
+				text: localization.GetStringOrFallback("general_speed", "speed"),
 				description: "adjust the time between each pitch change"
 			});
 			tool.menu.push({
@@ -492,7 +497,7 @@ function makeBlipTool() {
 			tool.menu.push({
 				control: "label",
 				icon: "blip",
-				text: "generator",
+				text: localization.GetStringOrFallback("blip_generator", "generator"),
 				description: "type of sound to generate when adding blips (" + blipNames[curGenerator] + ": " + blipDescriptions[curGenerator] + ")"
 			});
 
