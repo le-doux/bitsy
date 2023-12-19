@@ -28,7 +28,7 @@ jobs:
       - name: sanitize branch name
         id: name
         run: echo ::set-output name=ARTIFACT_NAME::$(echo ${{ github.head_ref }} | tr "/" "_")
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: editor
           retention-days: 7
