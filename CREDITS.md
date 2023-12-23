@@ -13,7 +13,7 @@
 - @ragzouken - Contributor
 - Samuel Fine - Contributor
 - Sean S. LeBlanc - Contributor
-- @zachThePerson - Contributor
+- Zach Hixson - Contributor
 
 ## Documentation
 
