@@ -93,14 +93,6 @@ function PaintTool(canvas, menuElement) {
 		if (isPainting) {
 			isPainting = false;
 
-			// force tile to re-render
-			// renderer.ClearCache();
-			// renderer.DeleteDrawing(drawing);
-			if (roomTool) {
-				// roomTool.renderer.ClearCache();
-				roomTool.select(roomTool.getSelected());
-			}
-
 			updateDrawingData();
 			refreshGameData();
 

@@ -1,3 +1,7 @@
+## 8.9
+
+- fix: fix bug where editing tiles would break room rendering
+
 ## 8.8
 
 - added brazilian portuguese translations by marco
