@@ -13,7 +13,7 @@
 - @ragzouken - Contributor
 - Samuel Fine - Contributor
 - Sean S. LeBlanc - Contributor
-- @zachThePerson - Contributor
+- Zach Hixson - Contributor
 
 ## Documentation
 
@@ -53,6 +53,7 @@
 - Mateusz Teklak - Polish translation
 - Matthias Löwe - German translation
 - Onion - Russian translation
+- Paul Bid (павел бид) - Russian translation
 - Peter Februar - French translation
 - Ray Song - Chinese translation
 - @scumslug - Estonian translation

@@ -1,6 +1,6 @@
 {
 	"name": "bitsy",
-	"version": "8.8.0",
+	"version": "8.9.0",
 	"description": "make tiny games, worlds, and stories",
 	"author": "Adam Le Doux",
 	"devDependencies": {

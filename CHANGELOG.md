@@ -1,3 +1,8 @@
+## 8.9
+
+- new & updated russian translations by Paul Bid (павел бид)
+- fix: fix bug where editing tiles would break room rendering
+
 ## 8.8
 
 - added brazilian portuguese translations by marco
