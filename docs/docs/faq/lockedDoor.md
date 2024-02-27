@@ -32,4 +32,3 @@ In the dialogue editor, you can write specific text and logic for when the playe
 
 ### Step 5
 That's all you need to do for a simple locked door! However, you may sometimes want to adjust other variables or items after you open a locked door. For example, in Zelda games, you lose a key after you use it. To do this, you can select "item and variable actions" and add some logic for specific branches. For the Zelda key example, you may wish to decrement the item count.
-<img width="400" alt="item_variable" src="https://github.com/vaasut/bitsy/assets/15849522/5c3909b9-ab01-4ffd-a74f-50e8f46e1aa9">
