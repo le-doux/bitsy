@@ -28,10 +28,10 @@ With the gear selected in the exits & endings tool, you can click "+ add lock". 
 In the dialogue editor, you can write specific text and logic for when the player has the key and when they do not have the key. You can adjust the logic depending on the needs of your game. In this example, notice that we set the specific item to be "card" and the player must have at least one of them.
 
 <img width="200" alt="dialogue_editor"  src="https://github.com/le-doux/bitsy/assets/15849522/4770f100-334d-4196-a7a7-d6455765969a">
-             <img width="200" alt="dialogue_editor_two"  src="https://github.com/le-doux/bitsy/assets/15849522/d8f54561-e968-448d-aff2-4845fcc131ac">
+<img width="200" alt="dialogue_editor_two"  src="https://github.com/le-doux/bitsy/assets/15849522/d8f54561-e968-448d-aff2-4845fcc131ac">
 
 ### Step 5
 That's all you need to do for a simple locked door! However, you may sometimes want to adjust other variables or items after you open a locked door. For example, in Zelda games, you lose a key after you use it. To do this, you can select "item and variable actions" and add some logic for specific branches. For the Zelda key example, you may wish to decrement the item count.
 
 <img width="200" alt="item_variable"  src="https://github.com/le-doux/bitsy/assets/15849522/a4772cf6-c3ba-44ce-994a-64a614e679b2">
-           <img width="200" alt="item_variable_two"  src="https://github.com/le-doux/bitsy/assets/15849522/6773b6fa-2f5d-4e32-9265-3e117f068b4d">
+<img width="200" alt="item_variable_two"  src="https://github.com/le-doux/bitsy/assets/15849522/6773b6fa-2f5d-4e32-9265-3e117f068b4d">
