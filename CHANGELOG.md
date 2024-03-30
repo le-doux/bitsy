@@ -1,3 +1,7 @@
+## 8.10
+
+- fix: fix bug rendering exits and endings
+
 ## 8.9
 
 - new & updated russian translations by Paul Bid (павел бид)
