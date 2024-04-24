@@ -1,3 +1,7 @@
+## 8.11
+
+- game tool: combines the features of the download, settings, and game data tools into one tool
+
 ## 8.10
 
 - fix: fix bug rendering exits and endings
