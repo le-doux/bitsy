@@ -94,6 +94,21 @@ label {
 textarea {
 	font-family: monospace;
 	font-size: 100%;
+	background: black;
+	color: white;
+	resize: none;
+	border: none
+	padding: var(--bitsy-space-s);
+	border-radius: var(--bitsy-space-xs);
+	flex-grow: 1;
+	scrollbar-color: white black;
+	white-space: pre;
+	overflow-wrap: normal;
+	overflow-x: scroll;
+}
+
+.bitsy-menu textarea {
+	margin-bottom: var(--bitsy-space-l);
 }
 
 /* form */
@@ -107,7 +122,11 @@ input {
 	font-family: monospace;
 }
 
-input + label {
+input[type=checkbox] + label {
+	background: var(--bitsy-color-accent-1);
+}
+
+input[type=radio] + label {
 	background: var(--bitsy-color-accent-1);
 }
 
@@ -199,6 +218,11 @@ input[type=checkbox]:disabled + label {
 	opacity: 0.5;
 }
 
+/* number */
+input[type=number] {
+	width: 4em;
+}
+
 /* icons */
 .bitsy_icon svg {
 	width: 1em;
@@ -247,18 +271,22 @@ input[type=checkbox]:disabled + label {
 
 .bitsy-card-xs .bitsy-card-main {
 	width: var(--bitsy-size-xs);
+	min-width: var(--bitsy-size-xs);
 }
 
 .bitsy-card-s .bitsy-card-main {
 	width: var(--bitsy-size-s);
+	min-width: var(--bitsy-size-xs);
 }
 
 .bitsy-card-m .bitsy-card-main {
 	width: var(--bitsy-size-m);
+	min-width: var(--bitsy-size-xs);
 }
 
 .bitsy-card-l .bitsy-card-main {
 	width: var(--bitsy-size-l);
+	min-width: var(--bitsy-size-xs);
 }
 
 .bitsy-card-titlebar {
@@ -302,7 +330,7 @@ input[type=checkbox]:disabled + label {
 	}
 
 	.bitsy-card .bitsy-card-main {
-		width: calc(100% - (2 * var(--bitsy-space-m)));
+		width: calc(100% - (2 * var(--bitsy-space-m))) !important;
 	}
 
 	.bitsy-card-main {
@@ -365,12 +393,16 @@ input[type=checkbox]:disabled + label {
 
 /* menu */
 .bitsy-menu {
-	/* this should be the root of menus - do what with it? */
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
 }
 
 .bitsy-menu-group {
 	display: flex;
+	flex-direction: row;
 	flex-wrap: wrap;
+	align-items: center;
 	margin-bottom: var(--bitsy-space-s);
 }
 
@@ -386,8 +418,20 @@ input[type=checkbox]:disabled + label {
 	opacity: 0.5;
 }
 
+details.bitsy-menu-group {
+	margin-bottom: var(--bitsy-space-m);
+}
+
+details.bitsy-menu-group summary {
+	margin-bottom: var(--bitsy-space-s);
+}
+
 .bitsy-menu-label .bitsy_icon {
 	margin-right: var(--bitsy-space-s);
+}
+
+.bitsy-menu-header {
+	font-weight: bold;
 }
 
 .bitsy-label-style-badge {
@@ -605,7 +649,11 @@ input[type=checkbox]:disabled + label {
 	color: var(--bitsy-color-main-1);
 }
 
-.controlBox input + label {
+.controlBox input[type=checkbox] + label {
+	background: var(--bitsy-color-accent-2);
+}
+
+.controlBox input[type=radio] + label {
 	background: var(--bitsy-color-accent-2);
 }
 

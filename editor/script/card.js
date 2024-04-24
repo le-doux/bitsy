@@ -101,14 +101,17 @@ function makeToolCard(processName, initFunction) {
 		card.nav = navControls;
 	}
 
-	var cardCanvas = document.createElement("canvas");
-	cardCanvas.classList.add("bitsy-card-nothing-hide");
-	cardCanvas.width = 512;
-	cardCanvas.height = 512;
+	var cardCanvas = null;
+	if (card.disableCanvas != true) {
+		cardCanvas = document.createElement("canvas");
+		cardCanvas.classList.add("bitsy-card-nothing-hide");
+		cardCanvas.width = 512;
+		cardCanvas.height = 512;
 
-	card.system._attachCanvas(cardCanvas);
+		card.system._attachCanvas(cardCanvas);
 
-	mainDiv.appendChild(cardCanvas);
+		mainDiv.appendChild(cardCanvas);
+	}
 
 	var menuDiv = document.createElement("div");
 	menuDiv.classList.add("bitsy-menu");
@@ -131,7 +134,7 @@ function makeToolCard(processName, initFunction) {
 					togglePanelAnimated(e);
 				},
 			}),
-			document.getElementById(card.insertBefore != undefined ? card.insertBefore : "resetGameButton"));
+			document.getElementById(card.insertBefore));
 
 	// todo : feels like kind of a disorganized structure right now..
 	card.rootElement = cardDiv;
@@ -220,22 +223,24 @@ function makeToolCard(processName, initFunction) {
 		onMouseMove(e);
 	}
 
-	card.canvasElement.onmousedown = onMouseDown;
-	card.canvasElement.onmouseup = onMouseUp;
-	card.canvasElement.onmousemove = onMouseMove;
+	if (card.canvasElement != null) {
+		card.canvasElement.onmousedown = onMouseDown;
+		card.canvasElement.onmouseup = onMouseUp;
+		card.canvasElement.onmousemove = onMouseMove;
 
-	card.canvasElement.onmouseenter = function(e) {
-		card.mouseState.hover = true;
-	};
+		card.canvasElement.onmouseenter = function(e) {
+			card.mouseState.hover = true;
+		};
 
-	card.canvasElement.onmouseleave = function(e) {
-		card.mouseState.hover = false;
-		card.canvasElement.onmouseup(e);
-	};
+		card.canvasElement.onmouseleave = function(e) {
+			card.mouseState.hover = false;
+			card.canvasElement.onmouseup(e);
+		};
 
-	card.canvasElement.addEventListener('touchstart', onTouchStart, { passive: false });
-	card.canvasElement.addEventListener('touchmove', onTouchMove, { passive: false });
-	card.canvasElement.addEventListener('touchend', onTouchEnd, { passive: false });
+		card.canvasElement.addEventListener('touchstart', onTouchStart, { passive: false });
+		card.canvasElement.addEventListener('touchmove', onTouchMove, { passive: false });
+		card.canvasElement.addEventListener('touchend', onTouchEnd, { passive: false });		
+	}
 
 	// hacky way to respond to changes outside the tool??
 	events.Listen("paint_edit", function() {
@@ -246,12 +251,14 @@ function makeToolCard(processName, initFunction) {
 
 	card.mouse = new MouseInterface(card);
 
-	// card.menu.update();
 	if (card.selectAtIndex) {
 		card.selectAtIndex(0);
 	}
 
 	card.system._startNoInput();
+
+	// initialize the menu
+	card.menu.update();
 
 	return card;
 }

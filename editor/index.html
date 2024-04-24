@@ -69,6 +69,7 @@
 		<script src="script/tools/room.js"></script>
 		<script src="script/tools/tune.js"></script>
 		<script src="script/tools/blip.js"></script>
+		<script src="script/tools/game.js"></script>
 
 		<!-- FONTS -->
 		<link href="style/googleNunito.css" rel="stylesheet">
@@ -157,63 +158,11 @@
 					<span class="localize inventory_tool_name">inventory</span>
 				</label>
 				
-				<input type="checkbox" value="downloadPanel" id="downloadCheck" onclick="togglePanelAnimated(event);" autocomplete="off" checked/>
-				<label title="show / hide download window" for="downloadCheck">
-					<span class="bitsy_icon icon_space_right">file</span>
-					<span class="localize download_tool_name">download</span>
-				</label>
-				
 				<input type="checkbox" value="gifPanel" id="gifCheck" onclick="togglePanelAnimated(event);" autocomplete="off" />
 				<label title="show / hide gif recording window" for="gifCheck">
 					<span class="bitsy_icon icon_space_right">record</span>
 					<span class="localize gif_tool_name">record gif</span>
 				</label>
-				
-				<input type="checkbox" value="dataPanel" onclick="togglePanelAnimated(event);" id="dataCheck" autocomplete="off" />
-				<label title="show / hide game data window" for="dataCheck">
-					<span class="bitsy_icon icon_space_right">game_data</span>
-					<span class="localize data_tool_name">game data</span>
-				</label>
-
-				<input type="checkbox" value="settingsPanel" onclick="togglePanelAnimated(event);" id="settingsCheck" autocomplete="off" />
-				<label title="show / hide settings window" for="settingsCheck">
-					<span class="bitsy_icon icon_space_right">settings</span>
-					<span class="localize settings_tool_name">settings</span>
-				</label>
-
-				<button id="resetGameButton" title="reset everything and start new game" onclick="newGameDialog();">
-					<span class="bitsy_icon">new_game</span>
-					<span class="localize reset_game">new game</span>
-				</button>
-			</div>
-		</div>
-
-		<div id="unsupportedFeatures" class="warning" style="display:none;">
-			<span class="localize unsupported_features">uh oh ~ your browser doesn't support all of bitsy's features, so some things might not work right. maybe try another browser, such as:</span>
-			<a href="https://www.google.com/chrome/browser" target="_blank">
-				<span class="localize browser_chrome">chrome</span>
-			</a>,
-			<a href="https://www.mozilla.org/firefox" target="_blank">
-				<span class="localize browser_firefox">firefox</span>
-			</a>
-			<button onclick="hideUnsupportedFeatureWarning();">
-				<span class="localize unsupported_features_dismiss">I'll be ok, hide this message</span>
-			</button>
-		</div>
-
-		<div id="fontMissingCharacter" class="warning" style="display:none;">
-			<div>
-				<span class="localize font_missing_character">The current font is missing some of the characters used in your dialog. Not all text in your game will display correctly. Consider picking a different font in the settings.</span>
-			</div>
-			<div>
-				<button onclick="showPanel('settingsPanel');">
-					<span class="bitsy_icon">open_tool</span>
-					<span class="localize open_settings">open settings</span>
-				</button>
-				<button onclick="hideFontMissingCharacterWarning();">
-					<span class="bitsy_icon">close</span>
-					<span class="localize close_label">close</span>
-				</button>
 			</div>
 		</div>
 
@@ -858,57 +807,6 @@
 					</div>
 				</div>
 
-				<div id="downloadPanel" class="bitsy-card bitsy-workbench-item">
-					<div class="bitsy-card-titlebar">
-						<span class="bitsy_icon">file</span>
-
-						<span class="bitsy-card-title" title="download window" onmousedown="grabCard(event);">
-							<span class="localize download_tool_name">download</span>
-						</span>
-
-						<button title="show about page for download" onclick="showAbout('./tools/download', 'downloadPanel');">
-							<span class="bitsy_icon">help</span>
-						</button>
-
-						<button title="minimize download window" class="bitsy-card-close-button" onclick="hidePanel('downloadPanel');">
-							<span class="bitsy_icon">close</span>
-						</button>
-					</div>
-
-					<div class="bitsy-card-main">
-						<div style="margin-bottom: var(--bitsy-space-s);">
-							<span class="localize download_html" style="margin-bottom: var(--bitsy-space-s);">download game as html file:</span>
-							<br>
-							<button title="download game as html file" class="color0" onclick="exportGame();">
-								<span class="bitsy_icon">download</span>
-								<span class="localize download_game">download game</span>
-							</button>
-						</div>
-
-						<div style="margin-bottom: var(--bitsy-space-s);">
-							<span class="localize import_html" style="margin-bottom: var(--bitsy-space-s);">import game from html file:</span>
-							<br style="margin-bottom: var(--bitsy-space-s);">
-							<label for="importGamePicker" class="filePickerLabel" title="import game from html file on your computer">
-								<span class="bitsy_icon">upload</span>
-								<span class="localize upload_game">upload game</span>
-							</label>
-							<input type="file" accept=".html" id="importGamePicker" style="display:none;" onchange="importGameFromFile(event);"/>
-						</div>
-
-						<!-- TODO LOCALIZE - word wrap -->
-						<div id="downloadHelp" class="helpMessage" style="display:none;">
-							Note: your browser doesn't support<br>
-							direct downloads, so sharing requires<br>
-							some extra steps:<br>
-							- press share <br>
-							- a new tab will open <br>
-							- save that tab <br>
-							- name it "mygame.html" <br>
-							- share your game as a web page!
-						</div>
-					</div>
-				</div>
-
 				<div id="gifPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item bitsy-playmode-enable" style="display:none;">
 					<div class="bitsy-card-titlebar">
 						<span class="bitsy_icon">record</span>
@@ -970,175 +868,6 @@
 							</a>
 						</div>
 
-					</div>
-				</div>
-
-				<div id="dataPanel" class="bitsy-card bitsy-card-m bitsy-workbench-item" style="display:none;">
-					<div class="bitsy-card-titlebar">
-						<span class="bitsy_icon">game_data</span>
-
-						<span class="bitsy-card-title" title="game data window" onmousedown="grabCard(event);">
-							<span class="localize data_tool_name">game data</span>
-						</span>
-
-						<button title="show about page for game data" onclick="showAbout('./tools/gamedata', 'dataPanel');">
-							<span class="bitsy_icon">help</span>
-						</button>
-
-						<button title="minimize game data window" class="bitsy-card-close-button" onclick="hidePanel('dataPanel');">
-							<span class="bitsy_icon">close</span>
-						</button>
-					</div>
-
-					<div class="bitsy-card-main">
-						<textarea title="raw text of the bitsy game data file (be careful when editing)" id="game_data" onchange="on_game_data_change();"></textarea>
-						<div class="bitsy-menu-group">
-							<input type="checkbox" id="fontDataCheck" onclick="toggleFontDataVisibility(event);" autocomplete="off" />
-							<label title="show / hide font data (WARNING: can be very slow for large fonts)" for="fontDataCheck" class="bitsy-menu-label">
-								<span id="fontDataIcon" class="bitsy_icon">visibility_off</span>
-								<span class="localize font_data_toggle_visible">font data</span>
-							</label>
-
-							<button title="download game data" class="bitsy-menu-label" onclick="exportGameData();">
-								<span class="bitsy_icon">download</span>
-								<span class="localize download_data">download data</span>
-							</button>
-
-							<label for="importGameDataPicker" class="filePickerLabel" title="import game data from a .bitsy file on your computer">
-								<span class="bitsy_icon">upload</span>
-								<!-- todo: localize -->
-								<span>upload data</span>
-							</label>
-							<input type="file" accept=".bitsy" id="importGameDataPicker" style="display: none;" onchange="importGameDataFromFile(event);" />
-						</div>
-					</div>
-				</div>
-
-				<div id="settingsPanel" class="bitsy-card bitsy-card-s bitsy-workbench-item" style="display:none;">
-					<div class="bitsy-card-titlebar">
-						<span class="bitsy_icon">settings</span>
-
-						<span class="bitsy-card-title" title="settings window" onmousedown="grabCard(event);">
-							<span class="localize settings_tool_name">settings</span>
-						</span>
-
-						<button title="show about page for settings" onclick="showAbout('./tools/settings', 'settingsPanel');">
-							<span class="bitsy_icon">help</span>
-						</button>
-
-						<button title="minimize settings window" class="bitsy-card-close-button" onclick="hidePanel('settingsPanel');">
-							<span class="bitsy_icon">close</span>
-						</button>
-					</div>
-
-					<div id="settingsInner" class="bitsy-card-main">
-						<div class="bitsy-menu">
-
-							<div class="bitsy-menu-group">
-								<span class="localize editor_settings">editor settings</span>
-							</div>
-							<div class="controlBox">
-								<span class="localize language_label">language</span>:
-								<select id="languageSelect" onchange="on_change_language(event);"></select>
-								<br/>
-								<span class="localize language_translator_credit" style="font-size: 80%;">English text by Adam Le Doux</span>
-							</div>
-							<div class="bitsy-menu-group">
-								<span class="localize game_settings">game settings</span>
-							</div>
-							<div class="controlBox">
-								<span class="localize font_label">font</span>:
-								<select id="fontSelect" onchange="on_change_font(event);">
-									<option value="ascii_small" class="localize font_ascii_small">ASCII Small</option>
-									<option value="unicode_european_small" class="localize font_unicode_european_small">Unicode European Small</option>
-									<option value="unicode_european_large" class="localize font_unicode_european_large">Unicode European Large</option>
-									<option value="unicode_asian" class="localize font_unicode_asian">Unicode Asian</option>
-									<option value="arabic" class="localize font_arabic">Arabic</option>
-									<option value="custom">Custom Font - none</option> <!-- TODO : localize -->
-								</select>
-								<div id="ascii_small_description" style="font-size: 80%">
-									<span class="localize font_ascii_small_description">Small font limited to ASCII, which includes English characters and some symbols.</span>
-								</div>
-								<div id="unicode_european_small_description" style="font-size: 80%">
-									<span class="localize font_unicode_european_small_description">Small font with some unicode support. Includes characters for most European languages.</span>
-								</div>
-								<div id="unicode_european_large_description" style="font-size: 80%">
-									<span class="localize font_unicode_european_large_description">Large font with more unicode support. Includes characters for all European languages.</span>
-								</div>
-								<div id="unicode_asian_description" style="font-size: 80%">
-									<span class="localize font_unicode_asian_description">Large font which includes characters for Asian languages such as Chinese, Japanese, and Korean.</span>
-								</div>
-								<div id="arabic_description" style="font-size: 80%">
-									<span class="localize font_arabic_description">Pixel font with Arabic characters</span>
-								</div>
-								<div id="custom_description" style="font-size: 80%">
-									<span class="localize font_custom_description">Upload your own custom font in the ".bitsyfont" format!</span>
-									<br/>
-									<label for="importFontPicker" class="filePickerLabel" title="import font from bitsyfont file on your computer">
-										<span class="bitsy_icon">upload</span>
-										<span class="localize upload_font">upload font</span>
-									</label>
-									<input title="import font from bitsyfont file on your computer" type="file" accept=".bitsyfont" id="importFontPicker" style="display:none;" onchange="importFontFromFile(event);"/>
-								</div>
-								<div style="margin-top:3px;">
-									<button title="download font file" class="color0" onclick="exportFont();">
-										<span class="bitsy_icon">download</span>
-										<span class="localize download_font">download font</span>
-									</button>
-								</div>
-								<div>
-									<span class="localize text_direction_label">text direction</span>:
-									<select id="textDirectionSelect" onchange="on_change_text_direction(event);">
-										<option value="LTR" class="localize text_direction_ltr">Left to Right</option>
-										<option value="RTL" class="localize text_direction_rtl">Right to Left</option>
-									</select>
-								</div>
-								<div style="font-size: 80%">
-									<span class="localize text_direction_description">Option for languages that read right to left</span>
-								</div>
-								<div style="margin-top: 5px;">
-									<span class="bitsy_icon">text_edit</span>
-									<span title="textbox graphics mode" class="localize setting_text_mode">text mode</span>:
-									<select id="textModeSelect" title="select resolution of textbox pixels" onchange="onChangeTextMode(event);">
-										<option value="TXT_HIREZ" title="2x pixel resolution" class="localize setting_text_hirez">default</option>
-										<option value="TXT_LOREZ" title="1x pixel resolution" class="localize setting_text_lorez">chunky</option>
-									</select>
-								</div>
-							</div>
-							<div class="bitsy-menu-group">
-								<!-- todo : localize -->
-								<span>export settings</span>
-							</div>
-							<div class="controlBox">
-								<span class="localize option_page_color">html page color:</span>
-								<br/>
-								<input title="pick background color for exported html page" type="color" value="#ffffff" id="pageColor" onchange="on_change_color_page();" autocomplete="off">
-							</div>
-							<div class="controlBox">
-								<form>
-									<span class="localize option_window_size">game window size:</span>
-									<br/>
-									<input type="radio" name="export size" value="full" onclick="chooseExportSizeFull();" id="exportSizeOptionFull" checked>
-									<label title="game window resizes to fill page (mobile friendly)" for="exportSizeOptionFull" class="left">
-										<span class="bitsy_icon">pagesize_full</span>
-										<span class="localize option_full_size">full page</span>
-									</label>
-
-									<input type="radio" name="export size" value="fixed" onclick="chooseExportSizeFixed();" id="exportSizeOptionFixed">
-									<label title="game window stays a fixed size" for="exportSizeOptionFixed" class="right">
-										<span class="bitsy_icon">pagesize_fixed</span>
-										<span class="localize option_fixed_size">fixed size</span>
-									</label>
-
-									<div style="margin-top:5px;">
-										<span class="controlBox" id="exportSizeFixedInputSpan" style="display:none;">
-											<input type="number" min="0" value="512" style="width:60px;" id="exportSizeFixedInput"> px
-										</span>
-									</div>
-								</form>
-							</div>
-
-						</div>
 					</div>
 				</div>
 

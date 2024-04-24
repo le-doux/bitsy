@@ -374,8 +374,15 @@ function BitsySystem(name) {
 	};
 
 	this._exit = function() {
-		input.unlisten(graphics.getCanvas());
+		// disable graphics
+		var canvas = graphics.getCanvas();
+		if (canvas) {
+			input.unlisten(canvas);	
+		}
+
+		// disable sound
 		sound.mute();
+
 		self._active = false;
 	};
 

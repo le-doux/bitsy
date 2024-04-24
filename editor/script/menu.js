@@ -1,13 +1,83 @@
 /* shared HTML element creation functions */
-function createGroupElement(options) {
-	var groupDiv = document.createElement("div");
-	groupDiv.classList.add("bitsy-menu-group");
+function tryGetMenuString(menuText) {
+	var menuString;
 
-	if (options && options.enabled === false) {
-		groupDiv.classList.add("disabled");
+	if (menuText && menuText.id && localization) {
+		menuString = localization.GetStringOrFallback(menuText.id, menuText.text);
+	}
+	else if (menuText && menuText.text) {
+		// no localization available
+		menuString = menuText.text;
+	}
+	else if (menuText) {
+		// fallback to raw string
+		menuString = menuText;
 	}
 
-	return groupDiv;
+	return menuString;
+}
+
+function createGroupElement(options) {
+	// todo : better setting name?
+	var hasHeader = options && (options.text || options.icon);
+	var isExpandable = options && (options.expandable === true);
+
+	var groupElement;
+	var groupHeaderLabel;
+
+	if (hasHeader) {
+		groupHeaderLabel = createLabelElement({
+			text: options.text,
+			description: options.description,
+			icon: options.icon,
+			style: "bitsy-menu-header",
+			elementType: "span", // override the element type to make it clickable
+		});
+	}
+
+	if (isExpandable) {
+		var groupDetails = document.createElement("details");
+
+		if (options && options.open === true) {
+			groupDetails.setAttribute("open", "");
+		}
+
+		groupDetails.ontoggle = function(e) {
+			if (options.ontoggle) {
+				options.ontoggle(e);
+			}
+		};
+
+		if (hasHeader) {
+			var groupSummary = document.createElement("summary");
+			groupSummary.appendChild(groupHeaderLabel);
+			groupDetails.appendChild(groupSummary);
+		}
+
+		groupElement = groupDetails;
+	}
+	else {
+		var groupDiv = document.createElement("div");
+
+		if (hasHeader) {
+			groupDiv.appendChild(groupHeaderLabel);
+		}
+
+		groupElement = groupDiv;
+	}
+
+	groupElement.classList.add("bitsy-menu-group");
+
+	if (options && options.enabled === false) {
+		groupElement.classList.add("disabled");
+	}
+
+	// todo : set via class instead? (name: row/column or horizontal/vertical?)
+	if (options && options.direction) {
+		groupElement.setAttribute("flex-direction", options.direction);
+	}
+
+	return groupElement;
 }
 
 function createIconElement(id) {
@@ -15,7 +85,8 @@ function createIconElement(id) {
 }
 
 function createLabelElement(options) {
-	var label = document.createElement("label");
+	var elementType = (options && options.elementType) ? options.elementType : "label";
+	var label = document.createElement(elementType);
 	label.classList.add("bitsy-menu-label");
 
 	if (options.style) {
@@ -26,9 +97,10 @@ function createLabelElement(options) {
 		label.appendChild(createIconElement(options.icon));
 	}
 
-	if (options.text) {
+	var labelText = tryGetMenuString(options.text);
+	if (labelText) {
 		var textSpan = document.createElement("span");
-		textSpan.innerText = options.text;
+		textSpan.innerText = labelText;
 
 		if (options.id) {
 			textSpan.id = options.id + "Text";
@@ -37,8 +109,9 @@ function createLabelElement(options) {
 		label.appendChild(textSpan);
 	}
 
-	if (options.description) {
-		label.title = options.description;
+	var labelTooltip = tryGetMenuString(options.description);
+	if (labelTooltip) {
+		label.title = labelTooltip;
 	}
 
 	if (options.for) {
@@ -67,6 +140,65 @@ function createTextInputElement(options) {
 
 	if (options.placeholder) {
 		input.placeholder = options.placeholder;
+	}
+
+	if (options.onchange) {
+		input.onchange = options.onchange;
+	}
+
+	return input;
+}
+
+function createTextAreaElement(options) {
+	var textarea = document.createElement("textarea");
+	textarea.setAttribute("spellcheck", false);
+
+	if (options.rows) {
+		textarea.setAttribute("rows", options.rows);
+	}
+
+	if (options.value) {
+		textarea.value = options.value;
+	}
+
+	// todo : description
+
+	if (options.onchange) {
+		textarea.onchange = options.onchange;
+	}
+
+	return textarea;
+}
+
+function createNumberInputElement(options) {
+	var input = document.createElement("input");
+	input.type = "number";
+
+	if (options.style) {
+		input.classList.add("bitsy-input-style-" + options.style);
+	}
+
+	if (options.value) {
+		input.value = options.value;
+	}
+
+	if (options.onchange) {
+		input.onchange = options.onchange;
+	}
+
+	return input;
+}
+
+function createColorInputElement(options) {
+	var input = document.createElement("input");
+	input.type = "color";
+
+	if (options.style) {
+		input.classList.add("bitsy-input-style-" + options.style);
+	}
+
+	if (options.value) {
+		input.value = options.value;
 	}
 
 	if (options.onchange) {
@@ -145,8 +277,13 @@ function createSelectElement(options) {
 		var option = options.options[i];
 		var value = (option.value != undefined ? option.value : null);
 		var optionElement = document.createElement("option");
-		optionElement.innerText = option.text;
-		optionElement.title = option.description;
+
+		var optionText = tryGetMenuString(option.text);
+		optionElement.innerText = optionText;
+
+		var optionTooltip = tryGetMenuString(option.description);
+		optionElement.title = optionTooltip;
+
 		optionElement.value = value;
 		optionElement.selected = (value === options.value);
 		selectElement.appendChild(optionElement);
@@ -162,14 +299,16 @@ function createButtonElement(options) {
 		button.appendChild(createIconElement(options.icon));
 	}
 
-	if (options.text) {
+	var buttonText = tryGetMenuString(options.text);
+	if (buttonText) {
 		var textSpan = document.createElement("span");
-		textSpan.innerText = options.text;
+		textSpan.innerText = buttonText;
 		button.appendChild(textSpan);
 	}
 
-	if (options.description) {
-		button.title = options.description;
+	var buttonTooltip = tryGetMenuString(options.description);
+	if (buttonTooltip) {
+		button.title = buttonTooltip;
 	}
 
 	if (options.enabled != undefined) {
@@ -191,6 +330,7 @@ function createButtonElement(options) {
 
 function createToggleElement(options) {
 	var toggleSpan = document.createElement("span");
+	toggleSpan.id = options.id + "Span";
 
 	var checkboxInput = document.createElement("input");
 	checkboxInput.type = "checkbox";
@@ -220,6 +360,42 @@ function createToggleElement(options) {
 	toggleSpan.appendChild(toggleLabel);
 
 	return toggleSpan;
+}
+
+function createFileInputElement(options) {
+	var fileInputSpan = document.createElement("span");
+
+	var fileInput = document.createElement("input");
+	fileInput.type = "file";
+	fileInput.style = "display:none;"; // hack! should add to default style
+	fileInput.accept = options.accept;
+	fileInput.id = options.id; // todo : auto-generate IDs?
+	fileInput.onchange = function (e) {
+		// load file chosen by user
+		var files = e.target.files;
+		var file = files[0];
+		var reader = new FileReader();
+		reader.readAsText(file);
+
+		reader.onloadend = function() {
+			if (options.onload) {
+				options.onload(reader.result);
+			}
+		}
+	}
+	fileInputSpan.appendChild(fileInput);
+
+	var fileInputLabel = createLabelElement({
+		icon: options.icon,
+		id: options.id + "Label",
+		text: options.text,
+		for: fileInput.id,
+		description: options.description,
+		style: "filePickerLabel" // hack - add to default style!
+	});
+	fileInputSpan.appendChild(fileInputLabel);
+
+	return fileInputSpan;
 }
 
 function createOptionsForFindCategory(categoryId, noneOption) {
@@ -266,7 +442,7 @@ function MenuInterface(tool) {
 		self.tool.menuUpdate();
 	};
 
-	var curGroupElement = null;
+	var groupStack = [];
 
 	function wrapEventHandler(handler) {
 		return function(e) {
@@ -309,6 +485,23 @@ function MenuInterface(tool) {
 						createFunction = createRadioElement;
 					}
 					break;
+				case "text":
+					createFunction = createTextInputElement;
+					break;
+				case "textarea":
+					// todo : combine with text element?
+					createFunction = createTextAreaElement;
+					break;
+				case "number":
+					createFunction = createNumberInputElement;
+					break;
+				case "color":
+					createFunction = createColorInputElement;
+					break;
+				// todo : should this be a special element? or wrap in a function?
+				case "file":
+					createFunction = createFileInputElement;
+					break;
 				case "group":
 					createFunction = createGroupElement;
 					break;
@@ -323,17 +516,21 @@ function MenuInterface(tool) {
 					message.onchange = wrapEventHandler(message.onchange);
 				}
 
+				if (message.onload) {
+					message.onload = wrapEventHandler(message.onload);
+				}
+
 				var element = createFunction(message);
 
-				if (curGroupElement === null || message.control === "group") {
-					self.tool.menuElement.appendChild(element);
+				if (groupStack.length > 0) {
+					groupStack[groupStack.length - 1].appendChild(element);
 				}
 				else {
-					curGroupElement.appendChild(element);
+					self.tool.menuElement.appendChild(element);
 				}
 
 				if (message.control === "group") {
-					curGroupElement = element;
+					groupStack.push(element);
 				}
 			}
 		}
@@ -341,7 +538,7 @@ function MenuInterface(tool) {
 
 	this.pop = function(message) {
 		if (message.control === "group") {
-			curGroupElement = null;
+			groupStack.pop();
 		}
 	};
 }

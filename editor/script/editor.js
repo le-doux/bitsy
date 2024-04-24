@@ -536,70 +536,19 @@ function getCurDialogId() {
 }
 
 function setDefaultGameState() {
+	// initialize game with default data
 	var defaultData = Resources["defaultGameData.bitsy"];
-	// bitsyLog("DEFAULT DATA \n" + defaultData, "editor");
-	document.getElementById("game_data").value = defaultData;
-	Store.set('game_data', document.getElementById("game_data").value); // save game
+	Store.set("game_data", defaultData);
+
+	// reset game state
 	clearGameData();
-	loadWorldFromGameData(document.getElementById("game_data").value); // load game
+
+	// load the game
+	var gamedataStorage = Store.get("game_data");
+	loadWorldFromGameData(gamedataStorage); // load game
 
 	// refresh images
 	renderer.ClearCache();
-}
-
-function newGameDialog() {
-	var resetMessage = localization.GetStringOrFallback("reset_game_message", "Starting a new game will erase your old data. Consider exporting your work first! Are you sure you want to start over?");
-	if (confirm(resetMessage)) {
-		resetGameData();
-	}
-}
-
-function resetGameData() {
-	setDefaultGameState();
-
-	// TODO : localize default_title
-	setTitle(localization.GetStringOrFallback("default_title", "Write your game's title here"));
-	dialog["0"] = {
-		src: localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"), // hacky to do this in two places :(
-		name: "cat dialog", // todo : localize
-	};
-	dialog["1"] = {
-		src: localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea"),
-		name: "tea dialog", // todo : localize
-	};
-
-	pickDefaultFontForLanguage(localization.GetLanguage());
-
-	// todo wrap these variable resets in a function
-	tileIndex = 0;
-	spriteIndex = 0;
-
-	refreshGameData();
-
-	// refresh images
-	renderer.ClearCache();
-
-	updateExitOptionsFromGameData();
-	updateInventoryUI();
-	updateFontSelectUI(); // hmm is this really the place for this?
-
-	on_paint_avatar();
-	document.getElementById('paintOptionAvatar').checked = true;
-
-	paintTool.updateCanvas();
-	markerTool.Clear(); // hacky -- should combine more of this stuff together
-	markerTool.Refresh();
-
-	roomTool.selectAtIndex(0);
-	tuneTool.selectAtIndex(0);
-	blipTool.selectAtIndex(0);
-
-	events.Raise("game_data_change"); // TODO -- does this need to have a specific reset event or flag?
-
-	// reset find tool (a bit heavy handed?)
-	findTool = new FindTool({
-		mainElement : document.getElementById("findPanelMain"),
-	});
 }
 
 function refreshGameData() {
@@ -609,15 +558,7 @@ function refreshGameData() {
 
 	flags.ROOM_FORMAT = 1; // always save out comma separated format, even if the old format is read in
 
-	// var gameData = serializeWorld();
-
-	// document.getElementById("game_data").value = gameData; // TODO : this is where the slow down is
-
 	var gameDataNoFonts = serializeWorld(true);
-	document.getElementById("game_data").value = showFontDataInGameData ? serializeWorld() : gameDataNoFonts;
-
-	// Store.set("game_data", gameData); //auto-save
-
 	Store.set("game_data", gameDataNoFonts);
 }
 
@@ -720,19 +661,6 @@ function detectBrowserFeatures() {
 	}
 }
 
-function hasUnsupportedFeatures() {
-	return /*!browserFeatures.colorPicker ||*/ !browserFeatures.fileDownload;
-}
-// NOTE: No longer relying on color picker feature
-
-function showUnsupportedFeatureWarning() {
-	document.getElementById("unsupportedFeatures").style.display = "block";
-}
-
-function hideUnsupportedFeatureWarning() {
-	document.getElementById("unsupportedFeatures").style.display = "none";
-}
-
 // This is the panel arrangement you get if you are new or your editor settings are out-of-date
 var defaultPanelPrefs = {
 	workspace : [
@@ -740,16 +668,14 @@ var defaultPanelPrefs = {
 		{ id:"roomPanel", 			visible:true, 	position:1  },
 		{ id:"paintPanel", 			visible:true, 	position:2  },
 		{ id:"colorsPanel", 		visible:true, 	position:3  },
-		{ id:"downloadPanel", 		visible:true, 	position:4  },
+		{ id:"gamePanel", 			visible:true, 	position:4  },
 		{ id:"gifPanel", 			visible:false, 	position:5  },
-		{ id:"dataPanel", 			visible:false, 	position:6  },
-		{ id:"exitsPanel", 			visible:false, 	position:7  },
-		{ id:"dialogPanel",			visible:false,	position:8 },
-		{ id:"findPanel",			visible:false,	position:9  },
-		{ id:"inventoryPanel",		visible:false,	position:10 },
-		{ id:"settingsPanel",		visible:false,	position:11 },
-		{ id:"tunePanel",			visible:false,	position:12 },
-		{ id:"blipPanel",			visible:false,	position:13 },
+		{ id:"exitsPanel", 			visible:false, 	position:6  },
+		{ id:"dialogPanel",			visible:false,	position:7 },
+		{ id:"findPanel",			visible:false,	position:8  },
+		{ id:"inventoryPanel",		visible:false,	position:9 },
+		{ id:"tunePanel",			visible:false,	position:10 },
+		{ id:"blipPanel",			visible:false,	position:11 },
 	]
 };
 // bitsyLog(defaultPanelPrefs, "editor");
@@ -759,7 +685,7 @@ function getPanelPrefs() {
 	var storedEngineVersion = Store.get('engine_version');
 	var useDefaultPrefs = (!storedEngineVersion) ||
 	                      (storedEngineVersion.major < 8) ||
-	                      (storedEngineVersion.minor < 0);
+	                      (storedEngineVersion.minor < 11);
 	var prefs = useDefaultPrefs ? defaultPanelPrefs : Store.get('panel_prefs', defaultPanelPrefs);
 
 	// add missing panel prefs (if any)
@@ -877,11 +803,8 @@ function start() {
 	}
 
 	//load last auto-save
-	var gamedataStorage = Store.get('game_data');
+	var gamedataStorage = Store.get("game_data");
 	if (gamedataStorage) {
-		//bitsyLog("~~~ found old save data! ~~~", "editor");
-		//bitsyLog(gamedataStorage, "editor");
-		document.getElementById("game_data").value = gamedataStorage;
 		on_game_data_change_core();
 	}
 	else {
@@ -911,10 +834,6 @@ function start() {
 		refreshGameData();
 	});
 
-	//unsupported feature stuff
-	if (hasUnsupportedFeatures() && !isPortraitOrientation()) {
-		showUnsupportedFeatureWarning();
-	}
 	if (!browserFeatures.fileDownload) {
 		document.getElementById("downloadHelp").style.display = "block";
 	}
@@ -978,32 +897,8 @@ function start() {
 		}
 	}
 
-	//color testing
-	// on_change_color_bg();
-	// on_change_color_tile();
-	// on_change_color_sprite();
-
 	// save latest version used by editor (for compatibility)
 	Store.set('engine_version', version);
-
-	// load saved export settings
-	export_settings = Store.get('export_settings', export_settings);
-	if (export_settings) {
-		document.getElementById("pageColor").value = export_settings.page_color;
-	}
-
-	// TODO : interesting idea but needs work!
-	// // try to honor state of all checkboxes from previous session
-	// var inputElements = document.getElementsByTagName("input");
-	// for (var i in inputElements) {
-	// 	if (inputElements[i].type === "checkbox") {
-	// 		var checkbox = inputElements[i];
-	// 		if (checkbox.checked) {
-	// 			bitsyLog(checkbox, "editor");
-	// 			checkbox.dispatchEvent(new Event("click"));
-	// 		}
-	// 	}
-	// }
 
 	// create title widgets
 	var titleTextWidgets = document.getElementsByClassName("titleWidgetContainer");
@@ -1015,8 +910,6 @@ function start() {
 	// prepare dialog tool
 	openDialogTool(titleDialogId, undefined, false); // start with the title open
 	alwaysShowDrawingDialog = document.getElementById("dialogAlwaysShowDrawingCheck").checked;
-
-	initLanguageOptions();
 
 	// find tool
 	findTool = new FindTool({
@@ -1056,6 +949,9 @@ function start() {
 			editorContent.insertBefore( panelElement, null ); //insert on the left
 		}
 	}
+
+	// game tool
+	gameTool = makeGameTool();
 
 	// about tool
 	initAbout();
@@ -1475,12 +1371,6 @@ function toggleDownloadOptions(e) {
 	}
 }
 
-// hacky - part of hiding font data from the game data
-function getFullGameData() {
-	// return document.getElementById("game_data").value + fontManager.GetData(fontName);
-	return serializeWorld();
-}
-
 function togglePlayMode(e) {
 	if (e.target.checked) {
 		on_play_mode();
@@ -1505,7 +1395,7 @@ function on_play_mode() {
 	roomTool.menu.update();
 	document.getElementById("appRoot").classList.add("bitsy-playmode");
 	// todo : I feel likef I need to take a look at the font manager and simplify things there
-	loadGame(roomTool.canvasElement, getFullGameData(), fontManager.GetData(defaultFontName));
+	loadGame(roomTool.canvasElement, serializeWorld(), fontManager.GetData(defaultFontName));
 }
 
 function on_edit_mode() {
@@ -1513,11 +1403,11 @@ function on_edit_mode() {
 
 	document.getElementById("appRoot").classList.remove("bitsy-playmode");
 
-	// stopGame();
 	quitGame();
 
-	// TODO I should really do more to separate the editor's game-data from the engine's game-data
-	loadWorldFromGameData(document.getElementById("game_data").value); //reparse world to account for any changes during gameplay
+	// reparse world to reset any changes from gameplay
+	var gamedataStorage = Store.get("game_data");
+	loadWorldFromGameData(gamedataStorage);
 
 	state.room = sortedRoomIdList()[roomIndex]; //restore current room to pre-play state
 
@@ -1580,13 +1470,6 @@ function togglePaintGrid(e) {
 function updatePaintGridCheck(checked) {
 	document.getElementById("paintGridCheck").checked = checked;
 	iconUtils.LoadIcon(document.getElementById("paintGridIcon"), checked ? "visibility" : "visibility_off");
-}
-
-var showFontDataInGameData = false;
-function toggleFontDataVisibility(e) {
-	showFontDataInGameData = e.target.checked;
-	iconUtils.LoadIcon(document.getElementById("fontDataIcon"), e.target.checked ? "visibility" : "visibility_off");
-	refreshGameData(); // maybe a bit expensive
 }
 
 /* PALETTE STUFF */
@@ -1828,13 +1711,21 @@ function on_change_adv_dialog() {
 function on_game_data_change() {
 	on_game_data_change_core();
 	refreshGameData();
+
+	// reset find tool (a bit heavy handed?)
+	findTool = new FindTool({
+		mainElement : document.getElementById("findPanelMain"),
+	});
 }
 
 function on_game_data_change_core() {
-	bitsyLog(document.getElementById("game_data").value, "editor");
+	var gamedataStorage = Store.get("game_data");
+	bitsyLog(gamedataStorage, "editor");
 
 	clearGameData();
-	loadWorldFromGameData(document.getElementById("game_data").value); //reparse world if user directly manipulates game data
+
+	// reparse world if user directly manipulates game data
+	loadWorldFromGameData(gamedataStorage);
 
 	if (roomTool) {
 		roomTool.selectAtIndex(0);
@@ -1907,31 +1798,8 @@ function on_game_data_change_core() {
 
 	updateInventoryUI();
 
-	updateFontSelectUI();
-
 	// TODO -- start using this for more things
 	events.Raise("game_data_change");
-}
-
-function updateFontSelectUI() {
-	var fontStorage = Store.get('custom_font', null);
-
-	var fontSelect = document.getElementById("fontSelect");
-
-	for (var i in fontSelect.options) {
-		var fontOption = fontSelect.options[i];
-		var fontOptionName = (fontOption.value === "custom" && fontStorage != null) ? fontStorage.name : fontOption.value;
-		fontOption.selected = fontOptionName === fontName;
-
-		if (fontOption.value === "custom" && fontStorage != null) {
-			var textSplit = fontOption.text.split("-");
-			fontOption.text = textSplit[0] + "- " + fontStorage.name;
-		}
-	}
-
-	updateFontDescriptionUI();
-	updateTextDirectionSelectUI(); // a bit hacky but probably ok?
-	updateEditorTextDirection(textDirection); // EXTREMELY hack :(
 }
 
 function updateFontDescriptionUI() {
@@ -1946,55 +1814,12 @@ function updateFontDescriptionUI() {
 	}
 }
 
-function updateExitOptionsFromGameData() {
-	// TODO ???
-}
-
 function on_toggle_wall(e) {
 	paintTool.toggleWall( e.target.checked );
 }
 
 function toggleWallUI(checked) {
 	iconUtils.LoadIcon(document.getElementById("wallCheckboxIcon"), checked ? "wall_on" : "wall_off");
-}
-
-function filenameFromGameTitle() {
-	var filename = getTitle().replace(/[^a-zA-Z]/g, "_"); // replace non alphabet characters
-	filename = filename.toLowerCase();
-	filename = filename.substring(0,32); // keep it from getting too long
-	return filename;
-}
-
-function exportGame() {
-	if (isPlayMode) {
-		alert("You can't download your game while you're playing it! Sorry :(");
-		return;
-	}
-
-	refreshGameData(); //just in case
-	// var gameData = document.getElementById("game_data").value; //grab game data
-	var gameData = getFullGameData();
-	var size = document.getElementById("exportSizeFixedInput").value;
-	//download as html file
-	exporter.exportGame(
-		gameData,
-		getTitle(),
-		export_settings.page_color,
-		filenameFromGameTitle() + ".html",
-		isFixedSize,
-		size);
-}
-
-function exportGameData() {
-	refreshGameData(); //just in case
-	// var gameData = document.getElementById("game_data").value; //grab game data
-	var gameData = getFullGameData();
-	ExporterUtils.DownloadFile(filenameFromGameTitle() + ".bitsy", gameData);
-}
-
-function exportFont() {
-	var fontData = fontManager.GetData(fontName);
-	ExporterUtils.DownloadFile( fontName + ".bitsyfont", fontData );
 }
 
 function hideAbout() {
@@ -2455,94 +2280,6 @@ function finishRecordingGif(gif) {
 	}, 10);
 }
 
-/* LOAD FROM FILE */
-function importGameFromFile(e) {
-	if (isPlayMode) {
-		alert("You can't upload a game while you're playing one! Sorry :(");
-		return;
-	}
-
-	resetGameData();
-
-	// load file chosen by user
-	var files = e.target.files;
-	var file = files[0];
-	var reader = new FileReader();
-	reader.readAsText( file );
-
-	reader.onloadend = function() {
-		var fileText = reader.result;
-		gameDataStr = exporter.importGame( fileText );
-
-		// change game data & reload everything
-		document.getElementById("game_data").value = gameDataStr;
-		on_game_data_change();
-
-		// reset find tool (a bit heavy handed?)
-		findTool = new FindTool({
-			mainElement : document.getElementById("findPanelMain"),
-		});
-	}
-}
-
-function importFontFromFile(e) {
-	// load file chosen by user
-	var files = e.target.files;
-	var file = files[0];
-	var reader = new FileReader();
-	reader.readAsText( file );
-
-	reader.onloadend = function() {
-		var fileText = reader.result;
-		bitsyLog(fileText, "editor");
-
-		var customFontName = (fontManager.Create(fileText)).getName();
-
-		fontManager.AddResource(customFontName + fontManager.GetExtension(), fileText);
-		switchFont(customFontName); // bitsy engine setting
-
-		var fontStorage = {
-			name : customFontName,
-			fontdata : fileText
-		};
-		Store.set('custom_font', fontStorage);
-
-		refreshGameData();
-		updateFontSelectUI();
-
-		// TODO
-		// fontLoadSettings.resources.set("custom.txt", fileText); // hacky!!!
-	}
-}
-
-function importGameDataFromFile(e) {
-	if (isPlayMode) {
-		alert("You can't upload a game while you're playing one! Sorry :(");
-		return;
-	}
-
-	resetGameData();
-
-	// load file chosen by user
-	var files = e.target.files;
-	var file = files[0];
-	var reader = new FileReader();
-	reader.readAsText(file);
-
-	reader.onloadend = function() {
-		var gameDataStr = reader.result;
-
-		// change game data & reload everything
-		document.getElementById("game_data").value = gameDataStr;
-		on_game_data_change();
-
-		// reset find tool (a bit heavy handed?)
-		findTool = new FindTool({
-			mainElement : document.getElementById("findPanelMain"),
-		});
-	}
-}
-
 /* ANIMATION EDITING*/
 function on_toggle_animated() {
 	bitsyLog("ON TOGGLE ANIMATED", "editor");
@@ -2789,21 +2526,6 @@ function on_paint_frame1() {
 function on_paint_frame2() {
 	paintTool.curDrawingFrameIndex = 1;
 	paintTool.reloadDrawing();
-}
-
-var export_settings = {
-	page_color : "#ffffff"
-};
-
-function on_change_color_page() {
-	var hex = document.getElementById("pageColor").value;
-	//bitsyLog(hex, "editor");
-	var rgb = hexToRgb( hex );
-	// document.body.style.background = hex;
-	document.getElementById("roomPanel").style.background = hex;
-	export_settings.page_color = hex;
-
-	Store.set('export_settings', export_settings);
 }
 
 function getComplimentingColor(palId) {
@@ -3056,47 +2778,17 @@ function chooseExportSizeFixed() {
 
 // LOCALIZATION
 var localization;
-function on_change_language(e) {
-	var language = e.target.value;
-	pickDefaultFontForLanguage(language);
-	on_change_language_inner(language);
+
+// TODO : create a system for placeholder text like I have for innerText
+function hackUpdatePlaceholderText() {
+	var titlePlaceholder = localization.GetStringOrFallback("title_placeholder", "Title");
+	var titleTextBoxes = document.getElementsByClassName("titleTextBox");
+	for (var i = 0; i < titleTextBoxes.length; i++) {
+		titleTextBoxes[i].placeholder = titlePlaceholder;
+	}
 }
 
-function on_change_language_inner(language) {
-	changeLnaguageStyle(language); // TODO : misspelled funciton name
-
-	localization.ChangeLanguage(language);
-	updateInventoryUI();
-	reloadDialogUI();
-	hackyUpdatePlaceholderText();
-
-	// update title in new language IF the user hasn't made any changes to the default title
-	if (localization.LocalizationContains("default_title", getTitle())) {
-		setTitle(localization.GetStringOrFallback("default_title", "Write your game's title here"));
-		// make sure all editors with a title know to update
-		events.Raise("dialog_update", { dialogId:titleDialogId, editorId:null });
-	}
-
-	// update default sprite
-	var defaultSpriteDlgExists = dialog["0"] != null && localization.LocalizationContains("default_sprite_dlg", dialog["0"]);
-	if (defaultSpriteDlgExists) {
-		dialog["0"] = {
-			src: localization.GetStringOrFallback("default_sprite_dlg", "I'm a cat"),
-			name: null,
-		};
-		paintTool.reloadDrawing();
-	}
-
-	// update default item
-	var defaultItemDlgExists = dialog["1"] != null && localization.LocalizationContains("default_item_dlg", dialog["1"]);
-	if (defaultItemDlgExists) {
-		dialog["1"] = {
-			src: localization.GetStringOrFallback("default_item_dlg", "You found a nice warm cup of tea"),
-			name: null,
-		};
-		paintTool.reloadDrawing(); // hacky to do this twice
-	}
-
+function hackUpdateEditorToolMenusOnLanguageChange() {
 	// hack : manually update tool menus & titles
 	if (roomTool) {
 		roomTool.resetTitlebar();
@@ -3116,133 +2808,32 @@ function on_change_language_inner(language) {
 		document.getElementById(tuneTool.id + "CheckLabelText").innerText = tuneTool.name();
 	}
 
-	refreshGameData();
-}
-
-// TODO : create a system for placeholder text like I have for innerText
-function hackyUpdatePlaceholderText() {
-	var titlePlaceholder = localization.GetStringOrFallback("title_placeholder", "Title");
-	var titleTextBoxes = document.getElementsByClassName("titleTextBox");
-	for (var i = 0; i < titleTextBoxes.length; i++) {
-		titleTextBoxes[i].placeholder = titlePlaceholder;
+	// do this in case the the current sprite dialog changed
+	if (paintTool) {
+		paintTool.reloadDrawing();
 	}
+
+	// TODO : test - is this necessary still? we already call "reloadDialogUI" in the settings tool
+	// make sure all editors with a title know to update
+	events.Raise("dialog_update", { dialogId:titleDialogId, editorId:null });
 }
 
 var curEditorLanguageCode = "en";
-function changeLnaguageStyle(newCode) { // TODO : fix function name
+function updateEditorLanguageStyle(newCode) {
 	document.body.classList.remove("lang_" + curEditorLanguageCode);
 	curEditorLanguageCode = newCode;
 	document.body.classList.add("lang_" + curEditorLanguageCode);
 }
 
-function pickDefaultFontForLanguage(lang) {
-	// TODO : switch to asian characters when we get asian language translations of editor
-	if (lang === "en") {
-		switchFont("ascii_small", true /*doPickTextDirection*/);
-	}
-	else if (lang === "ar") {
-		switchFont("arabic", true /*doPickTextDirection*/);
-	}
-	else if (lang === "zh" || lang === "ja") {
-		switchFont("unicode_asian", true /*doPickTextDirection*/);
-	}
-	else {
-		switchFont("unicode_european_small", true /*doPickTextDirection*/);
-	}
-	updateFontSelectUI();
-}
-
-function on_change_font(e) {
-	if (e.target.value != "custom") {
-		switchFont(e.target.value, true /*doPickTextDirection*/);
-	}
-	else {
-		var fontStorage = Store.get('custom_font', { name: 'ascii_small' });
-		switchFont(fontStorage.name, true /*doPickTextDirection*/);
-	}
-	updateFontDescriptionUI();
-	// updateEditorTextDirection();
-}
-
-function switchFont(newFontName, doPickTextDirection) {
-	if (doPickTextDirection === undefined || doPickTextDirection === null) {
-		doPickTextDirection = false;
-	}
-
-	fontName = newFontName;
-
-	if (doPickTextDirection) {
-		bitsyLog("PICK TEXT DIR", "editor");
-		pickDefaultTextDirectionForFont(newFontName);
-	}
-
-	refreshGameData()
-}
-
-function initLanguageOptions() {
-	localization.Localize();
-
-	var languageSelect = document.getElementById("languageSelect");
-	languageSelect.innerHTML = "";
-
-	var languageList = localization.GetLanguageList();
-	for (var i = 0; i < languageList.length; i++) {
-		var option = document.createElement("option");
-		option.innerText = languageList[i].name;
-		option.value = languageList[i].id;
-		option.selected = languageList[i].id === localization.GetLanguage();
-		languageSelect.add(option);
-	}
-
-	// is this doing duplicate work??
-	on_change_language_inner( localization.GetLanguage() );
-}
-
-function on_change_text_direction(e) {
-	bitsyLog("CHANGE TEXT DIR " + e.target.value, "editor");
-	updateEditorTextDirection(e.target.value);
-	refreshGameData();
-}
-
-function onChangeTextMode(e) {
-	flags.TXT_MODE = bitsy[e.target.value];
-	refreshGameData();
-}
-
-function pickDefaultTextDirectionForFont(newFontName) {
-	var newTextDirection = TextDirection.LeftToRight;
-	if (newFontName === "arabic") {
-		newTextDirection = TextDirection.RightToLeft;
-	}
-	updateEditorTextDirection(newTextDirection);
-	updateTextDirectionSelectUI();
-}
-
 function updateEditorTextDirection(newTextDirection) {
 	var prevTextDirection = textDirection;
-	textDirection = newTextDirection;
 
-	bitsyLog("TEXT BOX TEXT DIR " + textDirection, "editor");
+	bitsyLog("TEXT BOX TEXT DIR " + newTextDirection, "editor");
 
 	if (prevTextDirection != null) {
 		document.body.classList.remove("dir_" + prevTextDirection.toLowerCase());
 	}
-	document.body.classList.add("dir_" + textDirection.toLowerCase());
-}
-
-function updateTextDirectionSelectUI() {
-	var textDirSelect = document.getElementById("textDirectionSelect");
-	for (var i in textDirSelect.options) {
-		var option = textDirSelect.options[i];
-		option.selected = (option.value === textDirection);
-	}
-
-	// hacky to stick this here..
-	var textModeSelect = document.getElementById("textModeSelect");
-	for (var i in textModeSelect.options) {
-		var option = textModeSelect.options[i];
-		option.selected = (bitsy[option.value] === flags.TXT_MODE);
-	}
+	document.body.classList.add("dir_" + newTextDirection.toLowerCase());
 }
 
 /* UTILS (todo : move into utils.js after merge) */
@@ -3323,6 +2914,9 @@ function openFindToolWithCurrentPaintCategory() {
 
 	openFindTool(categoryId, "paintPanel");
 }
+
+/* GAME TOOL */
+var gameTool;
 
 /* SOUND TOOLS */
 var tuneTool;
