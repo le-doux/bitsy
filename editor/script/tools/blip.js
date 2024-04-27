@@ -88,7 +88,6 @@ function makeBlipTool() {
 
 		function generate() {
 			var curBlip = blip[selectedId];
-			curBlip.name = CreateDefaultName(blipNames[curGenerator], blip);
 
 			switch (curGenerator) {
 				case BlipGenerator.PICKUP:
@@ -518,6 +517,15 @@ function makeBlipTool() {
 				}
 			});
 
+			tool.menu.push({
+				control: "button",
+				icon: "loop",
+				description: "Regenerate blip",
+				onclick : function(e) {
+					generate()
+				},
+			});
+
 			tool.menu.pop({ control: "group" });
 		};
 
@@ -543,6 +551,7 @@ function makeBlipTool() {
 			}
 
 			selectedId = nextId;
+			blip[selectedId].name = CreateDefaultName(blipNames[curGenerator], blip);
 			generate();
 		};
 
