@@ -1,5 +1,5 @@
-function TileRenderer() {
-bitsy.log("!!!!! NEW TILE RENDERER");
+function TileRenderer(debugName) {
+bitsy.log("!!!!! NEW TILE RENDERER: " + debugName);
 
 var drawingCache = {
 	source: {},

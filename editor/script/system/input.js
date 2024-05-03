@@ -112,6 +112,8 @@ function InputSystem() {
 		// bitsyLog("KEYUP -- " + event.keyCode, "system");
 		pressed[event.keyCode] = false;
 		ignored[event.keyCode] = false;
+
+		isRestartComboPressed = false;
 	}
 
 	this.ontouchstart = function(event) {

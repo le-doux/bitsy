@@ -169,30 +169,24 @@ function findAndReplaceTileInAllRooms( findTile, replaceTile ) {
 
 /* MAKE DRAWING OBJECTS */
 function makeTile(id, imageData) {
-	var tileData = createDrawingData("TIL", id);
-	tileData.frameCount = (!imageData) ? 1 : (imageData.length);
-	tileData.isAnimated = tileData.frameCount > 1;
-	tile[id] = tileData;
-	makeDrawing(tileData.drw, imageData);
+	tile[id] = makeDrawing("TIL", id, imageData);
 }
 
 function makeSprite(id, imageData) {
-	var spriteData = createDrawingData("SPR", id);
-	spriteData.frameCount = (!imageData) ? 1 : (imageData.length);
-	spriteData.isAnimated = spriteData.frameCount > 1;
-	sprite[id] = spriteData;
-	makeDrawing(spriteData.drw, imageData);
+	sprite[id] = makeDrawing("SPR", id, imageData);
 }
 
 function makeItem(id, imageData) {
-	var itemData = createDrawingData("ITM", id);
-	itemData.frameCount = (!imageData) ? 1 : (imageData.length);
-	itemData.isAnimated = itemData.frameCount > 1;
-	item[id] = itemData;
-	makeDrawing(itemData.drw, imageData);
+	item[id] = makeDrawing("ITM", id, imageData);
 }
 
-function makeDrawing(id, imageData) {
+function makeDrawing(type, id, imageData) {
+	// initialize drawing data
+	var drawingData = createDrawingData(type, id);
+	drawingData.animation.frameCount = (!imageData) ? 1 : (imageData.length);
+	drawingData.animation.isAnimated = drawingData.animation.frameCount > 1;
+
+	// initialize renderer cache
 	if (!imageData) {
 		// if there's no image data, initialize with one empty frame
 		imageData = [
@@ -209,7 +203,9 @@ function makeDrawing(id, imageData) {
 		];
 	}
 
-	renderer.SetDrawingSource(id, imageData);
+	renderer.SetDrawingSource(drawingData.drw, imageData);
+
+	return drawingData;
 }
 
 /* EVENTS */
@@ -560,6 +556,14 @@ function refreshGameData() {
 
 	var gameDataNoFonts = serializeWorld(true);
 	Store.set("game_data", gameDataNoFonts);
+
+	// make sure to update the game tool!
+	// this ensures the game data text is up-to-date
+	// TODO : this is kind of a hack and it undoes any scrolling the game data textarea
+	// I should look into a better solution soon (some kind of file-watching-like concept?)
+	if (gameTool) {
+		gameTool.menu.update();
+	}
 }
 
 /* TIMER */
@@ -750,12 +754,11 @@ function isPortraitOrientation() {
 function start() {
 	initSystem();
 
+	// TODO : I need to get rid of this event system... it's too hard to debug
 	events.Listen("game_data_change", function(event) {
-		// TODO -- over time I can move more things in here
-		// on the other hand this is still sort of global thing that we don't want TOO much of
-
+		// TODO : refactor "openDialogTool" to split out the actual opening from reloading
 		// force re-load the dialog tool
-		openDialogTool(titleDialogId);
+		openDialogTool(titleDialogId, /*insertNextToId*/ null, /*showIfHidden*/ false);
 	});
 
 	isPlayerEmbeddedInEditor = true; // flag for game player to make changes specific to editor
@@ -936,6 +939,9 @@ function start() {
 	tuneTool = makeTuneTool();
 	blipTool = makeBlipTool();
 
+	// game tool
+	gameTool = makeGameTool();
+
 	// load panel preferences
 	var prefs = getPanelPrefs();
 	Store.set('panel_prefs', prefs); // save loaded prefs
@@ -949,9 +955,6 @@ function start() {
 			editorContent.insertBefore( panelElement, null ); //insert on the left
 		}
 	}
-
-	// game tool
-	gameTool = makeGameTool();
 
 	// about tool
 	initAbout();
@@ -1384,17 +1387,25 @@ function togglePlayMode(e) {
 
 function on_play_mode() {
 	isPlayMode = true;
+
 	if (document.getElementById("roomPanel").style.display === "none") {
 		showPanel("roomPanel");
 	}
 	else {
 		document.getElementById("roomPanel").scrollIntoView();
 	}
+
 	roomTool.setTitlebar("play", "playing...");
 	roomTool.system._active = false;
 	roomTool.menu.update();
+
 	document.getElementById("appRoot").classList.add("bitsy-playmode");
-	// todo : I feel likef I need to take a look at the font manager and simplify things there
+
+	// clear render cache(s)
+	renderer.ClearCache();
+	roomTool.renderer.ClearCache();
+
+	// todo : I feel like I need to take a look at the font manager and simplify things there
 	loadGame(roomTool.canvasElement, serializeWorld(), fontManager.GetData(defaultFontName));
 }
 
@@ -1404,6 +1415,10 @@ function on_edit_mode() {
 	document.getElementById("appRoot").classList.remove("bitsy-playmode");
 
 	quitGame();
+
+	// clear render cache(s)
+	renderer.ClearCache();
+	roomTool.renderer.ClearCache();
 
 	// reparse world to reset any changes from gameplay
 	var gamedataStorage = Store.get("game_data");
@@ -1439,7 +1454,6 @@ function on_edit_mode() {
 	}
 	paintTool.reloadDrawing();
 
-	renderer.ClearCache(true);
 	roomTool.resetTitlebar();
 	roomTool.system._active = true;
 	roomTool.menu.update();
@@ -1737,6 +1751,10 @@ function on_game_data_change_core() {
 
 	if (blipTool) {
 		blipTool.selectAtIndex(0);
+	}
+
+	if (gameTool) {
+		gameTool.menu.update();
 	}
 
 	if (markerTool) {
@@ -2806,6 +2824,12 @@ function hackUpdateEditorToolMenusOnLanguageChange() {
 		tuneTool.resetTitlebar();
 		tuneTool.menu.update();
 		document.getElementById(tuneTool.id + "CheckLabelText").innerText = tuneTool.name();
+	}
+
+	if (gameTool) {
+		gameTool.resetTitlebar();
+		gameTool.menu.update();
+		document.getElementById(gameTool.id + "CheckLabelText").innerText = gameTool.name();
 	}
 
 	// do this in case the the current sprite dialog changed

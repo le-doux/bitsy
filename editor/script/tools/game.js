@@ -9,6 +9,7 @@ function makeGameTool() {
 		// TODO : where is the right place for this metadata?
 		tool.size = "m";
 		tool.insertBefore = "roomCheckSpan"; // todo : need a better way of defining the order of the tool buttons
+		tool.aboutPage = "./tools/game";
 
 		tool.loop = function(dt) {};
 

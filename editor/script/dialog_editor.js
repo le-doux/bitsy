@@ -2680,7 +2680,14 @@ function DialogTool() {
 
 			function createSetArgFunc(functionNode, parameterIndex, parentEditor) {
 				return function(argNode) {
-					functionNode.args.splice(parameterIndex, 1, argNode);
+					if (argNode != null) {
+						functionNode.args.splice(parameterIndex, 1, argNode);	
+					}
+					else {
+						// null parameter node = delete this argument!
+						functionNode.args.splice(parameterIndex, 1);
+					}
+
 					parentEditor.NotifyUpdate();
 				};
 			}
@@ -2938,6 +2945,12 @@ function DialogTool() {
 			GetName: function() { return localization.GetStringOrFallback("transition_slide_r", "slide right"); },
 			id: "slide_r",
 		},
+		{
+			// todo : localize
+			GetName: function() { return "none"; },
+			// todo : hack! empty string is not actually a valid transition ID - just used to indicate this parameter should be deleted
+			id: "",
+		}
 	];
 
 	function ParameterEditor(parameterTypes, getArgFunc, setArgFunc, isEditable, isTypeEditable, openExpressionBuilderFunc) {
@@ -3203,8 +3216,14 @@ function DialogTool() {
 
 				parameterInput.onchange = function(event) {
 					var val = event.target.value;
-					var argNode = scriptUtils.CreateStringLiteralNode(val);
-					onChange(argNode);
+					if (val.length <= 0) {
+						// empty transition ID = delete the parameter!
+						onChange(null);
+					}
+					else {
+						var argNode = scriptUtils.CreateStringLiteralNode(val);
+						onChange(argNode);
+					}
 				}
 			}
 			else if (type === "tune") {

@@ -1,3 +1,19 @@
+## 8.12
+
+- docs: add locked door guide (@vaasut)
+- docs: add tune tool documentation
+- docs: add blip tool documentation
+- feature: blip tool: add re-generate button (@nashalexander)
+- feature: blip tool: tweaks to menu layout & tool name
+- feature: room tool: grid & wall visibility settings are saved
+- feature: dialog tool: "none" option for exit transitions from dialog
+- fix: fixed memory leak when editing rooms with large numbers of unique tiles (such as those exported by pixsy)
+- fix: game data text wasn't updating with edits from other tools
+- fix: added missing docs link to game tool
+- fix: copying drawings no longer loses animation frames
+- fix: reset game doesn't break title text
+- fix: game & dialog tools were opening at unexpected times
+
 ## 8.11
 
 - game tool: combines the features of the download, settings, and game data tools into one tool

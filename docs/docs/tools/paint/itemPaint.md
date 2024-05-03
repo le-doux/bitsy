@@ -26,7 +26,7 @@
 
 10. **Item animation**. Opens the animation panel where you can edit two animation frames. Select frame 1 or frame 2 to edit it in the paint window. The preview shows how the animation will look when playing the game.
 
-11. **Sound effect button**. Choose a [blip sound effect](../blipomatic) that will play when the player walks into this item. Choose none if you do not want a sound effect.
+11. **Sound effect button**. Choose a [blip sound effect](../blip) that will play when the player walks into this item. Choose none if you do not want a sound effect.
 
 12. **Open inventory**. Opens the [inventory tool](/tools/inventory/).
 
