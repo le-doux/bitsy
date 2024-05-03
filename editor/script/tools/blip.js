@@ -32,7 +32,7 @@ function makeBlipTool() {
 
 		// todo : how do I feel about these being functions? should I rename the property?
 		tool.name = function() {
-			return localization.GetStringOrFallback("blip_tool", "blip-o-matic");
+			return localization.GetStringOrFallback("blip_sfx", "blip");
 		};
 
 		tool.icon = "blip";
@@ -40,7 +40,7 @@ function makeBlipTool() {
 		tool.data = "BLIP";
 		tool.worldData = "blip.bitsy";
 		tool.insertBefore = "findCheck";
-		tool.aboutPage = "./tools/blipomatic";
+		tool.aboutPage = "./tools/blip";
 
 		tool.soundPlayer = new SoundPlayer();
 		tool.soundPlayer.tag = "blip_tool"; // for debugging
@@ -88,7 +88,6 @@ function makeBlipTool() {
 
 		function generate() {
 			var curBlip = blip[selectedId];
-			curBlip.name = CreateDefaultName(blipNames[curGenerator], blip);
 
 			switch (curGenerator) {
 				case BlipGenerator.PICKUP:
@@ -381,10 +380,42 @@ function makeBlipTool() {
 			tool.menu.push({
 				control: "button",
 				icon: "play",
-				text: localization.GetStringOrFallback("play_game", "play"),
+				// text: localization.GetStringOrFallback("play_game", "play"),
 				description: "play blip",
 				onclick : function(e) {
 					tool.soundPlayer.playBlip(curBlip);
+				},
+			});
+
+			tool.menu.push({
+				control: "label",
+				text: localization.GetStringOrFallback("blip_tool", "blip-o-matic"),
+				description: "sound generator for regenerating or adding blips (" + blipNames[curGenerator] + ": " + blipDescriptions[curGenerator] + ")"
+			});
+
+			// todo : I don't need to generate these each time do I?
+			var blipTypeOptions = []
+			for (var i = BlipGenerator.NONE + 1; i < BlipGenerator.COUNT; i++) {
+				blipTypeOptions.push({ text: blipNames[i], description: blipDescriptions[i], value: i });
+			}
+
+			tool.menu.push({
+				control: "select",
+				description: "select sound effect category",
+				name: "blipRandomType",
+				value: curGenerator,
+				options: blipTypeOptions,
+				onchange: function(e) {
+					curGenerator = parseInt(e.target.value);
+				}
+			});
+
+			tool.menu.push({
+				control: "button",
+				icon: "blip",
+				description: "regenerate blip",
+				onclick : function(e) {
+					generate()
 				},
 			});
 			tool.menu.pop({ control: "group" });
@@ -491,34 +522,6 @@ function makeBlipTool() {
 				}
 			});
 			tool.menu.pop({ control: "group" });
-
-			tool.menu.push({ control: "group" });
-
-			tool.menu.push({
-				control: "label",
-				icon: "blip",
-				text: localization.GetStringOrFallback("blip_generator", "generator"),
-				description: "type of sound to generate when adding blips (" + blipNames[curGenerator] + ": " + blipDescriptions[curGenerator] + ")"
-			});
-
-			// todo : I don't need to generate these each time do I?
-			var blipTypeOptions = []
-			for (var i = BlipGenerator.NONE + 1; i < BlipGenerator.COUNT; i++) {
-				blipTypeOptions.push({ text: blipNames[i], description: blipDescriptions[i], value: i });
-			}
-
-			tool.menu.push({
-				control: "select",
-				description: "select sound effect category",
-				name: "blipRandomType",
-				value: curGenerator,
-				options: blipTypeOptions,
-				onchange: function(e) {
-					curGenerator = parseInt(e.target.value);
-				}
-			});
-
-			tool.menu.pop({ control: "group" });
 		};
 
 		tool.onSelect = function(id) {
@@ -543,6 +546,7 @@ function makeBlipTool() {
 			}
 
 			selectedId = nextId;
+			blip[selectedId].name = CreateDefaultName(blipNames[curGenerator], blip);
 			generate();
 		};
 

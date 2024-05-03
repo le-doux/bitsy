@@ -52,8 +52,9 @@ function makeRoomTool() {
 		var prevAreExitsVisible = false;
 
 		/* VISIBILITY SETTINGS */
-		var isGridVisible = true;
-		var areWallsVisible = false;
+		// TODO : ultimately I want to combine all tool settings (panel settings, export settings, language setting) into one settings object
+		var isGridVisible = (getPanelSetting("roomPanel", "grid") != false);
+		var areWallsVisible = (getPanelSetting("roomPanel", "walls") == true);
 		var areExitsVisible = false;
 
 		function animate(tileName) {
@@ -611,7 +612,10 @@ function makeRoomTool() {
 					text: localization.GetStringOrFallback("grid_toggle_visible", "grid"),
 					description: "show/hide tile grid",
 					checked: isGridVisible,
-					onclick: function(e) { isGridVisible = e.target.checked; }
+					onclick: function(e) {
+						isGridVisible = e.target.checked;
+						setPanelSetting("roomPanel", "grid", isGridVisible);
+					}
 				});
 
 				tool.menu.push({
@@ -621,7 +625,10 @@ function makeRoomTool() {
 					text: localization.GetStringOrFallback("walls_toggle_visible", "walls"),
 					description: "show/hide wall tiles",
 					checked: areWallsVisible,
-					onclick: function(e) { areWallsVisible = e.target.checked; }
+					onclick: function(e) {
+						areWallsVisible = e.target.checked;
+						setPanelSetting("roomPanel", "walls", areWallsVisible);
+					}
 				});
 
 				tool.menu.pop({ control: "group" });

@@ -8,6 +8,7 @@
 - equa (@equaa) - Contributor
 - @frojo - Contributor
 - max - Contributor
+- @nashalexander - Contributor
 - @pancelor - Contributor
 - Pirijuamps - Contributor
 - @ragzouken - Contributor

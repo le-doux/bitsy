@@ -162,7 +162,7 @@ function makeToolCard(processName, initFunction) {
 	if (card.worldData) {
 		// is just attaching to the card object ok??
 		card.world = parseWorld(Resources[card.worldData]);
-		card.renderer = new TileRenderer(tilesize);
+		card.renderer = new TileRenderer(card.id);
 		card.renderer.SetDrawings(card.world.drawings);
 	}
 

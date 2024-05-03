@@ -26,7 +26,7 @@
 
 10. **Sprite animation**. Opens the animation panel where you can edit two animation frames. Select frame 1 or frame 2 to edit it in the paint window. The preview shows how the animation will look when playing the game.
 
-11. **Sound effect button**. Choose a [blip sound effect](../blipomatic) that will play when the player walks into this sprite. Choose none if you do not want a sound effect.
+11. **Sound effect button**. Choose a [blip sound effect](../blip) that will play when the player walks into this sprite. Choose none if you do not want a sound effect.
 
 12. **Dialog selection toggle**. Click this button to show a dropdown menu of all the dialogs you have created. Clicking it again will allow you to edit the current dialog.
 

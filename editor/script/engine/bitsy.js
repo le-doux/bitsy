@@ -123,7 +123,7 @@ var isPlayerEmbeddedInEditor = false;
 
 var renderer;
 if (engineFeatureFlags.isRendererEnabled) {
-	renderer = new TileRenderer();
+	renderer = new TileRenderer("bitsy");
 }
 
 var curGameData = null;
@@ -390,6 +390,7 @@ function update(dt) {
 }
 
 var isAnyButtonHeld = false;
+var isMenuButtonHeld = false;
 var isIgnoringInput = false;
 
 function isAnyButtonDown() {
@@ -456,13 +457,14 @@ function updateInput() {
 		isIgnoringInput = false;
 	}
 
-	// quit if the user ever presses the restart button
+	// quit when the user releases the restart button
 	// todo : should I rename it bitsy.BTN_RESTART or bitsy.BTN_QUIT or bitsy.BTN_OFF?
-	if (bitsy.button(bitsy.BTN_MENU)) {
+	if (isMenuButtonHeld && !bitsy.button(bitsy.BTN_MENU)) {
 		isGameOver = true;
 	}
 
 	isAnyButtonHeld = isAnyButtonDown();
+	isMenuButtonHeld = bitsy.button(bitsy.BTN_MENU);
 }
 
 var animationCounter = 0;

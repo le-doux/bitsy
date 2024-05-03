@@ -1736,7 +1736,7 @@ function makeTuneTool() {
 		tool.onGameDataChange = function() {
 			// force render refresh // todo : need to think about the architecture of sharing renderers
 			if (tool && tool.renderer) {
-				tool.renderer.ClearCache(true);
+				tool.renderer.ClearCache();
 				melodyBarTileIds = null;
 				harmonyBarTileIds = null;
 				blipTileIds = [];
