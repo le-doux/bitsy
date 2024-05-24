@@ -1421,6 +1421,7 @@ function on_edit_mode() {
 	roomTool.renderer.ClearCache();
 
 	// A hacky way to fix graphical issues when unpausing.
+	// reload and store the game data
 	//refreshGameData()
 	var gameDataNoFonts = serializeWorld(true);
 	Store.set("game_data", gameDataNoFonts)
