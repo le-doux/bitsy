@@ -1427,7 +1427,7 @@ function on_edit_mode() {
 	// TODO: find out why this works; a bug in the game_data store? maybe?
 	// alternatively, refreshGameData() could be used here
 	// the above is a subsection of the refreshGameData() function which
-	// could help with further narrowing down
+	// could help with further narrowing down the bug
 
 	// reparse world to reset any changes from gameplay
 	var gamedataStorage = Store.get("game_data");
