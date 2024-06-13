@@ -1,0 +1,62 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.tutorialSidebar.category.Introduction": {
+    "message": "介绍",
+    "description": "The label for category Introduction in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Introduction.link.generated-index.description": {
+    "message": "Bitsy是一个用于制作小型游戏或小型世界的小编辑器。其目标是让制作能够四处走动、与人交谈并置身于某个地方的游戏变得简单。",
+    "description": "The generated-index page description for category Introduction in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Tools": {
+    "message": "工具",
+    "description": "The label for category Tools in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Tools.link.generated-index.description": {
+    "message": "工具栏包含所有Bitsy编辑工具。点击工具按钮可以在工作区中切换该工具的显示与隐藏。点击“新建游戏(new game)”按钮将会让你开始一个新的Bitsy游戏。请注意，这会覆盖你当前的所有工作。如果你想先保存当前的工作，可以考虑使用下载或游戏数据工具导出你的游戏。",
+    "description": "The generated-index page description for category Tools in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Dialog": {
+    "message": "对话",
+    "description": "The label for category Dialog in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Game": {
+    "message": "游戏",
+    "description": "The label for category Game in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Paint": {
+    "message": "画图",
+    "description": "The label for category Paint in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Room": {
+    "message": "房间",
+    "description": "The label for category Room in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Advanced Topics": {
+    "message": "高级话题",
+    "description": "The label for category Advanced Topics in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Advanced Topics.link.generated-index.description": {
+    "message": "高级话题",
+    "description": "The generated-index page description for category Advanced Topics in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.FAQ": {
+    "message": "常见问题解答(FAQ)",
+    "description": "The label for category FAQ in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.FAQ.link.generated-index.description": {
+    "message": "一些被经常提问的问题！",
+    "description": "The generated-index page description for category FAQ in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Technical": {
+    "message": "技术文档",
+    "description": "The label for category Technical in sidebar tutorialSidebar"
+  },
+  "sidebar.tutorialSidebar.category.Technical.link.generated-index.description": {
+    "message": "技术文档",
+    "description": "The generated-index page description for category Technical in sidebar tutorialSidebar"
+  }
+}
