@@ -1,3 +1,7 @@
+## 8.13
+
+- fix: tiles in room tool getting scrambled when starting and stopping game (@Miguel-hrvs)
+
 ## 8.12
 
 - docs: add locked door guide (@vaasut)

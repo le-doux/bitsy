@@ -2,7 +2,7 @@
 // is this the right place for this to live?
 var version = {
 	major: 8, // major changes
-	minor: 12, // smaller changes
+	minor: 13, // smaller changes
 	devBuildPhase: "RELEASE",
 };
 function getEngineVersion() {
