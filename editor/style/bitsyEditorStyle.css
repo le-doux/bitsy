@@ -115,7 +115,7 @@ textarea {
 	background: black;
 	color: white;
 	resize: none;
-	border: none
+	border: none;
 	padding: var(--bitsy-space-s);
 	border-radius: var(--bitsy-space-xs);
 	flex-grow: 1;
@@ -167,7 +167,7 @@ input[type=text] {
 }
 
 input[type=text]:not([readonly]) {
-	color: black;
+	color: var(--bitsy-color-main-2);
 	background: var(--bitsy-color-neutral-1);
 	border-color: var(--bitsy-color-neutral-1);
 }
