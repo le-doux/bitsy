@@ -895,14 +895,15 @@ function parseFontData(parseState, world) {
 	var localFontData = lines[i];
 	i++;
 
-	while (i < lines.length && lines[i] != "") {
+	// Check for closing script tag to stop tag duplication on save/load html
+	while (i < lines.length && lines[i] != "</script>") {
 		localFontData += "\n" + lines[i];
 		i++;
 	}
-
+	
 	var localFontFilename = localFontName + fontManager.GetExtension();
 	fontManager.AddResource( localFontFilename, localFontData );
-
+	
 	return i;
 }
 
