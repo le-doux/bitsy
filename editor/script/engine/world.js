@@ -896,7 +896,7 @@ function parseFontData(parseState, world) {
 	i++;
 
 	// Check for closing script tag to stop tag duplication on save/load html
-	while (i < lines.length && lines[i] != "</script>") {
+	while (i < lines.length && lines[i] != "</script>" && lines[i] != "") {
 		localFontData += "\n" + lines[i];
 		i++;
 	}
