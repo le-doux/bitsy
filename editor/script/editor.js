@@ -778,6 +778,9 @@ function start() {
 		iconUtils.LoadIconAnimated(elements[i]);
 	}
 
+	// theme
+	theme = new Theme('light');
+
 	// localization
 	localization = new Localization(urlParameters["lang"]);
 	Store.init(function () {
@@ -2941,6 +2944,7 @@ function openFindToolWithCurrentPaintCategory() {
 
 /* GAME TOOL */
 var gameTool;
+var theme;
 
 /* SOUND TOOLS */
 var tuneTool;

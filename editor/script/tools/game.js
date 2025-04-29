@@ -25,7 +25,7 @@ function makeGameTool() {
 		var showFontDataInGameData = false;
 
 		// editor theme
-		var useDarkTheme = false;
+		var avaliableThemes = theme.GetAvaliableThemes();
 
 		// tool settings
 		var languageList = localization.GetLanguageList();
@@ -250,6 +250,15 @@ function makeGameTool() {
 				});
 			}
 
+			var themeOptions = [];
+			for(var i = 0; i < avaliableThemes.length; i++) {
+				themeOptions.push({
+					text: avaliableThemes[i],
+					description: avaliableThemes[i],
+					value: avaliableThemes[i],
+				});
+			}
+
 			tool.menu.push({
 				control: "group",
 				text: { id: "editor_settings", text: "tool settings" },
@@ -297,26 +306,15 @@ function makeGameTool() {
 			tool.menu.pop({ control: "group" });
 
 			tool.menu.push({ control: "group"});
+			tool.menu.push({ control: "label", text: "change editor theme" });
 			tool.menu.push({
-				control: "label",
-				text: "change editor theme",
-				description: "toggles editor theme between light and dark"
-			});
-			tool.menu.push({
-				control: "toggle",
-				id: "editor_theme_toggle",
-				icon: useDarkTheme ? "visibility_off" : "visibility",
-				text: useDarkTheme ? "dark theme" : "light theme",
-				description: "toggle editor theme",
-				checked: useDarkTheme,
-				onclick: function(e) {
-					useDarkTheme = e.target.checked;
-					if(useDarkTheme) {
-						document.documentElement.classList.add('dark-mode');
-					} else {
-						document.documentElement.classList.remove('dark-mode');
-					}
-				}
+				control: "select",
+				name: "editor_theme_select",
+				value: theme.GetCurrentTheme(),
+				options: themeOptions,
+				onchange: function(e) {
+					theme.SetTheme(e.target.value)
+				},
 			})
 			tool.menu.pop({ control: "group" });
 
