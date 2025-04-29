@@ -1352,10 +1352,6 @@ function deleteDrawing() {
 	events.Raise("select_drawing", { id: drawing.id, type: drawing.type });
 }
 
-function toggleDarkMode(e) {
-	document.documentElement.classList.toggle('dark-mode');
-}
-
 function toggleToolBar(e) {
 	if (e.target.checked) {
 		document.getElementById("toolsPanel").style.display = "flex";

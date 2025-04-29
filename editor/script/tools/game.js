@@ -24,6 +24,9 @@ function makeGameTool() {
 		// game data
 		var showFontDataInGameData = false;
 
+		// editor theme
+		var useDarkTheme = false;
+
 		// tool settings
 		var languageList = localization.GetLanguageList();
 
@@ -291,6 +294,30 @@ function makeGameTool() {
 					showFontDataInGameData = e.target.checked;
 				},
 			});
+			tool.menu.pop({ control: "group" });
+
+			tool.menu.push({ control: "group"});
+			tool.menu.push({
+				control: "label",
+				text: "change editor theme",
+				description: "toggles editor theme between light and dark"
+			});
+			tool.menu.push({
+				control: "toggle",
+				id: "editor_theme_toggle",
+				icon: useDarkTheme ? "visibility_off" : "visibility",
+				text: useDarkTheme ? "dark theme" : "light theme",
+				description: "toggle editor theme",
+				checked: useDarkTheme,
+				onclick: function(e) {
+					useDarkTheme = e.target.checked;
+					if(useDarkTheme) {
+						document.documentElement.classList.add('dark-mode');
+					} else {
+						document.documentElement.classList.remove('dark-mode');
+					}
+				}
+			})
 			tool.menu.pop({ control: "group" });
 
 			tool.menu.pop({ control: "group" });
