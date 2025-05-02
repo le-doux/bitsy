@@ -1,33 +1,144 @@
----
-sidebar_position: 1
----
 
-# About Bitsy
+TITLE Sergey T: The Real Quest
+VERSION 7.12
 
-> hi! bitsy is a little editor for little games or worlds. the goal is to make it easy to make games where you can walk around and talk to people and be somewhere.
->
-> have fun making things with bitsy!
->
-> &ndash; <cite>[adam](https://www.twitter.com/adamledoux)</cite>
+PAL 0
+#000000,#ffffff,#999999
 
-## Getting started
+ROOM 0
+10,10
+..........
+..A.......
+..........
+..........
+....1.....
+..........
+..........
+..........
+..........
+..........
 
-Here are good pages to start learning about Bitsy! :)
+NAME Level_2013
+EXT 0 4 1
 
-- Start with an [overview](introduction/overview) of the Bitsy editor
-- Or read a [tutorial](introduction/tutorial) by a member of the Bitsy community
-- Or check out the [FAQ pages](category/FAQ) for answers to frequently asked questions!
+ROOM 1
+10,10
+..........
+..B.......
+..........
+..........
+....2.....
+..........
+..........
+..........
+..........
+..........
 
-## Community
+NAME Level_2014
+EXT 0 4 2
 
-- [Made with bitsy](https://itch.io/games/made-with-bitsy)
-- [Forum](https://ledoux.itch.io/bitsy/community)
+ROOM 2
+10,10
+..C.......
+..........
+..........
+..........
+....3.....
+..........
+..........
+..........
+..........
+..........
 
-## Project
+NAME Level_2015
+EXT 0 4 3
 
-- [Blog](https://ledoux.itch.io/bitsy/devlog "itch.io devlog with bitsy updates and news")
-- [Credits](credits "list of bitsy contributors")
-- [Changelog](changelog "bitsy version notes")
-- [Report a bug](https://github.com/le-doux/bitsy/issues)
-- [How to contribute documentation](contributing)
-- [Source code](https://github.com/le-doux/bitsy)
+ROOM 3
+10,10
+..........
+..D.......
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+
+NAME Secret_Level
+
+TIL 0
+.
+
+SPR A
+0001110000
+0011111000
+0111111100
+0011111000
+0011111000
+0011111000
+0000000000
+0000000000
+NAME SergeyT
+DLG 0
+
+SPR B
+0000000000
+0011111000
+0111111100
+0011111000
+0011111000
+0001100000
+0000000000
+0000000000
+NAME SergeyA
+DLG 1
+
+SPR C
+0001100000
+0011111000
+0111111100
+0111111100
+0111111100
+0010010000
+0000000000
+0000000000
+NAME Ava
+DLG 2
+
+SPR D
+0001110000
+0011111000
+0111111100
+0111111100
+0011111000
+0011111000
+0000000000
+0000000000
+NAME Austin
+DLG 3
+
+DLG 0
+"Do you want to start something real?"
+"Yes."
+"Only if you have snacks."
+"...kiss."
+"Let’s make it a real quest."
+END
+
+DLG 1
+"Sergey A:"
+"Okay, but we’re not taking that basement apartment with roaches again."
+END
+
+DLG 2
+"Ava: *snort*"
+"I'm Princessnutaya!"
+END
+
+DLG 3
+"Austin: Meow."
+"Kotobochka mode engaged."
+END
+
