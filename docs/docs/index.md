@@ -14,9 +14,9 @@ sidebar_position: 1
 
 Here are good pages to start learning about Bitsy! :)
 
-- Start with an [overview](introduction/overview) of the Bitsy editor
-- Or read a [tutorial](introduction/tutorial) by a member of the Bitsy community
-- Or check out the [FAQ pages](category/FAQ) for answers to frequently asked questions!
+- Start with an [overview](/docs/introduction/overview) of the Bitsy editor
+- Or read a [tutorial](/docs/introduction/tutorial) by a member of the Bitsy community
+- Or check out the [FAQ pages](/docs/category/FAQ) for answers to frequently asked questions!
 
 ## Community
 
@@ -26,8 +26,8 @@ Here are good pages to start learning about Bitsy! :)
 ## Project
 
 - [Blog](https://ledoux.itch.io/bitsy/devlog "itch.io devlog with bitsy updates and news")
-- [Credits](credits "list of bitsy contributors")
-- [Changelog](changelog "bitsy version notes")
+- [Credits](/docs/credits "list of bitsy contributors")
+- [Changelog](/docs/changelog "bitsy version notes")
 - [Report a bug](https://github.com/le-doux/bitsy/issues)
-- [How to contribute documentation](contributing)
+- [How to contribute documentation](/docs/contributing)
 - [Source code](https://github.com/le-doux/bitsy)
