@@ -1,33 +1,191 @@
----
-sidebar_position: 1
----
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Starfarer's Relay</title>
+<style>
+body { background:black; }
+</style>
+</head>
+<body>
+<script>
+// Bitsy v7.12 game data
+var exportedGameData = `
+! BITSY VERSION 7.12
 
-# About Bitsy
+PAL 0
+0,0,0
+255,255,255
+40,40,100
+220,220,150
 
-> hi! bitsy is a little editor for little games or worlds. the goal is to make it easy to make games where you can walk around and talk to people and be somewhere.
->
-> have fun making things with bitsy!
->
-> &ndash; <cite>[adam](https://www.twitter.com/adamledoux)</cite>
+ROOMS 3
+NAME Sector Alpha
+0,0 1,0 1,0 1,0 1,0 1,0 1,0 1,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
 
-## Getting started
+NAME Sector Beta
+0,0 1,0 1,0 1,0 1,0 1,0 1,0 1,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
 
-Here are good pages to start learning about Bitsy! :)
+NAME Sector Gamma
+0,0 1,0 1,0 1,0 1,0 1,0 1,0 1,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0
 
-- Start with an [overview](/docs/introduction/overview) of the Bitsy editor
-- Or read a [tutorial](/docs/introduction/tutorial) by a member of the Bitsy community
-- Or check out the [FAQ pages](/docs/category/FAQ) for answers to frequently asked questions!
+TILES 2
+0
+00011000
+00111100
+01111110
+01111110
+01111110
+00111100
+00011000
+00000000
+1
+11111111
+10000001
+10011001
+10000001
+10011001
+10000001
+11111111
+00000000
 
-## Community
+SPRITES 4
+A
+00011000
+00111100
+01100110
+01000010
+01011010
+01111110
+00111100
+00000000
+NAME Starfarer
+DLG startDialog
+ROOM 0
+POS 1,1
 
-- [Made with bitsy](https://itch.io/games/made-with-bitsy)
-- [Forum](https://ledoux.itch.io/bitsy/community)
+B
+00011000
+00111100
+00100100
+00111100
+00100100
+00111100
+00011000
+00000000
+NAME AlphaTech
+DLG alphaDialog
+ROOM 0
+POS 6,3
 
-## Project
+C
+00111100
+01000010
+10011001
+10011001
+10011001
+01000010
+00111100
+00000000
+NAME BetaSyn
+DLG betaDialog
+ROOM 1
+POS 3,4
 
-- [Blog](https://ledoux.itch.io/bitsy/devlog "itch.io devlog with bitsy updates and news")
-- [Credits](/docs/credits "list of bitsy contributors")
-- [Changelog](/docs/changelog "bitsy version notes")
-- [Report a bug](https://github.com/le-doux/bitsy/issues)
-- [How to contribute documentation](/docs/contributing)
-- [Source code](https://github.com/le-doux/bitsy)
+D
+00100100
+01111110
+11111111
+11111111
+11111111
+01111110
+00100100
+00000000
+NAME Core Guardian
+DLG finalDialog
+ROOM 2
+POS 4,4
+
+ITEMS 2
+I shuttleCore
+00001000
+00011100
+00101010
+01000001
+01000001
+00101010
+00011100
+00001000
+DLG gotCore
+
+J beaconKey
+00001000
+00011100
+00100010
+01011101
+01011101
+00100010
+00011100
+00001000
+DLG gotKey
+
+ENDITEMS
+
+DLG startDialog
+"You've reached the Relay Outpost.  
+Mission 1: Retrieve the lost Shuttle Core from Sector Alpha.  
+Your journey begins."
+
+DLG alphaDialog
+"The malfunctioning drones hover anxiously.  
+Task: Locate the Shuttle Core hidden in this sector."
+
+DLG gotCore
+"You recovered the Shuttle Core!  
+Return to the Relay Outpost…  
+…but the Beta Gate has opened. Proceed to Sector Beta."
+
+DLG betaDialog
+"Sector Beta hums with static storms.  
+Task: Find the Beacon Key to activate the Gamma Jump."
+
+DLG gotKey
+"You found the Beacon Key!  
+The path to Sector Gamma is unlocked."
+
+DLG finalDialog
+"The Core Guardian awakens.  
+Final Quest: Present the Core and Beacon.  
+A pause… then acceptance.  
+'Sector stabilized. Starfarer, your duty is fulfilled.'  
+—END—"
+
+ENDDLG
+
+END
+`;
+</script>
+<script src="https://bitsy.org/engine/bitsy.js"></script>
+</body>
+</html>
