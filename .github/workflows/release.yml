@@ -30,7 +30,7 @@ jobs:
         id: version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
       - name: publish to itch.io
-        uses: josephbmanley/butler-publish-itchio-action@v1.0.3
+        uses: josephbmanley/butler-publish-itchio-action@v1.1.0
         env:
           BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
           CHANNEL: win-linux-mac-stable
