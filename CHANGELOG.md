@@ -1,3 +1,7 @@
+## 8.15
+
+- localization: additions/updates to Spanish translation (José Muñoz)
+
 ## 8.14
 
 - docs: added Chinese translation for some pages (@liximi)
