@@ -52,6 +52,7 @@
 - Florencia Rumpel Rodriguez (@\_\_rumpel) - Spanish translation
 - Game Makers Iceland - Icelandic translation
 - @iamflea-livingbugs - Chinese translation
+- José Muñoz - Spanish translation
 - Kai Werder - German translation
 - leonid.codes - Ukrainian translation
 - Marco - Brazilian Portuguese translation
